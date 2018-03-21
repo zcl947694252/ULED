@@ -9,6 +9,11 @@ android {
         targetSdkVersion 21
         versionCode 5
         versionName "2.2"
+
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
     }
     buildTypes {
         release {
@@ -40,4 +45,7 @@ dependencies {
     compile 'com.google.zxing:android-core:3.2.1'
     //compile project(':BluetoothStorageLib')
     compile 'com.google.code.gson:gson:2.8.2'
+
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    compile 'com.tencent.bugly:nativecrashreport:latest.release'
 }

@@ -7,6 +7,7 @@ import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.light.model.*;
 import com.telink.bluetooth.light.util.FileSystem;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,12 +27,12 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void onCreate() {
         super.onCreate();
         //this.doInit();
+        CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
+//        CrashReport.testJavaCrash();
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 //        AdvanceStrategy.setDefault(new MySampleAdvanceStrategy());
-
-
     }
 
     public int getOnlineCount() {
