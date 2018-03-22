@@ -52,6 +52,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private TelinkLightApplication mApplication;
     private List<DeviceInfo> updateList;
 
+    private boolean isInit=false;
+
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -109,8 +111,25 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         this.updateList = new ArrayList<>();
 
+//        initView();
+
 //        onLeScan(null);
         this.startScan(0);
+    }
+
+    private void initView() {
+        try{
+            Intent intent=getIntent();
+            isInit= (boolean) intent.getExtras().get("isInit");
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(isInit){
+
+            }else{
+
+            }
+        }
     }
 
     @Override
