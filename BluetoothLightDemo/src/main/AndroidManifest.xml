@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.telink.bluetooth.light">
+    package="com.dadoutek.uled">
 
     <!-- 蓝牙权限 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -27,17 +27,17 @@
         android:value="2.1"/>
 
     <application
-        android:name="com.telink.bluetooth.light.TelinkLightApplication"
+        android:name=".TelinkLightApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <service
-            android:name="com.telink.bluetooth.light.TelinkLightService"
+            android:name=".TelinkLightService"
             android:enabled="true" />
 
         <activity
-            android:name="com.telink.bluetooth.light.activity.SplashActivity"
+            android:name=".activity.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/StatusTheme"
@@ -50,90 +50,90 @@
         </activity>
 
         <activity
-            android:name="com.telink.bluetooth.light.activity.MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait">
         </activity>
 
         <activity
-            android:name="com.telink.bluetooth.light.activity.DeviceSettingActivity"
+            android:name=".activity.DeviceSettingActivity"
             android:label="@string/activity_device_setting_label"
             android:screenOrientation="portrait"
             android:theme="@style/StatusTheme"
             />
         <activity
-            android:name="com.telink.bluetooth.light.activity.DeviceScanningActivity"
+            android:name=".activity.DeviceScanningActivity"
             android:label="@string/activity_device_scanning_label"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.DeviceBatchScanningActivity"
+            android:name=".activity.DeviceBatchScanningActivity"
             android:label="@string/activity_device_scanning_label"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.AddMeshActivity"
+            android:name=".activity.AddMeshActivity"
             android:label="@string/activity_mesh_add_lable"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.DeviceGroupingActivity"
+            android:name=".activity.DeviceGroupingActivity"
             android:label="@string/activity_device_grouping"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.GroupSettingActivity"
+            android:name=".activity.GroupSettingActivity"
             android:label="@string/activity_group_setting"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.AddGroupActivity"
+            android:name=".activity.AddGroupActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.OtaActivity"
+            android:name=".activity.OtaActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.OtaDeviceListActivity"
+            android:name=".activity.OtaDeviceListActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.BatchOtaActivity"
+            android:name=".activity.BatchOtaActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.LogInfoActivity"
+            android:name=".activity.LogInfoActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <!-- <activity
              android:name=".activity.OTAPrepareActivity"
              android:screenOrientation="portrait" />-->
         <activity
-            android:name="com.telink.bluetooth.light.activity.OTAUpdateActivity"
+            android:name=".activity.OTAUpdateActivity"
             android:launchMode="singleTop"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.FileSelectActivity"
+            android:name=".activity.FileSelectActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.activity.UserAllActivity"
+            android:name=".activity.UserAllActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.telink.bluetooth.light.activity.OnlineStatusTestActivity"
+            android:name=".activity.OnlineStatusTestActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.qrcode.QRCodeScanActivity"
+            android:name=".qrcode.QRCodeScanActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.telink.bluetooth.light.qrcode.QRCodeShareActivity"
+            android:name=".qrcode.QRCodeShareActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
     </application>
