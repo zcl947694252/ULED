@@ -24,7 +24,9 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.dadou.bluetooth.LeBluetooth;
 import com.dadou.bluetooth.TelinkLog;
 import com.dadou.bluetooth.event.DeviceEvent;
 import com.dadou.bluetooth.event.LeScanEvent;
@@ -116,11 +118,39 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         this.updateList = new ArrayList<>();
 
         checkPermission();
+        checkSupport();
 
         initView();
 
 //        onLeScan(null);
         this.startScan(0);
+    }
+
+    public void checkSupport() {
+        //检查是否支持蓝牙设备
+        if (!LeBluetooth.getInstance().isSupport(getApplicationContext())) {
+            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show();
+            this.finish();
+            return;
+        }
+
+        if (!LeBluetooth.getInstance().isEnabled()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("开启蓝牙，体验智能灯!");
+            builder.setNeutralButton("cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.setNegativeButton("enable", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    LeBluetooth.getInstance().enable(getApplicationContext());
+                }
+            });
+            builder.show();
+        }
     }
 
     int PERMISSION_REQUEST_CODE = 0x10;
