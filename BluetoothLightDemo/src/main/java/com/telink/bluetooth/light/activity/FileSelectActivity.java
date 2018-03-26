@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,8 +9,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
 
 import java.io.File;
 import java.util.ArrayList;

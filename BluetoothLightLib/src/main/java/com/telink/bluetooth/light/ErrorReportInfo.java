@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.os.Parcel;
 import android.os.Parcelable;

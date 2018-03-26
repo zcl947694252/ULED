@@ -2,7 +2,7 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
@@ -10,13 +10,13 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
-import com.dadou.bluetooth.Command;
-import com.dadou.bluetooth.Peripheral;
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.crypto.AES;
-import com.dadou.util.Arrays;
-import com.dadou.util.Event;
-import com.dadou.util.EventBus;
+import com.telink.bluetooth.Command;
+import com.telink.bluetooth.Peripheral;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.crypto.AES;
+import com.telink.util.Arrays;
+import com.telink.util.Event;
+import com.telink.util.EventBus;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;

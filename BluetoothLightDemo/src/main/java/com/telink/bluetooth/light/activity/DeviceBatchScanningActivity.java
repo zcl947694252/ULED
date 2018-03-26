@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,23 +18,23 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.bluetooth.event.DeviceEvent;
-import com.dadou.bluetooth.event.LeScanEvent;
-import com.dadou.bluetooth.event.MeshEvent;
-import com.dadou.bluetooth.light.DeviceInfo;
-import com.dadou.bluetooth.light.LeScanParameters;
-import com.dadou.bluetooth.light.LeUpdateParameters;
-import com.dadou.bluetooth.light.LightAdapter;
-import com.dadou.bluetooth.light.Parameters;
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.model.Light;
-import com.dadou.bluetooth.light.model.Mesh;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.bluetooth.event.DeviceEvent;
+import com.telink.bluetooth.event.LeScanEvent;
+import com.telink.bluetooth.event.MeshEvent;
+import com.telink.bluetooth.light.DeviceInfo;
+import com.telink.bluetooth.light.LeScanParameters;
+import com.telink.bluetooth.light.LeUpdateParameters;
+import com.telink.bluetooth.light.LightAdapter;
+import com.telink.bluetooth.light.Parameters;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.model.Light;
+import com.telink.bluetooth.light.model.Mesh;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +205,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
                 //加灯完成继续扫描,直到扫不到设备
-                com.dadou.bluetooth.light.model.DeviceInfo deviceInfo1 = new com.dadou.bluetooth.light.model.DeviceInfo();
+                com.telink.bluetooth.light.model.DeviceInfo deviceInfo1 = new com.telink.bluetooth.light.model.DeviceInfo();
                 deviceInfo1.deviceName = deviceInfo.deviceName;
                 deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
                 deviceInfo1.longTermKey = deviceInfo.longTermKey;

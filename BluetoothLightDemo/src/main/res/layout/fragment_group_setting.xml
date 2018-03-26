@@ -75,7 +75,7 @@
 
                 <view
                     android:id="@+id/color_picker"
-                    class="com.dadou.bluetooth.light.widget.ColorPicker"
+                    class="com.telink.bluetooth.light.widget.ColorPicker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true" />

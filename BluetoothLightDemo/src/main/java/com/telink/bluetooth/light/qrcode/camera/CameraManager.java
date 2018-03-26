@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dadou.bluetooth.light.qrcode.camera;
+package com.telink.bluetooth.light.qrcode.camera;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -25,7 +25,7 @@ import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
 import com.google.zxing.client.android.camera.CameraConfigurationUtils;
-import com.dadou.bluetooth.TelinkLog;
+import com.telink.bluetooth.TelinkLog;
 
 import java.io.IOException;
 

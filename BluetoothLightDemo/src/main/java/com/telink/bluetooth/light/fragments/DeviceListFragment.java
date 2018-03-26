@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.fragments;
+package com.telink.bluetooth.light.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -24,18 +24,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dadou.bluetooth.light.ConnectionStatus;
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.activity.AddMeshActivity;
-import com.dadou.bluetooth.light.activity.DeviceScanningActivity;
-import com.dadou.bluetooth.light.activity.DeviceSettingActivity;
-import com.dadou.bluetooth.light.activity.LogInfoActivity;
-import com.dadou.bluetooth.light.activity.OTAUpdateActivity;
-import com.dadou.bluetooth.light.activity.OnlineStatusTestActivity;
-import com.dadou.bluetooth.light.activity.UserAllActivity;
-import com.dadou.bluetooth.light.model.Light;
-import com.dadou.bluetooth.light.model.Lights;
+import com.telink.bluetooth.light.ConnectionStatus;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.activity.AddMeshActivity;
+import com.telink.bluetooth.light.activity.DeviceScanningActivity;
+import com.telink.bluetooth.light.activity.DeviceSettingActivity;
+import com.telink.bluetooth.light.activity.LogInfoActivity;
+import com.telink.bluetooth.light.activity.OTAUpdateActivity;
+import com.telink.bluetooth.light.activity.OnlineStatusTestActivity;
+import com.telink.bluetooth.light.activity.UserAllActivity;
+import com.telink.bluetooth.light.model.Light;
+import com.telink.bluetooth.light.model.Lights;
 
 import java.util.List;
 

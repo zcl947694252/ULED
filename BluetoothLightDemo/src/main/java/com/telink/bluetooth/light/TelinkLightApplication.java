@@ -1,12 +1,12 @@
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.dadou.TelinkApplication;
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.bluetooth.light.model.*;
-import com.dadou.bluetooth.light.util.FileSystem;
+import com.telink.TelinkApplication;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.bluetooth.light.model.*;
+import com.telink.bluetooth.light.util.FileSystem;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.text.SimpleDateFormat;
@@ -105,7 +105,7 @@ public final class TelinkLightApplication extends TelinkApplication {
         if (mesh != null && mesh.devices != null) {
             Lights.getInstance().clear();
             Light light;
-            for (com.dadou.bluetooth.light.model.DeviceInfo deviceInfo : mesh.devices) {
+            for (com.telink.bluetooth.light.model.DeviceInfo deviceInfo : mesh.devices) {
                 light = new Light();
                 light.meshAddress = deviceInfo.meshAddress;
                 light.brightness = 0;

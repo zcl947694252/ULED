@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 public class MySampleAdvanceStrategy extends AdvanceStrategy {
 

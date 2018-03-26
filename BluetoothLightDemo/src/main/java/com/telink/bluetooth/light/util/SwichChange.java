@@ -1,6 +1,6 @@
-package com.dadou.bluetooth.light.util;
+package com.telink.bluetooth.light.util;
 
-import com.dadou.bluetooth.light.model.Group;
+import com.telink.bluetooth.light.model.Group;
 
 /**
  * Created by hejiajun on 2018/3/22.

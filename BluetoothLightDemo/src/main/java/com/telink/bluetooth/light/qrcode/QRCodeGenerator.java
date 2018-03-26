@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.qrcode;
+package com.telink.bluetooth.light.qrcode;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,8 +9,8 @@ import android.view.WindowManager;
 
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.bluetooth.light.TelinkLightApplication;
 
 import java.io.UnsupportedEncodingException;
 

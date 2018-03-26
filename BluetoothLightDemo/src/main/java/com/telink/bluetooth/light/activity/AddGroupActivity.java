@@ -1,9 +1,9 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.os.Bundle;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
 
 public class AddGroupActivity extends TelinkBaseActivity {
 

@@ -2,7 +2,7 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 /**
  * 自动重连参数

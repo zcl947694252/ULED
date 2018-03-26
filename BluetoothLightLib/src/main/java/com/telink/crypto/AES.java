@@ -2,9 +2,9 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.crypto;
+package com.telink.crypto;
 
-import com.dadou.util.Arrays;
+import com.telink.util.Arrays;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;

@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.model;
+package com.telink.bluetooth.light.model;
 
 /**
  * Created by hejiajun on 2018/3/22.

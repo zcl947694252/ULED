@@ -1,10 +1,10 @@
-package com.dadou.bluetooth.light.model;
+package com.telink.bluetooth.light.model;
 
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.dadou.bluetooth.light.util.FileSystem;
-import com.dadou.util.MeshUtils;
+import com.telink.bluetooth.light.util.FileSystem;
+import com.telink.util.MeshUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;

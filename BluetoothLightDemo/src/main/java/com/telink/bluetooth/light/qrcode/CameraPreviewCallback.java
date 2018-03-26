@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.qrcode;
+package com.telink.bluetooth.light.qrcode;
 
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -9,7 +9,7 @@ import com.google.zxing.FormatException;
 import com.google.zxing.LuminanceSource;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
-import com.dadou.bluetooth.TelinkLog;
+import com.telink.bluetooth.TelinkLog;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Queue;

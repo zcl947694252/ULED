@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.widget;
+package com.telink.bluetooth.light.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -12,7 +12,7 @@ import android.graphics.Region;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.dadou.bluetooth.light.R;
+import com.telink.bluetooth.light.R;
 
 
 public final class CameraCaptureView extends View {

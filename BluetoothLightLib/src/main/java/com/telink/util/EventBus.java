@@ -2,13 +2,13 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.util;
+package com.telink.util;
 
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import com.dadou.bluetooth.TelinkLog;
+import com.telink.bluetooth.TelinkLog;
 
 import java.util.ArrayList;
 import java.util.List;

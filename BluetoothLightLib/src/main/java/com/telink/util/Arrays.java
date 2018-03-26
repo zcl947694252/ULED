@@ -2,7 +2,7 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.util;
+package com.telink.util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Formatter;

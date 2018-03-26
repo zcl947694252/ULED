@@ -2,7 +2,7 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -13,15 +13,15 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.dadou.bluetooth.Command;
-import com.dadou.bluetooth.LeBluetooth;
-import com.dadou.bluetooth.Peripheral;
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.bluetooth.event.ErrorReportEvent;
-import com.dadou.util.Arrays;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
-import com.dadou.util.Strings;
+import com.telink.bluetooth.Command;
+import com.telink.bluetooth.LeBluetooth;
+import com.telink.bluetooth.Peripheral;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.bluetooth.event.ErrorReportEvent;
+import com.telink.util.Arrays;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
+import com.telink.util.Strings;
 
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;

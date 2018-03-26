@@ -2,7 +2,7 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou;
+package com.telink;
 
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -14,28 +14,28 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.bluetooth.event.DeviceEvent;
-import com.dadou.bluetooth.event.ErrorReportEvent;
-import com.dadou.bluetooth.event.LeScanEvent;
-import com.dadou.bluetooth.event.MeshEvent;
-import com.dadou.bluetooth.event.NotificationEvent;
-import com.dadou.bluetooth.event.ServiceEvent;
-import com.dadou.bluetooth.light.DeviceInfo;
-import com.dadou.bluetooth.light.ErrorReportInfo;
-import com.dadou.bluetooth.light.GetAlarmNotificationParser;
-import com.dadou.bluetooth.light.GetGroupNotificationParser;
-import com.dadou.bluetooth.light.GetSceneNotificationParser;
-import com.dadou.bluetooth.light.GetTimeNotificationParser;
-import com.dadou.bluetooth.light.LightAdapter;
-import com.dadou.bluetooth.light.LightService;
-import com.dadou.bluetooth.light.NotificationInfo;
-import com.dadou.bluetooth.light.NotificationParser;
-import com.dadou.bluetooth.light.OnlineStatusNotificationParser;
-import com.dadou.util.Event;
-import com.dadou.util.EventBus;
-import com.dadou.util.EventListener;
-import com.dadou.util.Strings;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.bluetooth.event.DeviceEvent;
+import com.telink.bluetooth.event.ErrorReportEvent;
+import com.telink.bluetooth.event.LeScanEvent;
+import com.telink.bluetooth.event.MeshEvent;
+import com.telink.bluetooth.event.NotificationEvent;
+import com.telink.bluetooth.event.ServiceEvent;
+import com.telink.bluetooth.light.DeviceInfo;
+import com.telink.bluetooth.light.ErrorReportInfo;
+import com.telink.bluetooth.light.GetAlarmNotificationParser;
+import com.telink.bluetooth.light.GetGroupNotificationParser;
+import com.telink.bluetooth.light.GetSceneNotificationParser;
+import com.telink.bluetooth.light.GetTimeNotificationParser;
+import com.telink.bluetooth.light.LightAdapter;
+import com.telink.bluetooth.light.LightService;
+import com.telink.bluetooth.light.NotificationInfo;
+import com.telink.bluetooth.light.NotificationParser;
+import com.telink.bluetooth.light.OnlineStatusNotificationParser;
+import com.telink.util.Event;
+import com.telink.util.EventBus;
+import com.telink.util.EventListener;
+import com.telink.util.Strings;
 
 public class TelinkApplication extends Application {
 

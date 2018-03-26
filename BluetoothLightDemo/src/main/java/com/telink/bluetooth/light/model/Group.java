@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.model;
+package com.telink.bluetooth.light.model;
 
 import android.content.res.ColorStateList;
 

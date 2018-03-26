@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.content.Intent;
 import android.os.Binder;

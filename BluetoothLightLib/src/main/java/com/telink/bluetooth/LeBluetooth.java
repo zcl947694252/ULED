@@ -2,7 +2,7 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth;
+package com.telink.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,7 +15,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.dadou.util.ContextUtil;
+import com.telink.util.ContextUtil;
 
 import java.util.UUID;
 

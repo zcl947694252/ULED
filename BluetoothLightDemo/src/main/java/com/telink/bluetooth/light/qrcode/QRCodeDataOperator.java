@@ -1,12 +1,12 @@
-package com.dadou.bluetooth.light.qrcode;
+package com.telink.bluetooth.light.qrcode;
 
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.model.DeviceInfo;
-import com.dadou.bluetooth.light.model.Mesh;
-import com.dadou.bluetooth.light.model.SharedPreferencesHelper;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.model.DeviceInfo;
+import com.telink.bluetooth.light.model.Mesh;
+import com.telink.bluetooth.light.model.SharedPreferencesHelper;
 
 import java.util.ArrayList;
 import java.util.List;

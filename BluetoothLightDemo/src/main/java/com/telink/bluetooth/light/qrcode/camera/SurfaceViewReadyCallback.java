@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.qrcode.camera;
+package com.telink.bluetooth.light.qrcode.camera;
 
 import android.view.SurfaceHolder;
 

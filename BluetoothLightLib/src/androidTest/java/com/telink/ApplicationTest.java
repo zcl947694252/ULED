@@ -1,4 +1,4 @@
-package com.dadou;
+package com.telink;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

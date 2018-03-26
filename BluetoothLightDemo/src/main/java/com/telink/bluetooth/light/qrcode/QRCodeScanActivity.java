@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.qrcode;
+package com.telink.bluetooth.light.qrcode;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -19,9 +19,9 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.qrcode.camera.Cameras;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.qrcode.camera.Cameras;
 
 
 /**

@@ -1,18 +1,16 @@
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 
-import com.dadou.bluetooth.LeBluetooth;
-import com.dadou.bluetooth.event.MeshEvent;
-import com.dadou.util.ContextUtil;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
+import com.telink.bluetooth.LeBluetooth;
+import com.telink.bluetooth.event.MeshEvent;
+import com.telink.util.ContextUtil;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 
 // 添加 扫描过程中出现的因定位未开启而导致的扫描不成功问题

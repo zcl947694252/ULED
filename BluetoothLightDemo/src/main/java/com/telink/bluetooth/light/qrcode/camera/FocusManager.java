@@ -1,10 +1,10 @@
-package com.dadou.bluetooth.light.qrcode.camera;
+package com.telink.bluetooth.light.qrcode.camera;
 
 import android.hardware.Camera;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.dadou.bluetooth.TelinkLog;
+import com.telink.bluetooth.TelinkLog;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

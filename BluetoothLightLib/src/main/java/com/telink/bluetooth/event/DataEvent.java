@@ -2,9 +2,9 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.event;
+package com.telink.bluetooth.event;
 
-import com.dadou.util.Event;
+import com.telink.util.Event;
 
 public class DataEvent<A> extends Event<String> {
 

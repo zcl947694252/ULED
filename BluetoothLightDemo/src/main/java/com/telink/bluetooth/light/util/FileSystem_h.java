@@ -1,9 +1,9 @@
-package com.dadou.bluetooth.light.util;
+package com.telink.bluetooth.light.util;
 
 import android.content.Context;
 import android.os.Environment;
 
-import com.dadou.bluetooth.TelinkLog;
+import com.telink.bluetooth.TelinkLog;
 
 import java.io.BufferedReader;
 import java.io.File;

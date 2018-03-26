@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.widget;
+package com.telink.bluetooth.light.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;

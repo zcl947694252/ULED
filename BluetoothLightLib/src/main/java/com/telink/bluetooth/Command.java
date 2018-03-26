@@ -2,9 +2,9 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth;
+package com.telink.bluetooth;
 
-import com.dadou.util.Arrays;
+import com.telink.util.Arrays;
 
 import java.util.UUID;
 

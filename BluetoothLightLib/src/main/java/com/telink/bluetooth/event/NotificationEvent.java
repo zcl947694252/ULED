@@ -2,13 +2,13 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.event;
+package com.telink.bluetooth.event;
 
 import android.app.Application;
 
-import com.dadou.bluetooth.light.NotificationInfo;
-import com.dadou.bluetooth.light.NotificationParser;
-import com.dadou.bluetooth.light.Opcode;
+import com.telink.bluetooth.light.NotificationInfo;
+import com.telink.bluetooth.light.NotificationParser;
+import com.telink.bluetooth.light.Opcode;
 
 import java.util.HashMap;
 import java.util.Map;

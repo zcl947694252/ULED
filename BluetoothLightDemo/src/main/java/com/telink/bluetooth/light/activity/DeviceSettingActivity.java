@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,11 +8,11 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.fragments.DeviceSettingFragment;
-import com.dadou.bluetooth.light.model.Light;
-import com.dadou.bluetooth.light.model.Lights;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.fragments.DeviceSettingFragment;
+import com.telink.bluetooth.light.model.Light;
+import com.telink.bluetooth.light.model.Lights;
 
 public final class DeviceSettingActivity extends TelinkBaseActivity {
 

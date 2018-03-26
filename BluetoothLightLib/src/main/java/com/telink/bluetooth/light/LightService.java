@@ -2,14 +2,14 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.dadou.bluetooth.Command;
+import com.telink.bluetooth.Command;
 
 /**
  * LightService是一个抽象类,封装了扫描加灯,自动重连,设备控制等方法.
@@ -91,9 +91,9 @@ public abstract class LightService extends Service implements
      *
      * @param params {@link LeScanParameters}类型
      * @see LeScanParameters
-     * @see com.dadou.bluetooth.event.LeScanEvent
-     * @see com.dadou.bluetooth.event.DeviceEvent
-     * @see com.dadou.bluetooth.event.MeshEvent
+     * @see com.telink.bluetooth.event.LeScanEvent
+     * @see com.telink.bluetooth.event.DeviceEvent
+     * @see com.telink.bluetooth.event.MeshEvent
      */
     public void startScan(Parameters params) {
 
@@ -127,8 +127,8 @@ public abstract class LightService extends Service implements
      *
      * @param params {@link LeAutoConnectParameters}类型参数
      * @see LeAutoConnectParameters
-     * @see com.dadou.bluetooth.event.DeviceEvent
-     * @see com.dadou.bluetooth.event.MeshEvent
+     * @see com.telink.bluetooth.event.DeviceEvent
+     * @see com.telink.bluetooth.event.MeshEvent
      */
     public void autoConnect(Parameters params) {
 
@@ -156,7 +156,7 @@ public abstract class LightService extends Service implements
      *
      * @param params {@link LeUpdateParameters}类型
      * @see LeUpdateParameters
-     * @see com.dadou.bluetooth.event.DeviceEvent
+     * @see com.telink.bluetooth.event.DeviceEvent
      */
     public void updateMesh(Parameters params) {
 

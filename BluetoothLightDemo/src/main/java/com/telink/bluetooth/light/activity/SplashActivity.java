@@ -1,24 +1,20 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.TelinkMeshErrorDealActivity;
-import com.dadou.bluetooth.light.model.Constent;
-import com.dadou.bluetooth.light.model.Mesh;
-import com.dadou.bluetooth.light.model.SharedPreferencesHelper;
-import com.dadou.bluetooth.light.util.FileSystem;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkMeshErrorDealActivity;
+import com.telink.bluetooth.light.model.Constent;
+import com.telink.bluetooth.light.model.Mesh;
+import com.telink.bluetooth.light.model.SharedPreferencesHelper;
+import com.telink.bluetooth.light.util.FileSystem;
 
 /**
  * Created by hejiajun on 2018/3/22.

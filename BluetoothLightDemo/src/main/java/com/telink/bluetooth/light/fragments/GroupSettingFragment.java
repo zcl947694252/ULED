@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.fragments;
+package com.telink.bluetooth.light.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.widget.ColorPicker;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.widget.ColorPicker;
 
 public final class GroupSettingFragment extends Fragment {
 

@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.qrcode;
+package com.telink.bluetooth.light.qrcode;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

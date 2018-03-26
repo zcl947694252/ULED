@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -10,15 +10,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dadou.bluetooth.event.NotificationEvent;
-import com.dadou.bluetooth.light.NotificationInfo;
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.util.Arrays;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
+import com.telink.bluetooth.event.NotificationEvent;
+import com.telink.bluetooth.light.NotificationInfo;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.util.Arrays;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 import java.text.SimpleDateFormat;
 

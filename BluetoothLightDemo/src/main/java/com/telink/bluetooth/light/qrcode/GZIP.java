@@ -1,6 +1,6 @@
-package com.dadou.bluetooth.light.qrcode;
+package com.telink.bluetooth.light.qrcode;
 
-import com.dadou.util.Arrays;
+import com.telink.util.Arrays;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

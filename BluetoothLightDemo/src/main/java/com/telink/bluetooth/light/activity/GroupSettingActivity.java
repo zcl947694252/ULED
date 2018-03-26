@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,11 +7,11 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.fragments.GroupSettingFragment;
-import com.dadou.bluetooth.light.model.Group;
-import com.dadou.bluetooth.light.model.Groups;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.fragments.GroupSettingFragment;
+import com.telink.bluetooth.light.model.Group;
+import com.telink.bluetooth.light.model.Groups;
 
 public final class GroupSettingActivity extends TelinkBaseActivity {
 

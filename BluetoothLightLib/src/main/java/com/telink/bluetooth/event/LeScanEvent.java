@@ -2,9 +2,9 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.event;
+package com.telink.bluetooth.event;
 
-import com.dadou.bluetooth.light.DeviceInfo;
+import com.telink.bluetooth.light.DeviceInfo;
 
 /**
  * 扫描事件

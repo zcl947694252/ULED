@@ -1,4 +1,4 @@
-package com.dadou.util;
+package com.telink.util;
 
 import android.content.Context;
 import android.location.LocationManager;

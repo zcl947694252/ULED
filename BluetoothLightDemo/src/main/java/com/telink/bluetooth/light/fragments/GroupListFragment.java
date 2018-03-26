@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.fragments;
+package com.telink.bluetooth.light.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -16,11 +16,11 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.activity.GroupSettingActivity;
-import com.dadou.bluetooth.light.model.Group;
-import com.dadou.bluetooth.light.model.Groups;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.activity.GroupSettingActivity;
+import com.telink.bluetooth.light.model.Group;
+import com.telink.bluetooth.light.model.Groups;
 
 public final class GroupListFragment extends Fragment {
 

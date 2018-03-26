@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,24 +16,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.bluetooth.event.DeviceEvent;
-import com.dadou.bluetooth.event.LeScanEvent;
-import com.dadou.bluetooth.event.MeshEvent;
-import com.dadou.bluetooth.light.LeScanParameters;
-import com.dadou.bluetooth.light.LightAdapter;
-import com.dadou.bluetooth.light.Manufacture;
-import com.dadou.bluetooth.light.OtaDeviceInfo;
-import com.dadou.bluetooth.light.Parameters;
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.model.DeviceInfo;
-import com.dadou.bluetooth.light.model.Mesh;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
-import com.dadou.util.Strings;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.bluetooth.event.DeviceEvent;
+import com.telink.bluetooth.event.LeScanEvent;
+import com.telink.bluetooth.event.MeshEvent;
+import com.telink.bluetooth.light.LeScanParameters;
+import com.telink.bluetooth.light.LightAdapter;
+import com.telink.bluetooth.light.Manufacture;
+import com.telink.bluetooth.light.OtaDeviceInfo;
+import com.telink.bluetooth.light.Parameters;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.model.DeviceInfo;
+import com.telink.bluetooth.light.model.Mesh;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
+import com.telink.util.Strings;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -276,7 +276,7 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
 
         switch (type) {
             case LeScanEvent.LE_SCAN:
-                com.dadou.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
+                com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                 onDeviceFound(deviceInfo.macAddress);
                 break;
             case LeScanEvent.LE_SCAN_COMPLETED:
@@ -315,24 +315,24 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
                     onOtaFailure(event.getArgs().macAddress);
                 } else if (status == LightAdapter.STATUS_OTA_COMPLETED) {
                     //ota完成
-                    com.dadou.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
+                    com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                     onOtaCompleted(deviceInfo.macAddress);
                 } else if (status == LightAdapter.STATUS_OTA_FAILURE) {
-                    com.dadou.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
+                    com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                     onOtaFailure(deviceInfo.macAddress);
                 } else if (status == LightAdapter.STATUS_GET_FIRMWARE_COMPLETED) {
                     //版本获取成功，比较版本后,开始ota
-                    com.dadou.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
+                    com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                     onFirmwareSuccess(deviceInfo.macAddress, deviceInfo.firmwareRevision);
                     //startOta(deviceInfo.macAddress);
                     login();
                 } else if (status == LightAdapter.STATUS_GET_FIRMWARE_FAILURE) {
                     //版本获取失败
-                    com.dadou.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
+                    com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                     TelinkLog.d(deviceInfo.macAddress + " 获取firmware失败");
                     onOtaFailure(deviceInfo.macAddress);
                 } else if (status == LightAdapter.STATUS_LOGIN) {
-                    com.dadou.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
+                    com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                     startOta(deviceInfo.macAddress);
                 }
 

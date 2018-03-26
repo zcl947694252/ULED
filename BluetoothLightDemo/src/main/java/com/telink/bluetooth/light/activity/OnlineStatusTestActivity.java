@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.app.Service;
 import android.os.Bundle;
@@ -10,17 +10,17 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.dadou.bluetooth.event.NotificationEvent;
-import com.dadou.bluetooth.light.ConnectionStatus;
-import com.dadou.bluetooth.light.OnlineStatusNotificationParser;
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.model.Light;
-import com.dadou.bluetooth.light.model.Lights;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
+import com.telink.bluetooth.event.NotificationEvent;
+import com.telink.bluetooth.light.ConnectionStatus;
+import com.telink.bluetooth.light.OnlineStatusNotificationParser;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.model.Light;
+import com.telink.bluetooth.light.model.Lights;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 import java.util.List;
 

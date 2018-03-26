@@ -1,16 +1,16 @@
-package com.dadou.bluetooth.light.service;
+package com.telink.bluetooth.light.service;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.dadou.bluetooth.event.NotificationEvent;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.model.Group;
-import com.dadou.bluetooth.light.model.Groups;
-import com.dadou.util.Event;
-import com.dadou.util.EventListener;
+import com.telink.bluetooth.event.NotificationEvent;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.model.Group;
+import com.telink.bluetooth.light.model.Groups;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 /**
  * Created by hejiajun on 2018/3/22.

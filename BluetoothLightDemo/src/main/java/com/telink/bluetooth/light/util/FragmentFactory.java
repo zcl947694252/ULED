@@ -1,10 +1,10 @@
-package com.dadou.bluetooth.light.util;
+package com.telink.bluetooth.light.util;
 
 import android.app.Fragment;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.fragments.DeviceListFragment;
-import com.dadou.bluetooth.light.fragments.GroupListFragment;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.fragments.DeviceListFragment;
+import com.telink.bluetooth.light.fragments.GroupListFragment;
 
 public abstract class FragmentFactory {
 

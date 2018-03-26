@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.dadou.bluetooth.light.qrcode.camera;
+package com.telink.bluetooth.light.qrcode.camera;
 
 import android.hardware.Camera;
 
-import com.dadou.bluetooth.TelinkLog;
+import com.telink.bluetooth.TelinkLog;
 
 public final class OpenCamera {
 

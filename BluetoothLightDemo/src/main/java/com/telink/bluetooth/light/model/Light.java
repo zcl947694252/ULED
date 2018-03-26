@@ -1,10 +1,10 @@
-package com.dadou.bluetooth.light.model;
+package com.telink.bluetooth.light.model;
 
 import android.content.res.ColorStateList;
 
-import com.dadou.bluetooth.light.ConnectionStatus;
-import com.dadou.bluetooth.light.DeviceInfo;
-import com.dadou.bluetooth.light.R;
+import com.telink.bluetooth.light.ConnectionStatus;
+import com.telink.bluetooth.light.DeviceInfo;
+import com.telink.bluetooth.light.R;
 
 public final class Light {
 

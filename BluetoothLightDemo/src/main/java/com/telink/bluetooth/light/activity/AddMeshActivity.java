@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -10,14 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.model.Mesh;
-import com.dadou.bluetooth.light.model.SharedPreferencesHelper;
-import com.dadou.bluetooth.light.qrcode.QRCodeShareActivity;
-import com.dadou.bluetooth.light.util.FileSystem;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.model.Mesh;
+import com.telink.bluetooth.light.model.SharedPreferencesHelper;
+import com.telink.bluetooth.light.qrcode.QRCodeShareActivity;
+import com.telink.bluetooth.light.util.FileSystem;
 
 public final class AddMeshActivity extends TelinkBaseActivity {
 

@@ -1,4 +1,4 @@
-package com.dadou.bluetooth.light.activity;
+package com.telink.bluetooth.light.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,18 +12,18 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadou.bluetooth.light.R;
-import com.dadou.bluetooth.light.TelinkBaseActivity;
-import com.dadou.bluetooth.light.TelinkLightApplication;
-import com.dadou.bluetooth.light.TelinkLightService;
-import com.dadou.bluetooth.light.model.DeviceInfo;
+import com.telink.bluetooth.light.R;
+import com.telink.bluetooth.light.TelinkBaseActivity;
+import com.telink.bluetooth.light.TelinkLightApplication;
+import com.telink.bluetooth.light.TelinkLightService;
+import com.telink.bluetooth.light.model.DeviceInfo;
 
 import java.util.List;
 
 public class OtaDeviceListActivity extends TelinkBaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private TelinkLightApplication mApp;
-    private List<com.dadou.bluetooth.light.model.DeviceInfo> mDevices;
+    private List<com.telink.bluetooth.light.model.DeviceInfo> mDevices;
     private GridView mDeviceListView;
     private Button mNext;
     private DeviceListAdapter mDeviceAdapter;

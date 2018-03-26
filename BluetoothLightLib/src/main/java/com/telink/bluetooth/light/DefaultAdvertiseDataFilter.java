@@ -2,12 +2,12 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 
-import com.dadou.bluetooth.TelinkLog;
-import com.dadou.util.Arrays;
+import com.telink.bluetooth.TelinkLog;
+import com.telink.util.Arrays;
 
 /**
  * 默认的广播过滤器

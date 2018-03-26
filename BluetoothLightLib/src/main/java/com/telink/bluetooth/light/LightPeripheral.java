@@ -2,15 +2,15 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 
-import com.dadou.bluetooth.Peripheral;
-import com.dadou.util.Strings;
+import com.telink.bluetooth.Peripheral;
+import com.telink.util.Strings;
 
 import java.util.HashMap;
 import java.util.List;

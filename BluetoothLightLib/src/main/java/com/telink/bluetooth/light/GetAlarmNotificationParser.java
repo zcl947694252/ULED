@@ -2,9 +2,9 @@
  * Copyright (C) 2015 The Telink Bluetooth Light Project
  *
  */
-package com.dadou.bluetooth.light;
+package com.telink.bluetooth.light;
 
-import com.dadou.util.NumberUtils;
+import com.telink.util.NumberUtils;
 
 /**
  * 闹铃通知解析器
