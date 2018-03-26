@@ -5,4 +5,12 @@
 
     <style name="AppTheme" parent="AppBaseTheme"/>
 
+    // values-v21。5.0 以上提供了 setStatusBarColor()  方法设置状态栏颜色。
+    <style name="StatusTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:colorPrimary">@color/theme_positive_color</item>
+        <item name="android:colorPrimaryDark">@color/theme_positive_color</item>
+        <item name="android:navigationBarColor">@color/theme_positive_color</item>
+    </style>
+
 </resources>

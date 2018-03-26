@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.telink.bluetooth.light.widget.CameraCaptureView
+        <com.dadou.bluetooth.light.widget.CameraCaptureView
             android:id="@+id/capture_viewfinder_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
