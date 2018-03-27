@@ -23,23 +23,15 @@ import com.dadoutek.uled.model.SharedPreferencesHelper;
 public class SplashActivity extends TelinkMeshErrorDealActivity {
 
     private TelinkLightApplication mApplication;
-    private static final int LOCATION_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-//        TelinkLightService.Instance().idleMode(true);//配置mesh前设置为空闲模式
         this.mApplication = (TelinkLightApplication) this.getApplication();
         initMesh();
         this.mApplication.doInit();
-//        checkPermission();
-
-        Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
-        intent.putExtra("isInit",true);
-        startActivity(intent);
-        finish();
-
+        goToNextView();
     }
 
     @Override
@@ -66,27 +58,10 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         }
     }
 
-    private void checkPermission(){
-
-        if (ContextCompat.checkSelfPermission(SplashActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {// 没有权限。
-            if (ActivityCompat.shouldShowRequestPermissionRationale(SplashActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-
-                ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
-            } else {
-                // 申请授权。
-                ActivityCompat.requestPermissions(SplashActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_CODE);
-            }
-        }
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                    Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
-                    intent.putExtra("isInit",true);
-                    startActivity(intent);
-                    finish();
-            }
-
-        }, 2500);
+    private void goToNextView(){
+        Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
+        intent.putExtra("isInit",true);
+        startActivity(intent);
+        finish();
     }
 }

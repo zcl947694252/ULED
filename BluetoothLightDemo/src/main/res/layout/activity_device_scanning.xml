@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     android:orientation="vertical">
 
@@ -65,7 +66,7 @@
         android:background="@color/theme_positive_color"
         android:text="log"
         android:textColor="@android:color/white"
-        android:visibility="visible" />
+        android:visibility="gone" />
     <Button
         android:id="@+id/btn_scan"
         android:layout_width="fill_parent"
@@ -78,4 +79,17 @@
         android:text="Go Back"
         android:textColor="@android:color/white"
         android:visibility="visible" />
+
+    <Button
+        android:id="@+id/btn_add_groups"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/theme_positive_color"
+        android:text="@string/add_groups"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
 </LinearLayout>
