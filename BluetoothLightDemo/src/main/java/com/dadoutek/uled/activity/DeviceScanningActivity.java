@@ -1,30 +1,39 @@
 package com.dadoutek.uled.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.util.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -45,6 +54,8 @@ import com.telink.util.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.functions.Consumer;
 
@@ -52,6 +63,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private ImageView backView;
     private Button btnScan;
+    private Button btnLog;
+    private Button btnAddGroups;
 
     private LayoutInflater inflater;
     private DeviceListAdapter adapter;
@@ -61,7 +74,14 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private boolean isInit = false;
     private RxPermissions mRxPermission;
+    private GridView deviceListView;
+    private Handler mHandler = new Handler();
 
+    private int preTime=0;
+    private int nextTime=0;
+    private boolean canStartTimer=true;
+    private Timer timer;
+    private Dialog loadDialog;
 
     private OnClickListener clickListener = new OnClickListener() {
 
@@ -78,7 +98,49 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             }
         }
     };
-    private Handler mHandler = new Handler();
+
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case Cmd.SCANCOMPLET:
+                    if(msg.arg1==Cmd.SCANFAIL){
+                        btnAddGroups.setVisibility(View.VISIBLE);
+                        btnAddGroups.setText("重新扫描");
+                        btnAddGroups.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startScan(0);
+                                btnAddGroups.setVisibility(View.GONE);
+                            }
+                        });
+                        if(timer!=null){
+                            timer.cancel();
+                        }
+                        closeDialog();
+                        showToast(getString(R.string.scan_end));
+                        canStartTimer=false;
+                        nextTime=0;
+                    }else if(msg.arg1==Cmd.SCANSUCCESS){
+                        btnAddGroups.setVisibility(View.VISIBLE);
+                        btnAddGroups.setText("开始分组");
+                        btnAddGroups.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                //实现分组方案
+                            }
+                        });
+                        timer.cancel();
+                        nextTime=0;
+                        closeDialog();
+                        canStartTimer=false;
+                    }
+
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -90,43 +152,20 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRxPermission = new RxPermissions(this);
-//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_scanning);
-
-        //监听事件
-        this.mApplication = (TelinkLightApplication) this.getApplication();
-        this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
-        this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
-        this.mApplication.addEventListener(MeshEvent.UPDATE_COMPLETED, this);
-        this.mApplication.addEventListener(MeshEvent.ERROR, this);
-
-        this.inflater = this.getLayoutInflater();
-        this.adapter = new DeviceListAdapter();
-
-        this.backView = (ImageView) this
-                .findViewById(R.id.img_header_menu_left);
-        this.backView.setOnClickListener(this.clickListener);
-        findViewById(R.id.btn_log).setOnClickListener(this.clickListener);
-        this.btnScan = (Button) this.findViewById(R.id.btn_scan);
-        this.btnScan.setOnClickListener(this.clickListener);
-        this.btnScan.setEnabled(false);
-        this.btnScan.setBackgroundResource(R.color.gray);
-
-        GridView deviceListView = (GridView) this
-                .findViewById(R.id.list_devices);
-        deviceListView.setAdapter(this.adapter);
-        deviceListView.setOnItemClickListener(this);
-
-        this.updateList = new ArrayList<>();
-
         checkPermission();
         checkSupport();
-
         initView();
-
+        initClick();
 //        onLeScan(null);
         this.startScan(0);
+    }
+
+    private void initClick() {
+        this.backView.setOnClickListener(this.clickListener);
+        this.btnScan.setOnClickListener(this.clickListener);
+        this.btnLog.setOnClickListener(this.clickListener);
+        deviceListView.setOnItemClickListener(this);
     }
 
     public void checkSupport() {
@@ -177,24 +216,55 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void initView() {
-//        try{
-//            Intent intent=getIntent();
-//            isInit= (boolean) intent.getExtras().get("isInit");
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }finally {
-//            if(isInit){
-//
-//            }else{
-//
-//            }
-//        }
+
+        //监听事件
+        this.mApplication = (TelinkLightApplication) this.getApplication();
+        this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
+        this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
+        this.mApplication.addEventListener(MeshEvent.UPDATE_COMPLETED, this);
+        this.mApplication.addEventListener(MeshEvent.ERROR, this);
+
+        this.inflater = this.getLayoutInflater();
+        this.adapter = new DeviceListAdapter();
+
+        this.backView = (ImageView) this.findViewById(R.id.img_header_menu_left);
+        this.btnAddGroups=findViewById(R.id.btn_add_groups);
+        this.btnLog=findViewById(R.id.btn_log);
+        this.btnScan = (Button) this.findViewById(R.id.btn_scan);
+        this.btnScan.setEnabled(false);
+        this.btnScan.setBackgroundResource(R.color.gray);
+        deviceListView= (GridView) this.findViewById(R.id.list_devices);
+        deviceListView.setAdapter(this.adapter);
+        this.updateList = new ArrayList<>();
+
+        try{
+            Intent intent=getIntent();
+            isInit= (boolean) intent.getExtras().get("isInit");
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(isInit){
+               backView.setVisibility(View.GONE);
+               btnScan.setVisibility(View.GONE);
+               btnLog.setVisibility(View.GONE);
+               btnAddGroups.setVisibility(View.GONE);
+            }else{
+                backView.setVisibility(View.VISIBLE);
+                btnScan.setVisibility(View.VISIBLE);
+                btnLog.setVisibility(View.VISIBLE);
+                btnAddGroups.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.updateList = null;
+        timer.cancel();
+        canStartTimer=false;
+        nextTime=0;
         this.mApplication.removeEventListener(this);
         this.mHandler.removeCallbacksAndMessages(null);
     }
@@ -219,6 +289,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                         public void run() {
                             if (mApplication.isEmptyMesh())
                                 return;
+                            openLoadingDialog();
                             Mesh mesh = mApplication.getMesh();
                             //扫描参数
                             LeScanParameters params = LeScanParameters.create();
@@ -233,14 +304,14 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 } else {
                     // TODO: 2018/3/26 弹框提示为何需要此权限，点击确定后再次申请权限，点击取消退出.
                     AlertDialog.Builder dialog = new AlertDialog.Builder(DeviceScanningActivity.this);
-                    dialog.setMessage("扫描灯具需要");
-                    dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    dialog.setMessage(getResources().getString(R.string.scan_tip));
+                    dialog.setPositiveButton(R.string.btn_ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             startScan(0);
                         }
                     });
-                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    dialog.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             System.exit(0);
@@ -301,6 +372,14 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private void onLeScanTimeout(LeScanEvent event) {
         this.btnScan.setEnabled(true);
         this.btnScan.setBackgroundResource(R.color.theme_positive_color);
+        creatMessage(Cmd.SCANCOMPLET,Cmd.SCANFAIL);
+    }
+
+    private void creatMessage(int what,int arg){
+        Message message=new Message();
+        message.what=what;
+        message.arg1=arg;
+        handler.sendMessage(message);
     }
 
     private void onDeviceStatusChanged(DeviceEvent event) {
@@ -338,6 +417,12 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                     this.adapter.notifyDataSetChanged();
                 }
 
+                if(canStartTimer){
+                    startTimer();
+                    canStartTimer=false;
+                }
+
+                preTime= TimeUtil.getNowSeconds();
                 this.startScan(1000);
                 break;
             case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
@@ -350,6 +435,22 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 break;
         }
     }
+
+    private void startTimer() {
+        timer=new Timer();
+        timer.schedule(task,1000,1000);
+    }
+
+    TimerTask task=new TimerTask() {
+        @Override
+        public void run() {
+            nextTime=TimeUtil.getNowSeconds();
+            Log.d("DeviceScanning", "timer: "+"nextTime="+nextTime+";preTime="+preTime);
+            if(preTime>0&&nextTime-preTime>=30){
+                creatMessage(Cmd.SCANCOMPLET,Cmd.SCANSUCCESS);
+            }
+        }
+    };
 
     private void onNError(final DeviceEvent event) {
 
@@ -495,6 +596,33 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             }
 
             return null;
+        }
+    }
+
+    public void openLoadingDialog(){
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View v = inflater.inflate(R.layout.dialogview, null);
+
+        LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);
+
+        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
+
+        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
+                R.animator.load_animation);
+
+        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
+
+        loadDialog = new Dialog(this,
+                R.style.FullHeightDialog);
+        loadDialog.setCancelable(true);
+        loadDialog.show();
+        loadDialog.setContentView(layout, new LinearLayout.LayoutParams(280,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+
+    public void closeDialog(){
+        if(loadDialog!=null){
+            loadDialog.dismiss();
         }
     }
 }
