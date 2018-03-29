@@ -6,6 +6,8 @@ import com.telink.bluetooth.light.ConnectionStatus;
 import com.telink.bluetooth.light.DeviceInfo;
 import com.dadoutek.uled.R;
 
+import java.util.ArrayList;
+
 public final class Light {
 
     public String name;//设备名
@@ -21,6 +23,8 @@ public final class Light {
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public String version;
     public boolean isLamp=true;
+    public boolean hasGroup=false;//当前灯是否有被分组
+    public ArrayList<Integer> belongGroups=null;//所属分组,每个灯最多属于8个分组
 
     public String getLabel() {
         return Integer.toString(this.meshAddress, 16) + ":" + this.brightness;

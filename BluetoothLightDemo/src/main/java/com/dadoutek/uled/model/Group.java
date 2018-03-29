@@ -2,7 +2,9 @@ package com.dadoutek.uled.model;
 
 import android.content.res.ColorStateList;
 
-public class Group {
+import java.io.Serializable;
+
+public class Group implements Serializable{
 
 	public String name;
 	public int meshAddress;

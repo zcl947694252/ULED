@@ -13,6 +13,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.util.DataCreater;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 
@@ -23,6 +24,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper;
 public class SplashActivity extends TelinkMeshErrorDealActivity {
 
     private TelinkLightApplication mApplication;
+    boolean isFirstData=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +32,17 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         setContentView(R.layout.activity_splash);
         this.mApplication = (TelinkLightApplication) this.getApplication();
         initMesh();
+        initData();
         this.mApplication.doInit();
         goToNextView();
+    }
+
+    private void initData() {
+        isFirstData=SharedPreferencesHelper.getBoolean(SplashActivity.this,"isFirstData",true);
+        if(isFirstData){
+            DataCreater.creatGroup(true,0);//初始化自动创建16个分组
+        }
+        SharedPreferencesHelper.putBoolean(SplashActivity.this,"isFirstData",false);
     }
 
     @Override

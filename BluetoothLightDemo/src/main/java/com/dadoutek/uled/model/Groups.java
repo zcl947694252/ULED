@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model;
 
-public class Groups extends DataStorageImpl<Group> {
+import java.io.Serializable;
+
+public class Groups extends DataStorageImpl<Group> implements Serializable{
 
     private static Groups mThis;
 

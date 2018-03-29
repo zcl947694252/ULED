@@ -1,10 +1,11 @@
 package com.dadoutek.uled.model;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DataStorageImpl<E> implements DataStorage<E> {
+public abstract class DataStorageImpl<E> implements DataStorage<E>,Serializable{
 
     protected List<E> data;
 
