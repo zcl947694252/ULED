@@ -38,11 +38,11 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     }
 
     private void initData() {
-        isFirstData=SharedPreferencesHelper.getBoolean(SplashActivity.this,"isFirstData",true);
-        if(isFirstData){
+//        isFirstData=SharedPreferencesHelper.getBoolean(SplashActivity.this,"isFirstData",true);
+//        if(isFirstData){
             DataCreater.creatGroup(true,0);//初始化自动创建16个分组
-        }
-        SharedPreferencesHelper.putBoolean(SplashActivity.this,"isFirstData",false);
+//        }
+//        SharedPreferencesHelper.putBoolean(SplashActivity.this,"isFirstData",false);
     }
 
     @Override
