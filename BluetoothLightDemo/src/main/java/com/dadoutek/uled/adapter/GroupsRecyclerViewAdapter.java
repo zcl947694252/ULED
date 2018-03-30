@@ -33,6 +33,10 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         mOnRecyclerviewItemClickListener.onItemClickListener(v, ((int) v.getTag()));
     }
 
+    public Group get(int addr) {
+        return Groups.getInstance().getByMeshAddress(addr);
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder{
         ImageView groupImage;
         TextView groupName;
@@ -79,4 +83,5 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     public long getItemId(int position) {
         return super.getItemId(position);
     }
+
 }
