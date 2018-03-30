@@ -406,10 +406,12 @@ public class LightAdapter {
         if (!this.mLightCtrl.isLogin())
             return false;
 
-        if (tag == null)
+        if (tag == null){
             return this.mLightCtrl.sendCommand(opcode, address, params, true, delay);
-        else
+        }
+        else{
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
+        }
     }
 
     synchronized public void startScan(Parameters params, Callback callback) {

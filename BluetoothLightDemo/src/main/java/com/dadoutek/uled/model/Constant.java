@@ -6,11 +6,12 @@ package com.dadoutek.uled.model;
 
 public class Constant {
 
-    public static final String NEW_MESH_FACTORY_NAME="987666";
+    public static final String NEW_MESH_FACTORY_NAME="987654";
     public static final String NEW_MESH_FACTORY_PASSWORD="123";
 
     public static final String DEFAULT_MESH_FACTORY_NAME="123456";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
     public static final String GROUPS_KEY="LastGroups";
+    public static final String DEFAULT_GROUP_ID="DEFAULT_GROUP_ID";
 }
