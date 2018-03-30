@@ -830,11 +830,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 holder.icon = icon;
                 holder.txtName = txtName;
                 holder.selected = selected;
-                if(grouping){
-                    holder.selected.setVisibility(View.VISIBLE);
-                }else{
-                    holder.selected.setVisibility(View.GONE);
-                }
 
                 convertView.setTag(holder);
             } else {
@@ -843,6 +838,10 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
             Light light = this.getItem(position);
 
+            holder.txtName.setText(light.name);
+            holder.icon.setImageResource(R.drawable.icon_light_on);
+            holder.selected.setChecked(light.selected);
+
             if(light.hasGroup){
                 holder.txtName.setVisibility(View.GONE);
                 holder.icon.setVisibility(View.GONE);
@@ -850,12 +849,12 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             }else{
                 holder.txtName.setVisibility(View.VISIBLE);
                 holder.icon.setVisibility(View.VISIBLE);
-                holder.selected.setVisibility(View.VISIBLE);
+                if(grouping){
+                    holder.selected.setVisibility(View.VISIBLE);
+                }else{
+                    holder.selected.setVisibility(View.GONE);
+                }
             }
-
-            holder.txtName.setText(light.name);
-            holder.icon.setImageResource(R.drawable.icon_light_on);
-            holder.selected.setChecked(light.selected);
 
             return convertView;
         }
