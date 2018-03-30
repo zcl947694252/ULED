@@ -101,7 +101,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private int currentGroupId=-1;
     private int dstAddress;
-    private List<Light> lightList=adapter.getLights();
 
     private final MyHandler handler = new MyHandler(this);
 
@@ -186,7 +185,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         btnAddGroups.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                sureGroups(lightList);
+                sureGroups(adapter.getLights());
             }
         });
         groupsBottom.setVisibility(View.VISIBLE);

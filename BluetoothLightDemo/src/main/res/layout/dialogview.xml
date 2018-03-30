@@ -10,12 +10,12 @@
 		android:id="@+id/img"
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
-		android:padding="2dip"
+		android:padding="10dip"
 		android:src="@drawable/waiting_up"
 		/>
 	<TextView 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"
-		android:padding="2dip"
+		android:padding="10dip"
 		android:text="@string/Loading" />
 </LinearLayout>
