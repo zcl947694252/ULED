@@ -62,19 +62,19 @@ import com.telink.bluetooth.light.Parameters;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import butterknife.Bind;
 import io.reactivex.functions.Consumer;
 
 public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String> {
 
-//    @Bind(R.id.recycler_view_groups)
+    //    @Bind(R.id.recycler_view_groups)
     android.support.v7.widget.RecyclerView recyclerViewGroups;
-//    @Bind(R.id.groups_bottom)
+    //    @Bind(R.id.groups_bottom)
     LinearLayout groupsBottom;
     private ImageView backView;
     private Button btnScan;
@@ -102,6 +102,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private int currentGroupId=-1;
     private int dstAddress;
 
+    private final MyHandler handler = new MyHandler(this);
+
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -119,51 +121,60 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     };
 
     private boolean grouping;
-    Handler handler = new Handler() {
+
+    private static class MyHandler extends Handler {
+        //防止内存溢出
+        private final WeakReference<DeviceScanningActivity> mWeakActivity;
+
+        private MyHandler(DeviceScanningActivity mWeakActivity) {
+            this.mWeakActivity = new WeakReference<>(mWeakActivity);
+        }
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            DeviceScanningActivity activity = mWeakActivity.get();
             switch (msg.what) {
                 case Cmd.SCANCOMPLET:
                     if (msg.arg1 == Cmd.SCANFAIL) {
-                        btnAddGroups.setVisibility(View.VISIBLE);
-                        btnAddGroups.setText("重新扫描");
-                        btnAddGroups.setOnClickListener(new OnClickListener() {
+                        activity.btnAddGroups.setVisibility(View.VISIBLE);
+                        activity.btnAddGroups.setText("重新扫描");
+                        activity.btnAddGroups.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                startScan(0);
-                                btnAddGroups.setVisibility(View.GONE);
+                                activity.startScan(0);
+                                activity.btnAddGroups.setVisibility(View.GONE);
                             }
                         });
-                        if (timer != null) {
-                            timer.cancel();
+                        if (activity.timer != null) {
+                            activity.timer.cancel();
                         }
-                        closeDialog();
-                        showToast(getString(R.string.scan_end));
-                        canStartTimer = false;
-                        nextTime = 0;
+                        activity.closeDialog();
+                        activity.showToast(activity.getString(R.string.scan_end));
+                        activity.canStartTimer = false;
+                        activity.nextTime = 0;
                     } else if (msg.arg1 == Cmd.SCANSUCCESS) {
-                        btnAddGroups.setVisibility(View.VISIBLE);
-                        btnAddGroups.setText("开始分组");
-                        btnAddGroups.setOnClickListener(new OnClickListener() {
+                        activity.btnAddGroups.setVisibility(View.VISIBLE);
+                        activity.btnAddGroups.setText("开始分组");
+                        activity.btnAddGroups.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 //实现分组方案
-                                startGrouping();
+                                activity.startGrouping();
                             }
                         });
-                        if (timer != null) {
-                            timer.cancel();
+                        if (activity.timer != null) {
+                            activity.timer.cancel();
                         }
-                        nextTime = 0;
-                        closeDialog();
-                        canStartTimer = false;
+                        activity.nextTime = 0;
+                        activity.closeDialog();
+                        activity.canStartTimer = false;
                     }
 
                     break;
             }
         }
-    };
+    }
 
     private void startGrouping() {
         grouping=true;
