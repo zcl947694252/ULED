@@ -35,6 +35,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
+import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
@@ -92,6 +93,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private Timer timer;
     private Dialog loadDialog;
     private Groups groups;
+    GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
 
     private final MyHandler handler = new MyHandler(this);
 
@@ -111,6 +113,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         }
     };
 
+    private boolean grouping;
 
     private static class MyHandler extends Handler {
         //防止内存溢出
@@ -144,6 +147,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                         activity.canStartTimer = false;
                         activity.nextTime = 0;
                     } else if (msg.arg1 == Cmd.SCANSUCCESS) {
+                        grouping=true;
+                        adapter.notifyDataSetChanged();
                         activity.btnAddGroups.setVisibility(View.VISIBLE);
                         activity.btnAddGroups.setText("开始分组");
                         activity.btnAddGroups.setOnClickListener(new OnClickListener() {
@@ -187,11 +192,17 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                     }
                 }
 
-                if (hasData) {
+                if(hasData){
                     //进行分组操作
-                } else if (!hasData && !isEnd) {
+                    //获取当前选择的分组
+                    Group group=getCurrentGroup();
+                    //获取当前勾选灯的列表
+                    List<Light> selectLights=getCurrentSelectLights();
+                    //将灯列表的灯循环设置分组
+                    setGroups(group,selectLights);
+                }else if(!hasData&&!isEnd){
                     showToast("请至少选择一个灯！");
-                } else if (!hasData && isEnd) {
+                }else if(!hasData&&isEnd){
                     //分组结束，进入下一个开关分组页面
                 }
             }
@@ -202,8 +213,47 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         //设置RecyclerView 布局
         recyclerViewGroups.setLayoutManager(layoutmanager);
         //设置Adapter
-        GroupsRecyclerViewAdapter adapter = new GroupsRecyclerViewAdapter(groups);
-        recyclerViewGroups.setAdapter(adapter);
+         groupsRecyclerViewAdapter= new GroupsRecyclerViewAdapter(groups,onRecyclerviewItemClickListener);
+        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+    }
+
+    private void setGroups(Group group, List<Light> selectLights) {
+    }
+
+    private List<Light> getCurrentSelectLights() {
+        return null;
+    }
+
+    private Group getCurrentGroup() {
+        return null;
+    }
+
+    private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener = new OnRecyclerviewItemClickListener() {
+        @Override
+        public void onItemClickListener(View v, int position) {
+
+                for(int i=groups.size()-1;i>=0;i--){
+                    if(i!=position&&groups.get(i).checked){
+                        updateData(i,false);
+                    }else if(i==position&&!groups.get(i).checked){
+                        updateData(i,true);
+                    }else if(i==position&&groups.get(i).checked){
+                        updateData(i,false);
+                    }
+                }
+
+            groupsRecyclerViewAdapter.notifyDataSetChanged();
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                    Constant.GROUPS_KEY,groups);
+        }
+    };
+
+    private void updateData(int position,boolean checkStateChange){
+//        Group group=groups.get(position);
+//        group.checked=checkStateChange;
+//        groups.remove(position);
+//        groups.add(group,position);
+        groups.get(position).checked=checkStateChange;
     }
 
     @Override
@@ -664,7 +714,11 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 holder.icon = icon;
                 holder.txtName = txtName;
                 holder.selected = selected;
-                holder.selected.setVisibility(View.VISIBLE);
+                if(grouping){
+                    holder.selected.setVisibility(View.VISIBLE);
+                }else{
+                    holder.selected.setVisibility(View.GONE);
+                }
 
                 convertView.setTag(holder);
             } else {
@@ -725,6 +779,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                     R.style.FullHeightDialog);
         }
         loadDialog.setCancelable(true);
+        loadDialog.setCanceledOnTouchOutside(false);
         loadDialog.show();
         loadDialog.setContentView(layout, new LinearLayout.LayoutParams(280,
                 LinearLayout.LayoutParams.WRAP_CONTENT));

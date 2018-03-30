@@ -41,7 +41,7 @@ public class DataCreater {
             group.brightness = 100;
             group.temperature = 100;
             group.color = 0xFFFFFF;
-            group.icon= R.drawable.ic_group_black_48dp;
+            group.icon= R.drawable.ic_group_white_48dp;
             groups.add(group);
         }
 
