@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.telink.TelinkApplication;
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.Peripheral;
@@ -400,16 +401,23 @@ public class LightAdapter {
 
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
 
-        if (!this.isStarted.get())
+        if (!this.isStarted.get()){
+            Log.d("Test", "***********TEST***********1111");
             return false;
+        }
 
-        if (!this.mLightCtrl.isLogin())
+
+        if (!this.mLightCtrl.isLogin()){
+            Log.d("Test", "***********TEST***********2222");
             return false;
+        }
 
         if (tag == null){
+            Log.d("Test", "***********TEST***********");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, delay);
         }
         else{
+            Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
         }
     }

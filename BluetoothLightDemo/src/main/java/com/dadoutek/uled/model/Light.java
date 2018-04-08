@@ -24,7 +24,15 @@ public final class Light {
     public String version;
     public boolean isLamp=true;
     public boolean hasGroup=false;//当前灯是否有被分组
-    public ArrayList<Integer> belongGroups=null;//所属分组,每个灯最多属于8个分组
+    public ArrayList<String> belongGroups=new ArrayList<>();//所属分组,每个灯最多属于8个分组
+
+    public ArrayList<String> getBelongGroups() {
+        return belongGroups;
+    }
+
+    public void setBelongGroups(ArrayList<String> belongGroups) {
+        this.belongGroups = belongGroups;
+    }
 
     public String getLabel() {
         return Integer.toString(this.meshAddress, 16) + ":" + this.brightness;

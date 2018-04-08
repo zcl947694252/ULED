@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
+import com.dadoutek.uled.util.DataCreater;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
 import com.dadoutek.uled.R;
@@ -127,11 +128,12 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         bedroom.brightness = 100;
         bedroom.temperature = 100;
         bedroom.color = 0xFFFFFF;
-
         Groups.getInstance().add(living);
         Groups.getInstance().add(family);
         Groups.getInstance().add(kitchen);
         Groups.getInstance().add(bedroom);
+
+//        DataCreater.creatGroup(true,0);
 
         this.adapter.notifyDataSetChanged();
     }
