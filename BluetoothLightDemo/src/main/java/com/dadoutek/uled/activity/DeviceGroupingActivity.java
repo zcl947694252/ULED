@@ -101,39 +101,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         Groups.getInstance().clear();
 
-        Group living = new Group();
-        living.name = "Living Room";
-        living.meshAddress = 0x8001;
-        living.brightness = 100;
-        living.temperature = 100;
-        living.color = 0xFFFFFF;
+        Groups groups=DataCreater.getGroups();
 
-        Group family = new Group();
-        family.name = "Family Room";
-        family.meshAddress = 0x8002;
-        family.brightness = 100;
-        family.temperature = 100;
-        family.color = 0xFFFFFF;
-
-        Group kitchen = new Group();
-        kitchen.name = "Kitchen";
-        kitchen.meshAddress = 0x8003;
-        kitchen.brightness = 100;
-        kitchen.temperature = 100;
-        kitchen.color = 0xFFFFFF;
-
-        Group bedroom = new Group();
-        bedroom.name = "Bedroom";
-        bedroom.meshAddress = 0x8004;
-        bedroom.brightness = 100;
-        bedroom.temperature = 100;
-        bedroom.color = 0xFFFFFF;
-        Groups.getInstance().add(living);
-        Groups.getInstance().add(family);
-        Groups.getInstance().add(kitchen);
-        Groups.getInstance().add(bedroom);
-
-//        DataCreater.creatGroup(true,0);
+        for(int i=0;i<groups.size();i++){
+            Groups.getInstance().add(groups.get(i));
+        }
 
         this.adapter.notifyDataSetChanged();
     }

@@ -3,6 +3,8 @@ package com.dadoutek.uled.model;
 import android.content.res.ColorStateList;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Group implements Serializable{
 
@@ -17,4 +19,5 @@ public class Group implements Serializable{
 
 	public boolean checked;
 
+	public List<Light> containsLightList=new ArrayList<>();
 }

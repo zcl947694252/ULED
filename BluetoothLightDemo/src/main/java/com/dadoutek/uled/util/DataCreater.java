@@ -7,6 +7,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
+import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 import java.util.List;
@@ -48,6 +49,14 @@ public class DataCreater {
         SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.GROUPS_KEY,groups);
 
         Log.d("test", "creatGroup: "+groups.size());
+    }
+
+    public static void updateLights(Lights lights){
+        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.Lights_KEY,lights);
+    }
+
+    public static void updateGroup(Groups groups){
+        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.GROUPS_KEY,groups);
     }
 
     /**

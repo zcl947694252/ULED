@@ -78,5 +78,6 @@
     <string name="Loading">扫描中...</string>
     <string name="scan_end">扫描完成，没有发现设备！</string>
     <string name="device_login_tip">正在登陆设备；请稍后！</string>
+    <string name="grouping_completed">分组完成</string>
 
 </resources>
