@@ -320,9 +320,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         groupsBottom.setVisibility(View.VISIBLE);
         LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        //设置RecyclerView 布局
         recyclerViewGroups.setLayoutManager(layoutmanager);
-        //设置Adapter
         groupsRecyclerViewAdapter= new GroupsRecyclerViewAdapter(groups,onRecyclerviewItemClickListener);
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
     }
@@ -968,7 +966,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             holder.icon.setImageResource(R.drawable.icon_light_on);
             holder.selected.setChecked(light.selected);
 
-            if(light.hasGroup){
+            if(light.belongGroups.size()>0){
                 holder.txtName.setVisibility(View.GONE);
                 holder.icon.setVisibility(View.GONE);
                 holder.selected.setVisibility(View.GONE);

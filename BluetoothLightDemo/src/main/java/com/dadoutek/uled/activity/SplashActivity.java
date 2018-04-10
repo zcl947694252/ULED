@@ -25,6 +25,8 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
     private TelinkLightApplication mApplication;
     boolean isFirstData=true;
+    //判断是否是第一次使用app，启动导航页
+    public static final String ISFIRSTLAUNCH="ISFIRSTLAUNCH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +72,12 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     }
 
     private void goToNextView(){
-        Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
-        intent.putExtra("isInit",true);
-        startActivity(intent);
-        finish();
+//        if(SharedPreferencesHelper.getBoolean(SplashActivity.this,ISFIRSTLAUNCH,true)){
+            SharedPreferencesHelper.putBoolean(SplashActivity.this,ISFIRSTLAUNCH,false);
+            Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
+            intent.putExtra("isInit",true);
+            startActivity(intent);
+            finish();
+//        }
     }
 }

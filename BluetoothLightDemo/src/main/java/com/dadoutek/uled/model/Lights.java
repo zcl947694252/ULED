@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model;
 
-public class Lights extends DataStorageImpl<Light> {
+import java.io.Serializable;
+
+public class Lights extends DataStorageImpl<Light> implements Serializable{
 
     private static Lights mThis;
 

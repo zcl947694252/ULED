@@ -6,9 +6,10 @@ import com.telink.bluetooth.light.ConnectionStatus;
 import com.telink.bluetooth.light.DeviceInfo;
 import com.dadoutek.uled.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public final class Light {
+public final class Light implements Serializable{
 
     public String name;//设备名
     public String macAddress;//蓝牙地址
