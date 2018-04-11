@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/dialog_view" 
 	android:orientation="horizontal"
-	android:layout_width="200dip" 
+	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
 	android:gravity="center_vertical"
 	android:background="#F7F7F7">
@@ -13,8 +13,8 @@
 		android:padding="10dip"
 		android:src="@drawable/waiting_up"
 		/>
-	<TextView 
-		android:layout_width="wrap_content" 
+	<TextView
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:padding="10dip"
 		android:text="@string/Loading" />

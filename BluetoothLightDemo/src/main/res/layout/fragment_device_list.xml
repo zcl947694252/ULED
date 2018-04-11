@@ -128,7 +128,8 @@
             android:layout_weight="1"
             android:button="@null"
             android:gravity="center_horizontal|center_vertical"
-            android:text="@string/device_list_Scene" />
+            android:text="@string/device_list_Scene"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/log"
@@ -138,7 +139,8 @@
             android:layout_weight="1"
             android:button="@null"
             android:gravity="center_horizontal|center_vertical"
-            android:text="LOG" />
+            android:text="LOG"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!--interval test-->
@@ -147,8 +149,8 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:paddingLeft="8dp"
-        android:visibility="gone"
-        android:paddingRight="8dp">
+        android:paddingRight="8dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -160,10 +162,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:maxLines="1"
-            android:text="FFFF"
             android:digits="0123456789abcdefABCDEF"
-            android:minWidth="50dp" />
+            android:maxLines="1"
+            android:minWidth="50dp"
+            android:text="FFFF" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -177,9 +179,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="500"
             android:digits="0123456789"
-            android:minWidth="50dp" />
+            android:minWidth="50dp"
+            android:text="500" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -197,7 +199,7 @@
             android:id="@+id/tv_test_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"/>
+            android:text="0" />
     </LinearLayout>
 
     <View
@@ -222,12 +224,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="UserAll"
-        android:visibility="visible" />
+        android:visibility="gone" />
     <!--OnlineStatus-->
 
     <Button
         android:id="@+id/online_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="online status test" />
+        android:text="online status test"
+        android:visibility="gone" />
 </LinearLayout>

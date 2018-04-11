@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,6 +29,7 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,6 +87,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private Button btnLog;
     private Button btnAddGroups;
     private Button btnGroupingCompleted;
+    private ProgressBar mProgressBar;
 
     private LayoutInflater inflater;
     private DeviceListAdapter adapter;
@@ -115,7 +118,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private List<Group> lightToGroupList = null;
     //分组所含灯的缓存
     private Lights nowLightList = Lights.getInstance();
-    private ArrayList<Integer> indexList=new ArrayList<>();
+    private ArrayList<Integer> indexList = new ArrayList<>();
 
     private final MyHandler handler = new MyHandler(this);
 
@@ -357,8 +360,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         }
 
 
-        for(int i=0;i<indexList.size();i++){
-            nowLightList.get(indexList.get(i)).hasGroup=true;
+        for (int i = 0; i < indexList.size(); i++) {
+            nowLightList.get(indexList.get(i)).hasGroup = true;
             nowLightList.get(indexList.get(i)).belongGroups.add(group.name);
         }
 
@@ -367,7 +370,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             sendGroupData(selectLights.get(index), group, index);
             index++;
             try {
-                Thread.sleep(200);
+                Thread.sleep(350);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -378,7 +381,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         ArrayList<Light> arrayList = new ArrayList<>();
         indexList.clear();
         for (int i = 0; i < nowLightList.size(); i++) {
-            if(nowLightList.get(i).selected&&!nowLightList.get(i).hasGroup){
+            if (nowLightList.get(i).selected && !nowLightList.get(i).hasGroup) {
                 arrayList.add(nowLightList.get(i));
                 indexList.add(i);
             }
@@ -494,7 +497,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void initView() {
-
         //监听事件
         this.mApplication = (TelinkLightApplication) this.getApplication();
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
@@ -505,6 +507,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         this.inflater = this.getLayoutInflater();
         this.adapter = new DeviceListAdapter();
+
 
         this.backView = (ImageView) this.findViewById(R.id.img_header_menu_left);
         groupsBottom = findViewById(R.id.groups_bottom);
@@ -536,21 +539,22 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             } else {
                 backView.setVisibility(View.VISIBLE);
                 btnScan.setVisibility(View.VISIBLE);
-                btnLog.setVisibility(View.VISIBLE);
+//                btnLog.setVisibility(View.VISIBLE);
                 btnAddGroups.setVisibility(View.GONE);
                 btnGroupingCompleted.setVisibility(View.GONE);
             }
         }
 
         currentGroupId = SharedPreferencesHelper.getInt(TelinkLightApplication.getInstance(),
-                Constant.DEFAULT_GROUP_ID,-1);
+                Constant.DEFAULT_GROUP_ID, -1);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.updateList = null;
-        timer.cancel();
+        if (timer != null)
+            timer.cancel();
         canStartTimer = false;
         nextTime = 0;
         this.mApplication.removeEventListener(this);
@@ -799,8 +803,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private void checkSelectLamp(Light light) {
 
-        Group group=groups.get(groups.size()-1);
-        Log.d("ScanGroup", "checkSelectLamp: "+groups.size());
+        Group group = groups.get(groups.size() - 1);
+        Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
 
         int groupAddress = group.meshAddress;
         int dstAddress = light.meshAddress;
@@ -842,8 +846,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         //已分组灯不显示
 //        nowLightList.get(index).hasGroup=true;
-        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  group:name=="+group.name+"; " +
-                " group:name=="+group.meshAddress+";  lighthas"+light.hasGroup);
+        Log.d("groupingCC", "sendGroupData: " + "----dstAddress:" + dstAddress + ";  group:name==" + group.name + "; " +
+                " group:name==" + group.meshAddress + ";  lighthas" + light.hasGroup);
         {
             //灯和分组互相绑定
 //            Lights.getInstance().get(index).belongGroups.add(group.name);
@@ -986,7 +990,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             holder.icon.setImageResource(R.drawable.icon_light_on);
             holder.selected.setChecked(light.selected);
 
-            if(light.hasGroup){
+            if (light.hasGroup) {
                 holder.txtName.setVisibility(View.GONE);
                 holder.icon.setVisibility(View.GONE);
                 holder.selected.setVisibility(View.GONE);
@@ -1050,7 +1054,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         loadDialog.setCancelable(true);
         loadDialog.setCanceledOnTouchOutside(false);
         loadDialog.show();
-        loadDialog.setContentView(layout, new LinearLayout.LayoutParams(280,
+        loadDialog.setContentView(layout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
     }
 

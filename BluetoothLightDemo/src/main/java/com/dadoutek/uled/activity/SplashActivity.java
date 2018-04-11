@@ -1,12 +1,7 @@
 package com.dadoutek.uled.activity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -23,33 +18,47 @@ import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 public class SplashActivity extends TelinkMeshErrorDealActivity {
 
+    private static final int REQ_MESH_SETTING = 0x01;
     private TelinkLightApplication mApplication;
-    boolean isFirstData=true;
-    //判断是否是第一次使用app，启动导航页
-    public static final String ISFIRSTLAUNCH="ISFIRSTLAUNCH";
+    boolean mIsFirstData = true;
+    public static final String IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        this.mApplication = (TelinkLightApplication) this.getApplication();
-        initMesh();
-        initData();
-        this.mApplication.doInit();
-        goToNextView();
+        init();
     }
 
-    private void initData() {
-        isFirstData=SharedPreferencesHelper.getBoolean(SplashActivity.this,"isFirstData",true);
-        if(isFirstData){
-            DataCreater.creatGroup(true,0);//初始化自动创建16个分组
+    private void init() {
+        this.mApplication = (TelinkLightApplication) this.getApplication();
+        this.mApplication.doInit();
+
+        //判断是否是第一次使用app，启动导航页
+        mIsFirstData = SharedPreferencesHelper.getBoolean(SplashActivity.this, IS_FIRST_LAUNCH, true);
+
+        if (mIsFirstData) {
+            initMesh();
+            initGroupData();
+            gotoMeshSetting();
+            //把是否是第一次进入设为false
+            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
+        } else {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         }
-        SharedPreferencesHelper.putBoolean(SplashActivity.this,"isFirstData",false);
+
+    }
+
+    /**
+     * 初始化分组数据
+     */
+    private void initGroupData() {
+        DataCreater.creatGroup(true, 0);//初始化自动创建16个分组
     }
 
     @Override
     protected void onLocationEnable() {
-
     }
 
     private void initMesh() {
@@ -71,13 +80,28 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         }
     }
 
-    private void goToNextView(){
-//        if(SharedPreferencesHelper.getBoolean(SplashActivity.this,ISFIRSTLAUNCH,true)){
-            SharedPreferencesHelper.putBoolean(SplashActivity.this,ISFIRSTLAUNCH,false);
-            Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
-            intent.putExtra("isInit",true);
-            startActivity(intent);
-            finish();
-//        }
+
+    private void gotoMeshSetting(){
+        startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
+    }
+
+    /**
+     * 进入引导流程，也就是进入DeviceActivity。
+     */
+    private void gotoDeviceScanning() {
+        //首次进入APP才进入引导流程
+        Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
+        intent.putExtra("isInit", true);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //退出MeshSetting后进入DeviceScanning
+        if (requestCode == REQ_MESH_SETTING) {
+            gotoDeviceScanning();
+        }
     }
 }

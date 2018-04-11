@@ -15,10 +15,10 @@
     <string name="header_account">Me</string>
 
     <!-- DeviceSchema List -->
-    <string name="device_list_header">Lights</string>
+    <string name="device_list_header">灯</string>
     <string name="device_list_menu_left">Meshs</string>
-    <string name="device_list_all_on">All On</string>
-    <string name="device_list_all_off">All Off</string>
+    <string name="device_list_all_on">全开</string>
+    <string name="device_list_all_off">全关</string>
     <string name="device_list_Scene">Ota</string>
     <string name="device_list_Scene_night">Night Scene</string>
     <string name="device_list_Scene_sleep">Sleep Scene</string>
@@ -41,12 +41,12 @@
     <string name="device_scan_add">Add Device</string>
 
     <!-- GroupSchema List -->
-    <string name="group_list_header">Groups</string>
-    <string name="group_list_on">On</string>
-    <string name="group_list_off">Off</string>
+    <string name="group_list_header">组</string>
+    <string name="group_list_on">开</string>
+    <string name="group_list_off">关</string>
 
     <!-- GroupSchema Setting -->
-    <string name="group_setting_header">Group Setting</string>
+    <string name="group_setting_header">分组设置</string>
 
     <!-- MeshSchema Add -->
     <string name="mesh_add_header">Add Mesh</string>
