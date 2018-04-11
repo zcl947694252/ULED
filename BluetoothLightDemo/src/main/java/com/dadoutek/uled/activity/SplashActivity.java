@@ -75,7 +75,6 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 //        if(SharedPreferencesHelper.getBoolean(SplashActivity.this,ISFIRSTLAUNCH,true)){
             SharedPreferencesHelper.putBoolean(SplashActivity.this,ISFIRSTLAUNCH,false);
             Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
-            intent.putExtra("isInit",true);
             startActivity(intent);
             finish();
 //        }
