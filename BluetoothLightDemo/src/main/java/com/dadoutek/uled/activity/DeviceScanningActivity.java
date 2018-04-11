@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -78,6 +79,7 @@ import io.reactivex.functions.Consumer;
 
 public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String> {
 
+    private static final int SCAN_TIMEOUT_SECOND = 60;
     //    @Bind(R.id.recycler_view_groups)
     android.support.v7.widget.RecyclerView recyclerViewGroups;
     //    @Bind(R.id.groups_bottom)
@@ -87,7 +89,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private Button btnLog;
     private Button btnAddGroups;
     private Button btnGroupingCompleted;
-    private ProgressBar mProgressBar;
 
     private LayoutInflater inflater;
     private DeviceListAdapter adapter;
@@ -431,6 +432,9 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRxPermission = new RxPermissions(this);
+        //设置屏幕常亮
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_device_scanning);
         groups = DataCreater.getGroups();
         checkPermission();
@@ -746,7 +750,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         public void run() {
             nextTime = TimeUtil.getNowSeconds();
             Log.d("DeviceScanning", "timer: " + "nextTime=" + nextTime + ";preTime=" + preTime);
-            if (preTime > 0 && nextTime - preTime >= 30) {
+            if (preTime > 0 && nextTime - preTime >= SCAN_TIMEOUT_SECOND) {
                 creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
             }
         }
