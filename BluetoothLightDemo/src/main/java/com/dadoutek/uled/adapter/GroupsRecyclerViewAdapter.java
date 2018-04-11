@@ -71,6 +71,10 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         }else{
             holder.groupImage.setImageResource(R.drawable.ic_group_white_48dp);
         }
+
+        if(position==mGroupList.size()-1){
+            holder.itemView.setVisibility(View.GONE);
+        }
     }
 
 

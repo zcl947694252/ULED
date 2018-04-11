@@ -114,6 +114,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private List<Group> lightToGroupList=null;
     //分组所含灯的缓存
     private Lights nowLightList=Lights.getInstance();
+    private ArrayList<Integer> indexList=new ArrayList<>();
 
     private final MyHandler handler = new MyHandler(this);
 
@@ -350,12 +351,19 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             Toast.makeText(DeviceScanningActivity.this,"请至少选择一个分组",Toast.LENGTH_SHORT).show();
             return;
         }
+
+
+        for(int i=0;i<indexList.size();i++){
+            nowLightList.get(indexList.get(i)).hasGroup=true;
+            nowLightList.get(indexList.get(i)).belongGroups.add(group.name);
+        }
+
         int index=0;
         while (index<selectLights.size()){
             sendGroupData(selectLights.get(index),group,index);
             index++;
             try {
-                Thread.sleep(50);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -364,9 +372,11 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private List<Light> getCurrentSelectLights() {
         ArrayList<Light> arrayList=new ArrayList<>();
+        indexList.clear();
         for(int i=0;i<nowLightList.size();i++){
-            if(nowLightList.get(i).selected){
+            if(nowLightList.get(i).selected&&!nowLightList.get(i).hasGroup){
                 arrayList.add(nowLightList.get(i));
+                indexList.add(i);
             }
         }
         return arrayList;
@@ -529,7 +539,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         }
 
         currentGroupId=SharedPreferencesHelper.getInt(TelinkLightApplication.getInstance(),
-                Constant.DEFAULT_GROUP_ID,0);
+                Constant.DEFAULT_GROUP_ID,-1);
     }
 
     @Override
@@ -784,7 +794,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private void checkSelectLamp(Light light) {
 
-        Group group=groups.get(3);
+        Group group=groups.get(groups.size()-1);
+        Log.d("ScanGroup", "checkSelectLamp: "+groups.size());
 
         int groupAddress = group.meshAddress;
         int dstAddress = light.meshAddress;
@@ -812,22 +823,25 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 (byte) (groupAddress >> 8 & 0xFF)};
 
         Log.d("Scanner", "checkSelectLamp: "+"opcode:"+opcode+";  dstAddress:"+dstAddress+";  params:"+params.toString());
-        if (!group.checked) {
+//        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  group:name=="+group.name+";  group:name=="+group.meshAddress+";  lighthas"+light.hasGroup);
+
+        if (group.checked) {
             params[0] = 0x01;
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
 
-        } else {
-            params[0] = 0x00;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
         }
+//        else {
+//            params[0] = 0x00;
+//            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+//        }
 
         //已分组灯不显示
-        //修改为显示分组列表下标
-        nowLightList.get(index).hasGroup=true;
+//        nowLightList.get(index).hasGroup=true;
+        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  group:name=="+group.name+"; " +
+                " group:name=="+group.meshAddress+";  lighthas"+light.hasGroup);
         {
             //灯和分组互相绑定
 //            Lights.getInstance().get(index).belongGroups.add(group.name);
-            nowLightList.get(index).belongGroups.add(group.name);
             groups.get(currentGroupId).containsLightList.add(light);
         }
         adapter.notifyDataSetChanged();
@@ -966,7 +980,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             holder.icon.setImageResource(R.drawable.icon_light_on);
             holder.selected.setChecked(light.selected);
 
-            if(light.belongGroups.size()>0){
+            if(light.hasGroup){
                 holder.txtName.setVisibility(View.GONE);
                 holder.icon.setVisibility(View.GONE);
                 holder.selected.setVisibility(View.GONE);
