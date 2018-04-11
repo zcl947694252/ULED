@@ -35,10 +35,12 @@ public final class AddMeshActivity extends TelinkBaseActivity {
                 finish();
             } else if (v == btnSave) {
                 saveMesh();
+                setResult(RESULT_OK);
+                finish();
             } else if (v == btnShare) {
                 startActivity(new Intent(AddMeshActivity.this, QRCodeShareActivity.class));
-            }else if (v == btnClear){
-                if (mApplication.getMesh().devices != null){
+            } else if (v == btnClear) {
+                if (mApplication.getMesh().devices != null) {
                     mApplication.getMesh().devices.clear();
                 }
             }
@@ -131,7 +133,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             return;
         }
 
-        if (newfactoryName.length() > 16 || newfactoryPwd.length() > 16 || factoryName.length() >16 || factoryPwd.length() > 16){
+        if (newfactoryName.length() > 16 || newfactoryPwd.length() > 16 || factoryName.length() > 16 || factoryPwd.length() > 16) {
             showToast("invalid! input max length: 16");
             return;
         }

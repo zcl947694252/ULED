@@ -9,8 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -49,24 +48,23 @@
             android:id="@+id/groups_bottom"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:visibility="gone"
+            android:layout_weight="0.3"
             android:orientation="vertical"
-            android:layout_weight="0.3">
+            android:visibility="gone">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_groups"
-                android:scrollbars="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/theme_positive_color"
-                />
+                android:background="@color/theme_positive_color" />
         </LinearLayout>
 
-        <FrameLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -80,8 +78,8 @@
                 android:listSelector="@android:color/transparent"
                 android:numColumns="3"
                 android:scrollbars="none"
-                android:verticalSpacing="10dp"></GridView>
-        </FrameLayout>
+                android:verticalSpacing="10dp" />
+        </RelativeLayout>
 
         <Button
             android:id="@+id/btn_log"
@@ -95,6 +93,7 @@
             android:text="log"
             android:textColor="@android:color/white"
             android:visibility="gone" />
+
         <Button
             android:id="@+id/btn_scan"
             android:layout_width="fill_parent"
