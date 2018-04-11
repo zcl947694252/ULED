@@ -528,26 +528,11 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         this.updateList = new ArrayList<>();
 
 //        groups= DataCreater.getGroups();
-        try {
-            Intent intent = getIntent();
-            isInit = (boolean) intent.getExtras().get("isInit");
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (isInit) {
-                backView.setVisibility(View.GONE);
-                btnScan.setVisibility(View.GONE);
-                btnLog.setVisibility(View.GONE);
-                btnAddGroups.setVisibility(View.GONE);
-                btnGroupingCompleted.setVisibility(View.GONE);
-            } else {
-                backView.setVisibility(View.VISIBLE);
-                btnScan.setVisibility(View.VISIBLE);
-//                btnLog.setVisibility(View.VISIBLE);
-                btnAddGroups.setVisibility(View.GONE);
-                btnGroupingCompleted.setVisibility(View.GONE);
-            }
-        }
+        backView.setVisibility(View.GONE);
+        btnScan.setVisibility(View.GONE);
+        btnLog.setVisibility(View.GONE);
+        btnAddGroups.setVisibility(View.GONE);
+        btnGroupingCompleted.setVisibility(View.GONE);
 
         currentGroupId = SharedPreferencesHelper.getInt(TelinkLightApplication.getInstance(),
                 Constant.DEFAULT_GROUP_ID, -1);
