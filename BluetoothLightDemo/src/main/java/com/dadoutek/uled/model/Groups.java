@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model;
 
+
 import java.io.Serializable;
 
 public class Groups extends DataStorageImpl<Group> implements Serializable{

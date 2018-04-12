@@ -54,7 +54,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
      * 初始化分组数据
      */
     private void initGroupData() {
-        DataCreater.creatGroup(true, 0);//初始化自动创建16个分组
+        DataCreater.creatGroup(this,true, 0);//初始化自动创建16个分组
     }
 
     @Override

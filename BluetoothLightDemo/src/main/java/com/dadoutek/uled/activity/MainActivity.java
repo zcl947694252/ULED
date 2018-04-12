@@ -152,7 +152,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             this.mContent = this.deviceFragment;
         }
 
-        this.mApplication.doInit();
+//        this.mApplication.doInit();
 
         TelinkLog.d("-------------------------------------------");
         TelinkLog.d(Build.MANUFACTURER);
@@ -177,12 +177,13 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
 
     int PERMISSION_REQUEST_CODE = 0x10;
-    private void checkPermission(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.READ_CONTACTS)) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
                     // 显示解释权限用途的界面，然后再继续请求权限
                 } else {
                     // 没有权限，直接请求权限
@@ -305,7 +306,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
 
-
                 if (this.mApplication.isEmptyMesh())
                     return;
 
@@ -317,7 +317,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
                 Mesh mesh = this.mApplication.getMesh();
 
-                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)){
+                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
                     TelinkLightService.Instance().idleMode(true);
                     return;
                 }
@@ -374,20 +374,23 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_LOGIN:
-                this.connectMeshAddress = this.mApplication.getConnectDevice().meshAddress;
+                DeviceInfo connectDevice = this.mApplication.getConnectDevice();
+                if (connectDevice != null) {
+                    this.connectMeshAddress = connectDevice.meshAddress;
 //                this.showToast("login success");
-                if (TelinkLightService.Instance().getMode() == LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            TelinkLightService.Instance().sendCommandNoResponse((byte) 0xE4, 0xFFFF, new byte[]{});
-                        }
-                    }, 3 * 1000);
-                }
+                    if (TelinkLightService.Instance().getMode() == LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                TelinkLightService.Instance().sendCommandNoResponse((byte) 0xE4, 0xFFFF, new byte[]{});
+                            }
+                        }, 3 * 1000);
+                    }
 
-                if (TelinkLightApplication.getApp().getMesh().isOtaProcessing() && foreground) {
-                    startActivity(new Intent(this, OTAUpdateActivity.class)
-                            .putExtra(OTAUpdateActivity.INTENT_KEY_CONTINUE_MESH_OTA, OTAUpdateActivity.CONTINUE_BY_PREVIOUS));
+                    if (TelinkLightApplication.getApp().getMesh().isOtaProcessing() && foreground) {
+                        startActivity(new Intent(this, OTAUpdateActivity.class)
+                                .putExtra(OTAUpdateActivity.INTENT_KEY_CONTINUE_MESH_OTA, OTAUpdateActivity.CONTINUE_BY_PREVIOUS));
+                    }
                 }
                 break;
             case LightAdapter.STATUS_CONNECTING:

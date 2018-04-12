@@ -42,6 +42,7 @@ repositories {
 dependencies {
     //compile(name: "libTelinkLight", ext: "aar")
     //    compile 'com.android.support:support-v4:26.1.0'
+    compile 'com.blankj:utilcode:1.13.10'
     compile project(':BluetoothLightLib')
     compile 'com.google.zxing:core:3.2.1'
     compile 'com.google.zxing:android-core:3.2.1'
@@ -57,4 +58,5 @@ dependencies {
     //    implementation 'com.jakewharton:butterknife:5.1.1'
     compile files('libs/android-butterknife-zelezny.jar')
     compile files('libs/butterknife-7.0.1.jar')
+    compile 'br.com.simplepass:loading-button-android:1.12.1'
 }

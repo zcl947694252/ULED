@@ -99,13 +99,13 @@ public class SharedPreferencesHelper {
         return preferences.getLong(key, defValue);
     }
 
-    public static void putFloat(Context context, String key, float value){
+    public static void putFloat(Context context, String key, float value) {
         SharedPreferences preferences = getSharePre(context);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putFloat(key, value).apply();
     }
 
-    public static float getFloat(Context context, String key, float defValue){
+    public static float getFloat(Context context, String key, float defValue) {
         SharedPreferences preferences = getSharePre(context);
         return preferences.getFloat(key, defValue);
     }

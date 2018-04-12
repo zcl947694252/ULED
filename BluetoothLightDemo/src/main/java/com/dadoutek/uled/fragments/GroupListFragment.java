@@ -89,13 +89,16 @@ public final class GroupListFragment extends Fragment {
 
         Groups.getInstance().clear();
 
-        Groups groups=DataCreater.getGroups();
+        Groups groups = DataCreater.getGroups();
+        Groups.getInstance().add(groups.get(0));    //所有灯必须有
 
-       for(int i=0;i<groups.size();i++){
-           Groups.getInstance().add(groups.get(i));
-       }
-
+        for (int i = 1; i < groups.size(); i++) {
+            Group group = groups.get(i);
+            if (group.containsLightList != null && group.containsLightList.size() > 0)
+                Groups.getInstance().add(group);
+        }
         this.notifyDataSetChanged();
+
     }
 
     public void notifyDataSetChanged() {

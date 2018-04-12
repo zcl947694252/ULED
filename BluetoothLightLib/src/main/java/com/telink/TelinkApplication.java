@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -299,16 +300,14 @@ public class TelinkApplication extends Application {
     }
 
     protected void onStatusChanged(Intent intent) {
-
         DeviceInfo deviceInfo = intent.getParcelableExtra(LightService.EXTRA_DEVICE);
 
         if (deviceInfo.status == LightAdapter.STATUS_LOGIN) {
             mCurrentConnect = deviceInfo;
             this.dispatchEvent(DeviceEvent.newInstance(this, DeviceEvent.CURRENT_CONNECT_CHANGED, deviceInfo));
-        }else if (deviceInfo.status == LightAdapter.STATUS_LOGOUT){
+        } else if (deviceInfo.status == LightAdapter.STATUS_LOGOUT) {
             mCurrentConnect = null;
         }
-
         this.dispatchEvent(DeviceEvent.newInstance(this, DeviceEvent.STATUS_CHANGED, deviceInfo));
     }
 

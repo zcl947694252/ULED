@@ -74,7 +74,6 @@ public final class DeviceListFragment extends Fragment {
     private Button btn_online_status;
 
 
-
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -97,6 +96,8 @@ public final class DeviceListFragment extends Fragment {
                 startActivity(intent);
 
             } else if (v == editView) {
+                //添加设备时，断开当前连接的灯。
+                TelinkLightService.Instance().disconnect();
                 Intent intent = new Intent(mContext, DeviceScanningActivity.class);
 //                Intent intent = new Intent(mContext, DeviceBatchScanningActivity.class);
                 startActivity(intent);
@@ -117,21 +118,20 @@ public final class DeviceListFragment extends Fragment {
                 startActivity(new Intent(getActivity(), LogInfoActivity.class));
             } else if (v.getId() == R.id.userAll) {
                 startActivity(new Intent(getActivity(), UserAllActivity.class));
-            } else if (v ==  btn_start_test){
-                if (!testStarted){
+            } else if (v == btn_start_test) {
+                if (!testStarted) {
                     startIntervalTest();
-                }else {
+                } else {
                     stopIntervalTest();
                 }
-            }else if (v == btn_online_status){
+            } else if (v == btn_online_status) {
                 startActivity(new Intent(getActivity(), OnlineStatusTestActivity.class));
             }
         }
     };
 
 
-
-    private void startIntervalTest(){
+    private void startIntervalTest() {
         try {
             interval = Long.parseLong(et_interval.getText().toString().trim());
             address = Integer.parseInt(et_adr.getText().toString(), 16);
@@ -142,12 +142,12 @@ public final class DeviceListFragment extends Fragment {
             mIntervalHandler.removeCallbacksAndMessages(null);
             mIntervalHandler.post(intervalTask);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(mContext, "input error", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void stopIntervalTest(){
+    private void stopIntervalTest() {
         testStarted = false;
         btn_start_test.setText("start");
         mIntervalHandler.removeCallbacksAndMessages(null);
@@ -156,7 +156,7 @@ public final class DeviceListFragment extends Fragment {
     private Runnable intervalTask = new Runnable() {
         @Override
         public void run() {
-            if (!testStarted)return;
+            if (!testStarted) return;
             if (onOff) {
                 byte opcode = (byte) 0xD0;
 //                int address = 0xFFFF;
@@ -397,7 +397,7 @@ public final class DeviceListFragment extends Fragment {
             holder.txtName.setTextColor(light.textColor);
             holder.statusIcon.setImageResource(light.icon);
 
-            Log.d("dadouLog",light.getLabel()+"-----"+light.textColor+"-----"+light.icon);
+            Log.d("dadouLog", light.getLabel() + "-----" + light.textColor + "-----" + light.icon);
             return convertView;
         }
 

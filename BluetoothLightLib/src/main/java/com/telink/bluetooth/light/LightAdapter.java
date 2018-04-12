@@ -1197,6 +1197,7 @@ public class LightAdapter {
             TelinkLog.d("onResetMeshSuccess "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
+            Log.d("Saw", "setStatus STATUS_UPDATE_MESH_COMPLETED");
             setStatus(STATUS_UPDATE_MESH_COMPLETED);
 
             if (getMode() == MODE_UPDATE_MESH) {

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.util;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.dadoutek.uled.R;
@@ -24,10 +25,20 @@ public class DataCreater {
      * @param automaticCreat 是否系统默认自己创建
      * @param number 当前不是系统创建 automaticCreat为false，填写创建分组数量
      */
-    public static void creatGroup(boolean automaticCreat,int number){
+    public static void creatGroup(Context context, boolean automaticCreat, int number){
         Groups.getInstance().clear();
         Groups groups=Groups.getInstance();
         int groupNum=0;
+
+        Group groupAllLights = new Group();
+        groupAllLights.name = context.getString(R.string.allLight);
+        groupAllLights.meshAddress = 0xFFFF;
+        groupAllLights.brightness = 100;
+        groupAllLights.temperature = 100;
+        groupAllLights.color = 0xFFFFFF;
+        groups.add(groupAllLights);
+
+
 
         if(automaticCreat){
             groupNum=16;
@@ -35,9 +46,9 @@ public class DataCreater {
             groupNum=number;
         }
 
-        for(int i=0;i<groupNum;i++){
+        for(int i=1;i<=groupNum;i++){
             Group group=new Group();
-            group.name = "Group"+i;
+            group.name = context.getString(R.string.group)+i;
             group.meshAddress = 0x8001+i;
             group.brightness = 100;
             group.temperature = 100;

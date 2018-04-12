@@ -14,8 +14,9 @@
 		android:src="@drawable/waiting_up"
 		/>
 	<TextView
+		android:id="@+id/tvContent"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:padding="10dip"
-		android:text="@string/Loading" />
+		android:text="@string/loading" />
 </LinearLayout>

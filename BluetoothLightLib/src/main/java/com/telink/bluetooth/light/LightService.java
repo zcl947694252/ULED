@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.telink.bluetooth.Command;
 
@@ -442,6 +443,7 @@ public abstract class LightService extends Service implements
         } else if (newStatus == LightAdapter.STATUS_UPDATE_ALL_MESH_COMPLETED) {
             intent.setAction(ACTION_UPDATE_MESH_COMPLETED);
         } else if (newStatus == LightAdapter.STATUS_OTA_PROGRESS) {
+            Log.d("Saw", "######## newStatus == LightAdapter.STATUS_OTA_PROGRESS ##########");
             OtaDeviceInfo deviceInfo = new OtaDeviceInfo();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
             deviceInfo.macAddress = light.getMacAddress();
@@ -451,6 +453,7 @@ public abstract class LightService extends Service implements
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
         } else {
+            Log.d("Saw", "######## newStatus == " + newStatus + " ###########");
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.macAddress = light.getMacAddress();
             deviceInfo.deviceName = light.getDeviceName();
