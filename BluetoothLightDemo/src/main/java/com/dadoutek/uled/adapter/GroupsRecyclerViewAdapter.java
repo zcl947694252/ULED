@@ -21,7 +21,7 @@ import java.util.List;
  * Created by hejiajun on 2018/3/28.
  */
 
-public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder>implements View.OnClickListener{
+public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
 
     private Groups mGroupList;
     //声明自定义的监听接口
@@ -37,7 +37,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         return Groups.getInstance().getByMeshAddress(addr);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView groupImage;
         TextView groupName;
 
@@ -48,14 +48,14 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         }
     }
 
-    public GroupsRecyclerViewAdapter(Groups mGroupList,OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener) {
+    public GroupsRecyclerViewAdapter(Groups mGroupList, OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener) {
         this.mGroupList = mGroupList;
         this.mOnRecyclerviewItemClickListener = mOnRecyclerviewItemClickListener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adpter_item_recycler_groups,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adpter_item_recycler_groups, parent, false);
         ViewHolder holder = new ViewHolder(view);
         view.setOnClickListener(this);
         return holder;
@@ -66,13 +66,13 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         Group group = mGroupList.get(position);
         holder.groupName.setText(group.name);
         holder.itemView.setTag(position);//给view设置tag以作为参数传递到监听回调方法中
-        if(mGroupList.get(position).checked){
+        if (mGroupList.get(position).checked) {
             holder.groupImage.setImageResource(R.drawable.ic_group_black_48dp);
-        }else{
+        } else {
             holder.groupImage.setImageResource(R.drawable.ic_group_white_48dp);
         }
 
-        if(position==mGroupList.size()-1){
+        if (position == mGroupList.size() - 1) {
             holder.itemView.setVisibility(View.GONE);
         }
     }

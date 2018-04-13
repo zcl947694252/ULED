@@ -3,6 +3,7 @@ package com.dadoutek.uled;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.model.DeviceInfo;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
@@ -32,6 +33,7 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void onCreate() {
         super.onCreate();
         //this.doInit();
+        Utils.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
 //        CrashReport.testJavaCrash();
         logInfo = new StringBuilder("log:");
@@ -93,7 +95,7 @@ public final class TelinkLightApplication extends TelinkApplication {
     }
 
     public Mesh getMesh() {
-        if (this.mesh == null){
+        if (this.mesh == null) {
             this.mesh = new Mesh();
             this.mesh.factoryName = "telink_mesh1";
             this.mesh.factoryPassword = "123";
@@ -106,7 +108,7 @@ public final class TelinkLightApplication extends TelinkApplication {
         refreshLights();
     }
 
-    public void refreshLights(){
+    public void refreshLights() {
         if (mesh != null && mesh.devices != null) {
             Lights.getInstance().clear();
             Light light;
@@ -123,7 +125,6 @@ public final class TelinkLightApplication extends TelinkApplication {
             }
         }
     }
-
 
 
     public boolean isEmptyMesh() {

@@ -12,7 +12,7 @@
     <!-- Bottom Nav -->
     <string name="header_devices">Lights</string>
     <string name="header_groups">Groups</string>
-    <string name="header_account">Me</string>
+    <string name="header_account">我的</string>
 
     <!-- DeviceSchema List -->
     <string name="device_list_header">灯</string>
@@ -26,19 +26,19 @@
     <!-- DeviceSchema Setting -->
     <string name="device_setting_header">Light Setting</string>
     <string name="device_setting_brightness">Brightness</string>
-    <string name="device_setting_color">Color</string>
-    <string name="device_setting_temperature">Color Temperature</string>
-    <string name="device_setting_music">Music</string>
+    <string name="device_setting_color">颜色</string>
+    <string name="device_setting_temperature">色温</string>
+    <string name="device_setting_music">音乐</string>
     <string name="device_setting_sound">Playing by heart</string>
-    <string name="device_setting_remove_device">Remove Device</string>
+    <string name="device_setting_remove_device">移除设备</string>
 
     <!-- DeviceSchema Grouping -->
-    <string name="device_grouping_header">Grouping</string>
+    <string name="device_grouping_header">分组</string>
 
     <!-- Scan DeviceSchema -->
-    <string name="device_scan_header">Network Scanning</string>
-    <string name="device_scan_scan">Scan Device</string>
-    <string name="device_scan_add">Add Device</string>
+    <string name="device_scan_header">扫描网络</string>
+    <string name="device_scan_scan">扫描设备</string>
+    <string name="device_scan_add">添加设备</string>
 
     <!-- GroupSchema List -->
     <string name="group_list_header">组</string>
@@ -49,18 +49,18 @@
     <string name="group_setting_header">分组设置</string>
 
     <!-- MeshSchema Add -->
-    <string name="mesh_add_header">Add Mesh</string>
-    <string name="mesh_add_label_mesh_setting">Mesh Setting</string>
-    <string name="mesh_add_label_factory_setting">Factory Default Setting</string>
-    <string name="mesh_add_button_save">Save Mesh</string>
-    <string name="mesh_add_button_share">Share Mesh</string>
-    <string name="mesh_add_button_clear">Clear Mesh</string>
+    <string name="mesh_add_header">控制设置</string>
+    <string name="mesh_add_label_mesh_setting">控制设置</string>
+    <string name="mesh_add_label_factory_setting">出厂默认设置</string>
+    <string name="mesh_add_button_save">保存</string>
+    <string name="mesh_add_button_share">分享</string>
+    <string name="mesh_add_button_clear">清空</string>
     <string name="mesh_add_default_factory_name">telink_mesh1</string>
     <string name="mesh_add_default_factory_password">123</string>
-    <string name="mesh_add_mesh_name">Default Mesh Name</string>
-    <string name="mesh_add_mesh_password">Default Mesh Password</string>
-    <string name="mesh_add_factory_mesh_name">Factory Mesh Name</string>
-    <string name="mesh_add_factory_mesh_password">Factory Mesh Password</string>
+    <string name="mesh_add_mesh_name">控制名称</string>
+    <string name="mesh_add_mesh_password">控制密码</string>
+    <string name="mesh_add_factory_mesh_name">安装Mesh名称</string>
+    <string name="mesh_add_factory_mesh_password">安装Mesh密码</string>
 
     <string name="title_activity_group_setting">GroupSettingActivity</string>
     <string name="title_activity_test">TestActivity</string>
@@ -72,14 +72,19 @@
     <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
     <string name="target_version">Target Version : %s</string>
     <string name="scan_tip">扫描灯具需要相关权限，否则无法进行下一步操作</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Cancel</string>
+    <string name="btn_ok">确定</string>
+    <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
     <string name="loading">扫描中...</string>
     <string name="scan_end">扫描完成，没有发现设备！</string>
-    <string name="device_login_tip">正在登陆设备；请稍后！</string>
+    <string name="device_login_tip">正在登陆设备，请稍后！</string>
     <string name="grouping_completed">分组完成</string>
     <string name="allLight">所有灯</string>
     <string name="group">组</string>
+    <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
+    <string name="quite">退出</string>
+    <string name="retry">重试</string>
+    <string name="light">灯</string>
+    <string name="me">我</string>
 
 </resources>

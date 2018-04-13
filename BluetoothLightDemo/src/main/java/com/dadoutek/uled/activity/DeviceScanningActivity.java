@@ -32,8 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.ObjectUtils;
-import com.blankj.utilcode.util.Utils;
+import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -74,7 +74,15 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String> {
     private static final String TAG = DeviceScanningActivity.class.getSimpleName();
@@ -164,6 +172,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     //处理扫描成功后
     private void scanSuccess() {
+
         //先连接灯。
         autoConnect();
 
@@ -175,11 +184,33 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         nowLightList.add(adapter.getLights());
         btnAddGroups.setOnClickListener(v -> {
             if (isLoginSuccess) {
-                //实现分组方案
+                //进入分组
                 startGrouping();
             } else {
-                Toast.makeText(DeviceScanningActivity.this,
-                        getResources().getString(R.string.device_login_tip), Toast.LENGTH_SHORT).show();
+                openLoadingDialog(getResources().getString(R.string.device_login_tip));
+                Consumer<Boolean> loginConsumer = aBoolean -> {
+                    if (aBoolean) {
+                        //收到登录成功的时间后关闭dialog并自动进入分组流程。
+                        closeDialog();
+                        startGrouping();
+                    }
+                };
+                mDisposable.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+                    //循环检测isLoginSuccess
+                    while (true) {
+                        Thread.sleep(20);   //两次检测之间的延时是必须的
+                        Log.d("Saw", "isLoginSuccess = " + isLoginSuccess);
+                        //如果isLoginSuccess为 true，则发射事件并退出循环检测。
+                        if (isLoginSuccess) {
+                            emitter.onNext(true);
+                            emitter.onComplete();
+                            break;
+                        }
+                    }
+                })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(loginConsumer));
             }
         });
         if (timer != null) {
@@ -296,6 +327,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 DataCreater.updateGroup(groups);
                 DataCreater.updateLights(nowLightList);
                 //目前测试调到主页
+                ActivityUtils.finishToActivity(MainActivity.class, true, true);
                 Intent intent = new Intent(DeviceScanningActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
@@ -365,13 +397,17 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         int index = 0;
 //        openLoadingDialog(getString(R.string.grouping));
         while (index < selectLights.size()) {
-            sendGroupData(selectLights.get(index), group, index);
-            index++;
-            try {
-                Thread.sleep(420);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            //每个灯发5次分组的命令，确保灯能收到命令.
+            for (int i = 0; i < 5; i++) {
+                sendGroupData(selectLights.get(index), group, index);
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+            index++;
+
         }
     }
 
@@ -529,7 +565,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         nextTime = 0;
         this.mApplication.removeEventListener(this);
         this.mHandler.removeCallbacksAndMessages(null);
-//        mDisposable.dispose();  //销毁时取消订阅.
+        mDisposable.dispose();  //销毁时取消订阅.
     }
 
     @Override
@@ -791,7 +827,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),      //0x01 代表添加组
                 (byte) (groupAddress >> 8 & 0xFF)};
 
-        Log.d("Scanner", "checkSelectLamp: " + "opcode:" + opcode + ";  dstAddress:" + dstAddress + ";  params:" + params.toString());
+//        Log.d("Scanner", "checkSelectLamp: " + "opcode:" + opcode + ";  dstAddress:" + dstAddress + ";  params:" + params.toString());
 //        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  group:name=="+group.name+";  group:name=="+group.meshAddress+";  lighthas"+light.hasGroup);
 
         if (group.checked) {
@@ -806,8 +842,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         //已分组灯不显示
 //        nowLightList.get(index).hasGroup=true;
-        Log.d("groupingCC", "sendGroupData: " + "----dstAddress:" + dstAddress + ";  group:name==" + group.name + "; " +
-                " group:name==" + group.meshAddress + ";  lighthas" + light.hasGroup);
+//        Log.d("groupingCC", "sendGroupData: " + "----dstAddress:" + dstAddress + ";  group:name==" + group.name + "; " +
+//                " group:name==" + group.meshAddress + ";  lighthas" + light.hasGroup);
         //灯和分组互相绑定
 //            Lights.getInstance().get(index).belongGroups.add(group.name);
 

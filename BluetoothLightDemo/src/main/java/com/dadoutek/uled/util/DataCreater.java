@@ -20,6 +20,16 @@ import java.util.List;
 
 public class DataCreater {
 
+
+    public static Group createAllLightController(Context context){
+        Group groupAllLights = new Group();
+        groupAllLights.name = context.getString(R.string.allLight);
+        groupAllLights.meshAddress = 0xFFFF;
+        groupAllLights.brightness = 100;
+        groupAllLights.temperature = 100;
+        groupAllLights.color = 0xFFFFFF;
+        return groupAllLights;
+    }
     /**
      * 创建分组
      * @param automaticCreat 是否系统默认自己创建
@@ -29,15 +39,6 @@ public class DataCreater {
         Groups.getInstance().clear();
         Groups groups=Groups.getInstance();
         int groupNum=0;
-
-        Group groupAllLights = new Group();
-        groupAllLights.name = context.getString(R.string.allLight);
-        groupAllLights.meshAddress = 0xFFFF;
-        groupAllLights.brightness = 100;
-        groupAllLights.temperature = 100;
-        groupAllLights.color = 0xFFFFFF;
-        groups.add(groupAllLights);
-
 
 
         if(automaticCreat){

@@ -101,12 +101,10 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         Groups.getInstance().clear();
 
-        Groups groups=DataCreater.getGroups();
+        Groups groups = DataCreater.getGroups();
 
-        for(int i=0;i<groups.size();i++){
-            if(groups.get(i).containsLightList.size()>0){
-                Groups.getInstance().add(groups.get(i));
-            }
+        for (int i = 0; i < groups.size(); i++) {
+            Groups.getInstance().add(groups.get(i));
         }
 
         this.adapter.notifyDataSetChanged();

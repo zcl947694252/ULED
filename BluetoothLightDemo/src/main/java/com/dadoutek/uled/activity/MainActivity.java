@@ -1,6 +1,7 @@
 package com.dadoutek.uled.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -12,18 +13,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
@@ -33,6 +40,7 @@ import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.FragmentFactory;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -49,25 +57,47 @@ import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.OnlineStatusNotificationParser;
 import com.telink.bluetooth.light.Parameters;
-import com.dadoutek.uled.R;
 import com.telink.util.BuildUtils;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 public final class MainActivity extends TelinkMeshErrorDealActivity implements EventListener<String> {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
     private static final int UPDATE_LIST = 0;
+    @BindView(R.id.content)
+    FrameLayout content;
+    @BindView(R.id.tab_devices)
+    ImageView tabDevices;
+    @BindView(R.id.tab_groups)
+    ImageView tabGroups;
+    @BindView(R.id.tab_account)
+    ImageView tabAccount;
+    @BindView(R.id.tabs)
+    ConstraintLayout tabs;
+    @BindView(R.id.tvLight)
+    TextView tvLight;
+    @BindView(R.id.tvGroups)
+    TextView tvGroups;
+    @BindView(R.id.tvAccount)
+    TextView tvAccount;
+
     private FragmentManager fragmentManager;
     private DeviceListFragment deviceFragment;
     private GroupListFragment groupFragment;
 
     private Fragment mContent;
 
-    private RadioGroup tabs;
 
     private TelinkLightApplication mApplication;
 
@@ -120,6 +150,10 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             }
         }
     };
+    private Disposable mDisposableDevices;
+    private Disposable mDisposableGroup;
+    private Disposable mDisposableDevicesText;
+    private Disposable mDisposableGroupsText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +164,10 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         //TelinkLog.ENABLE = false;
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        initBottomIconStatus();
+        initBottomIconClickListener();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
 
@@ -140,8 +178,9 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         this.groupFragment = (GroupListFragment) FragmentFactory
                 .createFragment(R.id.tab_groups);
 
-        this.tabs = (RadioGroup) this.findViewById(R.id.tabs);
-        this.tabs.setOnCheckedChangeListener(this.checkedChangeListener);
+//        this.tabs = (ConstraintLayout) this.findViewById(R.id.tabs);
+//        this.tabs.setOnCheckedChangeListener(this.checkedChangeListener);
+
 
         if (savedInstanceState == null) {
 
@@ -173,6 +212,74 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         registerReceiver(mReceiver, filter);
 
         checkPermission();
+    }
+
+    /**
+     * 设置底部Icon的默认状态，默认让的一个Icon作为选中Icon
+     */
+    private void initBottomIconStatus() {
+        tabDevices.setSelected(true);
+        tabDevices.setColorFilter(getResources().getColor(R.color.theme_positive_color));
+    }
+
+    /**
+     * 初始化底部Icon的点击事件监听
+     */
+    private void initBottomIconClickListener() {
+        //获取APP主颜色
+        int positiveColor = getResources().getColor(R.color.theme_positive_color);
+        Consumer<Object> devicesConsumer = o -> {
+            if (!tabDevices.isSelected()) {
+                tabDevices.setSelected(true);
+                tabGroups.setSelected(false);
+                tabAccount.setSelected(false);
+                tabDevices.setColorFilter(positiveColor);
+                tabGroups.setColorFilter(Color.GRAY);
+                tabAccount.setColorFilter(Color.GRAY);
+
+                tvLight.setTextColor(positiveColor);
+                tvGroups.setTextColor(Color.GRAY);
+                tvAccount.setTextColor(Color.GRAY);
+
+                switchContent(mContent, deviceFragment);
+            }
+        };
+
+        Consumer<Object> groupConsumer = o -> {
+            if (!tabGroups.isSelected()) {
+                tabDevices.setSelected(false);
+                tabGroups.setSelected(true);
+                tabAccount.setSelected(false);
+                tabDevices.setColorFilter(Color.GRAY);
+                tabGroups.setColorFilter(positiveColor);
+                tabAccount.setColorFilter(Color.GRAY);
+
+                tvLight.setTextColor(Color.GRAY);
+                tvGroups.setTextColor(positiveColor);
+                tvAccount.setTextColor(Color.GRAY);
+
+                switchContent(mContent, groupFragment);
+            }
+        };
+
+        mDisposableDevices = RxView.clicks(tabDevices)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(devicesConsumer);
+        mDisposableDevicesText = RxView.clicks(tvLight)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(devicesConsumer);
+
+        mDisposableGroup = RxView.clicks(tabGroups)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(groupConsumer);
+        mDisposableGroupsText = RxView.clicks(tvGroups)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(groupConsumer);
+
     }
 
 
@@ -240,21 +347,12 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             return;
         }
 
+        //如果蓝牙没开，则弹窗提示用户打开蓝牙
         if (!LeBluetooth.getInstance().isEnabled()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("开启蓝牙，体验智能灯!");
-            builder.setNeutralButton("cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            builder.setNegativeButton("enable", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    LeBluetooth.getInstance().enable(getApplicationContext());
-                }
-            });
+            builder.setMessage(getString(R.string.openBluetooth));
+            builder.setNeutralButton(R.string.btn_cancel, (dialog, which) -> finish());
+            builder.setNegativeButton(R.string.btn_ok, (dialog, which) -> LeBluetooth.getInstance().enable(getApplicationContext()));
             builder.show();
         }
 
@@ -265,12 +363,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         }
 
         Log.d(TAG, "onResume");
-//        mDelayHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                getAlarm();
-//            }
-//        }, 8000);
     }
 
     public static void getAlarm() {
@@ -365,8 +457,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             transaction.commit();
         }
     }
-
-    private Handler mHanlder = new Handler();
 
     private void onDeviceStatusChanged(DeviceEvent event) {
 
@@ -519,7 +609,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 mTimeoutBuilder = new AlertDialog.Builder(this);
                 mTimeoutBuilder.setTitle("AutoConnect Fail");
                 mTimeoutBuilder.setMessage("Connect device:" + TelinkLightApplication.getApp().getMesh().otaDevice.mac + " Fail, Quit? \nYES: quit MeshOTA process, NO: retry");
-                mTimeoutBuilder.setNeutralButton("Quit", new DialogInterface.OnClickListener() {
+                mTimeoutBuilder.setNeutralButton(R.string.quite, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Mesh mesh = TelinkLightApplication.getApp().getMesh();
@@ -529,7 +619,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                         dialog.dismiss();
                     }
                 });
-                mTimeoutBuilder.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
+                mTimeoutBuilder.setNegativeButton(R.string.retry, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         autoConnect();
