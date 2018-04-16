@@ -86,7 +86,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String> {
     private static final String TAG = DeviceScanningActivity.class.getSimpleName();
-    private static final int SCAN_TIMEOUT_SECOND = 30;
+    private static final int SCAN_TIMEOUT_SECOND = 10;
     //    @Bind(R.id.recycler_view_groups)
     android.support.v7.widget.RecyclerView recyclerViewGroups;
     //    @Bind(R.id.groups_bottom)
@@ -425,7 +425,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private Group getCurrentGroup() {
         if (currentGroupIndex == -1) {
-            return null;
+            return groups.get(0);
         }
         return groups.get(currentGroupIndex);
     }
@@ -440,13 +440,13 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 } else if (i == position && !groups.get(i).checked) {
                     updateData(i, true);
                 } else if (i == position && groups.get(i).checked) {
-                    updateData(i, false);
+                    updateData(i, true);
                 }
             }
 
             groupsRecyclerViewAdapter.notifyDataSetChanged();
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    Constant.GROUPS_KEY, groups);
+//            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+//                    Constant.GROUPS_KEY, groups);
             SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
         }
@@ -469,7 +469,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_device_scanning);
-        groups = DataCreater.getGroups();
+        groups = DataCreater.getInitGroups();
 //        checkPermission();
 //        handleIfSupportBle();
         initView();

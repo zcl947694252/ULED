@@ -11,6 +11,7 @@ import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,6 +56,7 @@ public class DataCreater {
             group.temperature = 100;
             group.color = 0xFFFFFF;
             group.icon= R.drawable.ic_group_white_48dp;
+            group.checked=false;
             groups.add(group);
         }
 
@@ -103,6 +105,30 @@ public class DataCreater {
     public static Groups getGroups(){
         Groups groups;
         groups=(Groups) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.GROUPS_KEY);
-        return  groups;
+
+        if(groups!=null&&groups.size()>0){
+            return groups;
+        }else{
+            return  Groups.getInstance();
+        }
+    }
+
+    public static Groups getInitGroups(){
+        Groups groups;
+        groups=(Groups) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.GROUPS_KEY);
+
+        if(groups!=null&&groups.size()>0){
+            for(int j=0;j<groups.size();j++){
+                if(j==0){
+                    Group group=groups.get(j);
+                    group.checked=true;
+                    groups.set(j,group);
+                }else
+                groups.get(j).checked=false;
+            }
+            return groups;
+        }else{
+            return  Groups.getInstance();
+        }
     }
 }

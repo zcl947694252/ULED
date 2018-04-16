@@ -75,6 +75,10 @@ public abstract class DataStorageImpl<E> implements DataStorage<E>,Serializable{
         return null;
     }
 
+    public void set(int index, E element) {
+       this.data.set(index,element);
+    }
+
     @Override
     public List<E> get() {
         return this.data;

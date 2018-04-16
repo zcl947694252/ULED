@@ -47,7 +47,6 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
-
     }
 
     /**

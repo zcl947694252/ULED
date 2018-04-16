@@ -20,6 +20,8 @@ public interface DataStorage<E> {
 
 	E get(int location);
 
+	void set(int index, E element);
+
 	void remove(int location);
 
 	void remove(E e);

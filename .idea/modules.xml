@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BluetoothLightDemo/BluetoothLightDemo.iml" filepath="$PROJECT_DIR$/BluetoothLightDemo/BluetoothLightDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" filepath="$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ULED.iml" filepath="$PROJECT_DIR$/ULED.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Uled.iml" filepath="$PROJECT_DIR$/Uled.iml" />
     </modules>
   </component>
 </project>
