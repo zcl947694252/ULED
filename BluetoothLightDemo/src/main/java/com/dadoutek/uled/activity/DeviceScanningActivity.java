@@ -324,13 +324,15 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             if (checkLightsHaveGroup()) {//所有灯都有分组可以跳转
                 showToast("分组完成！");
                 //页面跳转前进行分组数据保存
-                DataCreater.updateGroup(groups);
-                DataCreater.updateLights(nowLightList);
+//                DataCreater.updateGroup(groups);
+//                DataCreater.updateLights(nowLightList);
+
+                TelinkLightService.Instance().idleMode(true);
                 //目前测试调到主页
                 ActivityUtils.finishToActivity(MainActivity.class, true, true);
-                Intent intent = new Intent(DeviceScanningActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+//                Intent intent = new Intent(DeviceScanningActivity.this, MainActivity.class);
+//                startActivity(intent);
+//                finish();
             } else {
                 showToast("还有灯没有分组，请完成分组操作");
             }
@@ -398,10 +400,10 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 //        openLoadingDialog(getString(R.string.grouping));
         while (index < selectLights.size()) {
             //每个灯发5次分组的命令，确保灯能收到命令.
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 3; i++) {
                 sendGroupData(selectLights.get(index), group, index);
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -551,8 +553,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         btnAddGroups.setVisibility(View.GONE);
         btnGroupingCompleted.setVisibility(View.GONE);
 
-        currentGroupIndex = SharedPreferencesHelper.getInt(TelinkLightApplication.getInstance(),
-                Constant.DEFAULT_GROUP_ID, -1);
+        currentGroupIndex = -1;
     }
 
     @Override

@@ -7,6 +7,8 @@ package com.telink.bluetooth.light;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * 设备信息类
  */

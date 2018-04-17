@@ -36,6 +36,7 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.fragments.DeviceListFragment;
 import com.dadoutek.uled.fragments.GroupListFragment;
+import com.dadoutek.uled.fragments.MeFragment;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
@@ -95,6 +96,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     private FragmentManager fragmentManager;
     private DeviceListFragment deviceFragment;
     private GroupListFragment groupFragment;
+    private MeFragment meFragment;
 
     private Fragment mContent;
 
@@ -110,6 +112,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 switchContent(mContent, deviceFragment);
             } else if (checkedId == R.id.tab_groups) {
                 switchContent(mContent, groupFragment);
+            }else if(checkedId == R.id.tab_account){
+                switchContent(mContent, meFragment);
             }
         }
     };
@@ -154,6 +158,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     private Disposable mDisposableGroup;
     private Disposable mDisposableDevicesText;
     private Disposable mDisposableGroupsText;
+    private Disposable mDisposableAcount;
+    private Disposable mDisposableAcountText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +183,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 .createFragment(R.id.tab_devices);
         this.groupFragment = (GroupListFragment) FragmentFactory
                 .createFragment(R.id.tab_groups);
+        this.meFragment=(MeFragment)FragmentFactory
+                .createFragment(R.id.tab_account);
 
 //        this.tabs = (ConstraintLayout) this.findViewById(R.id.tabs);
 //        this.tabs.setOnCheckedChangeListener(this.checkedChangeListener);
@@ -262,6 +270,23 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             }
         };
 
+        Consumer<Object> acountConsumer = o -> {
+            if (!tabAccount.isSelected()) {
+                tabDevices.setSelected(false);
+                tabGroups.setSelected(false);
+                tabAccount.setSelected(true);
+                tabDevices.setColorFilter(Color.GRAY);
+                tabGroups.setColorFilter(Color.GRAY);
+                tabAccount.setColorFilter(positiveColor);
+
+                tvLight.setTextColor(Color.GRAY);
+                tvGroups.setTextColor(Color.GRAY);
+                tvAccount.setTextColor(positiveColor);
+
+                switchContent(mContent, meFragment);
+            }
+        };
+
         mDisposableDevices = RxView.clicks(tabDevices)
                 .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(AndroidSchedulers.mainThread())
@@ -279,6 +304,15 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(groupConsumer);
+
+        mDisposableGroup = RxView.clicks(tabAccount)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(acountConsumer);
+        mDisposableGroupsText = RxView.clicks(tvAccount)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(acountConsumer);
 
     }
 
