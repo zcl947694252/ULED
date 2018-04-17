@@ -333,7 +333,12 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
                 TelinkLightService.Instance().idleMode(true);
                 //目前测试调到主页
-                ActivityUtils.finishToActivity(MainActivity.class, false, true);
+                if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
+                    ActivityUtils.finishToActivity(MainActivity.class, false, true);
+                else {
+                    ActivityUtils.startActivity(MainActivity.class);
+                    finish();
+                }
 //                Intent intent = new Intent(DeviceScanningActivity.this, MainActivity.class);
 //                startActivity(intent);
 //                finish();
