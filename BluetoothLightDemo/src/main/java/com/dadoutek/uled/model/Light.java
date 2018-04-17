@@ -9,7 +9,7 @@ import com.dadoutek.uled.R;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public final class Light implements Serializable{
+public final class Light implements Serializable,Cloneable{
 
     public String name;//设备名
     public String macAddress;//蓝牙地址
@@ -55,5 +55,10 @@ public final class Light implements Serializable{
           } else if (this.status == ConnectionStatus.ON) {
               this.icon = R.drawable.icon_light_on;
           }
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

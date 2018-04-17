@@ -33,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -70,17 +69,16 @@ import com.telink.util.EventListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -125,13 +123,15 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     //灯的所属分组缓存
     private List<Group> lightToGroupList = null;
     //分组所含灯的缓存
-    private Lights nowLightList = Lights.getInstance();
+    private Lights nowLightList;
     private ArrayList<Integer> indexList = new ArrayList<>();
 
     private final MyHandler handler = new MyHandler(this);
 
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
+
+    private Disposable mGroupingDisposable;
 
     private OnClickListener clickListener = new OnClickListener() {
 
@@ -178,10 +178,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText("开始分组");
-        if (nowLightList != null && nowLightList.size() > 0) {
-            nowLightList.clear();
-        }
-        nowLightList.add(adapter.getLights());
+
         btnAddGroups.setOnClickListener(v -> {
             if (isLoginSuccess) {
                 //进入分组
@@ -317,6 +314,12 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void startGrouping() {
+        //存储当前添加的灯。
+        if (nowLightList != null && nowLightList.size() > 0) {
+            nowLightList.clear();
+        }
+        nowLightList.add(adapter.getLights());
+
         changeGroupView();
         //完成分组
         btnGroupingCompleted.setOnClickListener(v -> {
@@ -327,13 +330,15 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 DataCreater.updateGroup(groups);
                 DataCreater.updateLights(nowLightList);
 
+
                 TelinkLightService.Instance().idleMode(true);
                 //目前测试调到主页
-//                ActivityUtils.finishToActivity(MainActivity.class, true, true);
-                Intent intent = new Intent(DeviceScanningActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                ActivityUtils.finishToActivity(MainActivity.class, false, true);
+//                Intent intent = new Intent(DeviceScanningActivity.this, MainActivity.class);
+//                startActivity(intent);
+//                finish();
             } else {
+
                 showToast("还有灯没有分组，请完成分组操作");
             }
         });
@@ -397,25 +402,42 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             nowLightList.get(indexList.get(i)).belongGroups.add(group.name);
         }
 
-        int index = 0;
-        while (index < selectLights.size()) {
-            //每个灯发5次分组的命令，确保灯能收到命令.
-            for (int i = 0; i < 3; i++) {
-                sendGroupData(selectLights.get(index), group, index);
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+        mGroupingDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+            int index = 0;
+            while (index < selectLights.size()) {
+                //每个灯发3次分组的命令，确保灯能收到命令.
+                for (int i = 0; i < 3; i++) {
+                    Light light = selectLights.get(index);
+                    sendGroupData(light, group, index);
+                    saveLightAddrToGroup(light);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                index++;
             }
-            index++;
-        }
+            emitter.onNext(true);
+            emitter.onComplete();
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(o -> {
+                    if (o) {
+                        adapter.notifyDataSetChanged();
+                        closeDialog();
+                    }
+                });
 
-        new Handler().postDelayed(()-> {
-
-                closeDialog();
-
-        },selectLights.size()*3*300);
+        mDisposable.add(mGroupingDisposable);
+//
+//        new Handler().postDelayed(() -> {
+//
+//            closeDialog();
+//
+//        }, selectLights.size() * 3 * 300);
     }
 
     private List<Light> getCurrentSelectLights() {
@@ -476,12 +498,24 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_device_scanning);
-        groups = DataCreater.getInitGroups();
+
 //        checkPermission();
 //        handleIfSupportBle();
+        initData();
         initView();
         initClick();
         startScan(0);
+    }
+
+    private void initData() {
+        groups = DataCreater.getInitGroups();
+        try {
+            //深拷贝
+            nowLightList = (Lights) Lights.getInstance().clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void initClick() {
@@ -853,11 +887,25 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         //灯和分组互相绑定
 //            Lights.getInstance().get(index).belongGroups.add(group.name);
 
+//        if (group.containsLightList == null) {
+//            group.containsLightList = new ArrayList<>();
+//        }
+//        group.containsLightList.add(light.meshAddress);
+//        adapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 把light的address保存在当前选择的Group内。
+     *
+     * @param light 要保存的Light
+     */
+    public void saveLightAddrToGroup(Light light) {
+        Group group = getCurrentGroup();
         if (group.containsLightList == null) {
             group.containsLightList = new ArrayList<>();
         }
         group.containsLightList.add(light.meshAddress);
-        adapter.notifyDataSetChanged();
+
     }
 
     /**
