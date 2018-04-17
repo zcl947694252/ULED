@@ -305,11 +305,11 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(groupConsumer);
 
-        mDisposableGroup = RxView.clicks(tabAccount)
+        mDisposableAcount = RxView.clicks(tabAccount)
                 .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(acountConsumer);
-        mDisposableGroupsText = RxView.clicks(tvAccount)
+        mDisposableAcountText = RxView.clicks(tvAccount)
                 .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(acountConsumer);

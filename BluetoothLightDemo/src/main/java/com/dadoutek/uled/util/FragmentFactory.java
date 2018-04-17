@@ -5,6 +5,7 @@ import android.app.Fragment;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.fragments.DeviceListFragment;
 import com.dadoutek.uled.fragments.GroupListFragment;
+import com.dadoutek.uled.fragments.MeFragment;
 
 public abstract class FragmentFactory {
 
@@ -17,6 +18,7 @@ public abstract class FragmentFactory {
 		} else if (id == R.id.tab_groups) {
 			fragment = new GroupListFragment();
 		} else if (id == R.id.tab_account) {
+			fragment = new MeFragment();
 		}
 
 		return fragment;

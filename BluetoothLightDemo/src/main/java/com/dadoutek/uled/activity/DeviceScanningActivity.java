@@ -152,7 +152,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private void scanFail() {
         btnAddGroups.setVisibility(View.VISIBLE);
         btnGroupingCompleted.setVisibility(View.GONE);
-        btnAddGroups.setText("重新扫描");
+        btnAddGroups.setText(R.string.rescan);
         btnAddGroups.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,7 +177,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         autoConnect();
 
         btnAddGroups.setVisibility(View.VISIBLE);
-        btnAddGroups.setText("开始分组");
+        btnAddGroups.setText(R.string.start_group_bt);
         if (nowLightList != null && nowLightList.size() > 0) {
             nowLightList.clear();
         }
@@ -322,7 +322,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         btnGroupingCompleted.setOnClickListener(v -> {
             //判定是否还有灯没有分组，如果没有允许跳转到下一个页面
             if (checkLightsHaveGroup()) {//所有灯都有分组可以跳转
-                showToast("分组完成！");
+                showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
                 DataCreater.updateGroup(groups);
                 DataCreater.updateLights(nowLightList);
@@ -334,12 +334,12 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 startActivity(intent);
                 finish();
             } else {
-                showToast("还有灯没有分组，请完成分组操作");
+                showToast(getString(R.string.have_lamp_no_group_tip));
             }
         });
 
         //确定当前分组
-        btnAddGroups.setText("确定分组");
+        btnAddGroups.setText(R.string.sure_group);
         btnAddGroups.setOnClickListener(v -> {
             sureGroups();
             checkLightsHaveGroup();
@@ -378,13 +378,13 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             setGroups(group, selectLights);
 
         } else if (!hasBeSelected) {
-            showToast("请至少选择一个灯！");
+            showToast(getString(R.string.selected_lamp_tip));
         }
     }
 
     private void setGroups(Group group, List<Light> selectLights) {
         if (group == null) {
-            Toast.makeText(DeviceScanningActivity.this, "请至少选择一个分组", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DeviceScanningActivity.this, R.string.select_group_tip, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -619,7 +619,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         final int meshAddress = mesh.getDeviceAddress();
 
         if (meshAddress == -1) {
-            this.showToast("哎呦，网络里的灯泡太多了！目前可以有256灯");
+            this.showToast(getString(R.string.much_lamp_tip));
             this.finish();
             return;
         }
@@ -765,7 +765,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void onMeshEvent(MeshEvent event) {
-        new AlertDialog.Builder(this).setMessage("重启蓝牙,更好地体验智能灯!").show();
+        new AlertDialog.Builder(this).setMessage(R.string.restart_bluetooth).show();
     }
 
     @Override

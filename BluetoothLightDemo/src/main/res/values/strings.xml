@@ -71,14 +71,14 @@
     <string name="progress_ota">OTA Progress: %s </string>
     <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
     <string name="target_version">Target Version : %s</string>
-    <string name="scan_tip">扫描灯具需要相关权限，否则无法进行下一步操作</string>
+    <string name="scan_tip">Scanning lights need related permissions, otherwise it can not proceed to the next step</string>
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="add_groups">添加分组</string>
-    <string name="loading">扫描中...</string>
-    <string name="scan_end">扫描完成，没有发现设备！</string>
+    <string name="add_groups">Add a group</string>
+    <string name="loading">Scanning...</string>
+    <string name="scan_end">The scan was completed and no equipment was found!</string>
     <string name="device_login_tip">Logging, please wait!</string>
-    <string name="grouping_completed">分组完成</string>
+    <string name="grouping_completed">Grouping completed</string>
     <string name="allLight">All Lights</string>
     <string name="group">Group</string>
     <string name="openBluetooth">open Bluetooth, Play the smart light!</string>
@@ -86,7 +86,16 @@
     <string name="retry">Retry</string>
     <string name="light">Lights</string>
     <string name="me">Me</string>
-    <string name="fragment_name_me">我</string>
-    <string name="grouping_wait_tip">正在配置分组信息,请稍后！</string>
+    <string name="fragment_name_me">me</string>
+    <string name="grouping_wait_tip">Grouping information is being configured. Please wait!</string>
+    <string name="rescan">Rescan</string>
+    <string name="start_group_bt">Start grouping</string>
+    <string name="group_completed">Grouping is complete!</string>
+    <string name="have_lamp_no_group_tip">There are no lights grouping, please complete the grouping operation</string>
+    <string name="sure_group">Determine the group</string>
+    <string name="selected_lamp_tip">Please select at least one light!</string>
+    <string name="select_group_tip">Please select at least one group</string>
+    <string name="much_lamp_tip">Supports up to 256 lights</string>
+    <string name="restart_bluetooth">Restart Bluetooth to better experience smart lights!</string>
 
 </resources>
