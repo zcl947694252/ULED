@@ -87,5 +87,6 @@
     <string name="light">灯</string>
     <string name="me">我</string>
     <string name="fragment_name_me">我</string>
+    <string name="grouping_wait_tip">正在分组，请稍后！</string>
 
 </resources>
