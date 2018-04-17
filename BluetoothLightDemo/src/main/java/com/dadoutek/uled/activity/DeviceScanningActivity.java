@@ -372,6 +372,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         if (hasBeSelected) {
             //进行分组操作
+            openLoadingDialog(getResources().getString(R.string.grouping_wait_tip));
             //获取当前选择的分组
             Group group = getCurrentGroup();
             //获取当前勾选灯的列表
@@ -397,7 +398,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         }
 
         int index = 0;
-        openLoadingDialog(getResources().getString(R.string.grouping_wait_tip));
         while (index < selectLights.size()) {
             //每个灯发5次分组的命令，确保灯能收到命令.
             for (int i = 0; i < 3; i++) {
@@ -409,10 +409,13 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 }
             }
             index++;
-            if(index==selectLights.size()-1){
-                closeDialog();
-            }
         }
+
+        new Handler().postDelayed(()-> {
+
+                closeDialog();
+
+        },selectLights.size()*3*300);
     }
 
     private List<Light> getCurrentSelectLights() {
