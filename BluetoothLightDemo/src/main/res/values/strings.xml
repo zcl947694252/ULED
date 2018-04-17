@@ -97,5 +97,9 @@
     <string name="select_group_tip">Please select at least one group</string>
     <string name="much_lamp_tip">Supports up to 256 lights</string>
     <string name="restart_bluetooth">Restart Bluetooth to better experience smart lights!</string>
+    <string name="chear_cache">Empty the cache</string>
+    <string name="update_ite">Sync ITE</string>
+    <string name="clean_tip">Cache empty, please reset</string>
+    <string name="wait_develop">To be developed</string>
 
 </resources>

@@ -6,13 +6,17 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.CleanUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.util.AppUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -28,6 +32,10 @@ public class MeFragment extends Fragment {
     @BindView(R.id.app_version)
     TextView appVersion;
     Unbinder unbinder;
+    @BindView(R.id.chear_cache)
+    Button chearCache;
+    @BindView(R.id.update_ite)
+    Button updateIte;
     private LayoutInflater inflater;
 
     @Override
@@ -48,7 +56,7 @@ public class MeFragment extends Fragment {
     }
 
     private void initView() {
-       String versionName= AppUtils.getVersionName(getActivity());
+        String versionName = AppUtils.getVersionName(getActivity());
         appVersion.setText(versionName);
     }
 
@@ -56,5 +64,22 @@ public class MeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @OnClick({R.id.chear_cache, R.id.update_ite})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.chear_cache:
+                emptyTheCache();
+                break;
+            case R.id.update_ite:
+                ToastUtils.showShort(R.string.wait_develop);
+                break;
+        }
+    }
+
+    private void emptyTheCache() {
+        CleanUtils.cleanInternalSp();
+        ToastUtils.showShort(R.string.clean_tip);
     }
 }
