@@ -340,12 +340,9 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         //确定当前分组
         btnAddGroups.setText("确定分组");
-        btnAddGroups.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sureGroups();
-                checkLightsHaveGroup();
-            }
+        btnAddGroups.setOnClickListener(v -> {
+            sureGroups();
+            checkLightsHaveGroup();
         });
     }
 
@@ -411,11 +408,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             index++;
         }
 
-        new Handler().postDelayed(()-> {
-
-                closeDialog();
-
-        },selectLights.size()*3*300);
+        new Handler().postDelayed(()-> closeDialog(),selectLights.size()*3*300);
     }
 
     private List<Light> getCurrentSelectLights() {
