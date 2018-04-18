@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/BluetoothLightDemo/BluetoothLightDemo.iml" filepath="$PROJECT_DIR$/BluetoothLightDemo/BluetoothLightDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" filepath="$PROJECT_DIR$/BluetoothLightLib/BluetoothLightLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/Uled.iml" filepath="$PROJECT_DIR$/Uled.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>
