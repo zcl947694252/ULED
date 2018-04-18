@@ -313,6 +313,9 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         return true;
     }
 
+    /**
+     * 开始分组
+     */
     private void startGrouping() {
         //存储当前添加的灯。
         if (nowLightList != null && nowLightList.size() > 0) {
@@ -400,18 +403,32 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
         for (int i = 0; i < indexList.size(); i++) {
             nowLightList.get(indexList.get(i)).hasGroup = true;
-            nowLightList.get(indexList.get(i)).belongGroups.add(group.name);
+            ArrayList<String> nowLightBelongGroups = nowLightList.get(indexList.get(i)).belongGroups;
+            if (nowLightBelongGroups.size() > 0) {
+                nowLightBelongGroups.set(0, String.valueOf(group.meshAddress));
+            } else
+                nowLightBelongGroups.add(0, String.valueOf(group.meshAddress));
+            //全局的Lights的状态也需要修改
+            Lights.getInstance().get(indexList.get(i)).hasGroup = true;
+            ArrayList<String> lightBelongGroups = Lights.getInstance().get(indexList.get(i)).belongGroups;
+            if (lightBelongGroups.size() > 0) {
+                lightBelongGroups.set(0, String.valueOf(group.meshAddress));
+            } else
+                lightBelongGroups.add(0, String.valueOf(group.meshAddress));
         }
+
+        //修改了状态之后要保存进SP
+        mDataManager.updateLights(Lights.getInstance());
 
 
         mGroupingDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int index = 0;
             while (index < selectLights.size()) {
+                Light light = selectLights.get(index);
+                saveLightAddrToGroup(light);
                 //每个灯发3次分组的命令，确保灯能收到命令.
                 for (int i = 0; i < 3; i++) {
-                    Light light = selectLights.get(index);
                     sendGroupData(light, group, index);
-                    saveLightAddrToGroup(light);
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException e) {
@@ -511,8 +528,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private void initData() {
         this.mApplication = (TelinkLightApplication) this.getApplication();
         mDataManager = new DataManager(mApplication, mApplication.getMesh().name, mApplication.getMesh().password);
-        if (groups.size() == 0)
-            mDataManager.creatGroup(true, 0);
         groups = mDataManager.initGroupsChecked();
         try {
             //深拷贝

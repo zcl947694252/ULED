@@ -26,6 +26,9 @@ import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.DataManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class GroupListFragment extends Fragment {
 
     private LayoutInflater inflater;
@@ -46,17 +49,18 @@ public final class GroupListFragment extends Fragment {
             Intent intent = new Intent(mContext, GroupSettingActivity.class);
             intent.putExtra("groupAddress", group.meshAddress);
 
-            startActivityForResult(intent,0);
+            startActivityForResult(intent, 0);
 
             return true;
         }
     };
+    private GridView gridView;
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==0&&resultCode== Constant.RESULT_OK){
-            this.testData();
+        if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
+            this.initData();
             this.notifyDataSetChanged();
         }
     }
@@ -66,15 +70,13 @@ public final class GroupListFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
         this.mContext = this.getActivity();
-        this.adapter = new GroupListAdapter();
 
-        this.initData();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Groups.getInstance().clear();
+//        Groups.getInstance().clear();
     }
 
     @Override
@@ -85,10 +87,10 @@ public final class GroupListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_group_list, null);
 
-        GridView listView = (GridView) view.findViewById(R.id.list_groups);
-        listView.setOnItemLongClickListener(this.itemLongClickListener);
-        listView.setAdapter(this.adapter);
+        gridView = (GridView) view.findViewById(R.id.list_groups);
+        gridView.setOnItemLongClickListener(this.itemLongClickListener);
 
+        this.initData();
         return view;
     }
 
@@ -103,19 +105,21 @@ public final class GroupListFragment extends Fragment {
 
     private void initData() {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-        Mesh mesh = mApplication.getMesh();
-        DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
 
-        Groups.getInstance().clear();
-        Groups groups = dataManager.getGroups();
-        Groups.getInstance().add(dataManager.createAllLightController());    //所有灯必须有
+//        Groups.getInstance().clear();
+//        Groups groups = dataManager.getGroups();
+//        Groups.getInstance().add(dataManager.createAllLightControllerGroup());    //所有灯必须有
+//
+//        for (int i = 0; i < groups.size(); i++) {
+//            Group group = groups.get(i);
+//            if (group.containsLightList != null && group.containsLightList.size() > 0)
+//                Groups.getInstance().add(group);
+//        }
+//        this.notifyDataSetChanged();
 
-        for (int i = 0; i < groups.size(); i++) {
-            Group group = groups.get(i);
-            if (group.containsLightList != null && group.containsLightList.size() > 0)
-                Groups.getInstance().add(group);
-        }
-        this.notifyDataSetChanged();
+        DataManager dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
+        this.adapter = new GroupListAdapter(dataManager.getGroups());
+        gridView.setAdapter(this.adapter);
 
     }
 
@@ -131,9 +135,17 @@ public final class GroupListFragment extends Fragment {
 
     final class GroupListAdapter extends BaseAdapter implements
             OnClickListener, OnLongClickListener {
+        ArrayList<Group> groupArrayList = new ArrayList<>();
 
-        public GroupListAdapter() {
-
+        public GroupListAdapter(Groups groups) {
+            List<Group> groupList = groups.get();
+            Mesh mesh = mApplication.getMesh();
+            DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
+            groupArrayList.add(dataManager.createAllLightControllerGroup());
+            for (Group group : groupList) {
+                if (group.containsLightList.size() > 0)
+                    groupArrayList.add(group);
+            }
         }
 
         @Override
@@ -143,12 +155,12 @@ public final class GroupListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return Groups.getInstance().size();
+            return groupArrayList.size();
         }
 
         @Override
         public Group getItem(int position) {
-            return Groups.getInstance().get(position);
+            return groupArrayList.get(position);
         }
 
         @Override

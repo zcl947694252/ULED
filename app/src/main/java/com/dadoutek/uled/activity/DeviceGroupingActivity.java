@@ -20,6 +20,8 @@ import android.widget.TextView;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
+import com.dadoutek.uled.model.Light;
+import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
@@ -30,6 +32,7 @@ import com.telink.util.Event;
 import com.telink.util.EventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
 
@@ -55,10 +58,24 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             Group group = adapter.getItem(position);
+            deleteLightFromOldGroup();
             allocDeviceGroup(group);
             saveInfo(position);
         }
     };
+
+    private void deleteLightFromOldGroup() {
+//        Light light = Lights.getInstance().getByMeshAddress(meshAddress);
+        for (Group group :
+                Groups.getInstance().get()) {
+            for (int i = 0; i < group.containsLightList.size(); i++) {
+                if (group.containsLightList.get(i) == meshAddress) {
+                    group.containsLightList.remove(i);
+                }
+            }
+        }
+
+    }
 
     private void saveInfo(int position) {
         Groups groups = Groups.getInstance();
@@ -120,11 +137,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         listView.setAdapter(this.adapter);
 
 
-        this.testData();
+        this.initData();
         this.getDeviceGroup();
     }
 
-    private void testData() {
+    private void initData() {
         Groups.getInstance().clear();
         mDataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
 
@@ -163,6 +180,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         if (!group.checked) {
             params[0] = 0x01;
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+            group.containsLightList.add(meshAddress);
 
         } else {
             params[0] = 0x00;

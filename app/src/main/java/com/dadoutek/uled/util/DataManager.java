@@ -35,7 +35,11 @@ public class DataManager {
         mPwd = pwd;
     }
 
-    public Group createAllLightController() {
+    /**
+     * 创建一个控制所有灯的分组
+     * @return  group对象
+     */
+    public Group createAllLightControllerGroup() {
         Group groupAllLights = new Group();
         groupAllLights.name = mContext.getString(R.string.allLight);
         groupAllLights.meshAddress = 0xFFFF;

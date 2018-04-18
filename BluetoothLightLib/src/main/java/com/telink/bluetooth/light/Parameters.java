@@ -32,7 +32,7 @@ public class Parameters {
     private final Map<String, Object> mParams = new HashMap<>();
 
     public Parameters() {
-        this.set(PARAM_OUT_OF_MESH, "out_of_mesh");
+        this.set(PARAM_OUT_OF_MESH, "dadoutek");
     }
 
     public static Parameters newInstance() {
