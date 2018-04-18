@@ -634,7 +634,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         for (Light light : lights) {
             light.status = ConnectionStatus.OFFLINE;
             light.updateIcon();
-            lights.iterator().remove();
+//            lights.iterator().remove();
         }
         this.deviceFragment.notifyDataSetChanged();
 

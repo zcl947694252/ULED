@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.model.Groups;
@@ -40,11 +41,20 @@ public final class GroupListFragment extends Fragment {
             Intent intent = new Intent(mContext, GroupSettingActivity.class);
             intent.putExtra("groupAddress", group.meshAddress);
 
-            startActivity(intent);
+            startActivityForResult(intent,0);
 
             return true;
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==0&&resultCode== Constant.RESULT_OK){
+            this.testData();
+            this.notifyDataSetChanged();
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -157,5 +157,15 @@
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
             android:background="@color/border_line" />
+
+        <Button
+            android:id="@+id/btn_remove_group"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/click_btn"
+            android:text="删除分组"
+            android:visibility="visible"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 </ScrollView>

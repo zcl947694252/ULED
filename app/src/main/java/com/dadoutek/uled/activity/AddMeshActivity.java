@@ -189,7 +189,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
 
         canBeSave=true;
-        Mesh mesh = (Mesh) FileSystem.readAsObject(this, newfactoryName + "." + newfactoryPwd);
+        Mesh mesh = (Mesh) FileSystem.readAsObject(this, mNewMeshName + "." + mNewMeshPwd);
 
         if (mesh == null) {
             mesh = new Mesh();
