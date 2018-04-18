@@ -20,8 +20,7 @@ import android.widget.TextView;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Lights;
-import com.dadoutek.uled.util.DataCreater;
+import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
 import com.dadoutek.uled.R;
@@ -41,6 +40,8 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     private Groups groupsInit;
 
     private int meshAddress;
+    private DataManager mDataManager;
+
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -60,20 +61,20 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     };
 
     private void saveInfo(int position) {
-        Groups groups=Groups.getInstance();
-        if(groups.get(position).containsLightList==null){
-            groups.get(position).containsLightList=new ArrayList<>();
+        Groups groups = Groups.getInstance();
+        if (groups.get(position).containsLightList == null) {
+            groups.get(position).containsLightList = new ArrayList<>();
         }
-        if(groups.get(position).containsLightList.size()==0){
+        if (groups.get(position).containsLightList.size() == 0) {
             groups.get(position).containsLightList.add(meshAddress);
         }
-        if(!groups.get(position).containsLightList.contains(meshAddress)){
+        if (!groups.get(position).containsLightList.contains(meshAddress)) {
             groups.get(position).containsLightList.add(meshAddress);
         }
 
-        DataCreater.updateGroup(groups);
+        mDataManager.updateGroup(groups);
         finish();
-//        Lights lights=DataCreater.getLights();
+//        Lights lights=DataManager.getLights();
 //        for(int i=0;){
 //
 //        }
@@ -101,6 +102,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
 
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_grouping);
 
@@ -117,15 +119,16 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         listView.setOnItemClickListener(this.itemClickListener);
         listView.setAdapter(this.adapter);
 
+
         this.testData();
         this.getDeviceGroup();
     }
 
     private void testData() {
-
         Groups.getInstance().clear();
+        mDataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
 
-         groupsInit= DataCreater.getGroups();
+        groupsInit = mDataManager.getGroups();
 
         for (int i = 0; i < groupsInit.size(); i++) {
             Groups.getInstance().add(groupsInit.get(i));

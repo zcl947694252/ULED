@@ -51,7 +51,7 @@
     <!-- MeshSchema Add -->
     <string name="mesh_add_header">控制设置</string>
     <string name="mesh_add_label_mesh_setting">控制设置</string>
-    <string name="mesh_add_label_factory_setting">出厂默认设置</string>
+    <string name="install_setting">安装设置</string>
     <string name="mesh_add_button_save">保存</string>
     <string name="mesh_add_button_share">分享</string>
     <string name="mesh_add_button_clear">清空</string>

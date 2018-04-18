@@ -47,7 +47,7 @@ import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.dadoutek.uled.util.DataCreater;
+import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
@@ -69,7 +69,6 @@ import com.telink.util.EventListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -147,6 +146,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             }
         }
     };
+    private DataManager mDataManager;
 
     //扫描失败处理方法
     private void scanFail() {
@@ -327,8 +327,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             if (checkLightsHaveGroup()) {//所有灯都有分组可以跳转
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
-                DataCreater.updateGroup(groups);
-                DataCreater.updateLights(nowLightList);
+                mDataManager.updateGroup(groups);
+                mDataManager.updateLights(nowLightList);
 
 
                 TelinkLightService.Instance().idleMode(true);
@@ -509,7 +509,11 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void initData() {
-        groups = DataCreater.getInitGroups();
+        this.mApplication = (TelinkLightApplication) this.getApplication();
+        mDataManager = new DataManager(mApplication, mApplication.getMesh().name, mApplication.getMesh().password);
+        if (groups.size() == 0)
+            mDataManager.creatGroup(true, 0);
+        groups = mDataManager.initGroupsChecked();
         try {
             //深拷贝
             nowLightList = (Lights) Lights.getInstance().clone();
@@ -561,7 +565,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
     private void initView() {
         //监听事件
-        this.mApplication = (TelinkLightApplication) this.getApplication();
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
@@ -586,8 +589,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         deviceListView.setAdapter(this.adapter);
         this.updateList = new ArrayList<>();
 
-//        groups= DataCreater.getGroups();
-//        backView.setVisibility(View.GONE);
         btnScan.setVisibility(View.GONE);
         btnLog.setVisibility(View.GONE);
         btnAddGroups.setVisibility(View.GONE);
@@ -839,7 +840,10 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void checkSelectLamp(Light light) {
-
+        if (groups.size() == 0) {
+//            mDataManager.creatGroup(true, 0);
+        }
+        groups = mDataManager.initGroupsChecked();
         Group group = groups.get(groups.size() - 1);
         Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
 

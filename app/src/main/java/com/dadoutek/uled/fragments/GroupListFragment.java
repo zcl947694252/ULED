@@ -17,11 +17,13 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.model.Groups;
-import com.dadoutek.uled.util.DataCreater;
+import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.util.DataManager;
 
 public final class GroupListFragment extends Fragment {
 
@@ -29,6 +31,9 @@ public final class GroupListFragment extends Fragment {
     private GroupListAdapter adapter;
 
     private Activity mContext;
+    private TelinkLightApplication mApplication;
+
+
     private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
 
         @Override
@@ -52,7 +57,8 @@ public final class GroupListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.mContext = this.getActivity();
         this.adapter = new GroupListAdapter();
-        this.testData();
+
+        this.initData();
     }
 
     @Override
@@ -81,16 +87,18 @@ public final class GroupListFragment extends Fragment {
         super.onHiddenChanged(hidden);
 
         if (!hidden) {
-            this.testData();
+            this.initData();
         }
     }
 
-    private void testData() {
+    private void initData() {
+        this.mApplication = (TelinkLightApplication) getActivity().getApplication();
+        Mesh mesh = mApplication.getMesh();
+        DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
 
         Groups.getInstance().clear();
-
-        Groups groups = DataCreater.getGroups();
-        Groups.getInstance().add(DataCreater.createAllLightController(getActivity()));    //所有灯必须有
+        Groups groups = dataManager.getGroups();
+        Groups.getInstance().add(dataManager.createAllLightController());    //所有灯必须有
 
         for (int i = 0; i < groups.size(); i++) {
             Group group = groups.get(i);

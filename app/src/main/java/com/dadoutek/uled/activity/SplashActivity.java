@@ -8,7 +8,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.util.DataCreater;
+import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 
@@ -53,7 +53,9 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
      * 初始化分组数据
      */
     private void initGroupData() {
-        DataCreater.creatGroup(this,true, 0);//初始化自动创建16个分组
+        Mesh mesh = mApplication.getMesh();
+        DataManager dataManager = new DataManager(this, mesh.name, mesh.password);
+        dataManager.creatGroup(true, 0);//初始化自动创建16个分组
     }
 
     @Override
@@ -61,12 +63,12 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     }
 
     private void initMesh() {
-        Mesh mesh = (Mesh) FileSystem.readAsObject(this, Constant.NEW_MESH_FACTORY_NAME + "." + Constant.NEW_MESH_FACTORY_PASSWORD);
+        Mesh mesh = (Mesh) FileSystem.readAsObject(this, Constant.NEW_MESH_NAME + "." + Constant.NEW_MESH_PASSWORD);
 
         if (mesh == null) {
             mesh = new Mesh();
-            mesh.name = Constant.NEW_MESH_FACTORY_NAME;
-            mesh.password = Constant.NEW_MESH_FACTORY_PASSWORD;
+            mesh.name = Constant.NEW_MESH_NAME;
+            mesh.password = Constant.NEW_MESH_PASSWORD;
         }
 
         mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME;
@@ -80,7 +82,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     }
 
 
-    private void gotoMeshSetting(){
+    private void gotoMeshSetting() {
         startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
     }
 

@@ -32,12 +32,16 @@ import com.dadoutek.uled.activity.LogInfoActivity;
 import com.dadoutek.uled.activity.OTAUpdateActivity;
 import com.dadoutek.uled.activity.OnlineStatusTestActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
+import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.light.ConnectionStatus;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Light;
 
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 public final class DeviceListFragment extends Fragment {
 
@@ -74,6 +78,8 @@ public final class DeviceListFragment extends Fragment {
     private Button btn_online_status;
 
 
+    private static final int REQ_CHANGE_MESH_NAME = 0x01;
+
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -93,7 +99,7 @@ public final class DeviceListFragment extends Fragment {
                         params);
             } else if (v == backView) {
                 Intent intent = new Intent(mContext, AddMeshActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQ_CHANGE_MESH_NAME);
 
             } else if (v == editView) {
                 //添加设备时，断开当前连接的灯。
@@ -177,6 +183,21 @@ public final class DeviceListFragment extends Fragment {
             mIntervalHandler.postDelayed(this, interval);
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQ_CHANGE_MESH_NAME:
+//                    Lights.getInstance().clear();
+////                    Lights.getInstance().add(DataManager.getLights().get());
+//                    Groups.getInstance().clear();
+//                    Groups.getInstance().add(mDataManager.getGroups(getActivity()).get());
+                    adapter.notifyDataSetChanged();
+            }
+        }
+    }
 
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
 

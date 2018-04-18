@@ -51,7 +51,7 @@
     <!-- MeshSchema Add -->
     <string name="mesh_add_header">Add Mesh</string>
     <string name="mesh_add_label_mesh_setting">Mesh Setting</string>
-    <string name="mesh_add_label_factory_setting">Factory Default Setting</string>
+    <string name="install_setting">Install Setting</string>
     <string name="mesh_add_button_save">Save</string>
     <string name="mesh_add_button_share">Share</string>
     <string name="mesh_add_button_clear">Clear Mesh</string>

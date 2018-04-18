@@ -8,20 +8,20 @@ import java.io.Serializable;
 
 public class Constant implements Serializable{
 
-//    public static final String NEW_MESH_FACTORY_NAME="987654";
-//    public static final String NEW_MESH_FACTORY_PASSWORD="123";
+//    public static final String NEW_MESH_NAME="987654";
+//    public static final String NEW_MESH_PASSWORD="123";
 //
 //    public static final String DEFAULT_MESH_FACTORY_NAME="TestLocas";
 //    public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
-    public static final String NEW_MESH_FACTORY_NAME="866866";
-    public static final String NEW_MESH_FACTORY_PASSWORD="123";
+    public static final String NEW_MESH_NAME ="866866";
+    public static final String NEW_MESH_PASSWORD ="123";
 
     public static final String DEFAULT_MESH_FACTORY_NAME="688688";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
     public static final String GROUPS_KEY="LastGroups";
-    public static final String Lights_KEY="LastLights";
+    public static final String LIGHTS_KEY ="LastLights";
     public static final String DEFAULT_GROUP_ID="DEFAULT_GROUP_ID";
 
 

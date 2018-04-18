@@ -42,6 +42,8 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -82,7 +84,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="10dp"
                 android:padding="5dp"
-                android:text="@string/mesh_add_label_factory_setting" />
+                android:text="@string/install_setting" />
 
             <EditText
                 android:id="@+id/txt_factory_name"
@@ -149,7 +151,6 @@
                 android:layout_marginTop="15dp"
                 android:background="@color/theme_positive_color"
                 android:text="@string/mesh_add_button_clear"
-                android:visibility="gone"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
             <!--filter-->

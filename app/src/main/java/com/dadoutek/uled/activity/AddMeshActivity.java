@@ -16,7 +16,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.util.DataCreater;
+import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightService;
@@ -53,6 +53,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             } else if (v == btnClear) {
                 if (mApplication.getMesh().devices != null) {
                     mApplication.getMesh().devices.clear();
+                    mApplication.getMesh().saveOrUpdate(AddMeshActivity.this);
+                    finish();
                 }
             }
         }
@@ -62,9 +64,12 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         saveMesh();
         if (canBeSave) {
             //如果用户更改了控制名称或密码，那么就清空保存的组和灯
-            if (!mNewMeshName.equals(mOldMeshName) || !mNewMeshPwd.equals(mOldMeshPwd))
+            if (!mNewMeshName.equals(mOldMeshName) || !mNewMeshPwd.equals(mOldMeshPwd)) {
                 clearData();
-            setResult(RESULT_OK);
+                setResult(RESULT_OK);
+            } else {
+                setResult(RESULT_CANCELED);
+            }
             finish();
         }
     }
@@ -79,9 +84,10 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         groups.clear();
         lights.clear();
 
-        DataCreater.updateGroup(groups);
-        DataCreater.updateLights(lights);
+        DataManager dataManager = new DataManager(this, mNewMeshName, mNewMeshPwd);
 
+        groups.add(dataManager.getGroups().get());
+        lights.add(dataManager.getLights().get());
     }
 
     @Override
@@ -188,8 +194,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         }
 
 
-        canBeSave=true;
-        Mesh mesh = (Mesh) FileSystem.readAsObject(this, newfactoryName + "." + newfactoryPwd);
+        canBeSave = true;
+        Mesh mesh = (Mesh) FileSystem.readAsObject(this, mNewMeshName + "." + mNewMeshPwd);
 
         if (mesh == null) {
             mesh = new Mesh();
