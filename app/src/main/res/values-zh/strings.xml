@@ -101,5 +101,10 @@
     <string name="update_ite">同步ITE</string>
     <string name="clean_tip">缓存清空,App即将重启</string>
     <string name="wait_develop">待开发</string>
+    <string name="add_mesh_save_tip1">invalid! name should not equals with pwd</string>
+    <string name="add_mesh_save_tip2">修改前后名称不能相同！</string>
+    <string name="add_mesh_save_tip3">最大长度为16</string>
+    <string name="add_mesh_save_tip4">输入不包含 \'.\'</string>
+    <string name="add_mesh_save_tip5">账号或密码包含特殊字符！</string>
 
 </resources>

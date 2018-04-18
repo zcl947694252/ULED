@@ -101,5 +101,10 @@
     <string name="update_ite">Sync ITE</string>
     <string name="clean_tip">Cache empty, App Reboot soon</string>
     <string name="wait_develop">To be developed</string>
+    <string name="add_mesh_save_tip1">invalid! name should not equals with pwd</string>
+    <string name="add_mesh_save_tip2">The name cannot be the same before and after the modification!</string>
+    <string name="add_mesh_save_tip3">invalid! input max length: 16</string>
+    <string name="add_mesh_save_tip4">invalid! input should not contains \'.\'</string>
+    <string name="add_mesh_save_tip5">Account or password contains special characters!</string>
 
 </resources>

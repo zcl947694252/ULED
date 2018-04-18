@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -19,6 +20,9 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.qrcode.QRCodeShareActivity;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class AddMeshActivity extends TelinkBaseActivity {
 
     private ImageView backView;
@@ -27,6 +31,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
     private Button btnShare, btnClear;
 
     private TelinkLightApplication mApplication;
+    private boolean canBeSave=false;
+
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -34,9 +40,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == btnSave) {
-                saveMesh();
-                setResult(RESULT_OK);
-                finish();
+                saveData();
             } else if (v == btnShare) {
                 startActivity(new Intent(AddMeshActivity.this, QRCodeShareActivity.class));
             } else if (v == btnClear) {
@@ -46,6 +50,14 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             }
         }
     };
+
+    private void saveData() {
+        saveMesh();
+        if(canBeSave){
+            setResult(RESULT_OK);
+            finish();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,16 +141,26 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         String factoryPwd = txtFactoryPassword.getText().toString().trim();
 
         if (newfactoryName.equals(newfactoryPwd)) {
-            showToast("invalid! name should not equals with pwd");
+            showToast(getString(R.string.add_mesh_save_tip1));
+            canBeSave=false;
+            return;
+        }
+
+        if (newfactoryName.equals(factoryName)) {
+            showToast(getString(R.string.add_mesh_save_tip2));
+            canBeSave=false;
             return;
         }
 
         if (newfactoryName.length() > 16 || newfactoryPwd.length() > 16 || factoryName.length() > 16 || factoryPwd.length() > 16) {
-            showToast("invalid! input max length: 16");
+            showToast(getString(R.string.add_mesh_save_tip3));
+            canBeSave=false;
             return;
         }
-        if (newfactoryName.contains(".") || newfactoryPwd.contains(".")) {
-            showToast("invalid! input should not contains '.' ");
+        if (compileExChar(newfactoryName) || compileExChar(newfactoryPwd)) {
+//            showToast(getString(R.string.add_mesh_save_tip4));
+            Toast.makeText(AddMeshActivity.this, getString(R.string.add_mesh_save_tip5), Toast.LENGTH_LONG).show();
+            canBeSave=false;
             return;
         }
 
@@ -146,7 +168,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 //        if (mesh == null)
 //            mesh = new Mesh();
 
-
+        canBeSave=true;
         Mesh mesh = (Mesh) FileSystem.readAsObject(this, newfactoryName + "." + newfactoryPwd);
 
         if (mesh == null) {
@@ -178,5 +200,23 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         }
     }
 
+    /**
+
+     * @prama: str 要判断是否包含特殊字符的目标字符串
+
+     */
+
+    private boolean compileExChar(String str){
+
+        String limitEx="[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+
+        Pattern pattern = Pattern.compile(limitEx);
+        Matcher m = pattern.matcher(str);
+
+        if( m.find()){
+            return true;
+        }
+       return false;
+    }
 
 }
