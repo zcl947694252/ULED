@@ -13,7 +13,10 @@ import android.widget.Toast;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.model.Groups;
+import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.util.DataCreater;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightService;
@@ -31,7 +34,11 @@ public final class AddMeshActivity extends TelinkBaseActivity {
     private Button btnShare, btnClear;
 
     private TelinkLightApplication mApplication;
-    private boolean canBeSave=false;
+    private boolean canBeSave = false;
+    private String mOldMeshName;
+    private String mOldMeshPwd;
+    private String mNewMeshName;
+    private String mNewMeshPwd;
 
     private OnClickListener clickListener = new OnClickListener() {
 
@@ -53,10 +60,28 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
     private void saveData() {
         saveMesh();
-        if(canBeSave){
+        if (canBeSave) {
+            //如果用户更改了控制名称或密码，那么就清空保存的组和灯
+            if (!mNewMeshName.equals(mOldMeshName) || !mNewMeshPwd.equals(mOldMeshPwd))
+                clearData();
             setResult(RESULT_OK);
             finish();
         }
+    }
+
+    /**
+     * 清除组和灯的数据
+     */
+    private void clearData() {
+        Groups groups = Groups.getInstance();
+        Lights lights = Lights.getInstance();
+
+        groups.clear();
+        lights.clear();
+
+        DataCreater.updateGroup(groups);
+        DataCreater.updateLights(lights);
+
     }
 
     @Override
@@ -82,12 +107,15 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         this.btnClear.setOnClickListener(this.clickListener);
 
         TelinkLightService.Instance().idleMode(true);
+
+        updateGUI();
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateGUI();
     }
 
     private void updateGUI() {
@@ -110,6 +138,10 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         txtPassword.setText(mesh.password);
         txtFactoryMeshName.setText(mesh.factoryName);
         txtFactoryPassword.setText(mesh.factoryPassword);
+
+        mOldMeshName = mesh.name;
+        mOldMeshPwd = mesh.password;
+
     }
 
     @SuppressLint("ShowToast")
@@ -125,33 +157,33 @@ public final class AddMeshActivity extends TelinkBaseActivity {
                 .findViewById(R.id.txt_factory_password);
         //EditText otaText = (EditText) this.findViewById(R.id.ota_device);
 
-        String newfactoryName = txtMeshName.getText().toString().trim();
-        String newfactoryPwd = txtPassword.getText().toString().trim();
+        mNewMeshName = txtMeshName.getText().toString().trim();
+        mNewMeshPwd = txtPassword.getText().toString().trim();
 
         String factoryName = txtFactoryMeshName.getText().toString().trim();
         String factoryPwd = txtFactoryPassword.getText().toString().trim();
 
-        if (newfactoryName.equals(newfactoryPwd)) {
+        if (mNewMeshName.equals(mNewMeshPwd)) {
             showToast(getString(R.string.add_mesh_save_tip1));
-            canBeSave=false;
+            canBeSave = false;
             return;
         }
 
-        if (newfactoryName.equals(factoryName)) {
+        if (mNewMeshName.equals(factoryName)) {
             showToast(getString(R.string.add_mesh_save_tip2));
-            canBeSave=false;
+            canBeSave = false;
             return;
         }
 
-        if (newfactoryName.length() > 16 || newfactoryPwd.length() > 16 || factoryName.length() > 16 || factoryPwd.length() > 16) {
+        if (mNewMeshName.length() > 16 || mNewMeshPwd.length() > 16 || factoryName.length() > 16 || factoryPwd.length() > 16) {
             showToast(getString(R.string.add_mesh_save_tip3));
-            canBeSave=false;
+            canBeSave = false;
             return;
         }
-        if (compileExChar(newfactoryName) || compileExChar(newfactoryPwd)) {
+        if (compileExChar(mNewMeshName) || compileExChar(mNewMeshPwd)) {
 //            showToast(getString(R.string.add_mesh_save_tip4));
             Toast.makeText(AddMeshActivity.this, getString(R.string.add_mesh_save_tip5), Toast.LENGTH_LONG).show();
-            canBeSave=false;
+            canBeSave = false;
             return;
         }
 
@@ -161,8 +193,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         if (mesh == null) {
             mesh = new Mesh();
-            mesh.name = newfactoryName;
-            mesh.password = newfactoryPwd;
+            mesh.name = mNewMeshName;
+            mesh.password = mNewMeshPwd;
         }
 
         mesh.factoryName = factoryName;
@@ -172,27 +204,25 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             this.mApplication.setupMesh(mesh);
             SharedPreferencesHelper.saveMeshName(this, mesh.name);
             SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
-            this.showToast("Save Mesh Success");
+//            this.showToast("Save Mesh Success");
         }
     }
 
     /**
-
      * @prama: str 要判断是否包含特殊字符的目标字符串
-
      */
 
-    private boolean compileExChar(String str){
+    private boolean compileExChar(String str) {
 
-        String limitEx="[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
 
         Pattern pattern = Pattern.compile(limitEx);
         Matcher m = pattern.matcher(str);
 
-        if( m.find()){
+        if (m.find()) {
             return true;
         }
-       return false;
+        return false;
     }
 
 }
