@@ -73,6 +73,15 @@ public class DataCreater {
         SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.GROUPS_KEY,groups);
     }
 
+//    /**
+//     * 更改指定组的信息
+//     * @param group
+//     * @param position
+//     */
+//    public static void updateGroup(Groups group,int position){
+//        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.GROUPS_KEY,groups);
+//    }
+
     /**
      * 创建分组
      * @param automaticCreat 是否系统默认自己创建
@@ -110,6 +119,17 @@ public class DataCreater {
             return groups;
         }else{
             return  Groups.getInstance();
+        }
+    }
+
+    public static Lights getLights(){
+        Lights lights;
+        lights=(Lights) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.GROUPS_KEY);
+
+        if(lights!=null&&lights.size()>0){
+            return lights;
+        }else{
+            return  Lights.getInstance();
         }
     }
 

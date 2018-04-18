@@ -20,5 +20,5 @@ public class Group implements Serializable {
 
     public boolean checked;
 
-    public ArrayList<Integer> containsLightList;
+    public ArrayList<Integer> containsLightList=new ArrayList<>();
 }

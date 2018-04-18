@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
+import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataCreater;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
@@ -29,12 +30,15 @@ import com.dadoutek.uled.model.Groups;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
+import java.util.ArrayList;
+
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
 
     private final static int UPDATE = 1;
 
     private LayoutInflater inflater;
     private GroupListAdapter adapter;
+    private Groups groupsInit;
 
     private int meshAddress;
     private OnClickListener clickListener = new OnClickListener() {
@@ -51,9 +55,29 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                                 long id) {
             Group group = adapter.getItem(position);
             allocDeviceGroup(group);
-
+            saveInfo(position);
         }
     };
+
+    private void saveInfo(int position) {
+        Groups groups=Groups.getInstance();
+        if(groups.get(position).containsLightList==null){
+            groups.get(position).containsLightList=new ArrayList<>();
+        }
+        if(groups.get(position).containsLightList.size()==0){
+            groups.get(position).containsLightList.add(meshAddress);
+        }
+        if(!groups.get(position).containsLightList.contains(meshAddress)){
+            groups.get(position).containsLightList.add(meshAddress);
+        }
+
+        DataCreater.updateGroup(groups);
+        finish();
+//        Lights lights=DataCreater.getLights();
+//        for(int i=0;){
+//
+//        }
+    }
 
     private Handler mHandler = new Handler() {
         @Override
@@ -101,10 +125,10 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         Groups.getInstance().clear();
 
-        Groups groups = DataCreater.getGroups();
+         groupsInit= DataCreater.getGroups();
 
-        for (int i = 0; i < groups.size(); i++) {
-            Groups.getInstance().add(groups.get(i));
+        for (int i = 0; i < groupsInit.size(); i++) {
+            Groups.getInstance().add(groupsInit.get(i));
         }
 
         this.adapter.notifyDataSetChanged();
