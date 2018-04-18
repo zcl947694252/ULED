@@ -1,20 +1,35 @@
 package com.dadoutek.uled.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.widget.ColorPicker;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.activity.MainActivity;
+import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Group;
+import com.dadoutek.uled.model.Groups;
+import com.dadoutek.uled.util.DataCreater;
+import com.dadoutek.uled.widget.ColorPicker;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 
 public final class GroupSettingFragment extends Fragment {
 
     public int groupAddress;
+    @BindView(R.id.btn_remove_group)
+    Button btnRemoveGroup;
+    Unbinder unbinder;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
@@ -137,6 +152,28 @@ public final class GroupSettingFragment extends Fragment {
         this.colorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
         this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
 
+        unbinder = ButterKnife.bind(this, view);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @OnClick(R.id.btn_remove_group)
+    public void onViewClicked() {
+        Groups groups= DataCreater.getGroups();
+       for(int k=0;k<groups.size();k++){
+           if(groupAddress==groups.get(k).meshAddress&&groups.get(k).containsLightList!=null){
+               groups.get(k).containsLightList.clear();
+               DataCreater.updateGroup(groups);
+//               startActivity(new Intent(getActivity(), MainActivity.class));
+               getActivity().setResult(Constant.RESULT_OK);
+               getActivity().finish();
+               break;
+           }
+       }
     }
 }
