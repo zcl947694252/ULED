@@ -99,7 +99,7 @@
     <string name="restart_bluetooth">重启蓝牙,更好地体验智能灯!</string>
     <string name="chear_cache">清空缓存</string>
     <string name="update_ite">同步ITE</string>
-    <string name="clean_tip">缓存清空,请重新设置</string>
+    <string name="clean_tip">缓存清空,App即将重启</string>
     <string name="wait_develop">待开发</string>
 
 </resources>

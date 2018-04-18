@@ -1,6 +1,8 @@
 package com.dadoutek.uled.fragments;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.util.AppUtils;
 
 import butterknife.BindView;
@@ -78,8 +81,22 @@ public class MeFragment extends Fragment {
         }
     }
 
+    //清空缓存初始化APP
     private void emptyTheCache() {
         CleanUtils.cleanInternalSp();
+        CleanUtils.cleanExternalCache();
         ToastUtils.showShort(R.string.clean_tip);
+        restartApplication();
     }
+
+    //重启app并杀死原进程
+    private void restartApplication() {
+        final Intent intent = TelinkLightApplication.getInstance().getPackageManager().
+                getLaunchIntentForPackage(TelinkLightApplication.getInstance().getPackageName());
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+
 }
