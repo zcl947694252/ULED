@@ -112,7 +112,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 switchContent(mContent, deviceFragment);
             } else if (checkedId == R.id.tab_groups) {
                 switchContent(mContent, groupFragment);
-            }else if(checkedId == R.id.tab_account){
+            } else if (checkedId == R.id.tab_account) {
                 switchContent(mContent, meFragment);
             }
         }
@@ -183,7 +183,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 .createFragment(R.id.tab_devices);
         this.groupFragment = (GroupListFragment) FragmentFactory
                 .createFragment(R.id.tab_groups);
-        this.meFragment=(MeFragment)FragmentFactory
+        this.meFragment = (MeFragment) FragmentFactory
                 .createFragment(R.id.tab_account);
 
 //        this.tabs = (ConstraintLayout) this.findViewById(R.id.tabs);
@@ -634,6 +634,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         for (Light light : lights) {
             light.status = ConnectionStatus.OFFLINE;
             light.updateIcon();
+            lights.iterator().remove();
         }
         this.deviceFragment.notifyDataSetChanged();
 
