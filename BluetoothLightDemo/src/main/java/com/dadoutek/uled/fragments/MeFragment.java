@@ -61,6 +61,8 @@ public class MeFragment extends Fragment {
     private void initView() {
         String versionName = AppUtils.getVersionName(getActivity());
         appVersion.setText(versionName);
+        //暂时屏蔽
+        updateIte.setVisibility(View.GONE);
     }
 
     @Override
@@ -85,6 +87,8 @@ public class MeFragment extends Fragment {
     private void emptyTheCache() {
         CleanUtils.cleanInternalSp();
         CleanUtils.cleanExternalCache();
+        CleanUtils.cleanInternalFiles();
+        CleanUtils.cleanInternalCache();
         ToastUtils.showShort(R.string.clean_tip);
         restartApplication();
     }
