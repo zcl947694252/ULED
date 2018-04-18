@@ -106,5 +106,6 @@
     <string name="add_mesh_save_tip3">invalid! input max length: 16</string>
     <string name="add_mesh_save_tip4">invalid! input should not contains \'.\'</string>
     <string name="add_mesh_save_tip5">Account or password contains special characters!</string>
+    <string name="setting">Setting</string>
 
 </resources>

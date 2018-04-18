@@ -46,7 +46,7 @@ public final class DeviceListFragment extends Fragment {
     private LayoutInflater inflater;
     private DeviceListAdapter adapter;
 
-    private Button backView;
+    private ImageView backView;
     private ImageView editView;
     private Button btnAllOn;
     private Button btnAllOff;
@@ -285,7 +285,7 @@ public final class DeviceListFragment extends Fragment {
         listView.setOnItemLongClickListener(this.itemLongClickListener);
         listView.setAdapter(this.adapter);
 
-        this.backView = (Button) view.findViewById(R.id.img_header_menu_left);
+        this.backView = (ImageView) view.findViewById(R.id.img_header_menu_left);
         this.backView.setOnClickListener(this.clickListener);
 
         this.editView = (ImageView) view

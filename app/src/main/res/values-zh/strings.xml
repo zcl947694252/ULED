@@ -106,5 +106,6 @@
     <string name="add_mesh_save_tip3">最大长度为16</string>
     <string name="add_mesh_save_tip4">输入不包含 \'.\'</string>
     <string name="add_mesh_save_tip5">账号或密码包含特殊字符！</string>
+    <string name="setting">设置</string>
 
 </resources>

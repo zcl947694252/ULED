@@ -31,7 +31,7 @@
             android:layout_marginStart="30dp"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:text="@string/mesh_add_header"
+            android:text="@string/setting"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />
@@ -149,6 +149,7 @@
                 android:layout_marginTop="15dp"
                 android:background="@color/theme_positive_color"
                 android:text="@string/mesh_add_button_clear"
+                android:visibility="gone"
                 android:textColor="@android:color/white"
                 android:textSize="18sp" />
             <!--filter-->
