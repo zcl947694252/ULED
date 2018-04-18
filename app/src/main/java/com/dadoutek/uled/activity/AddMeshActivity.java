@@ -105,15 +105,6 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         this.btnClear = (Button) findViewById(R.id.btn_clear);
         this.btnClear.setOnClickListener(this.clickListener);
-//        this.btn_save_filter = (Button) this.findViewById(R.id.btn_save_filter);
-//        this.btn_save_filter.setOnClickListener(this.clickListener);
-
-
-       /* mac_1 = (EditText) findViewById(R.id.mac_1);
-        mac_2 = (EditText) findViewById(R.id.mac_2);
-        mac_3 = (EditText) findViewById(R.id.mac_3);
-        mac_4 = (EditText) findViewById(R.id.mac_4);*/
-//        this.updateGUI();
 
         TelinkLightService.Instance().idleMode(true);
 
@@ -197,11 +188,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         }
 
 
-//        if (mesh == null)
-//            mesh = new Mesh();
-
-        canBeSave = true;
-        Mesh mesh = (Mesh) FileSystem.readAsObject(this, mNewMeshName + "." + mNewMeshPwd);
+        canBeSave=true;
+        Mesh mesh = (Mesh) FileSystem.readAsObject(this, newfactoryName + "." + newfactoryPwd);
 
         if (mesh == null) {
             mesh = new Mesh();
@@ -211,18 +199,6 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         mesh.factoryName = factoryName;
         mesh.factoryPassword = factoryPwd;
-
-        /*if (!factoryName.equals(mesh.factoryName) || !factoryPwd.equals(mesh.factoryPassword)) {
-            mesh.allocDeviceAddress = null;
-            mesh.devices.clear();
-        }*/
-
-        /*if (newfactoryName.equals(mesh.name) || newfactoryPwd.equals(mesh.password)) {
-            mesh.allocDeviceAddress = null;
-            mesh.devices.clear();
-        }*/
-
-        //mesh.otaDevice = otaText.getText().toString().trim();
 
         if (mesh.saveOrUpdate(this)) {
             this.mApplication.setupMesh(mesh);
