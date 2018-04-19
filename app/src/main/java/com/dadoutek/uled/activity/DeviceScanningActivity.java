@@ -173,6 +173,13 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     //处理扫描成功后
     private void scanSuccess() {
 
+        //存储当前添加的灯。
+        //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
+        if (nowLightList != null && nowLightList.size() > 0) {
+            nowLightList.clear();
+        }
+        nowLightList.add(adapter.getLights());
+
         //先连接灯。
         autoConnect();
 
@@ -317,12 +324,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
      * 开始分组
      */
     private void startGrouping() {
-        //存储当前添加的灯。
-        if (nowLightList != null && nowLightList.size() > 0) {
-            nowLightList.clear();
-        }
-        nowLightList.add(adapter.getLights());
-
         changeGroupView();
         //完成分组
         btnGroupingCompleted.setOnClickListener(v -> {
@@ -858,7 +859,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         if (groups.size() == 0) {
 //            mDataManager.creatGroup(true, 0);
         }
-        groups = mDataManager.initGroupsChecked();
+//        groups = mDataManager.initGroupsChecked();
         Group group = groups.get(groups.size() - 1);
         Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
 
