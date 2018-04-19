@@ -162,7 +162,7 @@ public class DataManager {
 
     public Groups initGroupsChecked() {
         Groups groups;
-        groups = Groups.getInstance();
+        groups = getGroups();
         if (groups != null && groups.size() > 0)
             for (int j = 0; j < groups.size(); j++) {
                 if (j == 0) {

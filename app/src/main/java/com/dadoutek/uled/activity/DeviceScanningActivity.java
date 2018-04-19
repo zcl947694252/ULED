@@ -896,6 +896,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     private void checkSelectLamp(Light light) {
         if (groups.size() == 0) {
 //            mDataManager.creatGroup(true, 0);
+            groups = mDataManager.getGroups();
         }
 //        groups = mDataManager.initGroupsChecked();
         Group group = groups.get(groups.size() - 1);
