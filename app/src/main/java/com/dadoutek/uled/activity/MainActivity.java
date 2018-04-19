@@ -62,6 +62,7 @@ import com.telink.util.BuildUtils;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -631,10 +632,18 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
     private void onMeshOffline(MeshEvent event) {
         List<Light> lights = Lights.getInstance().get();
-        for (Light light : lights) {
+        Iterator<Light> it=lights.iterator();
+        while (it.hasNext()){
+            Light light=it.next();
             light.status = ConnectionStatus.OFFLINE;
             light.updateIcon();
+            it.remove();
         }
+//        for (Light light : lights) {
+////            light.status = ConnectionStatus.OFFLINE;
+////            light.updateIcon();
+//              lights.remove(light);
+//        }
         this.deviceFragment.notifyDataSetChanged();
 
         if (TelinkLightApplication.getApp().getMesh().isOtaProcessing()) {

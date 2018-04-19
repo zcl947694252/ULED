@@ -42,7 +42,6 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
             initGroupData();
             gotoMeshSetting();
             //把是否是第一次进入设为false
-            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
         } else {
             startActivity(new Intent(this, MainActivity.class));
             finish();

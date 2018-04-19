@@ -301,7 +301,6 @@ public final class DeviceListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_device_list, null);
 
         GridView listView = (GridView) view.findViewById(R.id.list_devices);
-
         listView.setOnItemClickListener(this.itemClickListener);
         listView.setOnItemLongClickListener(this.itemLongClickListener);
         listView.setAdapter(this.adapter);
@@ -349,8 +348,17 @@ public final class DeviceListFragment extends Fragment {
     }
 
     public void notifyDataSetChanged() {
-        if (this.adapter != null)
+        Lights lights=Lights.getInstance();
+        for(int k=0;k<lights.size();k++){
+            if(lights.get(k).status==ConnectionStatus.OFFLINE){
+                lights.remove(k);
+                k--;
+            }
+        }
+
+        if (this.adapter != null){
             this.adapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -430,5 +438,4 @@ public final class DeviceListFragment extends Fragment {
             return Lights.getInstance().getByMeshAddress(meshAddress);
         }
     }
-
 }

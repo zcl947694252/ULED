@@ -174,4 +174,14 @@ public class DataManager {
             }
         return groups;
     }
+
+    public String getGroupNameByAdress(int groupAdress){
+        Groups groups=getGroups();
+        for(int j=0;j<groups.size();j++){
+            if(groups.get(j).meshAddress==groupAdress){
+                return groups.get(j).name;
+            }
+        }
+        return "null";
+    }
 }

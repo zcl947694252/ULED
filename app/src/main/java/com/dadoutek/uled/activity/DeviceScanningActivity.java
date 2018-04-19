@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -124,6 +125,11 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     //分组所含灯的缓存
     private Lights nowLightList;
     private ArrayList<Integer> indexList = new ArrayList<>();
+
+    //对一个灯重复分组时记录上一次分组
+    private int originalGroupAddress=-1;
+
+    boolean isFirtst=true;
 
     private final MyHandler handler = new MyHandler(this);
 
@@ -409,6 +415,9 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 nowLightBelongGroups.set(0, String.valueOf(group.meshAddress));
             } else
                 nowLightBelongGroups.add(0, String.valueOf(group.meshAddress));
+
+            Log.d("BelongGroups", "setGroups: "+nowLightBelongGroups.get(0)
+                    +"=="+nowLightList.get(indexList.get(i)).belongGroups.get(0));
             //全局的Lights的状态也需要修改
             Lights.getInstance().get(indexList.get(i)).hasGroup = true;
             ArrayList<String> lightBelongGroups = Lights.getInstance().get(indexList.get(i)).belongGroups;
@@ -426,6 +435,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             int index = 0;
             while (index < selectLights.size()) {
                 Light light = selectLights.get(index);
+                deletePreGroup(light);
                 saveLightAddrToGroup(light);
                 //每个灯发3次分组的命令，确保灯能收到命令.
                 for (int i = 0; i < 3; i++) {
@@ -459,11 +469,27 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 //        }, selectLights.size() * 3 * 300);
     }
 
+    private void deletePreGroup(Light light) {
+        if(originalGroupAddress!=-1){
+            for(int i=0;i<groups.size();i++){
+                if(groups.get(i).meshAddress==originalGroupAddress){
+                    groups.get(i).containsLightList.remove((Integer) light.meshAddress);
+                }
+            }
+        }
+    }
+
     private List<Light> getCurrentSelectLights() {
         ArrayList<Light> arrayList = new ArrayList<>();
         indexList.clear();
         for (int i = 0; i < nowLightList.size(); i++) {
             if (nowLightList.get(i).selected && !nowLightList.get(i).hasGroup) {
+                arrayList.add(nowLightList.get(i));
+                indexList.add(i);
+            }else if(nowLightList.get(i).selected && nowLightList.get(i).hasGroup){
+                originalGroupAddress= Integer.parseInt(String.valueOf(nowLightList.get(i).belongGroups.get(0)));
+                //如果所选灯已有分组，清空后再继续添加到新的分组
+                nowLightList.get(i).belongGroups.clear();
                 arrayList.add(nowLightList.get(i));
                 indexList.add(i);
             }
@@ -476,6 +502,11 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             return groups.get(0);
         }
         return groups.get(currentGroupIndex);
+    }
+
+    private Group getPreGroup() {
+
+        return null;
     }
 
     private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener = new OnRecyclerviewItemClickListener() {
@@ -768,6 +799,13 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
                 preTime = TimeUtil.getNowSeconds();
 //                this.startScan(1000);
+
+                //扫描出灯就设置为非首次进入
+                if(isFirtst){
+                    isFirtst=false;
+                    SharedPreferencesHelper.putBoolean(DeviceScanningActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
+                }
+
                 this.startScan(200);
                 break;
             case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
@@ -925,7 +963,9 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         if (group.containsLightList == null) {
             group.containsLightList = new ArrayList<>();
         }
-        group.containsLightList.add(light.meshAddress);
+        if(!group.containsLightList.contains(light.meshAddress)){
+            group.containsLightList.add(light.meshAddress);
+        }
 
     }
 
@@ -1036,8 +1076,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
             DeviceItemHolder holder;
 
-            if (convertView == null) {
-
                 convertView = inflater.inflate(R.layout.device_item, null);
                 ImageView icon = (ImageView) convertView
                         .findViewById(R.id.img_icon);
@@ -1053,9 +1091,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 holder.selected = selected;
 
                 convertView.setTag(holder);
-            } else {
-                holder = (DeviceItemHolder) convertView.getTag();
-            }
+
 
             Light light = this.getItem(position);
 
@@ -1064,9 +1100,13 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             holder.selected.setChecked(light.selected);
 
             if (light.hasGroup) {
-                holder.txtName.setVisibility(View.GONE);
-                holder.icon.setVisibility(View.GONE);
-                holder.selected.setVisibility(View.GONE);
+//                holder.txtName.setVisibility(View.GONE);
+//                holder.icon.setVisibility(View.GONE);
+//                holder.selected.setVisibility(View.GONE);
+                holder.txtName.setText(mDataManager.getGroupNameByAdress(Integer.parseInt(
+                        light.getBelongGroups().get(light.getBelongGroups().size()-1))));
+                holder.icon.setVisibility(View.VISIBLE);
+                holder.selected.setVisibility(View.VISIBLE);
             } else {
                 holder.txtName.setVisibility(View.VISIBLE);
                 holder.icon.setVisibility(View.VISIBLE);
