@@ -107,5 +107,14 @@
     <string name="add_mesh_save_tip4">输入不包含 \'.\'</string>
     <string name="add_mesh_save_tip5">账号或密码包含特殊字符！</string>
     <string name="setting">设置</string>
+    <string name="delete_group">删除分组</string>
+    <string name="rename_the_group">重命名分组</string>
+    <string name="input_rename_text_tip">请输入新的组名:</string>
+    <string name="hint_input">请输入。。。</string>
+    <string name="btn_sure">确定</string>
+    <string name="group_name_setting">组名设置</string>
+    <string name="rename_tip_check">不允许输入特殊符号！</string>
+    <string name="repeat_tip_name">已经有这个组名了,请修改！</string>
+    <string name="successfully_modified">修改成功！</string>
 
 </resources>

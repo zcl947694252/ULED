@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -74,6 +75,12 @@ public final class GroupListFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("dadougg", "onResume: ");
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
 //        Groups.getInstance().clear();
@@ -105,18 +112,6 @@ public final class GroupListFragment extends Fragment {
 
     private void initData() {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-
-//        Groups.getInstance().clear();
-//        Groups groups = dataManager.getGroups();
-//        Groups.getInstance().add(dataManager.createAllLightControllerGroup());    //所有灯必须有
-//
-//        for (int i = 0; i < groups.size(); i++) {
-//            Group group = groups.get(i);
-//            if (group.containsLightList != null && group.containsLightList.size() > 0)
-//                Groups.getInstance().add(group);
-//        }
-//        this.notifyDataSetChanged();
-
         DataManager dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
         this.adapter = new GroupListAdapter(dataManager.getGroups());
         gridView.setAdapter(this.adapter);

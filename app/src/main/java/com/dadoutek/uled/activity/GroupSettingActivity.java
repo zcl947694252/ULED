@@ -1,6 +1,8 @@
 package com.dadoutek.uled.activity;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -8,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.fragments.GroupSettingFragment;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
@@ -53,8 +56,20 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
 		@Override
 		public void onClick(View v) {
 			if (v == backView) {
+				setResult(Constant.RESULT_OK);
 				finish();
 			}
 		}
 	};
+
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+			setResult(Constant.RESULT_OK);
+			finish();
+			return false;
+		}else {
+			return super.onKeyDown(keyCode, event);
+		}
+
+	}
 }

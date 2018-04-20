@@ -1,6 +1,5 @@
 package com.dadoutek.uled.fragments;
 
-import android.app.Application;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,9 +13,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.activity.MainActivity;
+import com.dadoutek.uled.activity.GroupSettingActivity;
+import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
@@ -31,6 +30,8 @@ public final class GroupSettingFragment extends Fragment {
     public int groupAddress;
     @BindView(R.id.btn_remove_group)
     Button btnRemoveGroup;
+    @BindView(R.id.btn_rename)
+    Button btnRename;
     Unbinder unbinder;
 
     private SeekBar brightnessBar;
@@ -166,11 +167,31 @@ public final class GroupSettingFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick(R.id.btn_remove_group)
-    public void onViewClicked() {
+    @OnClick({R.id.btn_remove_group, R.id.btn_rename})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.btn_remove_group:
+                removeGp();
+                break;
+            case R.id.btn_rename:
+                renameGp();
+                break;
+        }
+    }
+
+    private void renameGp() {
+        Intent intent=new Intent(getActivity(), RenameActivity.class);
+        intent.putExtra("groupAddress", groupAddress);
+        startActivity(intent);
+    }
+
+    private void removeGp() {
         DataManager dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
         Groups groups = dataManager.getGroups();
-        for (int k = 0; k < groups.size(); k++) {
+        for (
+                int k = 0; k < groups.size(); k++)
+
+        {
             if (groupAddress == groups.get(k).meshAddress && groups.get(k).containsLightList != null) {
                 groups.get(k).containsLightList.clear();
                 dataManager.updateGroup(groups);
@@ -181,4 +202,5 @@ public final class GroupSettingFragment extends Fragment {
             }
         }
     }
+
 }

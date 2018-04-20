@@ -107,5 +107,14 @@
     <string name="add_mesh_save_tip4">invalid! input should not contains \'.\'</string>
     <string name="add_mesh_save_tip5">Account or password contains special characters!</string>
     <string name="setting">Setting</string>
+    <string name="delete_group">Delete group</string>
+    <string name="rename_the_group">Rename the group</string>
+    <string name="input_rename_text_tip">Please enter a new group name:</string>
+    <string name="hint_input">please enter. . .</string>
+    <string name="btn_sure">Sure</string>
+    <string name="group_name_setting">Group name setting</string>
+    <string name="rename_tip_check">Input contains special characters, please modify</string>
+    <string name="repeat_tip_name">Already have this group name, please modify!</string>
+    <string name="successfully_modified">Successfully modified!</string>
 
 </resources>

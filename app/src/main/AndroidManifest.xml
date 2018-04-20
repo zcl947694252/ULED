@@ -135,6 +135,10 @@
             android:name=".qrcode.QRCodeShareActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.RenameActivity"
+            android:theme="@style/StatusTheme"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
