@@ -83,7 +83,6 @@ public final class GroupListFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        Groups.getInstance().clear();
     }
 
     @Override

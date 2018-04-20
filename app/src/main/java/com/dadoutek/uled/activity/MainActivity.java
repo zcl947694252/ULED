@@ -22,6 +22,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -735,6 +736,23 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                         .putExtra("progress", progress));
             }
         }
+    }
+
+    //记录用户首次点击返回键的时间
+    private long firstTime = 0;
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            long secondTime = System.currentTimeMillis();
+            if (secondTime - firstTime > 2000) {
+                Toast.makeText(MainActivity.this, R.string.click_double_exit, Toast.LENGTH_SHORT).show();
+                firstTime = secondTime;
+                return true;
+            } else {
+                System.exit(0);
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

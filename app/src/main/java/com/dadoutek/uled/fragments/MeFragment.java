@@ -1,7 +1,9 @@
 package com.dadoutek.uled.fragments;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -85,12 +87,20 @@ public class MeFragment extends Fragment {
 
     //清空缓存初始化APP
     private void emptyTheCache() {
-        CleanUtils.cleanInternalSp();
-        CleanUtils.cleanExternalCache();
-        CleanUtils.cleanInternalFiles();
-        CleanUtils.cleanInternalCache();
-        ToastUtils.showShort(R.string.clean_tip);
-        restartApplication();
+        new AlertDialog.Builder(getActivity())
+                .setTitle(getActivity().getString(R.string.empty_cache_title))
+                .setMessage(getActivity().getString(R.string.empty_cache_tip))
+                .setNegativeButton(getActivity().getString(R.string.btn_cancel), (dialog, which) -> {
+                })
+                .setPositiveButton(getActivity().getString(R.string.btn_sure), (dialog, which) -> {
+                    CleanUtils.cleanInternalSp();
+                    CleanUtils.cleanExternalCache();
+                    CleanUtils.cleanInternalFiles();
+                    CleanUtils.cleanInternalCache();
+                    ToastUtils.showShort(R.string.clean_tip);
+                    restartApplication();
+                })
+                .create().show();
     }
 
     //重启app并杀死原进程
