@@ -138,7 +138,7 @@
             android:layout_height="46dp"
             android:layout_margin="10dp"
             android:background="@drawable/click_btn"
-            android:text="Remove Device(Kick out)"
+            android:text="@string/remove_device_st"
             android:textColor="@android:color/white" />
 
     </LinearLayout>

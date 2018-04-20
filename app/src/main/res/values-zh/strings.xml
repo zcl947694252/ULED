@@ -2,16 +2,16 @@
 <resources>
 
     <!-- Activity Labels -->
-    <string name="app_name">ULed</string>
-    <string name="activity_device_setting_label">Device Setting</string>
-    <string name="activity_device_scanning_label">Device Scanning</string>
-    <string name="activity_device_grouping">Device Grouping</string>
-    <string name="activity_group_setting">Group Setting</string>
-    <string name="activity_mesh_add_lable">Add Mesh</string>
+    <string name="app_name">优乐迪</string>
+    <string name="activity_device_setting_label">设备设置</string>
+    <string name="activity_device_scanning_label">设备扫描</string>
+    <string name="activity_device_grouping">设备分组</string>
+    <string name="activity_group_setting">组设置</string>
+    <string name="activity_mesh_add_lable">添加Mesh</string>
 
     <!-- Bottom Nav -->
-    <string name="header_devices">Lights</string>
-    <string name="header_groups">Groups</string>
+    <string name="header_devices">灯组</string>
+    <string name="header_groups">组</string>
     <string name="header_account">我的</string>
 
     <!-- DeviceSchema List -->
@@ -20,12 +20,12 @@
     <string name="device_list_all_on">全开</string>
     <string name="device_list_all_off">全关</string>
     <string name="device_list_Scene">Ota</string>
-    <string name="device_list_Scene_night">Night Scene</string>
-    <string name="device_list_Scene_sleep">Sleep Scene</string>
+    <string name="device_list_Scene_night">夜晚场景</string>
+    <string name="device_list_Scene_sleep">睡眠场景</string>
 
     <!-- DeviceSchema Setting -->
-    <string name="device_setting_header">Light Setting</string>
-    <string name="device_setting_brightness">Brightness</string>
+    <string name="device_setting_header">灯设置</string>
+    <string name="device_setting_brightness">亮度</string>
     <string name="device_setting_color">颜色</string>
     <string name="device_setting_temperature">色温</string>
     <string name="device_setting_music">音乐</string>
@@ -62,14 +62,14 @@
     <string name="mesh_add_factory_mesh_name">安装Mesh名称</string>
     <string name="mesh_add_factory_mesh_password">安装Mesh密码</string>
 
-    <string name="title_activity_group_setting">GroupSettingActivity</string>
-    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_group_setting">组设置</string>
+    <string name="title_activity_test">测试页面</string>
 
-    <string name="select_file">Select file(%s)</string>
-    <string name="ota_prepare_title">OTA Prepare</string>
-    <string name="ota_update_title">OTA Processing</string>
-    <string name="progress_ota">OTA Progress: %s </string>
-    <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
+    <string name="select_file">选择文件(%s)</string>
+    <string name="ota_prepare_title">OTA 准备</string>
+    <string name="ota_update_title">OTA 正在进行</string>
+    <string name="progress_ota">OTA 进度: %s </string>
+    <string name="progress_mesh_ota">MeshOTA 进度: %s</string>
     <string name="target_version">Target Version : %s</string>
     <string name="scan_tip">扫描灯具需要相关权限，否则无法进行下一步操作</string>
     <string name="btn_ok">确定</string>
@@ -120,5 +120,6 @@
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
     <string name="empty_cache_tip">是否清除数据？清除后APP将自动重启</string>
+    <string name="remove_device_st">删除设备(点击)</string>
 
 </resources>

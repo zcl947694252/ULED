@@ -120,5 +120,6 @@
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
     <string name="empty_cache_tip">Clear data? APP will restart automatically after clearing</string>
+    <string name="remove_device_st">Remove Device(Kick out)</string>
 
 </resources>
