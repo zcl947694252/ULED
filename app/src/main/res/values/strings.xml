@@ -87,7 +87,7 @@
     <string name="light">Lights</string>
     <string name="me">Me</string>
     <string name="fragment_name_me">me</string>
-    <string name="grouping_wait_tip">Grouping information is being configured. Please wait!</string>
+    <string name="grouping_wait_tip">There are currently %1$s lights grouping, please wait!</string>
     <string name="rescan">Rescan</string>
     <string name="start_group_bt">Start grouping</string>
     <string name="group_completed">Grouping is complete!</string>
@@ -116,5 +116,6 @@
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="repeat_tip_name">Already have this group name, please modify!</string>
     <string name="successfully_modified">Successfully modified!</string>
+    <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
 
 </resources>

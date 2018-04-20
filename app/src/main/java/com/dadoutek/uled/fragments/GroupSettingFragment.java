@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -159,6 +160,20 @@ public final class GroupSettingFragment extends Fragment {
 
         unbinder = ButterKnife.bind(this, view);
         return view;
+    }
+
+    //所有灯控分组暂标为系统默认分组不做修改处理
+    private void checkGroupIsSystemGroup() {
+        if(groupAddress==0xFFFF){
+           btnRemoveGroup.setVisibility(View.GONE);
+           btnRename.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        checkGroupIsSystemGroup();
     }
 
     @Override

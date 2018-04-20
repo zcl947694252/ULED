@@ -87,7 +87,7 @@
     <string name="light">灯</string>
     <string name="me">我</string>
     <string name="fragment_name_me">我</string>
-    <string name="grouping_wait_tip">正在分组，请稍后！</string>
+    <string name="grouping_wait_tip">当前有%1$s个灯正在分组，请稍后！</string>
     <string name="rescan">重新扫描</string>
     <string name="start_group_bt">开始分组</string>
     <string name="group_completed">分组完成！</string>
@@ -116,5 +116,6 @@
     <string name="rename_tip_check">不允许输入特殊符号！</string>
     <string name="repeat_tip_name">已经有这个组名了,请修改！</string>
     <string name="successfully_modified">修改成功！</string>
+    <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
 
 </resources>
