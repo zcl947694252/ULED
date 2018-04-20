@@ -147,7 +147,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         groupsInit = mDataManager.getGroups();
 
-        for (int i = 0; i < groupsInit.size(); i++) {
+        for (int i = 0; i < groupsInit.size()-1; i++) {
             Groups.getInstance().add(groupsInit.get(i));
         }
 
