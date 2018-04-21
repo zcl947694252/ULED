@@ -2,9 +2,11 @@ package com.dadoutek.uled.util;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
@@ -25,9 +27,10 @@ public class DataManager {
 
     /**
      * 构造函数
-     * @param context   Activity或Application的Context
-     * @param meshName  要管理哪个MeshName里的数据
-     * @param pwd       要管理哪个pwd里的数据
+     *
+     * @param context  Activity或Application的Context
+     * @param meshName 要管理哪个MeshName里的数据
+     * @param pwd      要管理哪个pwd里的数据
      */
     public DataManager(Context context, String meshName, String pwd) {
         mContext = context;
@@ -37,7 +40,8 @@ public class DataManager {
 
     /**
      * 创建一个控制所有灯的分组
-     * @return  group对象
+     *
+     * @return group对象
      */
     public Group createAllLightControllerGroup() {
         Group groupAllLights = new Group();
@@ -135,6 +139,42 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, Groups.getInstance());
     }
 
+
+    /**
+     * 用户手动创建分组
+     *
+     * @param name   自定义组名
+     * @param groups 当前组集
+     */
+    public void creatGroup(String name, Groups groups,Context context) {
+        if(!checkRepeat(groups,context,name)){
+            int count = groups.size();
+            int newMeshAdress = ++count;
+            Group group = new Group();
+            group.name = name;
+            group.meshAddress = 0x8001 + newMeshAdress;
+            group.brightness = 100;
+            group.temperature = 100;
+            group.color = 0xFFFFFF;
+            groups.add(group);
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                    mMeshName + mPwd + Constant.GROUPS_KEY, groups);
+        }
+    }
+
+    public boolean checkRepeat(Groups groups,Context context,String newName){
+        for (
+                int k = 0; k < groups.size(); k++)
+
+        {
+            if (groups.get(k).name.equals(newName)) {
+                Toast.makeText(context, R.string.creat_group_fail_tip, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Groups getGroups() {
         Groups groups;
         groups = (Groups) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
@@ -143,7 +183,7 @@ public class DataManager {
         if (groups != null && groups.size() > 0) {
             return groups;
         } else {
-            creatGroup(false, 3);
+            creatGroup(false, 1);
             return Groups.getInstance();
         }
     }
@@ -175,10 +215,10 @@ public class DataManager {
         return groups;
     }
 
-    public String getGroupNameByAdress(int groupAdress){
-        Groups groups=getGroups();
-        for(int j=0;j<groups.size();j++){
-            if(groups.get(j).meshAddress==groupAdress){
+    public String getGroupNameByAdress(int groupAdress) {
+        Groups groups = getGroups();
+        for (int j = 0; j < groups.size(); j++) {
+            if (groups.get(j).meshAddress == groupAdress) {
                 return groups.get(j).name;
             }
         }

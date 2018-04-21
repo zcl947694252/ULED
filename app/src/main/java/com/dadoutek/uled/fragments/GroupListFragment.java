@@ -125,6 +125,7 @@ public final class GroupListFragment extends Fragment {
         public TextView txtName;
         public Button btnOn;
         public Button btnOff;
+        public Button btnSet;
     }
 
     final class GroupListAdapter extends BaseAdapter implements
@@ -159,7 +160,7 @@ public final class GroupListFragment extends Fragment {
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
 
         @Override
@@ -181,11 +182,15 @@ public final class GroupListFragment extends Fragment {
                 Button btnOff = (Button) convertView.findViewById(R.id.btn_off);
                 btnOff.setOnClickListener(this);
 
+                Button btnSet = (Button) convertView.findViewById(R.id.btn_set);
+                btnOff.setOnClickListener(this);
+
                 holder = new GroupItemHolder();
 
                 holder.txtName = txtName;
                 holder.btnOn = btnOn;
                 holder.btnOff = btnOff;
+                holder.btnSet=btnSet;
 
                 convertView.setTag(holder);
 
@@ -205,6 +210,7 @@ public final class GroupListFragment extends Fragment {
                 holder.txtName.setTag(group.meshAddress);
                 holder.btnOn.setTag(group.meshAddress);
                 holder.btnOff.setTag(group.meshAddress);
+                holder.btnSet.setTag(group.meshAddress);
             }
 
             return convertView;
@@ -226,6 +232,12 @@ public final class GroupListFragment extends Fragment {
             } else if (clickId == R.id.btn_off) {
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
                         new byte[]{0x00, 0x00, 0x00});
+            }else if(clickId == R.id.btn_set){
+
+                Intent intent = new Intent(mContext, GroupSettingActivity.class);
+                intent.putExtra("groupAddress", meshAddress);
+
+                startActivityForResult(intent, 0);
             }
         }
 

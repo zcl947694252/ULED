@@ -80,7 +80,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
 
     @Override
     public int getItemCount() {
-        return mGroupList.size() - 1;
+        return mGroupList.size();
     }
 
     @Override

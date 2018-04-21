@@ -22,9 +22,12 @@ import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.qrcode.QRCodeShareActivity;
+import com.dadoutek.uled.util.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.dadoutek.uled.util.StringUtils.compileExChar;
 
 public final class AddMeshActivity extends TelinkBaseActivity {
 
@@ -56,7 +59,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
                     mApplication.getMesh().saveOrUpdate(AddMeshActivity.this);
 
                     DataManager dataManager = new DataManager(AddMeshActivity.this, mNewMeshName, mNewMeshPwd);
-                    dataManager.creatGroup(false, 3);
+                    dataManager.creatGroup(false, 1);
 
                     dataManager.updateGroup(Groups.getInstance());
                     finish();
@@ -91,7 +94,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         DataManager dataManager = new DataManager(this, mNewMeshName, mNewMeshPwd);
 
-        dataManager.creatGroup(false, 3);//初始化自动创建16个分组
+        dataManager.creatGroup(false, 1);//初始化自动创建16个分组
 //        groups.add(dataManager.getGroups().get());
         lights.add(dataManager.getLights().get());
     }
@@ -218,23 +221,6 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
 //            this.showToast("Save Mesh Success");
         }
-    }
-
-    /**
-     * @prama: str 要判断是否包含特殊字符的目标字符串
-     */
-
-    private boolean compileExChar(String str) {
-
-        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
-
-        Pattern pattern = Pattern.compile(limitEx);
-        Matcher m = pattern.matcher(str);
-
-        if (m.find()) {
-            return true;
-        }
-        return false;
     }
 
 }

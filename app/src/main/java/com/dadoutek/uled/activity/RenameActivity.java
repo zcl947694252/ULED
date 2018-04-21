@@ -91,7 +91,7 @@ public class RenameActivity extends TelinkBaseActivity {
             return false;
         }
 
-        if(checkRepeat()){
+        if(dataManager.checkRepeat(groups,this,newName)){
             return false;
         }
         return true;
@@ -110,18 +110,4 @@ public class RenameActivity extends TelinkBaseActivity {
         }
         return false;
     }
-
-    private boolean checkRepeat(){
-        for (
-                int k = 0; k < groups.size(); k++)
-
-        {
-            if (groups.get(k).name.equals(newName)) {
-                Toast.makeText(RenameActivity.this, R.string.repeat_tip_name, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

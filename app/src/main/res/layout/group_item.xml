@@ -32,21 +32,31 @@
             <Button
                 android:id="@+id/btn_on"
                 style="@null"
-                android:layout_width="34dp"
+                android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:layout_margin="5dp"
-                android:background="@color/theme_positive_color"
+                android:background="@drawable/btn_radius_selector"
                 android:text="@string/group_list_on"
                 android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/btn_off"
                 style="@null"
-                android:layout_width="34dp"
+                android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:layout_margin="5dp"
-                android:background="@color/theme_positive_color"
+                android:background="@drawable/btn_radius_selector"
                 android:text="@string/group_list_off"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btn_set"
+                style="@null"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_margin="5dp"
+                android:background="@drawable/btn_radius_selector"
+                android:text="@string/set_str"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </RelativeLayout>

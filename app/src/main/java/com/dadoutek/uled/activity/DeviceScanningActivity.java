@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -49,6 +51,7 @@ import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
@@ -76,6 +79,7 @@ import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -93,6 +97,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     LinearLayout groupsBottom;
     @BindView(R.id.tv_num_lights)
     TextView tvNumLights;
+    @BindView(R.id.add_group_layout)
+    LinearLayout addGroupLayout;
     private ImageView backView;
     private Button btnScan;
     private Button btnLog;
@@ -241,6 +247,36 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         nextTime = 0;
         closeDialog();
         canStartTimer = false;
+    }
+
+    @OnClick(R.id.add_group_layout)
+    public void onViewClicked() {
+        addNewGroup();
+    }
+
+    private void addNewGroup() {
+        final EditText textGp = new EditText(this);
+        new AlertDialog.Builder(DeviceScanningActivity.this)
+                .setTitle(R.string.create_new_group)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(textGp)
+
+                .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check));
+                    } else {
+                        mDataManager.creatGroup(textGp.getText().toString().trim(), groups, this);
+                        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+                        recyclerViewGroups.smoothScrollToPosition(groups.size()-1);
+                        groupsRecyclerViewAdapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                    // TODO Auto-generated method stub
+                    dialog.dismiss();
+                }).show();
     }
 
     private static class MyHandler extends Handler {
@@ -920,7 +956,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             groups = mDataManager.getGroups();
         }
 //        groups = mDataManager.initGroupsChecked();
-        Group group = groups.get(groups.size() - 1);
+        Group group = groups.get(0);
         Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
 
         int groupAddress = group.meshAddress;
