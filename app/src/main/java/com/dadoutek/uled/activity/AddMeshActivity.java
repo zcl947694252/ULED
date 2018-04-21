@@ -56,7 +56,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
                     mApplication.getMesh().saveOrUpdate(AddMeshActivity.this);
 
                     DataManager dataManager = new DataManager(AddMeshActivity.this, mNewMeshName, mNewMeshPwd);
-                    dataManager.creatGroup(true, 0);
+                    dataManager.creatGroup(false, 3);
 
                     dataManager.updateGroup(Groups.getInstance());
                     finish();
@@ -91,7 +91,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         DataManager dataManager = new DataManager(this, mNewMeshName, mNewMeshPwd);
 
-        dataManager.creatGroup(true, 0);//初始化自动创建16个分组
+        dataManager.creatGroup(false, 3);//初始化自动创建16个分组
 //        groups.add(dataManager.getGroups().get());
         lights.add(dataManager.getLights().get());
     }

@@ -30,6 +30,11 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         init();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     private void init() {
         this.mApplication = (TelinkLightApplication) this.getApplication();
         this.mApplication.doInit();
@@ -42,6 +47,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
             initGroupData();
             gotoMeshSetting();
             //把是否是第一次进入设为false
+//            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
         } else {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -54,7 +60,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     private void initGroupData() {
         Mesh mesh = mApplication.getMesh();
         DataManager dataManager = new DataManager(this, mesh.name, mesh.password);
-        dataManager.creatGroup(true, 0);//初始化自动创建16个分组
+        dataManager.creatGroup(false, 3);//初始化自动创建16个分组
     }
 
     @Override

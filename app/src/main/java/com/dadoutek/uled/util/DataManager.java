@@ -143,7 +143,7 @@ public class DataManager {
         if (groups != null && groups.size() > 0) {
             return groups;
         } else {
-            creatGroup(true, 0);
+            creatGroup(false, 3);
             return Groups.getInstance();
         }
     }

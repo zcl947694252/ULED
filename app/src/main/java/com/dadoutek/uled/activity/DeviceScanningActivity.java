@@ -175,7 +175,15 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         }
         closeDialog();
         showToast(getString(R.string.scan_end));
-        finish();
+        //判断是否是第一次使用app，启动导航页
+        boolean mIsFirstData = SharedPreferencesHelper.getBoolean(DeviceScanningActivity.this,
+                SplashActivity.IS_FIRST_LAUNCH, true);
+        if (mIsFirstData) {
+            startActivity(new Intent(DeviceScanningActivity.this, SplashActivity.class));
+            finish();
+        } else {
+            finish();
+        }
         canStartTimer = false;
         nextTime = 0;
     }
@@ -383,7 +391,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener);
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
         tvNumLights.setVisibility(View.VISIBLE);
-        tvNumLights.setText(getString(R.string.scan_lights_num,nowLightList.size()+""));
+        tvNumLights.setText(getString(R.string.scan_lights_num, nowLightList.size() + ""));
     }
 
     private void sureGroups() {
