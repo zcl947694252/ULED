@@ -267,9 +267,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                         ToastUtils.showShort(getString(R.string.rename_tip_check));
                     } else {
                         mDataManager.creatGroup(textGp.getText().toString().trim(), groups, this);
-                        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
-                        recyclerViewGroups.smoothScrollToPosition(groups.size()-1);
-                        groupsRecyclerViewAdapter.notifyDataSetChanged();
+                        refreshView();
                         dialog.dismiss();
                     }
                 })
@@ -277,6 +275,23 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                     // TODO Auto-generated method stub
                     dialog.dismiss();
                 }).show();
+    }
+
+    private void refreshView() {
+        currentGroupIndex = groups.size()-1;
+        for (int i = groups.size() - 1; i >= 0; i--) {
+            if(i == groups.size() - 1){
+                groups.get(i).checked=true;
+            }else{
+                groups.get(i).checked=false;
+            }
+        }
+
+        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        recyclerViewGroups.smoothScrollToPosition(groups.size()-1);
+        groupsRecyclerViewAdapter.notifyDataSetChanged();
+        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
     private static class MyHandler extends Handler {
@@ -841,7 +856,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                     light = new Light();
                     light.name = deviceInfo.meshName;
                     light.meshAddress = meshAddress;
-                    light.textColor = this.getResources().getColorStateList(
+                    light.textColor = this.getResources().getColor(
                             R.color.black);
                     light.selected = false;
                     light.raw = deviceInfo;

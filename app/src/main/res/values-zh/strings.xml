@@ -125,5 +125,7 @@
     <string name="creat_group_fail_tip">创建失败,组名已存在！</string>
     <string name="create_new_group">创建一个新组</string>
     <string name="set_str">设置</string>
+    <string name="btn_rename_light">重命名</string>
+    <string name="rename_light">单灯重命名</string>
 
 </resources>

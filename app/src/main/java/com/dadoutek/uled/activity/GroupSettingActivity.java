@@ -31,7 +31,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
 
 		super.onCreate(savedInstanceState);
 
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		this.setContentView(R.layout.activity_group_setting);
 
 		this.mApplication = (TelinkLightApplication) this.getApplication();
@@ -66,6 +66,12 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
 			}
 		}
 	};
+
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if ((keyCode == KeyEvent.KEYCODE_BACK)) {

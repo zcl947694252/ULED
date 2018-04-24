@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddMeshActivity;
 import com.dadoutek.uled.activity.DeviceScanningActivity;
@@ -74,6 +75,8 @@ public final class DeviceListFragment extends Fragment {
     private TextView tv_test_count;
     private int testCount;
 
+    private  DataManager mDataManager;
+    private TelinkLightApplication mApplication;
 
     private Button btn_online_status;
 
@@ -278,6 +281,8 @@ public final class DeviceListFragment extends Fragment {
         onOff = false;
         testStarted = false;
         testCount = 0;
+        this.mApplication = (TelinkLightApplication) getActivity().getApplication();
+        mDataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
     }
 
     @Override
@@ -422,7 +427,7 @@ public final class DeviceListFragment extends Fragment {
 
             Light light = this.getItem(position);
 
-            holder.txtName.setText(light.getLabel());
+            holder.txtName.setText(mDataManager.getLightName(light));
             holder.txtName.setTextColor(light.textColor);
             holder.statusIcon.setImageResource(light.icon);
 

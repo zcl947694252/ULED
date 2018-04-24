@@ -16,13 +16,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="86dp"
             android:padding="10dp"
             android:singleLine="true"
             android:text="Test Name"
+            android:layout_toStartOf="@+id/right_bt"
             android:textSize="18sp" />
 
         <LinearLayout
+            android:id="@+id/right_bt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"

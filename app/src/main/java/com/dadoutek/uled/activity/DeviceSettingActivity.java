@@ -9,10 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.fragments.DeviceSettingFragment;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.util.DataManager;
 
 public final class DeviceSettingActivity extends TelinkBaseActivity {
 
@@ -21,6 +23,8 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     private DeviceSettingFragment settingFragment;
 
     private int meshAddress;
+    private TelinkLightApplication mApplication;
+    private DataManager dataManager;
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -46,12 +50,15 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
 
         this.meshAddress = this.getIntent().getIntExtra("meshAddress", 0);
 
+        mApplication = (TelinkLightApplication) this.getApplication();
+        dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
+
         Light light = Lights.getInstance().getByMeshAddress(meshAddress);
 
         if (light != null) {
             TextView txtTitle = (TextView) this
                     .findViewById(R.id.txt_header_title);
-            txtTitle.setText(light.getLabel2());
+            txtTitle.setText(dataManager.getLightName(light));
         }
 
         this.backView = (ImageView) this

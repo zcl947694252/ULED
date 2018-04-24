@@ -214,6 +214,7 @@ public final class GroupSettingFragment extends Fragment {
         Intent intent = new Intent(getActivity(), RenameActivity.class);
         intent.putExtra("groupAddress", groupAddress);
         startActivity(intent);
+        getActivity().finish();
     }
 
     private void removeGp() {

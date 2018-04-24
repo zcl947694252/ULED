@@ -117,7 +117,7 @@ public final class TelinkLightApplication extends TelinkApplication {
                 light.meshAddress = deviceInfo.meshAddress;
                 light.brightness = 0;
                 light.status = ConnectionStatus.OFFLINE;
-                light.textColor = this.getResources().getColorStateList(
+                light.textColor = this.getResources().getColor(
                         R.color.black);
                 light.updateIcon();
 

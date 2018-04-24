@@ -78,6 +78,8 @@ public final class GroupListFragment extends Fragment {
     public void onResume() {
         super.onResume();
         Log.d("dadougg", "onResume: ");
+        this.initData();
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -174,7 +176,7 @@ public final class GroupListFragment extends Fragment {
 
                 TextView txtName = (TextView) convertView
                         .findViewById(R.id.txt_name);
-                txtName.setOnLongClickListener(this);
+                txtName.setOnClickListener(this);
 
                 TextView btnOn = (TextView) convertView.findViewById(R.id.btn_on);
                 btnOn.setOnClickListener(this);
@@ -225,19 +227,22 @@ public final class GroupListFragment extends Fragment {
             byte opcode = (byte) 0xD0;
             int dstAddr = meshAddress;
 
-            if (clickId == R.id.btn_on) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                        new byte[]{0x01, 0x00, 0x00});
-
-            } else if (clickId == R.id.btn_off) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                        new byte[]{0x00, 0x00, 0x00});
-            }else if(clickId == R.id.btn_set){
-
-                Intent intent = new Intent(mContext, GroupSettingActivity.class);
-                intent.putExtra("groupAddress", meshAddress);
-
-                startActivityForResult(intent, 0);
+            switch (clickId){
+                case R.id.btn_on:
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
+                            new byte[]{0x01, 0x00, 0x00});
+                    break;
+                case R.id.btn_off:
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
+                            new byte[]{0x00, 0x00, 0x00});
+                    break;
+                case R.id.btn_set:
+                    Intent intent = new Intent(mContext, GroupSettingActivity.class);
+                    intent.putExtra("groupAddress", meshAddress);
+                    startActivityForResult(intent, 0);
+                    break;
+                case R.id.txt_name:
+                    break;
             }
         }
 

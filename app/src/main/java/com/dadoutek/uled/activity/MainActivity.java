@@ -608,10 +608,10 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             light.status = notificationInfo.connectionStatus;
 
             if (light.meshAddress == this.connectMeshAddress) {
-                light.textColor = this.getResources().getColorStateList(
+                light.textColor = this.getResources().getColor(
                         R.color.theme_positive_color);
             } else {
-                light.textColor = this.getResources().getColorStateList(
+                light.textColor = this.getResources().getColor(
                         R.color.black);
             }
 

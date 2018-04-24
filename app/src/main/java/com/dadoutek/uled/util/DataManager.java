@@ -10,8 +10,10 @@ import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
+import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -190,6 +192,22 @@ public class DataManager {
         return false;
     }
 
+    public boolean checkRepeat(Lights lights,Context context,String newName){
+        for (
+                int k = 0; k < lights.size(); k++)
+
+        {
+            if(lights.get(k).name==null){
+                return false;
+            }
+            if (lights.get(k).name.equals(newName)) {
+                Toast.makeText(context, "创建失败,名称已存在", Toast.LENGTH_LONG).show();
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Groups getGroups() {
         Groups groups;
         groups = (Groups) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
@@ -257,5 +275,17 @@ public class DataManager {
         }else{
             return null;
         }
+    }
+
+    public String getLightName(Light light){
+        Lights lights=getLights();
+        for(int i=0;i<lights.size();i++){
+            if(lights.get(i).name!=null&&!lights.get(i).name.isEmpty()){
+                if(light.meshAddress==lights.get(i).meshAddress){
+                    return lights.get(i).name;
+                }
+            }
+        }
+        return light.getLabel();
     }
 }

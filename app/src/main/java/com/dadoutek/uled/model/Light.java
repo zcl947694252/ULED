@@ -20,7 +20,7 @@ public final class Light implements Serializable,Cloneable{
     public ConnectionStatus status;//链接状态
     public DeviceInfo raw;//设备信息
     public boolean selected;//选择状态？
-    public ColorStateList textColor;//文字颜色
+    public int textColor;//文字颜色
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public String version;
     public boolean isLamp=true;
@@ -60,5 +60,117 @@ public final class Light implements Serializable,Cloneable{
     @Override
     protected Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+    }
+
+    public int getMeshAddress() {
+        return meshAddress;
+    }
+
+    public void setMeshAddress(int meshAddress) {
+        this.meshAddress = meshAddress;
+    }
+
+    public int getBrightness() {
+        return brightness;
+    }
+
+    public void setBrightness(int brightness) {
+        this.brightness = brightness;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+    }
+
+    public ConnectionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ConnectionStatus status) {
+        this.status = status;
+    }
+
+    public DeviceInfo getRaw() {
+        return raw;
+    }
+
+    public void setRaw(DeviceInfo raw) {
+        this.raw = raw;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public boolean isLamp() {
+        return isLamp;
+    }
+
+    public void setLamp(boolean lamp) {
+        isLamp = lamp;
+    }
+
+    public boolean isHasGroup() {
+        return hasGroup;
+    }
+
+    public void setHasGroup(boolean hasGroup) {
+        this.hasGroup = hasGroup;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
     }
 }

@@ -2,8 +2,8 @@ package com.dadoutek.uled.fragments;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +15,14 @@ import android.widget.TextView;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.activity.RenameLightActivity;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
-import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.widget.ColorPicker;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public final class DeviceSettingFragment extends Fragment implements View.OnClickListener {
@@ -34,12 +35,15 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @BindView(R.id.tv_temperature)
     TextView tvTemperature;
     Unbinder unbinder;
+    @BindView(R.id.btn_rename)
+    Button btnRename;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
     private ColorPicker colorPicker;
     private Button remove;
     private AlertDialog dialog;
+    Light light;
 
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
@@ -80,7 +84,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
             if (view == brightnessBar) {
 //                progress += 5;
 //                Log.d(TAG, "onValueChange: "+progress);
-                tvBrightness.setText(getString(R.string.device_setting_brightness,progress+""));
+                tvBrightness.setText(getString(R.string.device_setting_brightness, progress + ""));
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
 
@@ -90,7 +94,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
                 opcode = (byte) 0xE2;
                 params = new byte[]{0x05, (byte) progress};
-                tvTemperature.setText(getString(R.string.device_setting_temperature,progress+""));
+                tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
 
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
             }
@@ -183,11 +187,11 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        Light light = Lights.getInstance().getByMeshAddress(meshAddress);
+        light = Lights.getInstance().getByMeshAddress(meshAddress);
         brightnessBar.setProgress(light.brightness);
-        tvBrightness.setText(getString(R.string.device_setting_brightness,light.brightness+""));
+        tvBrightness.setText(getString(R.string.device_setting_brightness, light.brightness + ""));
         temperatureBar.setProgress(light.temperature);
-        tvTemperature.setText(getString(R.string.device_setting_temperature,light.temperature+""));
+        tvTemperature.setText(getString(R.string.device_setting_temperature, light.temperature + ""));
     }
 
     @Override
@@ -208,5 +212,17 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @OnClick(R.id.btn_rename)
+    public void onViewClicked() {
+        Intent intent=new Intent(getActivity(), RenameLightActivity.class);
+        intent.putExtra("lightAddress",meshAddress);
+        startActivityForResult(intent,0);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

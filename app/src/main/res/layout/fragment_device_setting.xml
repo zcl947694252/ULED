@@ -143,6 +143,15 @@
             android:text="@string/remove_device_st"
             android:textColor="@android:color/white" />
 
+        <Button
+            android:id="@+id/btn_rename"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/click_btn"
+            android:text="@string/btn_rename_light"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
 </ScrollView>

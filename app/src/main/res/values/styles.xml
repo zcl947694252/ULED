@@ -17,4 +17,8 @@
         <item name="android:windowNoTitle">true</item>
     </style>
 
+    <style name="FullHeightDialogNew" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>

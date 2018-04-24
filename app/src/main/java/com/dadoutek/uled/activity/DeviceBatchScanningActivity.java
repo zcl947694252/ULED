@@ -224,7 +224,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
                     light = new Light();
                     light.name = deviceInfo.meshName;
                     light.meshAddress = meshAddress;
-                    light.textColor = this.getResources().getColorStateList(
+                    light.textColor = this.getResources().getColor(
                             R.color.black);
                     light.selected = false;
                     light.raw = deviceInfo;

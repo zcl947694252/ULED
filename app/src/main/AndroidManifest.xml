@@ -83,8 +83,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.GroupSettingActivity"
-            android:label="@string/activity_group_setting"
-            android:theme="@style/StatusTheme"
+            android:theme="@style/FullHeightDialogNew"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.AddGroupActivity"
@@ -137,6 +136,11 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.RenameActivity"
+            android:theme="@style/StatusTheme"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.RenameLightActivity"
             android:theme="@style/StatusTheme"
             android:screenOrientation="portrait" />
     </application>
