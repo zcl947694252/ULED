@@ -123,9 +123,9 @@ public final class GroupListFragment extends Fragment {
 
     private static class GroupItemHolder {
         public TextView txtName;
-        public Button btnOn;
-        public Button btnOff;
-        public Button btnSet;
+        public TextView btnOn;
+        public TextView btnOff;
+        public TextView btnSet;
     }
 
     final class GroupListAdapter extends BaseAdapter implements
@@ -176,14 +176,14 @@ public final class GroupListFragment extends Fragment {
                         .findViewById(R.id.txt_name);
                 txtName.setOnLongClickListener(this);
 
-                Button btnOn = (Button) convertView.findViewById(R.id.btn_on);
+                TextView btnOn = (TextView) convertView.findViewById(R.id.btn_on);
                 btnOn.setOnClickListener(this);
 
-                Button btnOff = (Button) convertView.findViewById(R.id.btn_off);
+                TextView btnOff = (TextView) convertView.findViewById(R.id.btn_off);
                 btnOff.setOnClickListener(this);
 
-                Button btnSet = (Button) convertView.findViewById(R.id.btn_set);
-                btnOff.setOnClickListener(this);
+                TextView btnSet = (TextView) convertView.findViewById(R.id.btn_set);
+                btnSet.setOnClickListener(this);
 
                 holder = new GroupItemHolder();
 

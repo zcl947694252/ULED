@@ -24,6 +24,7 @@ public class Constant implements Serializable{
     public static final String LIGHTS_KEY ="LastLights";
     public static final String DEFAULT_GROUP_ID="DEFAULT_GROUP_ID";
 
+    public static final String GROUPS_KEY_ALL="GROUPS_KEY_ALL";
 
     public static final String OUT_OF_MESH_NAME = "xxxxxx";
 

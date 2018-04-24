@@ -25,9 +25,9 @@
 
     <!-- DeviceSchema Setting -->
     <string name="device_setting_header">灯设置</string>
-    <string name="device_setting_brightness">亮度</string>
+    <string name="device_setting_brightness">亮度:%1$s</string>
     <string name="device_setting_color">颜色</string>
-    <string name="device_setting_temperature">色温</string>
+    <string name="device_setting_temperature">色温:%1$s</string>
     <string name="device_setting_music">音乐</string>
     <string name="device_setting_sound">Playing by heart</string>
     <string name="device_setting_remove_device">移除设备</string>

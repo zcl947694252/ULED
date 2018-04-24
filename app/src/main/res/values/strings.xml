@@ -25,9 +25,9 @@
 
     <!-- DeviceSchema Setting -->
     <string name="device_setting_header">Light Setting</string>
-    <string name="device_setting_brightness">Brightness</string>
+    <string name="device_setting_brightness">Brightness:%1$s</string>
     <string name="device_setting_color">Color</string>
-    <string name="device_setting_temperature">Color Temperature</string>
+    <string name="device_setting_temperature">Color Temperature:%1$s</string>
     <string name="device_setting_music">Music</string>
     <string name="device_setting_sound">Playing by heart</string>
     <string name="device_setting_remove_device">Remove Device</string>

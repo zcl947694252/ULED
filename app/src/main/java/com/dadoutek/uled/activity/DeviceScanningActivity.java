@@ -964,17 +964,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         byte opcode = (byte) 0xD7;
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
-
-        Log.d("Scanner", "checkSelectLamp: " + "opcode:" + opcode + ";  dstAddress:" +
-                dstAddress + ";  params:" + params.toString() + "------>" + light.status);
-        if (!group.checked) {
             params[0] = 0x01;
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-
-        } else {
-            params[0] = 0x00;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-        }
     }
 
     private void sendGroupData(Light light, Group group, int index) {

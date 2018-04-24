@@ -9,14 +9,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 
-import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
@@ -34,11 +34,17 @@ public final class GroupSettingFragment extends Fragment {
     @BindView(R.id.btn_rename)
     Button btnRename;
     Unbinder unbinder;
+    @BindView(R.id.tv_brightness)
+    TextView tvBrightness;
+    @BindView(R.id.tv_temperature)
+    TextView tvTemperature;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
     private ColorPicker colorPicker;
     private TelinkLightApplication mApplication;
+    private Group group;
+    private DataManager dataManager;
 
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
@@ -82,14 +88,18 @@ public final class GroupSettingFragment extends Fragment {
             if (view == brightnessBar) {
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
-
+                group.brightness=progress;
+                dataManager.updateGroup(group,getActivity());
+                tvBrightness.setText(getString(R.string.device_setting_brightness,progress+""));
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
             } else if (view == temperatureBar) {
 
                 opcode = (byte) 0xE2;
                 params = new byte[]{0x05, (byte) progress};
-
+                group.temperature=progress;
+                dataManager.updateGroup(group,getActivity());
+                tvTemperature.setText(getString(R.string.device_setting_temperature,progress+""));
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
             }
         }
@@ -164,9 +174,9 @@ public final class GroupSettingFragment extends Fragment {
 
     //所有灯控分组暂标为系统默认分组不做修改处理
     private void checkGroupIsSystemGroup() {
-        if(groupAddress==0xFFFF){
-           btnRemoveGroup.setVisibility(View.GONE);
-           btnRename.setVisibility(View.GONE);
+        if (groupAddress == 0xFFFF) {
+            btnRemoveGroup.setVisibility(View.GONE);
+            btnRename.setVisibility(View.GONE);
         }
     }
 
@@ -174,6 +184,12 @@ public final class GroupSettingFragment extends Fragment {
     public void onResume() {
         super.onResume();
         checkGroupIsSystemGroup();
+        dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
+        group = dataManager.getGroup(groupAddress,getActivity());
+        brightnessBar.setProgress(group.brightness);
+        tvBrightness.setText(getString(R.string.device_setting_brightness, group.brightness + ""));
+        temperatureBar.setProgress(group.temperature);
+        tvTemperature.setText(getString(R.string.device_setting_temperature, group.temperature + ""));
     }
 
     @Override
@@ -195,7 +211,7 @@ public final class GroupSettingFragment extends Fragment {
     }
 
     private void renameGp() {
-        Intent intent=new Intent(getActivity(), RenameActivity.class);
+        Intent intent = new Intent(getActivity(), RenameActivity.class);
         intent.putExtra("groupAddress", groupAddress);
         startActivity(intent);
     }

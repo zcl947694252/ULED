@@ -99,6 +99,21 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
 
+    public void updateGroup(Group group,Context context) {
+        if(group.meshAddress==0xFFFF){
+            SharedPreferencesHelper.putObject(context,mMeshName + mPwd + Constant.GROUPS_KEY_ALL,group);
+        }
+
+        Groups groups=getGroups();
+        for(int i=0;i<groups.size();i++){
+            if(groups.get(i).meshAddress==group.meshAddress){
+                groups.set(i,group);
+                SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                        mMeshName + mPwd + Constant.GROUPS_KEY, groups);
+            }
+        }
+    }
+
 //    /**
 //     * 更改指定组的信息
 //     * @param group
@@ -223,5 +238,24 @@ public class DataManager {
             }
         }
         return "null";
+    }
+
+    public Group getGroup(int groupAdress,Context context) {
+        Groups groups = getGroups();
+        for (int j = 0; j < groups.size(); j++) {
+            if (groups.get(j).meshAddress == groupAdress) {
+                return groups.get(j);
+            }
+        }
+
+        if(groupAdress==0xFFFF){
+            Group group=(Group) SharedPreferencesHelper.getObject(context,mMeshName + mPwd + Constant.GROUPS_KEY_ALL);
+            if(group==null){
+                return createAllLightControllerGroup();
+            }
+           return group;
+        }else{
+            return null;
+        }
     }
 }
