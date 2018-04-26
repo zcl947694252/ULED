@@ -121,11 +121,15 @@
     <string name="empty_cache_title">Data clearing</string>
     <string name="empty_cache_tip">Clear data? APP will restart automatically after clearing</string>
     <string name="remove_device_st">Remove Device(Kick out)</string>
-    <string name="add_str_group">添加组</string>
-    <string name="creat_group_fail_tip">创建失败,组名已存在！</string>
-    <string name="create_new_group">创建一个新组</string>
-    <string name="set_str">设置</string>
-    <string name="btn_rename_light">重命名</string>
-    <string name="rename_light">单灯重命名</string>
+    <string name="add_str_group">Add group</string>
+    <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
+    <string name="create_new_group">Create a new group</string>
+    <string name="set_str">Setting</string>
+    <string name="btn_rename_light">Rename</string>
+    <string name="rename_light">Single lamp rename</string>
+    <string name="connect_state">Device connection, please wait. . .</string>
+    <string name="connect_success">connection succeeded!</string>
+    <string name="connect_fail">Connection failed!</string>
+    <string name="device_not_connected">The device is not connected!</string>
 
 </resources>

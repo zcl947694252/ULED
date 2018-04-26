@@ -3,6 +3,7 @@ package com.dadoutek.uled.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -23,14 +24,20 @@ import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -38,9 +45,11 @@ import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.fragments.DeviceListFragment;
 import com.dadoutek.uled.fragments.GroupListFragment;
 import com.dadoutek.uled.fragments.MeFragment;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.FragmentFactory;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.telink.bluetooth.LeBluetooth;
@@ -95,6 +104,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     @BindView(R.id.tvAccount)
     TextView tvAccount;
 
+    private Dialog loadDialog;
     private FragmentManager fragmentManager;
     private DeviceListFragment deviceFragment;
     private GroupListFragment groupFragment;
@@ -409,6 +419,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
+        this.mApplication.removeEventListener(this);
         TelinkLightService.Instance().disableAutoRefreshNotify();
     }
 
@@ -429,10 +440,13 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
      * 自动重连
      */
     private void autoConnect() {
+
         if (TelinkLightService.Instance() != null) {
 
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
+                ToastUtils.showLong(getString(R.string.connect_state));
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY,false);
 
                 if (this.mApplication.isEmptyMesh())
                     return;
@@ -500,6 +514,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_LOGIN:
+                ToastUtils.showLong(getString(R.string.connect_success));
+                SharedPreferencesHelper.putBoolean(this,Constant.CONNECT_STATE_SUCCESS_KEY,true);
                 DeviceInfo connectDevice = this.mApplication.getConnectDevice();
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress;
@@ -535,6 +551,9 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     }
 
     private void onNError(final DeviceEvent event) {
+
+        ToastUtils.showLong(getString(R.string.connect_fail));
+        SharedPreferencesHelper.putBoolean(this,Constant.CONNECT_STATE_SUCCESS_KEY,false);
 
         TelinkLightService.Instance().idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");

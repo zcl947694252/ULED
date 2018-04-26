@@ -22,8 +22,9 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
-    <meta-data android:name="android.max_aspect"
-        android:value="2.1"/>
+    <meta-data
+        android:name="android.max_aspect"
+        android:value="2.1" />
 
     <application
         android:name=".TelinkLightApplication"
@@ -39,8 +40,7 @@
             android:name=".activity.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/StatusTheme"
-            >
+            android:theme="@style/StatusTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,98 +51,99 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme"></activity>
 
         <activity
             android:name=".activity.DeviceSettingActivity"
-            android:label="@string/activity_device_setting_label"
             android:screenOrientation="portrait"
-            android:theme="@style/StatusTheme"
-            />
+            android:theme="@style/FullHeightDialogNew" />
         <activity
             android:name=".activity.DeviceScanningActivity"
             android:label="@string/activity_device_scanning_label"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.DeviceBatchScanningActivity"
             android:label="@string/activity_device_scanning_label"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.AddMeshActivity"
             android:label="@string/activity_mesh_add_lable"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.DeviceGroupingActivity"
             android:label="@string/activity_device_grouping"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.GroupSettingActivity"
-            android:theme="@style/FullHeightDialogNew"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/FullHeightDialogNew" />
         <activity
             android:name=".activity.AddGroupActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.OtaActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.OtaDeviceListActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.BatchOtaActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.LogInfoActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <!-- <activity
              android:name=".activity.OTAPrepareActivity"
              android:screenOrientation="portrait" />-->
         <activity
             android:name=".activity.OTAUpdateActivity"
             android:launchMode="singleTop"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.FileSelectActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.UserAllActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
 
         <activity
             android:name=".activity.OnlineStatusTestActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".qrcode.QRCodeScanActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".qrcode.QRCodeShareActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.RenameActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
 
         <activity
             android:name=".activity.RenameLightActivity"
-            android:theme="@style/StatusTheme"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
+        <activity
+            android:name=".activity.LightsOfGroupActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
     </application>
 
 </manifest>

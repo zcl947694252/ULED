@@ -29,4 +29,10 @@ public class Constant implements Serializable{
     public static final String OUT_OF_MESH_NAME = "xxxxxx";
 
     public static final int RESULT_OK=1;
+    public static final String LIGHT_ARESS_KEY="LIGHT_ARESS_KEY";
+    public static final String LIGHT_REFRESH_KEY="LIGHT_REFRESH_KEY";
+    public static final String LIGHT_REFRESH_KEY_OK="LIGHT_REFRESH_KEY_OK";
+
+    //标志链接是否成功
+    public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";
 }

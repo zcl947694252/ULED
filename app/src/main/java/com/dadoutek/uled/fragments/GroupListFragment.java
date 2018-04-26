@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.activity.LightsOfGroupActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.activity.GroupSettingActivity;
@@ -37,6 +38,7 @@ public final class GroupListFragment extends Fragment {
 
     private Activity mContext;
     private TelinkLightApplication mApplication;
+    private DataManager dataManager;
 
 
     private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
@@ -45,12 +47,12 @@ public final class GroupListFragment extends Fragment {
         public boolean onItemLongClick(AdapterView<?> parent, View view,
                                        int position, long id) {
 
-            Group group = adapter.getItem(position);
-
-            Intent intent = new Intent(mContext, GroupSettingActivity.class);
-            intent.putExtra("groupAddress", group.meshAddress);
-
-            startActivityForResult(intent, 0);
+//            Group group = adapter.getItem(position);
+//
+//            Intent intent = new Intent(mContext, GroupSettingActivity.class);
+//            intent.putExtra("groupAddress", group.meshAddress);
+//
+//            startActivityForResult(intent, 0);
 
             return true;
         }
@@ -113,7 +115,7 @@ public final class GroupListFragment extends Fragment {
 
     private void initData() {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-        DataManager dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
+        dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
         this.adapter = new GroupListAdapter(dataManager.getGroups());
         gridView.setAdapter(this.adapter);
 
@@ -226,6 +228,11 @@ public final class GroupListFragment extends Fragment {
 
             byte opcode = (byte) 0xD0;
             int dstAddr = meshAddress;
+            Intent intent;
+
+            if(!dataManager.getConnectState(getActivity())){
+                return;
+            }
 
             switch (clickId){
                 case R.id.btn_on:
@@ -237,11 +244,14 @@ public final class GroupListFragment extends Fragment {
                             new byte[]{0x00, 0x00, 0x00});
                     break;
                 case R.id.btn_set:
-                    Intent intent = new Intent(mContext, GroupSettingActivity.class);
+                    intent = new Intent(mContext, GroupSettingActivity.class);
                     intent.putExtra("groupAddress", meshAddress);
                     startActivityForResult(intent, 0);
                     break;
                 case R.id.txt_name:
+                        intent = new Intent(mContext, LightsOfGroupActivity.class);
+                        intent.putExtra("groupAddress", meshAddress);
+                        startActivity(intent);
                     break;
             }
         }
