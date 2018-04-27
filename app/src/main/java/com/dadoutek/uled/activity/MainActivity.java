@@ -1,7 +1,6 @@
 package com.dadoutek.uled.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -38,6 +37,7 @@ import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.fragments.DeviceListFragment;
 import com.dadoutek.uled.fragments.GroupListFragment;
 import com.dadoutek.uled.fragments.MeFragment;
+import com.dadoutek.uled.model.UpdateStatusDeviceType;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
@@ -57,6 +57,7 @@ import com.telink.bluetooth.light.GetAlarmNotificationParser;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LightAdapter;
+import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.bluetooth.light.OnlineStatusNotificationParser;
 import com.telink.bluetooth.light.Parameters;
 import com.telink.util.BuildUtils;
@@ -575,10 +576,29 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
 
     /**
+     * 检查是不是灯
+     */
+    private boolean checkIsLight(NotificationEvent event) {
+        if (event != null) {
+            NotificationInfo notificationInfo = event.getArgs();
+            if (notificationInfo != null) {
+                byte[] params = notificationInfo.params;
+                if (params != null && params.length > 0) {
+                    if (params[3] == UpdateStatusDeviceType.NORMAL_SWITCH)
+                        return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    /**
      * 处理{@link NotificationEvent#ONLINE_STATUS}事件
      */
     private synchronized void onOnlineStatusNotify(NotificationEvent event) {
-
+        if (!checkIsLight(event))
+            return;
         TelinkLog.i("MainActivity#onOnlineStatusNotify#Thread ID : " + Thread.currentThread().getId());
         List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList;
         //noinspection unchecked
@@ -586,6 +606,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
         if (notificationInfoList == null || notificationInfoList.size() <= 0)
             return;
+
 
         /*if (this.deviceFragment != null) {
             this.deviceFragment.onNotify(notificationInfoList);
@@ -633,9 +654,9 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
     private void onMeshOffline(MeshEvent event) {
         List<Light> lights = Lights.getInstance().get();
-        Iterator<Light> it=lights.iterator();
-        while (it.hasNext()){
-            Light light=it.next();
+        Iterator<Light> it = lights.iterator();
+        while (it.hasNext()) {
+            Light light = it.next();
             light.status = ConnectionStatus.OFFLINE;
             light.updateIcon();
             it.remove();

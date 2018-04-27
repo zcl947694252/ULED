@@ -92,7 +92,7 @@ public class LightAdapter {
     protected Callback mCallback;
     protected Context mContext;
     protected Parameters mParams;
-    protected LightController mLightCtrl;
+    public LightController mLightCtrl;
     private LightPeripherals mScannedLights;
     private LightPeripherals mUpdateLights;
     private Handler mLoopHandler;
@@ -134,7 +134,7 @@ public class LightAdapter {
         return this.mode.get();
     }
 
-    synchronized private void setMode(int value) {
+    synchronized public void setMode(int value) {
         this.mode.getAndSet(value);
         TelinkLog.d("set mode : " + value);
     }
@@ -401,22 +401,21 @@ public class LightAdapter {
 
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
 
-        if (!this.isStarted.get()){
+        if (!this.isStarted.get()) {
             Log.d("Test", "***********TEST***********1111");
             return false;
         }
 
 
-        if (!this.mLightCtrl.isLogin()){
+        if (!this.mLightCtrl.isLogin()) {
             Log.d("Test", "***********TEST***********2222");
             return false;
         }
 
-        if (tag == null){
+        if (tag == null) {
             Log.d("Test", "***********TEST***********");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, delay);
-        }
-        else{
+        } else {
             Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
         }
@@ -791,7 +790,7 @@ public class LightAdapter {
             this.mCallback.onNotify(this.mLightCtrl.getCurrentLight(), getMode(),
                     opcode, src, params);
 
-        Log.d("dadouDD", "onNotification: "+data[5]);
+        Log.d("dadouDD", "onNotification: " + data[5]);
     }
 
     /********************************************************************************
@@ -1095,7 +1094,8 @@ public class LightAdapter {
 
             if (mode == MODE_UPDATE_MESH) {
                 setState(STATE_RUNNING);
-                if (LightAdapter.this.status.get() != STATUS_UPDATE_MESH_COMPLETED && LightAdapter.this.status.get() != STATUS_UPDATE_ALL_MESH_COMPLETED) {
+                if (LightAdapter.this.status.get() != STATUS_UPDATE_MESH_COMPLETED &&
+                        LightAdapter.this.status.get() != STATUS_UPDATE_ALL_MESH_COMPLETED) {
                     setStatus(STATUS_LOGOUT, true);
                     setStatus(STATUS_UPDATE_MESH_FAILURE);
                 } else {

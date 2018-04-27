@@ -27,13 +27,12 @@ import android.widget.Toast;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddMeshActivity;
-import com.dadoutek.uled.activity.DeviceScanningActivity;
 import com.dadoutek.uled.activity.DeviceSettingActivity;
 import com.dadoutek.uled.activity.LogInfoActivity;
 import com.dadoutek.uled.activity.OTAUpdateActivity;
 import com.dadoutek.uled.activity.OnlineStatusTestActivity;
+import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
-import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.light.ConnectionStatus;
@@ -75,7 +74,7 @@ public final class DeviceListFragment extends Fragment {
     private TextView tv_test_count;
     private int testCount;
 
-    private  DataManager mDataManager;
+    private DataManager mDataManager;
     private TelinkLightApplication mApplication;
 
     private Button btn_online_status;
@@ -106,10 +105,11 @@ public final class DeviceListFragment extends Fragment {
 
             } else if (v == editView) {
                 //添加设备时，断开当前连接的灯。
-                TelinkLightService.Instance().disconnect();
-                Intent intent = new Intent(mContext, DeviceScanningActivity.class);
-//                Intent intent = new Intent(mContext, DeviceBatchScanningActivity.class);
-                startActivity(intent);
+//                TelinkLightService.Instance().disconnect();
+                TelinkLightService.Instance().idleMode(true);
+//                Intent intent = new Intent(mContext, DeviceScanningActivity.class);
+//                startActivity(intent);
+                startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
             } else if (v == btnOta) {
 //                Intent intent = new Intent(mContext, OtaDeviceListActivity.class);
                 List<Light> lights = Lights.getInstance().get();
@@ -353,15 +353,15 @@ public final class DeviceListFragment extends Fragment {
     }
 
     public void notifyDataSetChanged() {
-        Lights lights=Lights.getInstance();
-        for(int k=0;k<lights.size();k++){
-            if(lights.get(k).status==ConnectionStatus.OFFLINE){
+        Lights lights = Lights.getInstance();
+        for (int k = 0; k < lights.size(); k++) {
+            if (lights.get(k).status == ConnectionStatus.OFFLINE) {
                 lights.remove(k);
                 k--;
             }
         }
 
-        if (this.adapter != null){
+        if (this.adapter != null) {
             this.adapter.notifyDataSetChanged();
         }
     }

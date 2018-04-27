@@ -128,4 +128,22 @@
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
 
+    <string name="smartSwitch">switch</string>
+    <string name="select_device">select device </string>
+    <string name="install_switch">install switch</string>
+    <string name="install_switch_tips">1.Plug micro USB to your Switch\n2.Press any button one time\n3.The indicator on the right of USB will stay on </string>
+    <string name="search">Search</string>
+    <string name="complete">complete</string>
+    <string name="not_found_switch">Not found switch</string>
+    <string name="searching">Searching</string>
+    <string name="install_failed">Install failed</string>
+    <string name="installing">Installing</string>
+    <string name="title_activity_switch_group">SwitchGroupActivity</string>
+    <string name="select_group">Select group</string>
+    <string name="please_select_group">Please select a group at least</string>
+    <string name="connecting">Connecting</string>
+    <string name="connect_failed">Connect failed</string>
+    <string name="group_failed">Group failed</string>
+    <string name="connected">Connected</string>
+
 </resources>

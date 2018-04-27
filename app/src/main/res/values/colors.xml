@@ -9,4 +9,6 @@
     <color name="gray">#9e9e9e</color>
     <color name="red">#FF0000</color>
     <color name="theme_dark_color">#00008B</color>
+    <color name="colorAccent">#FF0000</color>
+    <color name="colorPrimary">#4A87EE</color>
 </resources>

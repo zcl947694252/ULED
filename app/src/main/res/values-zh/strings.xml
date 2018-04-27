@@ -128,4 +128,21 @@
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
 
+    <string name="smartSwitch">开关</string>
+    <string name="select_device">选择设备</string>
+    <string name="install_switch">安装开关</string>
+    <string name="search">搜索</string>
+    <string name="complete">完成</string>
+    <string name="not_found_switch">未找到开关</string>
+    <string name="searching">搜索中</string>
+    <string name="install_failed">安装失败</string>
+    <string name="installing">安装中</string>
+    <string name="install_switch_tips">1.把USB插入开关\n2.按任意一个按键\n3.USB右边的指示灯会常亮</string>
+    <string name="select_group">选择分组</string>
+    <string name="please_select_group">请至少选择一个分组</string>
+    <string name="connecting">连接中</string>
+    <string name="connect_failed">连接失败</string>
+    <string name="group_failed">分组失败</string>
+    <string name="connected">已连接</string>
+
 </resources>

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="AppBaseTheme" parent="android:Theme.Light.NoTitleBar"/>
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar" />
 
-    <style name="AppTheme" parent="AppBaseTheme"/>
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:colorPrimary">@color/theme_positive_color</item>
+        <item name="android:colorPrimaryDark">@color/theme_positive_color</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
 
-    // values-v21。5.0 以上提供了 setStatusBarColor()  方法设置状态栏颜色。
+    </style>
+
+
+    // values-v21。5.0 以上提供了 setStatusBarColor() 方法设置状态栏颜色。
+
     <style name="StatusTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:colorPrimary">@color/theme_positive_color</item>
@@ -20,5 +28,9 @@
     <style name="FullHeightDialogNew" parent="Theme.AppCompat.Light.Dialog">
         <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
