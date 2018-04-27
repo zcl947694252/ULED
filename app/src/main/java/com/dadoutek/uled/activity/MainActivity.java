@@ -50,6 +50,7 @@ import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.model.UpdateStatusDeviceType;
 import com.dadoutek.uled.util.FragmentFactory;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.telink.bluetooth.LeBluetooth;

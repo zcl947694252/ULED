@@ -20,7 +20,6 @@ import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.LogUtils;
-import com.kyleduo.switchbutton.SwitchButton;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import java.util.List;

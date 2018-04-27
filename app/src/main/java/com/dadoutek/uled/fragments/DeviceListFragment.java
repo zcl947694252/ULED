@@ -31,6 +31,7 @@ import com.dadoutek.uled.activity.DeviceSettingActivity;
 import com.dadoutek.uled.activity.LogInfoActivity;
 import com.dadoutek.uled.activity.OTAUpdateActivity;
 import com.dadoutek.uled.activity.OnlineStatusTestActivity;
+import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Groups;
