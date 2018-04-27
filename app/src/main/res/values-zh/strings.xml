@@ -127,6 +127,10 @@
     <string name="set_str">设置</string>
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
+    <string name="connect_state">设备连接中，请稍后。。。</string>
+    <string name="connect_success">连接成功！</string>
+    <string name="connect_fail">连接失败！</string>
+    <string name="device_not_connected">设备未连接！</string>
 
     <string name="smartSwitch">开关</string>
     <string name="select_device">选择设备</string>

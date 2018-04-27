@@ -30,6 +30,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public final static String TAG = DeviceSettingFragment.class.getSimpleName();
 
     public int meshAddress;
+    public String fromWhere;
     @BindView(R.id.tv_brightness)
     TextView tvBrightness;
     @BindView(R.id.tv_temperature)
@@ -88,6 +89,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
 
+                light.brightness=progress;
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
             } else if (view == temperatureBar) {
@@ -96,6 +98,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 params = new byte[]{0x05, (byte) progress};
                 tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
 
+                light.temperature=progress;
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
             }
         }
@@ -187,6 +190,9 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
+        if(fromWhere!=null&&!fromWhere.isEmpty()){
+            remove.setVisibility(View.GONE);
+        }
         light = Lights.getInstance().getByMeshAddress(meshAddress);
         brightnessBar.setProgress(light.brightness);
         tvBrightness.setText(getString(R.string.device_setting_brightness, light.brightness + ""));
@@ -218,7 +224,8 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public void onViewClicked() {
         Intent intent=new Intent(getActivity(), RenameLightActivity.class);
         intent.putExtra("lightAddress",meshAddress);
-        startActivityForResult(intent,0);
+        startActivity(intent);
+        getActivity().finish();
     }
 
     @Override

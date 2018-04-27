@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.activity.RenameActivity;
@@ -233,6 +234,14 @@ public class DataManager {
         }
     }
 
+    public boolean getConnectState(Context context){
+        if(!SharedPreferencesHelper.getBoolean(context, Constant.CONNECT_STATE_SUCCESS_KEY,false)){
+            ToastUtils.showLong(context.getString(R.string.device_not_connected));
+            return false;
+        }
+        return true;
+    }
+
     public Groups initGroupsChecked() {
         Groups groups;
         groups = getGroups();
@@ -275,6 +284,16 @@ public class DataManager {
         }else{
             return null;
         }
+    }
+
+    public Light getLight(int lightMesh,Context context) {
+        Lights lights = getLights();
+        for (int j = 0; j < lights.size(); j++) {
+            if (lights.get(j).meshAddress == lightMesh) {
+                return lights.get(j);
+            }
+        }
+            return null;
     }
 
     public String getLightName(Light light){

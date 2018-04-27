@@ -53,9 +53,8 @@
             android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.DeviceSettingActivity"
-            android:label="@string/activity_device_setting_label"
             android:screenOrientation="portrait"
-            android:theme="@style/StatusTheme" />
+            android:theme="@style/FullHeightDialogNew" />
         <activity
             android:name=".activity.DeviceScanningActivity"
             android:label="@string/activity_device_scanning_label"
@@ -152,10 +151,11 @@
             android:label="@string/title_activity_switch_group"
             android:parentActivityName=".activity.ScanningSwitchActivity"
             android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dadoutek.uled.activity.ScanningSwitchActivity" />
-        </activity>
+	</activity>
+	<activity
+            android:name=".activity.LightsOfGroupActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
     </application>
 
 </manifest>

@@ -31,8 +31,9 @@ import com.dadoutek.uled.activity.DeviceSettingActivity;
 import com.dadoutek.uled.activity.LogInfoActivity;
 import com.dadoutek.uled.activity.OTAUpdateActivity;
 import com.dadoutek.uled.activity.OnlineStatusTestActivity;
-import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
+import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.light.ConnectionStatus;
@@ -218,41 +219,11 @@ public final class DeviceListFragment extends Fragment {
             byte opcode = (byte) 0xD0;
 
             if (light.status == ConnectionStatus.OFF) {
-
-//                if (TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-//                        new byte[]{0x01, 0x00, 0x00})) {
-//                TelinkLightService.Instance().sendCommandNoResponse((byte) 0xFE, 0xFFFF,
-//                        new byte[]{0x07, 0x00, 0x0B, 0x00, 0x0F, 0x00, 0x17, 0x1E, 0x00, 0x00});
-//                TelinkLightService.Instance().sendCommandNoResponse((byte) 0xFE, 0xFFFF,
-//                        new byte[]{0x07, 0x00, 0x0B, 0x00, 0x0F, 0x00, 0x17, 0x1E, 0x00, 0x00});
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
                         new byte[]{0x01, 0x00, 0x00});
-//
-//                TelinkLightService.Instance().sendCommandNoResponse((byte) 0xFE, 0xFFFF,
-//                        new byte[]{0x07, 0x00, 0x0B, 0x00, 0x0F, 0x00, 0x17, 0x1E, 0x00, 0x00});
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-//                        new byte[]{0x00, 0x00, 0x00});
-//                TelinkLightService.Instance().updateNotification();
-                /*light.status = ConnectionStatus.ON;
-                light.icon = R.drawable.icon_light_on;
-                notifyDataSetChanged();*/
-//                }
             } else if (light.status == ConnectionStatus.ON) {
-
-//                if (TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-//                        new byte[]{0x00, 0x00, 0x00})) {
-
-//                TelinkLightService.Instance().sendCommandNoResponse((byte) 0xFE, 0xFFFF,
-//                        new byte[]{0x07, 0x00, 0x0B, 0x00, 0x0F, 0x00, 0x17, 0x1E, 0x00, 0x00});
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
                         new byte[]{0x00, 0x00, 0x00});
-//                TelinkLightService.Instance().updateNotification();
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-//                        new byte[]{0x01, 0x00, 0x00});
-                /*light.status = ConnectionStatus.OFF;
-                light.icon = R.drawable.icon_light_off;
-                notifyDataSetChanged();*/
-//                }
             }
         }
     };
@@ -266,7 +237,7 @@ public final class DeviceListFragment extends Fragment {
             Intent intent = new Intent(getActivity(),
                     DeviceSettingActivity.class);
             Light light = adapter.getItem(position);
-            intent.putExtra("meshAddress", light.meshAddress);
+            intent.putExtra(Constant.LIGHT_ARESS_KEY, light.meshAddress);
             startActivity(intent);
             return true;
         }

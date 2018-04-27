@@ -12,6 +12,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.fragments.DeviceSettingFragment;
 import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
@@ -23,6 +24,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     private DeviceSettingFragment settingFragment;
 
     private int meshAddress;
+    private String fromWhere;
     private TelinkLightApplication mApplication;
     private DataManager dataManager;
     private OnClickListener clickListener = new OnClickListener() {
@@ -48,7 +50,8 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_setting);
 
-        this.meshAddress = this.getIntent().getIntExtra("meshAddress", 0);
+        this.meshAddress = this.getIntent().getIntExtra(Constant.LIGHT_ARESS_KEY, 0);
+        this.fromWhere = this.getIntent().getStringExtra(Constant.LIGHT_REFRESH_KEY);
 
         mApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
@@ -73,6 +76,10 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 .getFragmentManager().findFragmentById(
                         R.id.device_setting_fragment);
 
+        if(fromWhere!=null&&!fromWhere.isEmpty()){
+            editView.setVisibility(View.GONE);
+            this.settingFragment.fromWhere = fromWhere;
+        }
         this.settingFragment.meshAddress = meshAddress;
     }
 }
