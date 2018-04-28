@@ -121,7 +121,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
 //            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
         }
-
     }
 
     private fun onLeScanTimeout(leScanEvent: LeScanEvent) {
