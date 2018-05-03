@@ -65,7 +65,6 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
             }
         }
 
-
         mAdapter.setOnItemChildClickListener { adapter, view, position ->
             when (view.id) {
                 R.id.btnOn -> {

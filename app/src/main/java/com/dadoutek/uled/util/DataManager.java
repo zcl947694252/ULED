@@ -13,9 +13,11 @@ import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -90,6 +92,42 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
 
         Log.d("test", "creatGroup: " + groups.size());
+    }
+
+    public void addScene(Scenes scenes) {
+        List<Scenes> list= (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+                mMeshName + mPwd + Constant.SCENE_KEY);
+
+        if(list!=null){
+            list.add(scenes);
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                    mMeshName + mPwd + Constant.SCENE_KEY, list);
+        }else{
+            list=new ArrayList<>();
+            list.add(scenes);
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                    mMeshName + mPwd + Constant.SCENE_KEY, list);
+        }
+    }
+
+    public void deleteScene(Scenes scenes) {
+        List<Scenes> list= (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+                mMeshName + mPwd + Constant.SCENE_KEY);
+
+        if(list!=null){
+            for(int i=0;i<list.size();i++){
+                if(scenes.sceneName.equals(list.get(i).sceneName)){
+                    list.remove(i);
+                    break;
+                }
+            }
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                    mMeshName + mPwd + Constant.SCENE_KEY, list);
+        }else{
+            list=new ArrayList<>();
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                    mMeshName + mPwd + Constant.SCENE_KEY, list);
+        }
     }
 
     public void updateLights(Lights lights) {
@@ -219,6 +257,18 @@ public class DataManager {
         } else {
             creatGroup(false, 1);
             return Groups.getInstance();
+        }
+    }
+
+    public List<Scenes> getScenesList() {
+        List<Scenes> list;
+        list = (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+                mMeshName + mPwd + Constant.SCENE_KEY);
+
+        if (list != null && list.size() > 0) {
+            return list;
+        } else {
+            return new ArrayList<>();
         }
     }
 

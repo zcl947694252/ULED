@@ -1,7 +1,6 @@
 package com.dadoutek.uled.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -24,14 +23,9 @@ import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
@@ -45,6 +39,7 @@ import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.fragments.DeviceListFragment;
 import com.dadoutek.uled.fragments.GroupListFragment;
 import com.dadoutek.uled.fragments.MeFragment;
+import com.dadoutek.uled.fragments.SceneFragment;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
@@ -105,12 +100,17 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     TextView tvGroups;
     @BindView(R.id.tvAccount)
     TextView tvAccount;
+    @BindView(R.id.tab_scene)
+    ImageView tabScene;
+    @BindView(R.id.tvScene)
+    TextView tvScene;
 
     private Dialog loadDialog;
     private FragmentManager fragmentManager;
     private DeviceListFragment deviceFragment;
     private GroupListFragment groupFragment;
     private MeFragment meFragment;
+    private SceneFragment sceneFragment;
 
     private Fragment mContent;
 
@@ -128,6 +128,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 switchContent(mContent, groupFragment);
             } else if (checkedId == R.id.tab_account) {
                 switchContent(mContent, meFragment);
+            }else if (checkedId == R.id.tab_scene) {
+                switchContent(mContent, sceneFragment);
             }
         }
     };
@@ -174,6 +176,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     private Disposable mDisposableGroupsText;
     private Disposable mDisposableAcount;
     private Disposable mDisposableAcountText;
+    private Disposable mDisposableScene;
+    private Disposable mDisposableSceneText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +203,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 .createFragment(R.id.tab_groups);
         this.meFragment = (MeFragment) FragmentFactory
                 .createFragment(R.id.tab_account);
-
+        this.sceneFragment = (SceneFragment) FragmentFactory
+                .createFragment(R.id.tab_scene);
 //        this.tabs = (ConstraintLayout) this.findViewById(R.id.tabs);
 //        this.tabs.setOnCheckedChangeListener(this.checkedChangeListener);
 
@@ -263,6 +268,10 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 tvGroups.setTextColor(Color.GRAY);
                 tvAccount.setTextColor(Color.GRAY);
 
+                tabScene.setSelected(false);
+                tabScene.setColorFilter(Color.GRAY);
+                tvScene.setTextColor(Color.GRAY);
+
                 switchContent(mContent, deviceFragment);
             }
         };
@@ -279,6 +288,10 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 tvLight.setTextColor(Color.GRAY);
                 tvGroups.setTextColor(positiveColor);
                 tvAccount.setTextColor(Color.GRAY);
+
+                tabScene.setSelected(false);
+                tabScene.setColorFilter(Color.GRAY);
+                tvScene.setTextColor(Color.GRAY);
 
                 switchContent(mContent, groupFragment);
             }
@@ -297,7 +310,32 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 tvGroups.setTextColor(Color.GRAY);
                 tvAccount.setTextColor(positiveColor);
 
+                tabScene.setSelected(false);
+                tabScene.setColorFilter(Color.GRAY);
+                tvScene.setTextColor(Color.GRAY);
+
                 switchContent(mContent, meFragment);
+            }
+        };
+
+        Consumer<Object> sceneConsumer = o -> {
+            if (!tabScene.isSelected()) {
+                tabDevices.setSelected(false);
+                tabGroups.setSelected(false);
+                tabAccount.setSelected(false);
+                tabDevices.setColorFilter(Color.GRAY);
+                tabGroups.setColorFilter(Color.GRAY);
+                tabAccount.setColorFilter(Color.GRAY);
+
+                tvLight.setTextColor(Color.GRAY);
+                tvGroups.setTextColor(Color.GRAY);
+                tvAccount.setTextColor(Color.GRAY);
+
+                tabScene.setSelected(true);
+                tabScene.setColorFilter(positiveColor);
+                tvScene.setTextColor(positiveColor);
+
+                switchContent(mContent, sceneFragment);
             }
         };
 
@@ -327,7 +365,14 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 .throttleFirst(500, TimeUnit.MILLISECONDS)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(acountConsumer);
-
+        mDisposableScene = RxView.clicks(tabScene)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(sceneConsumer);
+        mDisposableSceneText = RxView.clicks(tvScene)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(sceneConsumer);
     }
 
 
@@ -367,7 +412,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         this.mApplication.addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
         this.mApplication.addEventListener(ServiceEvent.SERVICE_CONNECTED, this);
         this.mApplication.addEventListener(MeshEvent.OFFLINE, this);
-
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
 
         this.autoConnect();
@@ -448,7 +492,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 ToastUtils.showLong(getString(R.string.connect_state));
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY,false);
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false);
 
                 if (this.mApplication.isEmptyMesh())
                     return;
@@ -517,7 +561,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         switch (deviceInfo.status) {
             case LightAdapter.STATUS_LOGIN:
                 ToastUtils.showLong(getString(R.string.connect_success));
-                SharedPreferencesHelper.putBoolean(this,Constant.CONNECT_STATE_SUCCESS_KEY,true);
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true);
                 DeviceInfo connectDevice = this.mApplication.getConnectDevice();
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress;
@@ -555,7 +599,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     private void onNError(final DeviceEvent event) {
 
         ToastUtils.showLong(getString(R.string.connect_fail));
-        SharedPreferencesHelper.putBoolean(this,Constant.CONNECT_STATE_SUCCESS_KEY,false);
+        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false);
 
         TelinkLightService.Instance().idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");

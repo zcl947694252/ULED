@@ -150,10 +150,13 @@
             android:name=".activity.SelectGroupForSwitchActivity"
             android:label="@string/title_activity_switch_group"
             android:parentActivityName=".activity.ScanningSwitchActivity"
-            android:theme="@style/AppTheme">
-	</activity>
-	<activity
+            android:theme="@style/AppTheme"></activity>
+        <activity
             android:name=".activity.LightsOfGroupActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
+        <activity
+            android:name=".activity.SceneSetAct"
             android:screenOrientation="portrait"
             android:theme="@style/StatusTheme" />
     </application>

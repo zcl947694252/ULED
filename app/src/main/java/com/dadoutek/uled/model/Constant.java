@@ -21,6 +21,7 @@ public class Constant implements Serializable{
     public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
     public static final String GROUPS_KEY="LastGroups";
+    public static final String SCENE_KEY="SCENE_LAST";
     public static final String LIGHTS_KEY ="LastLights";
     public static final String DEFAULT_GROUP_ID="DEFAULT_GROUP_ID";
 

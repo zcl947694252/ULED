@@ -53,10 +53,10 @@
             android:scaleY="0.8"
             android:src="@drawable/ic_bottom_lightbulb"
             android:tint="@color/gray"
-            app:layout_constraintEnd_toStartOf="@id/tab_groups"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/tab_account"
+            app:layout_constraintStart_toEndOf="@+id/tab_scene"
+            app:layout_constraintTop_toTopOf="parent"
+             />
 
         <TextView
             android:id="@+id/tvLight"
@@ -67,9 +67,9 @@
             android:text="@string/light"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tab_groups"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tab_devices" />
+            app:layout_constraintEnd_toStartOf="@id/tvAccount"
+            app:layout_constraintStart_toEndOf="@id/tvScene"
+            app:layout_constraintTop_toBottomOf="@id/tab_devices" />
 
         <ImageView
             android:id="@+id/tab_groups"
@@ -80,8 +80,9 @@
             android:scaleY="0.75"
             android:src="@drawable/ic_bottom_group"
             android:tint="@color/gray"
-            app:layout_constraintEnd_toStartOf="@+id/tab_account"
-            app:layout_constraintStart_toEndOf="@+id/tab_devices"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintEnd_toStartOf="@+id/tab_scene"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -93,9 +94,9 @@
             android:text="@string/group"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tvAccount"
-            app:layout_constraintStart_toEndOf="@id/tvLight"
-            app:layout_constraintTop_toBottomOf="@id/tab_groups" />
+            app:layout_constraintEnd_toStartOf="@id/tab_scene"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tab_groups" />
 
 
         <ImageView
@@ -109,8 +110,9 @@
             android:src="@drawable/ic_bottom_me"
             android:tint="@color/gray"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tab_groups"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/tab_devices"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <TextView
             android:id="@+id/tvAccount"
@@ -122,8 +124,35 @@
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/tvGroups"
+            app:layout_constraintStart_toEndOf="@id/tvLight"
             app:layout_constraintTop_toBottomOf="@id/tab_account" />
+
+        <ImageView
+            android:id="@+id/tab_scene"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/scene_name"
+            android:gravity="center_horizontal"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
+            android:src="@drawable/ic_all_out_white_36dp"
+            android:tint="@color/gray"
+            app:layout_constraintEnd_toStartOf="@+id/tab_devices"
+            app:layout_constraintStart_toEndOf="@+id/tab_groups"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvScene"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="4dp"
+            android:text="@string/scene_name"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tvLight"
+            app:layout_constraintStart_toEndOf="@id/tvGroups"
+            app:layout_constraintTop_toBottomOf="@id/tab_scene" />
 
     </android.support.constraint.ConstraintLayout>
 
