@@ -2,6 +2,7 @@ package com.dadoutek.uled.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -61,17 +62,22 @@ public class SwitchSceneGroupAdapter extends BaseQuickAdapter implements Adapter
         spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(this);
         spinner.setTag(helper.getPosition());
+        spinner.setSelection(0);
 
         String name= (String) item;
         helper.setText(R.id.tv_scene_button_name,name);
+
+        DbScene dbScene=sceneList.get(0);
+        map.put(btList.get(helper.getPosition()),dbScene);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         spinner= (Spinner) getViewByPosition(position,R.id.sp_scene);
         int positionScene= (int) spinner.getTag();
-        DbScene dbScene=sceneList.get(positionScene);
-        map.put(btList.get(position),dbScene);
+        DbScene dbScene=sceneList.get(position);
+        Log.d(TAG, "onItemSelected: "+position+"-------"+positionScene);
+        map.put(btList.get(positionScene),dbScene);
     }
 
     @Override

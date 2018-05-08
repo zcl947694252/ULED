@@ -147,7 +147,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
     private fun initView() {
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList,mSceneList,this)
-        recyclerView.layoutManager = GridLayoutManager(this, 3)
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
 //        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
 //        recyclerView.adapter = mAdapter
