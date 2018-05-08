@@ -33,6 +33,6 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:layout_marginStart="10dp"
-        android:background="@color/theme_positive_color"
+        android:background="@drawable/btn_rec_blue_bt"
         />
 </RelativeLayout>

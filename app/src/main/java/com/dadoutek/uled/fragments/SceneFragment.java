@@ -11,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DbScene;
+import com.dadoutek.uled.DbModel.DbSceneActions;
+import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
+import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -48,7 +52,8 @@ public class SceneFragment extends Fragment {
 
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
-    private List<Scenes> scenesListData;
+//    private List<Scenes> scenesListData;
+    private List<DbScene> scenesListData;
     private boolean isDelete=false;
 
     @Override
@@ -70,7 +75,7 @@ public class SceneFragment extends Fragment {
     private void initData() {
         telinkLightApplication= (TelinkLightApplication) this.getActivity().getApplication();
         dataManager=new DataManager(getActivity(),telinkLightApplication.getMesh().name,telinkLightApplication.getMesh().password);
-        scenesListData=dataManager.getScenesList();
+        scenesListData= DbSceneUtils.getAllScene();
     }
 
     private void initView() {
@@ -126,12 +131,12 @@ public class SceneFragment extends Fragment {
         @Override
         public void adapterOnClick(View v, int position) {
             if(v.getId()==R.id.scene_delete){
-                dataManager.deleteScene(scenesListData.get(position));
-                scenesListData.remove(position);
+//                dataManager.deleteScene(scenesListData.get(position));
+                deleteScene(position);
                 refreshData();
             }else if(v.getId()==R.id.scene_apply){
                 try {
-                    setScene(position);
+                    setScene(scenesListData.get(position).getId());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -139,26 +144,33 @@ public class SceneFragment extends Fragment {
         }
     };
 
-    private void setScene(int position) throws InterruptedException {
-        byte opcodeBn;
-        byte[] paramsBn;
-        byte opcodeTT;
-        byte[] paramsTT;
-        Scenes scenes=scenesListData.get(position);
-        opcodeBn = (byte) 0xD2;
-        opcodeTT = (byte) 0xE2;
-        paramsBn = new byte[]{(byte) scenes.brightness};
-        paramsTT = new byte[]{0x05, (byte) scenes.temperature};
-
-        List<Integer> groupsAddressList=scenes.groupsAddressList;
-
-        if(groupsAddressList.size()>0){
-            for(int i=0;i<groupsAddressList.size();i++){
+    private void deleteScene(int position) {
+        byte opcode=(byte) 0xEE;
+        byte[] params;
+        long id=scenesListData.get(position).getId();
+        List<DbSceneActions> list= DbSceneActionsUtils.searchActionsBySceneId(id);
+        params=new byte[]{0x00,(byte)id};
+        for(int i=0;i<list.size();i++){
+            try {
                 Thread.sleep(100);
-                TelinkLightService.Instance().sendCommandNoResponse(opcodeBn, groupsAddressList.get(i), paramsBn);
-                Thread.sleep(100);
-                TelinkLightService.Instance().sendCommandNoResponse(opcodeTT, groupsAddressList.get(i), paramsTT);
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,list.get(i).getGroupAddr(),params);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+        }
+
+        DbSceneUtils.deleteScene(scenesListData.get(position));
+        scenesListData.remove(position);
+    }
+
+    private void setScene(long id) throws InterruptedException {
+          byte opcode=(byte) 0xEF;
+          List<DbSceneActions> list= DbSceneActionsUtils.searchActionsBySceneId(id);
+        byte[] params;
+        for(int i=0;i<list.size();i++){
+            Thread.sleep(100);
+            params = new byte[]{(byte)id};
+            TelinkLightService.Instance().sendCommandNoResponse(opcode,list.get(i).getGroupAddr(),params);
         }
     }
 }

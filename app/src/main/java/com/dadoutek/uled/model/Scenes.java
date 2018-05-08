@@ -10,11 +10,7 @@ import java.util.List;
 
 public class Scenes implements Serializable{
     //应用到场景的组mesh
-    public List<Integer> groupsAddressList=new ArrayList<>();
-    //场景亮度
-    public int brightness;
-    //场景色温
-    public int temperature;
+    public List<Integer> action=new ArrayList<>();
     //场景名
     public String sceneName;
 }

@@ -1,9 +1,12 @@
 package com.dadoutek.uled;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
+import com.dadoutek.uled.dao.DaoMaster;
+import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.DeviceInfo;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
@@ -29,6 +32,8 @@ public final class TelinkLightApplication extends TelinkApplication {
     private Toast toast;
     private int onlineCount = 0;
 
+    private static DaoSession daoSession;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -40,6 +45,25 @@ public final class TelinkLightApplication extends TelinkApplication {
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 //        AdvanceStrategy.setDefault(new MySampleAdvanceStrategy());
+        setupDatabase();
+    }
+
+    /**
+     * 配置数据库
+     */
+    private void setupDatabase() {
+        //创建数据库shop.db"
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "uled.db", null);
+        //获取可写数据库
+        SQLiteDatabase db = helper.getWritableDatabase();
+        //获取数据库对象
+        DaoMaster daoMaster = new DaoMaster(db);
+        //获取Dao对象管理者
+        daoSession = daoMaster.newSession();
+    }
+
+    public static DaoSession getDaoInstant() {
+        return daoSession;
     }
 
     public int getOnlineCount() {

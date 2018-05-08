@@ -36,4 +36,7 @@ public class Constant implements Serializable{
 
     //标志链接是否成功
     public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";
+
+    //测试账号设置
+    public static String TESTACCOUNT="xxxx";
 }

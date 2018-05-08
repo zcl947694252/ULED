@@ -150,12 +150,19 @@
     <string name="group_failed">Group failed</string>
     <string name="connected">Connected</string>
     <string name="SceneSetting">Scene settings</string>
-    <string name="scene_apply">application</string>
+    <string name="scene_apply">apply</string>
     <string name="creat_scene">Create a scene</string>
     <string name="tv_scene_name">Scene name:</string>
     <string name="plaese_input_scene_name">Please enter the scene name</string>
     <string name="scene_tip">Please select at least one group!</string>
     <string name="scene_name">Scenes</string>
     <string name="add_scene_tip">Please click to select the group to apply to this scene:</string>
+    <string name="bt_add">添加</string>
+    <string name="group_select">组：</string>
+    <string name="scene1">场景1</string>
+    <string name="scene2">场景2</string>
+    <string name="scene3">场景3</string>
+    <string name="scene4">场景4</string>
+    <string name="scene_set">场景分配</string>
 
 </resources>

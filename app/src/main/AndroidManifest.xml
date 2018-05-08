@@ -159,6 +159,10 @@
             android:name=".activity.SceneSetAct"
             android:screenOrientation="portrait"
             android:theme="@style/StatusTheme" />
+        <activity
+            android:name=".activity.SelectSceneForSwitchActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
     </application>
 
 </manifest>

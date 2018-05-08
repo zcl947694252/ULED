@@ -148,7 +148,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe {
-                            startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
+                            if(mDeviceInfo.productUUID==DeviceType.NORMAL_SWITCH){
+                                startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
+                            }else{
+                                startActivity<SelectSceneForSwitchActivity>("deviceInfo" to mDeviceInfo)
+                            }
                         }
             }
 
@@ -201,10 +205,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
                 progressBtn.text = getString(R.string.connecting)
             }
-//            DeviceType.SCENE_SWITCH -> {
-//                params.setUpdateDeviceList(mDeviceInfo)
-//                TelinkLightService.Instance().autoConnect(params)
-//            }
+            DeviceType.SCENE_SWITCH -> {
+                mDeviceInfo = leScanEvent.args
+                params.setUpdateDeviceList(mDeviceInfo)
+                TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
+                progressBtn.text = getString(R.string.connecting)
+            }
         }
     }
 }

@@ -157,4 +157,11 @@
     <string name="scene_name">场景</string>
     <string name="title_activity_switch_group">SwitchGroupActivity</string>
     <string name="add_scene_tip">请点击选择需要应用到该场景的分组：</string>
+    <string name="bt_add">添加</string>
+    <string name="group_select">组：</string>
+    <string name="scene1">场景1</string>
+    <string name="scene2">场景2</string>
+    <string name="scene3">场景3</string>
+    <string name="scene4">场景4</string>
+    <string name="scene_set">场景分配</string>
 </resources>

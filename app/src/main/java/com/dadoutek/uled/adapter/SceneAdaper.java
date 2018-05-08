@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Scenes;
@@ -19,13 +20,13 @@ import java.util.List;
 
 public class SceneAdaper extends BaseAdapter implements View.OnClickListener{
 
-    private List<Scenes>list;
+    private List<DbScene>list;
     private Context context;
     private boolean isDelete;
     private LayoutInflater mLayoutInflater;
     private AdapterOnClickListner onClickListner1;
 
-    public SceneAdaper(List<Scenes>list, Context context,boolean isDelete,AdapterOnClickListner onClickListner1) {
+    public SceneAdaper(List<DbScene>list, Context context, boolean isDelete, AdapterOnClickListner onClickListner1) {
         this.list=list;
         this.context=context;
         this.isDelete=isDelete;
@@ -70,7 +71,7 @@ public class SceneAdaper extends BaseAdapter implements View.OnClickListener{
             holder.delete.setVisibility(View.GONE);
         }
 
-        holder.sceneName.setText(list.get(position).sceneName);
+        holder.sceneName.setText(list.get(position).getName());
         holder.delete.setOnClickListener(this);
         holder.delete.setTag(position);
         holder.apply.setOnClickListener(this);
