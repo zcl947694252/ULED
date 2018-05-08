@@ -19,6 +19,7 @@ import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
 import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.LogUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -121,6 +122,9 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
             }
             val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0xff.toByte(), map.getValue(key).id.toByte(),
                     0xff.toByte())
+
+            Thread.sleep(100)
+
             TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_SCENE_FOR_SWITCH,
                     mDeviceInfo.meshAddress,
                     paramBytes)
