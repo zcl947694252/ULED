@@ -52,9 +52,9 @@ public class SceneFragment extends Fragment {
 
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
-//    private List<Scenes> scenesListData;
+    //    private List<Scenes> scenesListData;
     private List<DbScene> scenesListData;
-    private boolean isDelete=false;
+    private boolean isDelete = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,17 +73,17 @@ public class SceneFragment extends Fragment {
     }
 
     private void initData() {
-        telinkLightApplication= (TelinkLightApplication) this.getActivity().getApplication();
-        dataManager=new DataManager(getActivity(),telinkLightApplication.getMesh().name,telinkLightApplication.getMesh().password);
-        scenesListData= DbSceneUtils.getAllScene();
+        telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
+        dataManager = new DataManager(getActivity(), telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
+        scenesListData = DbSceneUtils.getAllScene();
     }
 
     private void initView() {
-        adaper= new SceneAdaper(scenesListData,getActivity(),isDelete,adapterOnClickListner);
+        adaper = new SceneAdaper(scenesListData, getActivity(), isDelete, adapterOnClickListner);
         sceneList.setAdapter(adaper);
     }
 
-    private void refreshData(){
+    private void refreshData() {
         adaper.notifyDataSetChanged();
     }
 
@@ -102,18 +102,18 @@ public class SceneFragment extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.img_header_menu_left:
-                if(isDelete){
-                    isDelete=false;
-                }else {
-                    isDelete=true;
+                if (isDelete) {
+                    isDelete = false;
+                } else {
+                    isDelete = true;
                 }
 
                 adaper.changeState(isDelete);
                 refreshData();
                 break;
             case R.id.img_header_menu_right:
-                Intent intent=new Intent(getActivity(), SceneSetAct.class);
-                startActivityForResult(intent,0);
+                Intent intent = new Intent(getActivity(), SceneSetAct.class);
+                startActivityForResult(intent, 0);
                 break;
         }
     }
@@ -121,20 +121,20 @@ public class SceneFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==0&&resultCode== Constant.RESULT_OK){
+        if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
             initData();
             initView();
         }
     }
 
-    AdapterOnClickListner adapterOnClickListner=new AdapterOnClickListner() {
+    AdapterOnClickListner adapterOnClickListner = new AdapterOnClickListner() {
         @Override
         public void adapterOnClick(View v, int position) {
-            if(v.getId()==R.id.scene_delete){
+            if (v.getId() == R.id.scene_delete) {
 //                dataManager.deleteScene(scenesListData.get(position));
                 deleteScene(position);
                 refreshData();
-            }else if(v.getId()==R.id.scene_apply){
+            } else if (v.getId() == R.id.scene_apply) {
                 try {
                     setScene(scenesListData.get(position).getId());
                 } catch (InterruptedException e) {
@@ -145,15 +145,15 @@ public class SceneFragment extends Fragment {
     };
 
     private void deleteScene(int position) {
-        byte opcode=(byte) 0xEE;
+        byte opcode = (byte) 0xEE;
         byte[] params;
-        long id=scenesListData.get(position).getId();
-        List<DbSceneActions> list= DbSceneActionsUtils.searchActionsBySceneId(id);
-        params=new byte[]{0x00,(byte)id};
-        for(int i=0;i<list.size();i++){
+        long id = scenesListData.get(position).getId();
+        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        params = new byte[]{0x00, (byte) id};
+        for (int i = 0; i < list.size(); i++) {
             try {
                 Thread.sleep(100);
-                TelinkLightService.Instance().sendCommandNoResponse(opcode,list.get(i).getGroupAddr(),params);
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -164,13 +164,13 @@ public class SceneFragment extends Fragment {
     }
 
     private void setScene(long id) throws InterruptedException {
-          byte opcode=(byte) 0xEF;
-          List<DbSceneActions> list= DbSceneActionsUtils.searchActionsBySceneId(id);
+        byte opcode = (byte) 0xEF;
+        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
         byte[] params;
-        for(int i=0;i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);
-            params = new byte[]{(byte)id};
-            TelinkLightService.Instance().sendCommandNoResponse(opcode,list.get(i).getGroupAddr(),params);
+            params = new byte[]{(byte) id};
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
         }
     }
 }

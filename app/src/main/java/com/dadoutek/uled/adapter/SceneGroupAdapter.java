@@ -62,8 +62,8 @@ public class SceneGroupAdapter extends BaseQuickAdapter implements SeekBar.OnSee
         spinner.setAdapter(arrayAdapter);
         spinner.setSelection(itemGroup.groupPosition);
         spinner.setOnItemSelectedListener(this);
-        sbBrightness.setProgress(itemGroup.brightness);
-        sBtemperature.setProgress(itemGroup.temperature);
+//        sbBrightness.setProgress(50);
+//        sBtemperature.setProgress(50);
         tvBrightness.setText(sbBrightness.getProgress()+"");
         tvTemperature.setText(sBtemperature.getProgress()+"");
 //        helper.setText(R.id.tv_brightness,sbBrightness.getProgress()+"");

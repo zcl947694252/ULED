@@ -52,7 +52,7 @@
                     android:id="@+id/sb_brightness"
                     android:layout_marginStart="2dp"
                     android:max="100"
-                    android:progress="0"
+                    android:progress="50"
                     android:layout_width="130dp"
                     android:layout_height="wrap_content" />
                 <TextView
@@ -77,7 +77,7 @@
                     android:id="@+id/sb_temperature"
                     android:layout_marginStart="2dp"
                     android:max="100"
-                    android:progress="0"
+                    android:progress="50"
                     android:layout_width="130dp"
                     android:layout_height="wrap_content" />
                 <TextView

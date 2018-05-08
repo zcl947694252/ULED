@@ -164,4 +164,6 @@
     <string name="scene3">场景3</string>
     <string name="scene4">场景4</string>
     <string name="scene_set">场景分配</string>
+    <string name="setting_switch">正在配置开关</string>
+    <string name="pace_fail">配置失败</string>
 </resources>

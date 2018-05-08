@@ -1,13 +1,16 @@
 package com.dadoutek.uled.activity
 
+import android.annotation.SuppressLint
+import android.app.Dialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.CheckBox
-import android.widget.GridLayout
+import android.view.animation.AnimationUtils
+import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.DbModel.DbScene
 import com.dadoutek.uled.DbModel.DbSceneUtils
@@ -40,6 +43,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     private lateinit var mAdapter: SwitchSceneGroupAdapter
     private  lateinit var mSwitchList: ArrayList<String>
     private  lateinit var mSceneList: List<DbScene>
+    private var loadDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +65,10 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         fab.setOnClickListener { view ->
 //            if (mAdapter.selectedPos != -1) {
 //                progressBar.visibility = View.VISIBLE
+                openLoadingDialog(getString(R.string.setting_switch))
                 setSceneForSwitch()
                 updateNameForSwitch()
+
 //
 //            }
 //            else {
@@ -89,13 +95,15 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
 
+        closeDialog()
+
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
                 progressBar.visibility = View.GONE
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                snackbar(root, getString(R.string.group_failed))
+                snackbar(root, getString(R.string.pace_fail))
             }
         }
     }
@@ -168,4 +176,40 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mSceneList=DbSceneUtils.getAllScene()
     }
 
+
+    @SuppressLint("ResourceType")
+    fun openLoadingDialog(content: String) {
+        val inflater = LayoutInflater.from(this)
+        val v = inflater.inflate(R.layout.dialogview, null)
+
+        val layout = v.findViewById<View>(R.id.dialog_view) as LinearLayout
+        val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
+        tvContent.text = content
+
+        val spaceshipImage = v.findViewById<View>(R.id.img) as ImageView
+
+        @SuppressLint("ResourceType") val hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
+                R.animator.load_animation)
+
+        spaceshipImage.startAnimation(hyperspaceJumpAnimation)
+
+        if (loadDialog == null) {
+            loadDialog = Dialog(this,
+                    R.style.FullHeightDialog)
+        }
+        //loadDialog没显示才把它显示出来
+        if (!loadDialog!!.isShowing) {
+            loadDialog!!.setCancelable(true)
+            loadDialog!!.setCanceledOnTouchOutside(false)
+            loadDialog!!.setContentView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT))
+            loadDialog!!.show()
+        }
+    }
+
+    fun closeDialog() {
+        if (loadDialog != null) {
+            loadDialog!!.dismiss()
+        }
+    }
 }
