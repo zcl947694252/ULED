@@ -18,11 +18,10 @@ import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.activity.SceneSetAct;
+import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.util.DataManager;
 
 import java.util.List;
@@ -98,6 +97,15 @@ public class SceneFragment extends Fragment {
         unbinder.unbind();
     }
 
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            initData();
+            initView();
+        }
+    }
+
     @OnClick({R.id.img_header_menu_left, R.id.img_header_menu_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -112,7 +120,7 @@ public class SceneFragment extends Fragment {
                 refreshData();
                 break;
             case R.id.img_header_menu_right:
-                Intent intent = new Intent(getActivity(), SceneSetAct.class);
+                Intent intent = new Intent(getActivity(), AddSceneAct.class);
                 startActivityForResult(intent, 0);
                 break;
         }

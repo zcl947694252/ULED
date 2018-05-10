@@ -18,6 +18,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.util.AppUtils;
+import com.dadoutek.uled.util.DBManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -93,6 +94,7 @@ public class MeFragment extends Fragment {
                 .setNegativeButton(getActivity().getString(R.string.btn_cancel), (dialog, which) -> {
                 })
                 .setPositiveButton(getActivity().getString(R.string.btn_sure), (dialog, which) -> {
+                    DBManager.getInstance().deleteAllData();
                     CleanUtils.cleanInternalSp();
                     CleanUtils.cleanExternalCache();
                     CleanUtils.cleanInternalFiles();

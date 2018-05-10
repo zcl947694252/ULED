@@ -156,15 +156,18 @@
     <string name="plaese_input_scene_name">Please enter the scene name</string>
     <string name="scene_tip">Please select at least one group!</string>
     <string name="scene_name">Scenes</string>
-    <string name="add_scene_tip">Please click to select the group to apply to this scene:</string>
-    <string name="bt_add">添加</string>
-    <string name="group_select">组：</string>
-    <string name="scene1">场景1</string>
-    <string name="scene2">场景2</string>
-    <string name="scene3">场景3</string>
-    <string name="scene4">场景4</string>
-    <string name="scene_set">场景分配</string>
-    <string name="setting_switch">正在配置开关</string>
-    <string name="pace_fail">配置失败</string>
+    <string name="add_scene_tip">Please click to Add the group to apply to this scene:</string>
+    <string name="bt_add">Add to</string>
+    <string name="group_select">Please select group:</string>
+    <string name="scene1">scene 1</string>
+    <string name="scene2">scene 2</string>
+    <string name="scene3">scene 3</string>
+    <string name="scene4">scene 4</string>
+    <string name="scene_set">Scene assignment</string>
+    <string name="setting_switch">Configuring switch</string>
+    <string name="pace_fail">Configuration failed</string>
+    <string name="tip_switch">请先添加场景！再配置开关</string>
+    <string name="tip_add_scene">已经添加了所有存在的组！</string>
+    <string name="tip_save_dialog_all">当前选择包含了所有组,只有所有组的设置会生效,仍然保存？</string>
 
 </resources>

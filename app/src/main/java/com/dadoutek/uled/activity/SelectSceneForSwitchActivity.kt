@@ -7,11 +7,13 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.DbModel.DbScene
 import com.dadoutek.uled.DbModel.DbSceneUtils
 import com.dadoutek.uled.R
@@ -67,8 +69,6 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
 //                progressBar.visibility = View.VISIBLE
                 openLoadingDialog(getString(R.string.setting_switch))
                 setSceneForSwitch()
-                updateNameForSwitch()
-
 //
 //            }
 //            else {
@@ -136,7 +136,12 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
             TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_SCENE_FOR_SWITCH,
                     mDeviceInfo.meshAddress,
                     paramBytes)
+
+            Thread.sleep(100)
         }
+
+        Thread.sleep(100)
+        updateNameForSwitch()
     }
 
     private fun updateNameForSwitch() {
@@ -158,8 +163,12 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     }
 
     private fun initView() {
+        if(mSceneList.size===0){
+            ToastUtils.showLong(getString(R.string.tip_switch))
+            return
+        }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList,mSceneList,this)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.layoutManager = GridLayoutManager(this, 2) as RecyclerView.LayoutManager?
 //        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
 //        recyclerView.adapter = mAdapter

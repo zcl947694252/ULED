@@ -116,14 +116,14 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     override fun performed(event: Event<String>?) {
         when (event?.getType()) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout(event as LeScanEvent)
+            LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout()
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
 //            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
 //            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
         }
     }
 
-    private fun onLeScanTimeout(leScanEvent: LeScanEvent) {
+    private fun onLeScanTimeout() {
         progressBtn.progress = -1   //控件显示Error状态
     }
 

@@ -5,12 +5,14 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Generated;
 
+import java.io.Serializable;
+
 /**
  * Created by hejiajun on 2018/5/7.
  */
 
 @Entity
-public class DbSceneActions {
+public class DbSceneActions{
     @Id(autoincrement = true)
     private Long id;
 

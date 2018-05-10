@@ -21,6 +21,10 @@ public class DbSceneActionsUtils {
         dbSceneActionsDao.save(dbSceneActions);
     }
 
+    public static void deleteAll(){
+        dbSceneActionsDao.deleteAll();
+    }
+
     public static List<DbSceneActions> searchActionsBySceneId(long id){
         List<DbSceneActions> list=new ArrayList<>();
         Query<DbSceneActions> query=dbSceneActionsDao.queryBuilder().

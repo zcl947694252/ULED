@@ -5,6 +5,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
+import java.io.Serializable;
 import java.util.List;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
@@ -17,7 +18,7 @@ import com.dadoutek.uled.dao.DbSceneDao;
  */
 
 @Entity
-public class DbScene {
+public class DbScene{
     @Id(autoincrement = true)
     private Long id;
 

@@ -81,7 +81,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
                 R.id.checkBox -> {
                     val checkBox = view as CheckBox
                     if (checkBox.isChecked) {
-                        val oldPosition = mAdapter.selectedPos
+//                        val oldPosition = mAdapter.selectedPos
                         mAdapter.selectedPos = position
 //                        mAdapter.notifyItemChanged(oldPosition)
 //                        mAdapter.notifyItemChanged(mAdapter.selectedPos)

@@ -17,6 +17,10 @@ public class DbSceneUtils {
         dbSceneDao.save(dbScene);
     }
 
+    public static void deleteAll(){
+        dbSceneDao.deleteAll();
+    }
+
     public static List<DbScene> getAllScene(){
         return dbSceneDao.loadAll();
     }
