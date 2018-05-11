@@ -998,23 +998,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
 
         }
-//        else {
-//            params[0] = 0x00;
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-//        }
-
-        //已分组灯不显示
-//        nowLightList.get(index).hasGroup=true;
-//        Log.d("groupingCC", "sendGroupData: " + "----dstAddress:" + dstAddress + ";  group:name==" + group.name + "; " +
-//                " group:name==" + group.meshAddress + ";  lighthas" + light.hasGroup);
-        //灯和分组互相绑定
-//            Lights.getInstance().get(index).belongGroups.add(group.name);
-
-//        if (group.containsLightList == null) {
-//            group.containsLightList = new ArrayList<>();
-//        }
-//        group.containsLightList.add(light.meshAddress);
-//        adapter.notifyDataSetChanged();
     }
 
     /**

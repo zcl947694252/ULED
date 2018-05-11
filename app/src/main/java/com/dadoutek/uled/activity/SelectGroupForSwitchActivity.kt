@@ -65,7 +65,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
             }
         }
 
-        mAdapter.setOnItemChildClickListener { adapter, view, position ->
+        mAdapter.setOnItemChildClickListener { _, view, position ->
             when (view.id) {
                 R.id.btnOn -> {
                     val dstAddr = mGroupArrayList.get(position).meshAddress

@@ -16,8 +16,10 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameLightActivity;
+import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
 
 import butterknife.BindView;
@@ -30,6 +32,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public final static String TAG = DeviceSettingFragment.class.getSimpleName();
 
     public int meshAddress;
+    public int gpAddress;
     public String fromWhere;
     @BindView(R.id.tv_brightness)
     TextView tvBrightness;
@@ -145,11 +148,13 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         }
     };
     private TelinkLightApplication mApp;
+    private DataManager manager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mApp = (TelinkLightApplication) this.getActivity().getApplication();
+        manager=new DataManager(mApp,mApp.getMesh().name,mApp.getMesh().password);
     }
 
     @Override
@@ -191,7 +196,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public void onResume() {
         super.onResume();
         if(fromWhere!=null&&!fromWhere.isEmpty()){
-            remove.setVisibility(View.GONE);
+//            remove.setVisibility(View.GONE);
         }
         light = Lights.getInstance().getByMeshAddress(meshAddress);
         brightnessBar.setProgress(light.brightness);
@@ -210,6 +215,11 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
             }
 
+            if(gpAddress!=0){
+                Group group=manager.getGroup(gpAddress,getActivity());
+                group.containsLightList.remove((Integer) meshAddress);
+                manager.updateGroup(group,getActivity());
+            }
 //            getActivity().finish();
         }
     }

@@ -110,7 +110,9 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.mApplication.removeEventListener(this);
+//        this.mApplication.removeEventListener(this);
+        canBeRefresh=false;
+        this.mHandler.removeCallbacksAndMessages(null);
     }
 
     private void initData() {
@@ -201,6 +203,12 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
      */
     private synchronized void onOnlineStatusNotify(NotificationEvent event) {
 
+        if(canBeRefresh){
+            canBeRefresh=false;
+        }else{
+            return;
+        }
+
         TelinkLog.i("MainActivity#onOnlineStatusNotify#Thread ID : " + Thread.currentThread().getId());
         List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList;
         //noinspection unchecked
@@ -212,12 +220,6 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
         /*if (this.deviceFragment != null) {
             this.deviceFragment.onNotify(notificationInfoList);
         }*/
-
-        if(canBeRefresh){
-            canBeRefresh=false;
-        }else{
-            return;
-        }
 
         for (OnlineStatusNotificationParser.DeviceNotificationInfo notificationInfo : notificationInfoList) {
 
@@ -250,8 +252,10 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
             super.handleMessage(msg);
             switch (msg.what) {
                 case UPDATE_LIST:
-                    lightList.set(positionCurrent,currentLight);
-                    adapter.notifyItemChanged(positionCurrent);
+                    if(lightList.size()>0&&positionCurrent<lightList.size()){
+                        lightList.set(positionCurrent,currentLight);
+                        adapter.notifyItemChanged(positionCurrent);
+                    }
                     break;
             }
         }
@@ -275,6 +279,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
             }else if(v.getId()==R.id.tv_setting){
                 Intent intent=new Intent(LightsOfGroupActivity.this,DeviceSettingActivity.class);
                 intent.putExtra(Constant.LIGHT_ARESS_KEY,currentLight.meshAddress);
+                intent.putExtra(Constant.GROUP_ARESS_KEY,groupAddress);
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY,Constant.LIGHT_REFRESH_KEY_OK);
                 startActivity(intent);
             }

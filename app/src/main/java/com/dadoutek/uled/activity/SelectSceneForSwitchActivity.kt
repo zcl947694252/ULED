@@ -64,7 +64,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     private fun initListener() {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener { _ ->
 //            if (mAdapter.selectedPos != -1) {
 //                progressBar.visibility = View.VISIBLE
                 openLoadingDialog(getString(R.string.setting_switch))
@@ -168,7 +168,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
             return
         }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList,mSceneList,this)
-        recyclerView.layoutManager = GridLayoutManager(this, 2) as RecyclerView.LayoutManager?
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
 //        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
 //        recyclerView.adapter = mAdapter

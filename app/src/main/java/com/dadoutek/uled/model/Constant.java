@@ -31,6 +31,7 @@ public class Constant implements Serializable{
 
     public static final int RESULT_OK=1;
     public static final String LIGHT_ARESS_KEY="LIGHT_ARESS_KEY";
+    public static final String GROUP_ARESS_KEY="GROUP_ARESS_KEY";
     public static final String LIGHT_REFRESH_KEY="LIGHT_REFRESH_KEY";
     public static final String LIGHT_REFRESH_KEY_OK="LIGHT_REFRESH_KEY_OK";
 

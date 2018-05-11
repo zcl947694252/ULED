@@ -24,6 +24,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     private DeviceSettingFragment settingFragment;
 
     private int meshAddress;
+    private int gpAddress;
     private String fromWhere;
     private TelinkLightApplication mApplication;
     private DataManager dataManager;
@@ -38,6 +39,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                         DeviceGroupingActivity.class);
                 intent.putExtra("meshAddress", meshAddress);
                 startActivity(intent);
+                finish();
             }
         }
     };
@@ -52,6 +54,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
 
         this.meshAddress = this.getIntent().getIntExtra(Constant.LIGHT_ARESS_KEY, 0);
         this.fromWhere = this.getIntent().getStringExtra(Constant.LIGHT_REFRESH_KEY);
+        this.gpAddress=this.getIntent().getIntExtra(Constant.GROUP_ARESS_KEY,0);
 
         mApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
@@ -77,8 +80,9 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                         R.id.device_setting_fragment);
 
         if(fromWhere!=null&&!fromWhere.isEmpty()){
-            editView.setVisibility(View.GONE);
+//            editView.setVisibility(View.GONE);
             this.settingFragment.fromWhere = fromWhere;
+            this.settingFragment.gpAddress= gpAddress;
         }
         this.settingFragment.meshAddress = meshAddress;
     }
