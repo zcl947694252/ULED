@@ -119,13 +119,16 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         //删除时恢复可添加组标记
         adapter.setOnItemChildClickListener((adapter, view, position) -> {
-           for(int k=0;k<groupArrayList.size();k++){
-               if(groupArrayList.get(k).name.equals(itemGroupArrayList.get(position).gpName)){
-                   groupArrayList.get(k).selected=false;
-                   adapter.remove(position);
-                   break;
-               }
-           }
+            
+            if(groupArrayList.size()!=0){
+                for(int k=0;k<groupArrayList.size();k++){
+                    if(groupArrayList.get(k).name.equals(itemGroupArrayList.get(position).gpName)){
+                        groupArrayList.get(k).selected=false;
+                        adapter.remove(position);
+                        break;
+                    }
+                }
+            }
         });
     }
 
