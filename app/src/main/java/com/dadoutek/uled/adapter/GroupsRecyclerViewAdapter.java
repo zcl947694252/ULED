@@ -72,6 +72,14 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
             holder.groupImage.setImageResource(R.drawable.ic_group_white_48dp);
         }
 
+        if (mGroupList.get(position).meshAddress == 0xffff) {
+            RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+            holder.itemView.setVisibility(View.GONE);
+            param.height = 0;
+            param.width = 0;
+            holder.itemView.setLayoutParams(param);
+        }
+
 //        if (position == mGroupList.size() - 1) {
 //            holder.itemView.setVisibility(View.GONE);
 //        }

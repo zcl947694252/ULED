@@ -455,6 +455,10 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             //进行分组操作
             //获取当前选择的分组
             Group group = getCurrentGroup();
+            if(group.meshAddress==0xffff){
+                ToastUtils.showLong(R.string.tip_add_gp);
+                return;
+            }
             //获取当前勾选灯的列表
             List<Light> selectLights = getCurrentSelectLights();
 

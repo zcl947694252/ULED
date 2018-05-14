@@ -10,13 +10,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
@@ -58,9 +62,13 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             Group group = adapter.getItem(position);
-            deleteLightFromOldGroup();
-            allocDeviceGroup(group);
-            saveInfo(position);
+            if(group.checked){
+                ToastUtils.showLong("当前已是该组");
+            }else{
+                deleteLightFromOldGroup();
+                allocDeviceGroup(group);
+                saveInfo(position);
+            }
         }
     };
 
@@ -298,6 +306,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                     holder.name.setTextColor(color);
                 }
 
+            }
+
+            if (position == 0) {
+                AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(1, 1);
+                convertView.setLayoutParams(layoutParams);
             }
 
             return convertView;

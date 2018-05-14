@@ -60,7 +60,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     private void initGroupData() {
         Mesh mesh = mApplication.getMesh();
         DataManager dataManager = new DataManager(this, mesh.name, mesh.password);
-        dataManager.creatGroup(false, 1);//初始化自动创建16个分组
+        dataManager.createAllLightControllerGroup();//初始化自动创建
     }
 
     @Override

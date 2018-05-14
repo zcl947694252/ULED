@@ -99,11 +99,11 @@ public class AddSceneAct extends TelinkBaseActivity {
         dataManager = new DataManager(this, telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
         groups = dataManager.getGroups();
         itemGroupArrayList = new ArrayList<>();
-        groupArrayList.add(dataManager.createAllLightControllerGroup());
-        groupNameArrayList.add(groupArrayList.get(0).name);
+//        groupArrayList.add(dataManager.createAllLightControllerGroup());
+//        groupNameArrayList.add(groupArrayList.get(0).name);
         List<Group> groupList = groups.get();
         for (Group group : groupList) {
-            if (group.containsLightList.size() > 0)
+            if (group.containsLightList.size() > 0||group.meshAddress==0xffff)
                 group.checked = false;
             groupArrayList.add(group);
             groupNameArrayList.add(group.name);
@@ -119,7 +119,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         //删除时恢复可添加组标记
         adapter.setOnItemChildClickListener((adapter, view, position) -> {
-            
+
             if(groupArrayList.size()!=0){
                 for(int k=0;k<groupArrayList.size();k++){
                     if(groupArrayList.get(k).name.equals(itemGroupArrayList.get(position).gpName)){

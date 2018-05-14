@@ -1,12 +1,15 @@
 package com.dadoutek.uled.fragments;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Process;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +22,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+import com.dadoutek.uled.util.DataManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +46,8 @@ public class MeFragment extends Fragment {
     Button chearCache;
     @BindView(R.id.update_ite)
     Button updateIte;
+    @BindView(R.id.copy_data_base)
+    Button copyDataBase;
     private LayoutInflater inflater;
 
     @Override
@@ -74,7 +80,31 @@ public class MeFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite})
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }else{
+            DBManager.getInstance().copyDatabaseToSDCard(activity);
+            ToastUtils.showShort(R.string.copy_complete);
+        }
+    }
+
+    @OnClick({R.id.chear_cache, R.id.update_ite,R.id.copy_data_base})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -82,6 +112,9 @@ public class MeFragment extends Fragment {
                 break;
             case R.id.update_ite:
                 ToastUtils.showShort(R.string.wait_develop);
+                break;
+            case R.id.copy_data_base:
+                verifyStoragePermissions(getActivity());
                 break;
         }
     }
@@ -111,8 +144,6 @@ public class MeFragment extends Fragment {
                 getLaunchIntentForPackage(TelinkLightApplication.getInstance().getPackageName());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
-        android.os.Process.killProcess(android.os.Process.myPid());
+        Process.killProcess(Process.myPid());
     }
-
-
 }

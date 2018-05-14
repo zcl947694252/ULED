@@ -55,6 +55,13 @@ public class DataManager {
         groupAllLights.brightness = 100;
         groupAllLights.temperature = 100;
         groupAllLights.color = 0xFFFFFF;
+
+        Groups.getInstance().clear();
+        Groups groups = Groups.getInstance();
+        groups.add(groupAllLights);
+
+        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                mMeshName + mPwd + Constant.GROUPS_KEY, groups);
         return groupAllLights;
     }
 
@@ -92,42 +99,6 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
 
         Log.d("test", "creatGroup: " + groups.size());
-    }
-
-    public void addScene(Scenes scenes) {
-        List<Scenes> list= (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
-                mMeshName + mPwd + Constant.SCENE_KEY);
-
-        if(list!=null){
-            list.add(scenes);
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    mMeshName + mPwd + Constant.SCENE_KEY, list);
-        }else{
-            list=new ArrayList<>();
-            list.add(scenes);
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    mMeshName + mPwd + Constant.SCENE_KEY, list);
-        }
-    }
-
-    public void deleteScene(Scenes scenes) {
-        List<Scenes> list= (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
-                mMeshName + mPwd + Constant.SCENE_KEY);
-
-        if(list!=null){
-            for(int i=0;i<list.size();i++){
-                if(scenes.sceneName.equals(list.get(i).sceneName)){
-                    list.remove(i);
-                    break;
-                }
-            }
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    mMeshName + mPwd + Constant.SCENE_KEY, list);
-        }else{
-            list=new ArrayList<>();
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    mMeshName + mPwd + Constant.SCENE_KEY, list);
-        }
     }
 
     public void updateLights(Lights lights) {
@@ -255,7 +226,7 @@ public class DataManager {
         if (groups != null && groups.size() > 0) {
             return groups;
         } else {
-            creatGroup(false, 1);
+            createAllLightControllerGroup();
             return Groups.getInstance();
         }
     }

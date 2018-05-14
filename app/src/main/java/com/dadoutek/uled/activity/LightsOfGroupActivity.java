@@ -124,20 +124,23 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
 
     private void getLights() {
 
+        if (lightListAdress == null) {
+            ToastUtils.showLong(R.string.empty_light);
+            finish();
+        }else if(lightListAdress.size() == 0){
+            if(groupAddress!=0xffff){
+                ToastUtils.showLong(R.string.empty_light);
+                finish();
+            }
+        }
+
         if(groupAddress==0xFFFF){
-            for (int i = 0; i < lightListAdress.size(); i++) {
                 for (int j = 0; j < lights.size(); j++) {
                     Light light = lights.get(j);
                     if (light != null) {
                         lightList.add(light);
                     }
                 }
-            }
-        }else{
-            if (lightListAdress == null || lightListAdress.size() == 0) {
-                ToastUtils.showLong("当前组没有灯！");
-                finish();
-            }
         }
 
         for (int i = 0; i < lightListAdress.size(); i++) {

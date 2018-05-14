@@ -139,10 +139,10 @@ public final class GroupListFragment extends Fragment {
         public GroupListAdapter(Groups groups) {
             List<Group> groupList = groups.get();
             Mesh mesh = mApplication.getMesh();
-            DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
-            groupArrayList.add(dataManager.createAllLightControllerGroup());
+//            DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
+//            groupArrayList.add(dataManager.createAllLightControllerGroup());
             for (Group group : groupList) {
-                if (group.containsLightList.size() > 0)
+                if (group.containsLightList.size() > 0||group.meshAddress==0xffff)
                     groupArrayList.add(group);
             }
         }

@@ -39,6 +39,16 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/copy_data_base"
+        android:layout_marginTop="20dp"
+        android:text="@string/copy_data_base"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:background="@color/theme_positive_color"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/update_ite"
         android:layout_marginTop="20dp"
         android:text="@string/update_ite"

@@ -195,8 +195,9 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        if(fromWhere!=null&&!fromWhere.isEmpty()){
+        if(fromWhere!=null&&!fromWhere.isEmpty()&&gpAddress==0xffff){
 //            remove.setVisibility(View.GONE);
+              btnRename.setVisibility(View.GONE);
         }
         light = Lights.getInstance().getByMeshAddress(meshAddress);
         brightnessBar.setProgress(light.brightness);

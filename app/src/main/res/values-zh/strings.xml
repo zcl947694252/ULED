@@ -169,4 +169,8 @@
     <string name="tip_switch">请先添加场景！再配置开关</string>
     <string name="tip_add_scene">已经添加了所有存在的组！</string>
     <string name="tip_save_dialog_all">当前选择包含了所有组,只有所有组的设置会生效,仍然保存？</string>
+    <string name="copy_data_base">数据库拷贝</string>
+    <string name="copy_complete">拷贝完成</string>
+    <string name="tip_add_gp">请首先添加一个组！</string>
+    <string name="empty_light">当前组没有灯！</string>
 </resources>

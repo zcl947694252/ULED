@@ -8,10 +8,14 @@ import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
+import com.dadoutek.uled.DbModel.DbLight;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.DbModel.DbSceneActions;
 import com.dadoutek.uled.DbModel.DbRegion;
 import com.dadoutek.uled.DbModel.DbScene;
 
+import com.dadoutek.uled.dao.DbLightDao;
+import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneDao;
@@ -25,10 +29,14 @@ import com.dadoutek.uled.dao.DbSceneDao;
  */
 public class DaoSession extends AbstractDaoSession {
 
+    private final DaoConfig dbLightDaoConfig;
+    private final DaoConfig dbGroupDaoConfig;
     private final DaoConfig dbSceneActionsDaoConfig;
     private final DaoConfig dbRegionDaoConfig;
     private final DaoConfig dbSceneDaoConfig;
 
+    private final DbLightDao dbLightDao;
+    private final DbGroupDao dbGroupDao;
     private final DbSceneActionsDao dbSceneActionsDao;
     private final DbRegionDao dbRegionDao;
     private final DbSceneDao dbSceneDao;
@@ -36,6 +44,12 @@ public class DaoSession extends AbstractDaoSession {
     public DaoSession(Database db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
         super(db);
+
+        dbLightDaoConfig = daoConfigMap.get(DbLightDao.class).clone();
+        dbLightDaoConfig.initIdentityScope(type);
+
+        dbGroupDaoConfig = daoConfigMap.get(DbGroupDao.class).clone();
+        dbGroupDaoConfig.initIdentityScope(type);
 
         dbSceneActionsDaoConfig = daoConfigMap.get(DbSceneActionsDao.class).clone();
         dbSceneActionsDaoConfig.initIdentityScope(type);
@@ -46,19 +60,33 @@ public class DaoSession extends AbstractDaoSession {
         dbSceneDaoConfig = daoConfigMap.get(DbSceneDao.class).clone();
         dbSceneDaoConfig.initIdentityScope(type);
 
+        dbLightDao = new DbLightDao(dbLightDaoConfig, this);
+        dbGroupDao = new DbGroupDao(dbGroupDaoConfig, this);
         dbSceneActionsDao = new DbSceneActionsDao(dbSceneActionsDaoConfig, this);
         dbRegionDao = new DbRegionDao(dbRegionDaoConfig, this);
         dbSceneDao = new DbSceneDao(dbSceneDaoConfig, this);
 
+        registerDao(DbLight.class, dbLightDao);
+        registerDao(DbGroup.class, dbGroupDao);
         registerDao(DbSceneActions.class, dbSceneActionsDao);
         registerDao(DbRegion.class, dbRegionDao);
         registerDao(DbScene.class, dbSceneDao);
     }
     
     public void clear() {
+        dbLightDaoConfig.clearIdentityScope();
+        dbGroupDaoConfig.clearIdentityScope();
         dbSceneActionsDaoConfig.clearIdentityScope();
         dbRegionDaoConfig.clearIdentityScope();
         dbSceneDaoConfig.clearIdentityScope();
+    }
+
+    public DbLightDao getDbLightDao() {
+        return dbLightDao;
+    }
+
+    public DbGroupDao getDbGroupDao() {
+        return dbGroupDao;
     }
 
     public DbSceneActionsDao getDbSceneActionsDao() {
