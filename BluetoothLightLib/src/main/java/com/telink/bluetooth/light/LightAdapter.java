@@ -422,6 +422,7 @@ public class LightAdapter {
     }
 
     synchronized public void startScan(Parameters params, Callback callback) {
+        Log.d("Saw", "this.isStarted.get() = " + this.isStarted.get());
 
         if (!this.isStarted.get())
             return;
@@ -812,17 +813,22 @@ public class LightAdapter {
     synchronized private void setStatus(int newStatus, boolean ignoreIdleMode, boolean ignoreStatus) {
 
         if (!ignoreIdleMode) {
-            if (this.getMode() == MODE_IDLE)
+            if (this.getMode() == MODE_IDLE) {
+                Log.d("Saw", "return cause MODE_IDLE");
                 return;
+            }
         }
 
         if (!ignoreStatus) {
-            if (this.status.get() == newStatus)
+            if (this.status.get() == newStatus) {
+                Log.d("Saw", "return cause same status");
                 return;
+            }
         }
 
         int oldStatus = this.status.getAndSet(newStatus);
 
+        Log.d("Saw", "mCallback = " + mCallback);
         if (mCallback != null)
             mCallback.onStatusChanged(this.mLightCtrl,
                     this.getMode(), oldStatus, newStatus);
@@ -1197,8 +1203,8 @@ public class LightAdapter {
             TelinkLog.d("onResetMeshSuccess "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
-            Log.d("Saw", "setStatus STATUS_UPDATE_MESH_COMPLETED");
-            setStatus(STATUS_UPDATE_MESH_COMPLETED);
+            Log.d("Saw", "LightAdapter setStatus STATUS_UPDATE_MESH_COMPLETED");
+            setStatus(STATUS_UPDATE_MESH_COMPLETED, true);
 
             if (getMode() == MODE_UPDATE_MESH) {
                 updateCount.getAndIncrement();

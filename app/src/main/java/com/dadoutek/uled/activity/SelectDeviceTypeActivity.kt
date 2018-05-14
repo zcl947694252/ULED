@@ -2,6 +2,7 @@ package com.dadoutek.uled.activity
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import com.dadoutek.uled.R
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -19,6 +20,17 @@ class SelectDeviceTypeActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         initListener()
     }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     private fun initListener() {
         tvSmartSwitch.onClick {

@@ -3,6 +3,8 @@ package com.dadoutek.uled.activity
 import android.Manifest
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import com.blankj.utilcode.util.ConvertUtils
 import com.dadoutek.uled.R
@@ -35,6 +37,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     private val SCAN_TIMEOUT_SECOND: Int = 10
 
     private lateinit var mApplication: TelinkLightApplication
+    private var mRetryCount: Int = 0
 
     lateinit var mDeviceInfo: DeviceInfo
 
@@ -48,6 +51,17 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         initListener()
 
     }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     private fun initView() {
         setSupportActionBar(toolbar)
@@ -93,7 +107,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 params.setMeshName(mesh.factoryName)
                 params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                params.setScanMode(true)
+                params.setScanMode(false)
                 TelinkLightService.Instance().startScan(params)
 
                 progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
@@ -148,9 +162,9 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe {
-                            if(mDeviceInfo.productUUID==DeviceType.NORMAL_SWITCH){
+                            if (mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH) {
                                 startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
-                            }else{
+                            } else {
                                 startActivity<SelectSceneForSwitchActivity>("deviceInfo" to mDeviceInfo)
                             }
                         }
@@ -198,18 +212,31 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //        mDeviceInfo.meshAddress = meshAddress
 
 
+        Log.d("Saw", "onLeScan leScanEvent.args.productUUID = " + leScanEvent.args.productUUID)
         when (leScanEvent.args.productUUID) {
             DeviceType.NORMAL_SWITCH -> {
+                LeBluetooth.getInstance().stopScan()
                 mDeviceInfo = leScanEvent.args
                 params.setUpdateDeviceList(mDeviceInfo)
                 TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
                 progressBtn.text = getString(R.string.connecting)
             }
             DeviceType.SCENE_SWITCH -> {
+                LeBluetooth.getInstance().stopScan()
                 mDeviceInfo = leScanEvent.args
                 params.setUpdateDeviceList(mDeviceInfo)
                 TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
                 progressBtn.text = getString(R.string.connecting)
+            }
+            else -> {
+//                //如果扫到的不是以上两种设备，就重新进行扫描
+//                if (mRetryCount > 3) {
+//                    progressBtn.progress = -1    //控件显示Error状态
+//                    progressBtn.text = getString(R.string.connect_failed)
+//                } else {
+//                    startScan()
+//                    mRetryCount++
+//                }
             }
         }
     }

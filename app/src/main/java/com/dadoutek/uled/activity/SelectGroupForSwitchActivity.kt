@@ -27,7 +27,10 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 import java.util.ArrayList
 import android.support.v7.widget.DividerItemDecoration
+import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import com.dadoutek.uled.R.id.*
 
 
 class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> {
@@ -50,6 +53,15 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         initListener()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     private fun initListener() {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -122,6 +134,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
+                Log.d("Saw", "SelectGroupForSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
                 progressBar.visibility = View.GONE
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
@@ -160,10 +173,10 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setUpdateDeviceList(mDeviceInfo)
 //        TelinkLightService.Instance().updateMesh(params)
 
-        TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
         val meshName = Strings.stringToBytes(mesh.name, 16)
         val password = Strings.stringToBytes(mesh.password, 16)
 
+        TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
         TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
     }
 
@@ -185,7 +198,6 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.adapter = mAdapter
-
 
 
     }
