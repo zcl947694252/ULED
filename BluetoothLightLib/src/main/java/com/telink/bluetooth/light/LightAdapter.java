@@ -313,8 +313,10 @@ public class LightAdapter {
             return false;
 
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
-        if (light == null || !light.isConnected())
+        if (light == null || !light.isConnected()) {
+            Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
             return false;
+        }
         TelinkLog.d("LightAdapter#login");
         this.mLightCtrl.login(meshName, password);
         return true;

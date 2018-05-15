@@ -54,7 +54,6 @@
             android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.DeviceSettingActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/FullHeightDialogNew" />
         <activity
             android:name=".activity.DeviceScanningActivity"
@@ -78,7 +77,6 @@
             android:theme="@style/StatusTheme" />
         <activity
             android:name=".activity.GroupSettingActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/FullHeightDialogNew" />
         <activity
             android:name=".activity.AddGroupActivity"

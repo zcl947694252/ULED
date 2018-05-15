@@ -186,10 +186,10 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         val dataManager = DataManager(this, mesh.name, mesh.password)
         mGroupArrayList = ArrayList<Group>()
         val groupList = dataManager.groups.get()
-        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
+//        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
 
         for (group in groupList) {
-            if (group.containsLightList.size > 0)
+            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
                 mGroupArrayList.add(group)
         }
 
