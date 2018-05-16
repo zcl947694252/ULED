@@ -135,7 +135,10 @@
     <string name="smartSwitch">switch</string>
     <string name="select_device">select device </string>
     <string name="install_switch">install switch</string>
-    <string name="install_switch_tips">1.Plug micro USB to your Switch\n2.Press any button one time\n3.The indicator on the right of USB will stay on </string>
+    <string name="install_switch_tips1">1.Plug micro USB to your Switch</string>
+    <string name="install_switch_tips2">2.Press any button one time</string>
+    <string name="install_switch_tips3">3.The indicator on the right of USB will stay on</string>
+
     <string name="search">Search</string>
     <string name="complete">complete</string>
     <string name="not_found_switch">Not found switch</string>

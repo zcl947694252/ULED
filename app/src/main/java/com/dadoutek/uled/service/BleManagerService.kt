@@ -113,7 +113,7 @@
 //
 //            if (light.meshAddress == this.connectMeshAddress) {
 //                light.textColor = this.resources.getColor(
-//                        R.color.theme_positive_color)
+//                        R.color.colorPrimary)
 //            } else {
 //                light.textColor = this.resources.getColor(
 //                        R.color.black)

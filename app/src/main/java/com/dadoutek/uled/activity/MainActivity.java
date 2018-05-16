@@ -23,9 +23,11 @@ import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
@@ -41,12 +43,14 @@ import com.dadoutek.uled.fragments.GroupListFragment;
 import com.dadoutek.uled.fragments.MeFragment;
 import com.dadoutek.uled.fragments.SceneFragment;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.model.UpdateStatusDeviceType;
 import com.dadoutek.uled.util.FragmentFactory;
+import com.dadoutek.uled.util.LogUtils;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -104,6 +108,8 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     ImageView tabScene;
     @BindView(R.id.tvScene)
     TextView tvScene;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
     private Dialog loadDialog;
     private FragmentManager fragmentManager;
@@ -128,7 +134,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 switchContent(mContent, groupFragment);
             } else if (checkedId == R.id.tab_account) {
                 switchContent(mContent, meFragment);
-            }else if (checkedId == R.id.tab_scene) {
+            } else if (checkedId == R.id.tab_scene) {
                 switchContent(mContent, sceneFragment);
             }
         }
@@ -246,7 +252,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
      */
     private void initBottomIconStatus() {
         tabDevices.setSelected(true);
-        tabDevices.setColorFilter(getResources().getColor(R.color.theme_positive_color));
+        tabDevices.setColorFilter(getResources().getColor(R.color.colorPrimary));
     }
 
     /**
@@ -254,7 +260,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
      */
     private void initBottomIconClickListener() {
         //获取APP主颜色
-        int positiveColor = getResources().getColor(R.color.theme_positive_color);
+        int positiveColor = getResources().getColor(R.color.colorPrimary);
         Consumer<Object> devicesConsumer = o -> {
             if (!tabDevices.isSelected()) {
                 tabDevices.setSelected(true);
@@ -395,6 +401,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
     }
 
+
     @Override
     protected void onStart() {
 
@@ -405,14 +412,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         int result = BuildUtils.assetSdkVersion("4.4");
         Log.d(TAG, " Version : " + result);
 
-        // 监听各种事件
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
-        this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
-        this.mApplication.addEventListener(NotificationEvent.GET_ALARM, this);
-        this.mApplication.addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
-        this.mApplication.addEventListener(ServiceEvent.SERVICE_CONNECTED, this);
-        this.mApplication.addEventListener(MeshEvent.OFFLINE, this);
-        this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
 
         this.autoConnect();
     }
@@ -426,12 +425,16 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     @Override
     protected void onPause() {
         super.onPause();
+        //移除事件
+        this.mApplication.removeEventListener(this);
         Log.d(TAG, "onPause");
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
+        addEventListeners();
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(getApplicationContext())) {
             Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show();
@@ -465,7 +468,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
-        this.mApplication.removeEventListener(this);
         TelinkLightService.Instance().disableAutoRefreshNotify();
     }
 
@@ -477,9 +479,19 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
         unregisterReceiver(mReceiver);
         this.mApplication.doDestroy();
         this.mDelayHandler.removeCallbacksAndMessages(null);
-        //移除事件
-        this.mApplication.removeEventListener(this);
         Lights.getInstance().clear();
+    }
+
+
+    public void addEventListeners() {
+        // 监听各种事件
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
+        this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
+        this.mApplication.addEventListener(NotificationEvent.GET_ALARM, this);
+        this.mApplication.addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
+        this.mApplication.addEventListener(ServiceEvent.SERVICE_CONNECTED, this);
+        this.mApplication.addEventListener(MeshEvent.OFFLINE, this);
+        this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
     }
 
     /**
@@ -492,6 +504,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 ToastUtils.showLong(getString(R.string.connect_state));
+                runOnUiThread(() -> progressBar.setVisibility(View.VISIBLE));
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false);
 
                 if (this.mApplication.isEmptyMesh())
@@ -642,15 +655,17 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
     /**
      * 检查是不是灯
      */
-    private boolean checkIsLight(NotificationEvent event) {
-        if (event != null) {
-            NotificationInfo notificationInfo = event.getArgs();
-            if (notificationInfo != null) {
-                byte[] params = notificationInfo.params;
-                if (params != null && params.length > 0) {
-                    if (params[3] == UpdateStatusDeviceType.NORMAL_SWITCH)
-                        return false;
-                }
+    private boolean checkIsLight(OnlineStatusNotificationParser.DeviceNotificationInfo info) {
+        if (info != null) {
+            switch (info.reserve) {
+                case UpdateStatusDeviceType.OLD_NORMAL_SWITCH:
+                    return false;
+//                case DeviceType.NORMAL_SWITCH2:
+//                    return false;
+//                case DeviceType.SCENE_SWITCH:
+//                    return false;
+                default:
+                    return true;
             }
         }
         return true;
@@ -661,8 +676,6 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
      * 处理{@link NotificationEvent#ONLINE_STATUS}事件
      */
     private synchronized void onOnlineStatusNotify(NotificationEvent event) {
-        if (!checkIsLight(event))
-            return;
         TelinkLog.i("MainActivity#onOnlineStatusNotify#Thread ID : " + Thread.currentThread().getId());
         List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList;
         //noinspection unchecked
@@ -680,27 +693,34 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
 
             int meshAddress = notificationInfo.meshAddress;
             int brightness = notificationInfo.brightness;
+            Log.d("Saw", "meshAddress = " + meshAddress + "  reserve = " + notificationInfo.reserve +
+                    " status = " + notificationInfo.status + " connectionStatus = " + notificationInfo.connectionStatus.getValue());
+            if (checkIsLight(notificationInfo)) {
+                Light light = this.deviceFragment.getDevice(meshAddress);
+                if (light == null) {
+                    light = new Light();
+                    this.deviceFragment.addDevice(light);
+                }
 
-            Light light = this.deviceFragment.getDevice(meshAddress);
+                light.meshAddress = meshAddress;
+                light.brightness = brightness;
+                light.status = notificationInfo.connectionStatus;
 
-            if (light == null) {
-                light = new Light();
-                this.deviceFragment.addDevice(light);
+                if (light.meshAddress == this.connectMeshAddress) {
+                    light.textColor = this.getResources().getColor(
+                            R.color.colorPrimary);
+                } else {
+                    light.textColor = this.getResources().getColor(
+                            R.color.black);
+                }
+
+                runOnUiThread(() -> {
+                    if (progressBar.getVisibility() != View.GONE)
+                        progressBar.setVisibility(View.GONE);
+                });
+
+                light.updateIcon();
             }
-
-            light.meshAddress = meshAddress;
-            light.brightness = brightness;
-            light.status = notificationInfo.connectionStatus;
-
-            if (light.meshAddress == this.connectMeshAddress) {
-                light.textColor = this.getResources().getColor(
-                        R.color.theme_positive_color);
-            } else {
-                light.textColor = this.getResources().getColor(
-                        R.color.black);
-            }
-
-            light.updateIcon();
         }
 
         mHandler.obtainMessage(UPDATE_LIST).sendToTarget();

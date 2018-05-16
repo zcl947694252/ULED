@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
@@ -14,7 +15,6 @@ import com.dadoutek.uled.model.DeviceType
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
-import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
@@ -25,14 +25,13 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.startActivity
-import org.jetbrains.anko.toast
 import java.util.concurrent.TimeUnit
 
 class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
@@ -40,18 +39,19 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private lateinit var mApplication: TelinkLightApplication
     private var mRetryLoginCount: Int = 0
+    private var mRetryConnectCount: Int = 0
+    private var mConnected: Boolean = false
+    private var mScanned: Boolean = false
+    private var mLogged: Boolean = false
 
     lateinit var mDeviceInfo: DeviceInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
-
         this.mApplication = this.application as TelinkLightApplication
-
         initView()
         initListener()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -79,6 +79,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.onClick {
             if (progressBtn.progress <= 0) {
                 mRetryLoginCount = 0
+                mRetryConnectCount = 0
+                mScanned = false
+                mConnected = false
+                mLogged = false
                 startScan()
             }
         }
@@ -116,6 +120,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
                 progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                 progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+
+                launch(UI) {
+                    delay(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
+                    if (!mScanned) {
+                        onLeScanTimeout()
+                    }
+                }
             } else {
 
             }
@@ -146,7 +157,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     private fun onErrorReport(event: ErrorReportEvent) {
-        val info = (event as ErrorReportEvent).args
+        val info = event.args
         Log.d("Saw", "ScanningActivity#performed#ERROR_REPORT: " + " stateCode-" + info.stateCode
                 + " errorCode-" + info.errorCode
                 + " deviceId-" + info.deviceId)
@@ -154,13 +165,33 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onLeScanTimeout() {
         progressBtn.progress = -1   //控件显示Error状态
+        progressBtn.text = getString(R.string.not_found_switch)
     }
 
-    private fun login(): Boolean {
-        val mesh = mApplication.mesh
-        return TelinkLightService.Instance().login(Strings.stringToBytes(mesh.factoryName, 16),
-                Strings.stringToBytes(mesh.factoryPassword, 16))
 
+    /**
+     * 登录，实际上就是BLE连接成功之后的一些数据交互和notify enable.
+     */
+    private fun login() {
+        if (mRetryLoginCount > 3) {
+            onLoginFailed()
+        } else {
+            val mesh = mApplication.mesh
+            val LOGIN_TIMEOUT: Int = 15 //设一个比较长的超时，防止卡住
+            mLogged = false
+            val loginResult = TelinkLightService.Instance().login(Strings.stringToBytes(mesh.factoryName, 16),
+                    Strings.stringToBytes(mesh.factoryPassword, 16))
+            launch(UI) {
+                delay(LOGIN_TIMEOUT.toLong(), TimeUnit.SECONDS) //超时后执行下方代码
+                //如果在设定的时间之后还没有登录成功，则会执行onLoginFailed()
+                if (!mLogged)
+                    onLoginFailed()
+            }
+            if (!loginResult) {  //直接返回false就说明没有连接
+                connect()   //重新进行连接
+            }
+            mRetryLoginCount++
+        }
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -168,50 +199,56 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_CONNECTED -> {
-                if (!login()) {
-                    Log.d("Saw", "Login Failed")
-                    //
-                    TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
-                    TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
-                }
+                mConnected = true
+                //连接成功后，进行login
+                login()
 
             }
             LightAdapter.STATUS_LOGIN -> {
+                mLogged = true
                 progressBtn.progress = 100  //进度控件显示成完成状态
-
-                Observable.create<Boolean> {
-                    it.onNext(true)
-                }
-                        .delay(100, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe {
-                            if (mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH) {
-                                startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
-                            } else {
-                                startActivity<SelectSceneForSwitchActivity>("deviceInfo" to mDeviceInfo)
-                            }
-                        }
-            }
-
-            LightAdapter.STATUS_LOGOUT -> {
-                if (mRetryLoginCount > 3) {
-                    progressBtn.progress = -1    //控件显示Error状态
-                    progressBtn.text = getString(R.string.connect_failed)
+//                launch(UI) {
+//                    delay(100, TimeUnit.MILLISECONDS)
+                if (mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH ||
+                        mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH2) {
+                    startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
                 } else {
-                    if (!login()) {
-                        Log.d("Saw", "Login Failed")
-                        TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
-                    }
-                    mRetryLoginCount++
+                    startActivity<SelectSceneForSwitchActivity>("deviceInfo" to mDeviceInfo)
                 }
-
-
+//                }
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                //重试，进行login
+                login()
             }
 
+        }
 
-        }//                btnAddGroups.doneLoadingAnimation(R.color.black,
-        //                        BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp));
+    }
+
+    private fun onConnectFailed() {
+        progressBtn.progress = -1    //控件显示Error状态
+        progressBtn.text = getString(R.string.connect_failed)
+        LogUtils.d("connect failed")
+    }
+
+    private fun onLoginFailed() {
+        progressBtn.progress = -1    //控件显示Error状态
+        progressBtn.text = getString(R.string.connect_failed)
+        LogUtils.d("login failed")
+    }
+
+
+    private fun connect() {
+        val TIMEOUTSECONDS: Int = 15
+        launch(UI) {
+            mConnected = false
+            TelinkLightService.Instance().connect(mDeviceInfo.macAddress, TIMEOUTSECONDS)
+            delay(TIMEOUTSECONDS.toLong(), TimeUnit.SECONDS)
+            if (!mConnected) {
+                onConnectFailed()
+            }
+        }
 
     }
 
@@ -237,24 +274,35 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
 
         Log.d("Saw", "onLeScan leScanEvent.args.productUUID = " + leScanEvent.args.productUUID)
-        when (leScanEvent.args.productUUID) {
-            DeviceType.NORMAL_SWITCH -> {
-                LeBluetooth.getInstance().stopScan()
-                mDeviceInfo = leScanEvent.args
-                params.setUpdateDeviceList(mDeviceInfo)
-                TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
-                progressBtn.text = getString(R.string.connecting)
-            }
-            DeviceType.SCENE_SWITCH -> {
-                LeBluetooth.getInstance().stopScan()
-                mDeviceInfo = leScanEvent.args
-                params.setUpdateDeviceList(mDeviceInfo)
-                TelinkLightService.Instance().connect(mDeviceInfo.macAddress, 15)
-                progressBtn.text = getString(R.string.connecting)
-            }
-            else -> {
-                toast("leScanEvent.args.productUUID = ${leScanEvent.args.productUUID}")
+        if (!mScanned)
+            when (leScanEvent.args.productUUID) {
+                DeviceType.NORMAL_SWITCH -> {
+                    mScanned = true
+                    LeBluetooth.getInstance().stopScan()
+                    mDeviceInfo = leScanEvent.args
+                    params.setUpdateDeviceList(mDeviceInfo)
+                    connect()
+                    progressBtn.text = getString(R.string.connecting)
+                }
+                DeviceType.SCENE_SWITCH -> {
+                    mScanned = true
+                    LeBluetooth.getInstance().stopScan()
+                    mDeviceInfo = leScanEvent.args
+                    params.setUpdateDeviceList(mDeviceInfo)
+                    connect()
+                    progressBtn.text = getString(R.string.connecting)
+                }
 
+                DeviceType.NORMAL_SWITCH2 -> {
+                    mScanned = true
+                    LeBluetooth.getInstance().stopScan()
+                    mDeviceInfo = leScanEvent.args
+                    params.setUpdateDeviceList(mDeviceInfo)
+                    connect()
+                    progressBtn.text = getString(R.string.connecting)
+                }
+                else -> {
+                    LogUtils.d("leScanEvent.args.productUUID = ${leScanEvent.args.productUUID}")
 //                //如果扫到的不是以上两种设备，就重新进行扫描
 //                if (mRetryLoginCount > 3) {
 //                    progressBtn.progress = -1    //控件显示Error状态
@@ -263,7 +311,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //                    startScan()
 //                    mRetryLoginCount++
 //                }
+                }
             }
-        }
     }
 }

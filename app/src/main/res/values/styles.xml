@@ -4,8 +4,8 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar" />
 
     <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:colorPrimary">@color/theme_positive_color</item>
-        <item name="android:colorPrimaryDark">@color/theme_positive_color</item>
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
 
@@ -16,9 +16,9 @@
 
     <style name="StatusTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:colorPrimary">@color/theme_positive_color</item>
-        <item name="android:colorPrimaryDark">@color/theme_positive_color</item>
-        <item name="android:navigationBarColor">@color/theme_positive_color</item>
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
     </style>
 
     <style name="FullHeightDialog" parent="android:style/Theme.Dialog">

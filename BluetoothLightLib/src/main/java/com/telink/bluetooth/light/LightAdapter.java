@@ -830,7 +830,6 @@ public class LightAdapter {
 
         int oldStatus = this.status.getAndSet(newStatus);
 
-        Log.d("Saw", "mCallback = " + mCallback);
         if (mCallback != null)
             mCallback.onStatusChanged(this.mLightCtrl,
                     this.getMode(), oldStatus, newStatus);

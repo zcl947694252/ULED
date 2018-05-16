@@ -385,7 +385,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 return false;
             }
         }
-        btnGroupingCompleted.setBackgroundColor(getResources().getColor(R.color.theme_positive_color));
+        btnGroupingCompleted.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         return true;
     }
 
@@ -818,7 +818,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
      */
     private void onLeScanTimeout(LeScanEvent event) {
 //        this.btnScan.setEnabled(true);
-        this.btnScan.setBackgroundResource(R.color.theme_positive_color);
+        this.btnScan.setBackgroundResource(R.color.colorPrimary);
         if (preTime != 0) {//表示目前已经搜到了至少有一个设备
             creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
         } else {

@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/header_height"
-        android:background="@color/theme_positive_color">
+        android:background="@color/colorPrimary">
 
         <ImageView
             android:id="@+id/img_header_menu_left"
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_marginTop="10dp"
-        android:background="@color/theme_positive_color"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
         >
         <TextView

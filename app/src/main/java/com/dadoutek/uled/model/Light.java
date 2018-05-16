@@ -48,6 +48,7 @@ public final class Light implements Serializable,Cloneable{
     }
 
     public void updateIcon() {
+
           if (this.status == ConnectionStatus.OFFLINE) {
               this.icon = R.drawable.icon_light_offline;
           } else if (this.status == ConnectionStatus.OFF) {

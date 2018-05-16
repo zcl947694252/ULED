@@ -56,11 +56,15 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                finish()
+                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
     private fun initListener() {
@@ -100,8 +104,8 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
                         for (i in 0..(mGroupArrayList.size - 1)) {
                             if (i != mAdapter.selectedPos) {
-                                val checkBox = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox) as CheckBox
-                                checkBox.isChecked = false
+                                val cb = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox) as CheckBox
+                                cb.isChecked = false
                             }
                         }
                     } else {
@@ -140,6 +144,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(root, getString(R.string.group_failed))
+                progressBar.visibility = View.GONE
             }
         }
     }
