@@ -10,22 +10,22 @@ import java.util.List;
  */
 
 public class DbSceneUtils {
-    public static DbSceneDao dbSceneDao= TelinkLightApplication.
+    public static DbSceneDao dbSceneDao = TelinkLightApplication.
             getDaoInstant().getDbSceneDao();
 
-    public static void save(DbScene dbScene){
+    public static void save(DbScene dbScene) {
         dbSceneDao.save(dbScene);
     }
 
-    public static void deleteAll(){
+    public static void deleteAll() {
         dbSceneDao.deleteAll();
     }
 
-    public static List<DbScene> getAllScene(){
+    public static List<DbScene> getAllScene() {
         return dbSceneDao.loadAll();
     }
 
-    public static void deleteScene(DbScene dbScene){
+    public static void deleteScene(DbScene dbScene) {
         dbSceneDao.delete(dbScene);
     }
 }

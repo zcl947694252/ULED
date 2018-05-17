@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/scene_delete"
@@ -10,8 +9,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_delete_black_24dp"
         android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        />
+        android:layout_centerVertical="true" />
 
     <TextView
         android:id="@+id/scene_name"
@@ -20,8 +18,7 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="10dp"
         android:layout_toStartOf="@+id/scene_apply"
-        android:layout_toEndOf="@id/scene_delete"
-        />
+        android:layout_toEndOf="@id/scene_delete" />
 
     <TextView
         android:id="@+id/scene_apply"
@@ -33,6 +30,5 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:layout_marginStart="10dp"
-        android:background="@drawable/btn_rec_blue_bt"
-        />
+        android:background="@drawable/btn_rec_blue_bt" />
 </RelativeLayout>

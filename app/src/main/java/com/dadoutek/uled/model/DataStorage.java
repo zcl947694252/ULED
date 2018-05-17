@@ -4,31 +4,31 @@ import java.util.List;
 
 public interface DataStorage<E> {
 
-	void add(E e);
+    void add(E e);
 
-	void add(E e, int location);
+    void add(E e, int location);
 
-	void add(List<E> e);
+    void add(List<E> e);
 
-	boolean contains(E e);
+    boolean contains(E e);
 
-	boolean contains(String attributeName, Object attributeValue);
+    boolean contains(String attributeName, Object attributeValue);
 
-	E get(String attributeName, Object attributeValue);
+    E get(String attributeName, Object attributeValue);
 
-	List<E> get();
+    List<E> get();
 
-	E get(int location);
+    E get(int location);
 
-	void set(int index, E element);
+    void set(int index, E element);
 
-	void remove(int location);
+    void remove(int location);
 
-	void remove(E e);
+    void remove(E e);
 
-	int size();
+    int size();
 
-	boolean isEmpty();
+    boolean isEmpty();
 
-	void clear();
+    void clear();
 }

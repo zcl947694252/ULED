@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    >
+    android:layout_height="100dp">
 
     <TextView
         android:id="@+id/tv_scene_button_name"
@@ -13,13 +10,11 @@
         android:layout_width="wrap_content"
         android:layout_centerInParent="true"
         android:layout_above="@+id/sp_scene"
-        android:textSize="16sp"
-        />
+        android:textSize="16sp" />
 
     <Spinner
         android:id="@+id/sp_scene"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        ></Spinner>
+        android:layout_centerInParent="true" />
 </RelativeLayout>

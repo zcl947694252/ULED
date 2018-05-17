@@ -4,14 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.DbModel.DbScene
@@ -19,12 +18,8 @@ import com.dadoutek.uled.DbModel.DbSceneUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
-import com.dadoutek.uled.adapter.SelectSwitchGroupRvAdapter
 import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
-import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.LogUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -36,7 +31,6 @@ import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
-import kotlin.collections.ArrayList
 
 class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> {
 
@@ -120,13 +114,13 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setUpdateDeviceList(mDeviceInfo)
 
         var keyNum: Int = 0
-        val map: Map<String, DbScene> = mAdapter.getSceneMap()
+        val map: Map<Int, DbScene> = mAdapter.getSceneMap()
         for (key in map.keys) {
             when (key) {
-                getString(R.string.scene1) -> keyNum = 0x05
-                getString(R.string.scene2) -> keyNum = 0x06
-                getString(R.string.scene3) -> keyNum = 0x03
-                getString(R.string.scene4) -> keyNum = 0x04
+                1 -> keyNum = 0x05          //左上按键
+                2 -> keyNum = 0x03//0x06    //右上按键
+                3 -> keyNum = 0x06//0x03    //左下按键
+                4 -> keyNum = 0x04          //右下按键
             }
             val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0xff.toByte(), map.getValue(key).id.toByte(),
                     0xff.toByte())

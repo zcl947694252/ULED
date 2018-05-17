@@ -278,17 +278,17 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
     }
 
     private void refreshView() {
-        currentGroupIndex = groups.size()-1;
+        currentGroupIndex = groups.size() - 1;
         for (int i = groups.size() - 1; i >= 0; i--) {
-            if(i == groups.size() - 1){
-                groups.get(i).checked=true;
-            }else{
-                groups.get(i).checked=false;
+            if (i == groups.size() - 1) {
+                groups.get(i).checked = true;
+            } else {
+                groups.get(i).checked = false;
             }
         }
 
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
-        recyclerViewGroups.smoothScrollToPosition(groups.size()-1);
+        recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
@@ -455,7 +455,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             //进行分组操作
             //获取当前选择的分组
             Group group = getCurrentGroup();
-            if(group.meshAddress==0xffff){
+            if (group.meshAddress == 0xffff) {
                 ToastUtils.showLong(R.string.tip_add_gp);
                 return;
             }
@@ -983,8 +983,8 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
         byte opcode = (byte) 0xD7;
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
-            params[0] = 0x01;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+        params[0] = 0x01;
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
     }
 
     private void sendGroupData(Light light, Group group, int index) {

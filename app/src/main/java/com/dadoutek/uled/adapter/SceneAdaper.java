@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
-import com.dadoutek.uled.model.Scenes;
 
 import java.util.List;
 
@@ -18,20 +17,20 @@ import java.util.List;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class SceneAdaper extends BaseAdapter implements View.OnClickListener{
+public class SceneAdaper extends BaseAdapter implements View.OnClickListener {
 
-    private List<DbScene>list;
+    private List<DbScene> list;
     private Context context;
     private boolean isDelete;
     private LayoutInflater mLayoutInflater;
     private AdapterOnClickListner onClickListner1;
 
-    public SceneAdaper(List<DbScene>list, Context context, boolean isDelete, AdapterOnClickListner onClickListner1) {
-        this.list=list;
-        this.context=context;
-        this.isDelete=isDelete;
-        mLayoutInflater=LayoutInflater.from(context);
-        this.onClickListner1=onClickListner1;
+    public SceneAdaper(List<DbScene> list, Context context, boolean isDelete, AdapterOnClickListner onClickListner1) {
+        this.list = list;
+        this.context = context;
+        this.isDelete = isDelete;
+        mLayoutInflater = LayoutInflater.from(context);
+        this.onClickListner1 = onClickListner1;
     }
 
     @Override
@@ -52,22 +51,22 @@ public class SceneAdaper extends BaseAdapter implements View.OnClickListener{
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView==null){
-            convertView=mLayoutInflater.inflate(R.layout.item_scene,null);
-            holder=new ViewHolder();
+        if (convertView == null) {
+            convertView = mLayoutInflater.inflate(R.layout.item_scene, null);
+            holder = new ViewHolder();
 
-            holder.apply=convertView.findViewById(R.id.scene_apply);
-            holder.delete=convertView.findViewById(R.id.scene_delete);
-            holder.sceneName=convertView.findViewById(R.id.scene_name);
+            holder.apply = convertView.findViewById(R.id.scene_apply);
+            holder.delete = convertView.findViewById(R.id.scene_delete);
+            holder.sceneName = convertView.findViewById(R.id.scene_name);
 
             convertView.setTag(holder);
-        }else{
-            holder= (ViewHolder) convertView.getTag();
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        if(isDelete){
+        if (isDelete) {
             holder.delete.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             holder.delete.setVisibility(View.GONE);
         }
 
@@ -84,11 +83,11 @@ public class SceneAdaper extends BaseAdapter implements View.OnClickListener{
         onClickListner1.adapterOnClick(v, (int) v.getTag());
     }
 
-    public void changeState(boolean isDelete){
-        this.isDelete=isDelete;
+    public void changeState(boolean isDelete) {
+        this.isDelete = isDelete;
     }
 
-    public class ViewHolder{
+    public class ViewHolder {
         public TextView delete;
         public TextView sceneName;
         public TextView apply;

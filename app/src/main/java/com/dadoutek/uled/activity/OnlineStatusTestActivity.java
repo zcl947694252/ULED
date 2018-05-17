@@ -11,13 +11,13 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.ConnectionStatus;
-import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.model.Light;
 import com.telink.bluetooth.light.OnlineStatusNotificationParser;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
@@ -40,6 +40,7 @@ public class OnlineStatusTestActivity extends TelinkBaseActivity implements Even
     private int rspCnt = 0;
 
     private ScrollView scroller;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,9 +54,9 @@ public class OnlineStatusTestActivity extends TelinkBaseActivity implements Even
         btn_start_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!testStarted){
+                if (!testStarted) {
                     startTest();
-                }else {
+                } else {
                     stopTest();
                 }
             }
@@ -77,8 +78,8 @@ public class OnlineStatusTestActivity extends TelinkBaseActivity implements Even
     private Runnable notifyTask = new Runnable() {
         @Override
         public void run() {
-            if (!testStarted)return;
-            if (index != 0){
+            if (!testStarted) return;
+            if (index != 0) {
                 check();
             }
             userAll();
@@ -87,7 +88,7 @@ public class OnlineStatusTestActivity extends TelinkBaseActivity implements Even
         }
     };
 
-    private void check(){
+    private void check() {
         int count = getOnlineCount();
 
         tv_info.append("\n" + index + ":\t  当前在线: " + count
@@ -105,7 +106,7 @@ public class OnlineStatusTestActivity extends TelinkBaseActivity implements Even
         scrollDown();
     }
 
-    private void scrollDown(){
+    private void scrollDown() {
         handler.post(new Runnable() {
             @Override
             public void run() {

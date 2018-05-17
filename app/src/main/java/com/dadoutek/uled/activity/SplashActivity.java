@@ -8,9 +8,9 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 /**
  * Created by hejiajun on 2018/3/22.

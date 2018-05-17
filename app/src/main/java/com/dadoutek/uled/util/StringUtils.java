@@ -19,7 +19,7 @@ public class StringUtils {
         Pattern pattern = Pattern.compile(limitEx);
         Matcher m = pattern.matcher(str);
 
-        if (m.find()||str.isEmpty()) {
+        if (m.find() || str.isEmpty()) {
             return true;
         }
         return false;

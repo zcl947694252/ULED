@@ -12,15 +12,13 @@ import java.math.BigDecimal;
 
 /**
  * 清除缓存
- *
  */
 public class CleanMessageUtil {
 
     /**
      * @param context
      * @return
-     * @throws Exception
-     *             获取当前缓存
+     * @throws Exception 获取当前缓存
      */
     public static String getTotalCacheSize(Context context) throws Exception {
         long cacheSize = getFolderSize(context.getCacheDir());
@@ -32,8 +30,7 @@ public class CleanMessageUtil {
     }
 
     /**
-     * @param context
-     *            删除缓存
+     * @param context 删除缓存
      */
     public static void clearAllCache(Context context) {
         deleteDir(context.getCacheDir());
@@ -97,6 +94,7 @@ public class CleanMessageUtil {
     /**
      * 格式化单位
      * 计算缓存的大小
+     *
      * @param size
      * @return
      */

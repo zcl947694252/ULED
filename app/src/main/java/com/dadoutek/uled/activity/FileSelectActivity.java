@@ -8,9 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
-import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -1,9 +1,9 @@
 package com.dadoutek.uled.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/9.
@@ -24,8 +24,8 @@ public class DbRegion {
 
     @Generated(hash = 1474362139)
     public DbRegion(Long id, String controlMesh, String controlMeshPwd,
-            String installMesh, String installMeshPwd,
-            @NotNull String belongAccount) {
+                    String installMesh, String installMeshPwd,
+                    @NotNull String belongAccount) {
         this.id = id;
         this.controlMesh = controlMesh;
         this.controlMeshPwd = controlMeshPwd;

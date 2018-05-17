@@ -17,6 +17,8 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
+import com.dadoutek.uled.model.Light;
+import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.telink.bluetooth.TelinkLog;
@@ -29,8 +31,6 @@ import com.telink.bluetooth.light.LeScanParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.OtaDeviceInfo;
 import com.telink.bluetooth.light.Parameters;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
@@ -325,6 +325,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private int otaStateTimeout = 0;
     private int OTA_STATE_TIMEOUT_MAX = 3;
+
     // 获取本地设备OTA状态信息
     private void sendGetDeviceOtaStateCommand() {
         otaStateTimeout = 0;
@@ -335,7 +336,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         @Override
         public void run() {
 
-            if (otaStateTimeout < OTA_STATE_TIMEOUT_MAX){
+            if (otaStateTimeout < OTA_STATE_TIMEOUT_MAX) {
                 byte opcode = (byte) 0xC7;
                 int address = 0x0000;
                 byte[] params = new byte[]{0x20, 0x05};
@@ -344,7 +345,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 log("SendCommand 0xC7 getDeviceOtaState");
                 otaStateTimeout++;
                 delayHandler.postDelayed(this, 3000);
-            }else {
+            } else {
                 log("SendCommand 0xC7 getDeviceOtaState fail");
                 delayHandler.removeCallbacks(this);
                 if (mode == MODE_OTA) {

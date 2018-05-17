@@ -20,5 +20,4 @@
         app:srcCompat="@drawable/ic_done_white_48dp" />
 
 
-
 </android.support.design.widget.CoordinatorLayout>

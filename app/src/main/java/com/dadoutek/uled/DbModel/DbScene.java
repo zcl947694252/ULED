@@ -1,24 +1,24 @@
 package com.dadoutek.uled.DbModel;
 
+import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.dao.DbSceneActionsDao;
+import com.dadoutek.uled.dao.DbSceneDao;
+
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
-import java.io.Serializable;
 import java.util.List;
-import org.greenrobot.greendao.annotation.Generated;
-import org.greenrobot.greendao.DaoException;
-import com.dadoutek.uled.dao.DaoSession;
-import com.dadoutek.uled.dao.DbSceneActionsDao;
-import com.dadoutek.uled.dao.DbSceneDao;
 
 /**
  * Created by hejiajun on 2018/5/5.
  */
 
 @Entity
-public class DbScene{
+public class DbScene {
     @Id(autoincrement = true)
     private Long id;
 
@@ -30,11 +30,15 @@ public class DbScene{
     @ToMany(referencedJoinProperty = "actionId")
     private List<DbSceneActions> dbSceneActions;
 
-    /** Used to resolve relations */
+    /**
+     * Used to resolve relations
+     */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
 
-    /** Used for active entity operations. */
+    /**
+     * Used for active entity operations.
+     */
     @Generated(hash = 1485122994)
     private transient DbSceneDao myDao;
 
@@ -96,7 +100,9 @@ public class DbScene{
         return dbSceneActions;
     }
 
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    /**
+     * Resets a to-many relationship, making the next get call to query for a fresh result.
+     */
     @Generated(hash = 1970779748)
     public synchronized void resetDbSceneActions() {
         dbSceneActions = null;
@@ -138,7 +144,9 @@ public class DbScene{
         myDao.update(this);
     }
 
-    /** called by internal mechanisms, do not call yourself. */
+    /**
+     * called by internal mechanisms, do not call yourself.
+     */
     @Generated(hash = 1398896232)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;

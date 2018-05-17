@@ -2,7 +2,6 @@ package com.dadoutek.uled.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -12,25 +11,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
-import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.dao.DaoMaster;
+import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.qrcode.QRCodeShareActivity;
 import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
-import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.dadoutek.uled.qrcode.QRCodeShareActivity;
-import com.dadoutek.uled.util.StringUtils;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.dadoutek.uled.util.StringUtils.compileExChar;
 

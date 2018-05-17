@@ -10,12 +10,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkBaseActivity;
 import com.telink.util.Arrays;
 import com.telink.util.Event;
 import com.telink.util.EventListener;

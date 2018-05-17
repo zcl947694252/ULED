@@ -4,7 +4,6 @@ import android.content.res.ColorStateList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Group implements Serializable {
     private static final long serialVersionUID = 7387748275306879629L;
@@ -20,7 +19,7 @@ public class Group implements Serializable {
 
     public boolean checked;
 
-    public boolean selected=false;
+    public boolean selected = false;
 
-    public ArrayList<Integer> containsLightList=new ArrayList<>();
+    public ArrayList<Integer> containsLightList = new ArrayList<>();
 }

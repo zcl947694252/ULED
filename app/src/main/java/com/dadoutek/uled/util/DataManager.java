@@ -7,7 +7,6 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
@@ -15,7 +14,6 @@ import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,15 +109,15 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
 
-    public void updateGroup(Group group,Context context) {
-        if(group.meshAddress==0xFFFF){
-            SharedPreferencesHelper.putObject(context,mMeshName + mPwd + Constant.GROUPS_KEY_ALL,group);
+    public void updateGroup(Group group, Context context) {
+        if (group.meshAddress == 0xFFFF) {
+            SharedPreferencesHelper.putObject(context, mMeshName + mPwd + Constant.GROUPS_KEY_ALL, group);
         }
 
-        Groups groups=getGroups();
-        for(int i=0;i<groups.size();i++){
-            if(groups.get(i).meshAddress==group.meshAddress){
-                groups.set(i,group);
+        Groups groups = getGroups();
+        for (int i = 0; i < groups.size(); i++) {
+            if (groups.get(i).meshAddress == group.meshAddress) {
+                groups.set(i, group);
                 SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
                         mMeshName + mPwd + Constant.GROUPS_KEY, groups);
             }
@@ -173,8 +171,8 @@ public class DataManager {
      * @param name   自定义组名
      * @param groups 当前组集
      */
-    public void creatGroup(String name, Groups groups,Context context) {
-        if(!checkRepeat(groups,context,name)){
+    public void creatGroup(String name, Groups groups, Context context) {
+        if (!checkRepeat(groups, context, name)) {
             int count = groups.size();
             int newMeshAdress = ++count;
             Group group = new Group();
@@ -189,7 +187,7 @@ public class DataManager {
         }
     }
 
-    public boolean checkRepeat(Groups groups,Context context,String newName){
+    public boolean checkRepeat(Groups groups, Context context, String newName) {
         for (
                 int k = 0; k < groups.size(); k++)
 
@@ -202,12 +200,12 @@ public class DataManager {
         return false;
     }
 
-    public boolean checkRepeat(Lights lights,Context context,String newName){
+    public boolean checkRepeat(Lights lights, Context context, String newName) {
         for (
                 int k = 0; k < lights.size(); k++)
 
         {
-            if(lights.get(k).name==null){
+            if (lights.get(k).name == null) {
                 return false;
             }
             if (lights.get(k).name.equals(newName)) {
@@ -255,8 +253,8 @@ public class DataManager {
         }
     }
 
-    public boolean getConnectState(Context context){
-        if(!SharedPreferencesHelper.getBoolean(context, Constant.CONNECT_STATE_SUCCESS_KEY,false)){
+    public boolean getConnectState(Context context) {
+        if (!SharedPreferencesHelper.getBoolean(context, Constant.CONNECT_STATE_SUCCESS_KEY, false)) {
             ToastUtils.showLong(context.getString(R.string.device_not_connected));
             return false;
         }
@@ -288,7 +286,7 @@ public class DataManager {
         return "null";
     }
 
-    public Group getGroup(int groupAdress,Context context) {
+    public Group getGroup(int groupAdress, Context context) {
         Groups groups = getGroups();
         for (int j = 0; j < groups.size(); j++) {
             if (groups.get(j).meshAddress == groupAdress) {
@@ -296,32 +294,32 @@ public class DataManager {
             }
         }
 
-        if(groupAdress==0xFFFF){
-            Group group=(Group) SharedPreferencesHelper.getObject(context,mMeshName + mPwd + Constant.GROUPS_KEY_ALL);
-            if(group==null){
+        if (groupAdress == 0xFFFF) {
+            Group group = (Group) SharedPreferencesHelper.getObject(context, mMeshName + mPwd + Constant.GROUPS_KEY_ALL);
+            if (group == null) {
                 return createAllLightControllerGroup();
             }
-           return group;
-        }else{
+            return group;
+        } else {
             return null;
         }
     }
 
-    public Light getLight(int lightMesh,Context context) {
+    public Light getLight(int lightMesh, Context context) {
         Lights lights = getLights();
         for (int j = 0; j < lights.size(); j++) {
             if (lights.get(j).meshAddress == lightMesh) {
                 return lights.get(j);
             }
         }
-            return null;
+        return null;
     }
 
-    public String getLightName(Light light){
-        Lights lights=getLights();
-        for(int i=0;i<lights.size();i++){
-            if(lights.get(i).name!=null&&!lights.get(i).name.isEmpty()){
-                if(light.meshAddress==lights.get(i).meshAddress){
+    public String getLightName(Light light) {
+        Lights lights = getLights();
+        for (int i = 0; i < lights.size(); i++) {
+            if (lights.get(i).name != null && !lights.get(i).name.isEmpty()) {
+                if (light.meshAddress == lights.get(i).meshAddress) {
                     return lights.get(i).name;
                 }
             }

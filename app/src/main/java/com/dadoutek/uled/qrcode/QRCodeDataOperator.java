@@ -2,11 +2,11 @@ package com.dadoutek.uled.qrcode;
 
 import android.text.TextUtils;
 
-import com.dadoutek.uled.model.Mesh;
-import com.google.gson.Gson;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.DeviceInfo;
+import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;

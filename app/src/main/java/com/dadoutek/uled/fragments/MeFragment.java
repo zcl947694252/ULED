@@ -22,7 +22,6 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
-import com.dadoutek.uled.util.DataManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -98,13 +97,13 @@ public class MeFragment extends Fragment {
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
-        }else{
+        } else {
             DBManager.getInstance().copyDatabaseToSDCard(activity);
             ToastUtils.showShort(R.string.copy_complete);
         }
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite,R.id.copy_data_base})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:

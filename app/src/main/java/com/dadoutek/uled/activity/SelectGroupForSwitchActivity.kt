@@ -2,7 +2,11 @@ package com.dadoutek.uled.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
+import android.view.MenuItem
+import android.view.View
 import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
@@ -20,17 +24,11 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
-
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
-import java.util.ArrayList
-import android.support.v7.widget.DividerItemDecoration
-import android.util.Log
-import android.view.MenuItem
-import android.view.View
-import com.dadoutek.uled.R.id.*
+import java.util.*
 
 
 class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> {

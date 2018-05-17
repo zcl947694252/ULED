@@ -2,7 +2,6 @@ package com.dadoutek.uled.DbModel;
 
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.dao.DbRegionDao;
-import com.dadoutek.uled.dao.DbSceneDao;
 
 import java.util.List;
 
@@ -11,22 +10,22 @@ import java.util.List;
  */
 
 public class DbRegionUtils {
-    public static DbRegionDao dbRegionDao= TelinkLightApplication.
+    public static DbRegionDao dbRegionDao = TelinkLightApplication.
             getDaoInstant().getDbRegionDao();
 
-    public static void save(DbRegion dbRegion){
+    public static void save(DbRegion dbRegion) {
         dbRegionDao.save(dbRegion);
     }
 
-    public static void deleteAll(){
+    public static void deleteAll() {
         dbRegionDao.deleteAll();
     }
 
-    public static List<DbRegion> getAllRegion(){
+    public static List<DbRegion> getAllRegion() {
         return dbRegionDao.loadAll();
     }
 
-    public static void deleteRegion(DbRegion dbRegion){
+    public static void deleteRegion(DbRegion dbRegion) {
         dbRegionDao.delete(dbRegion);
     }
 }

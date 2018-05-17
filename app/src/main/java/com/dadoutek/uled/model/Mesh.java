@@ -23,9 +23,8 @@ public class Mesh implements Serializable {
 
     //public String otaDevice;
 
-//    public List<Integer> allocDeviceAddress;
+    //    public List<Integer> allocDeviceAddress;
     public List<DeviceInfo> devices = new ArrayList<>();
-
 
 
     public int getDeviceAddress() {

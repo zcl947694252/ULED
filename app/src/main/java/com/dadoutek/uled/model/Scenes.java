@@ -8,9 +8,9 @@ import java.util.List;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class Scenes implements Serializable{
+public class Scenes implements Serializable {
     //应用到场景的组mesh
-    public List<Integer> action=new ArrayList<>();
+    public List<Integer> action = new ArrayList<>();
     //场景名
     public String sceneName;
 }

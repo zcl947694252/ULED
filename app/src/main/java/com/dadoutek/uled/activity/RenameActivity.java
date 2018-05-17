@@ -87,11 +87,11 @@ public class RenameActivity extends TelinkBaseActivity {
     }
 
     private boolean checkName() {
-        if(compileExChar(newName)){
+        if (compileExChar(newName)) {
             return false;
         }
 
-        if(dataManager.checkRepeat(groups,this,newName)){
+        if (dataManager.checkRepeat(groups, this, newName)) {
             return false;
         }
         return true;

@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddMeshActivity;
@@ -34,12 +35,10 @@ import com.dadoutek.uled.activity.OnlineStatusTestActivity;
 import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Groups;
+import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.light.ConnectionStatus;
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Light;
 
 import java.util.List;
 

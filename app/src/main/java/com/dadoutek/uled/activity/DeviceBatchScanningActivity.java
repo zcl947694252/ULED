@@ -18,6 +18,12 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.model.Light;
+import com.dadoutek.uled.model.Mesh;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -27,12 +33,6 @@ import com.telink.bluetooth.light.LeScanParameters;
 import com.telink.bluetooth.light.LeUpdateParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.Parameters;
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Mesh;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 

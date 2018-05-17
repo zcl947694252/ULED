@@ -8,14 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
-import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
-
-import java.util.List;
 
 /**
  * Created by hejiajun on 2018/3/28.

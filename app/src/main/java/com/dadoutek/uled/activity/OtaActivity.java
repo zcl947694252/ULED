@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -28,7 +29,6 @@ import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.Manufacture;
 import com.telink.bluetooth.light.OtaDeviceInfo;
 import com.telink.bluetooth.light.Parameters;
-import com.dadoutek.uled.R;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
