@@ -1,10 +1,9 @@
 package com.dadoutek.uled.activity
 
 import android.Manifest
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.blankj.utilcode.util.ConvertUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
@@ -148,9 +147,9 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe {
-                            if(mDeviceInfo.productUUID==DeviceType.NORMAL_SWITCH){
+                            if (mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH) {
                                 startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
-                            }else{
+                            } else {
                                 startActivity<SelectSceneForSwitchActivity>("deviceInfo" to mDeviceInfo)
                             }
                         }

@@ -9,22 +9,20 @@ import android.widget.TextView;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Group;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by hejiajun on 2018/5/10.
  */
 
-public class GroupListAdapter extends BaseAdapter{
+public class GroupListAdapter extends BaseAdapter {
 
     Context context;
-    List<Group>list;
+    List<Group> list;
 
-    public GroupListAdapter(Context context, List<Group>list) {
-        this.context=context;
-        this.list=list;
+    public GroupListAdapter(Context context, List<Group> list) {
+        this.context = context;
+        this.list = list;
     }
 
     @Override
@@ -44,11 +42,11 @@ public class GroupListAdapter extends BaseAdapter{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = View.inflate(context, R.layout.item_group,null);
+        convertView = View.inflate(context, R.layout.item_group, null);
         TextView tvName = (TextView) convertView.findViewById(R.id.tv_group_name);
-        if(list.get(position).selected){
+        if (list.get(position).selected) {
             convertView.setVisibility(View.GONE);
-        }else{
+        } else {
             convertView.setVisibility(View.VISIBLE);
             tvName.setText(list.get(position).name);
         }

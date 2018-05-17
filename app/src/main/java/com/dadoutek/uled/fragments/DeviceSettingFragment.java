@@ -92,7 +92,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
 
-                light.brightness=progress;
+                light.brightness = progress;
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
             } else if (view == temperatureBar) {
@@ -101,7 +101,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 params = new byte[]{0x05, (byte) progress};
                 tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
 
-                light.temperature=progress;
+                light.temperature = progress;
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
             }
         }
@@ -154,7 +154,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mApp = (TelinkLightApplication) this.getActivity().getApplication();
-        manager=new DataManager(mApp,mApp.getMesh().name,mApp.getMesh().password);
+        manager = new DataManager(mApp, mApp.getMesh().name, mApp.getMesh().password);
     }
 
     @Override
@@ -195,9 +195,9 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        if(fromWhere!=null&&!fromWhere.isEmpty()&&gpAddress==0xffff){
+        if (fromWhere != null && !fromWhere.isEmpty() && gpAddress == 0xffff) {
 //            remove.setVisibility(View.GONE);
-              btnRename.setVisibility(View.GONE);
+            btnRename.setVisibility(View.GONE);
         }
         light = Lights.getInstance().getByMeshAddress(meshAddress);
         brightnessBar.setProgress(light.brightness);
@@ -216,10 +216,10 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
             }
 
-            if(gpAddress!=0){
-                Group group=manager.getGroup(gpAddress,getActivity());
+            if (gpAddress != 0) {
+                Group group = manager.getGroup(gpAddress, getActivity());
                 group.containsLightList.remove((Integer) meshAddress);
-                manager.updateGroup(group,getActivity());
+                manager.updateGroup(group, getActivity());
             }
 //            getActivity().finish();
         }
@@ -233,8 +233,8 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
     @OnClick(R.id.btn_rename)
     public void onViewClicked() {
-        Intent intent=new Intent(getActivity(), RenameLightActivity.class);
-        intent.putExtra("lightAddress",meshAddress);
+        Intent intent = new Intent(getActivity(), RenameLightActivity.class);
+        intent.putExtra("lightAddress", meshAddress);
         startActivity(intent);
         getActivity().finish();
     }

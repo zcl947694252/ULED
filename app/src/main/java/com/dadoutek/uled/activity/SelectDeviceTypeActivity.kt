@@ -1,7 +1,7 @@
 package com.dadoutek.uled.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import com.dadoutek.uled.R
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.toolbar.*

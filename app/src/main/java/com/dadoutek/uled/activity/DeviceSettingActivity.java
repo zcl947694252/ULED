@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.fragments.DeviceSettingFragment;
-import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
@@ -54,7 +54,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
 
         this.meshAddress = this.getIntent().getIntExtra(Constant.LIGHT_ARESS_KEY, 0);
         this.fromWhere = this.getIntent().getStringExtra(Constant.LIGHT_REFRESH_KEY);
-        this.gpAddress=this.getIntent().getIntExtra(Constant.GROUP_ARESS_KEY,0);
+        this.gpAddress = this.getIntent().getIntExtra(Constant.GROUP_ARESS_KEY, 0);
 
         mApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
@@ -79,10 +79,10 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 .getFragmentManager().findFragmentById(
                         R.id.device_setting_fragment);
 
-        if(fromWhere!=null&&!fromWhere.isEmpty()){
+        if (fromWhere != null && !fromWhere.isEmpty()) {
 //            editView.setVisibility(View.GONE);
             this.settingFragment.fromWhere = fromWhere;
-            this.settingFragment.gpAddress= gpAddress;
+            this.settingFragment.gpAddress = gpAddress;
         }
         this.settingFragment.meshAddress = meshAddress;
     }

@@ -6,9 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Environment;
 
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkLightApplication;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,8 +16,7 @@ import java.util.Calendar;
 
 
 /**
- * @author
- * 复制数据库到本应用当中
+ * @author 复制数据库到本应用当中
  */
 @SuppressLint("SdCardPath")
 public class CopyDataBaseFile {
@@ -35,6 +31,7 @@ public class CopyDataBaseFile {
 
     /**
      * 检查数据库是否存在
+     *
      * @return
      */
     public boolean checkDataBase() {
@@ -56,24 +53,25 @@ public class CopyDataBaseFile {
         String databaseFilenames = DATABASE_PATH + dbName;
         File dbfile = new File(databaseFilenames);
 
-        File backupFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"/"+dbName);
+        File backupFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/" + dbName);
         outputFile(dbfile, backupFile);
 
     }
+
     public void backupDataBaseWithTime() {
         String databaseFilenames = DATABASE_PATH + dbName;
         File dbfile = new File(databaseFilenames);
-        String time="";
-        Calendar calendar= Calendar.getInstance();
-        time=(calendar.get(Calendar.MONTH)+1)+""+calendar.get(Calendar.DAY_OF_MONTH)+""+calendar.get(Calendar.HOUR_OF_DAY)+""+calendar.get(Calendar.MINUTE);
-        File backupFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"/uled"+time+".db");
+        String time = "";
+        Calendar calendar = Calendar.getInstance();
+        time = (calendar.get(Calendar.MONTH) + 1) + "" + calendar.get(Calendar.DAY_OF_MONTH) + "" + calendar.get(Calendar.HOUR_OF_DAY) + "" + calendar.get(Calendar.MINUTE);
+        File backupFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/uled" + time + ".db");
         outputFile(dbfile, backupFile);
 
     }
 
     void outputFile(File dbfile, File backupFile) {
         File dir = backupFile.getParentFile();
-        if(dir.exists() == false){
+        if (dir.exists() == false) {
             dir.mkdirs();
         }
 
@@ -110,28 +108,28 @@ public class CopyDataBaseFile {
         String databaseFilenames = DATABASE_PATH + dbName;
         File dbfile = new File(databaseFilenames);
         File dir = dbfile.getParentFile();
-        inputFile(dbfile,null);
+        inputFile(dbfile, null);
     }
 
     public void copyDataBase(File file) {
         String databaseFilenames = DATABASE_PATH + dbName;
         File dbfile = new File(databaseFilenames);
         try {
-            FileInputStream inputStream=new FileInputStream(file);
-            inputFile(dbfile,inputStream);
+            FileInputStream inputStream = new FileInputStream(file);
+            inputFile(dbfile, inputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
     }
 
-    void inputFile(File dbfile , InputStream is) {
+    void inputFile(File dbfile, InputStream is) {
         File dir = dbfile.getParentFile();
-        if(dir.exists() == false){
+        if (dir.exists() == false) {
             dir.mkdirs();
         }
 
-        if(dbfile.exists()){
+        if (dbfile.exists()) {
             dbfile.delete();
         }
 
@@ -139,7 +137,7 @@ public class CopyDataBaseFile {
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(dbfile);// 得到数据库文件的写入流
-            if(is==null){
+            if (is == null) {
 //                is = TelinkLightApplication.getInstance().getApplicationContext().getResources().openRawResource(R.raw.hinteen);// 得到数据库文件的数据流
             }
 
@@ -170,15 +168,15 @@ public class CopyDataBaseFile {
         String databaseFilenames = DATABASE_PATH + dbName;
         File dbfile = new File(databaseFilenames);
         File dir = dbfile.getParentFile();
-        if(dir.exists() == false){
+        if (dir.exists() == false) {
             dir.mkdirs();
         }
 
-        if(dbfile.exists()){
+        if (dbfile.exists()) {
             dbfile.delete();
         }
-        File copyFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"/copyuled.db");
-        if(!copyFile.exists()){
+        File copyFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/copyuled.db");
+        if (!copyFile.exists()) {
             return;
         }
 

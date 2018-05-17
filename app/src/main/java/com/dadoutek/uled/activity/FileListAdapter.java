@@ -8,7 +8,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import com.dadoutek.uled.R;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class FileListAdapter extends BaseAdapter {
         mFiles = new ArrayList<>();
     }
 
-    public void setData(List<File> files){
+    public void setData(List<File> files) {
         this.mFiles = files;
         this.notifyDataSetChanged();
     }

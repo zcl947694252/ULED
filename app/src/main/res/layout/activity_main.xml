@@ -1,6 +1,5 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -42,6 +41,7 @@
             android:layout_height="wrap_content">
 
         </LinearLayout>
+
         <ImageView
             android:id="@+id/tab_devices"
             android:layout_width="0dp"
@@ -55,8 +55,7 @@
             android:tint="@color/gray"
             app:layout_constraintEnd_toStartOf="@id/tab_account"
             app:layout_constraintStart_toEndOf="@+id/tab_scene"
-            app:layout_constraintTop_toTopOf="parent"
-             />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvLight"
@@ -111,8 +110,7 @@
             android:tint="@color/gray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tab_devices"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvAccount"

@@ -1,26 +1,19 @@
 package com.dadoutek.uled.adapter;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.util.DataManager;
-import com.dadoutek.uled.util.LogUtils;
-import com.telink.bluetooth.light.ConnectionStatus;
 
 import java.util.List;
 

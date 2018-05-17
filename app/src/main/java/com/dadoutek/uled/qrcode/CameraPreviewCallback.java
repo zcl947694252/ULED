@@ -137,10 +137,10 @@ public final class CameraPreviewCallback implements Camera.PreviewCallback {
 //        TelinkLog.w("Content 解压后的二进制: " + mResult + "  " + GZIP.bytesToHexString(mResult.getBytes(GZIP.GZIP_ENCODE)));
 
         // 检测扫描到的二维码是否符合格式
-        if (new QRCodeDataOperator().parseData(mResult)){
+        if (new QRCodeDataOperator().parseData(mResult)) {
             mHandler.sendEmptyMessage(MESSAGE_POST_RESULT);
             mDecodeThread.pause();
-        }else {
+        } else {
             mHandler.sendEmptyMessage(MESSAGE_POST_DATA_ERROR);
         }
 

@@ -100,7 +100,7 @@ public class SceneFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if(!hidden){
+        if (!hidden) {
             initData();
             initView();
         }

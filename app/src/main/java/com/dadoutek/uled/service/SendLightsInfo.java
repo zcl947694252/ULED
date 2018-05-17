@@ -6,11 +6,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Light;
-import com.telink.bluetooth.event.NotificationEvent;
-import com.dadoutek.uled.model.Groups;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
@@ -18,9 +14,9 @@ import com.telink.util.EventListener;
  * Created by hejiajun on 2018/3/22.
  */
 
-public class SendLightsInfo extends Service implements EventListener<String>{
+public class SendLightsInfo extends Service implements EventListener<String> {
 
-    Light light=null;
+    Light light = null;
     private Bundle bundle;
 
     @Override

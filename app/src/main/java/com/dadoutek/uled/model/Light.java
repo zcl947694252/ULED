@@ -1,15 +1,13 @@
 package com.dadoutek.uled.model;
 
-import android.content.res.ColorStateList;
-
+import com.dadoutek.uled.R;
 import com.telink.bluetooth.light.ConnectionStatus;
 import com.telink.bluetooth.light.DeviceInfo;
-import com.dadoutek.uled.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public final class Light implements Serializable,Cloneable{
+public final class Light implements Serializable, Cloneable {
 
     public String name;//设备名
     public String macAddress;//蓝牙地址
@@ -23,9 +21,9 @@ public final class Light implements Serializable,Cloneable{
     public int textColor;//文字颜色
     public int icon = R.drawable.icon_light_on;//灯状态显示图
     public String version;
-    public boolean isLamp=true;
-    public boolean hasGroup=false;//当前灯是否有被分组
-    public ArrayList<String> belongGroups=new ArrayList<>();//所属分组的Mesh地址,每个灯最多属于8个分组
+    public boolean isLamp = true;
+    public boolean hasGroup = false;//当前灯是否有被分组
+    public ArrayList<String> belongGroups = new ArrayList<>();//所属分组的Mesh地址,每个灯最多属于8个分组
 
     public ArrayList<String> getBelongGroups() {
         return belongGroups;
@@ -40,7 +38,7 @@ public final class Light implements Serializable,Cloneable{
     }
 
     public String getLabel1() {
-        return  "bulb-" + Integer.toString(this.meshAddress, 16);
+        return "bulb-" + Integer.toString(this.meshAddress, 16);
     }
 
     public String getLabel2() {
@@ -48,13 +46,13 @@ public final class Light implements Serializable,Cloneable{
     }
 
     public void updateIcon() {
-          if (this.status == ConnectionStatus.OFFLINE) {
-              this.icon = R.drawable.icon_light_offline;
-          } else if (this.status == ConnectionStatus.OFF) {
-              this.icon = R.drawable.icon_light_off;
-          } else if (this.status == ConnectionStatus.ON) {
-              this.icon = R.drawable.icon_light_on;
-          }
+        if (this.status == ConnectionStatus.OFFLINE) {
+            this.icon = R.drawable.icon_light_offline;
+        } else if (this.status == ConnectionStatus.OFF) {
+            this.icon = R.drawable.icon_light_off;
+        } else if (this.status == ConnectionStatus.ON) {
+            this.icon = R.drawable.icon_light_on;
+        }
     }
 
     @Override

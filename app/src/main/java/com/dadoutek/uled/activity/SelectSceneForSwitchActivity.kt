@@ -4,14 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.DbModel.DbScene
@@ -19,12 +18,8 @@ import com.dadoutek.uled.DbModel.DbSceneUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
-import com.dadoutek.uled.adapter.SelectSwitchGroupRvAdapter
 import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
-import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.LogUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -36,15 +31,14 @@ import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
-import kotlin.collections.ArrayList
 
 class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SwitchSceneGroupAdapter
-    private  lateinit var mSwitchList: ArrayList<String>
-    private  lateinit var mSceneList: List<DbScene>
+    private lateinit var mSwitchList: ArrayList<String>
+    private lateinit var mSceneList: List<DbScene>
     private var loadDialog: Dialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,10 +59,10 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         fab.setOnClickListener { _ ->
-//            if (mAdapter.selectedPos != -1) {
+            //            if (mAdapter.selectedPos != -1) {
 //                progressBar.visibility = View.VISIBLE
-                openLoadingDialog(getString(R.string.setting_switch))
-                setSceneForSwitch()
+            openLoadingDialog(getString(R.string.setting_switch))
+            setSceneForSwitch()
 //
 //            }
 //            else {
@@ -119,14 +113,14 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
         params.setUpdateDeviceList(mDeviceInfo)
 
-        var keyNum:Int=0
-      val map:Map<String,DbScene> = mAdapter.getSceneMap()
-        for( key in map.keys){
-            when(key){
-                getString(R.string.scene1)-> keyNum=0x05
-                getString(R.string.scene2)-> keyNum=0x06
-                getString(R.string.scene3)-> keyNum=0x03
-                getString(R.string.scene4)-> keyNum=0x04
+        var keyNum: Int = 0
+        val map: Map<String, DbScene> = mAdapter.getSceneMap()
+        for (key in map.keys) {
+            when (key) {
+                getString(R.string.scene1) -> keyNum = 0x05
+                getString(R.string.scene2) -> keyNum = 0x06
+                getString(R.string.scene3) -> keyNum = 0x03
+                getString(R.string.scene4) -> keyNum = 0x04
             }
             val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0xff.toByte(), map.getValue(key).id.toByte(),
                     0xff.toByte())
@@ -163,11 +157,11 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     }
 
     private fun initView() {
-        if(mSceneList.size===0){
+        if (mSceneList.size === 0) {
             ToastUtils.showLong(getString(R.string.tip_switch))
             return
         }
-        mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList,mSceneList,this)
+        mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 //        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
@@ -182,7 +176,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mSwitchList.add(getString(R.string.scene3))
         mSwitchList.add(getString(R.string.scene4))
 
-        mSceneList=DbSceneUtils.getAllScene()
+        mSceneList = DbSceneUtils.getAllScene()
     }
 
 

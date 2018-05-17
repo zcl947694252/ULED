@@ -8,9 +8,9 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 /**
  * Created by hejiajun on 2018/3/22.
@@ -21,6 +21,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     private static final int REQ_MESH_SETTING = 0x01;
     private TelinkLightApplication mApplication;
     boolean mIsFirstData = true;
+    boolean mIsLogging= false;
     public static final String IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH";
 
     @Override
@@ -41,17 +42,28 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
         //判断是否是第一次使用app，启动导航页
         mIsFirstData = SharedPreferencesHelper.getBoolean(SplashActivity.this, IS_FIRST_LAUNCH, true);
+        mIsLogging=SharedPreferencesHelper.getBoolean(SplashActivity.this, Constant.IS_LOGIN, false);
 
         if (mIsFirstData) {
             initMesh();
             initGroupData();
-            gotoMeshSetting();
+            gotoLoginSetting(true);
             //把是否是第一次进入设为false
 //            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
         } else {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            if(mIsLogging){
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }else{
+                gotoLoginSetting(false);
+            }
         }
+    }
+
+    private void gotoLoginSetting(Boolean isFrist) {
+        Intent intent=new Intent(SplashActivity.this,LoginActivity.class);
+        intent.putExtra(IS_FIRST_LAUNCH,isFrist);
+        startActivity(intent);
     }
 
     /**
@@ -91,23 +103,4 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
     }
 
-    /**
-     * 进入引导流程，也就是进入DeviceActivity。
-     */
-    private void gotoDeviceScanning() {
-        //首次进入APP才进入引导流程
-        Intent intent = new Intent(SplashActivity.this, DeviceScanningActivity.class);
-        intent.putExtra("isInit", true);
-        startActivity(intent);
-        finish();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //退出MeshSetting后进入DeviceScanning
-        if (requestCode == REQ_MESH_SETTING) {
-            gotoDeviceScanning();
-        }
-    }
 }

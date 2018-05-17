@@ -43,8 +43,8 @@ public class TimeUtil {
         return s[0] + "-" + s[1];
     }
 
-    public static int getNowSeconds(){
-        Calendar calendar=Calendar.getInstance();
+    public static int getNowSeconds() {
+        Calendar calendar = Calendar.getInstance();
         return calendar.get(Calendar.SECOND);
     }
 
@@ -361,8 +361,6 @@ public class TimeUtil {
     }
 
 
-
-
     /**
      * 根据年和这一年的第几周，和这周的第几天返回日期
      *
@@ -521,8 +519,8 @@ public class TimeUtil {
         calendar.setMinimalDaysInFirstWeek(7); // 设置每周最少为7天
 
         calendar.setTimeInMillis(System.currentTimeMillis());
-        Log.d("dateBug", "getMyCurrentWeek: "+calendar.get(Calendar.WEEK_OF_YEAR));
-        if(calendar.get(Calendar.WEEK_OF_YEAR)==53){
+        Log.d("dateBug", "getMyCurrentWeek: " + calendar.get(Calendar.WEEK_OF_YEAR));
+        if (calendar.get(Calendar.WEEK_OF_YEAR) == 53) {
             return 0;
         }
         return calendar.get(Calendar.WEEK_OF_YEAR);
@@ -547,7 +545,7 @@ public class TimeUtil {
             e.printStackTrace();
         }
 
-        if(calendar.get(Calendar.WEEK_OF_YEAR)==53){
+        if (calendar.get(Calendar.WEEK_OF_YEAR) == 53) {
             return 0;
         }
         return calendar.get(Calendar.WEEK_OF_YEAR);
@@ -785,7 +783,7 @@ public class TimeUtil {
     public static String getFormatedDateTime(long dateTime, int type) {
         SimpleDateFormat localFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         localFormater.setTimeZone(TimeZone.getDefault());
-        String localTimeStr = localFormater.format(new Date(dateTime*1000));
+        String localTimeStr = localFormater.format(new Date(dateTime * 1000));
         return getFormatTime(localTimeStr, type);
     }
 
@@ -826,7 +824,7 @@ public class TimeUtil {
             case 8:           //返回分钟数
                 return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) + "";
             case 9:           //返回分钟数
-                return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)*60 +calendar.get(Calendar.SECOND)+ "";
+                return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.SECOND) + "";
         }
         return "";
     }
@@ -1007,9 +1005,10 @@ public class TimeUtil {
         }
         return "" + time;
     }
-/**
-*根据日前获得今天是星期几 0-6 周日：0 周六：6
- */
+
+    /**
+     * 根据日前获得今天是星期几 0-6 周日：0 周六：6
+     */
     public static String getWeeks(String pTime, Context context) {
         String Week = "";
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -1022,7 +1021,7 @@ public class TimeUtil {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return String.valueOf(c.get(Calendar.DAY_OF_WEEK)-1);
+        return String.valueOf(c.get(Calendar.DAY_OF_WEEK) - 1);
     }
 
     public static String getFormatStringWithUS(String title) {
@@ -1037,6 +1036,7 @@ public class TimeUtil {
         }
         return "";
     }
+
     public static String getFormatStringWithZH(String title) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         Date date = null; //初始化date
@@ -1050,15 +1050,15 @@ public class TimeUtil {
         return "";
     }
 
-    public static String getNowTime(){
-        SimpleDateFormat    formatter    =   new    SimpleDateFormat    ("yyyy-MM-dd HH:mm:ss");
-        Date    curDate    =   new    Date(System.currentTimeMillis());//获取当前时间
-        String    str    =    formatter.format(curDate);
+    public static String getNowTime() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        String str = formatter.format(curDate);
         return str;
     }
 
 
-    public static String formatDate(String str, String s1,String s2) {
+    public static String formatDate(String str, String s1, String s2) {
         SimpleDateFormat sf1 = new SimpleDateFormat(s1);
         SimpleDateFormat sf2 = new SimpleDateFormat(s2);
         String sfStr = "";

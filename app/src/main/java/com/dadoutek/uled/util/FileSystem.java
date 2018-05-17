@@ -46,7 +46,6 @@ public abstract class FileSystem {
     }
 
 
-
     public static boolean exists(Context context, String fileName) {
         File directory = context.getFilesDir();
 

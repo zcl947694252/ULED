@@ -88,18 +88,18 @@ public final class GroupSettingFragment extends Fragment {
             if (view == brightnessBar) {
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
-                group.brightness=progress;
-                dataManager.updateGroup(group,getActivity());
-                tvBrightness.setText(getString(R.string.device_setting_brightness,progress+""));
+                group.brightness = progress;
+                dataManager.updateGroup(group, getActivity());
+                tvBrightness.setText(getString(R.string.device_setting_brightness, progress + ""));
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
             } else if (view == temperatureBar) {
 
                 opcode = (byte) 0xE2;
                 params = new byte[]{0x05, (byte) progress};
-                group.temperature=progress;
-                dataManager.updateGroup(group,getActivity());
-                tvTemperature.setText(getString(R.string.device_setting_temperature,progress+""));
+                group.temperature = progress;
+                dataManager.updateGroup(group, getActivity());
+                tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
             }
         }
@@ -185,7 +185,7 @@ public final class GroupSettingFragment extends Fragment {
         super.onResume();
         checkGroupIsSystemGroup();
         dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
-        group = dataManager.getGroup(groupAddress,getActivity());
+        group = dataManager.getGroup(groupAddress, getActivity());
         brightnessBar.setProgress(group.brightness);
         tvBrightness.setText(getString(R.string.device_setting_brightness, group.brightness + ""));
         temperatureBar.setProgress(group.temperature);

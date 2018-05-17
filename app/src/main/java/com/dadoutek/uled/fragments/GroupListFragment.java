@@ -13,17 +13,16 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.DataManager;
@@ -142,7 +141,7 @@ public final class GroupListFragment extends Fragment {
 //            DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
 //            groupArrayList.add(dataManager.createAllLightControllerGroup());
             for (Group group : groupList) {
-                if (group.containsLightList.size() > 0||group.meshAddress==0xffff)
+                if (group.containsLightList.size() > 0 || group.meshAddress == 0xffff)
                     groupArrayList.add(group);
             }
         }
@@ -194,7 +193,7 @@ public final class GroupListFragment extends Fragment {
                 holder.txtName = txtName;
                 holder.btnOn = btnOn;
                 holder.btnOff = btnOff;
-                holder.btnSet=btnSet;
+                holder.btnSet = btnSet;
 
                 convertView.setTag(holder);
 
@@ -230,11 +229,11 @@ public final class GroupListFragment extends Fragment {
             int dstAddr = meshAddress;
             Intent intent;
 
-            if(!dataManager.getConnectState(getActivity())){
+            if (!dataManager.getConnectState(getActivity())) {
                 return;
             }
 
-            switch (clickId){
+            switch (clickId) {
                 case R.id.btn_on:
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
                             new byte[]{0x01, 0x00, 0x00});
@@ -249,9 +248,9 @@ public final class GroupListFragment extends Fragment {
                     startActivityForResult(intent, 0);
                     break;
                 case R.id.txt_name:
-                        intent = new Intent(mContext, LightsOfGroupActivity.class);
-                        intent.putExtra("groupAddress", meshAddress);
-                        startActivity(intent);
+                    intent = new Intent(mContext, LightsOfGroupActivity.class);
+                    intent.putExtra("groupAddress", meshAddress);
+                    startActivity(intent);
                     break;
             }
         }

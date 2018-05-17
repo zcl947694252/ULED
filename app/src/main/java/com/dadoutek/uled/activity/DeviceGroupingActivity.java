@@ -16,27 +16,22 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.model.Groups;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
 
@@ -62,9 +57,9 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             Group group = adapter.getItem(position);
-            if(group.checked){
-                ToastUtils.showLong("当前已是该组");
-            }else{
+            if (group.checked) {
+                ToastUtils.showLong(R.string.tip_selected_group);
+            } else {
                 deleteLightFromOldGroup();
                 allocDeviceGroup(group);
                 saveInfo(position);

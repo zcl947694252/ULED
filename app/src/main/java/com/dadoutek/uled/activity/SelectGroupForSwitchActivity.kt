@@ -2,7 +2,9 @@ package com.dadoutek.uled.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
 import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
@@ -20,14 +22,11 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
-
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
-import java.util.ArrayList
-import android.support.v7.widget.DividerItemDecoration
-import android.view.View
+import java.util.*
 
 
 class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> {
@@ -173,10 +172,10 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         val dataManager = DataManager(this, mesh.name, mesh.password)
         mGroupArrayList = ArrayList<Group>()
         val groupList = dataManager.groups.get()
-        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
+//        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
 
         for (group in groupList) {
-            if (group.containsLightList.size > 0)
+            if (group.containsLightList.size > 0 || group.meshAddress == 0xffff)
                 mGroupArrayList.add(group)
         }
 
@@ -185,7 +184,6 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.adapter = mAdapter
-
 
 
     }

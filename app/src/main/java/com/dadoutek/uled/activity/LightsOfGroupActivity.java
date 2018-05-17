@@ -64,7 +64,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
     private int positionCurrent;
     private Light currentLight;
     private static final int UPDATE_LIST = 0;
-    private boolean canBeRefresh=true;
+    private boolean canBeRefresh = true;
 
     @Override
     protected void onStart() {
@@ -111,7 +111,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
     protected void onDestroy() {
         super.onDestroy();
 //        this.mApplication.removeEventListener(this);
-        canBeRefresh=false;
+        canBeRefresh = false;
         this.mHandler.removeCallbacksAndMessages(null);
     }
 
@@ -127,20 +127,20 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
         if (lightListAdress == null) {
             ToastUtils.showLong(R.string.empty_light);
             finish();
-        }else if(lightListAdress.size() == 0){
-            if(groupAddress!=0xffff){
+        } else if (lightListAdress.size() == 0) {
+            if (groupAddress != 0xffff) {
                 ToastUtils.showLong(R.string.empty_light);
                 finish();
             }
         }
 
-        if(groupAddress==0xFFFF){
-                for (int j = 0; j < lights.size(); j++) {
-                    Light light = lights.get(j);
-                    if (light != null) {
-                        lightList.add(light);
-                    }
+        if (groupAddress == 0xFFFF) {
+            for (int j = 0; j < lights.size(); j++) {
+                Light light = lights.get(j);
+                if (light != null) {
+                    lightList.add(light);
                 }
+            }
         }
 
         for (int i = 0; i < lightListAdress.size(); i++) {
@@ -206,9 +206,9 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
      */
     private synchronized void onOnlineStatusNotify(NotificationEvent event) {
 
-        if(canBeRefresh){
-            canBeRefresh=false;
-        }else{
+        if (canBeRefresh) {
+            canBeRefresh = false;
+        } else {
             return;
         }
 
@@ -255,8 +255,8 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
             super.handleMessage(msg);
             switch (msg.what) {
                 case UPDATE_LIST:
-                    if(lightList.size()>0&&positionCurrent<lightList.size()){
-                        lightList.set(positionCurrent,currentLight);
+                    if (lightList.size() > 0 && positionCurrent < lightList.size()) {
+                        lightList.set(positionCurrent, currentLight);
                         adapter.notifyItemChanged(positionCurrent);
                     }
                     break;
@@ -267,23 +267,23 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
     SwitchButtonOnCheckedChangeListener onCheckedChangeListener = new SwitchButtonOnCheckedChangeListener() {
         @Override
         public void OnCheckedChangeListener(View v, int position) {
-            currentLight=lightList.get(position);
-            positionCurrent=position;
+            currentLight = lightList.get(position);
+            positionCurrent = position;
             byte opcode = (byte) 0xD0;
-            if(v.getId()==R.id.img_light){
-                canBeRefresh=true;
-                if(currentLight.status== ConnectionStatus.OFF){
+            if (v.getId() == R.id.img_light) {
+                canBeRefresh = true;
+                if (currentLight.status == ConnectionStatus.OFF) {
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight.meshAddress,
-                        new byte[]{0x01, 0x00, 0x00});
-                }else{
+                            new byte[]{0x01, 0x00, 0x00});
+                } else {
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight.meshAddress,
-                        new byte[]{0x00, 0x00, 0x00});
+                            new byte[]{0x00, 0x00, 0x00});
                 }
-            }else if(v.getId()==R.id.tv_setting){
-                Intent intent=new Intent(LightsOfGroupActivity.this,DeviceSettingActivity.class);
-                intent.putExtra(Constant.LIGHT_ARESS_KEY,currentLight.meshAddress);
-                intent.putExtra(Constant.GROUP_ARESS_KEY,groupAddress);
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY,Constant.LIGHT_REFRESH_KEY_OK);
+            } else if (v.getId() == R.id.tv_setting) {
+                Intent intent = new Intent(LightsOfGroupActivity.this, DeviceSettingActivity.class);
+                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight.meshAddress);
+                intent.putExtra(Constant.GROUP_ARESS_KEY, groupAddress);
+                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK);
                 startActivity(intent);
             }
         }

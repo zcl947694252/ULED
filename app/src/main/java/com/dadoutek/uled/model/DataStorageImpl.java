@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DataStorageImpl<E> implements DataStorage<E>,Serializable{
+public abstract class DataStorageImpl<E> implements DataStorage<E>, Serializable {
 
     protected List<E> data;
 
@@ -76,7 +76,7 @@ public abstract class DataStorageImpl<E> implements DataStorage<E>,Serializable{
     }
 
     public void set(int index, E element) {
-       this.data.set(index,element);
+        this.data.set(index, element);
     }
 
     @Override

@@ -87,27 +87,15 @@ public class RenameActivity extends TelinkBaseActivity {
     }
 
     private boolean checkName() {
-        if(compileExChar(newName)){
+        if (compileExChar(newName)) {
+            Toast.makeText(RenameActivity.this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        if(dataManager.checkRepeat(groups,this,newName)){
+        if (dataManager.checkRepeat(groups, this, newName)) {
             return false;
         }
         return true;
     }
 
-    private boolean compileExChar(String str) {
-
-        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
-
-        Pattern pattern = Pattern.compile(limitEx);
-        Matcher m = pattern.matcher(str);
-
-        if (m.find()) {
-            Toast.makeText(RenameActivity.this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        return false;
-    }
 }

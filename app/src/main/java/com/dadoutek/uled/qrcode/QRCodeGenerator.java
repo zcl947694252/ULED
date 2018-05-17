@@ -7,10 +7,10 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.dadoutek.uled.TelinkLightApplication;
 import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.telink.bluetooth.TelinkLog;
-import com.dadoutek.uled.TelinkLightApplication;
 
 import java.io.UnsupportedEncodingException;
 

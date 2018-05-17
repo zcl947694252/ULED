@@ -13,7 +13,7 @@ public class LogUtils {
     static String methodName;//方法名
     static int lineNumber;//行数
 
-    private LogUtils(){
+    private LogUtils() {
         /* Protect from instantiations */
     }
 
@@ -21,7 +21,7 @@ public class LogUtils {
         return BuildConfig.DEBUG;
     }
 
-    private static String createLog( String log ) {
+    private static String createLog(String log) {
         StringBuffer buffer = new StringBuffer();
         buffer.append(methodName);
         buffer.append("(").append(className).append(":").append(lineNumber).append(")");
@@ -29,14 +29,14 @@ public class LogUtils {
         return buffer.toString();
     }
 
-    private static void getMethodNames(StackTraceElement[] sElements){
+    private static void getMethodNames(StackTraceElement[] sElements) {
         className = sElements[1].getFileName();
         methodName = sElements[1].getMethodName();
         lineNumber = sElements[1].getLineNumber();
     }
 
 
-    public static void e(String message){
+    public static void e(String message) {
         if (!isDebuggable())
             return;
 
@@ -46,7 +46,7 @@ public class LogUtils {
     }
 
 
-    public static void i(String message){
+    public static void i(String message) {
         if (!isDebuggable())
             return;
 
@@ -54,7 +54,7 @@ public class LogUtils {
         Log.i(className, createLog(message));
     }
 
-    public static void d(String message){
+    public static void d(String message) {
         if (!isDebuggable())
             return;
 
@@ -62,7 +62,7 @@ public class LogUtils {
         Log.d(className, createLog(message));
     }
 
-    public static void v(String message){
+    public static void v(String message) {
         if (!isDebuggable())
             return;
 
@@ -70,7 +70,7 @@ public class LogUtils {
         Log.v(className, createLog(message));
     }
 
-    public static void w(String message){
+    public static void w(String message) {
         if (!isDebuggable())
             return;
 
@@ -78,7 +78,7 @@ public class LogUtils {
         Log.w(className, createLog(message));
     }
 
-    public static void wtf(String message){
+    public static void wtf(String message) {
         if (!isDebuggable())
             return;
 

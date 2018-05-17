@@ -81,7 +81,7 @@ public class QRCodeScanActivity extends TelinkBaseActivity implements ViewTreeOb
 //        this.mPreviewCallback.start();
     }
 
-    private void checkPermissionAndStart(){
+    private void checkPermissionAndStart() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             restartCamera();
         } else {
@@ -212,7 +212,6 @@ public class QRCodeScanActivity extends TelinkBaseActivity implements ViewTreeOb
             }
         }
     }
-
 
 
     @Override

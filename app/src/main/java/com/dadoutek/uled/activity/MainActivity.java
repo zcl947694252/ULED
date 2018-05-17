@@ -128,7 +128,7 @@ public final class MainActivity extends TelinkMeshErrorDealActivity implements E
                 switchContent(mContent, groupFragment);
             } else if (checkedId == R.id.tab_account) {
                 switchContent(mContent, meFragment);
-            }else if (checkedId == R.id.tab_scene) {
+            } else if (checkedId == R.id.tab_scene) {
                 switchContent(mContent, sceneFragment);
             }
         }
