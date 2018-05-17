@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    >
 
-    <include layout="@layout/title_layout" />
+    <include layout="@layout/title_layout"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,7 +13,8 @@
         android:orientation="horizontal"
         android:layout_marginStart="5dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="10dp"
+        >
 
         <TextView
             android:text="@string/tv_scene_name"
@@ -28,14 +29,14 @@
             android:maxLength="16"
             android:layout_width="230dp"
             android:layout_height="wrap_content" />
-
         <Button
             android:id="@+id/btn_sure_edit"
             android:layout_width="40dp"
             android:layout_height="25dp"
             android:text="@string/btn_sure"
             android:layout_marginStart="5dp"
-            android:background="@color/theme_positive_color" />
+            android:background="@color/colorPrimary"
+            />
     </LinearLayout>
 
     <TextView
@@ -50,36 +51,38 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/scene_group_list_view"
             android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/bt_add"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            />
 
         <Button
             android:id="@+id/bt_add"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@color/theme_positive_color"
+            android:background="@color/colorPrimary"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="10dp"
             android:layout_above="@+id/bt_save"
-            android:text="@string/bt_add" />
+            android:text="@string/bt_add"
+            />
 
         <Button
             android:id="@+id/bt_save"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/theme_positive_color"
+            android:background="@color/colorPrimary"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="10dp"
-            android:text="@string/mesh_add_button_save" />
+            android:text="@string/mesh_add_button_save"
+            />
     </RelativeLayout>
 
 </LinearLayout>

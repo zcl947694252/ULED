@@ -237,7 +237,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
 
             if (meshAddress == currentLight.meshAddress) {
                 currentLight.textColor = this.getResources().getColor(
-                        R.color.theme_positive_color);
+                        R.color.colorPrimary);
             } else {
                 currentLight.textColor = this.getResources().getColor(
                         R.color.black);

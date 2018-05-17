@@ -1,5 +1,5 @@
 package com.dadoutek.uled.model;
 
 public class UpdateStatusDeviceType {
-    public static byte NORMAL_SWITCH = 0x18;
+    public final static byte OLD_NORMAL_SWITCH = 0x18;
 }

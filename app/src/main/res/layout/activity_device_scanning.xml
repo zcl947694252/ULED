@@ -10,7 +10,7 @@
         android:id="@+id/rvToolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/header_height"
-        android:background="@color/theme_positive_color"
+        android:background="@color/colorPrimary"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -88,7 +88,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/theme_positive_color" />
+            android:background="@color/colorPrimary" />
     </LinearLayout>
 
 
@@ -133,7 +133,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/theme_positive_color"
+        android:background="@color/colorPrimary"
         android:text="log"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -146,7 +146,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/theme_positive_color"
+        android:background="@color/colorPrimary"
         android:text="Go Back"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -162,7 +162,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/theme_positive_color"
+        android:background="@color/colorPrimary"
         android:gravity="center"
         android:text="@string/add_groups"
         app:layout_constraintBottom_toTopOf="@id/grouping_completed"
@@ -179,7 +179,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/theme_positive_color"
+        android:background="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -2,9 +2,7 @@ package com.dadoutek.uled.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.view.View
 import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
@@ -22,11 +20,17 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
+
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
-import java.util.*
+import java.util.ArrayList
+import android.support.v7.widget.DividerItemDecoration
+import android.util.Log
+import android.view.MenuItem
+import android.view.View
+import com.dadoutek.uled.R.id.*
 
 
 class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> {
@@ -49,6 +53,19 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         initListener()
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> {
+                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
 
     private fun initListener() {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -87,8 +104,8 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
                         for (i in 0..(mGroupArrayList.size - 1)) {
                             if (i != mAdapter.selectedPos) {
-                                val checkBox = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox) as CheckBox
-                                checkBox.isChecked = false
+                                val cb = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox) as CheckBox
+                                cb.isChecked = false
                             }
                         }
                     } else {
@@ -121,11 +138,13 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
+                Log.d("Saw", "SelectGroupForSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
                 progressBar.visibility = View.GONE
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(root, getString(R.string.group_failed))
+                progressBar.visibility = View.GONE
             }
         }
     }
@@ -159,10 +178,10 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setUpdateDeviceList(mDeviceInfo)
 //        TelinkLightService.Instance().updateMesh(params)
 
-        TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
         val meshName = Strings.stringToBytes(mesh.name, 16)
         val password = Strings.stringToBytes(mesh.password, 16)
 
+        TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
         TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
     }
 
@@ -175,7 +194,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 //        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
 
         for (group in groupList) {
-            if (group.containsLightList.size > 0 || group.meshAddress == 0xffff)
+            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
                 mGroupArrayList.add(group)
         }
 
