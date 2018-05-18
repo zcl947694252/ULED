@@ -21,20 +21,22 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
-        DbGroupDao.createTable(db, ifNotExists);
         DbLightDao.createTable(db, ifNotExists);
+        DbUserDao.createTable(db, ifNotExists);
+        DbGroupDao.createTable(db, ifNotExists);
+        DbSceneActionsDao.createTable(db, ifNotExists);
         DbRegionDao.createTable(db, ifNotExists);
         DbSceneDao.createTable(db, ifNotExists);
-        DbSceneActionsDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
-        DbGroupDao.dropTable(db, ifExists);
         DbLightDao.dropTable(db, ifExists);
+        DbUserDao.dropTable(db, ifExists);
+        DbGroupDao.dropTable(db, ifExists);
+        DbSceneActionsDao.dropTable(db, ifExists);
         DbRegionDao.dropTable(db, ifExists);
         DbSceneDao.dropTable(db, ifExists);
-        DbSceneActionsDao.dropTable(db, ifExists);
     }
 
     /**
@@ -53,11 +55,12 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
-        registerDaoClass(DbGroupDao.class);
         registerDaoClass(DbLightDao.class);
+        registerDaoClass(DbUserDao.class);
+        registerDaoClass(DbGroupDao.class);
+        registerDaoClass(DbSceneActionsDao.class);
         registerDaoClass(DbRegionDao.class);
         registerDaoClass(DbSceneDao.class);
-        registerDaoClass(DbSceneActionsDao.class);
     }
 
     public DaoSession newSession() {

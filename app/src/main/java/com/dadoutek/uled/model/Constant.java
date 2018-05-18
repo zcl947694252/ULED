@@ -40,4 +40,10 @@ public class Constant implements Serializable {
 
     //测试账号设置
     public static String TESTACCOUNT = "xxxx";
+
+    //本地保存是否当前手机登陆过
+    public static final String IS_LOGIN = "IS_LOGIN";
+
+    //网络请求服务器测试地址
+    public static final String BASE_URL = "http://101.132.137.180/";
 }

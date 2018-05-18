@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Process;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
@@ -71,6 +72,7 @@ public class MeFragment extends Fragment {
         appVersion.setText(versionName);
         //暂时屏蔽
         updateIte.setVisibility(View.GONE);
+        copyDataBase.setVisibility(View.GONE);
     }
 
     @Override
@@ -103,7 +105,9 @@ public class MeFragment extends Fragment {
         }
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base})
+    long[] mHints = new long[6];//初始全部为0
+
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -115,7 +119,21 @@ public class MeFragment extends Fragment {
             case R.id.copy_data_base:
                 verifyStoragePermissions(getActivity());
                 break;
+            case R.id.app_version:
+                developerMode();
+                break;
         }
+
+    }
+
+    private void developerMode() {
+        //将mHints数组内的所有元素左移一个位置
+        System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
+        //获得当前系统已经启动的时间
+        mHints[mHints.length - 1] = SystemClock.uptimeMillis();
+        if (SystemClock.uptimeMillis() - mHints[0] <= 1000)
+            ToastUtils.showLong(R.string.developer_mode);
+        copyDataBase.setVisibility(View.VISIBLE);
     }
 
     //清空缓存初始化APP

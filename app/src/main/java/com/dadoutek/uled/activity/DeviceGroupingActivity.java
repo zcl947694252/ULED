@@ -58,7 +58,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                                 long id) {
             Group group = adapter.getItem(position);
             if (group.checked) {
-                ToastUtils.showLong("当前已是该组");
+                ToastUtils.showLong(R.string.tip_selected_group);
             } else {
                 deleteLightFromOldGroup();
                 allocDeviceGroup(group);

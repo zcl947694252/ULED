@@ -169,12 +169,29 @@
     <string name="scene_set">Scene assignment</string>
     <string name="setting_switch">Configuring switch</string>
     <string name="pace_fail">Configuration failed</string>
-    <string name="tip_switch">请先添加场景！再配置开关</string>
-    <string name="tip_add_scene">已经添加了所有存在的组！</string>
-    <string name="tip_save_dialog_all">当前选择包含了所有组,只有所有组的设置会生效,仍然保存？</string>
-    <string name="copy_data_base">数据库拷贝</string>
-    <string name="copy_complete">拷贝完成</string>
-    <string name="tip_add_gp">请首先添加一个组！</string>
-    <string name="empty_light">当前组没有灯！</string>
+    <string name="tip_switch">Please add scene first! Reconfiguration switch</string>
+    <string name="tip_add_scene">All existing groups have been added!</string>
+    <string name="tip_save_dialog_all">The current selection contains all the groups. Only the settings of all groups will take effect and still be saved?</string>
+    <string name="copy_data_base">Database copy</string>
+    <string name="copy_complete">Copy completed</string>
+    <string name="tip_add_gp">Please add a group first!</string>
+    <string name="empty_light">The current group has no lights!</string>
+    <string name="tip_selected_group">Currently it is this group</string>
+    <string name="developer_mode">进入开发者模式</string>
+    <string name="edit_user_name">用户名</string>
+    <string name="edit_password">密码</string>
+    <string name="edit_phone">手机号</string>
+    <string name="register_completed">完成</string>
+    <string name="registing">正在注册</string>
+    <string name="register_success">注册成功</string>
+    <string name="phone_input_error">手机号格式错误</string>
+    <string name="tip_register_input_error">用户名或密码不能包含特殊字符</string>
+    <string name="register_title_name">用户注册</string>
+    <string name="login_bt_name">登录</string>
+    <string name="user_login_title">用户登录</string>
+    <string name="logging_tip">正在登录</string>
+    <string name="login_success">登录成功</string>
+    <string name="register_name">注册</string>
+    <string name="login_fail">登录失败</string>
 
 </resources>

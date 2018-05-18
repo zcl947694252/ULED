@@ -24,8 +24,6 @@ import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
 
-import static com.dadoutek.uled.util.StringUtils.compileExChar;
-
 public final class AddMeshActivity extends TelinkBaseActivity {
 
     private ImageView backView;

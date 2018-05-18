@@ -1,14 +1,26 @@
 package com.dadoutek.uled;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TelinkBaseActivity extends AppCompatActivity {
 
     protected Toast toast;
     protected boolean foreground = false;
+    private Dialog loadDialog;
 
     @Override
     @SuppressLint("ShowToast")
@@ -51,5 +63,53 @@ public class TelinkBaseActivity extends AppCompatActivity {
 
     protected void saveLog(String log) {
         ((TelinkLightApplication) getApplication()).saveLog(log);
+    }
+
+    public void showLoadingDialog(String content) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View v = inflater.inflate(R.layout.dialogview, null);
+
+        LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);
+        TextView tvContent = (TextView) v.findViewById(R.id.tvContent);
+        tvContent.setText(content);
+
+        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
+
+        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
+                R.animator.load_animation);
+
+        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
+
+        if (loadDialog == null) {
+            loadDialog = new Dialog(this,
+                    R.style.FullHeightDialog);
+        }
+        //loadDialog没显示才把它显示出来
+        if (!loadDialog.isShowing()) {
+            loadDialog.setCancelable(true);
+            loadDialog.setCanceledOnTouchOutside(false);
+            loadDialog.setContentView(layout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            loadDialog.show();
+        }
+    }
+
+    public void hideLodingDialog() {
+        if (loadDialog != null) {
+            loadDialog.dismiss();
+        }
+    }
+
+    public boolean compileExChar(String str) {
+
+        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+
+        Pattern pattern = Pattern.compile(limitEx);
+        Matcher m = pattern.matcher(str);
+
+        if (m.find()) {
+            return true;
+        }
+        return false;
     }
 }
