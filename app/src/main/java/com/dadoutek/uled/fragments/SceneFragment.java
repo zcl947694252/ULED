@@ -11,10 +11,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.DbModel.DbSceneActions;
-import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
-import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -74,7 +73,7 @@ public class SceneFragment extends Fragment {
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
         dataManager = new DataManager(getActivity(), telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
-        scenesListData = DbSceneUtils.getAllScene();
+        scenesListData = TelinkLightApplication.getDaoInstant().getDbSceneDao().loadAll();
     }
 
     private void initView() {
@@ -156,7 +155,7 @@ public class SceneFragment extends Fragment {
         byte opcode = (byte) 0xEE;
         byte[] params;
         long id = scenesListData.get(position).getId();
-        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
         for (int i = 0; i < list.size(); i++) {
             try {
@@ -167,13 +166,13 @@ public class SceneFragment extends Fragment {
             }
         }
 
-        DbSceneUtils.deleteScene(scenesListData.get(position));
+        TelinkLightApplication.getDaoInstant().getDbSceneDao().delete(scenesListData.get(position));
         scenesListData.remove(position);
     }
 
     private void setScene(long id) throws InterruptedException {
         byte opcode = (byte) 0xEF;
-        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);

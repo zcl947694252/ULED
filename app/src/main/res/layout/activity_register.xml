@@ -5,6 +5,19 @@
 
     <include layout="@layout/title_layout"/>
 
+    <TextView
+        android:id="@+id/tv_user_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_user_password"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="18sp"
+        android:text="@string/phone_current"
+        android:layout_marginTop="180dp"
+        android:padding="5dp"
+        />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/edit_user_name"
         android:layout_width="wrap_content"
@@ -37,23 +50,6 @@
             android:maxLines="1" />
     </android.support.design.widget.TextInputLayout>
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/edit_user_phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/edit_user_password"
-        android:layout_marginTop="10dp"
-        android:layout_centerInParent="true">
-
-        <EditText
-            android:layout_width="260dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/edit_phone"
-            android:inputType="phone"
-            android:padding="5dp"
-            android:maxLength="16"
-            android:maxLines="1" />
-    </android.support.design.widget.TextInputLayout>
 
     <Button
         android:id="@+id/register_completed"
@@ -62,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:background="@drawable/btn_rec_blue_bt"
-        android:layout_below="@id/edit_user_phone"
+        android:layout_below="@id/edit_user_password"
         android:layout_centerInParent="true"
         />
 </RelativeLayout>

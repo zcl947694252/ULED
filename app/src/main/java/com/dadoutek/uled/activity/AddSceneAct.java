@@ -15,10 +15,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.DbModel.DbSceneActions;
-import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
-import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -236,7 +235,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
         dbScene.setBelongAccount(telinkLightApplication.getMesh().name);
-        DbSceneUtils.save(dbScene);
+        TelinkLightApplication.getDaoInstant().getDbSceneDao().save(dbScene);
 
         long idAction = dbScene.getId();
 
@@ -248,11 +247,11 @@ public class AddSceneAct extends TelinkBaseActivity {
             sceneActions.setColorTemperature(itemGroups.get(i).temperature);
             if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
                 sceneActions.setGroupAddr(0xFFFF);
-                DbSceneActionsUtils.save(sceneActions);
+                telinkLightApplication.getDaoInstant().getDbSceneActionsDao().save(sceneActions);
                 break;
             } else {
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                DbSceneActionsUtils.save(sceneActions);
+                telinkLightApplication.getDaoInstant().getDbSceneActionsDao().save(sceneActions);
             }
         }
 
@@ -283,7 +282,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) 0xEE;
-        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);

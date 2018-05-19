@@ -39,10 +39,10 @@ public class RegisterActivity extends TelinkBaseActivity {
     TextInputLayout editUserName;
     @BindView(R.id.edit_user_password)
     TextInputLayout editUserPassword;
-    @BindView(R.id.edit_user_phone)
-    TextInputLayout editUserPhone;
     @BindView(R.id.register_completed)
     Button registerCompleted;
+    @BindView(R.id.tv_user_phone)
+    TextView tvUserPhone;
 
     private String phone;
     private String userName;
@@ -59,6 +59,9 @@ public class RegisterActivity extends TelinkBaseActivity {
 
     private void initView() {
         txtHeaderTitle.setText(R.string.register_title_name);
+        Intent intent=getIntent();
+        phone= intent.getStringExtra("phone");
+        tvUserPhone.setText(getString(R.string.phone_current,phone));
     }
 
     @OnClick({R.id.img_header_menu_left, R.id.register_completed})
@@ -77,7 +80,7 @@ public class RegisterActivity extends TelinkBaseActivity {
 
     private void register() {
         showLoadingDialog(getString(R.string.registing));
-        MD5PassWord=md5(userPassWord);
+        MD5PassWord = md5(userPassWord);
         NetworkUtils.getRegisterApi()
                 .register(phone, MD5PassWord, userName)
                 .subscribeOn(Schedulers.io())
@@ -99,6 +102,7 @@ public class RegisterActivity extends TelinkBaseActivity {
                 Toast.makeText(RegisterActivity.this, R.string.register_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         }
 
@@ -115,7 +119,6 @@ public class RegisterActivity extends TelinkBaseActivity {
     };
 
     private boolean checkIsOK() {
-        phone = editUserPhone.getEditText().getText().toString().trim();
         userName = editUserName.getEditText().getText().toString().trim();
         userPassWord = editUserPassword.getEditText().getText().toString().trim();
 

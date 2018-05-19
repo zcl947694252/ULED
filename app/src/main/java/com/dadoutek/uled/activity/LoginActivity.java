@@ -53,6 +53,8 @@ public class LoginActivity extends TelinkBaseActivity {
     TextInputLayout editUserPhoneOrEmail;
     @BindView(R.id.btn_register)
     Button btnRegister;
+    @BindView(R.id.forget_password)
+    TextView forgetPassword;
 
     private final MyHandler mHandler = new MyHandler(this);
     private DbUser dbUser;
@@ -86,7 +88,7 @@ public class LoginActivity extends TelinkBaseActivity {
         }
     }
 
-    @OnClick({R.id.img_header_menu_left, R.id.btn_login,R.id.btn_register})
+    @OnClick({R.id.img_header_menu_left, R.id.btn_login, R.id.btn_register, R.id.forget_password})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.img_header_menu_left:
@@ -96,9 +98,20 @@ public class LoginActivity extends TelinkBaseActivity {
                 creatMessage(Cmd.GETACCOUNT, 0);
                 break;
             case R.id.btn_register:
-                startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
+                Intent intent=new Intent(LoginActivity.this, PhoneVerificationActivity.class);
+                intent.putExtra("fromLogin","register");
+                startActivity(intent);
+                break;
+            case R.id.forget_password:
+                forgetPassword();
                 break;
         }
+    }
+
+    private void forgetPassword() {
+        Intent intent=new Intent(LoginActivity.this, PhoneVerificationActivity.class);
+        intent.putExtra("fromLogin","forgetPassword");
+        startActivity(intent);
     }
 
     private void creatMessage(int what, int arg) {
@@ -176,6 +189,8 @@ public class LoginActivity extends TelinkBaseActivity {
                 LogUtils.d("logging" + stringResponse.getErrorCode() + "获取成功account");
                 dbUser.setAccount(stringResponse.getT());
                 creatMessage(Cmd.GETSALT, 0);
+            } else {
+                ToastUtils.showLong(R.string.name_or_password_error);
             }
         }
 
@@ -229,7 +244,7 @@ public class LoginActivity extends TelinkBaseActivity {
                 ToastUtils.showLong(R.string.login_success);
                 SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
                 TransformView();
-            }else{
+            } else {
                 ToastUtils.showLong(R.string.login_fail);
             }
         }

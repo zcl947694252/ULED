@@ -2,8 +2,7 @@ package com.dadoutek.uled.util;
 
 import android.content.Context;
 
-import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
-import com.dadoutek.uled.DbModel.DbSceneUtils;
+import com.dadoutek.uled.TelinkLightApplication;
 
 /**
  * Created by hejiajun on 2018/5/10.
@@ -21,8 +20,12 @@ public class DBManager {
     }
 
     public void deleteAllData() {
-        DbSceneUtils.deleteAll();
-        DbSceneActionsUtils.deleteAll();
+        TelinkLightApplication.getDaoInstant().getDbUserDao().deleteAll();
+        TelinkLightApplication.getDaoInstant().getDbSceneDao().deleteAll();
+        TelinkLightApplication.getDaoInstant().getDbSceneActionsDao().deleteAll();
+        TelinkLightApplication.getDaoInstant().getDbRegionDao().deleteAll();
+        TelinkLightApplication.getDaoInstant().getDbGroupDao().deleteAll();
+        TelinkLightApplication.getDaoInstant().getDbLightDao().deleteAll();
     }
 
     public void copyDatabaseToSDCard(Context context) {

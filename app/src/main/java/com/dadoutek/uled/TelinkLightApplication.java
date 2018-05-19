@@ -13,6 +13,7 @@ import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.FileSystem;
+import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.light.ConnectionStatus;
@@ -39,6 +40,7 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.onCreate();
         //this.doInit();
         Utils.init(this);
+        MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
 //        CrashReport.testJavaCrash();
         logInfo = new StringBuilder("log:");

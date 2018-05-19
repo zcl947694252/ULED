@@ -18,6 +18,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkUtils {
+    private static RequestInterface api;
     private static RequestInterface loginApi;
     private static RequestInterface registerApi;
     private static RequestInterface getAccountApi;
@@ -70,6 +71,19 @@ public class NetworkUtils {
             getAccountApi = retrofit.create(RequestInterface.class);
         }
         return getAccountApi;
+    }
+
+    public static RequestInterface getApi() {
+        if (api == null) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .client(okHttpClient)
+                    .baseUrl(Constant.BASE_URL)
+                    .addConverterFactory(gsonConverterFactory)
+                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
+                    .build();
+            api = retrofit.create(RequestInterface.class);
+        }
+        return api;
     }
 
     public static RequestInterface getSaltApi() {

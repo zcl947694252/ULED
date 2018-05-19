@@ -9,24 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by hejiajun on 2018/5/7.
+ * Created by hejiajun on 2018/5/18.
  */
 
-public class DbSceneActionsUtils {
-    public static DbSceneActionsDao dbSceneActionsDao = TelinkLightApplication.
-            getDaoInstant().getDbSceneActionsDao();
-
-    public static void save(DbSceneActions dbSceneActions) {
-        dbSceneActionsDao.save(dbSceneActions);
-    }
-
-    public static void deleteAll() {
-        dbSceneActionsDao.deleteAll();
-    }
+public class DBUtils {
 
     public static List<DbSceneActions> searchActionsBySceneId(long id) {
         List<DbSceneActions> list = new ArrayList<>();
-        Query<DbSceneActions> query = dbSceneActionsDao.queryBuilder().
+        Query<DbSceneActions> query = TelinkLightApplication.getDaoInstant().getDbSceneActionsDao().queryBuilder().
                 where(DbSceneActionsDao.Properties.ActionId.eq(id)).build();
         for (DbSceneActions dbSceneActions : query.list()) {
             list.add(dbSceneActions);

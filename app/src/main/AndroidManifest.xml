@@ -163,6 +163,14 @@
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/StatusTheme" />
+        <activity
+            android:name=".activity.PhoneVerificationActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
+        <activity
+            android:name=".activity.ForgetPassWordActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StatusTheme" />
     </application>
 
 </manifest>

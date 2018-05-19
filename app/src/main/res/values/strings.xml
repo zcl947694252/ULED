@@ -193,5 +193,25 @@
     <string name="login_success">登录成功</string>
     <string name="register_name">注册</string>
     <string name="login_fail">登录失败</string>
+    <string name="name_or_password_error">用户名或密码错误！</string>
+    <string name="phone_current">当前手机号：%1$s</string>
+    <string name="select_country">选择国家</string>
+    <string name="verification">验证</string>
+    <string name="send_verification">发送验证码</string>
+    <string name="VerificationCode">验证码</string>
+    <string name="send_message_success">发送成功</string>
+    <string name="send_message_fail">发送失败</string>
+    <string name="verification_code_error">验证码错误</string>
+    <string name="successful_verification">验证成功</string>
+    <string name="exit_login">退出登录</string>
+    <string name="forget_password">忘记密码？</string>
+    <string name="verification_phone">验证手机</string>
+    <string name="update_password">修改密码</string>
+    <string name="password_input_error">密码不能包含特殊字符</string>
+    <string name="different_input">两次输入不一致,请检查</string>
+    <string name="get_account_fail">获取用户失败</string>
+    <string name="tip_update_password_success">更改成功</string>
+    <string name="tip_update_password_fail">改密失败</string>
+    <string name="updating_password">正在更改</string>
 
 </resources>

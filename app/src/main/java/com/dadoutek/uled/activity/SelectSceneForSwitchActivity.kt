@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -15,16 +12,11 @@ import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.DbModel.DbScene
-import com.dadoutek.uled.DbModel.DbSceneUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
-import com.dadoutek.uled.adapter.SelectSwitchGroupRvAdapter
 import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
-import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.LogUtils
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -182,7 +174,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mSwitchList.add(getString(R.string.scene3))
         mSwitchList.add(getString(R.string.scene4))
 
-        mSceneList = DbSceneUtils.getAllScene()
+        mSceneList = TelinkLightApplication.getDaoInstant().dbSceneDao.loadAll()
     }
 
 

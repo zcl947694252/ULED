@@ -3,6 +3,15 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
+apply plugin: 'com.mob.sdk'
+
+// 在MobSDK的扩展中注册SMSSDK的相关信息
+MobSDK {
+    appKey "25cf78c05e01c"
+    appSecret "2a92040882a1b70888d4290aeb6e09c7"
+
+    SMSSDK {}
+}
 
 android {
     compileSdkVersion 27
@@ -97,4 +106,5 @@ dependencies {
 //    implementation 'com.squareup.retrofit2:adapter-rxjava2:latest.version'
     implementation 'com.squareup.okhttp3:okhttp:3.5.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    implementation 'com.hbb20:ccp:2.1.2'
 }

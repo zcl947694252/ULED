@@ -6,10 +6,13 @@ import com.dadoutek.uled.model.Response;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import okhttp3.RequestBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
@@ -26,6 +29,9 @@ public interface RequestInterface {
     Observable<Response<String>> getsalt(@Query("account") String account);
     @GET("api/auth/account")
     Observable<Response<String>> getAccount(@QueryMap Map<String, String> params);
+
+    @PUT("api/auth/forget-password")
+    Observable<Response<DbUser>> putPassword(@QueryMap Map<String, String> map);
 
     //用户注册相关接口
     @FormUrlEncoded

@@ -48,6 +48,8 @@ public class MeFragment extends Fragment {
     Button updateIte;
     @BindView(R.id.copy_data_base)
     Button copyDataBase;
+    @BindView(R.id.exit_login)
+    Button exitLogin;
     private LayoutInflater inflater;
 
     @Override
@@ -107,7 +109,7 @@ public class MeFragment extends Fragment {
 
     long[] mHints = new long[6];//初始全部为0
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -122,7 +124,14 @@ public class MeFragment extends Fragment {
             case R.id.app_version:
                 developerMode();
                 break;
+            case R.id.exit_login:
+                exitLogin();
+                break;
         }
+
+    }
+
+    private void exitLogin() {
 
     }
 

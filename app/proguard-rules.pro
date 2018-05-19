@@ -157,3 +157,7 @@ public static java.lang.String TABLENAME;
 
 # okhttp
 -dontwarn okio.**
+
+-keep class com.mob.**{*;}
+-keep class cn.smssdk.**{*;}
+-dontwarn com.mob.**
