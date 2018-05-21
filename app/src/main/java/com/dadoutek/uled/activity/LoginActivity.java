@@ -17,8 +17,10 @@ import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.LogUtils;
@@ -58,7 +60,10 @@ public class LoginActivity extends TelinkBaseActivity {
     TextInputLayout editUserPhoneOrEmail;
     @BindView(R.id.btn_register)
     Button btnRegister;
+    @BindView(R.id.forget_password)
+    TextView forgetPassword;
 
+    private final MyHandler mHandler = new MyHandler(this);
     private DbUser dbUser;
     private String salt = "";
     private String MD5Password;
@@ -100,16 +105,27 @@ public class LoginActivity extends TelinkBaseActivity {
         }
     }
 
-    @OnClick({R.id.btn_login, R.id.btn_register})
+    @OnClick({ R.id.btn_login, R.id.btn_register, R.id.forget_password})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_login:
                 login();
                 break;
             case R.id.btn_register:
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                Intent intent=new Intent(LoginActivity.this, PhoneVerificationActivity.class);
+                intent.putExtra("fromLogin","register");
+                startActivity(intent);
+                break;
+            case R.id.forget_password:
+                forgetPassword();
                 break;
         }
+    }
+
+    private void forgetPassword() {
+        Intent intent=new Intent(LoginActivity.this, PhoneVerificationActivity.class);
+        intent.putExtra("fromLogin","forgetPassword");
+        startActivity(intent);
     }
 
     @Override
@@ -169,8 +185,7 @@ public class LoginActivity extends TelinkBaseActivity {
                 LogUtils.d("logging" + stringResponse.getErrorCode() + "登录成功");
                 ToastUtils.showLong(R.string.login_success);
                 SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
-
-                setupMesh();
+                initDatBase(stringResponse.getT());
                 TransformView();
             } else {
                 ToastUtils.showLong(R.string.login_fail);
@@ -187,6 +202,19 @@ public class LoginActivity extends TelinkBaseActivity {
         public void onComplete() {
         }
     };
+
+    private void initDatBase(DbUser user) {
+        //首先保存当前数据库名
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),Constant.DB_NAME_KEY,user.getAccount());
+
+        //数据库分库
+        DaoSessionInstance.destroySession();
+        DaoSessionInstance.getInstance();
+
+        //从云端用户表同步数据到本地
+        dbUser=user;
+        DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
+    }
 
     private void setupMesh() {
         String name = SharedPreferencesHelper.getMeshName(this);
@@ -206,13 +234,12 @@ public class LoginActivity extends TelinkBaseActivity {
             SharedPreferencesHelper.saveMeshPassword(this, Constant.NEW_MESH_PASSWORD);
         }
     }
-
     private void TransformView() {
-//        if (isFirstLauch) {
-//            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
-//        } else {
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-//        }
+        if (isFirstLauch) {
+            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
+        } else {
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        }
     }
 
     @Override

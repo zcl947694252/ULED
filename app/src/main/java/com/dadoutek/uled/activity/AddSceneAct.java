@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,10 +15,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.DbModel.DbSceneActions;
-import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
-import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -27,10 +25,10 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.adapter.GroupListAdapter;
 import com.dadoutek.uled.adapter.SceneGroupAdapter;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.ItemGroup;
-import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.StringUtils;
@@ -238,7 +236,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
         dbScene.setBelongAccount(telinkLightApplication.getMesh().name);
-        DbSceneUtils.save(dbScene);
+        DaoSessionInstance.getInstance().getDbSceneDao().save(dbScene);
 
         long idAction = dbScene.getId();
 
@@ -250,11 +248,11 @@ public class AddSceneAct extends TelinkBaseActivity {
             sceneActions.setColorTemperature(itemGroups.get(i).temperature);
             if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
                 sceneActions.setGroupAddr(0xFFFF);
-                DbSceneActionsUtils.save(sceneActions);
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
                 break;
             } else {
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                DbSceneActionsUtils.save(sceneActions);
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
             }
         }
 
@@ -285,11 +283,10 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);
-            Log.d("Saw", "brightness = " + list.get(i).getBrightness() + " CT = " + list.get(i).getColorTemperature());
             params = new byte[]{0x01, (byte) id, (byte) list.get(i).getBrightness(),
                     (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) list.get(i).getColorTemperature()};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);

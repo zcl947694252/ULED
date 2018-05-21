@@ -36,8 +36,6 @@ import static com.dadoutek.uled.util.NetworkUtils.md5;
 public class RegisterActivity extends TelinkBaseActivity {
     @BindView(R.id.edit_user_password)
     TextInputLayout editUserPassword;
-    @BindView(R.id.edit_user_phone)
-    TextInputLayout editUserPhone;
     @BindView(R.id.register_completed)
     Button registerCompleted;
     @BindView(R.id.toolbar)
@@ -92,7 +90,7 @@ public class RegisterActivity extends TelinkBaseActivity {
 
     private void register() {
         showLoadingDialog(getString(R.string.registing));
-        MD5PassWord=md5(userPassWord);
+        MD5PassWord = md5(userPassWord);
         NetworkUtils.getRegisterApi()
                 .register(phone, MD5PassWord, userName)
                 .subscribeOn(Schedulers.io())
@@ -114,6 +112,7 @@ public class RegisterActivity extends TelinkBaseActivity {
                 Toast.makeText(RegisterActivity.this, R.string.register_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         }
 
@@ -130,8 +129,7 @@ public class RegisterActivity extends TelinkBaseActivity {
     };
 
     private boolean checkIsOK() {
-        phone = editUserPhone.getEditText().getText().toString().trim();
-        userName = phone;
+        userName = editUserName.getEditText().getText().toString().trim();
         userPassWord = editUserPassword.getEditText().getText().toString().trim();
 
         if (compileExChar(phone)) {

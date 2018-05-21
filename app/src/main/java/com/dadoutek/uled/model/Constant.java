@@ -46,4 +46,10 @@ public class Constant implements Serializable {
 
     //网络请求服务器测试地址
     public static final String BASE_URL = "http://101.132.137.180/";
+
+    //用于标记当前数据库名的本地存储
+    public static String DB_NAME_KEY="DB_NAME_KEY";
+
+    //用于标记当前数据库名的本地存储
+    public static String DB_TOken_KEY="DB_NAME_KEY";
 }

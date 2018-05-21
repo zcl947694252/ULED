@@ -1,15 +1,19 @@
 package com.dadoutek.uled.intf;
 
+import com.dadoutek.uled.DbModel.DbRegion;
 import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 
 import java.util.Map;
 
 import io.reactivex.Observable;
+import okhttp3.RequestBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
@@ -27,9 +31,19 @@ public interface RequestInterface {
     @GET("api/auth/account")
     Observable<Response<String>> getAccount(@QueryMap Map<String, String> params);
 
+    @PUT("api/auth/forget-password")
+    Observable<Response<DbUser>> putPassword(@QueryMap Map<String, String> map);
+
     //用户注册相关接口
     @FormUrlEncoded
     @POST("api/ext/soybean/register")
     Observable<Response<DbUser>> register(@Field("phone") String phone, @Field("password")
             String password, @Field("name") String name);
+
+    //区域相关接口
+    @POST("api/ext/soybean/region/add")
+    Observable<Response<DbRegion>> addRegion(@Field("token") String token, @Field("controlMesh") String controlMesh,
+                                             @Field("installMesh") String installMesh,@Field("installMeshPwd") String installMeshPwd);
+    @GET("api/ext/soybean/region/list")
+    Observable<Response<DbRegion>> getRegionList(@Query("token") String token);
 }

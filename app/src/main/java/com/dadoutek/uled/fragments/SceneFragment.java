@@ -11,10 +11,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.DbModel.DbSceneActions;
-import com.dadoutek.uled.DbModel.DbSceneActionsUtils;
-import com.dadoutek.uled.DbModel.DbSceneUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -24,6 +23,7 @@ import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.model.DaoSessionInstance;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class SceneFragment extends Fragment {
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
         dataManager = new DataManager(getActivity(), telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
-        scenesListData = DbSceneUtils.getAllScene();
+        scenesListData = DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
     }
 
     private void initView() {
@@ -157,7 +157,7 @@ public class SceneFragment extends Fragment {
         byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
         long id = scenesListData.get(position).getId();
-        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
         for (int i = 0; i < list.size(); i++) {
             try {
@@ -168,13 +168,13 @@ public class SceneFragment extends Fragment {
             }
         }
 
-        DbSceneUtils.deleteScene(scenesListData.get(position));
+        DaoSessionInstance.getInstance().getDbSceneDao().delete(scenesListData.get(position));
         scenesListData.remove(position);
     }
 
     private void setScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_LOAD;
-        List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);

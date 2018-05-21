@@ -13,6 +13,7 @@ import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.FileSystem;
+import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.light.ConnectionStatus;
@@ -39,32 +40,33 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.onCreate();
         //this.doInit();
         Utils.init(this);
+        MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
 //        CrashReport.testJavaCrash();
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 //        AdvanceStrategy.setDefault(new MySampleAdvanceStrategy());
-        setupDatabase();
+//        setupDatabase();
     }
 
-    /**
-     * 配置数据库
-     */
-    private void setupDatabase() {
-        //创建数据库shop.db"
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "uled.db", null);
-        //获取可写数据库
-        SQLiteDatabase db = helper.getWritableDatabase();
-        //获取数据库对象
-        DaoMaster daoMaster = new DaoMaster(db);
-        //获取Dao对象管理者
-        daoSession = daoMaster.newSession();
-    }
-
-    public static DaoSession getDaoInstant() {
-        return daoSession;
-    }
+//    /**
+//     * 配置数据库
+//     */
+//    private void setupDatabase() {
+//        //创建数据库shop.db"
+//        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "uled.db", null);
+//        //获取可写数据库
+//        SQLiteDatabase db = helper.getWritableDatabase();
+//        //获取数据库对象
+//        DaoMaster daoMaster = new DaoMaster(db);
+//        //获取Dao对象管理者
+//        daoSession = daoMaster.newSession();
+//    }
+//
+//    public static DaoSession getDaoInstant() {
+//        return daoSession;
+//    }
 
     public int getOnlineCount() {
         return onlineCount;

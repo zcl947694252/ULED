@@ -19,6 +19,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
+import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.Opcode
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -186,7 +187,8 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mSwitchList.add(getString(R.string.scene2))
         mSwitchList.add(getString(R.string.scene3))
         mSwitchList.add(getString(R.string.scene4))
-        mSceneList = DbSceneUtils.getAllScene()
+
+        mSceneList = DaoSessionInstance.getInstance().dbSceneDao.loadAll()
     }
 
 
