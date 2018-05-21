@@ -764,7 +764,6 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                             openLoadingDialog(getString(R.string.loading));
                         }, delay);
                     } else {
-                        // TODO: 2018/3/26 弹框提示为何需要此权限，点击确定后再次申请权限，点击取消退出.
                         AlertDialog.Builder dialog = new AlertDialog.Builder(DeviceScanningActivity.this);
                         dialog.setMessage(getResources().getString(R.string.scan_tip));
                         dialog.setPositiveButton(R.string.btn_ok, (dialog1, which) -> startScan(0));
@@ -995,7 +994,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 (byte) (groupAddress >> 8 & 0xFF)};
 
 //        Log.d("Scanner", "checkSelectLamp: " + "opcode:" + opcode + ";  dstAddress:" + dstAddress + ";  params:" + params.toString());
-//        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  group:name=="+group.name+";  group:name=="+group.meshAddress+";  lighthas"+light.hasGroup);
+//        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  men_group:name=="+men_group.name+";  men_group:name=="+men_group.meshAddress+";  lighthas"+light.hasGroup);
 
         if (group.checked) {
             params[0] = 0x01;
@@ -1067,7 +1066,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
 
                 if (group != null) {
                 }
-//                    group.checked = false;
+//                    men_group.checked = false;
             }
 
             int groupAddress;
@@ -1085,7 +1084,7 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
                 group = this.groupsRecyclerViewAdapter.get(groupAddress);
 
                 if (group != null) {
-//                    group.checked = true;
+//                    men_group.checked = true;
                 }
             }
 

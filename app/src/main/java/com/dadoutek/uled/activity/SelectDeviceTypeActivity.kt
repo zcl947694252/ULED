@@ -16,7 +16,7 @@ class SelectDeviceTypeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_select_device_type)
 
         setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.select_device)
+        supportActionBar?.title = getString(R.string.select_install_device)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         initListener()
     }

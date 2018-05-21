@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,6 +30,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.ItemGroup;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.StringUtils;
@@ -282,11 +284,12 @@ public class AddSceneAct extends TelinkBaseActivity {
     }
 
     private void addScene(long id) throws InterruptedException {
-        byte opcode = (byte) 0xEE;
+        byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
         List<DbSceneActions> list = DbSceneActionsUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);
+            Log.d("Saw", "brightness = " + list.get(i).getBrightness() + " CT = " + list.get(i).getColorTemperature());
             params = new byte[]{0x01, (byte) id, (byte) list.get(i).getBrightness(),
                     (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) list.get(i).getColorTemperature()};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);

@@ -6,13 +6,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.DbModel.DbScene
 import com.dadoutek.uled.DbModel.DbSceneUtils
 import com.dadoutek.uled.R
@@ -30,6 +30,7 @@ import com.telink.util.Strings
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
 class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> {
@@ -71,6 +72,12 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -158,7 +165,11 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
     private fun initView() {
         if (mSceneList.isEmpty()) {
-            ToastUtils.showLong(getString(R.string.tip_switch))
+//            ToastUtils.showLong(getString(R.string.tip_switch))
+            fab.visibility = View.GONE
+            indefiniteSnackbar(root, R.string.tip_switch, R.string.btn_ok) {
+                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+            }
             return
         }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)
@@ -175,7 +186,6 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mSwitchList.add(getString(R.string.scene2))
         mSwitchList.add(getString(R.string.scene3))
         mSwitchList.add(getString(R.string.scene4))
-
         mSceneList = DbSceneUtils.getAllScene()
     }
 

@@ -126,10 +126,10 @@ public class DataManager {
 
 //    /**
 //     * 更改指定组的信息
-//     * @param group
+//     * @param men_group
 //     * @param position
 //     */
-//    public void updateGroup(Groups group,int position){
+//    public void updateGroup(Groups men_group,int position){
 //        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.GROUPS_KEY,groups);
 //    }
 

@@ -133,7 +133,7 @@
     <string name="device_not_connected">设备未连接！</string>
 
     <string name="smartSwitch">开关</string>
-    <string name="select_device">选择设备</string>
+    <string name="select_install_device">选择安装设备</string>
     <string name="install_switch">安装开关</string>
     <string name="search">搜索</string>
     <string name="complete">完成</string>
@@ -192,4 +192,6 @@
     <string name="login_success">登录成功</string>
     <string name="register_name">注册</string>
     <string name="login_fail">登录失败</string>
+    <string name="add">添加</string>
+    <string name="open_location_service">请打开“位置服务”</string>
 </resources>

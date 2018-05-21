@@ -1,11 +1,16 @@
 package com.dadoutek.uled.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -19,8 +24,10 @@ import android.widget.TextView;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.activity.AddMeshActivity;
 import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
+import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
@@ -46,10 +53,10 @@ public final class GroupListFragment extends Fragment {
         public boolean onItemLongClick(AdapterView<?> parent, View view,
                                        int position, long id) {
 
-//            Group group = adapter.getItem(position);
+//            Group men_group = adapter.getItem(position);
 //
 //            Intent intent = new Intent(mContext, GroupSettingActivity.class);
-//            intent.putExtra("groupAddress", group.meshAddress);
+//            intent.putExtra("groupAddress", men_group.meshAddress);
 //
 //            startActivityForResult(intent, 0);
 
@@ -72,6 +79,7 @@ public final class GroupListFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
         this.mContext = this.getActivity();
+        setHasOptionsMenu(true);
 
     }
 
@@ -96,11 +104,37 @@ public final class GroupListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_group_list, null);
 
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.group_list_header);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
         gridView = (GridView) view.findViewById(R.id.list_groups);
         gridView.setOnItemLongClickListener(this.itemLongClickListener);
 
         this.initData();
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_setting:
+                Intent intent = new Intent(mContext, AddMeshActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.menu_add:
+                TelinkLightService.Instance().idleMode(true);
+                startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

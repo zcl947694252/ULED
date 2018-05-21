@@ -72,10 +72,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     private fun initListener() {
-        this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
         progressBtn.onClick {
             if (progressBtn.progress <= 0) {
                 mRetryLoginCount = 0
@@ -87,6 +83,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             }
         }
 
+    }
+
+    private fun addEventListener() {
+        this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
+        this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     private fun handleIfSupportBle() {
@@ -138,10 +140,16 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         TelinkLightService.Instance().disconnect()
-        this.mApplication.removeEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication.removeEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication.removeEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        addEventListener()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        this.mApplication.removeEventListener(this)
     }
 
     override fun performed(event: Event<String>?) {

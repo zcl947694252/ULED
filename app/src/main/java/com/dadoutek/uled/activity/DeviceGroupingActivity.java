@@ -33,6 +33,8 @@ import com.telink.util.EventListener;
 
 import java.util.ArrayList;
 
+import retrofit2.http.HEAD;
+
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
 
     private final static int UPDATE = 1;

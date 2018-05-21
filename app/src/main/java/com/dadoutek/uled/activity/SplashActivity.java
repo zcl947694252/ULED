@@ -21,7 +21,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     private static final int REQ_MESH_SETTING = 0x01;
     private TelinkLightApplication mApplication;
     boolean mIsFirstData = true;
-    boolean mIsLogging= false;
+    boolean mIsLogging = false;
     public static final String IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH";
 
     @Override
@@ -42,27 +42,27 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 
         //判断是否是第一次使用app，启动导航页
         mIsFirstData = SharedPreferencesHelper.getBoolean(SplashActivity.this, IS_FIRST_LAUNCH, true);
-        mIsLogging=SharedPreferencesHelper.getBoolean(SplashActivity.this, Constant.IS_LOGIN, false);
+        mIsLogging = SharedPreferencesHelper.getBoolean(SplashActivity.this, Constant.IS_LOGIN, false);
 
-        if (mIsFirstData) {
-            initMesh();
-            initGroupData();
-            gotoLoginSetting(true);
-            //把是否是第一次进入设为false
-//            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
+//        if (mIsFirstData) {
+//            initMesh();
+//            initGroupData();
+//            gotoLoginSetting(true);
+//            //把是否是第一次进入设为false
+////            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
+//        } else {
+        if (mIsLogging) {
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
         } else {
-            if(mIsLogging){
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            }else{
-                gotoLoginSetting(false);
-            }
+            gotoLoginSetting(false);
         }
+//        }
     }
 
     private void gotoLoginSetting(Boolean isFrist) {
-        Intent intent=new Intent(SplashActivity.this,LoginActivity.class);
-        intent.putExtra(IS_FIRST_LAUNCH,isFrist);
+        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+        intent.putExtra(IS_FIRST_LAUNCH, isFrist);
         startActivity(intent);
     }
 

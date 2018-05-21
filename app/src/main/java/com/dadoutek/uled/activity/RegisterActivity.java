@@ -3,6 +3,9 @@ package com.dadoutek.uled.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -31,18 +34,14 @@ import static com.dadoutek.uled.util.NetworkUtils.md5;
  */
 
 public class RegisterActivity extends TelinkBaseActivity {
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
-    @BindView(R.id.edit_user_name)
-    TextInputLayout editUserName;
     @BindView(R.id.edit_user_password)
     TextInputLayout editUserPassword;
     @BindView(R.id.edit_user_phone)
     TextInputLayout editUserPhone;
     @BindView(R.id.register_completed)
     Button registerCompleted;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private String phone;
     private String userName;
@@ -58,15 +57,31 @@ public class RegisterActivity extends TelinkBaseActivity {
     }
 
     private void initView() {
-        txtHeaderTitle.setText(R.string.register_title_name);
+        initToolbar();
     }
 
-    @OnClick({R.id.img_header_menu_left, R.id.register_completed})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.img_header_menu_left:
+    private void initToolbar() {
+        toolbar.setTitle(R.string.register_title_name);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
                 finish();
                 break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick(R.id.register_completed)
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
             case R.id.register_completed:
                 if (checkIsOK()) {
                     register();
@@ -116,7 +131,7 @@ public class RegisterActivity extends TelinkBaseActivity {
 
     private boolean checkIsOK() {
         phone = editUserPhone.getEditText().getText().toString().trim();
-        userName = editUserName.getEditText().getText().toString().trim();
+        userName = phone;
         userPassWord = editUserPassword.getEditText().getText().toString().trim();
 
         if (compileExChar(phone)) {

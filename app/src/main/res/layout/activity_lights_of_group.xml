@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <include layout="@layout/title_layout" />
+    <include layout="@layout/toolbar" />
 
     <LinearLayout
         android:layout_marginTop="10dp"
@@ -17,6 +17,6 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_lights"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent" />
     </LinearLayout>
 </LinearLayout>

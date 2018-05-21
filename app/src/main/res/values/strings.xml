@@ -133,7 +133,7 @@
     <string name="device_not_connected">The device is not connected!</string>
 
     <string name="smartSwitch">switch</string>
-    <string name="select_device">select device </string>
+    <string name="select_install_device">Select device to install</string>
     <string name="install_switch">install switch</string>
     <string name="install_switch_tips1">1.Plug micro USB to your Switch</string>
     <string name="install_switch_tips2">2.Press any button one time</string>
@@ -193,5 +193,7 @@
     <string name="login_success">登录成功</string>
     <string name="register_name">注册</string>
     <string name="login_fail">登录失败</string>
+    <string name="add">Add</string>
+    <string name="open_location_service">Please open "Location service"</string>
 
 </resources>
