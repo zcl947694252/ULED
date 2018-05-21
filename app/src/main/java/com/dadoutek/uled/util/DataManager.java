@@ -5,6 +5,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
@@ -109,7 +111,7 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
 
-    public void saveGroups(Groups groups){
+    public void saveGroups(List<DbGroup>groups){
         SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
@@ -176,28 +178,30 @@ public class DataManager {
      * @param name   自定义组名
      * @param groups 当前组集
      */
-    public void creatGroup(String name, Groups groups, Context context) {
+    public void creatGroup(String name, List<DbGroup> groups, Context context) {
         if (!checkRepeat(groups, context, name)) {
             int count = groups.size();
             int newMeshAdress = ++count;
-            Group group = new Group();
-            group.name = name;
-            group.meshAddress = 0x8001 + newMeshAdress;
-            group.brightness = 100;
-            group.temperature = 100;
-            group.color = 0xFFFFFF;
+            DbGroup group = new DbGroup();
+            group.setName(name);
+            group.setMeshAddr(0x8001 + newMeshAdress);
+            group.setBrightness(100);
+            group.setColorTemperature(100);
             groups.add(group);
+            //保留本地储存
             SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
                     mMeshName + mPwd + Constant.GROUPS_KEY, groups);
+            //新增数据库保存
+            DBUtils.saveGroup(group);
         }
     }
 
-    public boolean checkRepeat(Groups groups, Context context, String newName) {
+    public boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {
         for (
                 int k = 0; k < groups.size(); k++)
 
         {
-            if (groups.get(k).name.equals(newName)) {
+            if (groups.get(k).getName().equals(newName)) {
                 Toast.makeText(context, R.string.creat_group_fail_tip, Toast.LENGTH_LONG).show();
                 return true;
             }

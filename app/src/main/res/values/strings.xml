@@ -213,5 +213,6 @@
     <string name="tip_update_password_success">更改成功</string>
     <string name="tip_update_password_fail">改密失败</string>
     <string name="updating_password">正在更改</string>
+    <string name="tip_add_group">请先添加一个分组</string>
 
 </resources>

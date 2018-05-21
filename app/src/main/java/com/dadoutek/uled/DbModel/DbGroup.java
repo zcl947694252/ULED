@@ -4,6 +4,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -18,6 +19,9 @@ public class DbGroup {
     private int brightness;
     private int colorTemperature;
     private int belongRegionId;
+
+    @Transient
+    public boolean checked;
 
     @Generated(hash = 55678821)
     public DbGroup(Long id, int meshAddr, String name, int brightness,

@@ -7,10 +7,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
+
+import java.util.List;
 
 /**
  * Created by hejiajun on 2018/3/28.
@@ -18,7 +21,7 @@ import com.dadoutek.uled.model.Groups;
 
 public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
 
-    private Groups mGroupList;
+    private List<DbGroup> mGroupList;
     //声明自定义的监听接口
     private OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener = null;
 
@@ -43,7 +46,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         }
     }
 
-    public GroupsRecyclerViewAdapter(Groups mGroupList, OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener) {
+    public GroupsRecyclerViewAdapter(List<DbGroup> mGroupList, OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener) {
         this.mGroupList = mGroupList;
         this.mOnRecyclerviewItemClickListener = mOnRecyclerviewItemClickListener;
     }
@@ -58,8 +61,8 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Group group = mGroupList.get(position);
-        holder.groupName.setText(group.name);
+        DbGroup group = mGroupList.get(position);
+        holder.groupName.setText(group.getName());
         holder.itemView.setTag(position);//给view设置tag以作为参数传递到监听回调方法中
         if (mGroupList.get(position).checked) {
             holder.groupImage.setImageResource(R.drawable.ic_group_black_48dp);
@@ -67,7 +70,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
             holder.groupImage.setImageResource(R.drawable.ic_group_white_48dp);
         }
 
-        if (mGroupList.get(position).meshAddress == 0xffff) {
+        if (mGroupList.get(position).getMeshAddr() == 0xffff) {
             RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
             holder.itemView.setVisibility(View.GONE);
             param.height = 0;

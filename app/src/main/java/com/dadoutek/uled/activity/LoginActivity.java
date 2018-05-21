@@ -299,7 +299,7 @@ public class LoginActivity extends TelinkBaseActivity {
      */
     private void gotoDeviceScanning() {
         //首次进入APP才进入引导流程
-        Intent intent = new Intent(LoginActivity.this, DeviceScanningActivity.class);
+        Intent intent = new Intent(LoginActivity.this, DeviceScanningNewActivity.class);
         intent.putExtra("isInit", true);
         startActivity(intent);
         finish();

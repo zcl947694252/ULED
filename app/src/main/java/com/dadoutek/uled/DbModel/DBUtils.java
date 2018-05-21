@@ -1,13 +1,18 @@
 package com.dadoutek.uled.DbModel;
 
+import android.content.Context;
 import android.graphics.Region;
+import android.widget.Toast;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -30,6 +35,11 @@ public class DBUtils {
         return list;
     }
 
+    public static String getGroupNameByID(Long id){
+        DbGroup group=DaoSessionInstance.getInstance().getDbGroupDao().load(id);
+        return group.getName();
+    }
+
     public static void saveRegion(DbRegion dbRegion){
         //判断原来是否保存过这个区域
         DbRegion dbRegionOld=DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
@@ -42,17 +52,48 @@ public class DBUtils {
         }
     }
 
-    public static void saveGroups(Groups groups){
-        DbRegion region=new DbRegion();
-        for(int i=0;i<groups.size();i++){
-            DbGroup dbGroup=new DbGroup();
-            dbGroup.setBelongRegionId(region.getId().intValue());
-            dbGroup.setBrightness(groups.get(i).brightness);
-            dbGroup.setColorTemperature(groups.get(i).temperature);
-            dbGroup.setMeshAddr(groups.get(i).meshAddress);
-            dbGroup.setName(groups.get(i).name);
-            DaoSessionInstance.getInstance().getDbGroupDao().insert(dbGroup);
+    public static void saveGroup(DbGroup group){
+        DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
+    }
+
+    public static void saveLight(DbLight light){
+        DaoSessionInstance.getInstance().getDbLightDao().insertOrReplace(light);
+    }
+
+    public static void updateGroup(DbGroup group){
+        DaoSessionInstance.getInstance().getDbGroupDao().update(group);
+    }
+
+    public static void updateLight(DbLight light){
+        DaoSessionInstance.getInstance().getDbLightDao().update(light);
+    }
+
+    public static void addNewGroup(String name,List<DbGroup> groups,Context context){
+        if (!checkRepeat(groups, context, name)) {
+            int count = groups.size();
+            int newMeshAdress = ++count;
+            DbGroup group = new DbGroup();
+            group.setName(name);
+            group.setMeshAddr(0x8001 + newMeshAdress);
+            group.setBrightness(100);
+            group.setColorTemperature(100);
+            groups.add(group);
+            //新增数据库保存
+            DBUtils.saveGroup(group);
         }
+    }
+
+    public static boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {
+        for (
+                int k = 0; k < groups.size(); k++)
+
+        {
+            if (groups.get(k).getName().equals(newName)) {
+                Toast.makeText(context, R.string.creat_group_fail_tip, Toast.LENGTH_LONG).show();
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void saveLight(Lights lights){
