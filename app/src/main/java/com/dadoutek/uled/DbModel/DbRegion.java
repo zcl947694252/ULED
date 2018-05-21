@@ -19,7 +19,6 @@ public class DbRegion {
     private String installMesh;
     private String installMeshPwd;
 
-    @NotNull
     private String belongAccount;
 
     @Generated(hash = 1474362139)

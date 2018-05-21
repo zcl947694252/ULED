@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -400,9 +401,10 @@ public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity im
             if (checkLightsHaveGroup()) {//所有灯都有分组可以跳转
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
-                mDataManager.updateGroup(groups);
+                mDataManager.saveGroups(groups);
                 mDataManager.updateLights(nowLightList);
 
+                DBUtils.saveGroups(groups);
 
                 TelinkLightService.Instance().idleMode(true);
                 //目前测试调到主页

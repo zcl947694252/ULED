@@ -1,9 +1,13 @@
 package com.dadoutek.uled.DbModel;
 
+import android.graphics.Region;
+
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.Groups;
+import com.dadoutek.uled.model.Lights;
 
 import org.greenrobot.greendao.query.Query;
 
@@ -27,21 +31,35 @@ public class DBUtils {
     }
 
     public static void saveRegion(DbRegion dbRegion){
-//        if(queryRegionCheckRepeat(dbRegion)){
-//            DaoSessionInstance.getInstance().getDbRegionDao().update(dbRegion);
-//        }else{
-//
-//        }
-    }
-
-    //如果控制mesh重复则判定为重复
-    public static boolean queryRegionCheckRepeatAndSave(DbRegion dbRegion){
-        DbRegion dbRegionNew=DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
+        //判断原来是否保存过这个区域
+        DbRegion dbRegionOld=DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
                 where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.getControlMesh())).unique();
-        if(dbRegionNew==null){//直接插入
+        if(dbRegionOld==null){//直接插入
             DaoSessionInstance.getInstance().getDbRegionDao().insert(dbRegion);
         }else{//更新数据库
-            DaoSessionInstance.getInstance().getDbRegionDao()
+            dbRegion.setId(dbRegionOld.getId());
+            DaoSessionInstance.getInstance().getDbRegionDao().update(dbRegion);
         }
     }
+
+    public static void saveGroups(Groups groups){
+        DbRegion region=new DbRegion();
+        for(int i=0;i<groups.size();i++){
+            DbGroup dbGroup=new DbGroup();
+            dbGroup.setBelongRegionId(region.getId().intValue());
+            dbGroup.setBrightness(groups.get(i).brightness);
+            dbGroup.setColorTemperature(groups.get(i).temperature);
+            dbGroup.setMeshAddr(groups.get(i).meshAddress);
+            dbGroup.setName(groups.get(i).name);
+            DaoSessionInstance.getInstance().getDbGroupDao().insert(dbGroup);
+        }
+    }
+
+    public static void saveLight(Lights lights){
+
+    }
+
+//    public static Long getGroupIdByMeshAddress(){
+//
+//    }
 }

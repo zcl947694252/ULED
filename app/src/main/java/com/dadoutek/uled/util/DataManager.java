@@ -109,6 +109,11 @@ public class DataManager {
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
 
+    public void saveGroups(Groups groups){
+        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                mMeshName + mPwd + Constant.GROUPS_KEY, groups);
+    }
+
     public void updateGroup(Group group, Context context) {
         if (group.meshAddress == 0xFFFF) {
             SharedPreferencesHelper.putObject(context, mMeshName + mPwd + Constant.GROUPS_KEY_ALL, group);

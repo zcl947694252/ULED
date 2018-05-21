@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbRegion;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -219,9 +221,20 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             SharedPreferencesHelper.saveMeshName(this, mesh.name);
             SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
 //            this.showToast("Save Mesh Success");
+            saveToDataBase(factoryName,factoryPwd,mNewMeshName,mNewMeshPwd);
         }
 
 
+    }
+
+    private void saveToDataBase(String factoryName, String factoryPwd, String mNewMeshName, String mNewMeshPwd) {
+        DbRegion dbRegio=new DbRegion();
+        dbRegio.setBelongAccount("");
+        dbRegio.setControlMesh(mNewMeshName);
+        dbRegio.setControlMeshPwd(mNewMeshPwd);
+        dbRegio.setInstallMesh(factoryName);
+        dbRegio.setInstallMeshPwd(factoryPwd);
+        DBUtils.saveRegion(dbRegio);
     }
 
 }
