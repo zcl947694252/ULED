@@ -21,6 +21,7 @@ import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.util.DataManager;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public class SceneFragment extends Fragment {
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
         dataManager = new DataManager(getActivity(), telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
-        scenesListData = TelinkLightApplication.getDaoInstant().getDbSceneDao().loadAll();
+        scenesListData = DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
     }
 
     private void initView() {
@@ -166,7 +167,7 @@ public class SceneFragment extends Fragment {
             }
         }
 
-        TelinkLightApplication.getDaoInstant().getDbSceneDao().delete(scenesListData.get(position));
+        DaoSessionInstance.getInstance().getDbSceneDao().delete(scenesListData.get(position));
         scenesListData.remove(position);
     }
 

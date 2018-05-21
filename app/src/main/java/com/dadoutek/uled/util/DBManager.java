@@ -3,6 +3,7 @@ package com.dadoutek.uled.util;
 import android.content.Context;
 
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.model.DaoSessionInstance;
 
 /**
  * Created by hejiajun on 2018/5/10.
@@ -20,12 +21,12 @@ public class DBManager {
     }
 
     public void deleteAllData() {
-        TelinkLightApplication.getDaoInstant().getDbUserDao().deleteAll();
-        TelinkLightApplication.getDaoInstant().getDbSceneDao().deleteAll();
-        TelinkLightApplication.getDaoInstant().getDbSceneActionsDao().deleteAll();
-        TelinkLightApplication.getDaoInstant().getDbRegionDao().deleteAll();
-        TelinkLightApplication.getDaoInstant().getDbGroupDao().deleteAll();
-        TelinkLightApplication.getDaoInstant().getDbLightDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbRegionDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbGroupDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbLightDao().deleteAll();
     }
 
     public void copyDatabaseToSDCard(Context context) {

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.intf;
 
+import com.dadoutek.uled.DbModel.DbRegion;
 import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 
@@ -38,4 +39,11 @@ public interface RequestInterface {
     @POST("api/ext/soybean/register")
     Observable<Response<DbUser>> register(@Field("phone") String phone, @Field("password")
             String password, @Field("name") String name);
+
+    //区域相关接口
+    @POST("api/ext/soybean/region/add")
+    Observable<Response<DbRegion>> addRegion(@Field("token") String token, @Field("controlMesh") String controlMesh,
+                                             @Field("installMesh") String installMesh,@Field("installMeshPwd") String installMeshPwd);
+    @GET("api/ext/soybean/region/list")
+    Observable<Response<DbRegion>> getRegionList(@Query("token") String token);
 }

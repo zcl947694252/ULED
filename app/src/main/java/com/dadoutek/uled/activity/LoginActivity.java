@@ -15,8 +15,11 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.LogUtils;
@@ -243,6 +246,7 @@ public class LoginActivity extends TelinkBaseActivity {
                 LogUtils.d("logging" + stringResponse.getErrorCode() + "登录成功");
                 ToastUtils.showLong(R.string.login_success);
                 SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
+                initDatBase(stringResponse.getT());
                 TransformView();
             } else {
                 ToastUtils.showLong(R.string.login_fail);
@@ -259,6 +263,19 @@ public class LoginActivity extends TelinkBaseActivity {
         public void onComplete() {
         }
     };
+
+    private void initDatBase(DbUser user) {
+        //首先保存当前数据库名
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),Constant.DB_NAME_KEY,user.getAccount());
+
+        //数据库分库
+        DaoSessionInstance.destroySession();
+        DaoSessionInstance.getInstance();
+
+        //从云端用户表同步数据到本地
+        dbUser=user;
+        DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
+    }
 
     private void TransformView() {
         if (isFirstLauch) {

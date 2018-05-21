@@ -25,6 +25,7 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.adapter.GroupListAdapter;
 import com.dadoutek.uled.adapter.SceneGroupAdapter;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.ItemGroup;
@@ -235,7 +236,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
         dbScene.setBelongAccount(telinkLightApplication.getMesh().name);
-        TelinkLightApplication.getDaoInstant().getDbSceneDao().save(dbScene);
+        DaoSessionInstance.getInstance().getDbSceneDao().save(dbScene);
 
         long idAction = dbScene.getId();
 
@@ -247,11 +248,11 @@ public class AddSceneAct extends TelinkBaseActivity {
             sceneActions.setColorTemperature(itemGroups.get(i).temperature);
             if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
                 sceneActions.setGroupAddr(0xFFFF);
-                telinkLightApplication.getDaoInstant().getDbSceneActionsDao().save(sceneActions);
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
                 break;
             } else {
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                telinkLightApplication.getDaoInstant().getDbSceneActionsDao().save(sceneActions);
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
             }
         }
 

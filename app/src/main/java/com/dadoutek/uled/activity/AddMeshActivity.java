@@ -15,6 +15,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
@@ -219,6 +220,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
 //            this.showToast("Save Mesh Success");
         }
+
+
     }
 
 }
