@@ -27,7 +27,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = "xxxxxx";
+    public static final String OUT_OF_MESH_NAME = "out_of_mesh";
 
     public static final int RESULT_OK = 1;
     public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";

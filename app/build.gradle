@@ -106,4 +106,5 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
 
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
+    implementation 'com.hbb20:ccp:2.1.2'
 }

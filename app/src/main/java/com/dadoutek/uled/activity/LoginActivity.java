@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
@@ -17,12 +18,12 @@ import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.dao.DaoSession;
-import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.NetworkUtils;
 
@@ -63,7 +64,6 @@ public class LoginActivity extends TelinkBaseActivity {
     @BindView(R.id.forget_password)
     TextView forgetPassword;
 
-    private final MyHandler mHandler = new MyHandler(this);
     private DbUser dbUser;
     private String salt = "";
     private String MD5Password;
@@ -105,15 +105,15 @@ public class LoginActivity extends TelinkBaseActivity {
         }
     }
 
-    @OnClick({ R.id.btn_login, R.id.btn_register, R.id.forget_password})
+    @OnClick({R.id.btn_login, R.id.btn_register, R.id.forget_password})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_login:
                 login();
                 break;
             case R.id.btn_register:
-                Intent intent=new Intent(LoginActivity.this, PhoneVerificationActivity.class);
-                intent.putExtra("fromLogin","register");
+                Intent intent = new Intent(LoginActivity.this, PhoneVerificationActivity.class);
+                intent.putExtra("fromLogin", "register");
                 startActivity(intent);
                 break;
             case R.id.forget_password:
@@ -123,8 +123,8 @@ public class LoginActivity extends TelinkBaseActivity {
     }
 
     private void forgetPassword() {
-        Intent intent=new Intent(LoginActivity.this, PhoneVerificationActivity.class);
-        intent.putExtra("fromLogin","forgetPassword");
+        Intent intent = new Intent(LoginActivity.this, PhoneVerificationActivity.class);
+        intent.putExtra("fromLogin", "forgetPassword");
         startActivity(intent);
     }
 
@@ -185,6 +185,7 @@ public class LoginActivity extends TelinkBaseActivity {
                 LogUtils.d("logging" + stringResponse.getErrorCode() + "登录成功");
                 ToastUtils.showLong(R.string.login_success);
                 SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
+                setupMesh();
                 initDatBase(stringResponse.getT());
                 TransformView();
             } else {
@@ -205,14 +206,14 @@ public class LoginActivity extends TelinkBaseActivity {
 
     private void initDatBase(DbUser user) {
         //首先保存当前数据库名
-        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),Constant.DB_NAME_KEY,user.getAccount());
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.getAccount());
 
         //数据库分库
         DaoSessionInstance.destroySession();
         DaoSessionInstance.getInstance();
 
         //从云端用户表同步数据到本地
-        dbUser=user;
+        dbUser = user;
         DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
     }
 
@@ -228,18 +229,19 @@ public class LoginActivity extends TelinkBaseActivity {
             mesh.password = Constant.NEW_MESH_PASSWORD;
             mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME;
             mesh.password = Constant.DEFAULT_MESH_FACTORY_PASSWORD;
-//            mesh.saveOrUpdate(this);
+            mesh.saveOrUpdate(this);
             application.setupMesh(mesh);
             SharedPreferencesHelper.saveMeshName(this, phone);
             SharedPreferencesHelper.saveMeshPassword(this, Constant.NEW_MESH_PASSWORD);
         }
     }
+
     private void TransformView() {
-        if (isFirstLauch) {
-            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
-        } else {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-        }
+//        if (isFirstLauch) {
+//            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
+//        } else {
+        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//        }
     }
 
     @Override

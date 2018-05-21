@@ -29,6 +29,7 @@ import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.ItemGroup;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.StringUtils;

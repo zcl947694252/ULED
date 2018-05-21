@@ -41,7 +41,9 @@ public class DBUtils {
         if(dbRegionNew==null){//直接插入
             DaoSessionInstance.getInstance().getDbRegionDao().insert(dbRegion);
         }else{//更新数据库
-            DaoSessionInstance.getInstance().getDbRegionDao()
+            DaoSessionInstance.getInstance().getDbRegionDao();
         }
+
+        return true;
     }
 }

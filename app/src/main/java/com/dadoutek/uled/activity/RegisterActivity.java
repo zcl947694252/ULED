@@ -8,8 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ToastUtils;
@@ -22,9 +20,11 @@ import com.dadoutek.uled.util.NetworkUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.dadoutek.uled.util.NetworkUtils.md5;
@@ -38,10 +38,11 @@ public class RegisterActivity extends TelinkBaseActivity {
     TextInputLayout editUserPassword;
     @BindView(R.id.register_completed)
     Button registerCompleted;
+    @BindView(R.id.edit_user_phone)
+    TextInputLayout editUserName;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private String phone;
     private String userName;
     private String userPassWord;
     private String MD5PassWord;
@@ -52,10 +53,17 @@ public class RegisterActivity extends TelinkBaseActivity {
         setContentView(R.layout.activity_register);
         ButterKnife.bind(this);
         initView();
+
+
     }
 
     private void initView() {
         initToolbar();
+        String phone = getIntent().getStringExtra("phone");
+        if (!phone.isEmpty()) {
+            if (editUserName.getEditText() != null)
+                editUserName.getEditText().setText(phone);
+        }
     }
 
     private void initToolbar() {
@@ -92,7 +100,7 @@ public class RegisterActivity extends TelinkBaseActivity {
         showLoadingDialog(getString(R.string.registing));
         MD5PassWord = md5(userPassWord);
         NetworkUtils.getRegisterApi()
-                .register(phone, MD5PassWord, userName)
+                .register(userName, MD5PassWord, userName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
@@ -132,7 +140,7 @@ public class RegisterActivity extends TelinkBaseActivity {
         userName = editUserName.getEditText().getText().toString().trim();
         userPassWord = editUserPassword.getEditText().getText().toString().trim();
 
-        if (compileExChar(phone)) {
+        if (compileExChar(userName)) {
             ToastUtils.showLong(R.string.phone_input_error);
             return false;
         } else if (compileExChar(userName) || compileExChar(userPassWord)) {

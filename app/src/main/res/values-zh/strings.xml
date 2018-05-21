@@ -127,7 +127,7 @@
     <string name="set_str">设置</string>
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
-    <string name="connect_state">设备连接中，请稍后。。。</string>
+    <string name="connect_state">设备连接中，请稍后……</string>
     <string name="connect_success">连接成功！</string>
     <string name="connect_fail">连接失败！</string>
     <string name="device_not_connected">设备未连接！</string>
@@ -197,6 +197,7 @@
     <string name="select_country">选择国家</string>
     <string name="add">添加</string>
     <string name="open_location_service">请打开“位置服务”</string>
+    <string name="verification">验证</string>
     <string name="send_verification">发送验证码</string>
     <string name="VerificationCode">验证码</string>
     <string name="send_message_success">发送成功</string>
@@ -205,6 +206,7 @@
     <string name="successful_verification">验证成功</string>
     <string name="exit_login">退出登录</string>
     <string name="forget_password">忘记密码？</string>
+    <string name="verification_phone">验证手机</string>
     <string name="update_password">修改密码</string>
     <string name="password_input_error">密码不能包含特殊字符</string>
     <string name="different_input">两次输入不一致,请检查</string>
@@ -212,4 +214,8 @@
     <string name="tip_update_password_success">更改成功</string>
     <string name="tip_update_password_fail">改密失败</string>
     <string name="updating_password">正在更改</string>
+    <string name="not_grouped">未分组</string>
+    <string name="connect_failed_if_there_are_lights">连接失败，请确定附近有灯具存在!</string>
+    <string name="scanning_devices">扫描设备中</string>
+    <string name="not_found_light">未找到灯具，请确定附近有灯具存在!</string>
 </resources>
