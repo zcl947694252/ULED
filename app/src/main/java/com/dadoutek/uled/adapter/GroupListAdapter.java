@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Group;
 
@@ -18,9 +19,9 @@ import java.util.List;
 public class GroupListAdapter extends BaseAdapter {
 
     Context context;
-    List<Group> list;
+    List<DbGroup> list;
 
-    public GroupListAdapter(Context context, List<Group> list) {
+    public GroupListAdapter(Context context, List<DbGroup> list) {
         this.context = context;
         this.list = list;
     }
@@ -48,7 +49,7 @@ public class GroupListAdapter extends BaseAdapter {
             convertView.setVisibility(View.GONE);
         } else {
             convertView.setVisibility(View.VISIBLE);
-            tvName.setText(list.get(position).name);
+            tvName.setText(list.get(position).getName());
         }
         return convertView;
     }

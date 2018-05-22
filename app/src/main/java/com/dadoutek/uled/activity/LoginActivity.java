@@ -266,7 +266,8 @@ public class LoginActivity extends TelinkBaseActivity {
 
     private void initDatBase(DbUser user) {
         //首先保存当前数据库名
-        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),Constant.DB_NAME_KEY,user.getAccount());
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY,user.getAccount());
 
         //数据库分库
         DaoSessionInstance.destroySession();

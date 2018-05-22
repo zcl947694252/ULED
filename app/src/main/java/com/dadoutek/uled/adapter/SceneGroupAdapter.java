@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Group;
@@ -19,14 +20,14 @@ import java.util.List;
  */
 
 public class SceneGroupAdapter extends BaseQuickAdapter implements SeekBar.OnSeekBarChangeListener {
-    private ArrayList<Group> groupArrayList;
+    private ArrayList<DbGroup> groupArrayList;
 
     private List<ItemGroup> data;
     TextView tvBrightness;
     TextView tvTemperature;
     ItemGroup itemGroup;
 
-    public SceneGroupAdapter(int layoutResId, List<ItemGroup> data, ArrayList<Group> groupArrayList) {
+    public SceneGroupAdapter(int layoutResId, List<ItemGroup> data, ArrayList<DbGroup> groupArrayList) {
         super(layoutResId, data);
         this.data = data;
         this.groupArrayList = groupArrayList;

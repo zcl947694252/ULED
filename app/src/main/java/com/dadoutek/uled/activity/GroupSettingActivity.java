@@ -7,6 +7,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -21,7 +22,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
     private GroupSettingFragment settingFragment;
     private TelinkLightApplication mApplication;
 
-    private int groupAddress;
+    private DbGroup group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +33,12 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
         this.setContentView(R.layout.activity_group_setting);
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
-        this.groupAddress = this.getIntent().getIntExtra("groupAddress", 0);
-        DataManager dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
-
-        Group group = dataManager.getGroup(groupAddress, GroupSettingActivity.this);
+        this.group = (DbGroup) this.getIntent().getExtras().get("group");
 
         if (group != null) {
             TextView txtTitle = (TextView) this
                     .findViewById(R.id.txt_header_title);
-            txtTitle.setText(group.name);
+            txtTitle.setText(group.getName());
         }
 
         this.backView = (ImageView) this
@@ -50,7 +48,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
         this.settingFragment = (GroupSettingFragment) this.getFragmentManager()
                 .findFragmentById(R.id.group_setting_fragment);
 
-        this.settingFragment.groupAddress = groupAddress;
+        this.settingFragment.group = group;
     }
 
     private OnClickListener clickListener = new OnClickListener() {

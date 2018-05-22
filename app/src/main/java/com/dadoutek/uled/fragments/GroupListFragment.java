@@ -16,6 +16,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -38,7 +40,7 @@ public final class GroupListFragment extends Fragment {
     private Activity mContext;
     private TelinkLightApplication mApplication;
     private DataManager dataManager;
-
+    private List<DbGroup> gpList;
 
     private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
 
@@ -114,8 +116,8 @@ public final class GroupListFragment extends Fragment {
 
     private void initData() {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-        dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
-        this.adapter = new GroupListAdapter(dataManager.getGroups());
+        gpList= DBUtils.getGroupList();
+        this.adapter = new GroupListAdapter(gpList);
         gridView.setAdapter(this.adapter);
 
     }
@@ -133,15 +135,13 @@ public final class GroupListFragment extends Fragment {
 
     final class GroupListAdapter extends BaseAdapter implements
             OnClickListener, OnLongClickListener {
-        ArrayList<Group> groupArrayList = new ArrayList<>();
+        ArrayList<DbGroup> groupArrayList = new ArrayList<>();
 
-        public GroupListAdapter(Groups groups) {
-            List<Group> groupList = groups.get();
-            Mesh mesh = mApplication.getMesh();
-//            DataManager dataManager = new DataManager(getActivity(), mesh.name, mesh.password);
-//            groupArrayList.add(dataManager.createAllLightControllerGroup());
-            for (Group group : groupList) {
-                if (group.containsLightList.size() > 0 || group.meshAddress == 0xffff)
+        public GroupListAdapter(List<DbGroup> groups) {
+            List<DbGroup> groupList = groups;
+            for (DbGroup group : groupList) {
+//                if (group.containsLightList.size() > 0 || group.meshAddress == 0xffff)
+                    groupArrayList.add(DBUtils.createAllLightControllerGroup(getActivity()));
                     groupArrayList.add(group);
             }
         }
@@ -157,7 +157,7 @@ public final class GroupListFragment extends Fragment {
         }
 
         @Override
-        public Group getItem(int position) {
+        public DbGroup getItem(int position) {
             return groupArrayList.get(position);
         }
 
@@ -201,19 +201,19 @@ public final class GroupListFragment extends Fragment {
                 holder = (GroupItemHolder) convertView.getTag();
             }
 
-            Group group = this.getItem(position);
+            DbGroup group = this.getItem(position);
 
             if (group != null) {
-                if (group.textColor == null)
+                if (group.textColor == 0)
                     group.textColor = mContext.getResources()
-                            .getColorStateList(R.color.black);
+                            .getColor(R.color.black);
 
-                holder.txtName.setText(group.name);
+                holder.txtName.setText(group.getName());
                 holder.txtName.setTextColor(group.textColor);
-                holder.txtName.setTag(group.meshAddress);
-                holder.btnOn.setTag(group.meshAddress);
-                holder.btnOff.setTag(group.meshAddress);
-                holder.btnSet.setTag(group.meshAddress);
+                holder.txtName.setTag(position);
+                holder.btnOn.setTag(position);
+                holder.btnOff.setTag(position);
+                holder.btnSet.setTag(position);
             }
 
             return convertView;
@@ -223,10 +223,12 @@ public final class GroupListFragment extends Fragment {
         public void onClick(View view) {
 
             int clickId = view.getId();
-            int meshAddress = (int) view.getTag();
+            int position = (int) view.getTag();
+
+            DbGroup group=groupArrayList.get(position);
 
             byte opcode = (byte) 0xD0;
-            int dstAddr = meshAddress;
+            int dstAddr = group.getMeshAddr();
             Intent intent;
 
             if (!dataManager.getConnectState(getActivity())) {
@@ -244,12 +246,12 @@ public final class GroupListFragment extends Fragment {
                     break;
                 case R.id.btn_set:
                     intent = new Intent(mContext, GroupSettingActivity.class);
-                    intent.putExtra("groupAddress", meshAddress);
+                    intent.putExtra("group", group);
                     startActivityForResult(intent, 0);
                     break;
                 case R.id.txt_name:
                     intent = new Intent(mContext, LightsOfGroupActivity.class);
-                    intent.putExtra("groupAddress", meshAddress);
+                    intent.putExtra("group", group);
                     startActivity(intent);
                     break;
             }

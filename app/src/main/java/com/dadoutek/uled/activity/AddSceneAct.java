@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.DbModel.DbScene;
 import com.dadoutek.uled.DbModel.DbSceneActions;
 import com.dadoutek.uled.R;
@@ -60,19 +61,16 @@ public class AddSceneAct extends TelinkBaseActivity {
     @BindView(R.id.bt_add)
     Button btAdd;
 
-    private int brightness = 0;
-    private int temperature = 0;
-    private Groups groups;
     private Scenes scenes;
     private LayoutInflater inflater;
     private SceneGroupAdapter adapter;
 
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
-    private ArrayList<Group> groupArrayList = new ArrayList<>();
+    private ArrayList<DbGroup> groupArrayList = new ArrayList<>();
     private ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
     private ArrayList<String> groupNameArrayList = new ArrayList<>();
-    private List<Integer> groupsAddressList = new ArrayList<>();
+    private List<DbGroup> groups = new ArrayList<>();
     /**
      * 输入法管理器
      */
@@ -91,16 +89,14 @@ public class AddSceneAct extends TelinkBaseActivity {
         scenes = new Scenes();
         telinkLightApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
-        groups = dataManager.getGroups();
+        groups = DBUtils.getGroupList();
         itemGroupArrayList = new ArrayList<>();
-//        groupArrayList.add(dataManager.createAllLightControllerGroup());
-//        groupNameArrayList.add(groupArrayList.get(0).name);
-        List<Group> groupList = groups.get();
-        for (Group group : groupList) {
-            if (group.containsLightList.size() > 0 || group.meshAddress == 0xffff)
+
+        for (DbGroup group : groups) {
+//            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
                 group.checked = false;
             groupArrayList.add(group);
-            groupNameArrayList.add(group.name);
+            groupNameArrayList.add(group.getName());
         }
 
         LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
@@ -116,7 +112,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
             if (groupArrayList.size() != 0) {
                 for (int k = 0; k < groupArrayList.size(); k++) {
-                    if (groupArrayList.get(k).name.equals(itemGroupArrayList.get(position).gpName)) {
+                    if (groupArrayList.get(k).getName().equals(itemGroupArrayList.get(position).gpName)) {
                         groupArrayList.get(k).selected = false;
                         adapter.remove(position);
                         break;
@@ -141,7 +137,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     private void inflatView() {
         AlertDialog.Builder builder;
         AlertDialog dialog;
-        List<Group> showList = getShowList();
+        List<DbGroup> showList = getShowList();
         View bottomView = View.inflate(AddSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
         ListView lvGp = (ListView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
         lvGp.setAdapter(new GroupListAdapter(this, showList));//ListView设置适配器
@@ -154,8 +150,8 @@ public class AddSceneAct extends TelinkBaseActivity {
             ItemGroup itemGroup = new ItemGroup();
             itemGroup.brightness = 50;
             itemGroup.temperature = 50;
-            itemGroup.groupAress = showList.get(position).meshAddress;
-            itemGroup.gpName = showList.get(position).name;
+            itemGroup.groupAress = showList.get(position).getMeshAddr();
+            itemGroup.gpName = showList.get(position).getName();
             changeData(position, showList);
             adapter.addData(itemGroup);
             dialog.dismiss();
@@ -164,17 +160,17 @@ public class AddSceneAct extends TelinkBaseActivity {
         dialog.show();
     }
 
-    private void changeData(int position, List<Group> showList) {
+    private void changeData(int position, List<DbGroup> showList) {
         for (int k = 0; k < groupArrayList.size(); k++) {
-            if (groupArrayList.get(k).meshAddress == showList.get(position).meshAddress) {
+            if (groupArrayList.get(k).getMeshAddr() == showList.get(position).getMeshAddr()) {
                 showList.add(groupArrayList.get(k));
                 groupArrayList.get(k).selected = true;
             }
         }
     }
 
-    private List<Group> getShowList() {
-        List<Group> showList = new ArrayList<>();
+    private List<DbGroup> getShowList() {
+        List<DbGroup> showList = new ArrayList<>();
         for (int k = 0; k < groupArrayList.size(); k++) {
             if (!groupArrayList.get(k).selected) {
                 showList.add(groupArrayList.get(k));

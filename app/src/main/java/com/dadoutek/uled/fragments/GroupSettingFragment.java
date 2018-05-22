@@ -11,13 +11,13 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
 
@@ -28,7 +28,6 @@ import butterknife.Unbinder;
 
 public final class GroupSettingFragment extends Fragment {
 
-    public int groupAddress;
     @BindView(R.id.btn_remove_group)
     Button btnRemoveGroup;
     @BindView(R.id.btn_rename)
@@ -43,7 +42,7 @@ public final class GroupSettingFragment extends Fragment {
     private SeekBar temperatureBar;
     private ColorPicker colorPicker;
     private TelinkLightApplication mApplication;
-    private Group group;
+    public DbGroup group;
     private DataManager dataManager;
 
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
@@ -81,15 +80,15 @@ public final class GroupSettingFragment extends Fragment {
 
         private void onValueChange(View view, int progress) {
 
-            int addr = groupAddress;
+            int addr = group.getMeshAddr();
             byte opcode;
             byte[] params;
 
             if (view == brightnessBar) {
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
-                group.brightness = progress;
-                dataManager.updateGroup(group, getActivity());
+                group.setBrightness(progress);
+                DBUtils.updateGroup(group);
                 tvBrightness.setText(getString(R.string.device_setting_brightness, progress + ""));
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
@@ -97,8 +96,8 @@ public final class GroupSettingFragment extends Fragment {
 
                 opcode = (byte) 0xE2;
                 params = new byte[]{0x05, (byte) progress};
-                group.temperature = progress;
-                dataManager.updateGroup(group, getActivity());
+                group.setColorTemperature(progress);
+                DBUtils.updateGroup(group);
                 tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
             }
@@ -137,7 +136,7 @@ public final class GroupSettingFragment extends Fragment {
             byte green = (byte) (color >> 8 & 0xFF);
             byte blue = (byte) (color & 0xFF);
 
-            int addr = groupAddress;
+            int addr = group.getMeshAddr();
             byte opcode = (byte) 0xE2;
             byte[] params = new byte[]{0x04, red, green, blue};
 
@@ -174,7 +173,7 @@ public final class GroupSettingFragment extends Fragment {
 
     //所有灯控分组暂标为系统默认分组不做修改处理
     private void checkGroupIsSystemGroup() {
-        if (groupAddress == 0xFFFF) {
+        if (group.getMeshAddr() == 0xFFFF) {
             btnRemoveGroup.setVisibility(View.GONE);
             btnRename.setVisibility(View.GONE);
         }
@@ -184,12 +183,10 @@ public final class GroupSettingFragment extends Fragment {
     public void onResume() {
         super.onResume();
         checkGroupIsSystemGroup();
-        dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
-        group = dataManager.getGroup(groupAddress, getActivity());
-        brightnessBar.setProgress(group.brightness);
-        tvBrightness.setText(getString(R.string.device_setting_brightness, group.brightness + ""));
-        temperatureBar.setProgress(group.temperature);
-        tvTemperature.setText(getString(R.string.device_setting_temperature, group.temperature + ""));
+        brightnessBar.setProgress(group.getBrightness());
+        tvBrightness.setText(getString(R.string.device_setting_brightness, group.getBrightness() + ""));
+        temperatureBar.setProgress(group.getColorTemperature());
+        tvTemperature.setText(getString(R.string.device_setting_temperature, group.getColorTemperature() + ""));
     }
 
     @Override
@@ -212,27 +209,15 @@ public final class GroupSettingFragment extends Fragment {
 
     private void renameGp() {
         Intent intent = new Intent(getActivity(), RenameActivity.class);
-        intent.putExtra("groupAddress", groupAddress);
+        intent.putExtra("group", group);
         startActivity(intent);
         getActivity().finish();
     }
 
     private void removeGp() {
-        DataManager dataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
-        Groups groups = dataManager.getGroups();
-        for (
-                int k = 0; k < groups.size(); k++)
-
-        {
-            if (groupAddress == groups.get(k).meshAddress && groups.get(k).containsLightList != null) {
-                groups.get(k).containsLightList.clear();
-                dataManager.updateGroup(groups);
-//               startActivity(new Intent(getActivity(), MainActivity.class));
-                getActivity().setResult(Constant.RESULT_OK);
-                getActivity().finish();
-                break;
-            }
-        }
+        DBUtils.deleteGroup(group);
+        getActivity().setResult(Constant.RESULT_OK);
+        getActivity().finish();
     }
 
 }

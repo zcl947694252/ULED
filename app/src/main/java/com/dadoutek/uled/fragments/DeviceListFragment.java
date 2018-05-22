@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -35,8 +36,6 @@ import com.dadoutek.uled.activity.OnlineStatusTestActivity;
 import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.light.ConnectionStatus;
 
@@ -82,6 +81,7 @@ public final class DeviceListFragment extends Fragment {
 
 
     private static final int REQ_CHANGE_MESH_NAME = 0x01;
+    private List<DbLight> lightList;
 
     private OnClickListener clickListener = new OnClickListener() {
 
@@ -113,7 +113,7 @@ public final class DeviceListFragment extends Fragment {
                 startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
             } else if (v == btnOta) {
 //                Intent intent = new Intent(mContext, OtaDeviceListActivity.class);
-                List<Light> lights = Lights.getInstance().get();
+                List<DbLight> lights = Lights.getInstance().get();
                 for (Light light : lights) {
                     if (light.status != ConnectionStatus.OFFLINE) {
 //                        Intent intent = new Intent(mContext, OtaActivity.class);

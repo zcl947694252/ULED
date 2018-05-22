@@ -49,7 +49,6 @@ public class SceneFragment extends Fragment {
     private LayoutInflater layoutInflater;
     private SceneAdaper adaper;
 
-    private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
     //    private List<Scenes> scenesListData;
     private List<DbScene> scenesListData;
@@ -73,7 +72,6 @@ public class SceneFragment extends Fragment {
 
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
-        dataManager = new DataManager(getActivity(), telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
         scenesListData = DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
     }
 

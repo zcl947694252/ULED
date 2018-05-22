@@ -6,10 +6,13 @@ import android.widget.Toast;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -25,6 +28,8 @@ import java.util.List;
 
 public class DBUtils {
 
+    /********************************************查询*******************************/
+
     public static List<DbSceneActions> searchActionsBySceneId(long id) {
         List<DbSceneActions> list = new ArrayList<>();
         Query<DbSceneActions> query = DaoSessionInstance.getInstance().getDbSceneActionsDao().queryBuilder().
@@ -39,6 +44,23 @@ public class DBUtils {
         DbGroup group=DaoSessionInstance.getInstance().getDbGroupDao().load(id);
         return group.getName();
     }
+
+    public static DbGroup getGroupByID(long id){
+        DbGroup group=DaoSessionInstance.getInstance().getDbGroupDao().load((Long) id);
+        return group;
+    }
+
+    public static List<DbGroup> getGroupList(){
+        List<DbGroup> list=new ArrayList<>();
+        Query<DbGroup> query = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().
+                where(DbGroupDao.Properties.BelongRegionId.eq(Constant.CURRENT_USE_REGION_ID)).build();
+        for (DbGroup dbGroup : query.list()) {
+            list.add(dbGroup);
+        }
+        return list;
+    }
+
+    /********************************************保存*******************************/
 
     public static void saveRegion(DbRegion dbRegion){
         //判断原来是否保存过这个区域
@@ -60,6 +82,8 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbLightDao().insertOrReplace(light);
     }
 
+    /********************************************更改*******************************/
+
     public static void updateGroup(DbGroup group){
         DaoSessionInstance.getInstance().getDbGroupDao().update(group);
     }
@@ -67,6 +91,14 @@ public class DBUtils {
     public static void updateLight(DbLight light){
         DaoSessionInstance.getInstance().getDbLightDao().update(light);
     }
+
+    /********************************************删除*******************************/
+
+    public static void deleteGroup(DbGroup dbGroup){
+        DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
+    }
+
+    /********************************************其他*******************************/
 
     public static void addNewGroup(String name,List<DbGroup> groups,Context context){
         if (!checkRepeat(groups, context, name)) {
@@ -77,6 +109,7 @@ public class DBUtils {
             group.setMeshAddr(0x8001 + newMeshAdress);
             group.setBrightness(100);
             group.setColorTemperature(100);
+            group.setBelongRegionId((int)Constant.CURRENT_USE_REGION_ID);//目前暂无分区 区域ID暂为0
             groups.add(group);
             //新增数据库保存
             DBUtils.saveGroup(group);
@@ -96,11 +129,17 @@ public class DBUtils {
         return false;
     }
 
-    public static void saveLight(Lights lights){
 
+    /**
+     * 创建一个控制所有灯的分组
+     * @return group对象
+     */
+    public static DbGroup createAllLightControllerGroup(Context context) {
+        DbGroup groupAllLights = new DbGroup();
+        groupAllLights.setName(context.getString(R.string.allLight));
+        groupAllLights.setMeshAddr(0xFFFF);
+        groupAllLights.setBrightness(100);
+        groupAllLights.setColorTemperature(100);
+        return groupAllLights;
     }
-
-//    public static Long getGroupIdByMeshAddress(){
-//
-//    }
 }
