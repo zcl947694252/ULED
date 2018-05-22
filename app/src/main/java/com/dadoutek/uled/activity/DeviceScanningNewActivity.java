@@ -724,6 +724,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void initData() {
         this.mApplication = (TelinkLightApplication) this.getApplication();
+        nowLightList=new ArrayList<>();
+        if(groups==null){
+            groups=new ArrayList<>();
+        }
     }
 
     @Override

@@ -92,9 +92,9 @@ public class RenameActivity extends TelinkBaseActivity {
             return false;
         }
 
-        if (dataManager.checkRepeat(groups, this, newName)) {
-            return false;
-        }
+//        if (dataManager.checkRepeat(groups, this, newName)) {
+//            return false;
+//        }
         return true;
     }
 

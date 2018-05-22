@@ -50,7 +50,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
                 "\"CONTROL_MESH_PWD\" TEXT," + // 2: controlMeshPwd
                 "\"INSTALL_MESH\" TEXT," + // 3: installMesh
                 "\"INSTALL_MESH_PWD\" TEXT," + // 4: installMeshPwd
-                "\"BELONG_ACCOUNT\" TEXT NOT NULL );"); // 5: belongAccount
+                "\"BELONG_ACCOUNT\" TEXT);"); // 5: belongAccount
     }
 
     /** Drops the underlying database table. */
@@ -87,7 +87,11 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         if (installMeshPwd != null) {
             stmt.bindString(5, installMeshPwd);
         }
-        stmt.bindString(6, entity.getBelongAccount());
+ 
+        String belongAccount = entity.getBelongAccount();
+        if (belongAccount != null) {
+            stmt.bindString(6, belongAccount);
+        }
     }
 
     @Override
@@ -118,7 +122,11 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         if (installMeshPwd != null) {
             stmt.bindString(5, installMeshPwd);
         }
-        stmt.bindString(6, entity.getBelongAccount());
+ 
+        String belongAccount = entity.getBelongAccount();
+        if (belongAccount != null) {
+            stmt.bindString(6, belongAccount);
+        }
     }
 
     @Override
@@ -134,7 +142,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // controlMeshPwd
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // installMesh
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // installMeshPwd
-            cursor.getString(offset + 5) // belongAccount
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // belongAccount
         );
         return entity;
     }
@@ -146,7 +154,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         entity.setControlMeshPwd(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setInstallMesh(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setInstallMeshPwd(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
-        entity.setBelongAccount(cursor.getString(offset + 5));
+        entity.setBelongAccount(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     @Override

@@ -21,10 +21,9 @@ public class DbRegion {
 
     private String belongAccount;
 
-    @Generated(hash = 1474362139)
+    @Generated(hash = 1441573477)
     public DbRegion(Long id, String controlMesh, String controlMeshPwd,
-                    String installMesh, String installMeshPwd,
-                    @NotNull String belongAccount) {
+            String installMesh, String installMeshPwd, String belongAccount) {
         this.id = id;
         this.controlMesh = controlMesh;
         this.controlMeshPwd = controlMeshPwd;
