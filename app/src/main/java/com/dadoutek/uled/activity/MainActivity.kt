@@ -113,7 +113,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
         Log.d(TAG, "onCreate")
         //TelinkLog.ENABLE = false;
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_main)
         ButterKnife.bind(this)
 

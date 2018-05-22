@@ -78,7 +78,6 @@ public class DBUtils {
             DBUtils.saveGroup(group);
         }
 
-        return true;
     }
 
     public static boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {

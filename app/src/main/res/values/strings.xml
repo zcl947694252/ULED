@@ -220,5 +220,7 @@
     <string name="scanning_devices">Scanning devices</string>
     <string name="not_found_light">Not found light, Please make sure there are lamps nearby!</string>
     <string name="tip_add_group">请先添加一个分组</string>
+    <string name="scanning">Scanning</string>
+    <string name="scanned_x_devices">Scanned lights:%1$d</string>
 
 </resources>
