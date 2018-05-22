@@ -7,13 +7,11 @@ import com.dadoutek.uled.model.Response;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import okhttp3.RequestBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
-import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
@@ -26,8 +24,10 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("api/auth/login")
     Observable<Response<DbUser>> login(@Field("account") String account, @Field("password") String password);
+
     @GET("api/auth/salt")
     Observable<Response<String>> getsalt(@Query("account") String account);
+
     @GET("api/auth/account")
     Observable<Response<String>> getAccount(@QueryMap Map<String, String> params);
 
@@ -44,7 +44,8 @@ public interface RequestInterface {
     //区域相关接口
     @POST("api/ext/soybean/region/add")
     Observable<Response<DbRegion>> addRegion(@Field("token") String token, @Field("controlMesh") String controlMesh,
-                                             @Field("installMesh") String installMesh,@Field("installMeshPwd") String installMeshPwd);
+                                             @Field("installMesh") String installMesh, @Field("installMeshPwd") String installMeshPwd);
+
     @GET("api/ext/soybean/region/list")
     Observable<Response<DbRegion>> getRegionList(@Query("token") String token);
 }

@@ -31,13 +31,9 @@ public class DBUtils {
     /********************************************查询*******************************/
 
     public static List<DbSceneActions> searchActionsBySceneId(long id) {
-        List<DbSceneActions> list = new ArrayList<>();
         Query<DbSceneActions> query = DaoSessionInstance.getInstance().getDbSceneActionsDao().queryBuilder().
                 where(DbSceneActionsDao.Properties.ActionId.eq(id)).build();
-        for (DbSceneActions dbSceneActions : query.list()) {
-            list.add(dbSceneActions);
-        }
-        return list;
+        return new ArrayList<>(query.list());
     }
 
     public static String getGroupNameByID(Long id){
@@ -114,6 +110,7 @@ public class DBUtils {
             //新增数据库保存
             DBUtils.saveGroup(group);
         }
+
     }
 
     public static boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {

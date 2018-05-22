@@ -127,13 +127,13 @@
     <string name="set_str">设置</string>
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
-    <string name="connect_state">设备连接中，请稍后。。。</string>
+    <string name="connect_state">设备连接中，请稍后……</string>
     <string name="connect_success">连接成功！</string>
     <string name="connect_fail">连接失败！</string>
     <string name="device_not_connected">设备未连接！</string>
 
     <string name="smartSwitch">开关</string>
-    <string name="select_device">选择设备</string>
+    <string name="select_install_device">选择安装设备</string>
     <string name="install_switch">安装开关</string>
     <string name="search">搜索</string>
     <string name="complete">完成</string>
@@ -195,6 +195,8 @@
     <string name="name_or_password_error">用户名或密码错误！</string>
     <string name="phone_current">当前手机号：%1$s</string>
     <string name="select_country">选择国家</string>
+    <string name="add">添加</string>
+    <string name="open_location_service">请打开“位置服务”</string>
     <string name="verification">验证</string>
     <string name="send_verification">发送验证码</string>
     <string name="VerificationCode">验证码</string>
@@ -212,5 +214,11 @@
     <string name="tip_update_password_success">更改成功</string>
     <string name="tip_update_password_fail">改密失败</string>
     <string name="updating_password">正在更改</string>
+    <string name="not_grouped">未分组</string>
+    <string name="connect_failed_if_there_are_lights">连接失败，请确定附近有灯具存在!</string>
+    <string name="scanning_devices">扫描设备中</string>
+    <string name="not_found_light">未找到灯具，请确定附近有灯具存在!</string>
     <string name="tip_add_group">请先添加一个分组</string>
-</resources>
+    <string name="scanning">扫描中</string>
+    <string name="scanned_x_devices">已扫到:%1$d个灯</string>
+    </resources>

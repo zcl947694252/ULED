@@ -1,9 +1,9 @@
 package com.dadoutek.uled.fragments;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +21,9 @@ import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.model.DaoSessionInstance;
 
 import java.util.List;
 
@@ -151,7 +152,7 @@ public class SceneFragment extends Fragment {
     };
 
     private void deleteScene(int position) {
-        byte opcode = (byte) 0xEE;
+        byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
         long id = scenesListData.get(position).getId();
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
@@ -170,7 +171,7 @@ public class SceneFragment extends Fragment {
     }
 
     private void setScene(long id) throws InterruptedException {
-        byte opcode = (byte) 0xEF;
+        byte opcode = (byte) Opcode.SCENE_LOAD;
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {

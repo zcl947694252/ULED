@@ -2,6 +2,7 @@ package com.dadoutek.uled.util;
 
 import android.text.TextUtils;
 
+import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.intf.RequestInterface;
 import com.dadoutek.uled.model.Constant;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -14,7 +15,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.CallAdapter;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkUtils {
@@ -23,15 +23,18 @@ public class NetworkUtils {
     private static RequestInterface registerApi;
     private static RequestInterface getAccountApi;
     private static RequestInterface getSaltApi;
-    private static OkHttpClient okHttpClient=new OkHttpClient();
+    private static OkHttpClient okHttpClient = new OkHttpClient();
     private static Converter.Factory gsonConverterFactory = GsonConverterFactory.create();
     private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJava2CallAdapterFactory.create();
 
     public NetworkUtils() {
-        HttpLoggingInterceptor loggingInterceptor=new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
-         okHttpClient=new OkHttpClient.Builder()
-         .addInterceptor(loggingInterceptor).build();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        if (BuildConfig.DEBUG)
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        else
+            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+        okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor).build();
     }
 
     public static RequestInterface getloginApi() {

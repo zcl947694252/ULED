@@ -45,7 +45,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
                 .findViewById(R.id.img_header_menu_left);
         this.backView.setOnClickListener(this.clickListener);
 
-        this.settingFragment = (GroupSettingFragment) this.getFragmentManager()
+        this.settingFragment = (GroupSettingFragment) this.getSupportFragmentManager()
                 .findFragmentById(R.id.group_setting_fragment);
 
         this.settingFragment.group = group;

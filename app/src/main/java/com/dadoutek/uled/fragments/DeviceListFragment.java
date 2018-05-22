@@ -1,12 +1,12 @@
 package com.dadoutek.uled.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -320,7 +320,10 @@ public final class DeviceListFragment extends Fragment {
     }
 
     public Light getDevice(int meshAddress) {
-        return this.adapter.get(meshAddress);
+        if (this.adapter != null)
+            return this.adapter.get(meshAddress);
+        else
+            return null;
     }
 
     public void notifyDataSetChanged() {

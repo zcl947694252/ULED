@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,13 +47,11 @@ import butterknife.ButterKnife;
  * Created by hejiajun on 2018/4/24.
  */
 
-public class LightsOfGroupActivity extends TelinkBaseActivity implements View.OnClickListener, EventListener<String> {
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
+public class LightsOfGroupActivity extends TelinkBaseActivity implements EventListener<String> {
     @BindView(R.id.recycler_view_lights)
     RecyclerView recyclerViewLights;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     //组的mesh地址
     private int groupAddress;
@@ -85,13 +86,32 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lights_of_group);
         ButterKnife.bind(this);
+        initToolbar();
         initParameter();
+    }
+
+    private void initToolbar() {
+        toolbar.setTitle(R.string.group_setting_header);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void initParameter() {
         this.groupAddress = this.getIntent().getIntExtra("groupAddress", 0);
         this.mApplication = (TelinkLightApplication) this.getApplication();
         mDataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -154,21 +174,12 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements View.On
     }
 
     private void initView() {
-        txtHeaderTitle.setText(group.name);
-        imgHeaderMenuLeft.setOnClickListener(this);
+        toolbar.setTitle(group.name);
         recyclerViewLights.setLayoutManager(new GridLayoutManager(this, 3));
         adapter = new LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener);
         recyclerViewLights.setAdapter(adapter);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.img_header_menu_left:
-                finish();
-                break;
-        }
-    }
 
     @Override
     public void performed(Event<String> event) {

@@ -23,13 +23,13 @@ import java.util.Map;
 
 public class SwitchSceneGroupAdapter extends BaseQuickAdapter implements AdapterView.OnItemSelectedListener {
 
-    List<String> btList;
-    List<DbScene> sceneList;
-    List<String> sceneNameList;
-    Spinner spinner;
-    ArrayAdapter<String> arrayAdapter;
-    Context context;
-    public Map<String, DbScene> map;
+    private List<String> btList;
+    private List<DbScene> sceneList;
+    private List<String> sceneNameList;
+    private Spinner spinner;
+    private ArrayAdapter<String> arrayAdapter;
+    private Context context;
+    private Map<Integer, DbScene> map;
 
     public SwitchSceneGroupAdapter(int layoutResId, List<String> btList, List<DbScene> sceneList, Context context) {
         super(layoutResId, btList);
@@ -39,7 +39,7 @@ public class SwitchSceneGroupAdapter extends BaseQuickAdapter implements Adapter
         map = new HashMap<>();
         this.context = context;
         init();
-        this.arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, sceneNameList);
+        this.arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, sceneNameList);
     }
 
     private void init() {
@@ -52,24 +52,28 @@ public class SwitchSceneGroupAdapter extends BaseQuickAdapter implements Adapter
     protected void convert(BaseViewHolder helper, Object item) {
         spinner = helper.getView(R.id.sp_scene);
         spinner.setAdapter(arrayAdapter);
-        spinner.setOnItemSelectedListener(this);
-        spinner.setTag(helper.getPosition());
+        spinner.setTag(helper.getAdapterPosition());
         spinner.setSelection(0);
+        helper.setOnItemSelectedClickListener(R.id.sp_scene, this);
+        helper.setAdapter(R.id.sp_scene, arrayAdapter);
 
         String name = (String) item;
         helper.setText(R.id.tv_scene_button_name, name);
 
         DbScene dbScene = sceneList.get(0);
-        map.put(btList.get(helper.getPosition()), dbScene);
+        map.put(helper.getAdapterPosition(), dbScene);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        spinner = (Spinner) getViewByPosition(position, R.id.sp_scene);
-        int positionScene = (int) spinner.getTag();
-        DbScene dbScene = sceneList.get(position);
-        Log.d(TAG, "onItemSelected: " + position + "-------" + positionScene);
-        map.put(btList.get(positionScene), dbScene);
+        if (parent.getTag() != null) {
+            int rvPos = (Integer) parent.getTag();
+            Log.d(TAG, "onItemSelected: rvPos = " + rvPos + "position = " + position);
+//        spinner = (Spinner) getViewByPosition(position, R.id.sp_scene);
+//        int positionScene = (int) spinner.getTag();
+            DbScene dbScene = sceneList.get(position);
+            map.put(rvPos, dbScene);
+        }
     }
 
     @Override
@@ -77,7 +81,7 @@ public class SwitchSceneGroupAdapter extends BaseQuickAdapter implements Adapter
 
     }
 
-    public Map<String, DbScene> getSceneMap() {
+    public Map<Integer, DbScene> getSceneMap() {
         return map;
     }
 }

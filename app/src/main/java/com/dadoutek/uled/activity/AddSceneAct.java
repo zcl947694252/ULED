@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.ItemGroup;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.StringUtils;
@@ -278,7 +279,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     }
 
     private void addScene(long id) throws InterruptedException {
-        byte opcode = (byte) 0xEE;
+        byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {

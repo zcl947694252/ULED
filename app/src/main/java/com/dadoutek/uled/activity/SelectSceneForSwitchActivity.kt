@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.DbModel.DbScene
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
@@ -28,8 +30,8 @@ import com.telink.util.Strings
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
-import kotlin.collections.ArrayList
 
 class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> {
 
@@ -70,6 +72,12 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -113,13 +121,13 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setUpdateDeviceList(mDeviceInfo)
 
         var keyNum: Int = 0
-        val map: Map<String, DbScene> = mAdapter.getSceneMap()
+        val map: Map<Int, DbScene> = mAdapter.getSceneMap()
         for (key in map.keys) {
             when (key) {
-                getString(R.string.scene1) -> keyNum = 0x05
-                getString(R.string.scene2) -> keyNum = 0x06
-                getString(R.string.scene3) -> keyNum = 0x03
-                getString(R.string.scene4) -> keyNum = 0x04
+                1 -> keyNum = 0x05          //左上按键
+                2 -> keyNum = 0x03//0x06    //右上按键
+                3 -> keyNum = 0x06//0x03    //左下按键
+                4 -> keyNum = 0x04          //右下按键
             }
             val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0xff.toByte(), map.getValue(key).id.toByte(),
                     0xff.toByte())
@@ -157,7 +165,11 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
     private fun initView() {
         if (mSceneList.isEmpty()) {
-            ToastUtils.showLong(getString(R.string.tip_switch))
+//            ToastUtils.showLong(getString(R.string.tip_switch))
+            fab.visibility = View.GONE
+            indefiniteSnackbar(root, R.string.tip_switch, R.string.btn_ok) {
+                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+            }
             return
         }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)

@@ -10,11 +10,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -28,7 +31,6 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,9 +47,6 @@ import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.StringUtils;
@@ -74,6 +73,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -83,7 +83,6 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -92,12 +91,9 @@ import io.reactivex.schedulers.Schedulers;
 
 public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String> {
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
-    @BindView(R.id.rvToolbar)
-    RelativeLayout rvToolbar;
+    private static final int MAX_RETRY_COUNT = 5;   //update mesh failed的重试次数设置为5次
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     @BindView(R.id.recycler_view_groups)
     RecyclerView recyclerViewGroups;
     @BindView(R.id.add_group_layout)
@@ -147,6 +143,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private List<DbGroup> groups;
 
+    private Disposable mTimer;
+    private int mRetryCount = 0;
+
     //当前所选组index
     private int currentGroupIndex = -1;
 
@@ -161,6 +160,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     //灯的mesh地址
     private int dstAddress;
+    private Disposable mConnectTimer;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -263,6 +263,43 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         nextTime = 0;
     }
 
+    private void startTimer() {
+        stopTimer();
+        // 防止onLescanTimeout不调用，导致UI卡住的问题。设为正常超时时间的2倍
+        mTimer = Observable.timer(SCAN_TIMEOUT_SECOND * 2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    if (mRetryCount < MAX_RETRY_COUNT) {
+                        mRetryCount++;
+                        Log.d("ScanningTest", "rxjava timer timeout , retry count = " + mRetryCount);
+                        startScan(200);
+                    } else {
+                        Log.d("ScanningTest", "rxjava timer timeout , do not retry");
+                        onLeScanTimeout();
+
+                    }
+//
+                });
+
+    }
+
+
+    private void stopTimer() {
+        if (mTimer != null && !mTimer.isDisposed()) {
+//            Log.d("ScanningTest", "cancel timer");
+            mTimer.dispose();
+        }
+    }
+
+
+    private Disposable createTimeout() {
+        return Observable.timer(10, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
+                    closeDialog();
+                    mConnectTimer = null;
+                });
+    }
+
     //处理扫描成功后
     private void scanSuccess() {
 
@@ -271,44 +308,54 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (nowLightList != null && nowLightList.size() > 0) {
             nowLightList.clear();
         }
-        nowLightList.addAll(adapter.getLights());
+        if (nowLightList != null)
+            nowLightList.addAll(adapter.getLights());
 
         //先连接灯。
         autoConnect();
 
+        //倒计时10s，出问题了就超时。
+        mConnectTimer = createTimeout();
+
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText(R.string.start_group_bt);
+
 
         btnAddGroups.setOnClickListener(v -> {
             if (isLoginSuccess) {
                 //进入分组
                 startGrouping();
-            } else {
+            } else if (mConnectTimer == null) {
                 openLoadingDialog(getResources().getString(R.string.device_login_tip));
-                Consumer<Boolean> loginConsumer = aBoolean -> {
-                    if (aBoolean) {
-                        //收到登录成功的时间后关闭dialog并自动进入分组流程。
-                        closeDialog();
-                        startGrouping();
-                    }
-                };
-                mDisposable.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
-                    //循环检测isLoginSuccess
-                    while (true) {
-                        Thread.sleep(20);   //两次检测之间的延时是必须的
-                        Log.d("Saw", "isLoginSuccess = " + isLoginSuccess);
-                        //如果isLoginSuccess为 true，则发射事件并退出循环检测。
-                        if (isLoginSuccess) {
-                            emitter.onNext(true);
-                            emitter.onComplete();
-                            break;
-                        }
-                    }
-                })
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(loginConsumer));
+                autoConnect();
+                mConnectTimer = createTimeout();
+            } else {    //正在连接中
+                openLoadingDialog(getResources().getString(R.string.device_login_tip));
+
             }
+//                Consumer<Boolean> loginConsumer = aBoolean -> {
+//                    if (aBoolean) {
+//                        //收到登录成功的时间后关闭dialog并自动进入分组流程。
+//                        closeDialog();
+//                        startGrouping();
+//                    }
+//                };
+//                mDisposable.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+//                    //循环检测isLoginSuccess
+//                    while (true) {
+//                        Thread.sleep(20);   //两次检测之间的延时是必须的
+//                        Log.d("Saw", "isLoginSuccess = " + isLoginSuccess);
+//                        //如果isLoginSuccess为 true，则发射事件并退出循环检测。
+//                        if (isLoginSuccess) {
+//                            emitter.onNext(true);
+//                            emitter.onComplete();
+//                            break;
+//                        }
+//                    }
+//                })
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(loginConsumer));
         });
         if (timer != null) {
             timer.cancel();
@@ -668,7 +715,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void initClick() {
-        this.imgHeaderMenuLeft.setOnClickListener(this.clickListener);
         this.btnScan.setOnClickListener(this.clickListener);
         this.btnLog.setOnClickListener(this.clickListener);
         deviceListView.setOnItemClickListener(this);
@@ -678,9 +724,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         @Override
         public void onClick(View v) {
-            if (v == imgHeaderMenuLeft) {
-                finish();
-            } else if (v == btnScan) {
+            if (v == btnScan) {
                 finish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
@@ -690,6 +734,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initView() {
+        initToolbar();
         //监听事件
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
@@ -699,7 +744,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         this.inflater = this.getLayoutInflater();
         this.adapter = new DeviceListAdapter();
 
-        this.imgHeaderMenuLeft = (ImageView) this.findViewById(R.id.img_header_menu_left);
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
         this.btnAddGroups = findViewById(R.id.btn_add_groups);
@@ -709,7 +753,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         this.btnScan = (Button) this.findViewById(R.id.btn_scan);
         this.btnScan.setEnabled(false);
         this.btnScan.setBackgroundResource(R.color.gray);
-        deviceListView = (GridView) this.findViewById(R.id.list_devices);
+        deviceListView = this.findViewById(R.id.list_devices);
         deviceListView.setAdapter(this.adapter);
         this.updateList = new ArrayList<>();
 
@@ -722,11 +766,30 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         currentGroupIndex = -1;
     }
 
+    private void initToolbar() {
+        toolbar.setTitle(R.string.scanning);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void initData() {
         this.mApplication = (TelinkLightApplication) this.getApplication();
-        nowLightList=new ArrayList<>();
-        if(groups==null){
-            groups=new ArrayList<>();
+        nowLightList = new ArrayList<>();
+        if (groups == null) {
+            groups = new ArrayList<>();
         }
     }
 
@@ -901,7 +964,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 this.onLeScan((LeScanEvent) event);
                 break;
             case LeScanEvent.LE_SCAN_TIMEOUT:
-                this.onLeScanTimeout((LeScanEvent) event);
+                stopTimer();
+                this.onLeScanTimeout();
                 break;
             case DeviceEvent.STATUS_CHANGED:
                 this.onDeviceStatusChanged((DeviceEvent) event);
@@ -971,18 +1035,35 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     SharedPreferencesHelper.putBoolean(DeviceScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
 
+//
+
+                tvNumLights.setVisibility(View.VISIBLE);
+                tvNumLights.setText(getString(R.string.scan_lights_num, adapter.getCount() + ""));
+
+                Log.d("ScanningTest", "update mesh success");
+
                 this.startScan(200);
                 break;
             case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
                 //加灯失败继续扫描
-                this.startScan(200);
+                if (mRetryCount < MAX_RETRY_COUNT) {
+                    mRetryCount++;
+                    Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
+                    stopTimer();
+                    this.startScan(200);
+                } else {
+                    Log.d("ScanningTest", "update mesh failed , do not retry");
+                }
                 break;
 
             case LightAdapter.STATUS_ERROR_N:
                 this.onNError(event);
                 break;
             case LightAdapter.STATUS_LOGIN:
-                isLoginSuccess = true;
+                if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
+                    mConnectTimer.dispose();
+                    isLoginSuccess = true;
+                }
 //                btnAddGroups.doneLoadingAnimation(R.color.black,
 //                        BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp));
                 break;
@@ -1013,13 +1094,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     /**
      * 扫描不到任何设备了
      * （扫描结束）
-     *
-     * @param event
      */
-    private void onLeScanTimeout(LeScanEvent event) {
-//        this.btnScan.setEnabled(true);
+    private void onLeScanTimeout() {
+        TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.colorPrimary);
-        if (preTime != 0) {//表示目前已经搜到了至少有一个设备
+        if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
             creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
         } else {
             creatMessage(Cmd.SCANCOMPLET, Cmd.SCANFAIL);
@@ -1056,6 +1135,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             params.setScanMode(true);
                             //                params.setScanMac("FF:FF:7A:68:6B:7F");
                             TelinkLightService.Instance().startScan(params);
+                            startTimer();
                             openLoadingDialog(getString(R.string.loading));
                         }, delay);
                     } else {

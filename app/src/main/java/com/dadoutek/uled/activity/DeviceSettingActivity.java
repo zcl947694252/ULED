@@ -76,7 +76,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
         this.editView.setOnClickListener(this.clickListener);
 
         this.settingFragment = (DeviceSettingFragment) this
-                .getFragmentManager().findFragmentById(
+                .getSupportFragmentManager().findFragmentById(
                         R.id.device_setting_fragment);
 
         if (fromWhere != null && !fromWhere.isEmpty()) {

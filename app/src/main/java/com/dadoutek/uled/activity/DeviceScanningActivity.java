@@ -36,8 +36,6 @@
 //
 //import com.blankj.utilcode.util.ActivityUtils;
 //import com.blankj.utilcode.util.ToastUtils;
-//import com.dadoutek.uled.DbModel.DBUtils;
-//import com.dadoutek.uled.DbModel.DbGroup;
 //import com.dadoutek.uled.R;
 //import com.dadoutek.uled.TelinkLightApplication;
 //import com.dadoutek.uled.TelinkLightService;
@@ -78,6 +76,7 @@
 //import java.util.List;
 //import java.util.Timer;
 //import java.util.TimerTask;
+//import java.util.concurrent.TimeUnit;
 //
 //import butterknife.BindView;
 //import butterknife.ButterKnife;
@@ -93,6 +92,7 @@
 //public final class DeviceScanningActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String> {
 //    private static final String TAG = DeviceScanningActivity.class.getSimpleName();
 //    private static final int SCAN_TIMEOUT_SECOND = 10;
+//    private static final int MAX_RETRY_COUNT = 5;   //update mesh failed的重试次数设置为5次
 //    //    @Bind(R.id.recycler_view_groups)
 //    RecyclerView recyclerViewGroups;
 //    //    @Bind(R.id.groups_bottom)
@@ -124,8 +124,7 @@
 //    private boolean canStartTimer = true;
 //    private Timer timer;
 //    private Dialog loadDialog;
-////    private Groups groups = Groups.getInstance();
-//    private List<DbGroup> groups;
+//    private Groups groups = Groups.getInstance();
 //    GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
 //    //当前所选组index
 //    private int currentGroupIndex = -1;
@@ -166,6 +165,8 @@
 //        }
 //    };
 //    private DataManager mDataManager;
+//    private Disposable mTimer;
+//    private int mRetryCount = 0;
 //
 //    //扫描失败处理方法
 //    private void scanFail() {
@@ -199,7 +200,8 @@
 //
 //    //处理扫描成功后
 //    private void scanSuccess() {
-//
+////        Toast.makeText(mApplication, "扫描成功", Toast.LENGTH_SHORT).show();
+//        closeDialog();
 //        //存储当前添加的灯。
 //        //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
 //        if (nowLightList != null && nowLightList.size() > 0) {
@@ -229,7 +231,7 @@
 //                mDisposable.add(Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
 //                    //循环检测isLoginSuccess
 //                    while (true) {
-//                        Thread.sleep(20);   //两次检测之间的延时是必须的
+//                        Thread.sleep(20);   //检测之间的延时是必须的
 //                        Log.d("Saw", "isLoginSuccess = " + isLoginSuccess);
 //                        //如果isLoginSuccess为 true，则发射事件并退出循环检测。
 //                        if (isLoginSuccess) {
@@ -248,7 +250,6 @@
 //            timer.cancel();
 //        }
 //        nextTime = 0;
-//        closeDialog();
 //        canStartTimer = false;
 //    }
 //
@@ -275,7 +276,6 @@
 //                    }
 //                })
 //                .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
-//                    // TODO Auto-generated method stub
 //                    dialog.dismiss();
 //                }).show();
 //    }
@@ -312,9 +312,11 @@
 //            switch (msg.what) {
 //                case Cmd.SCANCOMPLET:
 //                    if (msg.arg1 == Cmd.SCANFAIL) {
+//                        Log.d("ScanningTest", "SCAN FAIL");
 //                        activity.scanFail();
 //                    } else if (msg.arg1 == Cmd.SCANSUCCESS) {
 //                        Log.d(TAG, "Cmd.SCANSUCCESS");
+//                        Log.d("ScanningTest", "SCAN SUCCESS");
 //                        activity.scanSuccess();
 //                    }
 //                    break;
@@ -354,7 +356,7 @@
 //                connectParams.setPassword(mesh.password);
 //                connectParams.autoEnableNotification(true);
 //                //连接之前安装的第一个灯，因为第一个灯的信号一般会比较好。
-//                connectParams.setConnectMac(adapter.getItem(0).macAddress);
+////                connectParams.setConnectMac(adapter.getItem(0).macAddress);
 //
 //                // 之前是否有在做MeshOTA操作，是则继续
 //                if (mesh.isOtaProcessing()) {
@@ -403,8 +405,9 @@
 //            if (checkLightsHaveGroup()) {//所有灯都有分组可以跳转
 //                showToast(getString(R.string.group_completed));
 //                //页面跳转前进行分组数据保存
-//                mDataManager.saveGroups(groups);
+//                mDataManager.updateGroup(groups);
 //                mDataManager.updateLights(nowLightList);
+//
 //
 //                TelinkLightService.Instance().idleMode(true);
 //                //目前测试调到主页
@@ -508,7 +511,7 @@
 //            int index = 0;
 //            while (index < selectLights.size()) {
 //                Light light = selectLights.get(index);
-////                deletePreGroup(light);
+//                deletePreGroup(light);
 //                saveLightAddrToGroup(light);
 //                //每个灯发3次分组的命令，确保灯能收到命令.
 //                for (int i = 0; i < 3; i++) {
@@ -548,7 +551,7 @@
 //    private void deletePreGroup(Light light) {
 //        if (originalGroupAddress != -1) {
 //            for (int i = 0; i < groups.size(); i++) {
-//                if (groups.get(i).getMeshAddr() == originalGroupAddress) {
+//                if (groups.get(i).meshAddress == originalGroupAddress) {
 //                    groups.get(i).containsLightList.remove((Integer) light.meshAddress);
 //                }
 //            }
@@ -709,7 +712,7 @@
 //        this.btnScan = (Button) this.findViewById(R.id.btn_scan);
 //        this.btnScan.setEnabled(false);
 //        this.btnScan.setBackgroundResource(R.color.gray);
-//        deviceListView = (GridView) this.findViewById(R.id.list_devices);
+//        deviceListView = this.findViewById(R.id.list_devices);
 //        deviceListView.setAdapter(this.adapter);
 //        this.updateList = new ArrayList<>();
 //
@@ -763,10 +766,13 @@
 //                            params.setScanMode(true);
 //                            //                params.setScanMac("FF:FF:7A:68:6B:7F");
 //                            TelinkLightService.Instance().startScan(params);
+//
+//                            Log.d("ScanningTest", "start scan");
+//                            startTimer();
+//
 //                            openLoadingDialog(getString(R.string.loading));
 //                        }, delay);
 //                    } else {
-//                        // TODO: 2018/3/26 弹框提示为何需要此权限，点击确定后再次申请权限，点击取消退出.
 //                        AlertDialog.Builder dialog = new AlertDialog.Builder(DeviceScanningActivity.this);
 //                        dialog.setMessage(getResources().getString(R.string.scan_tip));
 //                        dialog.setPositiveButton(R.string.btn_ok, (dialog1, which) -> startScan(0));
@@ -815,13 +821,14 @@
 //    /**
 //     * 扫描不到任何设备了
 //     * （扫描结束）
-//     *
-//     * @param event
 //     */
-//    private void onLeScanTimeout(LeScanEvent event) {
-////        this.btnScan.setEnabled(true);
+//    private void onLeScanTimeout() {
+//        TelinkLightService.Instance().idleMode(true);
 //        this.btnScan.setBackgroundResource(R.color.colorPrimary);
-//        if (preTime != 0) {//表示目前已经搜到了至少有一个设备
+//
+////        Log.d("ScanningTest", "onLeScanTimeout count = " + adapter.getCount());
+//
+//        if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
 //            creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
 //        } else {
 //            creatMessage(Cmd.SCANCOMPLET, Cmd.SCANFAIL);
@@ -838,7 +845,7 @@
 //    private void onDeviceStatusChanged(DeviceEvent event) {
 //
 //        DeviceInfo deviceInfo = event.getArgs();
-//
+////        Toast.makeText(mApplication, "deviceInfo.status = " + deviceInfo.status, Toast.LENGTH_SHORT).show();
 //        switch (deviceInfo.status) {
 //            case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
 //                //加灯完成继续扫描,直到扫不到设备
@@ -870,13 +877,6 @@
 //                    this.adapter.notifyDataSetChanged();
 //                }
 //
-//                if (canStartTimer) {
-////                    startTimer();
-//                    canStartTimer = false;
-//                }
-//
-//                preTime = TimeUtil.getNowSeconds();
-////                this.startScan(1000);
 //
 //                //扫描出灯就设置为非首次进入
 //                if (isFirtst) {
@@ -884,11 +884,22 @@
 //                    SharedPreferencesHelper.putBoolean(DeviceScanningActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
 //                }
 //
+//                Log.d("ScanningTest", "update mesh success");
+//                mRetryCount = 0;
+//                stopTimer();
 //                this.startScan(200);
 //                break;
 //            case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
 //                //加灯失败继续扫描
-//                this.startScan(200);
+//                if (mRetryCount < MAX_RETRY_COUNT) {
+//                    mRetryCount++;
+//                    Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
+//                    stopTimer();
+//                    this.startScan(200);
+//                } else {
+//                    Log.d("ScanningTest", "update mesh failed , do not retry");
+//                }
+////
 //                break;
 //
 //            case LightAdapter.STATUS_ERROR_N:
@@ -896,30 +907,48 @@
 //                break;
 //            case LightAdapter.STATUS_LOGIN:
 //                isLoginSuccess = true;
+////                Toast.makeText(mApplication, "Login success", Toast.LENGTH_LONG).show();
 ////                btnAddGroups.doneLoadingAnimation(R.color.black,
 ////                        BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp));
 //                break;
 //            case LightAdapter.STATUS_LOGOUT:
 //                isLoginSuccess = false;
+////                Toast.makeText(mApplication, "STATUS_LOGOUT", Toast.LENGTH_LONG).show();
+////                new AlertDialog.Builder(this).setMessage("STATUS_LOGOUT").show();
+//
 //                break;
 //        }
 //    }
 //
 //    private void startTimer() {
-//        timer = new Timer();
-//        timer.schedule(task, 1000, 1000);
+//        // 防止onLescanTimeout不调用，导致UI卡住的问题。设为正常超时时间的2倍
+//        stopTimer();
+//        mTimer = Observable.timer(SCAN_TIMEOUT_SECOND * 2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+//                .subscribe(aLong -> {
+//                    if (mRetryCount < MAX_RETRY_COUNT) {
+//                        mRetryCount++;
+//                        Log.d("ScanningTest", "rxjava timer timeout , retry count = " + mRetryCount);
+//                        startScan(200);
+//                    } else {
+//                        Log.d("ScanningTest", "rxjava timer timeout , do not retry");
+//                        onLeScanTimeout();
+//
+//                    }
+////
+//                });
+//
 //    }
 //
-//    TimerTask task = new TimerTask() {
-//        @Override
-//        public void run() {
-//            nextTime = TimeUtil.getNowSeconds();
-//            Log.d("DeviceScanning", "timer: " + "nextTime=" + nextTime + ";preTime=" + preTime);
-//            if (preTime > 0 && nextTime - preTime >= SCAN_TIMEOUT_SECOND) {
-//                creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
-//            }
+//
+//    private void stopTimer() {
+//        if (mTimer != null && !mTimer.isDisposed()) {
+//            Log.d("ScanningTest", "cancel timer");
+//            mTimer.dispose();
 //        }
-//    };
+//    }
+//
+//    ;
+//
 //
 //    private void onNError(final DeviceEvent event) {
 //
@@ -997,7 +1026,7 @@
 //                (byte) (groupAddress >> 8 & 0xFF)};
 //
 ////        Log.d("Scanner", "checkSelectLamp: " + "opcode:" + opcode + ";  dstAddress:" + dstAddress + ";  params:" + params.toString());
-////        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  group:name=="+group.name+";  group:name=="+group.meshAddress+";  lighthas"+light.hasGroup);
+////        Log.d("groupingCC", "sendGroupData: "+"----dstAddress:"+dstAddress+";  men_group:name=="+men_group.name+";  men_group:name=="+men_group.meshAddress+";  lighthas"+light.hasGroup);
 //
 //        if (group.checked) {
 //            params[0] = 0x01;
@@ -1035,7 +1064,10 @@
 //                this.onLeScan((LeScanEvent) event);
 //                break;
 //            case LeScanEvent.LE_SCAN_TIMEOUT:
-//                this.onLeScanTimeout((LeScanEvent) event);
+////                new AlertDialog.Builder(this).setMessage("扫描超时").show();
+//                stopTimer();
+//                Log.d("ScanningTest", "LE_SCAN_TIMEOUT");
+//                this.onLeScanTimeout();
 //                break;
 //            case DeviceEvent.STATUS_CHANGED:
 //                this.onDeviceStatusChanged((DeviceEvent) event);
@@ -1069,7 +1101,7 @@
 //
 //                if (group != null) {
 //                }
-////                    group.checked = false;
+////                    men_group.checked = false;
 //            }
 //
 //            int groupAddress;
@@ -1087,7 +1119,7 @@
 //                group = this.groupsRecyclerViewAdapter.get(groupAddress);
 //
 //                if (group != null) {
-////                    group.checked = true;
+////                    men_group.checked = true;
 //                }
 //            }
 //
@@ -1148,7 +1180,8 @@
 //
 //            Light light = this.getItem(position);
 //
-//            holder.txtName.setText(light.name);
+////            holder.txtName.setText(light.name);
+//            holder.txtName.setText(R.string.not_grouped);
 //            holder.icon.setImageResource(R.drawable.icon_light_on);
 //            holder.selected.setChecked(light.selected);
 //

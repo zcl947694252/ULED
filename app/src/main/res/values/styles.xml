@@ -19,6 +19,8 @@
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorPrimaryDark">@color/colorPrimary</item>
         <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
     </style>
 
     <style name="FullHeightDialog" parent="android:style/Theme.Dialog">

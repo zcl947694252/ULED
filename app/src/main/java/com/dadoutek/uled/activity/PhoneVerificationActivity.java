@@ -3,11 +3,11 @@ package com.dadoutek.uled.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -25,56 +25,73 @@ import cn.smssdk.SMSSDK;
  */
 
 public class PhoneVerificationActivity extends TelinkBaseActivity {
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
     @BindView(R.id.ccp)
     CountryCodePicker ccp;
     @BindView(R.id.edit_phone_number)
     TextInputLayout editPhoneNumber;
-    @BindView(R.id.center_layout)
-    LinearLayout centerLayout;
     @BindView(R.id.btn_send_verification)
     Button btnSendVerification;
     @BindView(R.id.edit_verification)
     TextInputLayout editVerification;
     @BindView(R.id.btn_verification)
     Button btnVerification;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private String countryCode;
     private String transForm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acitvity_phone_verification);
         ButterKnife.bind(this);
         initData();
+        initToolbar();
         initView();
     }
 
+    private void initToolbar() {
+        toolbar.setTitle(R.string.verification_phone);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null)
+            actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+
     private void initData() {
-        Intent intent=getIntent();
-        transForm=intent.getStringExtra("fromLogin");
+        Intent intent = getIntent();
+        transForm = intent.getStringExtra("fromLogin");
     }
 
     private void initView() {
-        countryCode=ccp.getSelectedCountryCode();
-        ccp.setOnCountryChangeListener(() -> countryCode=ccp.getSelectedCountryCode());
-        txtHeaderTitle.setText(R.string.verification_phone);
+        countryCode = ccp.getSelectedCountryCode();
+        ccp.setOnCountryChangeListener(() -> countryCode = ccp.getSelectedCountryCode());
     }
 
-    @OnClick({R.id.img_header_menu_left, R.id.btn_send_verification, R.id.btn_verification})
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @OnClick({R.id.btn_send_verification, R.id.btn_verification})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.img_header_menu_left:
                 finish();
                 break;
             case R.id.btn_send_verification:
-                sendCode(countryCode,editPhoneNumber.getEditText().getText().toString().trim());
+                sendCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim());
                 break;
             case R.id.btn_verification:
-                submitCode(countryCode,editPhoneNumber.getEditText().getText().toString().trim(),
+                submitCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim(),
                         editVerification.getEditText().getText().toString().trim());
                 break;
         }
@@ -89,7 +106,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                     // TODO 处理成功得到验证码的结果
                     // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
                     ToastUtils.showLong(R.string.send_message_success);
-                } else{
+                } else {
                     // TODO 处理错误的结果
                     ToastUtils.showLong(R.string.send_message_fail);
                 }
@@ -108,7 +125,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 if (result == SMSSDK.RESULT_COMPLETE) {
                     // TODO 处理验证成功的结果
                     tranformView();
-                } else{
+                } else {
                     // TODO 处理错误的结果
                     ToastUtils.showLong(R.string.verification_code_error);
                 }
@@ -121,15 +138,15 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
 
     private void tranformView() {
         ToastUtils.showLong(R.string.successful_verification);
-        Intent intent=null;
-        if(transForm.equals("register")){
-            intent=new Intent(PhoneVerificationActivity.this,RegisterActivity.class);
-            intent.putExtra("phone",editPhoneNumber.getEditText().getText().toString().trim());
-        }else if(transForm.equals("forgetPassword")){
-            intent=new Intent(PhoneVerificationActivity.this,ForgetPassWordActivity.class);
-            intent.putExtra("phone",editPhoneNumber.getEditText().getText().toString().trim());
+        Intent intent = null;
+        if (transForm.equals("register")) {
+            intent = new Intent(PhoneVerificationActivity.this, RegisterActivity.class);
+            intent.putExtra("phone", editPhoneNumber.getEditText().getText().toString().trim());
+        } else if (transForm.equals("forgetPassword")) {
+            intent = new Intent(PhoneVerificationActivity.this, ForgetPassWordActivity.class);
+            intent.putExtra("phone", editPhoneNumber.getEditText().getText().toString().trim());
         }
-        if(intent!=null){
+        if (intent != null) {
             startActivity(intent);
             finish();
         }
@@ -139,5 +156,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
         super.onDestroy();
         //用完回调要注销掉，否则可能会出现内存泄露
         SMSSDK.unregisterAllEventHandler();
-    };
+    }
+
+    ;
 }

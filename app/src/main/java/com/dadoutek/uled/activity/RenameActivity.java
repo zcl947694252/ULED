@@ -15,9 +15,6 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.util.DataManager;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

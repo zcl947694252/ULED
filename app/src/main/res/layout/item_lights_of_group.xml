@@ -13,25 +13,26 @@
 
     <TextView
         android:id="@+id/name"
-        android:text="name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <LinearLayout
-        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:text="name" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_setting"
             android:layout_width="50dp"
             android:layout_height="30dp"
-            android:gravity="center"
             android:layout_marginTop="8dp"
+            android:background="@drawable/btn_rec_selector"
+            android:gravity="center"
             android:text="@string/setting"
-            android:background="@drawable/btn_rec_selector" />
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
 </LinearLayout>

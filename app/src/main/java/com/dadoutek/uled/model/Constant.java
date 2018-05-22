@@ -14,10 +14,10 @@ public class Constant implements Serializable {
 //    public static final String DEFAULT_MESH_FACTORY_NAME="TestLocas";
 //    public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
-    public static final String NEW_MESH_NAME = "866866";
+    public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = "688688";
+    public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -27,7 +27,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = "xxxxxx";
+    public static final String OUT_OF_MESH_NAME = "out_of_mesh";
 
     public static final int RESULT_OK = 1;
     public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";
