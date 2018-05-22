@@ -295,7 +295,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 Activity mContext = DeviceGroupingActivity.this;
                 if (group.checked) {
                     ColorStateList color = mContext.getResources()
-                            .getColorStateList(R.color.colorPrimary);
+                            .getColorStateList(R.color.primary);
                     holder.name.setTextColor(color);
                 } else {
                     ColorStateList color = mContext.getResources()

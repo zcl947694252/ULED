@@ -4,24 +4,15 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar" />
 
     <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:colorAccent">@color/accent</item>
         <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
 
     </style>
 
 
-    // values-v21。5.0 以上提供了 setStatusBarColor() 方法设置状态栏颜色。
-
-    <style name="StatusTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorPrimaryDark">@color/colorPrimary</item>
-        <item name="android:navigationBarColor">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
-    </style>
 
     <style name="FullHeightDialog" parent="android:style/Theme.Dialog">
         <item name="android:windowNoTitle">true</item>

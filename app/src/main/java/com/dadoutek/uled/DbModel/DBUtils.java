@@ -52,6 +52,10 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
     }
 
+    public static List<DbGroup> getAllGroups() {
+        return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
+    }
+
     public static void saveLight(DbLight light){
         DaoSessionInstance.getInstance().getDbLightDao().insertOrReplace(light);
     }
@@ -64,7 +68,11 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbLightDao().update(light);
     }
 
-    public static void addNewGroup(String name,List<DbGroup> groups,Context context){
+    /**
+     *
+     * @return 新的Group对象
+     */
+    public static DbGroup addNewGroup(String name,List<DbGroup> groups,Context context){
         if (!checkRepeat(groups, context, name)) {
             int count = groups.size();
             int newMeshAdress = ++count;
@@ -76,7 +84,9 @@ public class DBUtils {
             groups.add(group);
             //新增数据库保存
             DBUtils.saveGroup(group);
+            return group;
         }
+        return null;
 
     }
 

@@ -117,6 +117,8 @@
     <string name="repeat_tip_name">Already have this group name, please modify!</string>
     <string name="successfully_modified">Successfully modified!</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
+    <string name="title_scanning_lights_num">Scanning(scanned %1$d lights)</string>
+    <string name="title_scanned_lights_num">Scan complete(scanned %1$d lights)</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
     <string name="empty_cache_tip">Clear data? APP will restart automatically after clearing</string>
@@ -222,5 +224,6 @@
     <string name="tip_add_group">请先添加一个分组</string>
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
+    <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
 
 </resources>

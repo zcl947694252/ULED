@@ -27,9 +27,9 @@
         app:layout_constraintTop_toBottomOf="@+id/tvHint3"
         app:pb_colorComplete="@color/green_complete"
         app:pb_colorError="@color/red_error"
-        app:pb_colorNormal="@color/colorPrimary"
+        app:pb_colorNormal="@color/primary"
         app:pb_colorPressed="@android:color/holo_blue_dark"
-        app:pb_colorProgress="@color/colorPrimary"
+        app:pb_colorProgress="@color/primary"
         app:pb_textComplete="@string/connected"
         app:pb_textError="@string/not_found_switch"
         app:pb_textProgress="@string/searching" />
