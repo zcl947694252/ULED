@@ -8,12 +8,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,12 +38,10 @@ public class RenameLightActivity extends TelinkBaseActivity {
     Button btnSure;
     @BindView(R.id.txt_header_title)
     TextView txtHeaderTitle;
-    private int lightAddress;
+    private DbLight light;
 
     private TelinkLightApplication mApplication;
     private String newName;
-    private DataManager dataManager;
-    private Lights lights = Lights.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +50,7 @@ public class RenameLightActivity extends TelinkBaseActivity {
         ButterKnife.bind(this);
         txtHeaderTitle.setText(R.string.rename_light);
         mApplication = (TelinkLightApplication) this.getApplication();
-        this.lightAddress = this.getIntent().getIntExtra("lightAddress", 0);
-        dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
+        this.light = (DbLight) this.getIntent().getExtras().get("light");
 //        Lights lights1=dataManager.getLights();
     }
 
@@ -76,18 +76,9 @@ public class RenameLightActivity extends TelinkBaseActivity {
     }
 
     private void saveName() {
-        for (
-                int k = 0; k < lights.size(); k++)
-
-        {
-            if (lightAddress == lights.get(k).meshAddress) {
-                lights.get(k).name = newName;
-                dataManager.updateLights(lights);
-                Toast.makeText(RenameLightActivity.this, R.string.successfully_modified, Toast.LENGTH_LONG).show();
-                finish();
-                break;
-            }
-        }
+        light.setName(newName);
+        DBUtils.updateLight(light);
+        finish();
     }
 
     private boolean checkName() {
@@ -96,8 +87,12 @@ public class RenameLightActivity extends TelinkBaseActivity {
             return false;
         }
 
-        if (dataManager.checkRepeat(lights, this, newName)) {
-            return false;
+        List<DbLight> lights=DBUtils.getAllLight();
+        for(int k=0;k<lights.size();k++){
+            if(lights.get(k).getName().equals(newName)){
+                ToastUtils.showLong(R.string.tip_used_name);
+                return false;
+            }
         }
         return true;
     }

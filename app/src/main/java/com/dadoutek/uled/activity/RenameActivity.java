@@ -7,6 +7,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -29,12 +31,10 @@ public class RenameActivity extends TelinkBaseActivity {
     EditText editRename;
     @BindView(R.id.btn_sure)
     Button btnSure;
-    private int groupAddress;
 
     private TelinkLightApplication mApplication;
     private String newName;
-    private DataManager dataManager;
-    private Groups groups;
+    private DbGroup group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +42,7 @@ public class RenameActivity extends TelinkBaseActivity {
         setContentView(R.layout.activity_rename);
         ButterKnife.bind(this);
         mApplication = (TelinkLightApplication) this.getApplication();
-        this.groupAddress = this.getIntent().getIntExtra("groupAddress", 0);
-        dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
-        groups = dataManager.getGroups();
+        this.group = (DbGroup) this.getIntent().getExtras().get("group");
     }
 
     @OnClick({R.id.img_header_menu_left, R.id.edit_rename, R.id.btn_sure})
@@ -69,18 +67,9 @@ public class RenameActivity extends TelinkBaseActivity {
     }
 
     private void saveName() {
-        for (
-                int k = 0; k < groups.size(); k++)
-
-        {
-            if (groupAddress == groups.get(k).meshAddress) {
-                groups.get(k).name = newName;
-                dataManager.updateGroup(groups);
-                Toast.makeText(RenameActivity.this, R.string.successfully_modified, Toast.LENGTH_LONG).show();
-                finish();
-                break;
-            }
-        }
+        group.setName(newName);
+        DBUtils.updateGroup(group);
+        finish();
     }
 
     private boolean checkName() {

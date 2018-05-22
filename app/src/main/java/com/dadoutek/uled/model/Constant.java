@@ -52,4 +52,10 @@ public class Constant implements Serializable {
 
     //用于标记当前数据库名的本地存储
     public static String DB_TOken_KEY="DB_NAME_KEY";
+
+    //当前使用的区域默认为0
+    public static long CURRENT_USE_REGION_ID=0;
+
+    //当前使用的区域默认为0
+    public static String CURRENT_USE_REGION_KEY="CURRENT_USE_REGION_KEY";
 }

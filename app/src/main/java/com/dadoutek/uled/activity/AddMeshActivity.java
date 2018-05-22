@@ -17,6 +17,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.Lights;
@@ -71,7 +72,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         if (canBeSave) {
             //如果用户更改了控制名称或密码，那么就清空保存的组和灯
             if (!mNewMeshName.equals(mOldMeshName) || !mNewMeshPwd.equals(mOldMeshPwd)) {
-                clearData();
+                //使用数据库保存改为不清空
+//                clearData();
                 setResult(RESULT_OK);
             } else {
                 setResult(RESULT_CANCELED);
@@ -84,20 +86,20 @@ public final class AddMeshActivity extends TelinkBaseActivity {
      * 清除组和灯的数据
      */
     private void clearData() {
-        Groups groups = Groups.getInstance();
-        Lights lights = Lights.getInstance();
-
-        groups.clear();
-        lights.clear();
-
-        DataManager dataManager = new DataManager(this, mNewMeshName, mNewMeshPwd);
-
-        dataManager.createAllLightControllerGroup();//初始化自动创建16个分组
-//        groups.add(dataManager.getGroups().get());
-        lights.add(dataManager.getLights().get());
-
-        //非本地保存的暂时清空数据库 2018-5-10 hjj
-        DBManager.getInstance().deleteAllData();
+//        Groups groups = Groups.getInstance();
+//        Lights lights = Lights.getInstance();
+//
+//        groups.clear();
+//        lights.clear();
+//
+//        DataManager dataManager = new DataManager(this, mNewMeshName, mNewMeshPwd);
+//
+//        dataManager.createAllLightControllerGroup();//初始化自动创建16个分组
+////        groups.add(dataManager.getGroups().get());
+//        lights.add(dataManager.getLights().get());
+//
+//        //非本地保存的暂时清空数据库 2018-5-10 hjj
+//        DBManager.getInstance().deleteAllData();
     }
 
     @Override
@@ -228,8 +230,9 @@ public final class AddMeshActivity extends TelinkBaseActivity {
     }
 
     private void saveToDataBase(String factoryName, String factoryPwd, String mNewMeshName, String mNewMeshPwd) {
+        String account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY,"dadou");
         DbRegion dbRegio=new DbRegion();
-        dbRegio.setBelongAccount("");
+        dbRegio.setBelongAccount(account);
         dbRegio.setControlMesh(mNewMeshName);
         dbRegio.setControlMeshPwd(mNewMeshPwd);
         dbRegio.setInstallMesh(factoryName);

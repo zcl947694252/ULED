@@ -224,6 +224,7 @@
     <string name="tip_add_group">请先添加一个分组</string>
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
+    <string name="tip_used_name">当前名称已被使用</string>
     <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
 
 </resources>

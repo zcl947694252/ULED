@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener;
@@ -28,12 +29,12 @@ public class LightsOfGroupRecyclerViewAdapter extends
         RecyclerView.Adapter<LightsOfGroupRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
     private final LayoutInflater mLayoutInflater;
     private final Context mContext;
-    private List<Light> lightList;
+    private List<DbLight> lightList;
     private DataManager dataManager;
     private TelinkLightApplication mApplication;
     public SwitchButtonOnCheckedChangeListener onCheckedChangeListener;
 
-    public LightsOfGroupRecyclerViewAdapter(Context mContext, List<Light> lightList,
+    public LightsOfGroupRecyclerViewAdapter(Context mContext, List<DbLight> lightList,
                                             SwitchButtonOnCheckedChangeListener onCheckedChangeListener) {
         this.mContext = mContext;
         this.lightList = lightList;
@@ -53,7 +54,7 @@ public class LightsOfGroupRecyclerViewAdapter extends
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Light light = lightList.get(position);
+        DbLight light = lightList.get(position);
         holder.name.setText(dataManager.getLightName(light));
         holder.tvSetting.setOnClickListener(this);
         holder.tvSetting.setTag(position);

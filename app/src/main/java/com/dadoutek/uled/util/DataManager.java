@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
@@ -324,15 +325,11 @@ public class DataManager {
         return null;
     }
 
-    public String getLightName(Light light) {
-        Lights lights = getLights();
-        for (int i = 0; i < lights.size(); i++) {
-            if (lights.get(i).name != null && !lights.get(i).name.isEmpty()) {
-                if (light.meshAddress == lights.get(i).meshAddress) {
-                    return lights.get(i).name;
-                }
-            }
+    public String getLightName(DbLight light) {
+        if(light.getName().isEmpty()){
+            return light.getLabel();
+        }else{
+            return light.getName();
         }
-        return light.getLabel();
     }
 }

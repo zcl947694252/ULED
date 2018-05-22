@@ -19,21 +19,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import retrofit2.http.HEAD;
 
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
 
@@ -41,65 +41,29 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
     private LayoutInflater inflater;
     private GroupListAdapter adapter;
-    private Groups groupsInit;
+    private List<DbGroup> groupsInit;
 
-    private int meshAddress;
-    private DataManager mDataManager;
+    private DbLight light;
 
-    private OnClickListener clickListener = new OnClickListener() {
-
-        @Override
-        public void onClick(View v) {
-            finish();
-        }
-    };
+    private OnClickListener clickListener = v -> finish();
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
-            Group group = adapter.getItem(position);
+            DbGroup group = adapter.getItem(position);
             if (group.checked) {
                 ToastUtils.showLong(R.string.tip_selected_group);
             } else {
-                deleteLightFromOldGroup();
                 allocDeviceGroup(group);
-                saveInfo(position);
+                saveInfo();
             }
         }
     };
 
-    private void deleteLightFromOldGroup() {
-//        Light light = Lights.getInstance().getByMeshAddress(meshAddress);
-        for (Group group :
-                Groups.getInstance().get()) {
-            for (int i = 0; i < group.containsLightList.size(); i++) {
-                if (group.containsLightList.get(i) == meshAddress) {
-                    group.containsLightList.remove(i);
-                }
-            }
-        }
-
-    }
-
-    private void saveInfo(int position) {
-        Groups groups = Groups.getInstance();
-        if (groups.get(position).containsLightList == null) {
-            groups.get(position).containsLightList = new ArrayList<>();
-        }
-        if (groups.get(position).containsLightList.size() == 0) {
-            groups.get(position).containsLightList.add(meshAddress);
-        }
-        if (!groups.get(position).containsLightList.contains(meshAddress)) {
-            groups.get(position).containsLightList.add(meshAddress);
-        }
-
-        mDataManager.updateGroup(groups);
+    private void saveInfo() {
+        DBUtils.updateLight(light);
         finish();
-//        Lights lights=DataManager.getLights();
-//        for(int i=0;){
-//
-//        }
     }
 
     private Handler mHandler = new Handler() {
@@ -128,7 +92,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_grouping);
 
-        this.meshAddress = this.getIntent().getIntExtra("meshAddress", 0);
+        this.light = (DbLight) this.getIntent().getExtras().get("light");
 
         this.inflater = this.getLayoutInflater();
         this.adapter = new GroupListAdapter();
@@ -137,25 +101,17 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 .findViewById(R.id.img_header_menu_left);
         backView.setOnClickListener(this.clickListener);
 
+        this.initData();
+
         GridView listView = (GridView) this.findViewById(R.id.list_groups);
         listView.setOnItemClickListener(this.itemClickListener);
         listView.setAdapter(this.adapter);
 
-
-        this.initData();
         this.getDeviceGroup();
     }
 
     private void initData() {
-        Groups.getInstance().clear();
-        mDataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
-
-        groupsInit = mDataManager.getGroups();
-
-        for (int i = 0; i < groupsInit.size(); i++) {
-            Groups.getInstance().add(groupsInit.get(i));
-        }
-
+        groupsInit = DBUtils.getGroupList();
         this.adapter.notifyDataSetChanged();
     }
 
@@ -167,17 +123,17 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
     private void getDeviceGroup() {
         byte opcode = (byte) 0xDD;
-        int dstAddress = this.meshAddress;
+        int dstAddress = light.getMeshAddr();
         byte[] params = new byte[]{0x08, 0x01};
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
         TelinkLightService.Instance().updateNotification();
     }
 
-    private void allocDeviceGroup(Group group) {
+    private void allocDeviceGroup(DbGroup group) {
 
-        int groupAddress = group.meshAddress;
-        int dstAddress = this.meshAddress;
+        int groupAddress = group.getMeshAddr();
+        int dstAddress = light.getMeshAddr();
         byte opcode = (byte) 0xD7;
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
@@ -185,7 +141,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         if (!group.checked) {
             params[0] = 0x01;
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-            group.containsLightList.add(meshAddress);
+            light.setBelongGroupId(group.getId());
 
         } else {
             params[0] = 0x00;
@@ -203,12 +159,12 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
             int srcAddress = info.src & 0xFF;
             byte[] params = info.params;
 
-            if (srcAddress != this.meshAddress)
+            if (srcAddress != light.getMeshAddr())
                 return;
 
             int count = this.adapter.getCount();
 
-            Group group;
+            DbGroup group;
 
             for (int i = 0; i < count; i++) {
                 group = this.adapter.getItem(i);
@@ -246,14 +202,17 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
     private final class GroupListAdapter extends BaseAdapter {
 
-        @Override
-        public int getCount() {
-            return Groups.getInstance().size();
+        public GroupListAdapter() {
         }
 
         @Override
-        public Group getItem(int position) {
-            return Groups.getInstance().get(position);
+        public int getCount() {
+            return groupsInit.size();
+        }
+
+        @Override
+        public DbGroup getItem(int position) {
+            return groupsInit.get(position);
         }
 
         @Override
@@ -261,8 +220,13 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
             return 0;
         }
 
-        public Group get(int addr) {
-            return Groups.getInstance().getByMeshAddress(addr);
+        public DbGroup get(int addr) {
+            for(int j=0;j<groupsInit.size();j++){
+                if(addr==groupsInit.get(j).getMeshAddr()){
+                    return groupsInit.get(j);
+                }
+            }
+            return null;
         }
 
         @Override
@@ -287,10 +251,10 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 holder = (GroupItemHolder) convertView.getTag();
             }
 
-            Group group = this.getItem(position);
+            DbGroup group = this.getItem(position);
 
             if (group != null) {
-                holder.name.setText(group.name);
+                holder.name.setText(group.getName());
 
                 Activity mContext = DeviceGroupingActivity.this;
                 if (group.checked) {
@@ -304,11 +268,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 }
 
             }
-
-            if (position == 0) {
-                AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(1, 1);
-                convertView.setLayoutParams(layoutParams);
-            }
+//
+//            if (position == 0) {
+//                AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(1, 1);
+//                convertView.setLayoutParams(layoutParams);
+//            }
 
             return convertView;
         }

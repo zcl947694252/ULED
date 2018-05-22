@@ -6,11 +6,16 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
+import java.io.Serializable;
+
 /**
  * Created by hejiajun on 2018/5/14.
  */
 @Entity
-public class DbGroup {
+public class DbGroup implements Serializable{
+
+    static final long serialVersionUID = -15515456L;
+
     @Id(autoincrement = true)
     private Long id;
     @NotNull
@@ -22,6 +27,10 @@ public class DbGroup {
 
     @Transient
     public boolean checked;
+    @Transient
+    public boolean selected;
+    @Transient
+    public int textColor;//文字颜色
 
     @Generated(hash = 55678821)
     public DbGroup(Long id, int meshAddr, String name, int brightness,

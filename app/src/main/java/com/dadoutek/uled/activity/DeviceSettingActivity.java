@@ -8,13 +8,13 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.fragments.DeviceSettingFragment;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 
 public final class DeviceSettingActivity extends TelinkBaseActivity {
@@ -23,7 +23,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     private ImageView editView;
     private DeviceSettingFragment settingFragment;
 
-    private int meshAddress;
+    private DbLight light;
     private int gpAddress;
     private String fromWhere;
     private TelinkLightApplication mApplication;
@@ -37,7 +37,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             } else if (v == editView) {
                 Intent intent = new Intent(DeviceSettingActivity.this,
                         DeviceGroupingActivity.class);
-                intent.putExtra("meshAddress", meshAddress);
+                intent.putExtra("light", light);
                 startActivity(intent);
                 finish();
             }
@@ -52,14 +52,12 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_setting);
 
-        this.meshAddress = this.getIntent().getIntExtra(Constant.LIGHT_ARESS_KEY, 0);
+        this.light = (DbLight) this.getIntent().getExtras().get(Constant.LIGHT_ARESS_KEY);
         this.fromWhere = this.getIntent().getStringExtra(Constant.LIGHT_REFRESH_KEY);
         this.gpAddress = this.getIntent().getIntExtra(Constant.GROUP_ARESS_KEY, 0);
 
         mApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
-
-        Light light = Lights.getInstance().getByMeshAddress(meshAddress);
 
         if (light != null) {
             TextView txtTitle = (TextView) this
@@ -84,6 +82,6 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             this.settingFragment.fromWhere = fromWhere;
             this.settingFragment.gpAddress = gpAddress;
         }
-        this.settingFragment.meshAddress = meshAddress;
+        this.settingFragment.light = light;
     }
 }
