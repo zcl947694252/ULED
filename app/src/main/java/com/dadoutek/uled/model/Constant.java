@@ -55,4 +55,7 @@ public class Constant implements Serializable {
 
     //当前使用的区域默认为0
     public static long CURRENT_USE_REGION_ID=0;
+
+    //当前使用的区域默认为0
+    public static String CURRENT_USE_REGION_KEY="CURRENT_USE_REGION_KEY";
 }

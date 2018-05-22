@@ -1,15 +1,23 @@
 package com.dadoutek.uled.DbModel;
 
+import com.dadoutek.uled.R;
+import com.telink.bluetooth.light.ConnectionStatus;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
+import java.io.Serializable;
+
 /**
  * Created by hejiajun on 2018/5/14.
  */
 @Entity
-public class DbLight {
+public class DbLight implements Serializable{
+
+    static final long serialVersionUID = -15515456L;
+
     @Id(autoincrement = true)
     private Long id;
     private int meshAddr;
@@ -27,6 +35,10 @@ public class DbLight {
     public boolean hasGroup=false;//当前灯是否有被分组
     @Transient
     public int textColor;//文字颜色
+    @Transient
+    public ConnectionStatus status;//链接状态
+    @Transient
+    public int icon = R.drawable.icon_light_on;//灯状态显示图
 
     @Generated(hash = 125913781)
     public DbLight(Long id, int meshAddr, String name, int brightness,
@@ -125,5 +137,20 @@ public class DbLight {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public String getLabel() {
+        return Integer.toString(this.getMeshAddr(), 16) + ":" + this.brightness;
+    }
+
+    public void updateIcon() {
+
+        if (this.status == ConnectionStatus.OFFLINE) {
+            this.icon = R.drawable.icon_light_offline;
+        } else if (this.status == ConnectionStatus.OFF) {
+            this.icon = R.drawable.icon_light_off;
+        } else if (this.status == ConnectionStatus.ON) {
+            this.icon = R.drawable.icon_light_on;
+        }
     }
 }

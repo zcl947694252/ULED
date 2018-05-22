@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -21,9 +24,6 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.adapter.LightsOfGroupRecyclerViewAdapter;
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -53,17 +53,14 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    //组的mesh地址
-    private int groupAddress;
-    private Group group;
+    private DbGroup group;
     private DataManager mDataManager;
     private TelinkLightApplication mApplication;
     private List<Integer> lightListAdress;
-    private List<Light> lightList;
-    private Lights lights = Lights.getInstance();
+    private List<DbLight> lightList;
     private LightsOfGroupRecyclerViewAdapter adapter;
     private int positionCurrent;
-    private Light currentLight;
+    private DbLight currentLight;
     private static final int UPDATE_LIST = 0;
     private boolean canBeRefresh = true;
 
@@ -99,7 +96,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
     }
 
     private void initParameter() {
-        this.groupAddress = this.getIntent().getIntExtra("groupAddress", 0);
+        this.group = (DbGroup) this.getIntent().getExtras().get("group");
         this.mApplication = (TelinkLightApplication) this.getApplication();
         mDataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
     }
@@ -136,45 +133,16 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
     }
 
     private void initData() {
-        group = mDataManager.getGroup(groupAddress, this);
-        lightListAdress = group.containsLightList;
-        lightList = new ArrayList<>();
-        getLights();
-    }
-
-    private void getLights() {
-
-        if (lightListAdress == null) {
-            ToastUtils.showLong(R.string.empty_light);
-            finish();
-        } else if (lightListAdress.size() == 0) {
-            if (groupAddress != 0xffff) {
-                ToastUtils.showLong(R.string.empty_light);
-                finish();
-            }
-        }
-
-        if (groupAddress == 0xFFFF) {
-            for (int j = 0; j < lights.size(); j++) {
-                Light light = lights.get(j);
-                if (light != null) {
-                    lightList.add(light);
-                }
-            }
-        }
-
-        for (int i = 0; i < lightListAdress.size(); i++) {
-            for (int j = 0; j < lights.size(); j++) {
-                Light light = lights.get(j);
-                if (light != null && light.meshAddress == lightListAdress.get(i)) {
-                    lightList.add(light);
-                }
-            }
+        if(group.getMeshAddr()==0xffff){
+            lightList = DBUtils.getAllLight();
+        }else{
+            lightList = DBUtils.getLightByGroupID(group.getId());
         }
     }
+
 
     private void initView() {
-        toolbar.setTitle(group.name);
+        toolbar.setTitle(group.getName());
         recyclerViewLights.setLayoutManager(new GridLayoutManager(this, 3));
         adapter = new LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener);
         recyclerViewLights.setAdapter(adapter);
@@ -246,7 +214,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
 
             currentLight.status = notificationInfo.connectionStatus;
 
-            if (meshAddress == currentLight.meshAddress) {
+            if (meshAddress == currentLight.getMeshAddr()) {
                 currentLight.textColor = this.getResources().getColor(
                         R.color.colorPrimary);
             } else {
@@ -284,16 +252,16 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
             if (v.getId() == R.id.img_light) {
                 canBeRefresh = true;
                 if (currentLight.status == ConnectionStatus.OFF) {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight.meshAddress,
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight.getMeshAddr(),
                             new byte[]{0x01, 0x00, 0x00});
                 } else {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight.meshAddress,
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight.getMeshAddr(),
                             new byte[]{0x00, 0x00, 0x00});
                 }
             } else if (v.getId() == R.id.tv_setting) {
                 Intent intent = new Intent(LightsOfGroupActivity.this, DeviceSettingActivity.class);
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight.meshAddress);
-                intent.putExtra(Constant.GROUP_ARESS_KEY, groupAddress);
+                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight);
+                intent.putExtra(Constant.GROUP_ARESS_KEY, group.getMeshAddr());
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK);
                 startActivity(intent);
             }

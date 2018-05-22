@@ -12,13 +12,13 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameLightActivity;
 import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
 
@@ -31,7 +31,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
     public final static String TAG = DeviceSettingFragment.class.getSimpleName();
 
-    public int meshAddress;
+    public DbLight light;
     public int gpAddress;
     public String fromWhere;
     @BindView(R.id.tv_brightness)
@@ -47,7 +47,6 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     private ColorPicker colorPicker;
     private Button remove;
     private AlertDialog dialog;
-    Light light;
 
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
@@ -82,7 +81,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
         private void onValueChange(View view, int progress, boolean immediate) {
 
-            int addr = meshAddress;
+            int addr = light.getMeshAddr();
             byte opcode;
             byte[] params;
             if (view == brightnessBar) {
@@ -92,17 +91,18 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 opcode = (byte) 0xD2;
                 params = new byte[]{(byte) progress};
 
-                light.brightness = progress;
+                light.setBrightness(progress);
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-
+                DBUtils.updateLight(light);
             } else if (view == temperatureBar) {
 
                 opcode = (byte) 0xE2;
                 params = new byte[]{0x05, (byte) progress};
                 tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
 
-                light.temperature = progress;
+                light.setColorTemperature(progress);
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+                DBUtils.updateLight(light);
             }
         }
     };
@@ -140,7 +140,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
             byte green = (byte) (color >> 8 & 0xFF);
             byte blue = (byte) (color & 0xFF);
 
-            int addr = meshAddress;
+            int addr = light.getMeshAddr();
             byte opcode = (byte) 0xE2;
             byte[] params = new byte[]{0x04, red, green, blue};
 
@@ -199,28 +199,27 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 //            remove.setVisibility(View.GONE);
             btnRename.setVisibility(View.GONE);
         }
-        light = Lights.getInstance().getByMeshAddress(meshAddress);
-        brightnessBar.setProgress(light.brightness);
-        tvBrightness.setText(getString(R.string.device_setting_brightness, light.brightness + ""));
-        temperatureBar.setProgress(light.temperature);
-        tvTemperature.setText(getString(R.string.device_setting_temperature, light.temperature + ""));
+        brightnessBar.setProgress(light.getBrightness());
+        tvBrightness.setText(getString(R.string.device_setting_brightness, light.getBrightness() + ""));
+        temperatureBar.setProgress(light.getColorTemperature());
+        tvTemperature.setText(getString(R.string.device_setting_temperature, light.getColorTemperature() + ""));
     }
 
     @Override
     public void onClick(View v) {
         if (v == this.remove) {
             byte opcode = (byte) 0xE3;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddress, null);
-            Lights.getInstance().remove(Lights.getInstance().getByMeshAddress(meshAddress));
-            if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(meshAddress)) {
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
+            DBUtils.deleteLight(light);
+            if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
                 TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
             }
-
-            if (gpAddress != 0) {
-                Group group = manager.getGroup(gpAddress, getActivity());
-                group.containsLightList.remove((Integer) meshAddress);
-                manager.updateGroup(group, getActivity());
-            }
+            getActivity().finish();
+//            if (gpAddress != 0) {
+//                Group group = manager.getGroup(gpAddress, getActivity());
+//                group.containsLightList.remove((Integer) light.getMeshAddr());
+//                manager.updateGroup(group, getActivity());
+//            }
 //            getActivity().finish();
         }
     }
@@ -234,7 +233,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @OnClick(R.id.btn_rename)
     public void onViewClicked() {
         Intent intent = new Intent(getActivity(), RenameLightActivity.class);
-        intent.putExtra("lightAddress", meshAddress);
+        intent.putExtra("light", light);
         startActivity(intent);
         getActivity().finish();
     }

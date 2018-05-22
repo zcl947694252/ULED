@@ -48,6 +48,7 @@ public final class GroupListFragment extends Fragment {
     private TelinkLightApplication mApplication;
     private DataManager dataManager;
     private List<DbGroup> gpList;
+    private TelinkLightApplication application;
 
     private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
 
@@ -153,7 +154,9 @@ public final class GroupListFragment extends Fragment {
         gpList= DBUtils.getGroupList();
         this.adapter = new GroupListAdapter(gpList);
         gridView.setAdapter(this.adapter);
-
+        application= (TelinkLightApplication) getActivity().getApplication();
+        dataManager=new DataManager(TelinkLightApplication.getInstance(),
+                application.getMesh().name,application.getMesh().password);
     }
 
     public void notifyDataSetChanged() {
@@ -169,14 +172,15 @@ public final class GroupListFragment extends Fragment {
 
     final class GroupListAdapter extends BaseAdapter implements
             OnClickListener, OnLongClickListener {
-        ArrayList<DbGroup> groupArrayList = new ArrayList<>();
+        ArrayList<DbGroup> groupArrayListNew = new ArrayList<>();
 
         public GroupListAdapter(List<DbGroup> groups) {
+            if(groupArrayListNew.size()>0){
+                groupArrayListNew.clear();
+            }
             List<DbGroup> groupList = groups;
             for (DbGroup group : groupList) {
-//                if (group.containsLightList.size() > 0 || group.meshAddress == 0xffff)
-                    groupArrayList.add(DBUtils.createAllLightControllerGroup(getActivity()));
-                    groupArrayList.add(group);
+                groupArrayListNew.add(group);
             }
         }
 
@@ -187,12 +191,12 @@ public final class GroupListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return groupArrayList.size();
+            return groupArrayListNew.size();
         }
 
         @Override
         public DbGroup getItem(int position) {
-            return groupArrayList.get(position);
+            return groupArrayListNew.get(position);
         }
 
         @Override
@@ -259,7 +263,7 @@ public final class GroupListFragment extends Fragment {
             int clickId = view.getId();
             int position = (int) view.getTag();
 
-            DbGroup group=groupArrayList.get(position);
+            DbGroup group=groupArrayListNew.get(position);
 
             byte opcode = (byte) 0xD0;
             int dstAddr = group.getMeshAddr();

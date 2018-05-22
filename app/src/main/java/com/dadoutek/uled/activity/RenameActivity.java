@@ -69,6 +69,7 @@ public class RenameActivity extends TelinkBaseActivity {
     private void saveName() {
         group.setName(newName);
         DBUtils.updateGroup(group);
+        finish();
     }
 
     private boolean checkName() {

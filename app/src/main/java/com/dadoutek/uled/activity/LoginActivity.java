@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
@@ -215,6 +216,7 @@ public class LoginActivity extends TelinkBaseActivity {
         //从云端用户表同步数据到本地
         dbUser = user;
         DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
+        DBUtils.createAllLightControllerGroup(this);
     }
 
     private void setupMesh() {
