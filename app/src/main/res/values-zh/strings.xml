@@ -218,4 +218,5 @@
     <string name="connect_failed_if_there_are_lights">连接失败，请确定附近有灯具存在!</string>
     <string name="scanning_devices">扫描设备中</string>
     <string name="not_found_light">未找到灯具，请确定附近有灯具存在!</string>
+    <string name="tip_add_group">请先添加一个分组</string>
 </resources>

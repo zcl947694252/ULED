@@ -38,7 +38,7 @@ class SelectDeviceTypeActivity : AppCompatActivity() {
         }
 
         tvSmartLight.onClick {
-            startActivity<DeviceScanningActivity>()
+            startActivity<DeviceScanningNewActivity>()
         }
 
     }

@@ -3,6 +3,7 @@ package com.dadoutek.uled.DbModel;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -19,6 +20,13 @@ public class DbLight {
     private int meshUUID;
     private int productUUID;
     private Long belongGroupId;
+
+    @Transient
+    public boolean selected;//选择状态
+    @Transient
+    public boolean hasGroup=false;//当前灯是否有被分组
+    @Transient
+    public int textColor;//文字颜色
 
     @Generated(hash = 125913781)
     public DbLight(Long id, int meshAddr, String name, int brightness,
@@ -109,5 +117,13 @@ public class DbLight {
 
     public void setBelongGroupId(Long belongGroupId) {
         this.belongGroupId = belongGroupId;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }
