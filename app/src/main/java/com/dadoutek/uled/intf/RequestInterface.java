@@ -31,8 +31,9 @@ public interface RequestInterface {
     @GET("api/auth/account")
     Observable<Response<String>> getAccount(@QueryMap Map<String, String> params);
 
-    @PUT("api/auth/forget-password")
-    Observable<Response<DbUser>> putPassword(@QueryMap Map<String, String> map);
+    @FormUrlEncoded
+    @POST("api/ext/soybean/forget")
+    Observable<Response<DbUser>> putPassword(@Field("account") String account, @Field("password") String password);
 
     //用户注册相关接口
     @FormUrlEncoded

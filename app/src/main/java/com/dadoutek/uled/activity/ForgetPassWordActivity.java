@@ -152,11 +152,8 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
     };
 
     private void updatePassword() {
-        Map<String, String> map = new HashMap<>();
-        map.put("account", dbUser.getAccount());
-        map.put("password", md5(editNewPassword.getEditText().getText().toString().trim()));
         NetworkUtils.getApi()
-                .putPassword(map)
+                .putPassword(dbUser.getAccount(),md5(editNewPassword.getEditText().getText().toString().trim()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observerUpdatePassword);
