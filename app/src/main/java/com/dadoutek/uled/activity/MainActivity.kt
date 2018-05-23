@@ -184,23 +184,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
 
-    private fun checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
-                    // 显示解释权限用途的界面，然后再继续请求权限
-                } else {
-                    // 没有权限，直接请求权限
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_CONTACTS),
-                            PERMISSION_REQUEST_CODE)
-                }
-            }
-        }
-
-    }
-
-
     override fun onStart() {
 
         super.onStart()

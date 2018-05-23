@@ -89,8 +89,8 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
         Map<String, String> map = new HashMap<>();
         map.put("phone", phone);
         map.put("channel", dbUser.getChannel());
-        NetworkUtils.getAccountApi()
-                .getAccount(map)
+        NetworkUtils.getApi()
+                .getAccount(phone, dbUser.getChannel())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observerAccount);

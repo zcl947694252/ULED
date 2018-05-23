@@ -19,32 +19,24 @@ import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.intf.AccountModel;
 import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.LogUtils;
-import com.dadoutek.uled.util.NetworkUtils;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.dadoutek.uled.util.NetworkUtils.md5;
 
 /**
  * Created by hejiajun on 2018/5/15.
@@ -148,42 +140,15 @@ public class LoginActivity extends TelinkBaseActivity {
         phone = editUserPhoneOrEmail.getEditText().getText().toString().trim();
         editPassWord = editUserPassword.getEditText().getText().toString().trim();
 
-        Map<String, String> map = new HashMap<>();
-        map.put("phone", phone);
-        map.put("channel", dbUser.getChannel());
 
-        //首先调用getAccount接口
-        NetworkUtils.getAccountApi()
-                .getAccount(map)
-                .observeOn(Schedulers.io())
-                .flatMap((Function<Response<String>, ObservableSource<Response<String>>>)
-                        stringResponse -> {
-                            dbUser.setAccount(stringResponse.getT());
-                            //然后调用getSalt接口
-                            return NetworkUtils.getSaltApi()
-                                    .getsalt(dbUser.getAccount());
-                        })
-                .flatMap((Function<Response<String>, ObservableSource<Response<DbUser>>>)
-                        stringResponse -> {
-                            salt = stringResponse.getT();
-                            MD5Password = md5(md5(md5(editPassWord) + dbUser.getAccount()) + salt);
-                            //最后调用登录接口
-                            return NetworkUtils.getloginApi()
-                                    .login(dbUser.getAccount(), MD5Password);
-                        })
-
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new NetworkObserver<DbUser>(){
+        AccountModel.INSTANCE.login(phone, editPassWord, dbUser.getChannel())
+                .subscribe(new NetworkObserver<DbUser>() {
                     @Override
-                    public void onNext(@NotNull Response<DbUser> t) {
-                        super.onNext(t);
-                        hideLodingDialog();
-                        LogUtils.d("logging" + t.getErrorCode() + "登录成功");
+                    public void onNext(DbUser dbUser) {
+                        LogUtils.d("logging: " + "登录成功");
                         ToastUtils.showLong(R.string.login_success);
-                        SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
-                        setupMesh();
-                        initDatBase(t.getT());
+
+                        hideLodingDialog();
                         TransformView();
                     }
 
@@ -207,8 +172,6 @@ public class LoginActivity extends TelinkBaseActivity {
                 LogUtils.d("logging" + stringResponse.getErrorCode() + "登录成功");
                 ToastUtils.showLong(R.string.login_success);
                 SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
-                setupMesh();
-                initDatBase(stringResponse.getT());
                 TransformView();
             } else {
                 ToastUtils.showLong(R.string.login_fail);
@@ -226,38 +189,6 @@ public class LoginActivity extends TelinkBaseActivity {
         }
     };
 
-    private void initDatBase(DbUser user) {
-        //首先保存当前数据库名
-        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.getAccount());
-
-        //数据库分库
-        DaoSessionInstance.destroySession();
-        DaoSessionInstance.getInstance();
-
-        //从云端用户表同步数据到本地
-        dbUser = user;
-        DBUtils.saveUser(dbUser);
-        DBUtils.createAllLightControllerGroup(this);
-    }
-
-    private void setupMesh() {
-        String name = SharedPreferencesHelper.getMeshName(this);
-        String pwd = SharedPreferencesHelper.getMeshPassword(this);
-
-        if (TextUtils.isEmpty(name) && TextUtils.isEmpty(pwd)) {
-//                Mesh mesh = (Mesh) FileSystem.readAsObject(this, name + "." + pwd);
-            TelinkLightApplication application = (TelinkLightApplication) getApplication();
-            Mesh mesh = application.getMesh();
-            mesh.name = phone;
-            mesh.password = Constant.NEW_MESH_PASSWORD;
-            mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME;
-            mesh.password = Constant.DEFAULT_MESH_FACTORY_PASSWORD;
-            mesh.saveOrUpdate(this);
-            application.setupMesh(mesh);
-            SharedPreferencesHelper.saveMeshName(this, phone);
-            SharedPreferencesHelper.saveMeshPassword(this, Constant.NEW_MESH_PASSWORD);
-        }
-    }
 
     private void TransformView() {
 //        if (isFirstLauch) {

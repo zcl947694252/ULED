@@ -37,44 +37,6 @@ public class NetworkUtils {
                 .addInterceptor(loggingInterceptor).build();
     }
 
-    public static RequestInterface getloginApi() {
-        if (loginApi == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
-                    .addConverterFactory(gsonConverterFactory)
-                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
-                    .build();
-            loginApi = retrofit.create(RequestInterface.class);
-        }
-        return loginApi;
-    }
-
-    public static RequestInterface getRegisterApi() {
-        if (registerApi == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
-                    .addConverterFactory(gsonConverterFactory)
-                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
-                    .build();
-            registerApi = retrofit.create(RequestInterface.class);
-        }
-        return registerApi;
-    }
-
-    public static RequestInterface getAccountApi() {
-        if (getAccountApi == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
-                    .addConverterFactory(gsonConverterFactory)
-                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
-                    .build();
-            getAccountApi = retrofit.create(RequestInterface.class);
-        }
-        return getAccountApi;
-    }
 
     public static RequestInterface getApi() {
         if (api == null) {
@@ -87,19 +49,6 @@ public class NetworkUtils {
             api = retrofit.create(RequestInterface.class);
         }
         return api;
-    }
-
-    public static RequestInterface getSaltApi() {
-        if (getSaltApi == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
-                    .addConverterFactory(gsonConverterFactory)
-                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
-                    .build();
-            getSaltApi = retrofit.create(RequestInterface.class);
-        }
-        return getSaltApi;
     }
 
     public static String md5(String string) {

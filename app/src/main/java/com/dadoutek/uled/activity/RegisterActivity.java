@@ -97,7 +97,7 @@ public class RegisterActivity extends TelinkBaseActivity {
     private void register() {
         showLoadingDialog(getString(R.string.registing));
         MD5PassWord = md5(userPassWord);
-        NetworkUtils.getRegisterApi()
+        NetworkUtils.getApi()
                 .register(userName, MD5PassWord, userName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

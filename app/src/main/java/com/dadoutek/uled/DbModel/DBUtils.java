@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbLightDao;
 import com.dadoutek.uled.dao.DbRegionDao;
@@ -237,9 +238,9 @@ public class DBUtils {
      *
      * @return group对象
      */
-    public static void createAllLightControllerGroup(Context context) {
+    public static void createAllLightControllerGroup() {
         DbGroup groupAllLights = new DbGroup();
-        groupAllLights.setName(context.getString(R.string.allLight));
+        groupAllLights.setName(TelinkLightApplication.getInstance().getString(R.string.allLight));
         groupAllLights.setMeshAddr(0xFFFF);
         groupAllLights.setBrightness(100);
         groupAllLights.setColorTemperature(100);
