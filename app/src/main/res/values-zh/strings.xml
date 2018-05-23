@@ -117,6 +117,8 @@
     <string name="repeat_tip_name">已经有这个组名了,请修改！</string>
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
+    <string name="title_scanning_lights_num">扫描中(已扫到%1$d个灯)</string>
+    <string name="title_scanned_lights_num">扫描完成(已扫到%1$d个灯)</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
     <string name="empty_cache_tip">是否清除数据？清除后APP将自动重启</string>
@@ -223,4 +225,5 @@
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="One_click_backup">一键备份</string>
+    <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
 </resources>

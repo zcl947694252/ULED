@@ -195,7 +195,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
      */
     private void onLeScanTimeout(LeScanEvent event) {
         this.btnScan.setEnabled(true);
-        this.btnScan.setBackgroundResource(R.color.colorPrimary);
+        this.btnScan.setBackgroundResource(R.color.primary);
     }
 
     private void onDeviceStatusChanged(DeviceEvent event) {

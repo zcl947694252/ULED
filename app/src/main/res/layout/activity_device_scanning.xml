@@ -6,9 +6,30 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
+
+
     <include
         android:id="@+id/rvToolbar"
-        layout="@layout/toolbar" />
+        layout="@layout/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/scanPb"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_indeterminateTint="@color/accent"
+        app:mpb_useIntrinsicPadding="false"
+        app:mpb_showProgressBackground="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding" />
+
 
     <LinearLayout
         android:id="@+id/groups_bottom"
@@ -37,10 +58,10 @@
                 android:id="@+id/add_group_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
+                android:layout_alignParentRight="true"
                 android:layout_marginEnd="10dp"
-                android:layout_alignParentRight="true">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -48,16 +69,16 @@
                     android:background="@drawable/ic_group_add_black_48dp" />
 
                 <TextView
-                    android:text="@string/add_str_group"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_str_group" />
             </LinearLayout>
         </RelativeLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorPrimary" />
+            android:background="@color/primary" />
     </LinearLayout>
 
 
@@ -65,17 +86,18 @@
         android:id="@+id/light_num_layout"
         android:layout_width="match_parent"
         android:layout_height="20dp"
+        android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/groups_bottom"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/list_devices"
-        android:gravity="center">
+        app:layout_constraintTop_toBottomOf="@id/groups_bottom">
 
         <TextView
             android:id="@+id/tv_num_lights"
-            android:textColor="@color/blue"
-            android:text="@string/scan_lights_num"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@string/scan_lights_num"
+            android:textColor="@color/blue" />
     </LinearLayout>
 
 
@@ -102,7 +124,7 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:text="log"
         android:textColor="@android:color/white"
         android:visibility="gone" />
@@ -115,13 +137,13 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:text="Go Back"
         android:textColor="@android:color/white"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:visibility="gone" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btn_add_groups"
@@ -131,14 +153,14 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:gravity="center"
         android:text="@string/add_groups"
-        app:layout_constraintBottom_toTopOf="@id/grouping_completed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@android:color/white"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/grouping_completed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/grouping_completed"
@@ -148,12 +170,12 @@
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="10dp"
-        android:background="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/primary"
         android:text="@string/grouping_completed"
         android:textColor="@android:color/white"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

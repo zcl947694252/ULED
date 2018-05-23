@@ -142,6 +142,10 @@ public class DBUtils {
                 Constant.DB_ADD);
     }
 
+    public static List<DbGroup> getAllGroups() {
+        return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
+    }
+
     /********************************************更改*******************************/
 
     public static void updateGroup(DbGroup group) {

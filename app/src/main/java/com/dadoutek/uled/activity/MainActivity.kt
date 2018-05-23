@@ -19,13 +19,11 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
-import android.view.Window
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.R.id.*
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.TelinkMeshErrorDealActivity
@@ -44,13 +42,17 @@ import com.telink.bluetooth.light.*
 import com.telink.util.BuildUtils
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.util.concurrent.TimeUnit
 
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private val loadDialog: Dialog? = null
@@ -222,6 +224,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         //移除事件
         this.mApplication!!.removeEventListener(this)
         Log.d(TAG, "onPause")
+        mConnectTimer?.dispose()
     }
 
 
@@ -289,6 +292,26 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
+
+    private fun stopConnectTimer() {
+        mConnectTimer?.dispose()
+    }
+
+
+    private var mConnectTimer: Disposable? = null
+    private fun startConnectTimer() {
+        //如果超过8s还没有变为连接中状态，则显示为超时
+        mConnectTimer = Observable.timer(8000, TimeUnit.MILLISECONDS)
+                .subscribe(Consumer {
+                    indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                        TelinkLightService.Instance().idleMode(true)
+                        autoConnect()
+                    }
+                })
+
+
+    }
+
     /**
      * 自动重连
      */
@@ -331,26 +354,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 }
                 //自动重连
                 TelinkLightService.Instance().autoConnect(connectParams)
+                startConnectTimer();
 
                 indefiniteSnackbar(root, getString(R.string.scanning_devices))
                 runOnUiThread { progressBar?.visibility = View.VISIBLE }
-
-                //如果超过8s还没有变为连接中状态，则显示为超时
-                launch(UI)
-                {
-                    mIsConnecting = false
-                    kotlinx.coroutines.experimental.delay(8000)
-                    if (!mIsConnecting) {
-                        kotlinx.coroutines.experimental.delay(100)  //不加延时有时不显示
-                        runOnUiThread(Runnable {
-                            indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-                                TelinkLightService.Instance().idleMode(true)
-                                autoConnect()
-                            }
-                        })
-                    }
-
-                }
 
 
             }
@@ -384,7 +391,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 */
 
-    private var mIsConnecting: Boolean = false
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
 
@@ -417,7 +423,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 }
             }
             LightAdapter.STATUS_CONNECTING -> {
-                mIsConnecting = true
+                stopConnectTimer()
                 indefiniteSnackbar(root, getString(R.string.connect_state))
             }
             LightAdapter.STATUS_LOGOUT ->
@@ -523,7 +529,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                 if (light.meshAddress == this.connectMeshAddress) {
                     light.textColor = this.resources.getColor(
-                            R.color.colorPrimary)
+                            R.color.primary)
                 } else {
                     light.textColor = this.resources.getColor(
                             R.color.black)

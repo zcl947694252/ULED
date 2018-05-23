@@ -107,4 +107,5 @@ dependencies {
 
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
     implementation 'com.hbb20:ccp:2.1.2'
+    implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'
 }

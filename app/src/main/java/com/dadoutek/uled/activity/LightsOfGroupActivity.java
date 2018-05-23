@@ -216,7 +216,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
 
             if (meshAddress == currentLight.getMeshAddr()) {
                 currentLight.textColor = this.getResources().getColor(
-                        R.color.colorPrimary);
+                        R.color.primary);
             } else {
                 currentLight.textColor = this.getResources().getColor(
                         R.color.black);

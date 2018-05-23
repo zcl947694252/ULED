@@ -35,7 +35,7 @@
             android:layout_height="25dp"
             android:text="@string/btn_sure"
             android:layout_marginStart="5dp"
-            android:background="@color/colorPrimary" />
+            android:background="@color/primary" />
     </LinearLayout>
 
     <TextView
@@ -63,7 +63,7 @@
             android:id="@+id/bt_add"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/primary"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="10dp"
@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_alignParentBottom="true"
-            android:background="@color/colorPrimary"
+            android:background="@color/primary"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="10dp"

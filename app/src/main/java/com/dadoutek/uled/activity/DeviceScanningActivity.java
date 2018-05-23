@@ -390,7 +390,7 @@
 //                return false;
 //            }
 //        }
-//        btnGroupingCompleted.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+//        btnGroupingCompleted.setBackgroundColor(getResources().getColor(R.color.primary));
 //        return true;
 //    }
 //
@@ -824,7 +824,7 @@
 //     */
 //    private void onLeScanTimeout() {
 //        TelinkLightService.Instance().idleMode(true);
-//        this.btnScan.setBackgroundResource(R.color.colorPrimary);
+//        this.btnScan.setBackgroundResource(R.color.primary);
 //
 ////        Log.d("ScanningTest", "onLeScanTimeout count = " + adapter.getCount());
 //
