@@ -26,7 +26,7 @@ public class DbGroup implements Serializable{
     private int belongRegionId;
 
     @Transient
-    public boolean checked;
+    public boolean checked=false;
     @Transient
     public boolean selected;
     @Transient

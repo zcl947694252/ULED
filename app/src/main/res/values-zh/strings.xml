@@ -224,6 +224,7 @@
     <string name="scanning">扫描中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
+    <string name="One_click_backup">一键备份</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>

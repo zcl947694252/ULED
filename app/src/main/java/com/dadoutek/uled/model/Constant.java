@@ -58,4 +58,11 @@ public class Constant implements Serializable {
 
     //当前使用的区域默认为0
     public static String CURRENT_USE_REGION_KEY="CURRENT_USE_REGION_KEY";
+
+    //用于标记数据库改变增加
+    public static String DB_ADD="DB_ADD";
+    //用于标记数据库改变删除
+    public static String DB_DELETE="DB_DELETE";
+    //用于标记数据库改变修改
+    public static String DB_UPDATE="DB_UPDATE";
 }
