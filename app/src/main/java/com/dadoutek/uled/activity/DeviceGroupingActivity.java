@@ -44,6 +44,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     private List<DbGroup> groupsInit;
 
     private DbLight light;
+    private int gpAdress;
 
     private OnClickListener clickListener = v -> finish();
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
@@ -55,11 +56,22 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
             if (group.checked) {
                 ToastUtils.showLong(R.string.tip_selected_group);
             } else {
+                deletePreGroup();
                 allocDeviceGroup(group);
                 saveInfo();
             }
         }
     };
+
+    private void deletePreGroup() {
+        int groupAddress = gpAdress;
+        int dstAddress = light.getMeshAddr();
+        byte opcode = (byte) 0xD7;
+        byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
+                (byte) (groupAddress >> 8 & 0xFF)};
+        params[0] = 0x00;
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+    }
 
     private void saveInfo() {
         DBUtils.updateLight(light);
@@ -93,6 +105,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         this.setContentView(R.layout.activity_device_grouping);
 
         this.light = (DbLight) this.getIntent().getExtras().get("light");
+        this.gpAdress = this.getIntent().getIntExtra("gpAddress",0);
 
         this.inflater = this.getLayoutInflater();
         this.adapter = new GroupListAdapter();

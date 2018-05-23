@@ -1,6 +1,7 @@
 package com.dadoutek.uled.DbModel;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
@@ -278,8 +279,14 @@ public class DBUtils {
                         return;
                     }
                 }
+
+                if(dataChangeList.get(i).getChangeType().equals(operating)){
+                    Log.d("sameData", "recordingChange: "+"--------");
+                    return;
+                }
             }
         }
+
 
         DbDataChange dataChange=new DbDataChange();
         dataChange.setChangeId(changeIndex);

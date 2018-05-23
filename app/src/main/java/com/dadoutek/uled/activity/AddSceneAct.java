@@ -95,7 +95,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         for (DbGroup group : groups) {
 //            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
-                group.checked = false;
+                group.selected = false;
             groupArrayList.add(group);
             groupNameArrayList.add(group.getName());
         }

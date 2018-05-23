@@ -53,7 +53,7 @@
         android:layout_gravity="center"
         android:textSize="18sp"
         android:text="@string/copy_data_base"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:layout_width="200dp"
         android:layout_height="wrap_content" />
 

@@ -38,6 +38,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 Intent intent = new Intent(DeviceSettingActivity.this,
                         DeviceGroupingActivity.class);
                 intent.putExtra("light", light);
+                intent.putExtra("gpAddress", gpAddress);
                 startActivity(intent);
                 finish();
             }
