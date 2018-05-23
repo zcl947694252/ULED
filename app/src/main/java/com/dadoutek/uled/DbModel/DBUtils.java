@@ -8,6 +8,7 @@ import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbLightDao;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
@@ -74,6 +75,14 @@ public class DBUtils {
         return list;
     }
 
+    public static List<DbScene> getSceneAll(){
+        return DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
+    }
+
+    public static List<DbDataChange> getDataChangeAll(){
+        return DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
+    }
+
     /********************************************保存*******************************/
 
     public static void saveRegion(DbRegion dbRegion) {
@@ -84,40 +93,101 @@ public class DBUtils {
             DaoSessionInstance.getInstance().getDbRegionDao().insert(dbRegion);
             //暂时用本地保存区域
             SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.getId());
+            recordingChange(dbRegion.getId(),
+                    DaoSessionInstance.getInstance().getDbRegionDao().getTablename(),
+                    Constant.DB_ADD);
         } else {//更新数据库
             dbRegion.setId(dbRegionOld.getId());
             DaoSessionInstance.getInstance().getDbRegionDao().update(dbRegion);
             //暂时用本地保存区域
             SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.getId());
+            recordingChange(dbRegion.getId(),
+                    DaoSessionInstance.getInstance().getDbRegionDao().getTablename(),
+                    Constant.DB_UPDATE);
         }
     }
 
     public static void saveGroup(DbGroup group) {
         DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
+        recordingChange(group.getId(),
+                DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                Constant.DB_ADD);
     }
 
     public static void saveLight(DbLight light) {
         DaoSessionInstance.getInstance().getDbLightDao().insertOrReplace(light);
+        recordingChange(light.getId(),
+                DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
+                Constant.DB_ADD);
+    }
+
+    public static void saveUser(DbUser dbUser) {
+        DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
+        recordingChange(dbUser.getId(),
+                DaoSessionInstance.getInstance().getDbUserDao().getTablename(),
+                Constant.DB_ADD);
+    }
+
+    public static void saveScene(DbScene dbScene) {
+        DaoSessionInstance.getInstance().getDbSceneDao().save(dbScene);
+        recordingChange(dbScene.getId(),
+                DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
+                Constant.DB_ADD);
+    }
+
+    public static void saveSceneActions(DbSceneActions sceneActions) {
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
+        recordingChange(sceneActions.getId(),
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+                Constant.DB_ADD);
     }
 
     /********************************************更改*******************************/
 
     public static void updateGroup(DbGroup group) {
         DaoSessionInstance.getInstance().getDbGroupDao().update(group);
+        recordingChange(group.getId(),
+                DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                Constant.DB_UPDATE);
     }
 
     public static void updateLight(DbLight light) {
         DaoSessionInstance.getInstance().getDbLightDao().update(light);
+        recordingChange(light.getId(),
+                DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
+                Constant.DB_UPDATE);
     }
 
     /********************************************删除*******************************/
 
     public static void deleteGroup(DbGroup dbGroup) {
         DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
+        recordingChange(dbGroup.getId(),
+                DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                Constant.DB_DELETE);
     }
 
     public static void deleteLight(DbLight dbLight) {
         DaoSessionInstance.getInstance().getDbLightDao().delete(dbLight);
+        recordingChange(dbLight.getId(),
+                DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
+                Constant.DB_DELETE);
+    }
+
+    public static void deleteScene(DbScene dbScene) {
+        DaoSessionInstance.getInstance().getDbSceneDao().delete(dbScene);
+        recordingChange(dbScene.getId(),
+                DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
+                Constant.DB_DELETE);
+    }
+
+    public static void deleteAllData() {
+        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbRegionDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbGroupDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbLightDao().deleteAll();
     }
 
     /********************************************其他*******************************/
@@ -135,6 +205,10 @@ public class DBUtils {
             groups.add(group);
             //新增数据库保存
             DBUtils.saveGroup(group);
+
+            recordingChange(group.getId(),
+                    DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                    Constant.DB_ADD);
         }
 
     }
@@ -169,6 +243,9 @@ public class DBUtils {
 
         if (list.size() == 0) {
             DaoSessionInstance.getInstance().getDbGroupDao().insert(groupAllLights);
+            recordingChange(groupAllLights.getId(),
+                    DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                    Constant.DB_ADD);
         }
 //        for(int i=0;i<list.size();i++){
 //            if(list.get(i).getMeshAddr()!=0xffff){
@@ -176,5 +253,34 @@ public class DBUtils {
 //                DaoSessionInstance.getInstance().getDbGroupDao().save(groupAllLights);
 //            }
 //        }
+    }
+
+    /**
+     * 记录本地数据库变化
+     * @param changeIndex 变化的位置
+     * @param changeTable 变化数据所属表
+     * @param operating 所执行的操作
+     */
+    public static void recordingChange(Long changeIndex,String changeTable,String operating){
+        List<DbDataChange> dataChangeList=DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
+        for(int i=0;i<dataChangeList.size();i++){
+            //首先确定是同一张表的同一条数据进行操作
+            if(dataChangeList.get(i).getChangeId()==
+                    changeIndex&&dataChangeList.get(i).getTableName().equals(changeTable)){
+                //先添加数据后进行其他操作的情况
+                if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)&&
+                        !operating.equals(Constant.DB_ADD)){
+                    if(operating.equals(Constant.DB_UPDATE)){
+                        return;
+                    }
+                }
+            }
+        }
+
+        DbDataChange dataChange=new DbDataChange();
+        dataChange.setChangeId(changeIndex);
+        dataChange.setChangeType(operating);
+        dataChange.setTableName(changeTable);
+        DaoSessionInstance.getInstance().getDbDataChangeDao().insert(dataChange);
     }
 }

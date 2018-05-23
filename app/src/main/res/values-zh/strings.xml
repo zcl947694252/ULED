@@ -222,4 +222,5 @@
     <string name="scanning">扫描中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
+    <string name="One_click_backup">一键备份</string>
 </resources>

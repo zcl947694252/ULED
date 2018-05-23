@@ -233,7 +233,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
         dbScene.setBelongAccount(telinkLightApplication.getMesh().name);
-        DaoSessionInstance.getInstance().getDbSceneDao().save(dbScene);
+        DBUtils.saveScene(dbScene);
 
         long idAction = dbScene.getId();
 
@@ -245,11 +245,11 @@ public class AddSceneAct extends TelinkBaseActivity {
             sceneActions.setColorTemperature(itemGroups.get(i).temperature);
             if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
                 sceneActions.setGroupAddr(0xFFFF);
-                DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
+                DBUtils.saveSceneActions(sceneActions);
                 break;
             } else {
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
+                DBUtils.saveSceneActions(sceneActions);
             }
         }
 

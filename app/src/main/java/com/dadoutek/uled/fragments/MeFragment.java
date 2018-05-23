@@ -19,8 +19,12 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.DbModel.DBUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.service.SyncDataService;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
 
@@ -50,6 +54,8 @@ public class MeFragment extends Fragment {
     Button copyDataBase;
     @BindView(R.id.exit_login)
     Button exitLogin;
+    @BindView(R.id.one_click_backup)
+    Button oneClickBackup;
     private LayoutInflater inflater;
 
     @Override
@@ -109,7 +115,7 @@ public class MeFragment extends Fragment {
 
     long[] mHints = new long[6];//初始全部为0
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login,R.id.one_click_backup})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -127,12 +133,21 @@ public class MeFragment extends Fragment {
             case R.id.exit_login:
                 exitLogin();
                 break;
+            case R.id.one_click_backup:
+               syncDataToServer();
+                break;
         }
 
     }
 
-    private void exitLogin() {
+    private void syncDataToServer() {
+        Intent intent=new Intent(getActivity(), SyncDataService.class);
+        getActivity().startService(intent);
+    }
 
+    private void exitLogin() {
+        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+        restartApplication();
     }
 
     private void developerMode() {
@@ -153,7 +168,7 @@ public class MeFragment extends Fragment {
                 .setNegativeButton(getActivity().getString(R.string.btn_cancel), (dialog, which) -> {
                 })
                 .setPositiveButton(getActivity().getString(R.string.btn_sure), (dialog, which) -> {
-                    DBManager.getInstance().deleteAllData();
+                    DBUtils.deleteAllData();
                     CleanUtils.cleanInternalSp();
                     CleanUtils.cleanExternalCache();
                     CleanUtils.cleanInternalFiles();

@@ -223,5 +223,6 @@
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">当前名称已被使用</string>
+    <string name="One_click_backup">一键备份</string>
 
 </resources>

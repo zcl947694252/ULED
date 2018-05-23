@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.dadoutek.uled.DbModel.DBUtils
 import com.dadoutek.uled.DbModel.DbScene
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
@@ -187,7 +188,7 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mSwitchList.add(getString(R.string.scene3))
         mSwitchList.add(getString(R.string.scene4))
 
-        mSceneList = DaoSessionInstance.getInstance().dbSceneDao.loadAll()
+        mSceneList = DBUtils.getSceneAll()
     }
 
 

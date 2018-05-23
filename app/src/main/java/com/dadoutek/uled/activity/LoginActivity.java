@@ -215,7 +215,7 @@ public class LoginActivity extends TelinkBaseActivity {
 
         //从云端用户表同步数据到本地
         dbUser = user;
-        DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
+        DBUtils.saveUser(dbUser);
         DBUtils.createAllLightControllerGroup(this);
     }
 

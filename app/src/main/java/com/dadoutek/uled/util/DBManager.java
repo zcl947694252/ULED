@@ -20,15 +20,6 @@ public class DBManager {
         return mInstance;
     }
 
-    public void deleteAllData() {
-        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
-        DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
-        DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
-        DaoSessionInstance.getInstance().getDbRegionDao().deleteAll();
-        DaoSessionInstance.getInstance().getDbGroupDao().deleteAll();
-        DaoSessionInstance.getInstance().getDbLightDao().deleteAll();
-    }
-
     public void copyDatabaseToSDCard(Context context) {
         CopyDataBaseFile copyDataBaseFile = new CopyDataBaseFile(context);
         copyDataBaseFile.backupDataBase();
