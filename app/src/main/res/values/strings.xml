@@ -226,5 +226,12 @@
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
+    <string name="login_timeout">Login timeout</string>
+    <string name="account_not_exist">Account does not exist</string>
+    <string name="account_exist">Account does exist</string>
+    <string name="unknown_network_error">Unknown network error</string>
+    <string name="network_error">Network Error</string>
+    <string name="network_unavailable">Network unavailable.Check your network settings.</string>
+    <string name="network_time_out">Network connection timed out, please try again.</string>
 
 </resources>

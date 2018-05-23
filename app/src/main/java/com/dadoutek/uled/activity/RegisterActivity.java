@@ -20,11 +20,9 @@ import com.dadoutek.uled.util.NetworkUtils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.dadoutek.uled.util.NetworkUtils.md5;
@@ -107,7 +105,6 @@ public class RegisterActivity extends TelinkBaseActivity {
     }
 
     Observer<Response<DbUser>> observer = new Observer<Response<DbUser>>() {
-
         @Override
         public void onSubscribe(Disposable d) {
 
@@ -121,6 +118,8 @@ public class RegisterActivity extends TelinkBaseActivity {
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
+            } else {
+                Toast.makeText(RegisterActivity.this, "ErrorCode = " + dbUserResponse.getErrorCode(), Toast.LENGTH_SHORT).show();
             }
         }
 

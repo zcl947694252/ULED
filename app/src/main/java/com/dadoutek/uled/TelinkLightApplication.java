@@ -58,11 +58,11 @@ public final class TelinkLightApplication extends TelinkApplication {
     @Override
     public void doInit() {
 
-        String fileName = "telink-";
-        fileName += System.currentTimeMillis();
-        fileName += ".log";
-        TelinkLog.LOG2FILE_ENABLE = false;
-        TelinkLog.onCreate(fileName);
+//        String fileName = "telink-";
+//        fileName += System.currentTimeMillis();
+//        fileName += ".log";
+//        TelinkLog.LOG2FILE_ENABLE = false;
+//        TelinkLog.onCreate(fileName);
         super.doInit();
         //AES.Security = true;
 

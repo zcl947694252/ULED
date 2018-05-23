@@ -160,7 +160,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
         initBottomNavigation()
 
-        checkPermission()
+//        checkPermission()
 
         if (savedInstanceState == null) {
 //            initDefaultFragment()

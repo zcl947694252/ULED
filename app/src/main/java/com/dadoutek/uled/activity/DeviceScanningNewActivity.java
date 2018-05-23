@@ -50,7 +50,6 @@ import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.StringUtils;
-import com.dadoutek.uled.util.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -71,8 +70,6 @@ import com.telink.util.EventListener;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -128,11 +125,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
     private Dialog loadDialog;
-    private int preTime = 0;
-    private int nextTime = 0;
-    private Timer timer;
     private final DeviceScanningNewActivity.MyHandler handler = new DeviceScanningNewActivity.MyHandler(this);
-    private boolean canStartTimer = true;
     //分组所含灯的缓存
     private List<DbLight> nowLightList;
     private LayoutInflater inflater;
@@ -248,10 +241,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 btnAddGroups.setVisibility(View.GONE);
             }
         });
-        if (timer != null) {
-            timer.cancel();
-        }
-//        closeDialog();
         scanPb.setVisibility(View.GONE);
         showToast(getString(R.string.scan_end));
         //判断是否是第一次使用app，启动导航页
@@ -263,8 +252,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         } else {
             finish();
         }
-        canStartTimer = false;
-        nextTime = 0;
     }
 
     private void startTimer() {
@@ -317,14 +304,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (nowLightList != null)
             nowLightList.addAll(adapter.getLights());
 
-        if (timer != null) {
-            timer.cancel();
-        }
-        nextTime = 0;
-//        closeDialog();
         scanPb.setVisibility(View.GONE);
-
-        canStartTimer = false;
 
         //先连接灯。
         autoConnect();
@@ -344,7 +324,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
-//                openLoadingDialog(getResources().getString(R.string.device_login_tip));
+                openLoadingDialog(getResources().getString(R.string.device_login_tip));
 
             }
         });
@@ -399,17 +379,19 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             //进行分组操作
             //获取当前选择的分组
             DbGroup group = getCurrentGroup();
-            if (group.getMeshAddr() == 0xffff) {
-                ToastUtils.showLong(R.string.tip_add_gp);
-                return;
-            }
-            //获取当前勾选灯的列表
-            List<DbLight> selectLights = getCurrentSelectLights();
+            if (group != null) {
+                if (group.getMeshAddr() == 0xffff) {
+                    ToastUtils.showLong(R.string.tip_add_gp);
+                    return;
+                }
+                //获取当前勾选灯的列表
+                List<DbLight> selectLights = getCurrentSelectLights();
 
-            openLoadingDialog(getResources().getString(R.string.grouping_wait_tip,
-                    selectLights.size() + ""));
-            //将灯列表的灯循环设置分组
-            setGroups(group, selectLights);
+                openLoadingDialog(getResources().getString(R.string.grouping_wait_tip,
+                        selectLights.size() + ""));
+                //将灯列表的灯循环设置分组
+                setGroups(group, selectLights);
+            }
 
         } else if (!hasBeSelected) {
             showToast(getString(R.string.selected_lamp_tip));
@@ -418,7 +400,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void setGroups(DbGroup group, List<DbLight> selectLights) {
         if (group == null) {
-            Toast.makeText(DeviceScanningNewActivity.this, R.string.select_group_tip, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mApplication, R.string.select_group_tip, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -508,7 +490,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private DbGroup getCurrentGroup() {
         if (currentGroupIndex == -1) {
-            ToastUtils.showLong(R.string.tip_add_gp);
+            if (groups.size() > 1) {
+                Toast.makeText(this, R.string.please_select_group, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, R.string.tip_add_gp, Toast.LENGTH_SHORT).show();
+            }
             return null;
         }
         return groups.get(currentGroupIndex);
@@ -566,7 +552,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroup(textGp.getText().toString().trim(), groups, this);
-//                        groups.add()
                         refreshView();
                         dialog.dismiss();
                     }
@@ -619,24 +604,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         groups.get(position).checked = checkStateChange;
     }
 
-    TimerTask task = new TimerTask() {
-        @Override
-        public void run() {
-            nextTime = TimeUtil.getNowSeconds();
-            Log.d("DeviceScanning", "timer: " + "nextTime=" + nextTime + ";preTime=" + preTime);
-            if (preTime > 0 && nextTime - preTime >= SCAN_TIMEOUT_SECOND) {
-                creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
-            }
-        }
-    };
-
     /**
      * 自动重连
      * 此处用作设备登录
      */
     private void autoConnect() {
         if (TelinkLightService.Instance() != null) {
-
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 openLoadingDialog(getResources().getString(R.string.device_login_tip));
                 TelinkLightService.Instance().idleMode(true);
@@ -804,12 +777,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.updateList = null;
-        if (timer != null)
-            timer.cancel();
-        canStartTimer = false;
-        nextTime = 0;
+        Log.d("ScanningTest", "remove all listener");
         this.mApplication.removeEventListener(this);
+        this.updateList = null;
         this.mHandler.removeCallbacksAndMessages(null);
         mDisposable.dispose();  //销毁时取消订阅.
         if (mTimer != null)
@@ -959,7 +929,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-    /*********************************泰麟威后台数据部分*********************************************/
+    /*********************************泰凌微后台数据部分*********************************************/
 
     /**
      * 事件处理方法
@@ -1022,7 +992,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     light.setMeshAddr(meshAddress);
                     light.textColor = this.getResources().getColor(
                             R.color.black);
-                    light.setBelongGroupId(Long.valueOf(-1));
+                    light.setBelongGroupId(-1L);
                     light.setMacAddr(deviceInfo.macAddress);
                     light.setMeshUUID(deviceInfo.meshUUID);
                     light.setProductUUID(deviceInfo.productUUID);
@@ -1031,22 +1001,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     this.adapter.notifyDataSetChanged();
                 }
 
-                if (canStartTimer) {
-//                    startTimer();
-                    canStartTimer = false;
-                }
-
-                preTime = TimeUtil.getNowSeconds();
-//                this.startScan(1000);
-
                 //扫描出灯就设置为非首次进入
                 if (isFirtst) {
                     isFirtst = false;
                     SharedPreferencesHelper.putBoolean(DeviceScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
-
-//
-
 //                tvNumLights.setVisibility(View.VISIBLE);
 //                tvNumLights.setText(getString(R.string.scan_lights_num, adapter.getCount() + ""));
                 toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));

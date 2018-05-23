@@ -19,6 +19,7 @@ import com.dadoutek.uled.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Mesh;
@@ -27,6 +28,8 @@ import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.NetworkUtils;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -171,7 +174,25 @@ public class LoginActivity extends TelinkBaseActivity {
 
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observerLogin);
+                .subscribe(new NetworkObserver<DbUser>(){
+                    @Override
+                    public void onNext(@NotNull Response<DbUser> t) {
+                        super.onNext(t);
+                        hideLodingDialog();
+                        LogUtils.d("logging" + t.getErrorCode() + "登录成功");
+                        ToastUtils.showLong(R.string.login_success);
+                        SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
+                        setupMesh();
+                        initDatBase(t.getT());
+                        TransformView();
+                    }
+
+                    @Override
+                    public void onError(@NotNull Throwable e) {
+                        super.onError(e);
+                        hideLodingDialog();
+                    }
+                });
     }
 
     Observer<Response<DbUser>> observerLogin = new Observer<Response<DbUser>>() {

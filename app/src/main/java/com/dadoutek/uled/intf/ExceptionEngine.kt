@@ -1,7 +1,18 @@
 package com.dadoutek.uled.intf
 
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.intf.NetworkStatusCode.BAD_GATEWAY
+import com.dadoutek.uled.intf.NetworkStatusCode.FORBIDDEN
+import com.dadoutek.uled.intf.NetworkStatusCode.GATEWAY_TIMEOUT
+import com.dadoutek.uled.intf.NetworkStatusCode.HTTP_ERROR
+import com.dadoutek.uled.intf.NetworkStatusCode.INTERNAL_SERVER_ERROR
+import com.dadoutek.uled.intf.NetworkStatusCode.NOT_FOUND
+import com.dadoutek.uled.intf.NetworkStatusCode.REQUEST_TIMEOUT
+import com.dadoutek.uled.intf.NetworkStatusCode.SERVICE_UNAVAILABLE
+import com.dadoutek.uled.intf.NetworkStatusCode.UNAUTHORIZED
 import com.google.gson.JsonParseException
+import com.telink.TelinkApplication
 
 
 import org.json.JSONException
@@ -19,39 +30,24 @@ import retrofit2.HttpException
 object ExceptionEngine {
 
     fun handleException(e: Throwable): ServerException {
-        val ex: ApiException
-        if (e is HttpException) {             //HTTP错误
-            ex = ApiException(e, HTTP_ERROR)
-            when (e.code()) {
-                UNAUTHORIZED, FORBIDDEN, NOT_FOUND, REQUEST_TIMEOUT, GATEWAY_TIMEOUT, INTERNAL_SERVER_ERROR, BAD_GATEWAY, SERVICE_UNAVAILABLE -> ex.setDisplayMessage(App.getInstance().getString(R.string.network_error))  //均视为网络错误
-                else -> ex.setDisplayMessage(App.getInstance().getString(R.string.network_error))
-            }
-            return ex
+        val ex: ServerException
+        //HTTP错误
+        if (e is HttpException) {
+            ex = ServerException(TelinkApplication.getInstance().getString(R.string.network_error))
         } else if (e is ServerException) {    //服务器返回的错误
-            ex = ApiException(e, e.getCode())
-            ex.setDisplayMessage(e.getMsg())
-            return ex
+            ToastUtils.showShort(e.message)
         } else if (e is JsonParseException
                 || e is JSONException
                 || e is ParseException) {
-            ex = ApiException(e, REQUEST_ARGS)
-            ex.setDisplayMessage(App.getInstance().getString(R.string.data_format_error))
+            ToastUtils.showShort(e.message)
 
-            //均视为解析错误
-            return ex
         } else if (e is ConnectException) {
-            ex = ApiException(e, NOT_FOUND)
-            ex.setDisplayMessage(App.getInstance().getString(R.string.network_unavailable))  //均视为网络错误
-            return ex
+            ToastUtils.showShort(R.string.network_unavailable)  //均视为网络错误
         } else if (e is SocketTimeoutException) {
-            ex = ApiException(e, REQUEST_TIMEOUT)
-            ex.setDisplayMessage(App.getInstance().getString(R.string.network_time_out))  //请求超时
-            return ex
+            ToastUtils.showShort(R.string.network_time_out)  //请求超时
         } else {
-            ex = ApiException(e, BUSY)
-            ex.setDisplayMessage(App.getInstance().getString(R.string.unkown_error))
             //未知错误
-            return ex
+            ToastUtils.showShort(e.message)
         }
     }
 }

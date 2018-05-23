@@ -225,4 +225,15 @@
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
+    <string name="login_timeout">登录超时</string>
+    <string name="account_not_exist">账户不存在</string>
+    <string name="account_exist">账户已存在</string>
+    <string name="unknown_network_error">未知网络异常</string>
+    <string name="network_error">网络异常！</string>
+
+    <string name="network_unavailable">当前网络不可用，请检查网络设置。</string>
+
+    <string name="network_time_out">网络连接超时，请重试</string>
+
+
 </resources>
