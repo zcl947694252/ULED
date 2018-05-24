@@ -19,7 +19,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
-import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.Opcode
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -125,10 +124,10 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         val map: Map<Int, DbScene> = mAdapter.getSceneMap()
         for (key in map.keys) {
             when (key) {
-                1 -> keyNum = 0x05          //左上按键
-                2 -> keyNum = 0x03//0x06    //右上按键
-                3 -> keyNum = 0x06//0x03    //左下按键
-                4 -> keyNum = 0x04          //右下按键
+                0 -> keyNum = 0x05          //左上按键
+                1 -> keyNum = 0x03          //右上按键
+                2 -> keyNum = 0x06          //左下按键
+                3 -> keyNum = 0x04          //右下按键
             }
             val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0xff.toByte(), map.getValue(key).id.toByte(),
                     0xff.toByte())
