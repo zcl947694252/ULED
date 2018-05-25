@@ -141,11 +141,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         groupsInit = DBUtils.getGroupList();
         this.adapter.notifyDataSetChanged();
 
-        for(int i=0;i<groupsInit.size();i++){
-            if(groupsInit.get(i).getMeshAddr()==gpAdress){
-                groupsInit.get(i).checked=true;
-            }
-        }
+//        for(int i=0;i<groupsInit.size();i++){
+//            if(groupsInit.get(i).getMeshAddr()==gpAdress){
+//                groupsInit.get(i).checked=true;
+//            }
+//        }
     }
 
     @Override

@@ -107,12 +107,27 @@ public class DBUtils {
     public static List<DbGroup> getGroupList() {
         int allGIndex = -1;
         QueryBuilder<DbGroup> qb = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder();
-        List<DbGroup> list = qb.whereOr(
-                DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()),
-               DbGroupDao.Properties.BelongRegionId.eq(allGIndex))
+        List<DbGroup> list = qb.where(
+                DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
         .list();
 
         return list;
+    }
+
+    //未分组
+    public static DbGroup getGroupNull() {
+        int allGIndex = -1;
+        QueryBuilder<DbGroup> qb = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder();
+        List<DbGroup> list = qb.where(
+                DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
+                .list();
+
+       for(int i=0;i<list.size();i++){
+           if(list.get(i).getMeshAddr()==0xffff){
+               return list.get(i);
+           }
+       }
+        return null;
     }
 
     public static List<DbScene> getSceneAll(){
@@ -141,6 +156,31 @@ public class DBUtils {
             DaoSessionInstance.getInstance().getDbRegionDao().insert(dbRegion);
             //暂时用本地保存区域
             SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.getId());
+
+            recordingChange(dbRegion.getId(),
+                    DaoSessionInstance.getInstance().getDbRegionDao().getTablename(),
+                    Constant.DB_ADD);
+            createAllLightControllerGroup();
+        } else {//更新数据库
+            dbRegion.setId(dbRegionOld.getId());
+            DaoSessionInstance.getInstance().getDbRegionDao().update(dbRegion);
+            //暂时用本地保存区域
+            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.getId());
+            recordingChange(dbRegion.getId(),
+                    DaoSessionInstance.getInstance().getDbRegionDao().getTablename(),
+                    Constant.DB_UPDATE);
+        }
+    }
+
+    public static void insertRegion(DbRegion dbRegion) {
+        //判断原来是否保存过这个区域
+        DbRegion dbRegionOld = DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
+                where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.getControlMesh())).unique();
+        if (dbRegionOld == null) {//直接插入
+            DaoSessionInstance.getInstance().getDbRegionDao().insert(dbRegion);
+            //暂时用本地保存区域
+            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.getId());
+
             recordingChange(dbRegion.getId(),
                     DaoSessionInstance.getInstance().getDbRegionDao().getTablename(),
                     Constant.DB_ADD);
@@ -163,6 +203,10 @@ public class DBUtils {
     }
 
     public static void saveLight(DbLight light) {
+        //保存灯之前先把所有的灯都分配到当前的所有组去
+        DbGroup dbGroup=getGroupNull();
+        light.setBelongGroupId(dbGroup.getId());
+
         DaoSessionInstance.getInstance().getDbLightDao().save(light);
         recordingChange(light.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
@@ -286,15 +330,12 @@ public class DBUtils {
         groupAllLights.setMeshAddr(0xFFFF);
         groupAllLights.setBrightness(100);
         groupAllLights.setColorTemperature(100);
-        groupAllLights.setBelongRegionId(-1);
+        groupAllLights.setBelongRegionId((int)SharedPreferencesUtils.getCurrentUseRegion());
         List<DbGroup> list = getGroupList();
-
-        if (list.size() == 0) {
-            DaoSessionInstance.getInstance().getDbGroupDao().insert(groupAllLights);
-            recordingChange(groupAllLights.getId(),
+        DaoSessionInstance.getInstance().getDbGroupDao().insert(groupAllLights);
+        recordingChange(groupAllLights.getId(),
                     DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                     Constant.DB_ADD);
-        }
 //        for(int i=0;i<list.size();i++){
 //            if(list.get(i).getMeshAddr()!=0xffff){
 //                groupAllLights.setId(Long.valueOf(0));
