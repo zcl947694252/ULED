@@ -34,6 +34,7 @@ import com.telink.bluetooth.light.OnlineStatusNotificationParser;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -129,8 +130,13 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
     }
 
     private void initData() {
+        lightList=new ArrayList<>();
         if(group.getMeshAddr()==0xffff){
-            lightList = DBUtils.getAllLight();
+//            lightList = DBUtils.getAllLight();
+            List<DbGroup> list=DBUtils.getGroupList();
+            for(int j=0;j<list.size();j++){
+                lightList.addAll(DBUtils.getLightByGroupID(list.get(j).getId()));
+            }
         }else{
             lightList = DBUtils.getLightByGroupID(group.getId());
         }

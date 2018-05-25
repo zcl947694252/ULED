@@ -326,6 +326,11 @@ public class DataManager {
     }
 
     public String getLightName(DbLight light) {
+
+        //如果当前灯没分组  显示未分组
+        if(DBUtils.getGroupByID(light.getBelongGroupId()).getMeshAddr()==0xffff){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }
         if(light.getName()==null||light.getName().isEmpty()){
             return light.getLabel();
         }else{

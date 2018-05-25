@@ -122,7 +122,6 @@ object AccountModel {
         //从云端用户表同步数据到本地
 //        dbUser = user
         DBUtils.saveUser(user)
-        DBUtils.createAllLightControllerGroup()
     }
 
     private fun setIsLogin(isLogin: Boolean) {
@@ -191,6 +190,8 @@ object AccountModel {
         mesh.password = dbRegio.installMeshPwd
         mesh.saveOrUpdate(TelinkLightApplication.getInstance())
         application.setupMesh(mesh)
+
+//        DBUtils.createAllLightControllerGroup()
     }
 
 
