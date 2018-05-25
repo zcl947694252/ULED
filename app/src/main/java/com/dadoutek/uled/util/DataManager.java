@@ -332,4 +332,12 @@ public class DataManager {
             return light.getName();
         }
     }
+
+    public String getLightNameOR(Light light) {
+        if(light.getName()==null||light.getName().isEmpty()){
+            return light.getLabel();
+        }else{
+            return light.getName();
+        }
+    }
 }

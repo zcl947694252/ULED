@@ -66,11 +66,8 @@ object AccountModel {
         val lights= SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
                 name+pwd+Constant.LIGHTS_KEY) as? Lights
 
-        Log.d("lights=====","kkkkkk"+lights!!.get().size)
-        if(lights.get()!=null&&lights.get().size>0){
-            Log.d("lights=====","mmmmmm"+lights!!.get().size)
+        if(lights!!.get()!=null&&lights.get().size>0){
             for(item in lights.get()){
-                Log.d("lights=====","nnnnnn"+lights!!.get().size+"--"+item.brightness)
                 var light : DbLight = DbLight()
                 if(item.belongGroups.size>0){
                     light.belongGroupId = DBUtils.getGroupByMesh(item.belongGroups.get(0)).id
@@ -88,7 +85,6 @@ object AccountModel {
                     light.productUUID = 0
                 }
                 DBUtils.saveLight(light)
-                Log.d("lights=====","dddddd"+lights!!.get().size+"--"+item.brightness)
             }
         }
     }

@@ -24,8 +24,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -37,10 +35,11 @@ import com.dadoutek.uled.activity.OnlineStatusTestActivity;
 import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.activity.UserAllActivity;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Light;
+import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.bluetooth.light.ConnectionStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -83,7 +82,6 @@ public final class DeviceListFragment extends Fragment {
 
 
     private static final int REQ_CHANGE_MESH_NAME = 0x01;
-    private List<DbLight> lightList;
 
     private OnClickListener clickListener = new OnClickListener() {
 
@@ -115,8 +113,8 @@ public final class DeviceListFragment extends Fragment {
                 startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
             } else if (v == btnOta) {
 //                Intent intent = new Intent(mContext, OtaDeviceListActivity.class);
-                List<DbLight> lights = DBUtils.getAllLight();
-                for (DbLight light : lights) {
+                List<Light> lights = Lights.getInstance().get();
+                for (Light light : lights) {
                     if (light.status != ConnectionStatus.OFFLINE) {
 //                        Intent intent = new Intent(mContext, OtaActivity.class);
 //                        intent.putExtra("meshAddress", light.meshAddress);
@@ -211,12 +209,12 @@ public final class DeviceListFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
 
-            DbLight light = adapter.getItem(position);
+            Light light = adapter.getItem(position);
 
             if (light.status == ConnectionStatus.OFFLINE)
                 return;
 
-            int dstAddr = light.getMeshAddr();
+            int dstAddr = light.meshAddress;
 
             byte opcode = (byte) 0xD0;
 
@@ -238,8 +236,8 @@ public final class DeviceListFragment extends Fragment {
 
             Intent intent = new Intent(getActivity(),
                     DeviceSettingActivity.class);
-            DbLight light = adapter.getItem(position);
-            intent.putExtra(Constant.LIGHT_ARESS_KEY, light);
+            Light light = adapter.getItem(position);
+            intent.putExtra(Constant.LIGHT_ARESS_KEY, light.meshAddress);
             startActivity(intent);
             return true;
         }
@@ -249,7 +247,6 @@ public final class DeviceListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mContext = this.getActivity();
-        lightList = new ArrayList<>();
         this.adapter = new DeviceListAdapter();
         mIntervalHandler = new Handler();
         onOff = false;
@@ -318,11 +315,11 @@ public final class DeviceListFragment extends Fragment {
         return view;
     }
 
-    public void addDevice(DbLight light) {
+    public void addDevice(Light light) {
         this.adapter.add(light);
     }
 
-    public DbLight getDevice(int meshAddress) {
+    public Light getDevice(int meshAddress) {
         if (this.adapter != null)
             return this.adapter.get(meshAddress);
         else
@@ -330,10 +327,10 @@ public final class DeviceListFragment extends Fragment {
     }
 
     public void notifyDataSetChanged() {
-        lightList = DBUtils.getAllLight();
-        for (int k = 0; k < lightList.size(); k++) {
-            if (lightList.get(k).status == ConnectionStatus.OFFLINE) {
-                lightList.remove(k);
+        Lights lights = Lights.getInstance();
+        for (int k = 0; k < lights.size(); k++) {
+            if (lights.get(k).status == ConnectionStatus.OFFLINE) {
+                lights.remove(k);
                 k--;
             }
         }
@@ -365,12 +362,12 @@ public final class DeviceListFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return lightList.size();
+            return Lights.getInstance().size();
         }
 
         @Override
-        public DbLight getItem(int position) {
-            return lightList.get(position);
+        public Light getItem(int position) {
+            return Lights.getInstance().get(position);
         }
 
         @Override
@@ -402,9 +399,9 @@ public final class DeviceListFragment extends Fragment {
                 holder = (DeviceItemHolder) convertView.getTag();
             }
 
-            DbLight light = this.getItem(position);
+            Light light = this.getItem(position);
 
-            holder.txtName.setText(mDataManager.getLightName(light));
+            holder.txtName.setText(mDataManager.getLightNameOR(light));
             holder.txtName.setTextColor(light.textColor);
             holder.statusIcon.setImageResource(light.icon);
 
@@ -412,17 +409,12 @@ public final class DeviceListFragment extends Fragment {
             return convertView;
         }
 
-        public void add(DbLight light) {
-            lightList.add(light);
+        public void add(Light light) {
+            Lights.getInstance().add(light);
         }
 
-        public DbLight get(int meshAddress) {
-           for(int i=0;i<lightList.size();i++){
-               if(meshAddress==lightList.get(i).getMeshAddr()){
-                   return lightList.get(i);
-               }
-           }
-            return null;
+        public Light get(int meshAddress) {
+            return Lights.getInstance().getByMeshAddress(meshAddress);
         }
     }
 }

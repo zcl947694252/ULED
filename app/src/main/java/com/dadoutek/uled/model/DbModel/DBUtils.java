@@ -159,7 +159,6 @@ public class DBUtils {
     }
 
     public static void saveLight(DbLight light) {
-        Log.d("lights=====","66666666666"+light.getBrightness());
         DaoSessionInstance.getInstance().getDbLightDao().save(light);
         recordingChange(light.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),

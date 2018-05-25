@@ -501,11 +501,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             Log.d("Saw", "meshAddress = " + meshAddress + "  reserve = " + notificationInfo.reserve +
                     " status = " + notificationInfo.status + " connectionStatus = " + notificationInfo.connectionStatus.value)
             if (checkIsLight(notificationInfo)) {
-                //                Light light = this.deviceFragment.getDevice(meshAddress);
+//                var light = this.deviceFragment.getDevice(meshAddress) as Lights
                 var light: Light? = lights.getByMeshAddress(meshAddress)
                 if (light == null) {
                     light = Light()
-                    //                    this.deviceFragment.addDevice(light);
+                                        this.deviceFragment.addDevice(light);
                 }
 
                 light.meshAddress = meshAddress
