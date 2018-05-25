@@ -127,6 +127,10 @@ public class DBUtils {
         return DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
     }
 
+    public static List<DbGroup> getAllGroups() {
+        return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
+    }
+
     /********************************************保存*******************************/
 
     public static void saveRegion(DbRegion dbRegion) {
@@ -184,10 +188,6 @@ public class DBUtils {
         recordingChange(sceneActions.getId(),
                 DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
                 Constant.DB_ADD);
-    }
-
-    public static List<DbGroup> getAllGroups() {
-        return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
     }
 
     /********************************************更改*******************************/

@@ -152,7 +152,7 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
                 this.onOnlineStatusNotify((NotificationEvent) event);
                 break;
             case DeviceEvent.STATUS_CHANGED:
-//                this.onDeviceStatusChanged((DeviceEvent) event);
+                this.onDeviceStatusChanged((DeviceEvent) event);
                 break;
             case MeshEvent.OFFLINE:
 //                this.onMeshOffline((MeshEvent) event);
@@ -174,6 +174,9 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
                         + " deviceId-" + info.deviceId);
                 break;
         }
+    }
+
+    private void onDeviceStatusChanged(DeviceEvent event) {
     }
 
     /**

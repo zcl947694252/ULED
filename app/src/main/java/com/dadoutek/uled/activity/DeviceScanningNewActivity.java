@@ -771,7 +771,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         nowLightList = new ArrayList<>();
         if (groups == null) {
             groups = new ArrayList<>();
-            groups.addAll(DBUtils.getAllGroups());
+            groups.addAll(DBUtils.getGroupList());
         }
     }
 

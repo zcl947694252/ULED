@@ -1,6 +1,7 @@
 package com.dadoutek.uled.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,27 +11,36 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.util.StringUtils;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.OnClick;
 
 
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
@@ -44,7 +54,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     private DbLight light;
     private int gpAdress;
 
+    private Button btnAdd;
+
     private OnClickListener clickListener = v -> finish();
+
+    private GridView listView;
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
 
         @Override
@@ -103,10 +117,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         this.setContentView(R.layout.activity_device_grouping);
 
         this.light = (DbLight) this.getIntent().getExtras().get("light");
-        this.gpAdress = this.getIntent().getIntExtra("gpAddress",0);
+        this.gpAdress = this.getIntent().getIntExtra("gpAddress", 0);
 
         this.inflater = this.getLayoutInflater();
         this.adapter = new GroupListAdapter();
+        btnAdd=findViewById(R.id.add_group_new);
 
         ImageView backView = (ImageView) this
                 .findViewById(R.id.img_header_menu_left);
@@ -114,9 +129,10 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         this.initData();
 
-        GridView listView = (GridView) this.findViewById(R.id.list_groups);
+        listView = (GridView) this.findViewById(R.id.list_groups);
         listView.setOnItemClickListener(this.itemClickListener);
         listView.setAdapter(this.adapter);
+        btnAdd.setOnClickListener(v -> addNewGroup());
 
         this.getDeviceGroup();
     }
@@ -124,6 +140,12 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     private void initData() {
         groupsInit = DBUtils.getGroupList();
         this.adapter.notifyDataSetChanged();
+
+        for(int i=0;i<groupsInit.size();i++){
+            if(groupsInit.get(i).getMeshAddr()==gpAdress){
+                groupsInit.get(i).checked=true;
+            }
+        }
     }
 
     @Override
@@ -207,6 +229,36 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         }
     }
 
+    private void addNewGroup() {
+            final EditText textGp = new EditText(this);
+            new AlertDialog.Builder(DeviceGroupingActivity.this)
+                    .setTitle(R.string.create_new_group)
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .setView(textGp)
+
+                    .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+                        // 获取输入框的内容
+                        if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
+                            ToastUtils.showShort(getString(R.string.rename_tip_check));
+                        } else {
+                            //往DB里添加组数据
+                            DBUtils.addNewGroup(textGp.getText().toString().trim(), groupsInit, this);
+                            refreshView();
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                        dialog.dismiss();
+                    }).show();
+    }
+
+    private void refreshView() {
+        groupsInit = DBUtils.getGroupList();
+        adapter=new GroupListAdapter();
+        listView.setAdapter(this.adapter);
+        adapter.notifyDataSetInvalidated();
+    }
+
     private static class GroupItemHolder {
         public TextView name;
     }
@@ -232,8 +284,8 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         }
 
         public DbGroup get(int addr) {
-            for(int j=0;j<groupsInit.size();j++){
-                if(addr==groupsInit.get(j).getMeshAddr()){
+            for (int j = 0; j < groupsInit.size(); j++) {
+                if (addr == groupsInit.get(j).getMeshAddr()) {
                     return groupsInit.get(j);
                 }
             }
@@ -279,11 +331,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 }
 
             }
-//
-//            if (position == 0) {
-//                AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(1, 1);
-//                convertView.setLayoutParams(layoutParams);
-//            }
+
+            if (position == 0) {
+                AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(1, 1);
+                convertView.setLayoutParams(layoutParams);
+            }
 
             return convertView;
         }

@@ -35,6 +35,14 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/add_group_new"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:text="@string/add_groups"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </RelativeLayout>
 
     <GridView
