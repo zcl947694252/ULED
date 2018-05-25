@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,9 +36,6 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -46,6 +44,9 @@ import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -157,6 +158,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     //灯的mesh地址
     private int dstAddress;
     private Disposable mConnectTimer;
+    private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -170,9 +172,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             nowLightList.get(position).selected = true;
 //            getDeviceGroup(light);
             checkSelectLamp(light);
+//            startBlink(light);
         } else {
             nowLightList.get(position).selected = false;
             this.updateList.remove(light);
+            stopBlink(light);
+//            controlLightOnOrOff(light.getMeshAddr(), true);
         }
     }
 
@@ -184,16 +189,60 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             return;
         }
 //        groups = mDataManager.initGroupsChecked();
-        DbGroup group = groups.get(0);
-        Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
+//        DbGroup group = groups.get(0);
+//        Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
 
+
+        startBlink(light);
+//        int groupAddress = group.getMeshAddr();
+//        int dstAddress = light.getMeshAddr();
+//        byte opcode = (byte) Opcode.SET_GROUP;
+//        byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
+//                (byte) (groupAddress >> 8 & 0xFF)};
+//        params[0] = 0x01;
+//        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+    }
+
+
+    /**
+     * 让灯开始闪烁
+     */
+    private void startBlink(DbLight light) {
+//        int dstAddress = light.getMeshAddr();
+
+        DbGroup group = groups.get(0);
         int groupAddress = group.getMeshAddr();
         int dstAddress = light.getMeshAddr();
         byte opcode = (byte) Opcode.SET_GROUP;
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
         params[0] = 0x01;
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+        mBlinkDisposables.put(dstAddress, Observable.timer(1000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+//                    boolean on;
+                    //第一次执行为true，第二次为false，第三次为true，如此循环。
+//                    on = aLong % 2 != 0;
+//                    controlLightOnOrOff(dstAddress, on);
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+                }));
+    }
+
+    private void controlLightOnOrOff(int dstAddress, boolean on) {
+        byte parmOnOrOff;
+        if (on) {
+            parmOnOrOff = 0x01;
+        } else
+            parmOnOrOff = 0x00;
+        byte[] params = new byte[]{parmOnOrOff, 0x00, 0x00};
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF, dstAddress,
+                params);
+    }
+
+    private void stopBlink(DbLight light) {
+        Disposable disposable = mBlinkDisposables.get(light.getMeshAddr());
+        disposable.dispose();
     }
 
     @Override
@@ -414,18 +463,27 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         mGroupingDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int index = 0;
+
+            for (int i = 0; i < selectLights.size(); i++) {
+                //让选中的灯停下来别再发闪的命令了。
+                stopBlink(selectLights.get(i));
+            }
+
+            Thread.sleep(1000);
             while (index < selectLights.size()) {
                 DbLight light = selectLights.get(index);
 //                deletePreGroup(light);
 //                saveLightAddrToGroup(light);
-                //每个灯发3次分组的命令，确保灯能收到命令.
-                for (int i = 0; i < 3; i++) {
-                    sendGroupData(light, group, index);
-                    try {
+                try {
+                    //每个灯发3次分组的命令，确保灯能收到命令.
+                    for (int i = 0; i < 3; i++) {
+                        sendGroupData(light, group, index);
+
                         Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+
                     }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 index++;
             }
@@ -437,7 +495,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .subscribe(o -> {
                     if (o) {
                         for (int i = 0; i < selectLights.size(); i++) {
-                            selectLights.get(i).selected = false;
+                            DbLight light = selectLights.get(i);
+                            light.selected = false;
                         }
                         adapter.notifyDataSetChanged();
                         closeDialog();
@@ -794,6 +853,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             mGroupingDisposable.dispose();
         if (mConnectTimer != null)
             mConnectTimer.dispose();
+
+        for (int i = 0; i < mBlinkDisposables.size(); i++) {
+            Disposable disposable = mBlinkDisposables.get(i);
+            if (disposable != null)
+                disposable.dispose();
+        }
     }
 
     public void openLoadingDialog(String content) {
