@@ -180,7 +180,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         bnve.enableShiftingMode(false);
         bnve.enableItemShiftingMode(false);
         bnve.setupWithViewPager(viewPager)
-
     }
 
 

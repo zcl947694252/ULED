@@ -1,4 +1,6 @@
 package com.dadoutek.uled.widget
 
-class LoadingDialog {
-}
+import android.support.v7.app.AlertDialog
+
+//class LoadingDialog : AlertDialog {
+//}

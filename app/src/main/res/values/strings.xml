@@ -234,5 +234,7 @@
     <string name="network_error">Network Error</string>
     <string name="network_unavailable">Network unavailable.Check your network settings.</string>
     <string name="network_time_out">Network connection timed out, please try again.</string>
+    <string name="delete_light_confirm">Do you really want to delete the light?</string>
+    <string name="delete_group_confirm">Do you really want to delete the group?</string>
 
 </resources>
