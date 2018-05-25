@@ -7,14 +7,12 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.fragments.GroupSettingFragment;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.util.DataManager;
 
 public final class GroupSettingActivity extends TelinkBaseActivity {
 

@@ -1,25 +1,18 @@
 package com.dadoutek.uled;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbRegion;
-import com.dadoutek.uled.dao.DaoMaster;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.dao.DaoSession;
-import com.dadoutek.uled.model.DeviceInfo;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
-import com.telink.bluetooth.light.ConnectionStatus;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.text.SimpleDateFormat;

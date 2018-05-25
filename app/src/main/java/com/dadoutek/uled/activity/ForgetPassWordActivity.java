@@ -10,10 +10,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.DbModel.DbUser;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.NetworkUtils;

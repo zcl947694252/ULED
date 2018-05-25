@@ -6,9 +6,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Group;
 
 import java.util.List;
 

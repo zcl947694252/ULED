@@ -9,11 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener;
-import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.util.DataManager;
 
 import java.util.List;

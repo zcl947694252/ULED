@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.dadoutek.uled.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 

@@ -9,7 +9,7 @@ import android.widget.Spinner;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
-import com.dadoutek.uled.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.R;
 
 import java.util.ArrayList;

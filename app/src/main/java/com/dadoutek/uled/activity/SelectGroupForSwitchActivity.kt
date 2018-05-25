@@ -13,7 +13,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.adapter.SelectSwitchGroupRvAdapter
-import com.dadoutek.uled.model.Group
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.util.DataManager
 import com.telink.bluetooth.event.DeviceEvent
@@ -36,7 +37,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
-    private lateinit var mGroupArrayList: ArrayList<Group>
+    private lateinit var mGroupArrayList: ArrayList<DbGroup>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,13 +83,13 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         mAdapter.setOnItemChildClickListener { _, view, position ->
             when (view.id) {
                 R.id.btnOn -> {
-                    val dstAddr = mGroupArrayList.get(position).meshAddress
+                    val dstAddr = mGroupArrayList.get(position).meshAddr
                     TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF, dstAddr,
                             byteArrayOf(0x01, 0x00, 0x00))
                 }
 
                 R.id.btnOff -> {
-                    val dstAddr = mGroupArrayList.get(position).meshAddress
+                    val dstAddr = mGroupArrayList.get(position).meshAddr
                     TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF, dstAddr,
                             byteArrayOf(0x00, 0x00, 0x00))
                 }
@@ -157,7 +158,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setNewPassword(mesh.password)
 
         params.setUpdateDeviceList(mDeviceInfo)
-        val groupAddress = mGroupArrayList.get(mAdapter.selectedPos).meshAddress
+        val groupAddress = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
         val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddress shr 8 and 0xFF).toByte())
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
@@ -186,13 +187,13 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
     private fun initView() {
         mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
         val mesh = mApplication.mesh
-        val dataManager = DataManager(this, mesh.name, mesh.password)
-        mGroupArrayList = ArrayList<Group>()
-        val groupList = dataManager.groups.get()
+//        val dataManager = DataManager(this, mesh.name, mesh.password)
+        mGroupArrayList = ArrayList<DbGroup>()
+        val groupList = DBUtils.getGroupList()
 //        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
 
         for (group in groupList) {
-            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
+//            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
                 mGroupArrayList.add(group)
         }
 

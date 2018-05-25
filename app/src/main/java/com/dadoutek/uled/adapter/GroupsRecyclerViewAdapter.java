@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Group;

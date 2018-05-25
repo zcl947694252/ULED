@@ -21,8 +21,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -31,9 +31,6 @@ import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
 import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Groups;
-import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.DataManager;
 
 import java.util.ArrayList;

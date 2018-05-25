@@ -35,9 +35,9 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbGroup;
-import com.dadoutek.uled.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -453,6 +453,23 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //        }, selectLights.size() * 3 * 300);
     }
 
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        if (grouping) {
+            finish();
+        } else {
+            new AlertDialog.Builder(this)
+                    .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+                        finish();
+                    })
+                    .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
+                    }))
+                    .setMessage(R.string.exit_tips_in_scanning)
+                    .show();
+        }
+    }
+
     private void sendGroupData(DbLight light, DbGroup group, int index) {
         int groupAddress = group.getMeshAddr();
         dstAddress = light.getMeshAddr();
@@ -743,18 +760,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (grouping) {
-                    finish();
-                } else {
-                    new AlertDialog.Builder(this)
-                            .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
-                                finish();
-                            })
-                            .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
-                            }))
-                            .setMessage(R.string.exit_tips_in_scanning)
-                            .show();
-                }
+                onBackPressed();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -765,7 +771,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         nowLightList = new ArrayList<>();
         if (groups == null) {
             groups = new ArrayList<>();
-            groups.addAll(DBUtils.getAllGroups());
+            groups.addAll(DBUtils.getGroupList());
         }
     }
 
