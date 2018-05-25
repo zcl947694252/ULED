@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -14,16 +13,12 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbUser;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.intf.AccountModel;
+import com.dadoutek.uled.model.HttpModel.AccountModel;
 import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DaoSessionInstance;
-import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.LogUtils;
@@ -34,9 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by hejiajun on 2018/5/15.

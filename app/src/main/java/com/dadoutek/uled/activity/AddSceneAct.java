@@ -15,10 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbGroup;
-import com.dadoutek.uled.DbModel.DbScene;
-import com.dadoutek.uled.DbModel.DbSceneActions;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -26,13 +26,11 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.adapter.GroupListAdapter;
 import com.dadoutek.uled.adapter.SceneGroupAdapter;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DaoSessionInstance;
-import com.dadoutek.uled.model.Group;
-import com.dadoutek.uled.model.Groups;
 import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.StringUtils;
 
 import java.util.ArrayList;
@@ -232,7 +230,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
-        dbScene.setBelongAccount(telinkLightApplication.getMesh().name);
+        dbScene.setBelongRegionId((long)SharedPreferencesUtils.getCurrentUseRegion());
         DBUtils.saveScene(dbScene);
 
         long idAction = dbScene.getId();

@@ -11,20 +11,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbRegion;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.Groups;
-import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.qrcode.QRCodeShareActivity;
-import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.FileSystem;
 
@@ -224,6 +221,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
 //            this.showToast("Save Mesh Success");
             saveToDataBase(factoryName,factoryPwd,mNewMeshName,mNewMeshPwd);
+
         }
 
 

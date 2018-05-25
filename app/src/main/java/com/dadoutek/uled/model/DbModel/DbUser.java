@@ -1,6 +1,4 @@
-package com.dadoutek.uled.DbModel;
-
-import com.google.gson.annotations.SerializedName;
+package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;

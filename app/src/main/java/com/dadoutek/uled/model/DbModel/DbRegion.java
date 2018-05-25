@@ -1,9 +1,8 @@
-package com.dadoutek.uled.DbModel;
+package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.NotNull;
 
 /**
  * Created by hejiajun on 2018/5/9.

@@ -1,10 +1,10 @@
 package com.dadoutek.uled.intf;
 
-import com.dadoutek.uled.DbModel.DbGroup;
-import com.dadoutek.uled.DbModel.DbLight;
-import com.dadoutek.uled.DbModel.DbRegion;
-import com.dadoutek.uled.DbModel.DbScene;
-import com.dadoutek.uled.DbModel.DbUser;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbRegion;
+import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 
 import java.util.List;
@@ -171,10 +171,11 @@ public interface RequestInterface {
     @GET("api/user/info/mine")
     Observable<Response<DbUser>> getUserInfo(@Query("token") String token);
 
-//    //修改用户信息
-//    @PUT("api/user/update")
-//    Observable<Response<Void>> updateScene(@Query("token") String token,
-//                                           @Query("rid") int rid,
-//                                           @Query("name") String name,
-//                                           @Query("actions") List<String> actions);
+    //修改用户信息
+    @PUT("api/user/update")
+    Observable<Response<Void>> updateUser(@Query("token") String token,
+                                           @Query("avatar") String avatar,
+                                           @Query("name") String name,
+                                           @Query("email") String email,
+                                           @Query("introduction") String introduction);
 }

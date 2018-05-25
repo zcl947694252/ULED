@@ -1,4 +1,4 @@
-package com.dadoutek.uled.DbModel;
+package com.dadoutek.uled.model.DbModel;
 
 import android.content.Context;
 import android.util.Log;
@@ -16,6 +16,7 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +45,52 @@ public class DBUtils {
         return group;
     }
 
+    public static DbLight getLightByID(long id) {
+        DbLight light = DaoSessionInstance.getInstance().getDbLightDao().load((Long) id);
+        return light;
+    }
+
+    public static DbRegion getRegionByID(long id) {
+        DbRegion region = DaoSessionInstance.getInstance().getDbRegionDao().load((Long) id);
+        return region;
+    }
+
+    public static DbScene getSceneByID(long id) {
+        DbScene scene = DaoSessionInstance.getInstance().getDbSceneDao().load((Long) id);
+        return scene;
+    }
+
+    public static DbSceneActions getSceneActionsByID(long id) {
+        DbSceneActions actions = DaoSessionInstance.getInstance().getDbSceneActionsDao().load((Long) id);
+        return actions;
+    }
+
+    public static DbUser getUserByID(long id) {
+        DbUser user = DaoSessionInstance.getInstance().getDbUserDao().load((Long) id);
+        return user;
+    }
+
     public static DbRegion getCurrentRegion(long id) {
         DbRegion region = DaoSessionInstance.getInstance().getDbRegionDao().load((Long) id);
         return region;
     }
 
-    public static DbLight getLight(String mesh) {
+    public static DbRegion getLastRegion() {
+        List<DbRegion> list  = DaoSessionInstance.getInstance().getDbRegionDao().
+                queryBuilder().orderDesc(DbRegionDao.Properties.Id).list();
+        return list.get(0);
+    }
+
+    public static DbLight getLightByMesh(String mesh) {
         DbLight dbLight = DaoSessionInstance.getInstance().getDbLightDao().queryBuilder().
                 where(DbLightDao.Properties.MeshAddr.eq(mesh)).unique();
         return dbLight;
+    }
+
+    public static DbGroup getGroupByMesh(String mesh) {
+        DbGroup dbGroup = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().
+                where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique();
+        return dbGroup;
     }
 
     public static List<DbLight> getAllLight() {
@@ -79,6 +117,10 @@ public class DBUtils {
 
     public static List<DbScene> getSceneAll(){
         return DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
+    }
+
+    public static List<DbRegion> getRegionAll(){
+        return DaoSessionInstance.getInstance().getDbRegionDao().loadAll();
     }
 
     public static List<DbDataChange> getDataChangeAll(){
@@ -117,7 +159,8 @@ public class DBUtils {
     }
 
     public static void saveLight(DbLight light) {
-        DaoSessionInstance.getInstance().getDbLightDao().insertOrReplace(light);
+        Log.d("lights=====","66666666666"+light.getBrightness());
+        DaoSessionInstance.getInstance().getDbLightDao().save(light);
         recordingChange(light.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
                 Constant.DB_ADD);

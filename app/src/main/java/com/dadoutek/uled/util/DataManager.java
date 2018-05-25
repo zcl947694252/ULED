@@ -5,9 +5,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.DbModel.DBUtils;
-import com.dadoutek.uled.DbModel.DbGroup;
-import com.dadoutek.uled.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
@@ -326,7 +326,7 @@ public class DataManager {
     }
 
     public String getLightName(DbLight light) {
-        if(light.getName().isEmpty()){
+        if(light.getName()==null||light.getName().isEmpty()){
             return light.getLabel();
         }else{
             return light.getName();

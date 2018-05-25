@@ -1,4 +1,4 @@
-package com.dadoutek.uled.DbModel;
+package com.dadoutek.uled.model.DbModel;
 
 import com.dadoutek.uled.R;
 import com.telink.bluetooth.light.ConnectionStatus;

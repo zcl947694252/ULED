@@ -19,14 +19,17 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DbDataChange;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.dadoutek.uled.service.SyncDataService;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,6 +60,9 @@ public class MeFragment extends Fragment {
     @BindView(R.id.one_click_backup)
     Button oneClickBackup;
     private LayoutInflater inflater;
+
+    private DbDataChange dbDataChange;
+    private List<DbDataChange> dbDataChangeList;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -134,15 +140,37 @@ public class MeFragment extends Fragment {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-               syncDataToServer();
+               syncDataStep1();
                 break;
         }
 
     }
 
-    private void syncDataToServer() {
-        Intent intent=new Intent(getActivity(), SyncDataService.class);
-        getActivity().startService(intent);
+    private void syncDataStep1() {
+            dbDataChangeList= DBUtils.getDataChangeAll();
+            for(int i=0;i<dbDataChangeList.size();i++){
+                getLocalData(dbDataChangeList.get(i).getTableName(),
+                        dbDataChangeList.get(i).getChangeId(),
+                        dbDataChangeList.get(i).getChangeType());
+            }
+    }
+
+    private void getLocalData(String tableName, Long changeId, String type) {
+        switch (tableName){
+            case "DB_GROUPS":
+                DbGroup group=DBUtils.getGroupByID(changeId);
+                break;
+            case "DB_LIGHT":
+                break;
+            case "DB_REGION":
+                break;
+            case "DB_SCENE":
+                break;
+            case "DB_SCENE_ACTIONS":
+                break;
+            case "DB_USER":
+                break;
+        }
     }
 
     private void exitLogin() {

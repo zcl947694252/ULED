@@ -1,4 +1,4 @@
-package com.dadoutek.uled.DbModel;
+package com.dadoutek.uled.model.DbModel;
 
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
@@ -25,28 +25,24 @@ public class DbScene {
     private String name;
 
     @NotNull
-    private String belongAccount;
+    private Long belongRegionId;
 
     @ToMany(referencedJoinProperty = "actionId")
-    private List<DbSceneActions> dbSceneActions;
+    private List<DbSceneActions> actions;
 
-    /**
-     * Used to resolve relations
-     */
+    /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
 
-    /**
-     * Used for active entity operations.
-     */
+    /** Used for active entity operations. */
     @Generated(hash = 1485122994)
     private transient DbSceneDao myDao;
 
-    @Generated(hash = 1730224282)
-    public DbScene(Long id, String name, @NotNull String belongAccount) {
+    @Generated(hash = 1820180226)
+    public DbScene(Long id, String name, @NotNull Long belongRegionId) {
         this.id = id;
         this.name = name;
-        this.belongAccount = belongAccount;
+        this.belongRegionId = belongRegionId;
     }
 
     @Generated(hash = 662958756)
@@ -69,43 +65,40 @@ public class DbScene {
         this.name = name;
     }
 
-    public String getBelongAccount() {
-        return this.belongAccount;
+    public Long getBelongRegionId() {
+        return this.belongRegionId;
     }
 
-    public void setBelongAccount(String belongAccount) {
-        this.belongAccount = belongAccount;
+    public void setBelongRegionId(Long belongRegionId) {
+        this.belongRegionId = belongRegionId;
     }
 
     /**
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 233131991)
-    public List<DbSceneActions> getDbSceneActions() {
-        if (dbSceneActions == null) {
+    @Generated(hash = 1787079285)
+    public List<DbSceneActions> getActions() {
+        if (actions == null) {
             final DaoSession daoSession = this.daoSession;
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             DbSceneActionsDao targetDao = daoSession.getDbSceneActionsDao();
-            List<DbSceneActions> dbSceneActionsNew = targetDao
-                    ._queryDbScene_DbSceneActions(id);
+            List<DbSceneActions> actionsNew = targetDao._queryDbScene_Actions(id);
             synchronized (this) {
-                if (dbSceneActions == null) {
-                    dbSceneActions = dbSceneActionsNew;
+                if (actions == null) {
+                    actions = actionsNew;
                 }
             }
         }
-        return dbSceneActions;
+        return actions;
     }
 
-    /**
-     * Resets a to-many relationship, making the next get call to query for a fresh result.
-     */
-    @Generated(hash = 1970779748)
-    public synchronized void resetDbSceneActions() {
-        dbSceneActions = null;
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 1155922067)
+    public synchronized void resetActions() {
+        actions = null;
     }
 
     /**
@@ -144,12 +137,12 @@ public class DbScene {
         myDao.update(this);
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
+    /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1398896232)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getDbSceneDao() : null;
     }
+
+
 }
