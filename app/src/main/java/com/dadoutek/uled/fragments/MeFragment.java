@@ -28,6 +28,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import java.util.List;
 
@@ -86,7 +87,11 @@ public class MeFragment extends Fragment {
         appVersion.setText(versionName);
         //暂时屏蔽
         updateIte.setVisibility(View.GONE);
-        copyDataBase.setVisibility(View.GONE);
+        if( SharedPreferencesUtils.isDeveloperModel()){
+            copyDataBase.setVisibility(View.VISIBLE);
+        }else{
+            copyDataBase.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -161,6 +166,7 @@ public class MeFragment extends Fragment {
                 DbGroup group=DBUtils.getGroupByID(changeId);
                 break;
             case "DB_LIGHT":
+//                Db
                 break;
             case "DB_REGION":
                 break;
@@ -183,9 +189,11 @@ public class MeFragment extends Fragment {
         System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
         //获得当前系统已经启动的时间
         mHints[mHints.length - 1] = SystemClock.uptimeMillis();
-        if (SystemClock.uptimeMillis() - mHints[0] <= 1000)
+        if (SystemClock.uptimeMillis() - mHints[0] <= 1000){
             ToastUtils.showLong(R.string.developer_mode);
-        copyDataBase.setVisibility(View.VISIBLE);
+            copyDataBase.setVisibility(View.VISIBLE);
+            SharedPreferencesUtils.setDeveloperModel(true);
+        }
     }
 
     //清空缓存初始化APP

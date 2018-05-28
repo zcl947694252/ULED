@@ -59,6 +59,9 @@ public class Constant implements Serializable {
     //当前使用的区域默认为0
     public static String CURRENT_USE_REGION_KEY="CURRENT_USE_REGION_KEY";
 
+    //是否是开发者模式
+    public static String IS_DEVELOPER_MODE="IS_DEVELOPER_MODE";
+
     //用于标记数据库改变增加
     public static String DB_ADD="DB_ADD";
     //用于标记数据库改变删除

@@ -206,7 +206,6 @@ public final class GroupSettingFragment extends Fragment {
                 new AlertDialog.Builder(Objects.requireNonNull(getActivity())).setMessage(R.string.delete_group_confirm)
                         .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
                             DBUtils.deleteGroup(group);
-
                             getActivity().setResult(Constant.RESULT_OK);
                             getActivity().finish();
                         })

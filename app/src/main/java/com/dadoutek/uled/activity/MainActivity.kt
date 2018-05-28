@@ -174,7 +174,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         bnve.setupWithViewPager(viewPager)
     }
 
-
     override fun onStart() {
         super.onStart()
         Log.d(TAG, "onStart")
