@@ -24,18 +24,16 @@
         <EditText
             android:id="@+id/edit_name"
             android:hint="@string/plaese_input_scene_name"
-            android:background="@drawable/edit_rename"
             android:maxLength="16"
             android:layout_width="230dp"
             android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btn_sure_edit"
-            android:layout_width="40dp"
-            android:layout_height="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="@string/btn_sure"
-            android:layout_marginStart="5dp"
-            android:background="@color/primary" />
+            android:layout_marginStart="5dp" />
     </LinearLayout>
 
     <TextView

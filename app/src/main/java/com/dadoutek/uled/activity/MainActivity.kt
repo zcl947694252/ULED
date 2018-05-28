@@ -8,12 +8,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.text.TextUtils
 import android.util.Log
@@ -33,8 +31,6 @@ import com.dadoutek.uled.fragments.GroupListFragment
 import com.dadoutek.uled.fragments.MeFragment
 import com.dadoutek.uled.fragments.SceneFragment
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.util.BleUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
@@ -161,12 +157,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
-
-//        checkPermission()
-
-        if (savedInstanceState == null) {
-//            initDefaultFragment()
-        }
     }
 
     private fun initBottomNavigation() {
@@ -174,7 +164,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
         meFragment = MeFragment()
-        val fragments: List<Fragment> = listOf(groupFragment, sceneFragment, deviceFragment, meFragment)
+        val fragments: List<Fragment> = listOf(groupFragment, sceneFragment, meFragment)
         val vpAdapter = ViewPagerAdapter(supportFragmentManager, fragments)
         viewPager.adapter = vpAdapter
         //禁止所有动画效果
@@ -186,15 +176,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
 
     override fun onStart() {
-
         super.onStart()
-
         Log.d(TAG, "onStart")
-
         val result = BuildUtils.assetSdkVersion("4.4")
         Log.d(TAG, " Version : $result")
-
-
         this.autoConnect()
     }
 
@@ -208,7 +193,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         //移除事件
         this.mApplication!!.removeEventListener(this)
         Log.d(TAG, "onPause")
-        mConnectTimer?.dispose()
+        stopConnectTimer()
     }
 
 
@@ -285,7 +270,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private var mConnectTimer: Disposable? = null
     private fun startConnectTimer() {
         //如果超过8s还没有变为连接中状态，则显示为超时
-        mConnectTimer = Observable.timer(8000, TimeUnit.MILLISECONDS)
+        mConnectTimer = Observable.timer(10, TimeUnit.SECONDS)
                 .subscribe(Consumer {
                     indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                         TelinkLightService.Instance().idleMode(true)
@@ -340,7 +325,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 TelinkLightService.Instance().autoConnect(connectParams)
                 startConnectTimer();
 
-                indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                //延时20ms显示ScanningDevices
+                launch(UI) {
+                    kotlinx.coroutines.experimental.delay(20)
+                    indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                }
                 runOnUiThread { progressBar?.visibility = View.VISIBLE }
 
 
@@ -388,7 +377,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 }
 //                ToastUtils.showLong(getString(R.string.connect_success))
                 launch(UI) {
-                    kotlinx.coroutines.experimental.delay(200)
+                    kotlinx.coroutines.experimental.delay(20)
                     snackbar(root, R.string.connect_success)
                 }
 
@@ -408,7 +397,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             }
             LightAdapter.STATUS_CONNECTING -> {
                 stopConnectTimer()
-                indefiniteSnackbar(root, getString(R.string.connect_state))
+                launch(UI) {
+                    kotlinx.coroutines.experimental.delay(20)
+                    indefiniteSnackbar(root, getString(R.string.connect_state))
+                }
             }
             LightAdapter.STATUS_LOGOUT ->
                 //                this.showToast("disconnect");
@@ -560,7 +552,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         ////            light.updateIcon();
         //              lights.remove(light);
         //        }
-        this.deviceFragment!!.notifyDataSetChanged()
+        this.deviceFragment.notifyDataSetChanged()
 
         if (TelinkLightApplication.getApp().mesh.isOtaProcessing) {
             TelinkLightService.Instance().idleMode(true)

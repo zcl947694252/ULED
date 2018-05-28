@@ -8,4 +8,6 @@ object Opcode {
     const val SET_SCENE_FOR_SWITCH: Byte = 0xF1.toByte()
     const val SCENE_ADD_OR_DEL: Byte = 0xEE.toByte()
     const val SCENE_LOAD: Byte = 0xEF.toByte()
+    const val SET_LUM: Byte = 0xD2.toByte()
+    const val SET_TEMPERATURE: Byte = 0xE2.toByte()
 }

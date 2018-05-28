@@ -25,6 +25,8 @@ public class SceneGroupAdapter extends BaseQuickAdapter implements SeekBar.OnSee
     TextView tvBrightness;
     TextView tvTemperature;
     ItemGroup itemGroup;
+    private long preTime;
+    private int delayTime = 20;
 
     public SceneGroupAdapter(int layoutResId, List<ItemGroup> data, ArrayList<DbGroup> groupArrayList) {
         super(layoutResId, data);
@@ -69,6 +71,13 @@ public class SceneGroupAdapter extends BaseQuickAdapter implements SeekBar.OnSee
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        long currentTime = System.currentTimeMillis();
+
+        if ((currentTime - this.preTime) < this.delayTime) {
+            this.preTime = currentTime;
+            return;
+        }
+
         int position = (int) seekBar.getTag();
         int address = data.get(position).groupAress;
         byte opcode;

@@ -12,12 +12,13 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameLightActivity;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
 
@@ -52,7 +53,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
         private long preTime;
-        private int delayTime = 100;
+        private int delayTime = 20;
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
@@ -69,15 +70,16 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
 
-           /* if (progress % 5 != 0)
-                return;
+//            if (progress % 5 != 0)
+//                return;
 
-            long currentTime = System.currentTimeMillis();
+//            long currentTime = System.currentTimeMillis();
+//
+//            if ((currentTime - this.preTime) >= this.delayTime) {
+//                this.preTime = currentTime;
+//            }
 
-            if ((currentTime - this.preTime) >= this.delayTime) {
-                this.preTime = currentTime;*/
             this.onValueChange(seekBar, progress, false);
-            //}
         }
 
         private void onValueChange(View view, int progress, boolean immediate) {
@@ -89,7 +91,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 //                progress += 5;
 //                Log.d(TAG, "onValueChange: "+progress);
                 tvBrightness.setText(getString(R.string.device_setting_brightness, progress + ""));
-                opcode = (byte) 0xD2;
+                opcode = (byte) Opcode.SET_LUM;
                 params = new byte[]{(byte) progress};
 
                 light.setBrightness(progress);
@@ -97,7 +99,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                 DBUtils.updateLight(light);
             } else if (view == temperatureBar) {
 
-                opcode = (byte) 0xE2;
+                opcode = (byte) Opcode.SET_TEMPERATURE;
                 params = new byte[]{0x05, (byte) progress};
                 tvTemperature.setText(getString(R.string.device_setting_temperature, progress + ""));
 
@@ -111,7 +113,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     private ColorPicker.OnColorChangeListener colorChangedListener = new ColorPicker.OnColorChangeListener() {
 
         private long preTime;
-        private int delayTime = 100;
+        private int delayTime = 20;
 
         @Override
         public void onStartTrackingTouch(ColorPicker view) {
@@ -129,10 +131,10 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
             long currentTime = System.currentTimeMillis();
 
-            if ((currentTime - this.preTime) >= this.delayTime) {
-                this.preTime = currentTime;
-                this.changeColor(color);
-            }
+//            if ((currentTime - this.preTime) >= this.delayTime) {
+//                this.preTime = currentTime;
+//                this.changeColor(color);
+//            }
         }
 
         private void changeColor(int color) {

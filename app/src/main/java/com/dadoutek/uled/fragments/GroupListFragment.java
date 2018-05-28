@@ -121,6 +121,7 @@ public final class GroupListFragment extends Fragment {
         getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

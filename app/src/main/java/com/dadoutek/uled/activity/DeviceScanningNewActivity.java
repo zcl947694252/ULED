@@ -469,7 +469,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 stopBlink(selectLights.get(i));
             }
 
-            Thread.sleep(1000);
             while (index < selectLights.size()) {
                 DbLight light = selectLights.get(index);
 //                deletePreGroup(light);

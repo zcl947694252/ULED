@@ -19,6 +19,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
 
@@ -51,7 +52,7 @@ public final class GroupSettingFragment extends Fragment {
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
         private long preTime;
-        private int delayTime = 100;
+        private int delayTime = 20;
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
@@ -68,9 +69,9 @@ public final class GroupSettingFragment extends Fragment {
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
 
-            if (progress % 5 != 0)
-                return;
-
+//            if (progress % 5 != 0)
+//                return;
+//
             long currentTime = System.currentTimeMillis();
 
             if ((currentTime - this.preTime) < this.delayTime) {
@@ -88,7 +89,7 @@ public final class GroupSettingFragment extends Fragment {
             byte[] params;
 
             if (view == brightnessBar) {
-                opcode = (byte) 0xD2;
+                opcode = (byte) Opcode.SET_LUM;
                 params = new byte[]{(byte) progress};
                 group.setBrightness(progress);
                 DBUtils.updateGroup(group);
@@ -97,7 +98,7 @@ public final class GroupSettingFragment extends Fragment {
 
             } else if (view == temperatureBar) {
 
-                opcode = (byte) 0xE2;
+                opcode = (byte) Opcode.SET_TEMPERATURE;
                 params = new byte[]{0x05, (byte) progress};
                 group.setColorTemperature(progress);
                 DBUtils.updateGroup(group);
@@ -109,7 +110,7 @@ public final class GroupSettingFragment extends Fragment {
     private ColorPicker.OnColorChangeListener colorChangedListener = new ColorPicker.OnColorChangeListener() {
 
         private long preTime;
-        private int delayTime = 100;
+        private int delayTime = 20;
 
         @Override
         public void onStartTrackingTouch(ColorPicker view) {
