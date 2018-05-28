@@ -3,6 +3,7 @@ package com.dadoutek.uled.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -199,7 +202,16 @@ public final class GroupSettingFragment extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_remove_group:
-                removeGp();
+                new AlertDialog.Builder(Objects.requireNonNull(getActivity())).setMessage(R.string.delete_group_confirm)
+                        .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+                            DBUtils.deleteGroup(group);
+
+                            getActivity().setResult(Constant.RESULT_OK);
+                            getActivity().finish();
+                        })
+                        .setNegativeButton(R.string.btn_cancel, null)
+                        .show();
+
                 break;
             case R.id.btn_rename:
                 renameGp();
@@ -214,10 +226,5 @@ public final class GroupSettingFragment extends Fragment {
         getActivity().finish();
     }
 
-    private void removeGp() {
-        DBUtils.deleteGroup(group);
-        getActivity().setResult(Constant.RESULT_OK);
-        getActivity().finish();
-    }
 
 }

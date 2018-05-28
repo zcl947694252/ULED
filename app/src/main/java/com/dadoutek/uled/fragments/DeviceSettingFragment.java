@@ -1,9 +1,9 @@
 package com.dadoutek.uled.fragments;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +20,8 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameLightActivity;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -207,13 +209,19 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @Override
     public void onClick(View v) {
         if (v == this.remove) {
-            byte opcode = (byte) 0xE3;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
-            DBUtils.deleteLight(light);
-            if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
-                TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
-            }
-            getActivity().finish();
+            new AlertDialog.Builder(Objects.requireNonNull(getActivity())).setMessage(R.string.delete_light_confirm)
+                    .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+                        byte opcode = (byte) 0xE3;
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
+                        DBUtils.deleteLight(light);
+                        if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
+                            TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
+                        }
+                        getActivity().finish();
+                    })
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show();
+
 //            if (gpAddress != 0) {
 //                Group group = manager.getGroup(gpAddress, getActivity());
 //                group.containsLightList.remove((Integer) light.getMeshAddr());

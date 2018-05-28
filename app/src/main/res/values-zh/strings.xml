@@ -235,6 +235,8 @@
     <string name="network_unavailable">当前网络不可用，请检查网络设置。</string>
 
     <string name="network_time_out">网络连接超时，请重试</string>
+    <string name="delete_light_confirm">确定要删除此灯吗？</string>
 
+    <string name="delete_group_confirm">确定要删除此组吗？</string>
 
 </resources>
