@@ -89,8 +89,10 @@ public class MeFragment extends Fragment {
         updateIte.setVisibility(View.GONE);
         if( SharedPreferencesUtils.isDeveloperModel()){
             copyDataBase.setVisibility(View.VISIBLE);
+            chearCache.setVisibility(View.VISIBLE);
         }else{
             copyDataBase.setVisibility(View.GONE);
+            chearCache.setVisibility(View.GONE);
         }
     }
 
@@ -192,6 +194,7 @@ public class MeFragment extends Fragment {
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000){
             ToastUtils.showLong(R.string.developer_mode);
             copyDataBase.setVisibility(View.VISIBLE);
+            chearCache.setVisibility(View.VISIBLE);
             SharedPreferencesUtils.setDeveloperModel(true);
         }
     }
