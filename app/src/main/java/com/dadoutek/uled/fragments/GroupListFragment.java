@@ -21,8 +21,6 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -31,7 +29,10 @@ import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
 import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +120,11 @@ public final class GroupListFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
+        if(SharedPreferencesUtils.isDeveloperModel()){
+            menu.findItem(R.id.menu_setting).setVisible(true);
+        }else{
+            menu.findItem(R.id.menu_setting).setVisible(false);
+        }
     }
 
     @Override
@@ -148,12 +154,12 @@ public final class GroupListFragment extends Fragment {
 
     private void initData() {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-        gpList= DBUtils.getGroupList();
+        gpList = DBUtils.getGroupList();
         this.adapter = new GroupListAdapter(gpList);
         gridView.setAdapter(this.adapter);
-        application= (TelinkLightApplication) getActivity().getApplication();
-        dataManager=new DataManager(TelinkLightApplication.getInstance(),
-                application.getMesh().name,application.getMesh().password);
+        application = (TelinkLightApplication) getActivity().getApplication();
+        dataManager = new DataManager(TelinkLightApplication.getInstance(),
+                application.getMesh().name, application.getMesh().password);
     }
 
     public void notifyDataSetChanged() {
@@ -172,7 +178,7 @@ public final class GroupListFragment extends Fragment {
         ArrayList<DbGroup> groupArrayListNew = new ArrayList<>();
 
         public GroupListAdapter(List<DbGroup> groups) {
-            if(groupArrayListNew.size()>0){
+            if (groupArrayListNew.size() > 0) {
                 groupArrayListNew.clear();
             }
             List<DbGroup> groupList = groups;
@@ -260,7 +266,7 @@ public final class GroupListFragment extends Fragment {
             int clickId = view.getId();
             int position = (int) view.getTag();
 
-            DbGroup group=groupArrayListNew.get(position);
+            DbGroup group = groupArrayListNew.get(position);
 
             byte opcode = (byte) 0xD0;
             int dstAddr = group.getMeshAddr();

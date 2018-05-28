@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import java.util.List;
@@ -283,6 +284,11 @@ public final class DeviceListFragment extends Fragment {
 
         this.backView = (ImageView) view.findViewById(R.id.img_header_menu_left);
         this.backView.setOnClickListener(this.clickListener);
+        if(SharedPreferencesUtils.isDeveloperModel()){
+            backView.setVisibility(View.VISIBLE);
+        }else{
+            backView.setVisibility(View.GONE);
+        }
 
         this.editView = (ImageView) view
                 .findViewById(R.id.img_header_menu_right);

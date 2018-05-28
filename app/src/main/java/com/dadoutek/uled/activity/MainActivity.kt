@@ -174,7 +174,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
         meFragment = MeFragment()
-        val fragments: List<Fragment> = listOf(groupFragment, sceneFragment, deviceFragment, meFragment)
+        val fragments: List<Fragment> = listOf(groupFragment, sceneFragment, meFragment)
         val vpAdapter = ViewPagerAdapter(supportFragmentManager, fragments)
         viewPager.adapter = vpAdapter
         //禁止所有动画效果
@@ -183,7 +183,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         bnve.enableItemShiftingMode(false);
         bnve.setupWithViewPager(viewPager)
     }
-
 
     override fun onStart() {
 

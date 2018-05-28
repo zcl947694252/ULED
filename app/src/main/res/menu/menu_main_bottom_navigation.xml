@@ -9,10 +9,10 @@
         android:id="@+id/bnve_scene"
         android:icon="@drawable/ic_all_out_white_36dp"
         android:title="@string/scene_name" />
-    <item
-        android:id="@+id/bnve_light"
-        android:icon="@drawable/ic_bottom_lightbulb"
-        android:title="@string/light" />
+    <!--<item-->
+        <!--android:id="@+id/bnve_light"-->
+        <!--android:icon="@drawable/ic_bottom_lightbulb"-->
+        <!--android:title="@string/light" />-->
     <item
         android:id="@+id/bnve_account"
         android:icon="@drawable/ic_bottom_me"

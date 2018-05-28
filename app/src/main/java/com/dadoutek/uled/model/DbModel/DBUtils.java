@@ -253,6 +253,14 @@ public class DBUtils {
     /********************************************删除*******************************/
 
     public static void deleteGroup(DbGroup dbGroup) {
+        List<DbLight> lights=DBUtils.getLightByGroupID(dbGroup.getId());
+        DbGroup allGroup=getGroupNull();
+
+        for(int i=0;i<lights.size();i++){
+            lights.get(i).setBelongGroupId(allGroup.getId());
+            updateLight(lights.get(i));
+        }
+
         DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
@@ -280,6 +288,7 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbRegionDao().deleteAll();
         DaoSessionInstance.getInstance().getDbGroupDao().deleteAll();
         DaoSessionInstance.getInstance().getDbLightDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbDataChangeDao().deleteAll();
     }
 
     /********************************************其他*******************************/

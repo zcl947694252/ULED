@@ -22,6 +22,7 @@ import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import java.util.List;
 
@@ -117,8 +118,12 @@ public class SceneFragment extends Fragment {
                 refreshData();
                 break;
             case R.id.img_header_menu_right:
-                Intent intent = new Intent(getActivity(), AddSceneAct.class);
-                startActivityForResult(intent, 0);
+                if (!SharedPreferencesUtils.getConnectState(getActivity())) {
+                    return;
+                }else{
+                    Intent intent = new Intent(getActivity(), AddSceneAct.class);
+                    startActivityForResult(intent, 0);
+                }
                 break;
         }
     }
