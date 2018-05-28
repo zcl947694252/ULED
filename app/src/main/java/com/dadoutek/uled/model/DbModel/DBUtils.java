@@ -352,26 +352,33 @@ public class DBUtils {
      */
     public static void recordingChange(Long changeIndex,String changeTable,String operating){
         List<DbDataChange> dataChangeList=DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
+
+        if(dataChangeList.size()==0){
+            saveChange(changeIndex,operating,changeTable);
+            return;
+        }else
+
         for(int i=0;i<dataChangeList.size();i++){
             //首先确定是同一张表的同一条数据进行操作
-            if(dataChangeList.get(i).getChangeId()==
-                    changeIndex&&dataChangeList.get(i).getTableName().equals(changeTable)){
-                //先添加数据后进行其他操作的情况
-                if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)&&
-                        !operating.equals(Constant.DB_ADD)){
-                    if(operating.equals(Constant.DB_UPDATE)){
-                        return;
-                    }
-                }
-
-                if(dataChangeList.get(i).getChangeType().equals(operating)){
-                    Log.d("sameData", "recordingChange: "+"--------");
-                    return;
+            if(dataChangeList.get(i).getTableName().equals(changeTable) &
+                    dataChangeList.get(i).getChangeId().equals(changeIndex)){
+                //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
+                if(!operating.equals(Constant.DB_DELETE)){
+                        break;
+                }else{
+                    saveChange(changeIndex,operating,changeTable);
+                    break;
                 }
             }
+            //如果数据表没有该数据直接添加
+            else if(i==dataChangeList.size()-1){
+                saveChange(changeIndex,operating,changeTable);
+                break;
+            }
         }
+    }
 
-
+    private static void saveChange(Long changeIndex, String operating, String changeTable){
         DbDataChange dataChange=new DbDataChange();
         dataChange.setChangeId(changeIndex);
         dataChange.setChangeType(operating);
