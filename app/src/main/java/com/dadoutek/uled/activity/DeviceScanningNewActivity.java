@@ -217,7 +217,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
         params[0] = 0x01;
-        mBlinkDisposables.put(dstAddress, Observable.timer(1000, TimeUnit.MILLISECONDS)
+        mBlinkDisposables.put(dstAddress, Observable.timer(300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
