@@ -219,11 +219,12 @@ public class LightsOfGroupActivity extends TelinkBaseActivity implements EventLi
 
             currentLight.status = notificationInfo.connectionStatus;
 
-            if (meshAddress == currentLight.getMeshAddr()) {
-                currentLight.textColor = this.getResources().getColor(
+            if (currentLight.getMeshAddr() ==
+                    TelinkLightApplication.getInstance().getConnectDevice().meshAddress) {
+                currentLight.textColor = getResources().getColor(
                         R.color.primary);
             } else {
-                currentLight.textColor = this.getResources().getColor(
+                currentLight.textColor = getResources().getColor(
                         R.color.black);
             }
 

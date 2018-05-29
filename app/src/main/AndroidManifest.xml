@@ -149,6 +149,10 @@
         <activity
             android:name=".activity.DeviceScanningNewActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.ChangeSceneAct"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

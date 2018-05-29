@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,15 +14,23 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameLightActivity;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
+import com.telink.bluetooth.light.LeAutoConnectParameters;
+import com.telink.bluetooth.light.LeRefreshNotifyParameters;
+import com.telink.bluetooth.light.LightAdapter;
+import com.telink.bluetooth.light.Parameters;
 
 import java.util.Objects;
 
@@ -213,13 +223,26 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         if (v == this.remove) {
             new AlertDialog.Builder(Objects.requireNonNull(getActivity())).setMessage(R.string.delete_light_confirm)
                     .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
-                        byte opcode = (byte) 0xE3;
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
-                        DBUtils.deleteLight(light);
-                        if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
-                            TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
+
+                        if(TelinkLightService.Instance().getAdapter().mLightCtrl.getCurrentLight().isConnected()){
+                            byte opcode = (byte) 0xE3;
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
+                            DBUtils.deleteLight(light);
+                            if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
+                                TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
+                            }
+
+                            if(TelinkLightApplication.getInstance().getConnectDevice().meshAddress ==light.getMeshAddr()){
+                                Log.d(TAG, "onClick: "+"sacesame");
+                                new Thread(() -> {
+                                    autoConnect();
+                                }).start();
+                            }
+                            getActivity().finish();
+                        }else{
+                            ToastUtils.showLong("当前处于未连接状态，重连中。。。");
+                            autoConnect();
                         }
-                        getActivity().finish();
                     })
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show();
@@ -230,6 +253,54 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 //                manager.updateGroup(group, getActivity());
 //            }
 //            getActivity().finish();
+        }
+    }
+
+    /**
+     * 自动重连
+     */
+    private void autoConnect() {
+
+        if (TelinkLightService.Instance() != null) {
+
+            if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+
+                ToastUtils.showLong(getString(R.string.connect_state));
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.CONNECT_STATE_SUCCESS_KEY, false);
+
+                if (this.mApp.isEmptyMesh())
+                    return;
+
+//                Lights.getInstance().clear();
+                this.mApp.refreshLights();
+
+                Mesh mesh = this.mApp.getMesh();
+
+                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
+                    TelinkLightService.Instance().idleMode(true);
+                    return;
+                }
+
+                //自动重连参数
+                LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
+                connectParams.setMeshName(mesh.name);
+                connectParams.setPassword(mesh.password);
+                connectParams.autoEnableNotification(true);
+
+                // 之前是否有在做MeshOTA操作，是则继续
+                if (mesh.isOtaProcessing()) {
+                    connectParams.setConnectMac(mesh.otaDevice.mac);
+                }
+                //自动重连
+                TelinkLightService.Instance().autoConnect(connectParams);
+            }
+
+            //刷新Notify参数
+            LeRefreshNotifyParameters refreshNotifyParams = Parameters.createRefreshNotifyParameters();
+            refreshNotifyParams.setRefreshRepeatCount(2);
+            refreshNotifyParams.setRefreshInterval(2000);
+            //开启自动刷新Notify
+            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
         }
     }
 

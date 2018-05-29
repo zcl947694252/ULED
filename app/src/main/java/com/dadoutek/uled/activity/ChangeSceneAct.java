@@ -2,6 +2,7 @@ package com.dadoutek.uled.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,17 +16,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.adapter.GroupListAdapter;
 import com.dadoutek.uled.adapter.SceneGroupAdapter;
+import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
@@ -44,7 +47,7 @@ import butterknife.OnClick;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class AddSceneAct extends TelinkBaseActivity {
+public class ChangeSceneAct extends TelinkBaseActivity {
     @BindView(R.id.img_header_menu_left)
     ImageView imgHeaderMenuLeft;
     @BindView(R.id.txt_header_title)
@@ -60,7 +63,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     @BindView(R.id.bt_add)
     Button btAdd;
 
-    private Scenes scenes;
+    private DbScene scene;
     private LayoutInflater inflater;
     private SceneGroupAdapter adapter;
 
@@ -82,30 +85,10 @@ public class AddSceneAct extends TelinkBaseActivity {
         ButterKnife.bind(this);
         initData();
         initView();
+        initClick();
     }
 
-    private void initData() {
-        scenes = new Scenes();
-        telinkLightApplication = (TelinkLightApplication) this.getApplication();
-        dataManager = new DataManager(this, telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
-        groups = DBUtils.getGroupList();
-        itemGroupArrayList = new ArrayList<>();
-
-        for (DbGroup group : groups) {
-//            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
-                group.selected = false;
-            groupArrayList.add(group);
-            groupNameArrayList.add(group.getName());
-        }
-
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
-        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
-        sceneGroupListView.setLayoutManager(layoutmanager);
-
-        this.adapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
-//        sceneGroupListView.setAdapter(adapter);
-        adapter.bindToRecyclerView(sceneGroupListView);
-
+    private void initClick() {
         //删除时恢复可添加组标记
         adapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (groupArrayList.size() != 0) {
@@ -127,6 +110,56 @@ public class AddSceneAct extends TelinkBaseActivity {
         });
     }
 
+    private void initData() {
+        telinkLightApplication = (TelinkLightApplication) this.getApplication();
+        dataManager = new DataManager(this, telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
+        groups = DBUtils.getGroupList();
+        itemGroupArrayList = new ArrayList<>();
+
+        Intent intent=getIntent();
+        scene= (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
+        scene.__setDaoSession(DaoSessionInstance.getInstance());
+        List<DbSceneActions> actions=scene.getActions();
+
+        boolean includeAll=false;
+        loop2:for (DbGroup group : groups) {
+//            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
+            group.selected = false;
+
+           loop1: for(int i=0;i<actions.size();i++){
+                if(group.getMeshAddr()==actions.get(i).getGroupAddr()){
+                    group.selected = true;
+                    group.setBrightness(actions.get(i).getBrightness());
+                    group.setColorTemperature(actions.get(i).getColorTemperature());
+
+                    ItemGroup itemGroup = new ItemGroup();
+                    itemGroup.brightness = actions.get(i).getBrightness();
+                    itemGroup.temperature = actions.get(i).getColorTemperature();
+                    itemGroup.groupAress = actions.get(i).getGroupAddr();
+                    itemGroup.gpName = group.getName();
+                    itemGroupArrayList.add(itemGroup);
+
+                    if(group.getMeshAddr()!=0xffff){
+                        includeAll=false;
+                    }else {
+                        includeAll=true;
+                    }
+                    break loop1;
+                }
+            }
+
+            if(includeAll){
+                   group.selected=true;
+            }else{
+                if(group.getMeshAddr() == 0xffff){
+                    group.selected=true;
+                }
+            }
+            groupArrayList.add(group);
+            groupNameArrayList.add(group.getName());
+        }
+    }
+
     private void addNewItem() {
         for (int j = 0; j < groupArrayList.size(); j++) {
             if (groupArrayList.get(j).selected == false) {
@@ -143,7 +176,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         AlertDialog.Builder builder;
         AlertDialog dialog;
         List<DbGroup> showList = getShowList();
-        View bottomView = View.inflate(AddSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
+        View bottomView = View.inflate(ChangeSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
         ListView lvGp = (ListView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
         lvGp.setAdapter(new GroupListAdapter(this, showList));//ListView设置适配器
 
@@ -194,12 +227,22 @@ public class AddSceneAct extends TelinkBaseActivity {
     }
 
     private void initView() {
+
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        sceneGroupListView.setLayoutManager(layoutmanager);
+
+        this.adapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
+//        sceneGroupListView.setAdapter(adapter);
+        adapter.bindToRecyclerView(sceneGroupListView);
+
         inflater = LayoutInflater.from(this);
         txtHeaderTitle.setText(R.string.creat_scene);
 //        sceneGroupListView.set(this);
         mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         editName.setFocusable(false);//设置输入框不可聚焦，即失去焦点和光标
+        editName.setText(scene.getName());
         if (mInputMethodManager.isActive()) {
             mInputMethodManager.hideSoftInputFromWindow(editName.getWindowToken(), 0);// 隐藏输入法
         }
@@ -243,12 +286,10 @@ public class AddSceneAct extends TelinkBaseActivity {
         String name = editName.getText().toString().trim();
         List<ItemGroup> itemGroups = adapter.getDataResult();
 
-        DbScene dbScene = new DbScene();
-        dbScene.setName(name);
-        dbScene.setBelongRegionId((long)SharedPreferencesUtils.getCurrentUseRegion());
-        DBUtils.saveScene(dbScene);
-
-        long idAction = dbScene.getId();
+        scene.setName(name);
+        DBUtils.updateScene(scene);
+        long idAction = scene.getId();
+        DBUtils.deleteSceneActionsList(scene.getActions());
 
         for (int i = 0; i < itemGroups.size(); i++) {
             DbSceneActions sceneActions = new DbSceneActions();
@@ -265,10 +306,9 @@ public class AddSceneAct extends TelinkBaseActivity {
                 DBUtils.saveSceneActions(sceneActions);
 //            }
         }
-
         try {
             Thread.sleep(100);
-            addScene(idAction);
+            updateScene(idAction);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -291,7 +331,9 @@ public class AddSceneAct extends TelinkBaseActivity {
 //        dialog.show();
 //    }
 
-    private void addScene(long id) throws InterruptedException {
+    private void updateScene(long id) throws InterruptedException {
+        deleteScene(id);
+
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
@@ -303,6 +345,18 @@ public class AddSceneAct extends TelinkBaseActivity {
         }
     }
 
+    private void deleteScene(long id) {
+        byte opcode = Opcode.SCENE_ADD_OR_DEL;
+        byte[] params;
+        params = new byte[]{0x00, (byte) id};
+            try {
+                Thread.sleep(100);
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xff, params);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+    }
+
     private boolean checked() {
 
         String name = editName.getText().toString().trim();
@@ -312,7 +366,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         }
 
 //        List<ItemGroup> itemGroups = adapter.getData();
-
+//
 //        for (int i = 0; i < itemGroups.size(); i++) {
 //            if (itemGroups.get(i).groupAress == 0xFFFF) {
 //                showSaveDialog();
