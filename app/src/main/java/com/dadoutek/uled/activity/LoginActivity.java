@@ -12,14 +12,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.model.HttpModel.AccountModel;
 import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.Response;
+import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.HttpModel.AccountModel;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.LogUtils;
 
@@ -28,8 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * Created by hejiajun on 2018/5/15.
@@ -129,58 +127,32 @@ public class LoginActivity extends TelinkBaseActivity {
 
 
     private void login() {
-        showLoadingDialog(getString(R.string.logging_tip));
         phone = editUserPhoneOrEmail.getEditText().getText().toString().trim();
         editPassWord = editUserPassword.getEditText().getText().toString().trim();
 
+        if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
+            showLoadingDialog(getString(R.string.logging_tip));
+            AccountModel.INSTANCE.login(phone, editPassWord, dbUser.getChannel())
+                    .subscribe(new NetworkObserver<DbUser>() {
+                        @Override
+                        public void onNext(DbUser dbUser) {
+                            LogUtils.d("logging: " + "登录成功");
+                            ToastUtils.showLong(R.string.login_success);
 
-        AccountModel.INSTANCE.login(phone, editPassWord, dbUser.getChannel())
-                .subscribe(new NetworkObserver<DbUser>() {
-                    @Override
-                    public void onNext(DbUser dbUser) {
-                        LogUtils.d("logging: " + "登录成功");
-                        ToastUtils.showLong(R.string.login_success);
+                            hideLodingDialog();
+                            TransformView();
+                        }
 
-                        hideLodingDialog();
-                        TransformView();
-                    }
-
-                    @Override
-                    public void onError(@NotNull Throwable e) {
-                        super.onError(e);
-                        hideLodingDialog();
-                    }
-                });
+                        @Override
+                        public void onError(@NotNull Throwable e) {
+                            super.onError(e);
+                            hideLodingDialog();
+                        }
+                    });
+        } else {
+            Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show();
+        }
     }
-
-    Observer<Response<DbUser>> observerLogin = new Observer<Response<DbUser>>() {
-        @Override
-        public void onSubscribe(Disposable d) {
-        }
-
-        @Override
-        public void onNext(Response<DbUser> stringResponse) {
-            hideLodingDialog();
-            if (stringResponse.getErrorCode() == 0) {
-                LogUtils.d("logging" + stringResponse.getErrorCode() + "登录成功");
-                ToastUtils.showLong(R.string.login_success);
-                SharedPreferencesHelper.putBoolean(LoginActivity.this, Constant.IS_LOGIN, true);
-                TransformView();
-            } else {
-                ToastUtils.showLong(R.string.login_fail);
-            }
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            hideLodingDialog();
-            Toast.makeText(LoginActivity.this, "onError:" + e.toString(), Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onComplete() {
-        }
-    };
 
 
     private void TransformView() {

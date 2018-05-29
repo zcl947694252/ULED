@@ -1,4 +1,4 @@
-package com.dadoutek.uled.util;
+package com.dadoutek.uled.intf;
 
 import android.text.TextUtils;
 
@@ -17,7 +17,7 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class NetworkUtils {
+public class NetworkFactory {
     private static RequestInterface api;
     private static RequestInterface loginApi;
     private static RequestInterface registerApi;
@@ -27,7 +27,7 @@ public class NetworkUtils {
     private static Converter.Factory gsonConverterFactory = GsonConverterFactory.create();
     private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJava2CallAdapterFactory.create();
 
-    public NetworkUtils() {
+    public NetworkFactory() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG)
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
