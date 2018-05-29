@@ -236,5 +236,6 @@
     <string name="network_time_out">Network connection timed out, please try again.</string>
     <string name="delete_light_confirm">Do you really want to delete the light?</string>
     <string name="delete_group_confirm">Do you really want to delete the group?</string>
+    <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
 
 </resources>

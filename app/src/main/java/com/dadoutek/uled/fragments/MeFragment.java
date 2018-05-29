@@ -17,8 +17,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.dadoutek.uled.activity.SplashActivity;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -220,10 +222,7 @@ public class MeFragment extends Fragment {
 
     //重启app并杀死原进程
     private void restartApplication() {
-        final Intent intent = TelinkLightApplication.getInstance().getPackageManager().
-                getLaunchIntentForPackage(TelinkLightApplication.getInstance().getPackageName());
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        Process.killProcess(Process.myPid());
+        ActivityUtils.startActivity(SplashActivity.class);
+        ActivityUtils.finishAllActivitiesExceptNewest();
     }
 }

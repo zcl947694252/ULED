@@ -101,7 +101,7 @@
     <string name="update_ite">同步ITE</string>
     <string name="clean_tip">缓存清空,App即将重启</string>
     <string name="wait_develop">待开发</string>
-    <string name="add_mesh_save_tip1">名字不能喝密码相同</string>
+    <string name="add_mesh_save_tip1">名字不能和密码相同</string>
     <string name="add_mesh_save_tip2">修改前后名称不能相同！</string>
     <string name="add_mesh_save_tip3">最大长度为16</string>
     <string name="add_mesh_save_tip4">输入不包含 \'.\'</string>
@@ -238,5 +238,6 @@
     <string name="delete_light_confirm">确定要删除此灯吗？</string>
 
     <string name="delete_group_confirm">确定要删除此组吗？</string>
+    <string name="phone_or_password_can_not_be_empty">手机号或密码不能为空</string>
 
 </resources>

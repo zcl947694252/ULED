@@ -15,7 +15,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.util.LogUtils;
-import com.dadoutek.uled.util.NetworkUtils;
+import com.dadoutek.uled.intf.NetworkFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -88,7 +88,7 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
         Map<String, String> map = new HashMap<>();
         map.put("phone", phone);
         map.put("channel", dbUser.getChannel());
-        NetworkUtils.getApi()
+        NetworkFactory.getApi()
                 .getAccount(phone, dbUser.getChannel())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -151,7 +151,7 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
     };
 
     private void updatePassword() {
-        NetworkUtils.getApi()
+        NetworkFactory.getApi()
                 .putPassword(dbUser.getAccount(),md5(editNewPassword.getEditText().getText().toString().trim()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -15,7 +15,7 @@ import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.model.Response;
-import com.dadoutek.uled.util.NetworkUtils;
+import com.dadoutek.uled.intf.NetworkFactory;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,7 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.dadoutek.uled.util.NetworkUtils.md5;
+import static com.dadoutek.uled.intf.NetworkFactory.md5;
 
 /**
  * Created by hejiajun on 2018/5/16.
@@ -97,7 +97,7 @@ public class RegisterActivity extends TelinkBaseActivity {
     private void register() {
         showLoadingDialog(getString(R.string.registing));
         MD5PassWord = md5(userPassWord);
-        NetworkUtils.getApi()
+        NetworkFactory.getApi()
                 .register(userName, MD5PassWord, userName)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

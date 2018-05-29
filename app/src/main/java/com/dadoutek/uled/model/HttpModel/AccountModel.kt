@@ -1,12 +1,11 @@
 package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
-import android.util.Log
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.util.NetworkUtils
+import com.dadoutek.uled.intf.NetworkFactory
 import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -19,22 +18,22 @@ import kotlinx.coroutines.experimental.launch
 object AccountModel {
     fun login(phone: String, password: String, channel: String): Observable<DbUser> {
         lateinit var account: String
-        return NetworkUtils.getApi()
+        return NetworkFactory.getApi()
                 .getAccount(phone, channel)
                 .compose(NetworkTransformer())
                 .flatMap { response: String ->
                     account = response
-                    NetworkUtils.getApi()
+                    NetworkFactory.getApi()
                             .getsalt(response)
                             .compose(NetworkTransformer())
 
                 }
                 .flatMap { response: String ->
                     val salt = response
-                    val md5Pwd = NetworkUtils.md5(
-                            NetworkUtils.md5(
-                                    NetworkUtils.md5(password) + account) + salt)
-                    NetworkUtils.getApi().login(account, md5Pwd)
+                    val md5Pwd = NetworkFactory.md5(
+                            NetworkFactory.md5(
+                                    NetworkFactory.md5(password) + account) + salt)
+                    NetworkFactory.getApi().login(account, md5Pwd)
                             .compose(NetworkTransformer())
                 }
                 .observeOn(Schedulers.io())

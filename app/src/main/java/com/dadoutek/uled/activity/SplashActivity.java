@@ -64,43 +64,16 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
         intent.putExtra(IS_FIRST_LAUNCH, isFrist);
         startActivity(intent);
+        finish();
     }
 
-    /**
-     * 初始化分组数据
-     */
-    private void initGroupData() {
-        Mesh mesh = mApplication.getMesh();
-        DataManager dataManager = new DataManager(this, mesh.name, mesh.password);
-        dataManager.createAllLightControllerGroup();//初始化自动创建
-    }
+
 
     @Override
     protected void onLocationEnable() {
     }
 
-    private void initMesh() {
-        Mesh mesh = (Mesh) FileSystem.readAsObject(this, Constant.NEW_MESH_NAME + "." + Constant.NEW_MESH_PASSWORD);
-
-        if (mesh == null) {
-            mesh = new Mesh();
-            mesh.name = Constant.NEW_MESH_NAME;
-            mesh.password = Constant.NEW_MESH_PASSWORD;
-        }
-
-        mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME;
-        mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD;
-
-        if (mesh.saveOrUpdate(this)) {
-            this.mApplication.setupMesh(mesh);
-            SharedPreferencesHelper.saveMeshName(this, mesh.name);
-            SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
-        }
-    }
 
 
-    private void gotoMeshSetting() {
-        startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
-    }
 
 }
