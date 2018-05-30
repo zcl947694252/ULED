@@ -191,10 +191,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
         if (TelinkLightService.Instance() != null) {
 
-            Log.d("Saw", "TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH is ${TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH}")
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
-                ToastUtils.showLong(getString(R.string.connecting))
+                ToastUtils.showLong(getString(R.string.connect_state))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
                 scanPb.visibility = View.VISIBLE
 
@@ -247,6 +246,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
             LightAdapter.STATUS_CONNECTING -> {
+                Log.d("connectting","444")
                 scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -321,6 +321,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                 currentLight!!.textColor = ContextCompat.getColor(
                         this, R.color.black)
             }
+
+            Log.d("connectting","333")
 
             currentLight!!.updateIcon()
         }
