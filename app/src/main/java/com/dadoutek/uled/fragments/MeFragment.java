@@ -27,6 +27,11 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbDataChange;
 import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbRegion;
+import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbSceneActions;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
@@ -170,17 +175,25 @@ public class MeFragment extends Fragment {
                 DbGroup group=DBUtils.getGroupByID(changeId);
                 break;
             case "DB_LIGHT":
-//                Db
+                DbLight light=DBUtils.getLightByID(changeId);
                 break;
             case "DB_REGION":
+                DbRegion region=DBUtils.getRegionByID(changeId);
                 break;
             case "DB_SCENE":
+                DbScene scene=DBUtils.getSceneByID(changeId);
                 break;
             case "DB_SCENE_ACTIONS":
+                DbSceneActions actions=DBUtils.getSceneActionsByID(changeId);
                 break;
             case "DB_USER":
+                DbUser user=DBUtils.getUserByID(changeId);
                 break;
         }
+    }
+
+    private void change(){
+
     }
 
     private void exitLogin() {

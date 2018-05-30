@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import butterknife.ButterKnife
@@ -184,9 +185,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     private fun autoConnect() {
 
         if (TelinkLightService.Instance() != null) {
-
+            Log.d("connectting","222")
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-
+                Log.d("connectting","111")
                 ToastUtils.showLong(getString(R.string.connect_state))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
                 scanPb.visibility = View.VISIBLE
@@ -240,6 +241,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
             LightAdapter.STATUS_CONNECTING -> {
+                Log.d("connectting","444")
                 scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -269,10 +271,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onLogout() {
         //如果超过8s还没有连接上，则显示为超时
         runOnUiThread {
+            Log.d("connectting","555")
             if (scanPb.visibility == View.VISIBLE) {
 //                indefiniteSnackbar(root, R.string.connect_failed_if_there_are_lights, R.string.retry) {
 //                }
             }
+            autoConnect()
         }
     }
 
@@ -315,6 +319,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                         this, R.color.black)
             }
 
+            Log.d("connectting","333")
+
             currentLight!!.updateIcon()
         }
 
@@ -326,10 +332,4 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
     }
-
-    companion object {
-        private val UPDATE_LIST = 0
-    }
-
-
 }
