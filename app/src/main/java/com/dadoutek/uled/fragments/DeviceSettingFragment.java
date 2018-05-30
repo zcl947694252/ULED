@@ -1,5 +1,6 @@
 package com.dadoutek.uled.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
+import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LightAdapter;
@@ -154,7 +156,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
             byte blue = (byte) (color & 0xFF);
 
             int addr = light.getMeshAddr();
-            byte opcode = (byte) 0xE2;
+            byte opcode = Opcode.SET_TEMPERATURE;
             byte[] params = new byte[]{0x04, red, green, blue};
 
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
@@ -162,6 +164,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     };
     private TelinkLightApplication mApp;
     private DataManager manager;
+    private DeviceInfo mConnectDevice;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -202,6 +205,9 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         this.remove.setOnClickListener(this);
 
         unbinder = ButterKnife.bind(this, view);
+
+
+        mConnectDevice = TelinkLightApplication.getInstance().getConnectDevice();
         return view;
     }
 
@@ -224,15 +230,24 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
             new AlertDialog.Builder(Objects.requireNonNull(getActivity())).setMessage(R.string.delete_light_confirm)
                     .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
 
-                        if(TelinkLightService.Instance().getAdapter().mLightCtrl.getCurrentLight().isConnected()){
-                            byte opcode = (byte) 0xE3;
+                        if (TelinkLightService.Instance().getAdapter().mLightCtrl.getCurrentLight().isConnected()) {
+                            byte opcode = (byte) Opcode.KICK_OUT;
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
                             DBUtils.deleteLight(light);
                             if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
                                 TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
                             }
+                            if (mConnectDevice != null) {
+                                Log.d(getActivity().getClass().getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice.meshAddress);
+                                Log.d(getActivity().getClass().getSimpleName(), "light.getMeshAddr() = " + light.getMeshAddr());
+                                if (light.getMeshAddr() == mConnectDevice.meshAddress) {
+                                    getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra("data", true));
+                                }
+                            }
                             getActivity().finish();
-                        }else{
+
+
+                        } else {
                             ToastUtils.showLong("当前处于未连接状态，重连中。。。");
                             getActivity().finish();
                         }
@@ -258,7 +273,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
-                ToastUtils.showLong(getString(R.string.connect_state));
+                ToastUtils.showLong(getString(R.string.connecting));
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.CONNECT_STATE_SUCCESS_KEY, false);
 
                 if (this.mApp.isEmptyMesh())

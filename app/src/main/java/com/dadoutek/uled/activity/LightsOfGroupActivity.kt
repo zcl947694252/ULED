@@ -1,11 +1,13 @@
 package com.dadoutek.uled.activity
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import butterknife.ButterKnife
@@ -43,6 +45,8 @@ import java.util.*
 
 class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
+    private val REQ_LIGHT_SETTING: Int = 0x01
+
     private lateinit var group: DbGroup
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
@@ -67,12 +71,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                         byteArrayOf(0x00, 0x00, 0x00))
             }
         } else if (v.id == R.id.tv_setting) {
-            if (TelinkLightApplication.getInstance().connectDevice != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+            if (scanPb.visibility != View.VISIBLE) {
                 val intent = Intent(this@LightsOfGroupActivity, DeviceSettingActivity::class.java)
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                startActivity(intent)
+                startActivityForResult(intent, REQ_LIGHT_SETTING)
             } else {
                 ToastUtils.showShort(R.string.reconnecting)
             }
@@ -123,7 +127,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun listenerConnect() {
-        if (TelinkLightApplication.getInstance().connectDevice == null || !TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+        Log.d("Saw", "isConnected = ${TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected}");
+
+        if (!TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
             autoConnect()
         }
     }
@@ -185,9 +191,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
         if (TelinkLightService.Instance() != null) {
 
+            Log.d("Saw", "TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH is ${TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH}")
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
-                ToastUtils.showLong(getString(R.string.connect_state))
+                ToastUtils.showLong(getString(R.string.connecting))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
                 scanPb.visibility = View.VISIBLE
 
@@ -267,13 +274,13 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLogout() {
-        //如果超过8s还没有连接上，则显示为超时
-        runOnUiThread {
-            if (scanPb.visibility == View.VISIBLE) {
+//        runOnUiThread {
+//            if (scanPb.visibility == View.VISIBLE) {
 //                indefiniteSnackbar(root, R.string.connect_failed_if_there_are_lights, R.string.retry) {
+//                    autoConnect()
 //                }
-            }
-        }
+//            }
+//        }
     }
 
     /**
@@ -327,9 +334,20 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
-    companion object {
-        private val UPDATE_LIST = 0
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQ_LIGHT_SETTING -> {
+                    val isConnect = data?.getBooleanExtra("data", false) ?: false
+                    if (isConnect) {
+                        scanPb.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+        }
     }
-
-
 }
+
