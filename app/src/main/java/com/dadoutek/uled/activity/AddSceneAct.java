@@ -15,10 +15,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -26,6 +22,10 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.adapter.GroupListAdapter;
 import com.dadoutek.uled.adapter.SceneGroupAdapter;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
@@ -93,7 +93,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         for (DbGroup group : groups) {
 //            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
-                group.selected = false;
+            group.selected = false;
             groupArrayList.add(group);
             groupNameArrayList.add(group.getName());
         }
@@ -109,12 +109,12 @@ public class AddSceneAct extends TelinkBaseActivity {
         //删除时恢复可添加组标记
         adapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (groupArrayList.size() != 0) {
-                if(adapter.getItemCount()==1){
+                if (adapter.getItemCount() == 1) {
                     for (int k = 0; k < groupArrayList.size(); k++) {
                         groupArrayList.get(k).selected = false;
                     }
                     adapter.remove(position);
-                }else{
+                } else {
                     for (int k = 0; k < groupArrayList.size(); k++) {
                         if (groupArrayList.get(k).getName().equals(itemGroupArrayList.get(position).gpName)) {
                             groupArrayList.get(k).selected = false;
@@ -167,14 +167,14 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void changeData(int position, List<DbGroup> showList) {
         for (int k = 0; k < groupArrayList.size(); k++) {
-            if(showList.get(position).getMeshAddr()==0xffff){
+            if (showList.get(position).getMeshAddr() == 0xffff) {
                 groupArrayList.get(k).selected = true;
-            }else{
+            } else {
                 if (groupArrayList.get(k).getMeshAddr() == showList.get(position).getMeshAddr()) {
 //                    showList.add(groupArrayList.get(k));
                     groupArrayList.get(k).selected = true;
-                    for(int i=0;i<groupArrayList.size();i++){
-                        if(groupArrayList.get(i).getMeshAddr()==0xffff){
+                    for (int i = 0; i < groupArrayList.size(); i++) {
+                        if (groupArrayList.get(i).getMeshAddr() == 0xffff) {
                             groupArrayList.get(i).selected = true;
                         }
                     }
@@ -245,7 +245,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
-        dbScene.setBelongRegionId((long)SharedPreferencesUtils.getCurrentUseRegion());
+        dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
         DBUtils.saveScene(dbScene);
 
         long idAction = dbScene.getId();
@@ -261,8 +261,8 @@ public class AddSceneAct extends TelinkBaseActivity {
 //                DBUtils.saveSceneActions(sceneActions);
 //                break;
 //            } else {
-                sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                DBUtils.saveSceneActions(sceneActions);
+            sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
+            DBUtils.saveSceneActions(sceneActions);
 //            }
         }
 
@@ -297,8 +297,14 @@ public class AddSceneAct extends TelinkBaseActivity {
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);
-            params = new byte[]{0x01, (byte) id, (byte) list.get(i).getBrightness(),
-                    (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) list.get(i).getColorTemperature()};
+            byte temperature = (byte) list.get(i).getColorTemperature();
+            if (temperature > 99)
+                temperature = 99;
+            byte light = (byte) list.get(i).getBrightness();
+            if (light > 99)
+                light = 99;
+            params = new byte[]{0x01, (byte) id, light,
+                    (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, temperature};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
         }
     }

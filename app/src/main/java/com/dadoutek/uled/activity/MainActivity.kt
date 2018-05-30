@@ -265,17 +265,25 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         //如果超过 delaySeconds 还没有变为连接中状态，则显示为超时
         mConnectTimer = Observable.timer(delaySeconds, TimeUnit.SECONDS)
                 .subscribe(Consumer {
-                    if (retryConnectTime > MAX_RETRY_CONNECT_TIME) {
+                    if (mConnectingSnackbar != null) {
+                        if (retryConnectTime < MAX_RETRY_CONNECT_TIME) {
+                            retryConnectTime++
+                            TelinkLightService.Instance().idleMode(true)
+                            autoConnect()
+                        } else {
+                            indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                                TelinkLightService.Instance().idleMode(true)
+                                autoConnect()
+                            }
+
+                        }
+                    } else {
                         indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
                         }
-                    } else {
-                        retryConnectTime++
-                        TelinkLightService.Instance().idleMode(true)
-                        autoConnect()
-                    }
 
+                    }
                 })
     }
 
