@@ -231,17 +231,10 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                             if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
                                 TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
                             }
-
-                            if(TelinkLightApplication.getInstance().getConnectDevice().meshAddress ==light.getMeshAddr()){
-                                Log.d(TAG, "onClick: "+"sacesame");
-                                new Thread(() -> {
-                                    autoConnect();
-                                }).start();
-                            }
                             getActivity().finish();
                         }else{
                             ToastUtils.showLong("当前处于未连接状态，重连中。。。");
-                            autoConnect();
+                            getActivity().finish();
                         }
                     })
                     .setNegativeButton(R.string.btn_cancel, null)
