@@ -11,7 +11,6 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Message
 import android.support.v4.app.Fragment
 import android.text.TextUtils
 import android.util.Log
@@ -50,6 +49,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.lang.Thread.sleep
 import java.util.concurrent.TimeUnit
 
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
@@ -69,14 +69,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
 
     private var connectMeshAddress: Int = 0
-    private val mHandler = object : Handler() {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            when (msg.what) {
-                UPDATE_LIST -> deviceFragment?.notifyDataSetChanged()
-            }
-        }
-    }
 
     private val mDelayHandler = Handler()
     private val delay = 200
@@ -298,7 +290,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 this.mApplication!!.refreshLights()
 
 
-                this.deviceFragment!!.notifyDataSetChanged()
+                this.deviceFragment.notifyDataSetChanged()
 
                 val mesh = this.mApplication!!.mesh
 
@@ -385,7 +377,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress
                     if (TelinkLightService.Instance().mode == LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                        mHandler.postDelayed({ TelinkLightService.Instance().sendCommandNoResponse(0xE4.toByte(), 0xFFFF, byteArrayOf()) }, (3 * 1000).toLong())
+//                        mHandler.postDelayed({
+//                            TelinkLightService.Instance().sendCommandNoResponse(0xE4.toByte(),
+//                                    0xFFFF, byteArrayOf())
+//                        }, (3 * 1000).toLong())
+
                     }
 
                     if (TelinkLightApplication.getApp().mesh.isOtaProcessing && foreground) {
@@ -481,7 +477,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
         notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
 
-        if (notificationInfoList == null || notificationInfoList.size <= 0)
+        if (notificationInfoList.isEmpty())
             return
 
         for (notificationInfo in notificationInfoList) {
@@ -516,7 +512,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
         }
 
-        mHandler.obtainMessage(UPDATE_LIST).sendToTarget()
+        runOnUiThread { deviceFragment.notifyDataSetChanged() }
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
@@ -527,14 +523,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             } else {
                 val dialog = AlertDialog.Builder(this)
                 dialog.setMessage(resources.getString(R.string.scan_tip))
-                dialog.setPositiveButton(R.string.btn_ok) { dialog1, which -> autoConnect() }
-                dialog.setNegativeButton(R.string.btn_cancel) { dialog12, which -> ActivityUtils.finishAllActivities(true) }
+                dialog.setPositiveButton(R.string.btn_ok) { _, _ -> autoConnect() }
+                dialog.setNegativeButton(R.string.btn_cancel) { _, _ -> ActivityUtils.finishAllActivities(true) }
             }
         })
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-
     }
 
     private fun onMeshOffline(event: MeshEvent) {

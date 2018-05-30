@@ -122,7 +122,7 @@
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
     <string name="empty_cache_tip">Clear data? APP will restart automatically after clearing</string>
-    <string name="remove_device_st">Remove Device(Kick out)</string>
+    <string name="factory_reset">Factory reset</string>
     <string name="add_str_group">Add group</string>
     <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
     <string name="create_new_group">Create a new group</string>
@@ -237,5 +237,6 @@
     <string name="delete_light_confirm">Do you really want to delete the light?</string>
     <string name="delete_group_confirm">Do you really want to delete the group?</string>
     <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
+    <string name="reconnecting">Reconnecting...</string>
 
 </resources>

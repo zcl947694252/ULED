@@ -3,15 +3,11 @@ package com.dadoutek.uled.activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Message
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.MenuItem
 import android.view.View
-import butterknife.BindView
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -24,22 +20,21 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.DataManager
 import com.telink.bluetooth.TelinkLog
-import com.telink.bluetooth.event.*
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.OnlineStatusNotificationParser
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar
-import org.jetbrains.anko.design.indefiniteSnackbar
+import kotlinx.android.synthetic.main.activity_lights_of_group.*
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 
 /**
@@ -47,18 +42,11 @@ import java.util.*
  */
 
 class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
-    @BindView(R.id.recycler_view_lights)
-    private var recyclerViewLights: RecyclerView? = null
-    @BindView(R.id.toolbar)
-    internal var toolbar: Toolbar? = null
-    @BindView(R.id.scanPb)
-    private var scanPb: MaterialProgressBar? = null
 
-    private var group: DbGroup? = null
+    private lateinit var group: DbGroup
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
-    private val lightListAdress: List<Int>? = null
-    private var lightList: MutableList<DbLight>? = null
+    private lateinit var lightList: MutableList<DbLight>
     private var adapter: LightsOfGroupRecyclerViewAdapter? = null
     private var positionCurrent: Int = 0
     private var currentLight: DbLight? = null
@@ -66,9 +54,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private var onCheckedChangeListener: SwitchButtonOnCheckedChangeListener = SwitchButtonOnCheckedChangeListener { v, position ->
-        currentLight = lightList!![position]
+        currentLight = lightList[position]
         positionCurrent = position
-        val opcode = 0xD0.toByte()
+        val opcode = Opcode.LIGHT_ON_OFF
         if (v.id == R.id.img_light) {
             canBeRefresh = true
             if (currentLight!!.status == ConnectionStatus.OFF) {
@@ -79,25 +67,24 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                         byteArrayOf(0x00, 0x00, 0x00))
             }
         } else if (v.id == R.id.tv_setting) {
-            val intent = Intent(this@LightsOfGroupActivity, DeviceSettingActivity::class.java)
-            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-            intent.putExtra(Constant.GROUP_ARESS_KEY, group!!.meshAddr)
-            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-            startActivity(intent)
+            if (TelinkLightApplication.getInstance().connectDevice != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                val intent = Intent(this@LightsOfGroupActivity, DeviceSettingActivity::class.java)
+                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
+                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                startActivity(intent)
+            } else {
+                ToastUtils.showShort(R.string.reconnecting)
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
         // 监听各种事件
-        this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication!!.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-        this.mApplication!!.addEventListener(NotificationEvent.GET_ALARM, this)
-        this.mApplication!!.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
-        this.mApplication!!.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-        this.mApplication!!.addEventListener(MeshEvent.OFFLINE, this)
-
-        this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +96,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initToolbar() {
-        toolbar!!.setTitle(R.string.group_setting_header)
+        toolbar.setTitle(R.string.group_setting_header)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -137,7 +124,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun listenerConnect() {
         if (TelinkLightApplication.getInstance().connectDevice == null || !TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
-            Thread { autoConnect() }.start()
+            autoConnect()
         }
     }
 
@@ -154,23 +141,23 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initData() {
         lightList = ArrayList()
-        if (group!!.meshAddr == 0xffff) {
+        if (group.meshAddr == 0xffff) {
             //            lightList = DBUtils.getAllLight();
             val list = DBUtils.getGroupList()
             for (j in list.indices) {
-                lightList!!.addAll(DBUtils.getLightByGroupID(list[j].id!!))
+                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
             }
         } else {
-            lightList = DBUtils.getLightByGroupID(group!!.id!!)
+            lightList = DBUtils.getLightByGroupID(group.id)
         }
     }
 
 
     private fun initView() {
-        toolbar!!.title = group!!.name
-        recyclerViewLights!!.layoutManager = GridLayoutManager(this, 3)
+        toolbar.title = group.name ?: ""
+        recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
         adapter = LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener)
-        recyclerViewLights!!.adapter = adapter
+        recycler_view_lights.adapter = adapter
     }
 
 
@@ -178,14 +165,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         when (event.type) {
             NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-            MeshEvent.OFFLINE -> {
-            }
-            ServiceEvent.SERVICE_CONNECTED -> {
-            }
-            ServiceEvent.SERVICE_DISCONNECTED -> {
-            }
-            NotificationEvent.GET_DEVICE_STATE -> {
-            }
 
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
@@ -210,33 +189,37 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
                 ToastUtils.showLong(getString(R.string.connect_state))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
-                scanPb!!.visibility = View.VISIBLE
+                scanPb.visibility = View.VISIBLE
 
                 if (this.mApplication!!.isEmptyMesh)
                     return
 
                 //                Lights.getInstance().clear();
-                this.mApplication!!.refreshLights()
+                this.mApplication?.refreshLights()
 
-                val mesh = this.mApplication!!.mesh
+                val mesh = this.mApplication?.mesh
 
-                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
+                if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
                     TelinkLightService.Instance().idleMode(true)
                     return
                 }
 
                 //自动重连参数
                 val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(mesh.name)
-                connectParams.setPassword(mesh.password)
+                connectParams.setMeshName(mesh?.name)
+                connectParams.setPassword(mesh?.password)
                 connectParams.autoEnableNotification(true)
 
                 // 之前是否有在做MeshOTA操作，是则继续
-                if (mesh.isOtaProcessing) {
-                    connectParams.setConnectMac(mesh.otaDevice.mac)
+                if (mesh?.isOtaProcessing == true) {
+                    connectParams.setConnectMac(mesh.otaDevice?.mac)
                 }
                 //自动重连
-                TelinkLightService.Instance().autoConnect(connectParams)
+                Thread {
+                    TelinkLightService.Instance().autoConnect(connectParams)
+                }.start()
+
+
             }
 
             //刷新Notify参数
@@ -252,22 +235,23 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         val deviceInfo = event.args
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
-                adapter!!.notifyDataSetChanged()
-                scanPb!!.visibility = View.GONE
+                scanPb.visibility = View.GONE
+                adapter?.notifyDataSetChanged()
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
             LightAdapter.STATUS_CONNECTING -> {
+                scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_LOGOUT -> {
                 onLogout()
             }
             LightAdapter.STATUS_ERROR_N -> {
-                onNError(event)
+                onNError()
             }
         }
     }
 
-    private fun onNError(event: DeviceEvent) {
+    private fun onNError() {
 
         ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
@@ -277,28 +261,26 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
         val builder = AlertDialog.Builder(this)
         builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
-        builder.setNegativeButton("confirm") { dialog, which -> dialog.dismiss() }
+        builder.setNegativeButton("confirm") { dialog, _ -> dialog.dismiss() }
         builder.setCancelable(false)
         builder.show()
     }
 
     private fun onLogout() {
         //如果超过8s还没有连接上，则显示为超时
-        if (progressBar.visibility == View.VISIBLE) {
-            launch(UI) {
-                indefiniteSnackbar(root, R.string.connect_failed_if_there_are_lights, R.string.retry) {
-                    autoConnect()
-                }
+        runOnUiThread {
+            if (scanPb.visibility == View.VISIBLE) {
+//                indefiniteSnackbar(root, R.string.connect_failed_if_there_are_lights, R.string.retry) {
+//                }
             }
-
-
         }
     }
 
     /**
      * 处理[NotificationEvent.ONLINE_STATUS]事件
      */
-    @Synchronized private fun onOnlineStatusNotify(event: NotificationEvent) {
+    @Synchronized
+    private fun onOnlineStatusNotify(event: NotificationEvent) {
 
         if (canBeRefresh) {
             canBeRefresh = false
@@ -307,11 +289,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
         TelinkLog.i("MainActivity#onOnlineStatusNotify#Thread ID : " + Thread.currentThread().id)
-        val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
-        notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
+        val notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
 
-        if (notificationInfoList == null || notificationInfoList.size <= 0)
+        if (notificationInfoList.isEmpty())
             return
 
         /*if (this.deviceFragment != null) {
@@ -320,9 +301,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
         for (notificationInfo in notificationInfoList) {
 
-            val meshAddress = notificationInfo.meshAddress
-            val brightness = notificationInfo.brightness
-
             if (currentLight == null) {
                 return
             }
@@ -330,23 +308,23 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
             currentLight!!.status = notificationInfo.connectionStatus
 
             if (currentLight!!.meshAddr == TelinkLightApplication.getInstance().connectDevice.meshAddress) {
-                currentLight!!.textColor = resources.getColor(
-                        R.color.primary)
+                currentLight!!.textColor = ContextCompat.getColor(
+                        this, R.color.primary)
             } else {
-                currentLight!!.textColor = resources.getColor(
-                        R.color.black)
+                currentLight!!.textColor = ContextCompat.getColor(
+                        this, R.color.black)
             }
 
             currentLight!!.updateIcon()
         }
 
-//        mHandler.obtainMessage(UPDATE_LIST).sendToTarget()
-        launch(UI) {
-            if (lightList?.size!! > 0 && positionCurrent < lightList!!.size && currentLight != null) {
-                lightList?.set(positionCurrent, currentLight!!)
+        runOnUiThread {
+            if (lightList.size > 0 && positionCurrent < lightList.size && currentLight != null) {
+                lightList[positionCurrent] = currentLight!!
                 adapter?.notifyItemChanged(positionCurrent)
             }
         }
+
     }
 
     companion object {

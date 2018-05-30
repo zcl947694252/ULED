@@ -1186,8 +1186,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             scanPb.setVisibility(View.VISIBLE);
 
                         }, delay);
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                            }
+                        }).start();
                     } else {
-                        // TODO: 2018/3/26 弹框提示为何需要此权限，点击确定后再次申请权限，点击取消退出.
                         AlertDialog.Builder dialog = new AlertDialog.Builder(DeviceScanningNewActivity.this);
                         dialog.setMessage(getResources().getString(R.string.scan_tip));
                         dialog.setPositiveButton(R.string.btn_ok, (dialog1, which) -> startScan(0));
