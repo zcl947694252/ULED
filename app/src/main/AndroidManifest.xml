@@ -121,8 +121,7 @@
         <activity android:name=".activity.SceneSwitchActivity" />
         <activity
             android:name=".activity.SelectGroupForSwitchActivity"
-            android:label="@string/title_activity_switch_group"
-            android:theme="@style/AppTheme" />
+            android:label="@string/title_activity_switch_group" />
         <activity
             android:name=".activity.LightsOfGroupActivity"
             android:screenOrientation="portrait" />
