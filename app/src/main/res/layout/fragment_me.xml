@@ -92,7 +92,7 @@
 
         <TextView
             android:id="@+id/app_version_name"
-            android:text="App版本号:"
+            android:text="@string/app_version_name"
             android:textSize="18sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"

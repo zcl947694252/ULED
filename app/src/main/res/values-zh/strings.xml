@@ -239,5 +239,6 @@
     <string name="delete_group_confirm">确定要删除此组吗？</string>
     <string name="phone_or_password_can_not_be_empty">手机号或密码不能为空</string>
     <string name="reconnecting">重连中……</string>
+    <string name="app_version_name">App版本号:</string>
 
 </resources>
