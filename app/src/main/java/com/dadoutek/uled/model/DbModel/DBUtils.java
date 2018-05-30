@@ -10,6 +10,7 @@ import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbLightDao;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
+import com.dadoutek.uled.dao.DbSceneDao;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
@@ -118,7 +119,7 @@ public class DBUtils {
         int allGIndex = -1;
         QueryBuilder<DbScene> qb = DaoSessionInstance.getInstance().getDbSceneDao().queryBuilder();
         List<DbScene> list = qb.where(
-                DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
+                DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
                 .list();
 
         return list;
