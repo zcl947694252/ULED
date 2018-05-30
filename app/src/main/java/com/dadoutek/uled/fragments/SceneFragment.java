@@ -7,10 +7,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.dadoutek.uled.activity.ChangeSceneAct;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
@@ -35,7 +37,7 @@ import butterknife.Unbinder;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class SceneFragment extends Fragment {
+public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener{
 
     @BindView(R.id.img_header_menu_left)
     ImageView imgHeaderMenuLeft;
@@ -67,7 +69,12 @@ public class SceneFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
         initData();
         initView();
+        initClick();
         return view;
+    }
+
+    private void initClick() {
+        sceneList.setOnItemClickListener(this);
     }
 
     private void initData() {
@@ -181,5 +188,13 @@ public class SceneFragment extends Fragment {
             params = new byte[]{(byte) id};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        DbScene scene=scenesListData.get(position);
+        Intent intent=new Intent(getActivity(), ChangeSceneAct.class);
+        intent.putExtra(Constant.CURRENT_SELECT_SCENE,scene);
+        startActivity(intent);
     }
 }

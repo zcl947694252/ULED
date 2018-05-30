@@ -250,6 +250,20 @@ public class DBUtils {
                 Constant.DB_UPDATE);
     }
 
+    public static void updateScene(DbScene scene) {
+        DaoSessionInstance.getInstance().getDbSceneDao().update(scene);
+        recordingChange(scene.getId(),
+                DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
+                Constant.DB_UPDATE);
+    }
+
+    public static void updateDbActions(DbSceneActions actions) {
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().update(actions);
+        recordingChange(actions.getId(),
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+                Constant.DB_UPDATE);
+    }
+
     /********************************************删除*******************************/
 
     public static void deleteGroup(DbGroup dbGroup) {
@@ -279,6 +293,15 @@ public class DBUtils {
         recordingChange(dbScene.getId(),
                 DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
                 Constant.DB_DELETE);
+    }
+
+    public static void deleteSceneActionsList(List<DbSceneActions> sceneActionslist) {
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteInTx(sceneActionslist);
+        for(int i=0;i<sceneActionslist.size();i++){
+            recordingChange(sceneActionslist.get(i).getId(),
+                    DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+                    Constant.DB_DELETE);
+        }
     }
 
     public static void deleteAllData() {

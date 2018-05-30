@@ -1,5 +1,8 @@
 package com.dadoutek.uled.model.DbModel;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.dao.DbSceneDao;
@@ -11,6 +14,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -18,7 +22,8 @@ import java.util.List;
  */
 
 @Entity
-public class DbScene {
+public class DbScene implements Parcelable{
+
     @Id(autoincrement = true)
     private Long id;
 
@@ -48,6 +53,32 @@ public class DbScene {
     @Generated(hash = 662958756)
     public DbScene() {
     }
+
+    protected DbScene(Parcel in) {
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
+        name = in.readString();
+        if (in.readByte() == 0) {
+            belongRegionId = null;
+        } else {
+            belongRegionId = in.readLong();
+        }
+    }
+
+    public static final Creator<DbScene> CREATOR = new Creator<DbScene>() {
+        @Override
+        public DbScene createFromParcel(Parcel in) {
+            return new DbScene(in);
+        }
+
+        @Override
+        public DbScene[] newArray(int size) {
+            return new DbScene[size];
+        }
+    };
 
     public Long getId() {
         return this.id;
@@ -145,4 +176,25 @@ public class DbScene {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        dest.writeString(name);
+        if (belongRegionId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(belongRegionId);
+        }
+    }
 }

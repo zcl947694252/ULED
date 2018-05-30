@@ -6,7 +6,7 @@ package com.dadoutek.uled.model;
 
 public class ItemGroup {
     public int groupAress = 0;
-    public int brightness = 0;
-    public int temperature = 0;
+    public int brightness = 50;
+    public int temperature = 50;
     public String gpName = "";
 }

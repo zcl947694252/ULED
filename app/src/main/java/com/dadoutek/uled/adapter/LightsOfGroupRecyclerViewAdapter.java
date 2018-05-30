@@ -55,6 +55,17 @@ public class LightsOfGroupRecyclerViewAdapter extends
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DbLight light = lightList.get(position);
         holder.name.setText(dataManager.getLightName(light));
+
+        if(TelinkLightApplication.getInstance().getConnectDevice() == null){
+            holder.name.setTextColor(mContext.getResources().getColor(R.color.black));
+        }else{
+            if(TelinkLightApplication.getInstance().getConnectDevice().meshAddress==light.getMeshAddr()){
+                holder.name.setTextColor(mContext.getResources().getColor(R.color.primary));
+            }else{
+                holder.name.setTextColor(mContext.getResources().getColor(R.color.black));
+            }
+        }
+//        holder.name.setTextColor(light.textColor);
         holder.tvSetting.setOnClickListener(this);
         holder.tvSetting.setTag(position);
         holder.imgLight.setBackgroundResource(light.icon);

@@ -19,10 +19,12 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameActivity;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
 
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -205,6 +207,7 @@ public final class GroupSettingFragment extends Fragment {
             case R.id.btn_remove_group:
                 new AlertDialog.Builder(Objects.requireNonNull(getActivity())).setMessage(R.string.delete_group_confirm)
                         .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+                            CmdDelete(group.getId(),group.getMeshAddr());
                             DBUtils.deleteGroup(group);
                             getActivity().setResult(Constant.RESULT_OK);
                             getActivity().finish();
@@ -216,6 +219,18 @@ public final class GroupSettingFragment extends Fragment {
             case R.id.btn_rename:
                 renameGp();
                 break;
+        }
+    }
+
+    private void CmdDelete(long id,int groupAddress) {
+        List<DbLight> lights=DBUtils.getLightByGroupID(id);
+        for(int k=0;k<lights.size();k++){
+            int dstAddress = lights.get(k).getMeshAddr();
+            byte opcode = (byte) 0xD7;
+            byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
+                    (byte) (groupAddress >> 8 & 0xFF)};
+            params[0] = 0x00;
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
         }
     }
 
