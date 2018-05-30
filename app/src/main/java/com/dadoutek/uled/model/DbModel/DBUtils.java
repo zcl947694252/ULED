@@ -114,6 +114,16 @@ public class DBUtils {
         return list;
     }
 
+    public static List<DbScene> getSceneList() {
+        int allGIndex = -1;
+        QueryBuilder<DbScene> qb = DaoSessionInstance.getInstance().getDbSceneDao().queryBuilder();
+        List<DbScene> list = qb.where(
+                DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
+                .list();
+
+        return list;
+    }
+
     //未分组
     public static DbGroup getGroupNull() {
         int allGIndex = -1;

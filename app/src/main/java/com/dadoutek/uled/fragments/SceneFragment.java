@@ -79,7 +79,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
 
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
-        scenesListData = DBUtils.getSceneAll();
+        scenesListData = DBUtils.getSceneList();
     }
 
     private void initView() {
