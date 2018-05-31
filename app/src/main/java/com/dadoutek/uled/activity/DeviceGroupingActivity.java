@@ -67,6 +67,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
             DbGroup group = adapter.getItem(position);
             if (group.checked) {
                 ToastUtils.showLong(R.string.tip_selected_group);
+                finish();
             } else {
                 deletePreGroup();
                 allocDeviceGroup(group);
@@ -76,7 +77,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     };
 
     private void deletePreGroup() {
-        int groupAddress = gpAdress;
+        int groupAddress = DBUtils.getGroupByID(light.getBelongGroupId()).getMeshAddr();
         int dstAddress = light.getMeshAddr();
         byte opcode = (byte) 0xD7;
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
@@ -171,15 +172,15 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
 
-        if (!group.checked) {
+//        if (!group.checked) {
             params[0] = 0x01;
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
             light.setBelongGroupId(group.getId());
-
-        } else {
-            params[0] = 0x00;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-        }
+//
+//        } else {
+//            params[0] = 0x00;
+//            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+//        }
     }
 
     @Override
@@ -254,6 +255,19 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
     private void refreshView() {
         groupsInit = DBUtils.getGroupList();
+
+        for(int k=0;k<groupsInit.size();k++){
+            if(k==groupsInit.size()-1){
+                groupsInit.get(k).checked=true;
+                deletePreGroup();
+                allocDeviceGroup(groupsInit.get(k));
+                light.setBelongGroupId(groupsInit.get(k).getId());
+                DBUtils.updateLight(light);
+            }else{
+                groupsInit.get(k).checked=false;
+            }
+        }
+
         adapter=new GroupListAdapter();
         listView.setAdapter(this.adapter);
         adapter.notifyDataSetInvalidated();
