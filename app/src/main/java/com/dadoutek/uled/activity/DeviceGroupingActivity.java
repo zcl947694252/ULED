@@ -122,32 +122,22 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         this.gpAdress = this.getIntent().getIntExtra("gpAddress", 0);
 
         this.inflater = this.getLayoutInflater();
-        this.adapter = new GroupListAdapter();
         btnAdd=findViewById(R.id.add_group_new);
 
         ImageView backView = (ImageView) this
                 .findViewById(R.id.img_header_menu_left);
         backView.setOnClickListener(this);
 
-        this.initData();
-
+        groupsInit = DBUtils.getGroupList();
         listView = (GridView) this.findViewById(R.id.list_groups);
         listView.setOnItemClickListener(this.itemClickListener);
-        listView.setAdapter(this.adapter);
+
+        adapter = new GroupListAdapter();
+        listView.setAdapter(adapter);
+
         btnAdd.setOnClickListener(v -> addNewGroup());
 
         this.getDeviceGroup();
-    }
-
-    private void initData() {
-        groupsInit = DBUtils.getGroupList();
-        this.adapter.notifyDataSetChanged();
-
-//        for(int i=0;i<groupsInit.size();i++){
-//            if(groupsInit.get(i).getMeshAddr()==gpAdress){
-//                groupsInit.get(i).checked=true;
-//            }
-//        }
     }
 
     @Override
@@ -271,7 +261,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         adapter=new GroupListAdapter();
         listView.setAdapter(this.adapter);
-        adapter.notifyDataSetInvalidated();
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -317,7 +307,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
 
         public DbGroup get(int addr) {
@@ -335,7 +325,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
             GroupItemHolder holder;
 
-            if (convertView == null) {
+//            if (convertView == null) {
 
                 convertView = inflater.inflate(R.layout.grouping_item, null);
 
@@ -346,10 +336,10 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 holder.name = txtName;
 
                 convertView.setTag(holder);
-
-            } else {
-                holder = (GroupItemHolder) convertView.getTag();
-            }
+//
+//            } else {
+//                holder = (GroupItemHolder) convertView.getTag();
+//            }
 
             DbGroup group = this.getItem(position);
 
