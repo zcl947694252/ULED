@@ -1,6 +1,7 @@
 package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
+import android.util.Log
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.*
@@ -70,6 +71,8 @@ object AccountModel {
                 var light : DbLight = DbLight()
                 if(item.belongGroups.size>0){
                     light.belongGroupId = DBUtils.getGroupByMesh(item.belongGroups.get(0)).id
+                }else{
+                    light.belongGroupId = 1
                 }
                 light.brightness=item.brightness
                 light.colorTemperature=item.temperature
@@ -83,7 +86,7 @@ object AccountModel {
                     light.meshUUID = 0
                     light.productUUID = 0
                 }
-                DBUtils.saveLight(light)
+                DBUtils.oldToNewSaveLight(light)
             }
         }
     }

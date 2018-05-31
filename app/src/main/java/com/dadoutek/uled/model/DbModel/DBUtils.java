@@ -91,6 +91,7 @@ public class DBUtils {
     public static DbGroup getGroupByMesh(String mesh) {
         DbGroup dbGroup = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().
                 where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique();
+        Log.d("datasave", "getGroupByMesh: "+mesh);
         return dbGroup;
     }
 
@@ -218,6 +219,13 @@ public class DBUtils {
         DbGroup dbGroup=getGroupNull();
         light.setBelongGroupId(dbGroup.getId());
 
+        DaoSessionInstance.getInstance().getDbLightDao().save(light);
+        recordingChange(light.getId(),
+                DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
+                Constant.DB_ADD);
+    }
+
+    public static void oldToNewSaveLight(DbLight light) {
         DaoSessionInstance.getInstance().getDbLightDao().save(light);
         recordingChange(light.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),

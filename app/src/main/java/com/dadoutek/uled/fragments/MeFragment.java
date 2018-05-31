@@ -192,9 +192,9 @@ public class MeFragment extends Fragment {
         }
     }
 
-    private void change(){
-
-    }
+//    private void change(String table,){
+//
+//    }
 
     private void exitLogin() {
         SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
