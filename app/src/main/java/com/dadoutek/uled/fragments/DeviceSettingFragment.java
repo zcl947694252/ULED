@@ -195,9 +195,6 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         brightnessBar.setMax(100);
         temperatureBar.setMax(100);
 
-        this.brightnessBar.setOnSeekBarChangeListener(this.barChangeListener);
-        this.temperatureBar.setOnSeekBarChangeListener(this.barChangeListener);
-
         this.colorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
         this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
 
@@ -222,6 +219,34 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         tvBrightness.setText(getString(R.string.device_setting_brightness, light.getBrightness() + ""));
         temperatureBar.setProgress(light.getColorTemperature());
         tvTemperature.setText(getString(R.string.device_setting_temperature, light.getColorTemperature() + ""));
+
+        sendInitCmd(light.getBrightness(),light.getColorTemperature());
+
+        this.brightnessBar.setOnSeekBarChangeListener(this.barChangeListener);
+        this.temperatureBar.setOnSeekBarChangeListener(this.barChangeListener);
+    }
+
+    private void sendInitCmd(int brightness, int colorTemperature) {
+        int addr = light.getMeshAddr();
+        byte opcode;
+        byte[] params;
+//                progress += 5;
+//                Log.d(TAG, "onValueChange: "+progress);
+            opcode = (byte) Opcode.SET_LUM;
+            params = new byte[]{(byte) brightness};
+            light.setBrightness(brightness);
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            opcode = (byte) Opcode.SET_TEMPERATURE;
+            params = new byte[]{0x05, (byte) colorTemperature};
+            light.setColorTemperature(colorTemperature);
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+        }
     }
 
     @Override

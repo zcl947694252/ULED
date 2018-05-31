@@ -2,6 +2,7 @@ package com.dadoutek.uled.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,7 +44,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 
 
-public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener {
+public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener,OnClickListener {
 
     private final static int UPDATE = 1;
 
@@ -56,7 +57,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
     private Button btnAdd;
 
-    private OnClickListener clickListener = v -> finish();
+//    private OnClickListener clickListener = v -> finish();
 
     private GridView listView;
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
@@ -126,7 +127,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         ImageView backView = (ImageView) this
                 .findViewById(R.id.img_header_menu_left);
-        backView.setOnClickListener(this.clickListener);
+        backView.setOnClickListener(this);
 
         this.initData();
 
@@ -256,21 +257,43 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     private void refreshView() {
         groupsInit = DBUtils.getGroupList();
 
-        for(int k=0;k<groupsInit.size();k++){
-            if(k==groupsInit.size()-1){
-                groupsInit.get(k).checked=true;
-                deletePreGroup();
-                allocDeviceGroup(groupsInit.get(k));
-                light.setBelongGroupId(groupsInit.get(k).getId());
-                DBUtils.updateLight(light);
-            }else{
-                groupsInit.get(k).checked=false;
-            }
-        }
+//        for(int k=0;k<groupsInit.size();k++){
+//            if(k==groupsInit.size()-1){
+//                groupsInit.get(k).checked=true;
+//                deletePreGroup();
+//                allocDeviceGroup(groupsInit.get(k));
+//                light.setBelongGroupId(groupsInit.get(k).getId());
+//                DBUtils.updateLight(light);
+//            }else{
+//                groupsInit.get(k).checked=false;
+//            }
+//        }
 
         adapter=new GroupListAdapter();
         listView.setAdapter(this.adapter);
         adapter.notifyDataSetInvalidated();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.img_header_menu_left:
+                onBackPressed();
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder=new AlertDialog.Builder(DeviceGroupingActivity.this);
+        builder.setTitle(R.string.group_not_change_tip);
+        builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+            finish();
+        });
+        builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
     }
 
     private static class GroupItemHolder {

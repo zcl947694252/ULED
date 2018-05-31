@@ -239,5 +239,6 @@
     <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
     <string name="reconnecting">Reconnecting...</string>
     <string name="app_version_name">App version number:</string>
+    <string name="group_not_change_tip">Grouping unchanged, determine exit?</string>
 
 </resources>
