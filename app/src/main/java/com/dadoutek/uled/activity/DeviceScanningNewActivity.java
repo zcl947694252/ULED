@@ -582,7 +582,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      */
     private boolean checkLightsHaveGroup() {
         for (int j = 0; j < nowLightList.size(); j++) {
-            if (nowLightList.get(j).getBelongGroupId() == null) {
+            if (DBUtils.getGroupByID(nowLightList.get(j).getBelongGroupId()).getMeshAddr() == 0xffff) {
                 groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
                 return false;
             }
