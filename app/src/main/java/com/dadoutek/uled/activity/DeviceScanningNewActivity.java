@@ -802,7 +802,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         lightNumLayout.setVisibility(View.GONE);
 
-        currentGroupIndex = -1;
+        if(groups.size()>1){
+            groups.get(groups.size()-1).checked=true;
+            currentGroupIndex=groups.size()-1;
+            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+        }else{
+            currentGroupIndex = -1;
+        }
     }
 
     private void initToolbar() {
