@@ -99,7 +99,6 @@ public final class GroupSettingFragment extends Fragment {
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
             } else if (view == temperatureBar) {
-
                 opcode = (byte) Opcode.SET_TEMPERATURE;
                 params = new byte[]{0x05, (byte) progress};
                 group.setColorTemperature(progress);

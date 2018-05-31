@@ -38,11 +38,11 @@
 
         <Button
             android:id="@+id/add_group_new"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="20dp"
-            android:text="@string/add_groups"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:text="@string/add_groups" />
     </RelativeLayout>
 
     <GridView
