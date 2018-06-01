@@ -12,17 +12,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.activity.ChangeSceneAct;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddSceneAct;
+import com.dadoutek.uled.activity.ChangeSceneAct;
 import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
@@ -37,7 +37,7 @@ import butterknife.Unbinder;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener{
+public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     @BindView(R.id.img_header_menu_left)
     ImageView imgHeaderMenuLeft;
@@ -127,7 +127,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
             case R.id.img_header_menu_right:
                 if (!SharedPreferencesUtils.getConnectState(getActivity())) {
                     return;
-                }else{
+                } else {
                     Intent intent = new Intent(getActivity(), AddSceneAct.class);
                     startActivityForResult(intent, 0);
                 }
@@ -192,9 +192,9 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        DbScene scene=scenesListData.get(position);
-        Intent intent=new Intent(getActivity(), ChangeSceneAct.class);
-        intent.putExtra(Constant.CURRENT_SELECT_SCENE,scene);
+        DbScene scene = scenesListData.get(position);
+        Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
+        intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
         startActivity(intent);
     }
 }
