@@ -78,6 +78,16 @@
             android:layout_marginEnd="50dp"
             android:layout_marginBottom="10dp"
             android:text="@string/mesh_add_button_save" />
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:visibility="gone"
+            android:indeterminate="false"
+            style="?android:attr/progressBarStyle"
+            android:progress="0"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </RelativeLayout>
 
 </LinearLayout>

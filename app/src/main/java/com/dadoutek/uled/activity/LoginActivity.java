@@ -139,14 +139,14 @@ public class LoginActivity extends TelinkBaseActivity {
                             LogUtils.d("logging: " + "登录成功");
                             ToastUtils.showLong(R.string.login_success);
 
-                            hideLodingDialog();
+                            hideLoadingDialog();
                             TransformView();
                         }
 
                         @Override
                         public void onError(@NotNull Throwable e) {
                             super.onError(e);
-                            hideLodingDialog();
+                            hideLoadingDialog();
                         }
                     });
         } else {

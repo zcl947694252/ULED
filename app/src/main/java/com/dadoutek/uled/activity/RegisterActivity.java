@@ -112,7 +112,7 @@ public class RegisterActivity extends TelinkBaseActivity {
 
         @Override
         public void onNext(Response<DbUser> dbUserResponse) {
-            hideLodingDialog();
+            hideLoadingDialog();
             if (dbUserResponse.getErrorCode() == 0) {
                 Toast.makeText(RegisterActivity.this, R.string.register_success, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
@@ -125,7 +125,7 @@ public class RegisterActivity extends TelinkBaseActivity {
 
         @Override
         public void onError(Throwable e) {
-            hideLodingDialog();
+            hideLoadingDialog();
             Toast.makeText(RegisterActivity.this, "onError:" + e.toString(), Toast.LENGTH_SHORT).show();
         }
 

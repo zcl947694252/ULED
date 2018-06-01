@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,12 +74,13 @@ public class TelinkBaseActivity extends AppCompatActivity {
         TextView tvContent = (TextView) v.findViewById(R.id.tvContent);
         tvContent.setText(content);
 
-        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
 
-        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
-                R.animator.load_animation);
+//        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
+//
+//        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
+//                R.animator.load_animation);
 
-        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
+//        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
 
         if (loadDialog == null) {
             loadDialog = new Dialog(this,
@@ -88,13 +90,12 @@ public class TelinkBaseActivity extends AppCompatActivity {
         if (!loadDialog.isShowing()) {
             loadDialog.setCancelable(true);
             loadDialog.setCanceledOnTouchOutside(false);
-            loadDialog.setContentView(layout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            loadDialog.setContentView(layout);
             loadDialog.show();
         }
     }
 
-    public void hideLodingDialog() {
+    public void hideLoadingDialog() {
         if (loadDialog != null) {
             loadDialog.dismiss();
         }

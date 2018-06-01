@@ -113,7 +113,7 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
 
         @Override
         public void onError(Throwable e) {
-            hideLodingDialog();
+            hideLoadingDialog();
             Toast.makeText(ForgetPassWordActivity.this, "onError:" + e.toString(), Toast.LENGTH_SHORT).show();
         }
 
@@ -129,7 +129,7 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
 
         @Override
         public void onNext(Response<DbUser> stringResponse) {
-            hideLodingDialog();
+            hideLoadingDialog();
             if (stringResponse.getErrorCode() == 0) {
                 LogUtils.d("logging" + stringResponse.getErrorCode() + "更改成功");
                 ToastUtils.showLong(R.string.tip_update_password_success);
@@ -141,7 +141,7 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
 
         @Override
         public void onError(Throwable e) {
-            hideLodingDialog();
+            hideLoadingDialog();
             Toast.makeText(ForgetPassWordActivity.this, "onError:" + e.toString(), Toast.LENGTH_SHORT).show();
         }
 

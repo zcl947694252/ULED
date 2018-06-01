@@ -281,7 +281,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
     private boolean isSave = false;
 
     private void save() {
-        showLoadingDialog(getString(R.string.save_now));
+        showLoadingDialog(getString(R.string.saving));
         new Thread(() -> {
             String name = editName.getText().toString().trim();
         List<ItemGroup> itemGroups = itemGroupArrayList;
@@ -306,7 +306,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }finally {
-                hideLodingDialog();
+                hideLoadingDialog();
                 finish();
             }
         }).start();

@@ -200,12 +200,12 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
         tvContent.text = content
 
-        val spaceshipImage = v.findViewById<View>(R.id.img) as ImageView
+//        val spaceshipImage = v.findViewById<View>(R.id.img) as ImageView
 
-        @SuppressLint("ResourceType") val hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
-                R.animator.load_animation)
-
-        spaceshipImage.startAnimation(hyperspaceJumpAnimation)
+//        @SuppressLint("ResourceType") val hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
+//                R.animator.load_animation)
+//
+//        spaceshipImage.startAnimation(hyperspaceJumpAnimation)
 
         if (loadDialog == null) {
             loadDialog = Dialog(this,

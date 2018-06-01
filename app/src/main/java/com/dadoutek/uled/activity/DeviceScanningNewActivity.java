@@ -1,7 +1,6 @@
 package com.dadoutek.uled.activity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -21,8 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -336,7 +333,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         return Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
                     Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
-                    closeDialog();
+                    hideLoadingDialog();
                     mConnectTimer = null;
                 });
     }
@@ -374,7 +371,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
-                openLoadingDialog(getResources().getString(R.string.device_login_tip));
+                showLoadingDialog(getResources().getString(R.string.device_login_tip));
 
             }
         });
@@ -437,7 +434,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 //获取当前勾选灯的列表
                 List<DbLight> selectLights = getCurrentSelectLights();
 
-                openLoadingDialog(getResources().getString(R.string.grouping_wait_tip,
+                showLoadingDialog(getResources().getString(R.string.grouping_wait_tip,
                         selectLights.size() + ""));
                 //将灯列表的灯循环设置分组
                 setGroups(group, selectLights);
@@ -499,7 +496,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.selected = false;
                         }
                         adapter.notifyDataSetChanged();
-                        closeDialog();
+                        hideLoadingDialog();
                     }
                 });
 
@@ -687,7 +684,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void autoConnect() {
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                openLoadingDialog(getResources().getString(R.string.device_login_tip));
+                showLoadingDialog(getResources().getString(R.string.device_login_tip));
                 TelinkLightService.Instance().idleMode(true);
 
                 Log.d("ScanningTest", "this.mApplication.isEmptyMesh() = " + this.mApplication.isEmptyMesh());
@@ -868,40 +865,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-    public void openLoadingDialog(String content) {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View v = inflater.inflate(R.layout.dialogview, null);
-
-        LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);
-        TextView tvContent = (TextView) v.findViewById(R.id.tvContent);
-        tvContent.setText(content);
-
-        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
-
-        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
-                R.animator.load_animation);
-
-        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
-
-        if (loadDialog == null) {
-            loadDialog = new Dialog(this,
-                    R.style.FullHeightDialog);
-        }
-        //loadDialog没显示才把它显示出来
-        if (!loadDialog.isShowing()) {
-            loadDialog.setCancelable(true);
-            loadDialog.setCanceledOnTouchOutside(false);
-            loadDialog.setContentView(layout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            loadDialog.show();
-        }
-    }
-
-    public void closeDialog() {
-        if (loadDialog != null) {
-            loadDialog.dismiss();
-        }
-    }
 
     private static class DeviceItemHolder {
         public ImageView icon;
@@ -1114,7 +1077,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     mConnectTimer.dispose();
                     isLoginSuccess = true;
                     //进入分组
-                    closeDialog();
+                    hideLoadingDialog();
                     startGrouping();
                 }
 //                btnAddGroups.doneLoadingAnimation(R.color.black,

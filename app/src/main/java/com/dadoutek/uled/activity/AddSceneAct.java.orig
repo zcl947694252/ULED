@@ -240,11 +240,38 @@ public class AddSceneAct extends TelinkBaseActivity {
     private boolean isSave = false;
 
     private void save() {
-        showLoadingDialog(getString(R.string.saving));
+<<<<<<< HEAD
+        String name = editName.getText().toString().trim();
+//        List<ItemGroup> itemGroups = adapter.getData();
+        List<ItemGroup> itemGroups = itemGroupArrayList;
+
+        DbScene dbScene = new DbScene();
+        dbScene.setName(name);
+        dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
+        DBUtils.saveScene(dbScene);
+
+        long idAction = dbScene.getId();
+
+        for (int i = 0; i < itemGroups.size(); i++) {
+            DbSceneActions sceneActions = new DbSceneActions();
+            sceneActions.setActionId(idAction);
+            sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
+            sceneActions.setBrightness(itemGroups.get(i).brightness);
+            sceneActions.setColorTemperature(itemGroups.get(i).temperature);
+//            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
+//                sceneActions.setGroupAddr(0xFFFF);
+//                DBUtils.saveSceneActions(sceneActions);
+//                break;
+//            } else {
+            sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
+            DBUtils.saveSceneActions(sceneActions);
+//            }
+        }
+=======
+        showLoadingDialog(getString(R.string.save_now));
         new Thread(() -> {
             String name = editName.getText().toString().trim();
-//        List<ItemGroup> itemGroups = adapter.getData();
-            List<ItemGroup> itemGroups = itemGroupArrayList;
+            List<ItemGroup> itemGroups = adapter.getDataResult();
 
             DbScene dbScene = new DbScene();
             dbScene.setName(name);
@@ -259,23 +286,18 @@ public class AddSceneAct extends TelinkBaseActivity {
                 sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
-//            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
-//                sceneActions.setGroupAddr(0xFFFF);
-//                DBUtils.saveSceneActions(sceneActions);
-//                break;
-//            } else {
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
                 DBUtils.saveSceneActions(sceneActions);
-//            }
             }
+>>>>>>> f9c94561dee7804b136fecd64aba1b495e1c2c38
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(200);
                 addScene(idAction);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            } finally {
-                hideLoadingDialog();
+            }finally {
+                hideLodingDialog();
                 finish();
             }
         }).start();

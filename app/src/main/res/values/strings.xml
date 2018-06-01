@@ -75,7 +75,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add a group</string>
-    <string name="loading">Scanning...</string>
+    <string name="loading">Loading</string>
     <string name="scan_end">The scan was completed and no equipment was found!</string>
     <string name="device_login_tip">Logging, please wait!</string>
     <string name="grouping_completed">Grouping completed</string>
@@ -237,12 +237,13 @@
     <string name="delete_light_confirm">Do you really want to delete the light?</string>
     <string name="delete_group_confirm">Do you really want to delete the group?</string>
     <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
-    <string name="reconnecting">Reconnecting...</string>
+    <string name="reconnecting">Reconnecting</string>
     <string name="app_version_name">App version number:</string>
     <string name="group_not_change_tip">Grouping unchanged, determine exit?</string>
-    <string name="save_now">正在保存。。。</string>
+    <string name="save_now">saving…</string>
     <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
     <string name="i_know">OK</string>
     <string name="exit">Exit</string>
+    <string name="saving">Saving</string>
 
 </resources>
