@@ -25,6 +25,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbUserDao.createTable(db, ifNotExists);
         DbGroupDao.createTable(db, ifNotExists);
         DbSceneActionsDao.createTable(db, ifNotExists);
+        DbDeleteGroupDao.createTable(db, ifNotExists);
         DbDataChangeDao.createTable(db, ifNotExists);
         DbRegionDao.createTable(db, ifNotExists);
         DbSceneDao.createTable(db, ifNotExists);
@@ -36,6 +37,7 @@ public class DaoMaster extends AbstractDaoMaster {
         DbUserDao.dropTable(db, ifExists);
         DbGroupDao.dropTable(db, ifExists);
         DbSceneActionsDao.dropTable(db, ifExists);
+        DbDeleteGroupDao.dropTable(db, ifExists);
         DbDataChangeDao.dropTable(db, ifExists);
         DbRegionDao.dropTable(db, ifExists);
         DbSceneDao.dropTable(db, ifExists);
@@ -61,6 +63,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbUserDao.class);
         registerDaoClass(DbGroupDao.class);
         registerDaoClass(DbSceneActionsDao.class);
+        registerDaoClass(DbDeleteGroupDao.class);
         registerDaoClass(DbDataChangeDao.class);
         registerDaoClass(DbRegionDao.class);
         registerDaoClass(DbSceneDao.class);

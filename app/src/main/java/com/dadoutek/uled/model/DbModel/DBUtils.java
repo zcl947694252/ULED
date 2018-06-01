@@ -157,6 +157,10 @@ public class DBUtils {
         return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
     }
 
+    public static List<DbDeleteGroup> getDeleteGroups() {
+        return DaoSessionInstance.getInstance().getDbDeleteGroupDao().queryBuilder().list();
+    }
+
     /********************************************保存*******************************/
 
     public static void saveRegion(DbRegion dbRegion) {
@@ -211,6 +215,12 @@ public class DBUtils {
         recordingChange(group.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                 Constant.DB_ADD);
+    }
+
+    public static void saveDeleteGroup(DbGroup group) {
+        DbDeleteGroup dbDeleteGroup=new DbDeleteGroup();
+        dbDeleteGroup.setGroupAress(group.getMeshAddr());
+        DaoSessionInstance.getInstance().getDbDeleteGroupDao().save(dbDeleteGroup);
     }
 
     public static void saveLight(DbLight light) {
@@ -293,10 +303,15 @@ public class DBUtils {
             updateLight(lights.get(i));
         }
 
+        saveDeleteGroup(dbGroup);
         DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                 Constant.DB_DELETE);
+    }
+
+    public static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup){
+        DaoSessionInstance.getInstance().getDbDeleteGroupDao().delete(dbDeleteGroup);
     }
 
     public static void deleteLight(DbLight dbLight) {
@@ -337,17 +352,19 @@ public class DBUtils {
     public static void addNewGroup(String name, List<DbGroup> groups, Context context) {
         if (!checkRepeat(groups, context, name)) {
             int count = groups.size();
-            int newMeshAdress = ++count;
-
-            for (int k = 0; k < groups.size(); k++) {
-                if (groups.get(k).getMeshAddr() == newMeshAdress) {
-                    ++newMeshAdress;
-                    break;
-                }
-            }
+            int newMeshAdress;
             DbGroup group = new DbGroup();
+
+            List<DbDeleteGroup> list=getDeleteGroups();
+            if(list.size()>0){
+                newMeshAdress=list.get(0).getGroupAress();
+                group.setMeshAddr(newMeshAdress);
+                deleteDeleteGroup(list.get(0));
+            }else {
+                newMeshAdress = ++count;
+                group.setMeshAddr(0x8001 + newMeshAdress);
+            }
             group.setName(name);
-            group.setMeshAddr(0x8001 + newMeshAdress);
             group.setBrightness(100);
             group.setColorTemperature(100);
             group.setBelongRegionId((int) SharedPreferencesUtils.getCurrentUseRegion());//目前暂无分区 区域ID暂为0

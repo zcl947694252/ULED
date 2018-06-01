@@ -12,6 +12,7 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
+import com.dadoutek.uled.model.DbModel.DbDeleteGroup;
 import com.dadoutek.uled.model.DbModel.DbDataChange;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.DbModel.DbScene;
@@ -20,6 +21,7 @@ import com.dadoutek.uled.dao.DbLightDao;
 import com.dadoutek.uled.dao.DbUserDao;
 import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
+import com.dadoutek.uled.dao.DbDeleteGroupDao;
 import com.dadoutek.uled.dao.DbDataChangeDao;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneDao;
@@ -37,6 +39,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig dbUserDaoConfig;
     private final DaoConfig dbGroupDaoConfig;
     private final DaoConfig dbSceneActionsDaoConfig;
+    private final DaoConfig dbDeleteGroupDaoConfig;
     private final DaoConfig dbDataChangeDaoConfig;
     private final DaoConfig dbRegionDaoConfig;
     private final DaoConfig dbSceneDaoConfig;
@@ -45,6 +48,7 @@ public class DaoSession extends AbstractDaoSession {
     private final DbUserDao dbUserDao;
     private final DbGroupDao dbGroupDao;
     private final DbSceneActionsDao dbSceneActionsDao;
+    private final DbDeleteGroupDao dbDeleteGroupDao;
     private final DbDataChangeDao dbDataChangeDao;
     private final DbRegionDao dbRegionDao;
     private final DbSceneDao dbSceneDao;
@@ -65,6 +69,9 @@ public class DaoSession extends AbstractDaoSession {
         dbSceneActionsDaoConfig = daoConfigMap.get(DbSceneActionsDao.class).clone();
         dbSceneActionsDaoConfig.initIdentityScope(type);
 
+        dbDeleteGroupDaoConfig = daoConfigMap.get(DbDeleteGroupDao.class).clone();
+        dbDeleteGroupDaoConfig.initIdentityScope(type);
+
         dbDataChangeDaoConfig = daoConfigMap.get(DbDataChangeDao.class).clone();
         dbDataChangeDaoConfig.initIdentityScope(type);
 
@@ -78,6 +85,7 @@ public class DaoSession extends AbstractDaoSession {
         dbUserDao = new DbUserDao(dbUserDaoConfig, this);
         dbGroupDao = new DbGroupDao(dbGroupDaoConfig, this);
         dbSceneActionsDao = new DbSceneActionsDao(dbSceneActionsDaoConfig, this);
+        dbDeleteGroupDao = new DbDeleteGroupDao(dbDeleteGroupDaoConfig, this);
         dbDataChangeDao = new DbDataChangeDao(dbDataChangeDaoConfig, this);
         dbRegionDao = new DbRegionDao(dbRegionDaoConfig, this);
         dbSceneDao = new DbSceneDao(dbSceneDaoConfig, this);
@@ -86,6 +94,7 @@ public class DaoSession extends AbstractDaoSession {
         registerDao(DbUser.class, dbUserDao);
         registerDao(DbGroup.class, dbGroupDao);
         registerDao(DbSceneActions.class, dbSceneActionsDao);
+        registerDao(DbDeleteGroup.class, dbDeleteGroupDao);
         registerDao(DbDataChange.class, dbDataChangeDao);
         registerDao(DbRegion.class, dbRegionDao);
         registerDao(DbScene.class, dbSceneDao);
@@ -96,6 +105,7 @@ public class DaoSession extends AbstractDaoSession {
         dbUserDaoConfig.clearIdentityScope();
         dbGroupDaoConfig.clearIdentityScope();
         dbSceneActionsDaoConfig.clearIdentityScope();
+        dbDeleteGroupDaoConfig.clearIdentityScope();
         dbDataChangeDaoConfig.clearIdentityScope();
         dbRegionDaoConfig.clearIdentityScope();
         dbSceneDaoConfig.clearIdentityScope();
@@ -115,6 +125,10 @@ public class DaoSession extends AbstractDaoSession {
 
     public DbSceneActionsDao getDbSceneActionsDao() {
         return dbSceneActionsDao;
+    }
+
+    public DbDeleteGroupDao getDbDeleteGroupDao() {
+        return dbDeleteGroupDao;
     }
 
     public DbDataChangeDao getDbDataChangeDao() {
