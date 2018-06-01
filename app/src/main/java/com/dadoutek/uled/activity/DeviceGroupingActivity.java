@@ -2,12 +2,16 @@ package com.dadoutek.uled.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -16,10 +20,8 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
@@ -27,11 +29,9 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.StringUtils;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
@@ -41,10 +41,10 @@ import com.telink.util.EventListener;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
 
-public final class DeviceGroupingActivity extends TelinkBaseActivity implements EventListener,OnClickListener {
+public final class DeviceGroupingActivity extends TelinkBaseActivity implements
+        EventListener{
 
     private final static int UPDATE = 1;
 
@@ -55,7 +55,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     private DbLight light;
     private int gpAdress;
 
-    private Button btnAdd;
+//    private Button btnAdd;
 
 //    private OnClickListener clickListener = v -> finish();
 
@@ -121,12 +121,12 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
         this.light = (DbLight) this.getIntent().getExtras().get("light");
         this.gpAdress = this.getIntent().getIntExtra("gpAddress", 0);
 
-        this.inflater = this.getLayoutInflater();
-        btnAdd=findViewById(R.id.add_group_new);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.activity_device_grouping);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ImageView backView = (ImageView) this
-                .findViewById(R.id.img_header_menu_left);
-        backView.setOnClickListener(this);
+        this.inflater = this.getLayoutInflater();
 
         groupsInit = DBUtils.getGroupList();
         listView = (GridView) this.findViewById(R.id.list_groups);
@@ -134,8 +134,6 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
         adapter = new GroupListAdapter();
         listView.setAdapter(adapter);
-
-        btnAdd.setOnClickListener(v -> addNewGroup());
 
         this.getDeviceGroup();
     }
@@ -164,9 +162,9 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
                 (byte) (groupAddress >> 8 & 0xFF)};
 
 //        if (!group.checked) {
-            params[0] = 0x01;
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-            light.setBelongGroupId(group.getId());
+        params[0] = 0x01;
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+        light.setBelongGroupId(group.getId());
 //
 //        } else {
 //            params[0] = 0x00;
@@ -222,26 +220,26 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
     }
 
     private void addNewGroup() {
-            final EditText textGp = new EditText(this);
-            new AlertDialog.Builder(DeviceGroupingActivity.this)
-                    .setTitle(R.string.create_new_group)
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .setView(textGp)
+        final EditText textGp = new EditText(this);
+        new AlertDialog.Builder(DeviceGroupingActivity.this)
+                .setTitle(R.string.create_new_group)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(textGp)
 
-                    .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
-                        // 获取输入框的内容
-                        if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                            ToastUtils.showShort(getString(R.string.rename_tip_check));
-                        } else {
-                            //往DB里添加组数据
-                            DBUtils.addNewGroup(textGp.getText().toString().trim(), groupsInit, this);
-                            refreshView();
-                            dialog.dismiss();
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check));
+                    } else {
+                        //往DB里添加组数据
+                        DBUtils.addNewGroup(textGp.getText().toString().trim(), groupsInit, this);
+                        refreshView();
                         dialog.dismiss();
-                    }).show();
+                    }
+                })
+                .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                    dialog.dismiss();
+                }).show();
     }
 
     private void refreshView() {
@@ -259,31 +257,43 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 //            }
 //        }
 
-        adapter=new GroupListAdapter();
+        adapter = new GroupListAdapter();
         listView.setAdapter(this.adapter);
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.img_header_menu_left:
-                onBackPressed();
-                break;
-        }
-    }
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder=new AlertDialog.Builder(DeviceGroupingActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceGroupingActivity.this);
         builder.setTitle(R.string.group_not_change_tip);
         builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
             finish();
         });
         builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
         });
-        AlertDialog dialog=builder.create();
+        AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+
+            case R.id.menu_add:
+                addNewGroup();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_grouping, menu);
+        return true;
     }
 
     private static class GroupItemHolder {
@@ -327,15 +337,15 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements 
 
 //            if (convertView == null) {
 
-                convertView = inflater.inflate(R.layout.grouping_item, null);
+            convertView = inflater.inflate(R.layout.grouping_item, null);
 
-                TextView txtName = (TextView) convertView
-                        .findViewById(R.id.txt_name);
+            TextView txtName = (TextView) convertView
+                    .findViewById(R.id.txt_name);
 
-                holder = new GroupItemHolder();
-                holder.name = txtName;
+            holder = new GroupItemHolder();
+            holder.name = txtName;
 
-                convertView.setTag(holder);
+            convertView.setTag(holder);
 //
 //            } else {
 //                holder = (GroupItemHolder) convertView.getTag();
