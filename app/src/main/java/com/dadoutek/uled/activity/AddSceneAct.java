@@ -215,7 +215,6 @@ public class AddSceneAct extends TelinkBaseActivity {
                 if (checked()) {
                     save();
                     setResult(Constant.RESULT_OK);
-                    finish();
                 }
                 break;
             case R.id.edit_name:
@@ -240,56 +239,40 @@ public class AddSceneAct extends TelinkBaseActivity {
     private boolean isSave = false;
 
     private void save() {
-        String name = editName.getText().toString().trim();
-        List<ItemGroup> itemGroups = adapter.getDataResult();
+        showLoadingDialog(getString(R.string.save_now));
+        new Thread(() -> {
+            String name = editName.getText().toString().trim();
+            List<ItemGroup> itemGroups = adapter.getDataResult();
 
-        DbScene dbScene = new DbScene();
-        dbScene.setName(name);
-        dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
-        DBUtils.saveScene(dbScene);
+            DbScene dbScene = new DbScene();
+            dbScene.setName(name);
+            dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
+            DBUtils.saveScene(dbScene);
 
-        long idAction = dbScene.getId();
+            long idAction = dbScene.getId();
 
-        for (int i = 0; i < itemGroups.size(); i++) {
-            DbSceneActions sceneActions = new DbSceneActions();
-            sceneActions.setActionId(idAction);
-            sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
-            sceneActions.setBrightness(itemGroups.get(i).brightness);
-            sceneActions.setColorTemperature(itemGroups.get(i).temperature);
-//            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
-//                sceneActions.setGroupAddr(0xFFFF);
-//                DBUtils.saveSceneActions(sceneActions);
-//                break;
-//            } else {
-            sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-            DBUtils.saveSceneActions(sceneActions);
-//            }
-        }
+            for (int i = 0; i < itemGroups.size(); i++) {
+                DbSceneActions sceneActions = new DbSceneActions();
+                sceneActions.setActionId(idAction);
+                sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
+                sceneActions.setBrightness(itemGroups.get(i).brightness);
+                sceneActions.setColorTemperature(itemGroups.get(i).temperature);
+                sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
+                DBUtils.saveSceneActions(sceneActions);
+            }
 
-        try {
-            Thread.sleep(100);
-            addScene(idAction);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            try {
+                Thread.sleep(200);
+                addScene(idAction);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }finally {
+                hideLodingDialog();
+                finish();
+            }
+        }).start();
     }
 
-//    private void showSaveDialog() {
-//        AlertDialog dialog;
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("");
-//        builder.setMessage(R.string.tip_save_dialog_all);
-//        builder.setPositiveButton(R.string.btn_sure, (dialogInterface, i) -> {
-//            isSave = true;
-//            save();
-//            setResult(Constant.RESULT_OK);
-//            finish();
-//        });
-//        builder.setNegativeButton(R.string.btn_cancel, (dialogInterface, i) -> isSave = false);
-//
-//        dialog = builder.create();
-//        dialog.show();
-//    }
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;

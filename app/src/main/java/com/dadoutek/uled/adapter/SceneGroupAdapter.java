@@ -37,7 +37,8 @@ public class SceneGroupAdapter extends BaseQuickAdapter implements SeekBar.OnSee
 
     @Override
     protected void convert(BaseViewHolder helper, Object item) {
-        int position = helper.getLayoutPosition();
+        int position = helper.getAdapterPosition() ;
+        Log.d(TAG, "onProgressChanged----------------: "+position);
         SeekBar sbBrightness = helper.getView(R.id.sb_brightness);
         SeekBar sBtemperature = helper.getView(R.id.sb_temperature);
 
@@ -78,6 +79,7 @@ public class SceneGroupAdapter extends BaseQuickAdapter implements SeekBar.OnSee
 //            return;
 //        }
         int position = (int) seekBar.getTag();
+        Log.d(TAG, "onProgressChanged: "+position);
         int address = data.get(position).groupAress;
         byte opcode;
         byte[] params;
