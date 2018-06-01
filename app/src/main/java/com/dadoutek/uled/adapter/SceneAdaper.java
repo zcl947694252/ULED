@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.dadoutek.uled.model.DbModel.DbScene;
@@ -90,6 +91,6 @@ public class SceneAdaper extends BaseAdapter implements View.OnClickListener {
     public class ViewHolder {
         public TextView delete;
         public TextView sceneName;
-        public TextView apply;
+        public Button apply;
     }
 }

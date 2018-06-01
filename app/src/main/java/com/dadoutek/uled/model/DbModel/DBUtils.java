@@ -17,7 +17,6 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
-import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +76,7 @@ public class DBUtils {
     }
 
     public static DbRegion getLastRegion() {
-        List<DbRegion> list  = DaoSessionInstance.getInstance().getDbRegionDao().
+        List<DbRegion> list = DaoSessionInstance.getInstance().getDbRegionDao().
                 queryBuilder().orderDesc(DbRegionDao.Properties.Id).list();
         return list.get(0);
     }
@@ -91,7 +90,7 @@ public class DBUtils {
     public static DbGroup getGroupByMesh(String mesh) {
         DbGroup dbGroup = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().
                 where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique();
-        Log.d("datasave", "getGroupByMesh: "+mesh);
+        Log.d("datasave", "getGroupByMesh: " + mesh);
         return dbGroup;
     }
 
@@ -111,7 +110,7 @@ public class DBUtils {
         QueryBuilder<DbGroup> qb = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder();
         List<DbGroup> list = qb.where(
                 DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
-        .list();
+                .list();
 
         return list;
     }
@@ -134,23 +133,23 @@ public class DBUtils {
                 DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
                 .list();
 
-       for(int i=0;i<list.size();i++){
-           if(list.get(i).getMeshAddr()==0xffff){
-               return list.get(i);
-           }
-       }
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getMeshAddr() == 0xffff) {
+                return list.get(i);
+            }
+        }
         return null;
     }
 
-    public static List<DbScene> getSceneAll(){
+    public static List<DbScene> getSceneAll() {
         return DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
     }
 
-    public static List<DbRegion> getRegionAll(){
+    public static List<DbRegion> getRegionAll() {
         return DaoSessionInstance.getInstance().getDbRegionDao().loadAll();
     }
 
-    public static List<DbDataChange> getDataChangeAll(){
+    public static List<DbDataChange> getDataChangeAll() {
         return DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
     }
 
@@ -216,7 +215,7 @@ public class DBUtils {
 
     public static void saveLight(DbLight light) {
         //保存灯之前先把所有的灯都分配到当前的所有组去
-        DbGroup dbGroup=getGroupNull();
+        DbGroup dbGroup = getGroupNull();
         light.setBelongGroupId(dbGroup.getId());
 
         DaoSessionInstance.getInstance().getDbLightDao().save(light);
@@ -286,10 +285,10 @@ public class DBUtils {
     /********************************************删除*******************************/
 
     public static void deleteGroup(DbGroup dbGroup) {
-        List<DbLight> lights=DBUtils.getLightByGroupID(dbGroup.getId());
-        DbGroup allGroup=getGroupNull();
+        List<DbLight> lights = DBUtils.getLightByGroupID(dbGroup.getId());
+        DbGroup allGroup = getGroupNull();
 
-        for(int i=0;i<lights.size();i++){
+        for (int i = 0; i < lights.size(); i++) {
             lights.get(i).setBelongGroupId(allGroup.getId());
             updateLight(lights.get(i));
         }
@@ -316,7 +315,7 @@ public class DBUtils {
 
     public static void deleteSceneActionsList(List<DbSceneActions> sceneActionslist) {
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteInTx(sceneActionslist);
-        for(int i=0;i<sceneActionslist.size();i++){
+        for (int i = 0; i < sceneActionslist.size(); i++) {
             recordingChange(sceneActionslist.get(i).getId(),
                     DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
                     Constant.DB_DELETE);
@@ -339,6 +338,13 @@ public class DBUtils {
         if (!checkRepeat(groups, context, name)) {
             int count = groups.size();
             int newMeshAdress = ++count;
+
+            for (int k = 0; k < groups.size(); k++) {
+                if (groups.get(k).getMeshAddr() == newMeshAdress) {
+                    ++newMeshAdress;
+                    break;
+                }
+            }
             DbGroup group = new DbGroup();
             group.setName(name);
             group.setMeshAddr(0x8001 + newMeshAdress);
@@ -381,12 +387,12 @@ public class DBUtils {
         groupAllLights.setMeshAddr(0xFFFF);
         groupAllLights.setBrightness(100);
         groupAllLights.setColorTemperature(100);
-        groupAllLights.setBelongRegionId((int)SharedPreferencesUtils.getCurrentUseRegion());
+        groupAllLights.setBelongRegionId((int) SharedPreferencesUtils.getCurrentUseRegion());
         List<DbGroup> list = getGroupList();
         DaoSessionInstance.getInstance().getDbGroupDao().insert(groupAllLights);
         recordingChange(groupAllLights.getId(),
-                    DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
-                    Constant.DB_ADD);
+                DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                Constant.DB_ADD);
 //        for(int i=0;i<list.size();i++){
 //            if(list.get(i).getMeshAddr()!=0xffff){
 //                groupAllLights.setId(Long.valueOf(0));
@@ -397,40 +403,41 @@ public class DBUtils {
 
     /**
      * 记录本地数据库变化
+     *
      * @param changeIndex 变化的位置
      * @param changeTable 变化数据所属表
-     * @param operating 所执行的操作
+     * @param operating   所执行的操作
      */
-    public static void recordingChange(Long changeIndex,String changeTable,String operating){
-        List<DbDataChange> dataChangeList=DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
+    public static void recordingChange(Long changeIndex, String changeTable, String operating) {
+        List<DbDataChange> dataChangeList = DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
 
-        if(dataChangeList.size()==0){
-            saveChange(changeIndex,operating,changeTable);
+        if (dataChangeList.size() == 0) {
+            saveChange(changeIndex, operating, changeTable);
             return;
-        }else
+        } else
 
-        for(int i=0;i<dataChangeList.size();i++){
-            //首先确定是同一张表的同一条数据进行操作
-            if(dataChangeList.get(i).getTableName().equals(changeTable) &
-                    dataChangeList.get(i).getChangeId().equals(changeIndex)){
-                //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
-                if(!operating.equals(Constant.DB_DELETE)){
+            for (int i = 0; i < dataChangeList.size(); i++) {
+                //首先确定是同一张表的同一条数据进行操作
+                if (dataChangeList.get(i).getTableName().equals(changeTable) &
+                        dataChangeList.get(i).getChangeId().equals(changeIndex)) {
+                    //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
+                    if (!operating.equals(Constant.DB_DELETE)) {
                         break;
-                }else{
-                    saveChange(changeIndex,operating,changeTable);
+                    } else {
+                        saveChange(changeIndex, operating, changeTable);
+                        break;
+                    }
+                }
+                //如果数据表没有该数据直接添加
+                else if (i == dataChangeList.size() - 1) {
+                    saveChange(changeIndex, operating, changeTable);
                     break;
                 }
             }
-            //如果数据表没有该数据直接添加
-            else if(i==dataChangeList.size()-1){
-                saveChange(changeIndex,operating,changeTable);
-                break;
-            }
-        }
     }
 
-    private static void saveChange(Long changeIndex, String operating, String changeTable){
-        DbDataChange dataChange=new DbDataChange();
+    private static void saveChange(Long changeIndex, String operating, String changeTable) {
+        DbDataChange dataChange = new DbDataChange();
         dataChange.setChangeId(changeIndex);
         dataChange.setChangeType(operating);
         dataChange.setTableName(changeTable);

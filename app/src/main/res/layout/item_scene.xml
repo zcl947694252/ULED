@@ -5,22 +5,25 @@
 
     <TextView
         android:id="@+id/scene_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
         android:background="@drawable/ic_delete_black_24dp"
         android:layout_alignParentStart="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="15dp"
+        />
 
     <TextView
         android:id="@+id/scene_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="25sp"
         android:layout_centerVertical="true"
         android:layout_marginStart="10dp"
         android:layout_toStartOf="@+id/scene_apply"
         android:layout_toEndOf="@id/scene_delete" />
 
-    <TextView
+    <Button
         android:id="@+id/scene_apply"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,6 +32,5 @@
         android:text="@string/scene_apply"
         android:textColor="@color/white"
         android:textSize="18sp"
-        android:layout_marginStart="10dp"
-        android:background="@drawable/btn_rec_blue_bt" />
+        android:layout_marginEnd="15dp" />
 </RelativeLayout>
