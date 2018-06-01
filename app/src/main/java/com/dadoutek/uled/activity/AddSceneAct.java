@@ -67,7 +67,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
     private ArrayList<DbGroup> groupArrayList = new ArrayList<>();
-    private ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
+    ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
     private ArrayList<String> groupNameArrayList = new ArrayList<>();
     private List<DbGroup> groups = new ArrayList<>();
     /**
@@ -159,6 +159,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             itemGroup.gpName = showList.get(position).getName();
             changeData(position, showList);
             adapter.addData(itemGroup);
+
             dialog.dismiss();
         });
 
@@ -241,7 +242,8 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void save() {
         String name = editName.getText().toString().trim();
-        List<ItemGroup> itemGroups = adapter.getDataResult();
+//        List<ItemGroup> itemGroups = adapter.getData();
+        List<ItemGroup> itemGroups = itemGroupArrayList;
 
         DbScene dbScene = new DbScene();
         dbScene.setName(name);
