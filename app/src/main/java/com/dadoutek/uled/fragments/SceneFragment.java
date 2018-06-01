@@ -103,7 +103,6 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
 
-
     @OnClick({R.id.img_header_menu_left, R.id.img_header_menu_right})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -145,11 +144,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
                 deleteScene(position);
                 refreshData();
             } else if (v.getId() == R.id.scene_apply) {
-                try {
-                    setScene(scenesListData.get(position).getId());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                setScene(scenesListData.get(position).getId());
             }
         }
     };
@@ -160,27 +155,39 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         long id = scenesListData.get(position).getId();
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
-        for (int i = 0; i < list.size(); i++) {
-            try {
-                Thread.sleep(100);
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        new Thread(() -> {
+//            for (int i = 0; i < list.size(); i++) {
+//                try {
+//                    Thread.sleep(100);
+//                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+        }).start();
         DBUtils.deleteScene(scenesListData.get(position));
         scenesListData.remove(position);
     }
 
-    private void setScene(long id) throws InterruptedException {
-        byte opcode = (byte) Opcode.SCENE_LOAD;
+    private void setScene(long id) {
+        byte opcode = Opcode.SCENE_LOAD;
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
-        byte[] params;
-        for (int i = 0; i < list.size(); i++) {
-            Thread.sleep(100);
+        new Thread(() -> {
+            byte[] params;
             params = new byte[]{(byte) id};
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
-        }
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+//            for (int i = 0; i < list.size(); i++) {
+//
+//                try {
+//                    Thread.sleep(100);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+//            }
+        }).start();
+
     }
 
     @Override
