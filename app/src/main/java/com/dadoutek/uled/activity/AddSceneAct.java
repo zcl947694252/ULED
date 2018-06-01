@@ -216,7 +216,6 @@ public class AddSceneAct extends TelinkBaseActivity {
                 if (checked()) {
                     save();
                     setResult(Constant.RESULT_OK);
-                    finish();
                 }
                 break;
             case R.id.edit_name:
@@ -241,6 +240,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     private boolean isSave = false;
 
     private void save() {
+ 	new Thread(() -> {
         String name = editName.getText().toString().trim();
 //        List<ItemGroup> itemGroups = adapter.getData();
         List<ItemGroup> itemGroups = itemGroupArrayList;
@@ -273,25 +273,13 @@ public class AddSceneAct extends TelinkBaseActivity {
             addScene(idAction);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }finally {
+                hideLodingDialog();
+                finish();
+            }
+        }).start();
     }
 
-//    private void showSaveDialog() {
-//        AlertDialog dialog;
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("");
-//        builder.setMessage(R.string.tip_save_dialog_all);
-//        builder.setPositiveButton(R.string.btn_sure, (dialogInterface, i) -> {
-//            isSave = true;
-//            save();
-//            setResult(Constant.RESULT_OK);
-//            finish();
-//        });
-//        builder.setNegativeButton(R.string.btn_cancel, (dialogInterface, i) -> isSave = false);
-//
-//        dialog = builder.create();
-//        dialog.show();
-//    }
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;

@@ -240,6 +240,7 @@
     <string name="reconnecting">Reconnecting...</string>
     <string name="app_version_name">App version number:</string>
     <string name="group_not_change_tip">Grouping unchanged, determine exit?</string>
+    <string name="save_now">正在保存。。。</string>
     <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
     <string name="i_know">OK</string>
     <string name="exit">Exit</string>

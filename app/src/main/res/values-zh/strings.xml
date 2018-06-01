@@ -241,6 +241,7 @@
     <string name="reconnecting">重连中……</string>
     <string name="app_version_name">App版本号:</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
+    <string name="save_now">正在保存。。。</string>
     <string name="require_permission_reason" >App使用蓝牙需要此权限。</string>
     <string name="i_know">我知道了</string>
     <string name="exit">退出</string>
