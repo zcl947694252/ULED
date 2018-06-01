@@ -102,14 +102,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         unbinder.unbind();
     }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if (!hidden) {
-            initData();
-            initView();
-        }
-    }
+
 
     @OnClick({R.id.img_header_menu_left, R.id.img_header_menu_right})
     public void onViewClicked(View view) {
@@ -196,5 +189,15 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
         intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
         startActivity(intent);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            initData();
+            initView();
+        }
+
     }
 }
