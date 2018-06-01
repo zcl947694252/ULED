@@ -1,10 +1,11 @@
 package com.dadoutek.uled.activity
 
+import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
 import android.util.Log
@@ -25,6 +26,8 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.DialogUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -35,6 +38,7 @@ import com.telink.bluetooth.light.OnlineStatusNotificationParser
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
@@ -188,54 +192,63 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
      * 自动重连
      */
     private fun autoConnect() {
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {
+            if (it) {
+                //授予了权限
+                if (TelinkLightService.Instance() != null) {
 
-        if (TelinkLightService.Instance() != null) {
+                    if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
-            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                        ToastUtils.showLong(getString(R.string.connect_state))
+                        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+                        scanPb.visibility = View.VISIBLE
 
-                ToastUtils.showLong(getString(R.string.connect_state))
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
-                scanPb.visibility = View.VISIBLE
+                        if (this.mApplication!!.isEmptyMesh) {
+                            return@Consumer
+                        }
+                        this.mApplication?.refreshLights()
 
-                if (this.mApplication!!.isEmptyMesh)
-                    return
+                        val mesh = this.mApplication?.mesh
 
-                //                Lights.getInstance().clear();
-                this.mApplication?.refreshLights()
+                        if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
+                            TelinkLightService.Instance().idleMode(true)
+                            return@Consumer
+                        }
 
-                val mesh = this.mApplication?.mesh
+                        //自动重连参数
+                        val connectParams = Parameters.createAutoConnectParameters()
+                        connectParams.setMeshName(mesh?.name)
+                        connectParams.setPassword(mesh?.password)
+                        connectParams.autoEnableNotification(true)
 
-                if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-                    TelinkLightService.Instance().idleMode(true)
-                    return
+                        // 之前是否有在做MeshOTA操作，是则继续
+                        if (mesh?.isOtaProcessing == true) {
+                            connectParams.setConnectMac(mesh.otaDevice?.mac)
+                        }
+                        //自动重连
+                        Thread {
+                            TelinkLightService.Instance().autoConnect(connectParams)
+                        }.start()
+
+
+                    }
+
+                    //刷新Notify参数
+                    val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+                    refreshNotifyParams.setRefreshRepeatCount(2)
+                    refreshNotifyParams.setRefreshInterval(2000)
+                    //开启自动刷新Notify
+                    TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
                 }
-
-                //自动重连参数
-                val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(mesh?.name)
-                connectParams.setPassword(mesh?.password)
-                connectParams.autoEnableNotification(true)
-
-                // 之前是否有在做MeshOTA操作，是则继续
-                if (mesh?.isOtaProcessing == true) {
-                    connectParams.setConnectMac(mesh.otaDevice?.mac)
-                }
-                //自动重连
-                Thread {
-                    TelinkLightService.Instance().autoConnect(connectParams)
-                }.start()
-
-
+            } else {
+                //没有授予权限
+                DialogUtils.showNoBlePermissionDialog(this, { autoConnect() }, { finish() })
             }
+        })
 
-            //刷新Notify参数
-            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-            refreshNotifyParams.setRefreshRepeatCount(2)
-            refreshNotifyParams.setRefreshInterval(2000)
-            //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
-        }
     }
+
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
@@ -246,7 +259,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
             LightAdapter.STATUS_CONNECTING -> {
-                Log.d("connectting","444")
+                Log.d("connectting", "444")
                 scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -322,7 +335,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                         this, R.color.black)
             }
 
-            Log.d("connectting","333")
+            Log.d("connectting", "333")
 
             currentLight!!.updateIcon()
         }

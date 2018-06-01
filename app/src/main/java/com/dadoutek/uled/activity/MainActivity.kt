@@ -1,7 +1,6 @@
 package com.dadoutek.uled.activity
 
 import android.Manifest
-import android.app.AlertDialog
 import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
@@ -14,6 +13,7 @@ import android.os.Handler
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
@@ -34,6 +34,7 @@ import com.dadoutek.uled.fragments.MeFragment
 import com.dadoutek.uled.fragments.SceneFragment
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
@@ -297,56 +298,65 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      * 自动重连
      */
     private fun autoConnect() {
-        if (TelinkLightService.Instance() != null) {
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {
+            if (it) {
+                //授予了权限
+                if (TelinkLightService.Instance() != null) {
 
-            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                    if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
 //                ToastUtils.showLong(getString(R.string.connect_state))
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+                        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                if (this.mApplication!!.isEmptyMesh)
-                    return
+                        if (this.mApplication!!.isEmptyMesh)
+                            return@Consumer
 
-                //                Lights.getInstance().clear();
-                this.mApplication!!.refreshLights()
+                        //                Lights.getInstance().clear();
+                        this.mApplication!!.refreshLights()
 
 
-                this.deviceFragment.notifyDataSetChanged()
+                        this.deviceFragment.notifyDataSetChanged()
 
-                val mesh = this.mApplication!!.mesh
+                        val mesh = this.mApplication!!.mesh
 
-                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
-                    TelinkLightService.Instance().idleMode(true)
-                    return
+                        if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
+                            TelinkLightService.Instance().idleMode(true)
+                            return@Consumer
+                        }
+
+                        //自动重连参数
+                        val connectParams = Parameters.createAutoConnectParameters()
+                        connectParams.setMeshName(mesh.name)
+                        connectParams.setPassword(mesh.password)
+                        connectParams.autoEnableNotification(true)
+
+                        // 之前是否有在做MeshOTA操作，是则继续
+                        if (mesh.isOtaProcessing) {
+                            connectParams.setConnectMac(mesh.otaDevice.mac)
+                            saveLog("Action: AutoConnect:" + mesh.otaDevice.mac)
+                        } else {
+                            saveLog("Action: AutoConnect:NULL")
+                        }
+                        //自动重连
+                        TelinkLightService.Instance().autoConnect(connectParams)
+                        startConnectTimer();
+
+
+                    }
+
+                    //刷新Notify参数
+                    val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+                    refreshNotifyParams.setRefreshRepeatCount(2)
+                    refreshNotifyParams.setRefreshInterval(2000)
+                    //开启自动刷新Notify
+                    TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
                 }
-
-                //自动重连参数
-                val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(mesh.name)
-                connectParams.setPassword(mesh.password)
-                connectParams.autoEnableNotification(true)
-
-                // 之前是否有在做MeshOTA操作，是则继续
-                if (mesh.isOtaProcessing) {
-                    connectParams.setConnectMac(mesh.otaDevice.mac)
-                    saveLog("Action: AutoConnect:" + mesh.otaDevice.mac)
-                } else {
-                    saveLog("Action: AutoConnect:NULL")
-                }
-                //自动重连
-                TelinkLightService.Instance().autoConnect(connectParams)
-                startConnectTimer();
-
-
+            } else {
+                //没有授予权限
+                DialogUtils.showNoBlePermissionDialog(this, { autoConnect() }, { finish() })
             }
-
-            //刷新Notify参数
-            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-            refreshNotifyParams.setRefreshRepeatCount(2)
-            refreshNotifyParams.setRefreshInterval(2000)
-            //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
-        }
+        })
     }
 
 /*

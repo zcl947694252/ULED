@@ -50,6 +50,7 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
@@ -802,12 +803,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         lightNumLayout.setVisibility(View.GONE);
 
-        if(groups.size()>1){
-            groups.get(groups.size()-1).checked=true;
-            currentGroupIndex=groups.size()-1;
+        if (groups.size() > 1) {
+            groups.get(groups.size() - 1).checked = true;
+            currentGroupIndex = groups.size() - 1;
             SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-        }else{
+        } else {
             currentGroupIndex = -1;
         }
     }
@@ -1194,17 +1195,16 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                         }, delay);
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                            }
+                        new Thread(() -> {
                         }).start();
                     } else {
-                        AlertDialog.Builder dialog = new AlertDialog.Builder(DeviceScanningNewActivity.this);
-                        dialog.setMessage(getResources().getString(R.string.scan_tip));
-                        dialog.setPositiveButton(R.string.btn_ok, (dialog1, which) -> startScan(0));
-                        dialog.setNegativeButton(R.string.btn_cancel, (dialog12, which) -> System.exit(0));
+                        DialogUtils.INSTANCE.showNoBlePermissionDialog(this, () -> {
+                            startScan(0);
+                            return null;
+                        }, () -> {
+                            finish();
+                            return null;
+                        });
                     }
                 }));
 
