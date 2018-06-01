@@ -220,7 +220,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         temperatureBar.setProgress(light.getColorTemperature());
         tvTemperature.setText(getString(R.string.device_setting_temperature, light.getColorTemperature() + ""));
 
-        sendInitCmd(light.getBrightness(),light.getColorTemperature());
+//        sendInitCmd(light.getBrightness(),light.getColorTemperature());
 
         this.brightnessBar.setOnSeekBarChangeListener(this.barChangeListener);
         this.temperatureBar.setOnSeekBarChangeListener(this.barChangeListener);

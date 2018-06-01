@@ -99,6 +99,7 @@ public final class GroupSettingFragment extends Fragment {
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
             } else if (view == temperatureBar) {
+
                 opcode = (byte) Opcode.SET_TEMPERATURE;
                 params = new byte[]{0x05, (byte) progress};
                 group.setColorTemperature(progress);
@@ -166,11 +167,8 @@ public final class GroupSettingFragment extends Fragment {
         this.brightnessBar = (SeekBar) view.findViewById(R.id.sb_brightness);
         this.temperatureBar = (SeekBar) view.findViewById(R.id.sb_temperature);
 
-        this.brightnessBar.setOnSeekBarChangeListener(this.barChangeListener);
-        this.temperatureBar.setOnSeekBarChangeListener(this.barChangeListener);
 
         this.colorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
-        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
 
         unbinder = ButterKnife.bind(this, view);
         return view;
@@ -192,6 +190,11 @@ public final class GroupSettingFragment extends Fragment {
         tvBrightness.setText(getString(R.string.device_setting_brightness, group.getBrightness() + ""));
         temperatureBar.setProgress(group.getColorTemperature());
         tvTemperature.setText(getString(R.string.device_setting_temperature, group.getColorTemperature() + ""));
+
+
+        this.brightnessBar.setOnSeekBarChangeListener(this.barChangeListener);
+        this.temperatureBar.setOnSeekBarChangeListener(this.barChangeListener);
+        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
     }
 
     @Override
