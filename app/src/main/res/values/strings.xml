@@ -154,7 +154,7 @@
     <string name="connect_failed">Connect failed</string>
     <string name="group_failed">Group failed</string>
     <string name="connected">Connected</string>
-    <string name="SceneSetting">Scene settings</string>
+    <string name="SceneSetting">Scene</string>
     <string name="scene_apply">apply</string>
     <string name="creat_scene">Create a scene</string>
     <string name="tv_scene_name">Scene name:</string>
@@ -245,5 +245,6 @@
     <string name="i_know">OK</string>
     <string name="exit">Exit</string>
     <string name="saving">Saving</string>
+    <string name="delete_name">删除</string>
 
 </resources>

@@ -151,7 +151,7 @@
     <string name="connect_failed">连接失败</string>
     <string name="group_failed">分组失败</string>
     <string name="connected">已连接</string>
-    <string name="SceneSetting">场景设置</string>
+    <string name="SceneSetting">场景</string>
     <string name="scene_apply">应用</string>
     <string name="creat_scene">创建场景</string>
     <string name="tv_scene_name">场景名：</string>
@@ -247,5 +247,6 @@
     <string name="exit">退出</string>
     <string name="saving">保存中</string>
     <string name="connect_state">连接中，请稍后…</string>
+    <string name="delete_name">删除</string>
 
 </resources>

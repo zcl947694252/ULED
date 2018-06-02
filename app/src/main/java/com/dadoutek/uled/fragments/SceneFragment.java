@@ -4,11 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -17,6 +21,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.activity.ChangeSceneAct;
+import com.dadoutek.uled.activity.MainActivity;
 import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
@@ -39,17 +44,20 @@ import butterknife.Unbinder;
 
 public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
-    @BindView(R.id.img_header_menu_right)
-    ImageView imgHeaderMenuRight;
+//    @BindView(R.id.img_header_menu_left)
+//    ImageView imgHeaderMenuLeft;
+//    @BindView(R.id.txt_header_title)
+//    TextView txtHeaderTitle;
+//    @BindView(R.id.img_header_menu_right)
+//    ImageView imgHeaderMenuRight;
     @BindView(R.id.scene_list)
     ListView sceneList;
     Unbinder unbinder;
     private LayoutInflater layoutInflater;
     private SceneAdaper adaper;
+
+    private Toolbar toolbar;
+    TextView toolbarTitle;
 
     private TelinkLightApplication telinkLightApplication;
     //    private List<Scenes> scenesListData;
@@ -67,10 +75,45 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         layoutInflater = inflater;
         View view = layoutInflater.inflate(R.layout.fragment_scene, null);
         unbinder = ButterKnife.bind(this, view);
+        toolbar= view.findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.SceneSetting);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
         initData();
         initView();
         initClick();
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        menu.clear();
+        inflater.inflate(R.menu.menu_scene, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_delete:
+                if (isDelete) {
+                    isDelete = false;
+                } else {
+                    isDelete = true;
+                }
+
+                adaper.changeState(isDelete);
+                refreshData();
+                break;
+            case R.id.menu_add:
+                if (!SharedPreferencesUtils.getConnectState(getActivity())) {
+//                    return;
+                } else {
+                    Intent intent = new Intent(getActivity(), AddSceneAct.class);
+                    startActivityForResult(intent, 0);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initClick() {
@@ -102,30 +145,6 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         unbinder.unbind();
     }
 
-
-    @OnClick({R.id.img_header_menu_left, R.id.img_header_menu_right})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.img_header_menu_left:
-                if (isDelete) {
-                    isDelete = false;
-                } else {
-                    isDelete = true;
-                }
-
-                adaper.changeState(isDelete);
-                refreshData();
-                break;
-            case R.id.img_header_menu_right:
-                if (!SharedPreferencesUtils.getConnectState(getActivity())) {
-                    return;
-                } else {
-                    Intent intent = new Intent(getActivity(), AddSceneAct.class);
-                    startActivityForResult(intent, 0);
-                }
-                break;
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

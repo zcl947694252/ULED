@@ -91,6 +91,6 @@ public class SceneAdaper extends BaseAdapter implements View.OnClickListener {
     public class ViewHolder {
         public TextView delete;
         public TextView sceneName;
-        public Button apply;
+        public TextView apply;
     }
 }

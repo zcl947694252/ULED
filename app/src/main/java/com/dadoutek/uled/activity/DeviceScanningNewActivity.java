@@ -473,10 +473,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //                saveLightAddrToGroup(light);
                 try {
                     //每个灯发3次分组的命令，确保灯能收到命令.
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < 5; i++) {
                         sendGroupData(light, group, index);
 
-                        Thread.sleep(300);
+                        Thread.sleep(350);
 
                     }
                 } catch (InterruptedException e) {
@@ -592,6 +592,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     //分组页面调整
     private void changeGroupView() {
         grouping = true;
+        deviceListView.setOnItemClickListener(this);
         deviceListView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         btnAddGroups.setVisibility(View.VISIBLE);
@@ -753,7 +754,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void initClick() {
         this.btnScan.setOnClickListener(this.clickListener);
         this.btnLog.setOnClickListener(this.clickListener);
-        deviceListView.setOnItemClickListener(this);
     }
 
     private View.OnClickListener clickListener = new View.OnClickListener() {

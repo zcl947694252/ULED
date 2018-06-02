@@ -211,10 +211,12 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        if (fromWhere != null && !fromWhere.isEmpty() && gpAddress == 0xffff) {
-//            remove.setVisibility(View.GONE);
-            btnRename.setVisibility(View.GONE);
-        }
+//        if (fromWhere != null && !fromWhere.isEmpty() && gpAddress == 0xffff) {
+////            remove.setVisibility(View.GONE);
+//            btnRename.setVisibility(View.GONE);
+//        }
+
+        btnRename.setVisibility(View.GONE);
         brightnessBar.setProgress(light.getBrightness());
         tvBrightness.setText(getString(R.string.device_setting_brightness, light.getBrightness() + ""));
         temperatureBar.setProgress(light.getColorTemperature());
