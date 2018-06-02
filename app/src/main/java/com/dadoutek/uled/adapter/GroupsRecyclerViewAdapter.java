@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
 
@@ -70,11 +70,16 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
             holder.groupImage.setImageResource(R.drawable.ic_group_white_48dp);
         }
 
-        if (mGroupList.get(position).getMeshAddr() == 0xffff) {
-            RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+        RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+        if (position == 0 && mGroupList.get(position).getMeshAddr() == 0xffff) {
             holder.itemView.setVisibility(View.GONE);
             param.height = 0;
             param.width = 0;
+            holder.itemView.setLayoutParams(param);
+        } else {
+            holder.itemView.setVisibility(View.VISIBLE);
+            param.width = RecyclerView.LayoutParams.WRAP_CONTENT;
+            param.height = RecyclerView.LayoutParams.WRAP_CONTENT;
             holder.itemView.setLayoutParams(param);
         }
 
@@ -87,6 +92,11 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
     @Override
     public int getItemCount() {
         return mGroupList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
     }
 
     @Override
