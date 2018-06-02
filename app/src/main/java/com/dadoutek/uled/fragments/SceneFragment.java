@@ -42,7 +42,8 @@ import butterknife.Unbinder;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener,
+        Toolbar.OnMenuItemClickListener {
 
 //    @BindView(R.id.img_header_menu_left)
 //    ImageView imgHeaderMenuLeft;
@@ -77,43 +78,14 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         unbinder = ButterKnife.bind(this, view);
         toolbar= view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.SceneSetting);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.menu_scene);
+        toolbar.setOnMenuItemClickListener(this);
         setHasOptionsMenu(true);
         initData();
         initView();
         initClick();
         return view;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        menu.clear();
-        inflater.inflate(R.menu.menu_scene, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.menu_delete:
-                if (isDelete) {
-                    isDelete = false;
-                } else {
-                    isDelete = true;
-                }
-
-                adaper.changeState(isDelete);
-                refreshData();
-                break;
-            case R.id.menu_add:
-                if (!SharedPreferencesUtils.getConnectState(getActivity())) {
-//                    return;
-                } else {
-                    Intent intent = new Intent(getActivity(), AddSceneAct.class);
-                    startActivityForResult(intent, 0);
-                }
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void initClick() {
@@ -225,5 +197,30 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
             initView();
         }
 
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_delete:
+                if (isDelete) {
+                    isDelete = false;
+                } else {
+                    isDelete = true;
+                }
+
+                adaper.changeState(isDelete);
+                refreshData();
+                break;
+            case R.id.menu_add:
+                if (!SharedPreferencesUtils.getConnectState(getActivity())) {
+//                    return;
+                } else {
+                    Intent intent = new Intent(getActivity(), AddSceneAct.class);
+                    startActivityForResult(intent, 0);
+                }
+                break;
+        }
+        return false;
     }
 }

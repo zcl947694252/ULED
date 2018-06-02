@@ -37,7 +37,7 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class GroupListFragment extends Fragment {
+public final class GroupListFragment extends Fragment implements Toolbar.OnMenuItemClickListener{
 
     private LayoutInflater inflater;
     private GroupListAdapter adapter;
@@ -47,6 +47,7 @@ public final class GroupListFragment extends Fragment {
     private DataManager dataManager;
     private List<DbGroup> gpList;
     private TelinkLightApplication application;
+    private Toolbar toolbar;
 
     private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
 
@@ -105,15 +106,31 @@ public final class GroupListFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_group_list, null);
 
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.group_list_header);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        toolbar.inflateMenu(R.menu.men_group);
+        toolbar.setOnMenuItemClickListener(this);
+        if(SharedPreferencesUtils.isDeveloperModel()){
+            toolbar.getMenu().findItem(R.id.menu_setting).setVisible(true);
+        }else{
+            toolbar.getMenu().findItem(R.id.menu_setting).setVisible(false);
+        }
+
+        setHasOptionsMenu(true);
 
         gridView = (GridView) view.findViewById(R.id.list_groups);
         gridView.setOnItemLongClickListener(this.itemLongClickListener);
 
         this.initData();
         return view;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        if (isVisibleToUser) {
+
+        }
     }
 
     @Override
@@ -127,22 +144,6 @@ public final class GroupListFragment extends Fragment {
         }
     }
 
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_setting:
-                Intent intent = new Intent(mContext, AddMeshActivity.class);
-                startActivity(intent);
-                break;
-
-            case R.id.menu_add:
-                TelinkLightService.Instance().idleMode(true);
-                startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
@@ -165,6 +166,22 @@ public final class GroupListFragment extends Fragment {
 
     public void notifyDataSetChanged() {
         this.adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_setting:
+                Intent intent = new Intent(mContext, AddMeshActivity.class);
+                startActivity(intent);
+                break;
+
+            case R.id.menu_add:
+                TelinkLightService.Instance().idleMode(true);
+                startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
+                break;
+        }
+        return false;
     }
 
     private static class GroupItemHolder {
