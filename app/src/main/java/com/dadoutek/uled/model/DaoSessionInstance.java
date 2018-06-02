@@ -11,22 +11,23 @@ import com.dadoutek.uled.dao.DaoSession;
  */
 
 public class DaoSessionInstance {
-    private DaoSessionInstance() {}
+    private DaoSessionInstance() {
+    }
 
-    private static DaoSession session=null;
+    private static DaoSession session = null;
 
-    public static String name=null;
+    public static String name = null;
 
     public static DaoSession getInstance() {
-        if(name==null){
-            name=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                    Constant.DB_NAME_KEY,"uled")+".db";
+        if (name == null) {
+            name = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                    Constant.DB_NAME_KEY, "uled") + ".db";
         }
 
         if (session == null) {
             //创建数据库shop.db"
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(TelinkLightApplication.getInstance()
-                    , name, null);
+            MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.getInstance()
+                    , name);
             //获取可写数据库
             SQLiteDatabase db = helper.getWritableDatabase();
             //获取数据库对象
@@ -37,7 +38,7 @@ public class DaoSessionInstance {
         return session;
     }
 
-    public static void destroySession(){
-        session=null;
+    public static void destroySession() {
+        session = null;
     }
 }

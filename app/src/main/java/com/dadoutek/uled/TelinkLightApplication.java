@@ -65,12 +65,14 @@ public final class TelinkLightApplication extends TelinkApplication {
         if(currentRegionID!=-1){
             DbRegion dbRegion= DBUtils.getCurrentRegion(currentRegionID);
 
-            String name=dbRegion.getControlMesh();
-            String pwd = dbRegion.getControlMeshPwd();
-            if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                if (FileSystem.exists(this, name + "." + pwd)) {
-                    Mesh mesh = (Mesh) FileSystem.readAsObject(this, name + "." + pwd);
-                    setupMesh(mesh);
+            if (dbRegion != null) {
+                String name = dbRegion.getControlMesh();
+                String pwd = dbRegion.getControlMeshPwd();
+                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
+                    if (FileSystem.exists(this, name + "." + pwd)) {
+                        Mesh mesh = (Mesh) FileSystem.readAsObject(this, name + "." + pwd);
+                        setupMesh(mesh);
+                    }
                 }
             }
         }
