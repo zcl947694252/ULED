@@ -644,7 +644,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             }
         }
 
-        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+//        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
