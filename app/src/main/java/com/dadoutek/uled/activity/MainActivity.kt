@@ -85,11 +85,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                 when (state) {
                     BluetoothAdapter.STATE_ON -> {
-                        Log.d(TAG, "蓝牙开启")
+                        Log.d(TAG, getString(R.string.open_blutooth))
                         TelinkLightService.Instance().idleMode(true)
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> Log.d(TAG, "蓝牙关闭")
+                    BluetoothAdapter.STATE_OFF -> Log.d(TAG, getString(R.string.close_bluetooth))
                 }
             }
         }

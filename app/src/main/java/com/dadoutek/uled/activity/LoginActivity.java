@@ -18,6 +18,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.HttpModel.AccountModel;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -159,7 +160,12 @@ public class LoginActivity extends TelinkBaseActivity {
 //        if (isFirstLauch) {
 //            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
 //        } else {
-        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        if(DBUtils.getAllLight().size()==0){
+            startActivity(new Intent(LoginActivity.this, EmptyAddActivity.class));
+//            startActivity(new Intent(LoginActivity.this, AddMeshActivity.class));
+        }else{
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+        }
 //        }
     }
 

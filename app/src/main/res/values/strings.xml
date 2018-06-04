@@ -246,5 +246,8 @@
     <string name="exit">Exit</string>
     <string name="saving">Saving</string>
     <string name="delete_name">删除</string>
+    <string name="open_blutooth">蓝牙开启</string>
+    <string name="close_bluetooth">蓝牙关闭</string>
+    <string name="empty_tip">当前还没有任何灯,点击添加</string>
 
 </resources>

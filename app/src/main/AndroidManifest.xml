@@ -152,6 +152,10 @@
         <activity
             android:name=".activity.ChangeSceneAct"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.EmptyAddActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

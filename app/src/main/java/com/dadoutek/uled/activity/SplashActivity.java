@@ -7,6 +7,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DataManager;
@@ -52,8 +53,13 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 ////            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
 //        } else {
         if (mIsLogging) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
+            if(DBUtils.getAllLight()!=null&&DBUtils.getAllLight().size()==0){
+                startActivity(new Intent(this,EmptyAddActivity.class));
+                finish();
+            }else{
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+            }
         } else {
             gotoLoginSetting(false);
         }
