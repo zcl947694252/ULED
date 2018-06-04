@@ -35,7 +35,7 @@ public class EmptyAddActivity extends TelinkBaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tip:
-                developerMode();
+//                developerMode();
                 break;
             case R.id.img_add:
                 Intent intent=new Intent(EmptyAddActivity.this,DeviceScanningNewActivity.class);

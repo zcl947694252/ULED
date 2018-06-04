@@ -251,5 +251,11 @@
     <string name="open_blutooth">蓝牙开启</string>
     <string name="close_bluetooth">蓝牙关闭</string>
     <string name="empty_tip">当前还没有任何灯,点击添加</string>
+    <string name="grouping_fail">分组失败</string>
+    <string name="add_scene_gp_tip">请添加需要应用到该场景的分组！</string>
+    <string name="group_fail_tip">目前有灯分组失败，请检查或重试！</string>
+    <string name="one_click_reset">一键恢复出厂设置</string>
+    <string name="disconected">未连接</string>
+    <string name="reset_all_now">正在恢复出厂设置</string>
 
 </resources>

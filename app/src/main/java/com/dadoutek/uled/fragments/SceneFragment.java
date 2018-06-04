@@ -181,12 +181,13 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
 
     }
 
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         DbScene scene = scenesListData.get(position);
         Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
         intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
-        startActivity(intent);
+        startActivityForResult(intent,0);
     }
 
     @Override

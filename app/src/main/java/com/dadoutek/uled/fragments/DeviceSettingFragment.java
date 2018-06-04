@@ -20,6 +20,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.RenameLightActivity;
+import com.dadoutek.uled.intf.NetworkFactory;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -316,10 +317,19 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                     return;
                 }
 
+                String account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.DB_NAME_KEY,"dadou");
+
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 connectParams.setMeshName(mesh.name);
-                connectParams.setPassword(mesh.password);
+                if(SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
+                        ,Constant.USER_TYPE,Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)){
+                    connectParams.setPassword(NetworkFactory.md5(
+                            NetworkFactory.md5(mesh.password)+account));
+                }else{
+                    connectParams.setPassword(mesh.password);
+                }
                 connectParams.autoEnableNotification(true);
 
                 // 之前是否有在做MeshOTA操作，是则继续

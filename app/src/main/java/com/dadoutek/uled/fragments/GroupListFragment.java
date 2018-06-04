@@ -112,7 +112,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
         toolbar.inflateMenu(R.menu.men_group);
         toolbar.setOnMenuItemClickListener(this);
         if(SharedPreferencesUtils.isDeveloperModel()){
-            toolbar.getMenu().findItem(R.id.menu_setting).setVisible(true);
+            toolbar.getMenu().findItem(R.id.menu_setting).setVisible(false);
         }else{
             toolbar.getMenu().findItem(R.id.menu_setting).setVisible(false);
         }
@@ -133,16 +133,16 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
-        if(SharedPreferencesUtils.isDeveloperModel()){
-            menu.findItem(R.id.menu_setting).setVisible(true);
-        }else{
-            menu.findItem(R.id.menu_setting).setVisible(false);
-        }
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
+//        if(SharedPreferencesUtils.isDeveloperModel()){
+//            menu.findItem(R.id.menu_setting).setVisible(true);
+//        }else{
+//            menu.findItem(R.id.menu_setting).setVisible(false);
+//        }
+//    }
 
 
     @Override

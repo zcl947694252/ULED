@@ -59,6 +59,17 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/one_click_reset"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:textSize="18sp"
+        android:text="@string/one_click_reset"
+        android:background="@color/primary"
+        android:visibility="visible"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/one_click_backup"
         android:layout_marginTop="20dp"
         android:text="@string/One_click_backup"

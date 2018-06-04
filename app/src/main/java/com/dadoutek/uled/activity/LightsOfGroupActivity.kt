@@ -18,6 +18,7 @@ import com.dadoutek.uled.TelinkBaseActivity
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.adapter.LightsOfGroupRecyclerViewAdapter
+import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -216,10 +217,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                             return@Consumer
                         }
 
+                        val account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                Constant.DB_NAME_KEY,"dadou")
                         //自动重连参数
                         val connectParams = Parameters.createAutoConnectParameters()
                         connectParams.setMeshName(mesh?.name)
-                        connectParams.setPassword(mesh?.password)
+                        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+                            connectParams.setPassword(NetworkFactory.md5(
+                                    NetworkFactory.md5(mesh?.password) + account))
+                        } else {
+                            connectParams.setPassword(mesh?.password)
+                        }
                         connectParams.autoEnableNotification(true)
 
                         // 之前是否有在做MeshOTA操作，是则继续

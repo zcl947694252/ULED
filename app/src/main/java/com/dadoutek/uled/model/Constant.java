@@ -69,4 +69,12 @@ public class Constant implements Serializable {
     public static String DB_DELETE="DB_DELETE";
     //用于标记数据库改变修改
     public static String DB_UPDATE="DB_UPDATE";
+    //用户类型
+    public static String USER_TYPE="USER_TYPE";
+    //用户类型老用户
+    public static String USER_TYPE_OLD="OLD_USER";
+    //用户类型新用户
+    public static String USER_TYPE_NEW="NEW_USER";
+    //用户类型新用户
+    public static int CTROL_PASSWORD_REGION=1000000000;
 }

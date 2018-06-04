@@ -4,9 +4,10 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.Utils;
+import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
-import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
@@ -59,20 +60,22 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.doInit();
         //AES.Security = true;
 
-        long currentRegionID= SharedPreferencesUtils.getCurrentUseRegion();
+        long currentRegionID = SharedPreferencesUtils.getCurrentUseRegion();
 
 
-        if(currentRegionID!=-1){
-            DbRegion dbRegion= DBUtils.getCurrentRegion(currentRegionID);
+        if (currentRegionID != -1) {
+            DbRegion dbRegion = DBUtils.getCurrentRegion(currentRegionID);
 
             if (dbRegion != null) {
                 String name = dbRegion.getControlMesh();
                 String pwd = dbRegion.getControlMeshPwd();
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                    if (FileSystem.exists(this, name + "." + pwd)) {
-                        Mesh mesh = (Mesh) FileSystem.readAsObject(this, name + "." + pwd);
-                        setupMesh(mesh);
-                    }
+                    mesh = new Mesh();
+                    mesh.name = name;
+                    mesh.password = pwd;
+                    mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME;
+                    mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD;
+                    setupMesh(mesh);
                 }
             }
         }

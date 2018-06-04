@@ -32,6 +32,7 @@ import com.dadoutek.uled.fragments.DeviceListFragment
 import com.dadoutek.uled.fragments.GroupListFragment
 import com.dadoutek.uled.fragments.MeFragment
 import com.dadoutek.uled.fragments.SceneFragment
+import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DialogUtils
@@ -324,11 +325,17 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                             TelinkLightService.Instance().idleMode(true)
                             return@Consumer
                         }
-
+                        val account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                Constant.DB_NAME_KEY,"dadou")
                         //自动重连参数
                         val connectParams = Parameters.createAutoConnectParameters()
-                        connectParams.setMeshName(mesh.name)
-                        connectParams.setPassword(mesh.password)
+                        connectParams.setMeshName(mesh?.name)
+                        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+                            connectParams.setPassword(NetworkFactory.md5(
+                                    NetworkFactory.md5(mesh?.password) + account))
+                        } else {
+                            connectParams.setPassword(mesh?.password)
+                        }
                         connectParams.autoEnableNotification(true)
 
                         // 之前是否有在做MeshOTA操作，是则继续

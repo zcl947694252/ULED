@@ -14,6 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import java.util.*
 
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
@@ -41,7 +42,7 @@ object AccountModel {
                 .doOnNext {
                     setIsLogin(true)
                     initDatBase(it)
-                    setupMesh(phone)
+                    setupMesh(account)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -130,7 +131,7 @@ object AccountModel {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, isLogin)
     }
 
-    private fun setupMesh(phone: String) {
+    private fun setupMesh(account: String) {
 
         val regionList = DBUtils.getRegionAll()
 
@@ -144,7 +145,7 @@ object AccountModel {
             mesh.password = dbRegion.controlMeshPwd
             mesh.factoryName = dbRegion.installMesh
             mesh.password = dbRegion.installMeshPwd
-            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+//            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
             application.setupMesh(mesh)
             return
         }
@@ -157,20 +158,24 @@ object AccountModel {
             //                Mesh mesh = (Mesh) FileSystem.readAsObject(this, name + "." + pwd);
             val application = getApplication() as TelinkLightApplication
             val mesh = application.mesh
-            mesh.name = phone
-            mesh.password = Constant.NEW_MESH_PASSWORD
+            mesh.name = account
+            mesh.password = Random().nextInt(Constant.CTROL_PASSWORD_REGION).toString()
             mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
-            mesh.password = Constant.DEFAULT_MESH_FACTORY_PASSWORD
-            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+            mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
+//            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
             application.setupMesh(mesh)
 //            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(), phone)
 //            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(), Constant.NEW_MESH_PASSWORD)
             saveToDataBase(mesh.factoryName, mesh.password, mesh.name, mesh.password)
+            SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                    Constant.USER_TYPE,Constant.USER_TYPE_NEW)
         }else{
             saveToDataBase(Constant.DEFAULT_MESH_FACTORY_NAME, Constant.DEFAULT_MESH_FACTORY_PASSWORD,name, pwd)
             oldDataConvertToNewData(name,pwd)
             SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(),null)
             SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(),null)
+            SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                    Constant.USER_TYPE,Constant.USER_TYPE_OLD)
         }
     }
 
@@ -190,7 +195,7 @@ object AccountModel {
         mesh.password = dbRegio.controlMeshPwd
         mesh.factoryName = dbRegio.installMesh
         mesh.password = dbRegio.installMeshPwd
-        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+//        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
         application.setupMesh(mesh)
 
 //        DBUtils.createAllLightControllerGroup()
