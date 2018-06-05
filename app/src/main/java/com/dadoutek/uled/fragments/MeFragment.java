@@ -220,7 +220,7 @@ public class MeFragment extends Fragment {
                         try {
                             byte opcode = (byte) Opcode.KICK_OUT;
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                            Thread.sleep(400);
+                            Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }finally {
@@ -282,21 +282,69 @@ public class MeFragment extends Fragment {
         switch (tableName) {
             case "DB_GROUPS":
                 DbGroup group = DBUtils.getGroupByID(changeId);
+                switch (type){
+                    case Constant.DB_ADD:
+                        break;
+                    case Constant.DB_DELETE:
+                        break;
+                    case Constant.DB_UPDATE:
+                        break;
+                }
                 break;
             case "DB_LIGHT":
                 DbLight light = DBUtils.getLightByID(changeId);
+                switch (type){
+                    case Constant.DB_ADD:
+                        break;
+                    case Constant.DB_DELETE:
+                        break;
+                    case Constant.DB_UPDATE:
+                        break;
+                }
                 break;
             case "DB_REGION":
                 DbRegion region = DBUtils.getRegionByID(changeId);
+                switch (type){
+                    case Constant.DB_ADD:
+                        break;
+                    case Constant.DB_DELETE:
+                        break;
+                    case Constant.DB_UPDATE:
+                        break;
+                }
                 break;
             case "DB_SCENE":
                 DbScene scene = DBUtils.getSceneByID(changeId);
+                switch (type){
+                    case Constant.DB_ADD:
+                        break;
+                    case Constant.DB_DELETE:
+                        break;
+                    case Constant.DB_UPDATE:
+                        break;
+                }
                 break;
             case "DB_SCENE_ACTIONS":
                 DbSceneActions actions = DBUtils.getSceneActionsByID(changeId);
+                switch (type){
+                    case Constant.DB_ADD:
+                        break;
+                    case Constant.DB_DELETE:
+                        break;
+                    case Constant.DB_UPDATE:
+                        break;
+                }
                 break;
             case "DB_USER":
                 DbUser user = DBUtils.getUserByID(changeId);
+                switch (type){
+                    case Constant.DB_ADD:
+                        break;
+                    case Constant.DB_DELETE:
+                        break;
+                    case Constant.DB_UPDATE:
+                        break;
+                }
                 break;
         }
     }

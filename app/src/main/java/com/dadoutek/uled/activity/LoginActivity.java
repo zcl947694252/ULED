@@ -163,6 +163,7 @@ public class LoginActivity extends TelinkBaseActivity {
         if(DBUtils.getAllLight().size()==0){
             startActivity(new Intent(LoginActivity.this, EmptyAddActivity.class));
 //            startActivity(new Intent(LoginActivity.this, AddMeshActivity.class));
+            finish();
         }else{
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }

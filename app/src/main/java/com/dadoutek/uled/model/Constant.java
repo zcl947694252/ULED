@@ -64,11 +64,11 @@ public class Constant implements Serializable {
     public static String IS_DEVELOPER_MODE="IS_DEVELOPER_MODE";
 
     //用于标记数据库改变增加
-    public static String DB_ADD="DB_ADD";
+    public static final String DB_ADD="DB_ADD";
     //用于标记数据库改变删除
-    public static String DB_DELETE="DB_DELETE";
+    public static final String DB_DELETE="DB_DELETE";
     //用于标记数据库改变修改
-    public static String DB_UPDATE="DB_UPDATE";
+    public static final String DB_UPDATE="DB_UPDATE";
     //用户类型
     public static String USER_TYPE="USER_TYPE";
     //用户类型老用户

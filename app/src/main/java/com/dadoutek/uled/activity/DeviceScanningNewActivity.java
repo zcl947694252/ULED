@@ -544,10 +544,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     public void onBackPressed() {
 //        super.onBackPressed();
         if (grouping) {
+            startActivity(new Intent(DeviceScanningNewActivity.this,MainActivity.class));
             finish();
         } else {
             new AlertDialog.Builder(this)
                     .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+                        startActivity(new Intent(DeviceScanningNewActivity.this,MainActivity.class));
                         finish();
                     })
                     .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {

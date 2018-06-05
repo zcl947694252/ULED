@@ -177,6 +177,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             progressBar?.visibility = View.VISIBLE
             mConnectingSnackbar = null      //只有当为空时进入connecting才会显示
             this.autoConnect()
+        }else{
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),Constant.CONNECT_STATE_SUCCESS_KEY,true);
         }
     }
 
