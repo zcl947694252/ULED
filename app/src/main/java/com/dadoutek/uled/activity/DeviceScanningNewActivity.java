@@ -841,15 +841,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         groupingCompleted.setVisibility(View.GONE);
 
         lightNumLayout.setVisibility(View.GONE);
-
-        if (groups.size() > 1) {
-            groups.get(groups.size() - 1).checked = true;
-            currentGroupIndex = groups.size() - 1;
-            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
-                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-        } else {
-            currentGroupIndex = -1;
-        }
     }
 
     private void initToolbar() {
@@ -877,6 +868,21 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (groups == null) {
             groups = new ArrayList<>();
             groups.addAll(DBUtils.getGroupList());
+        }
+
+        if(groups.size()>1){
+            for(int i=0;i<groups.size();i++){
+                if(i==groups.size()-1){
+                    groups.get(i).checked = true;
+                    currentGroupIndex = i;
+                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                }else{
+                    groups.get(i).checked = false;
+                }
+            }
+        }else{
+            currentGroupIndex = -1;
         }
     }
 

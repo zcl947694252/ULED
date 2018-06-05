@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -165,10 +166,22 @@ public class MeFragment extends Fragment {
                 syncDataStep1();
                 break;
             case R.id.one_click_reset:
-                resetAllLight();
+                showSureResetDialog();
                 break;
         }
 
+    }
+
+    private void showSureResetDialog() {
+        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.tip_reset_sure);
+        builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
+        });
+        builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+            resetAllLight();
+        });
+        AlertDialog dialog=builder.create();
+        dialog.show();
     }
 
     private void resetAllLight() {
@@ -184,6 +197,12 @@ public class MeFragment extends Fragment {
 
             for(int i=0;i<list.size();i++){
                 lightList.addAll(DBUtils.getLightByGroupID(list.get(i).getId()));
+            }
+
+            if(lightList.size()==0){
+                hideLoadingDialog();
+                ToastUtils.showLong(R.string.reset_fail_tip1);
+                return;
             }
 
             int index1=0;

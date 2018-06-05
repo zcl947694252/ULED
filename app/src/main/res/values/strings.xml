@@ -255,5 +255,7 @@
     <string name="one_click_reset">一键恢复出厂设置</string>
     <string name="disconected">未连接</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
+    <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
+    <string name="tip_reset_sure">是否确定所有灯恢复出厂设置？</string>
 
 </resources>
