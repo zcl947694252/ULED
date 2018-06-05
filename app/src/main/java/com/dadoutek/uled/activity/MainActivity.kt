@@ -10,14 +10,12 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
-import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import butterknife.ButterKnife
@@ -325,12 +323,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                             TelinkLightService.Instance().idleMode(true)
                             return@Consumer
                         }
-                        val account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                Constant.DB_NAME_KEY,"dadou")
+                        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                Constant.DB_NAME_KEY, "dadou")
                         //自动重连参数
                         val connectParams = Parameters.createAutoConnectParameters()
                         connectParams.setMeshName(mesh?.name)
-                        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+                        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
                             connectParams.setPassword(NetworkFactory.md5(
                                     NetworkFactory.md5(mesh?.password) + account))
                         } else {
