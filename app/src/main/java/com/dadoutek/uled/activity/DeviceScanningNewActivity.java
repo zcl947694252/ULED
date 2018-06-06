@@ -479,11 +479,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     //每个灯发3次分组的命令，确保灯能收到命令.
                     for (int i = 0; i < 10; i++) {
                         sendGroupData(light, group, index);
-                        Thread.sleep(400);
+                        Thread.sleep(500);
 //                        getDeviceGroup(light);
 //                        Thread.sleep(200);
 
                         if (groupingSuccess) {
+//                            sendGroupData(light, group, index);
                             groupingSuccess = false;
                             break;
                         } else if (groupingSuccess == false && i == 9) {

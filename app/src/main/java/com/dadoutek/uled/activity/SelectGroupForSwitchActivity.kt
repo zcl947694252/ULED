@@ -13,9 +13,12 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.adapter.SelectSwitchGroupRvAdapter
+import com.dadoutek.uled.intf.NetworkFactory
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.DataManager
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -155,7 +158,15 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        params.setNewPassword(mesh.password)
+        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou")
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+            params.setNewPassword(NetworkFactory.md5(
+                    NetworkFactory.md5(mesh?.password) + account))
+        } else {
+            params.setNewPassword(mesh?.password)
+        }
 
         params.setUpdateDeviceList(mDeviceInfo)
         val groupAddress = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
@@ -172,13 +183,29 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        params.setNewPassword(mesh.password)
+        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou")
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+            params.setNewPassword(NetworkFactory.md5(
+                    NetworkFactory.md5(mesh?.password) + account))
+        } else {
+            params.setNewPassword(mesh?.password)
+        }
 
         params.setUpdateDeviceList(mDeviceInfo)
 //        TelinkLightService.Instance().updateMesh(params)
 
+
         val meshName = Strings.stringToBytes(mesh.name, 16)
-        val password = Strings.stringToBytes(mesh.password, 16)
+        var password = Strings.stringToBytes(mesh.password, 16)
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+             password = Strings.stringToBytes(NetworkFactory.md5(
+                     NetworkFactory.md5(mesh?.password) + account), 16)
+        } else {
+            password = Strings.stringToBytes(mesh.password, 16)
+        }
 
         TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
         TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)

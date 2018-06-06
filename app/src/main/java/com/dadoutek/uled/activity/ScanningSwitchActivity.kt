@@ -10,8 +10,10 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
+import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
@@ -275,7 +277,15 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        params.setNewPassword(mesh.password)
+        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou")
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+            params.setNewPassword(NetworkFactory.md5(
+                    NetworkFactory.md5(mesh?.password) + account))
+        } else {
+            params.setNewPassword(mesh?.password)
+        }
 
 
 //        mDeviceInfo.meshAddress = meshAddress
