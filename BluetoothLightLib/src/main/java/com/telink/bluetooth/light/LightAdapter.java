@@ -1298,10 +1298,12 @@ public class LightAdapter {
                 case LightController.LightEvent.DELETE_SUCCESS:
                     setStatus(STATUS_DELETE_COMPLETED);
                     setMode(MODE_IDLE);
+                    Log.d("kkkkkk", "performed: "+"11111");
                     break;
                 case LightController.LightEvent.DELETE_FAILURE:
                     setStatus(STATUS_DELETE_FAILURE);
                     setMode(MODE_IDLE);
+                    Log.d("kkkkkk", "performed: "+"222222");
                     break;
             }
         }

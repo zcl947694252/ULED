@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -217,8 +218,12 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
                 if (!SharedPreferencesUtils.getConnectState(getActivity())) {
 //                    return;
                 } else {
-                    Intent intent = new Intent(getActivity(), AddSceneAct.class);
-                    startActivityForResult(intent, 0);
+                    if(scenesListData.size()>=16){
+                        ToastUtils.showLong(R.string.scene_16_tip);
+                    }else{
+                        Intent intent = new Intent(getActivity(), AddSceneAct.class);
+                        startActivityForResult(intent, 0);
+                    }
                 }
                 break;
         }

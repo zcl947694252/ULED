@@ -299,6 +299,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      * 自动重连
      */
     private fun autoConnect() {
+
+        if(SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)){
+            return
+        }
+
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {
             if (it) {
@@ -529,8 +534,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                             R.color.black)
                 }
 
-                lights.add(light)
                 light.updateIcon()
+                lights.add(light)
+
+                SharedPreferencesHelper.putObject(this,Constant.LIGHT_STATE_KEY,lights)
             }
 
         }

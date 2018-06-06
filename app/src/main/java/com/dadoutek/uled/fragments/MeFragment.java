@@ -11,9 +11,11 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,8 +40,16 @@ import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
+import com.telink.bluetooth.event.DeviceEvent;
+import com.telink.bluetooth.event.LeScanEvent;
+import com.telink.bluetooth.event.MeshEvent;
+import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
+import com.telink.bluetooth.light.OnlineStatusNotificationParser;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +64,7 @@ import butterknife.Unbinder;
  * Created by hejiajun on 2018/4/16.
  */
 
-public class MeFragment extends Fragment {
+public class MeFragment extends Fragment implements EventListener<String> {
 
     @BindView(R.id.txt_header_title)
     TextView txtHeaderTitle;
@@ -80,10 +90,16 @@ public class MeFragment extends Fragment {
     private DbDataChange dbDataChange;
     private List<DbDataChange> dbDataChangeList;
     private Dialog loadDialog;
+    private TelinkLightApplication mApplication;
+    private DbLight currentLight;
+    private boolean isDeleteSuccess=false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.mApplication = (TelinkLightApplication) getActivity().getApplication();
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
+        this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
     }
 
     @Nullable
@@ -186,6 +202,7 @@ public class MeFragment extends Fragment {
 
     private void resetAllLight() {
         showLoadingDialog(getString(R.string.reset_all_now));
+        SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,true);
         new Thread(() -> {
             List<DbGroup> list = DBUtils.getGroupList();
             List<DbLight> lightList=new ArrayList<>();
@@ -218,16 +235,24 @@ public class MeFragment extends Fragment {
             for(int j=lightList.size()-1;j>=0;j--){
                 if(deviceInfo!=null){
                         try {
+                            if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+                                ToastUtils.showLong(R.string.error_disconnect_tip);
+                                SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,false);
+                                break;
+                            }
+
+                            Thread.sleep(550);
                             byte opcode = (byte) Opcode.KICK_OUT;
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                            Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }finally {
-                            DBUtils.deleteLight(lightList.get(j));
-                            if(j==0){
-                                hideLoadingDialog();
-                            }
+                                DBUtils.deleteLight(lightList.get(j));
+                                isDeleteSuccess=false;
+                                if(j==0){
+                                    hideLoadingDialog();
+                                    SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,false);
+                                }
                         }
                 }
             }
@@ -268,6 +293,39 @@ public class MeFragment extends Fragment {
             loadDialog.dismiss();
         }
     }
+
+    /**
+     * 事件处理方法
+     *
+     * @param event
+     */
+    @Override
+    public void performed(Event<String> event) {
+        switch (event.getType()){
+            case NotificationEvent.ONLINE_STATUS:
+//                onOnlineStatusNotify((NotificationEvent)event);
+                break;
+        }
+    }
+
+//    private void onOnlineStatusNotify(NotificationEvent event) {
+////        List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList;
+//
+//        List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList =
+//                (List<OnlineStatusNotificationParser.DeviceNotificationInfo>) event.parse();
+//
+//        if (notificationInfoList.isEmpty())
+//            return;
+//
+//        for (OnlineStatusNotificationParser.DeviceNotificationInfo notificationInfo : notificationInfoList) {
+//            int  meshAddress = notificationInfo.meshAddress;
+//            if(currentLight!=null && currentLight.getMeshAddr() == meshAddress){
+//                isDeleteSuccess=true;
+//            }else{
+//                isDeleteSuccess=false;
+//            }
+//        }
+//    }
 
     private void syncDataStep1() {
         dbDataChangeList = DBUtils.getDataChangeAll();

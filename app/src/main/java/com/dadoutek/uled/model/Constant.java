@@ -77,4 +77,9 @@ public class Constant implements Serializable {
     public static String USER_TYPE_NEW="NEW_USER";
     //用户类型新用户
     public static int CTROL_PASSWORD_REGION=1000000000;
+
+    public static String LIGHT_STATE_KEY="LIGHT_STATE_KEY";
+
+    //是否在一键恢复出厂设置
+    public static String DELETEING="DELETEING";
 }

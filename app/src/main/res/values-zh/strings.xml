@@ -259,5 +259,8 @@
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
     <string name="tip_reset_sure">是否确定所有灯恢复出厂设置？</string>
+    <string name="delete_lamp_tip">有灯删除失败，请链接后重试。。。</string>
+    <string name="error_disconnect_tip">断开连接,请链接后再重试</string>
+    <string name="scene_16_tip">场景上限为16个！</string>
 
 </resources>

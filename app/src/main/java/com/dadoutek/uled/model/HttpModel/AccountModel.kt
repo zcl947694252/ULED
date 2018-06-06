@@ -159,7 +159,7 @@ object AccountModel {
             val application = getApplication() as TelinkLightApplication
             val mesh = application.mesh
             mesh.name = account
-            mesh.password = Random().nextInt(Constant.CTROL_PASSWORD_REGION).toString()
+            mesh.password = account
             mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
             mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
 //            mesh.saveOrUpdate(TelinkLightApplication.getInstance())

@@ -24,6 +24,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.Lights
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.DataManager
@@ -160,6 +161,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
             }
         } else {
             lightList = DBUtils.getLightByGroupID(group.id)
+        }
+        val lights=SharedPreferencesHelper.getObject(this,Constant.LIGHT_STATE_KEY) as Lights?
+        if(lights!=null){
+            for(j in lightList.indices){
+                for(i in lights.get().indices){
+                    if(lightList.get(j).meshAddr==lights.get(i).meshAddress){
+                        lightList.get(j).icon=lights.get(i).icon
+                        lightList.get(j).status=lights.get(i).status
+                    }
+                }
+            }
         }
     }
 

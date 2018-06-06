@@ -242,7 +242,7 @@ public class DBUtils {
     }
 
     public static void saveUser(DbUser dbUser) {
-        DaoSessionInstance.getInstance().getDbUserDao().save(dbUser);
+        DaoSessionInstance.getInstance().getDbUserDao().insertOrReplace(dbUser);
         recordingChange(dbUser.getId(),
                 DaoSessionInstance.getInstance().getDbUserDao().getTablename(),
                 Constant.DB_ADD);
