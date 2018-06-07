@@ -30,7 +30,7 @@ abstract class NetworkObserver<t>() : Observer<t> {
             ToastUtils.showShort(R.string.network_time_out)  //请求超时
         } else {
             //未知错误
-            ToastUtils.showShort(e.message)
+            ToastUtils.showShort(R.string.unknown_network_error)
         }
     }
 
