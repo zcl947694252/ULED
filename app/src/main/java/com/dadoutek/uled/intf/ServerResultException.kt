@@ -33,6 +33,10 @@ object ServerResultException {
                 //Token验证错误
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.login_timeout))
             }
+            NetworkStatusCode.BAD_GATEWAY -> {
+                //服务器异常
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.server_exception))
+            }
             else -> {
                 throw RuntimeException(TelinkLightApplication.getInstance().getString(R.string.unknown_network_error))
             }

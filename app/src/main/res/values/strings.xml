@@ -245,20 +245,21 @@
     <string name="i_know">OK</string>
     <string name="exit">Exit</string>
     <string name="saving">Saving</string>
-    <string name="delete_name">删除</string>
-    <string name="open_blutooth">蓝牙开启</string>
-    <string name="close_bluetooth">蓝牙关闭</string>
-    <string name="empty_tip">当前还没有任何灯,点击添加</string>
-    <string name="grouping_fail">分组失败</string>
-    <string name="add_scene_gp_tip">请添加需要应用到该场景的分组！</string>
-    <string name="group_fail_tip">目前有灯分组失败，请检查或重试！</string>
-    <string name="one_click_reset">一键恢复出厂设置</string>
-    <string name="disconected">未连接</string>
-    <string name="reset_all_now">正在恢复出厂设置</string>
-    <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
-    <string name="tip_reset_sure">是否确定所有灯恢复出厂设置？</string>
-    <string name="delete_lamp_tip">有灯删除失败，请链接后重试。。。</string>
-    <string name="error_disconnect_tip">断开连接,请链接后再重试</string>
-    <string name="scene_16_tip">场景上限为16个！</string>
+    <string name="delete_name">delete</string>
+    <string name="open_blutooth">Bluetooth on</string>
+    <string name="close_bluetooth">Bluetooth off</string>
+    <string name="empty_tip">There are currently no lights, click to add</string>
+    <string name="grouping_fail">Failed to group</string>
+    <string name="add_scene_gp_tip">Please add a group that needs to be applied to this scene!</string>
+    <string name="group_fail_tip">There are currently lights failing to group, please check or try again!</string>
+    <string name="one_click_reset">One-touch factory reset</string>
+    <string name="disconected">not connected</string>
+    <string name="reset_all_now">Restoring factory settings</string>
+    <string name="reset_fail_tip1">There are no lights at the moment, please check if the lights are installed</string>
+    <string name="tip_reset_sure">Are you sure all lights are reset to factory settings?</string>
+    <string name="delete_lamp_tip">There is a lamp deletion failure. Please try again after linking. . .</string>
+    <string name="error_disconnect_tip">Disconnect, please link and try again</string>
+    <string name="scene_16_tip">The maximum number of scenes is 16!</string>
+    <string name="server_exception">Server exception</string>
 
 </resources>

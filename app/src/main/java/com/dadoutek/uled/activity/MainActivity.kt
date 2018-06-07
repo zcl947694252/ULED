@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.PowerManager
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -49,6 +50,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.powerManager
 import java.util.concurrent.TimeUnit
 
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
@@ -102,11 +104,18 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     //记录用户首次点击返回键的时间
     private var firstTime: Long = 0
 
+    private var mWakeLock: PowerManager.WakeLock? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
         Log.d(TAG, "onCreate")
+
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (powerManager != null) {
+            mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "WakeLock")
+        }
         //TelinkLog.ENABLE = false;
 //        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_main)
@@ -193,11 +202,20 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         this.mApplication!!.removeEventListener(this)
         Log.d(TAG, "onPause")
         stopConnectTimer()
+
+        if (mWakeLock != null) {
+            mWakeLock!!.acquire()
+        }
     }
 
 
     override fun onResume() {
         super.onResume()
+
+        if (mWakeLock != null) {
+            mWakeLock!!.acquire()
+        }
+
         addEventListeners()
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {

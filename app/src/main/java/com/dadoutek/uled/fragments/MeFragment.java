@@ -241,14 +241,16 @@ public class MeFragment extends Fragment implements EventListener<String> {
                                 break;
                             }
 
-                            Thread.sleep(550);
-                            byte opcode = (byte) Opcode.KICK_OUT;
-                            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
+                            for(int k=0;k<5;k++){
+                                byte opcode = (byte) Opcode.KICK_OUT;
+                                TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
+                                Thread.sleep(500);
+                            }
+                            Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }finally {
                                 DBUtils.deleteLight(lightList.get(j));
-                                isDeleteSuccess=false;
                                 if(j==0){
                                     hideLoadingDialog();
                                     SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,false);

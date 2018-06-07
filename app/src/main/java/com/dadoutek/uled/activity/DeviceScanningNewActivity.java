@@ -384,6 +384,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      * 开始分组
      */
     private void startGrouping() {
+        LeBluetooth.getInstance().stopScan();
+
         changeGroupView();
         //完成分组
         groupingCompleted.setOnClickListener(v -> {
@@ -1126,7 +1128,20 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 deviceInfo1.productUUID = deviceInfo.productUUID;
                 deviceInfo1.status = deviceInfo.status;
                 deviceInfo1.meshName = deviceInfo.meshName;
-                this.mApplication.getMesh().devices.add(deviceInfo1);
+
+                for (int i = 0; i < this.mApplication.getMesh().devices.size(); i++) {
+                    if (this.mApplication.getMesh().devices.get(i).macAddress.equals(deviceInfo1.macAddress)) {
+                        this.mApplication.getMesh().devices.remove(i);
+                        this.mApplication.getMesh().devices.add(deviceInfo1);
+                        Log.d(TAG, "dadou_scan2: "+deviceInfo1.macAddress);
+                        break;
+                    } else if (i == this.mApplication.getMesh().devices.size() - 1){
+                        this.mApplication.getMesh().devices.add(deviceInfo1);
+                        Log.d(TAG, "dadou_scan1: "+deviceInfo1.macAddress);
+                    }
+                }
+
+//                this.mApplication.getMesh().devices.add(deviceInfo1);
                 this.mApplication.getMesh().saveOrUpdate(this);
                 int meshAddress = deviceInfo.meshAddress & 0xFF;
                 DbLight light = this.adapter.get(meshAddress);
@@ -1217,6 +1232,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      * （扫描结束）
      */
     private void onLeScanTimeout() {
+//        TelinkLightService.Instance()
+        LeBluetooth.getInstance().stopScan();
         TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
@@ -1238,6 +1255,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      */
     private void startScan(final int delay) {
         //添加进disposable，防止内存溢出.
+
+        if(grouping){
+            Log.d(TAG, "startScanddd: "+"ddddddddddd");
+            return;
+        }
+
         mDisposable.add(
                 mRxPermission.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN).subscribe(granted -> {
@@ -1323,7 +1346,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             }
 
             DeviceInfo deviceInfo = event.getArgs();
-            deviceInfo.meshAddress = meshAddress;
+
+            com.dadoutek.uled.model.DeviceInfo meshDeviceInfo = new com.dadoutek.uled.model.DeviceInfo();
+            meshDeviceInfo.meshAddress = meshAddress;
+            meshDeviceInfo.meshUUID = deviceInfo.meshUUID;
+            meshDeviceInfo.macAddress=deviceInfo.macAddress;
+            Log.d(TAG, "dadou_scan_adddddddddddddd: "+meshDeviceInfo.macAddress);
+            this.mApplication.getMesh().devices.add(meshDeviceInfo);
+
             params.setUpdateDeviceList(deviceInfo);
             TelinkLightService.Instance().updateMesh(params);
         }, 200);
