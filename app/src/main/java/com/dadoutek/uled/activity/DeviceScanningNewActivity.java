@@ -1110,104 +1110,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         new AlertDialog.Builder(this).setMessage(R.string.restart_bluetooth).show();
     }
 
-    private void onDeviceStatusChanged(DeviceEvent event) {
-
-        DeviceInfo deviceInfo = event.getArgs();
-
-        switch (deviceInfo.status) {
-            case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
-                //加灯完成继续扫描,直到扫不到设备
-                com.dadoutek.uled.model.DeviceInfo deviceInfo1 = new com.dadoutek.uled.model.DeviceInfo();
-                deviceInfo1.deviceName = deviceInfo.deviceName;
-                deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
-                deviceInfo1.longTermKey = deviceInfo.longTermKey;
-                deviceInfo1.macAddress = deviceInfo.macAddress;
-                TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID);
-                deviceInfo1.meshAddress = deviceInfo.meshAddress;
-                deviceInfo1.meshUUID = deviceInfo.meshUUID;
-                deviceInfo1.productUUID = deviceInfo.productUUID;
-                deviceInfo1.status = deviceInfo.status;
-                deviceInfo1.meshName = deviceInfo.meshName;
-
-                for (int i = 0; i < this.mApplication.getMesh().devices.size(); i++) {
-                    if (this.mApplication.getMesh().devices.get(i).macAddress.equals(deviceInfo1.macAddress)) {
-                        this.mApplication.getMesh().devices.remove(i);
-                        this.mApplication.getMesh().devices.add(deviceInfo1);
-                        Log.d(TAG, "dadou_scan2: "+deviceInfo1.macAddress);
-                        break;
-                    } else if (i == this.mApplication.getMesh().devices.size() - 1){
-                        this.mApplication.getMesh().devices.add(deviceInfo1);
-                        Log.d(TAG, "dadou_scan1: "+deviceInfo1.macAddress);
-                    }
-                }
-
-//                this.mApplication.getMesh().devices.add(deviceInfo1);
-                this.mApplication.getMesh().saveOrUpdate(this);
-                int meshAddress = deviceInfo.meshAddress & 0xFF;
-                DbLight light = this.adapter.get(meshAddress);
-
-                if (light == null) {
-                    light = new DbLight();
-                    light.setName(deviceInfo.meshName);
-                    light.setMeshAddr(meshAddress);
-                    light.textColor = this.getResources().getColor(
-                            R.color.black);
-                    light.setBelongGroupId(-1L);
-                    light.setMacAddr(deviceInfo.macAddress);
-                    light.setMeshUUID(deviceInfo.meshUUID);
-                    light.setProductUUID(deviceInfo.productUUID);
-                    light.setSelected(false);
-                    this.adapter.add(light);
-                    this.adapter.notifyDataSetChanged();
-                }
-
-                //扫描出灯就设置为非首次进入
-                if (isFirtst) {
-                    isFirtst = false;
-                    SharedPreferencesHelper.putBoolean(DeviceScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
-                }
-//                tvNumLights.setVisibility(View.VISIBLE);
-//                tvNumLights.setText(getString(R.string.scan_lights_num, adapter.getCount() + ""));
-                toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
-
-                Log.d("ScanningTest", "update mesh success");
-                mRetryCount = 0;
-                this.startScan(200);
-                break;
-            case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
-                //加灯失败继续扫描
-                if (mRetryCount < MAX_RETRY_COUNT) {
-                    mRetryCount++;
-                    Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
-                    stopTimer();
-                    this.startScan(200);
-                } else {
-                    Log.d("ScanningTest", "update mesh failed , do not retry");
-                }
-                break;
-
-            case LightAdapter.STATUS_ERROR_N:
-                this.onNError(event);
-                break;
-            case LightAdapter.STATUS_LOGIN:
-                Log.d("ScanningTest", "mConnectTimer = " + mConnectTimer);
-                if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
-                    Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
-                    mConnectTimer.dispose();
-                    isLoginSuccess = true;
-                    //进入分组
-                    hideLoadingDialog();
-                    startGrouping();
-                }
-//                btnAddGroups.doneLoadingAnimation(R.color.black,
-//                        BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp));
-                break;
-            case LightAdapter.STATUS_LOGOUT:
-                isLoginSuccess = false;
-                break;
-        }
-    }
-
     private void onNError(final DeviceEvent event) {
 
         TelinkLightService.Instance().idleMode(true);
@@ -1320,6 +1222,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      */
     private void onLeScan(final LeScanEvent event) {
 
+        DeviceInfo deviceInfo = event.getArgs();
+
         final Mesh mesh = this.mApplication.getMesh();
         final int meshAddress = mesh.getDeviceAddress();
 
@@ -1345,19 +1249,114 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 params.setNewPassword(mesh.password);
             }
 
-            DeviceInfo deviceInfo = event.getArgs();
-
-            com.dadoutek.uled.model.DeviceInfo meshDeviceInfo = new com.dadoutek.uled.model.DeviceInfo();
-            meshDeviceInfo.meshAddress = meshAddress;
-            meshDeviceInfo.meshUUID = deviceInfo.meshUUID;
-            meshDeviceInfo.macAddress=deviceInfo.macAddress;
-            Log.d(TAG, "dadou_scan_adddddddddddddd: "+meshDeviceInfo.macAddress);
-            this.mApplication.getMesh().devices.add(meshDeviceInfo);
+//            com.dadoutek.uled.model.DeviceInfo meshDeviceInfo = new com.dadoutek.uled.model.DeviceInfo();
+//            meshDeviceInfo.meshAddress = meshAddress;
+//            meshDeviceInfo.meshUUID = deviceInfo.meshUUID;
+//            meshDeviceInfo.macAddress=deviceInfo.macAddress;
+            Log.d(TAG, "dadou_scan_mesh: "+meshAddress+"------"+deviceInfo.macAddress);
+//            this.mApplication.getMesh().devices.add(meshDeviceInfo);
 
             params.setUpdateDeviceList(deviceInfo);
             TelinkLightService.Instance().updateMesh(params);
         }, 200);
 
 
+    }
+
+    private void onDeviceStatusChanged(DeviceEvent event) {
+
+        DeviceInfo deviceInfo = event.getArgs();
+
+        switch (deviceInfo.status) {
+            case LightAdapter.STATUS_UPDATE_MESH_COMPLETED:
+                //加灯完成继续扫描,直到扫不到设备
+                com.dadoutek.uled.model.DeviceInfo deviceInfo1 = new com.dadoutek.uled.model.DeviceInfo();
+                deviceInfo1.deviceName = deviceInfo.deviceName;
+                deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
+                deviceInfo1.longTermKey = deviceInfo.longTermKey;
+                deviceInfo1.macAddress = deviceInfo.macAddress;
+                TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID);
+                deviceInfo1.meshAddress = deviceInfo.meshAddress;
+                deviceInfo1.meshUUID = deviceInfo.meshUUID;
+                deviceInfo1.productUUID = deviceInfo.productUUID;
+                deviceInfo1.status = deviceInfo.status;
+                deviceInfo1.meshName = deviceInfo.meshName;
+
+                for (int i = 0; i < this.mApplication.getMesh().devices.size(); i++) {
+                    if (this.mApplication.getMesh().devices.get(i).meshAddress==(deviceInfo1.meshAddress)) {
+                        this.mApplication.getMesh().devices.remove(i);
+                        this.mApplication.getMesh().devices.add(deviceInfo1);
+                        Log.d(TAG, "dadou_scan_UPDATE_MESH_COMPLETED_same: "+deviceInfo1.macAddress);
+                        break;
+                    }
+                }
+
+//                this.mApplication.getMesh().devices.add(deviceInfo1);
+                this.mApplication.getMesh().saveOrUpdate(this);
+                int meshAddress = deviceInfo.meshAddress & 0xFF;
+                DbLight light = this.adapter.get(meshAddress);
+
+                Log.d(TAG, "dadou_scan_onDeviceStatusChanged: "+meshAddress);
+
+                if (light == null) {
+                    light = new DbLight();
+                    light.setName(deviceInfo.meshName);
+                    light.setMeshAddr(meshAddress);
+                    light.textColor = this.getResources().getColor(
+                            R.color.black);
+                    light.setBelongGroupId(-1L);
+                    light.setMacAddr(deviceInfo.macAddress);
+                    light.setMeshUUID(deviceInfo.meshUUID);
+                    light.setProductUUID(deviceInfo.productUUID);
+                    light.setSelected(false);
+                    this.adapter.add(light);
+                    this.adapter.notifyDataSetChanged();
+                }
+
+                //扫描出灯就设置为非首次进入
+                if (isFirtst) {
+                    isFirtst = false;
+                    SharedPreferencesHelper.putBoolean(DeviceScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
+                }
+//                tvNumLights.setVisibility(View.VISIBLE);
+//                tvNumLights.setText(getString(R.string.scan_lights_num, adapter.getCount() + ""));
+                toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
+
+                Log.d("ScanningTest", "update mesh success");
+                mRetryCount = 0;
+                this.startScan(200);
+                break;
+            case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
+                //加灯失败继续扫描
+                if (mRetryCount < MAX_RETRY_COUNT) {
+                    mRetryCount++;
+                    Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
+                    stopTimer();
+                    this.startScan(200);
+                } else {
+                    Log.d("ScanningTest", "update mesh failed , do not retry");
+                }
+                break;
+
+            case LightAdapter.STATUS_ERROR_N:
+                this.onNError(event);
+                break;
+            case LightAdapter.STATUS_LOGIN:
+                Log.d("ScanningTest", "mConnectTimer = " + mConnectTimer);
+                if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
+                    Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
+                    mConnectTimer.dispose();
+                    isLoginSuccess = true;
+                    //进入分组
+                    hideLoadingDialog();
+                    startGrouping();
+                }
+//                btnAddGroups.doneLoadingAnimation(R.color.black,
+//                        BitmapFactory.decodeResource(getResources(), R.drawable.ic_done_white_48dp));
+                break;
+            case LightAdapter.STATUS_LOGOUT:
+                isLoginSuccess = false;
+                break;
+        }
     }
 }

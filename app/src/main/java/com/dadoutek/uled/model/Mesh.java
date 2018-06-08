@@ -3,6 +3,7 @@ package com.dadoutek.uled.model;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.util.FileSystem;
 import com.telink.util.MeshUtils;
 
@@ -27,8 +28,11 @@ public class Mesh implements Serializable {
     public List<DeviceInfo> devices = new ArrayList<>();
 
 
-    public int getDeviceAddress() {
+    public synchronized int getDeviceAddress() {
         if (devices == null || devices.size() == 0) {
+            com.dadoutek.uled.model.DeviceInfo meshDeviceInfo = new com.dadoutek.uled.model.DeviceInfo();
+            meshDeviceInfo.meshAddress = 1;
+            devices.add(meshDeviceInfo);
             return 1;
         }
 
@@ -39,6 +43,10 @@ public class Mesh implements Serializable {
                     continue flag_index;
                 }
             }
+
+            com.dadoutek.uled.model.DeviceInfo meshDeviceInfo = new com.dadoutek.uled.model.DeviceInfo();
+            meshDeviceInfo.meshAddress = i;
+            devices.add(meshDeviceInfo);
             return i;
         }
 
