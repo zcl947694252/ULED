@@ -1220,9 +1220,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      *
      * @param event
      */
-    private void onLeScan(final LeScanEvent event) {
-
-        DeviceInfo deviceInfo = event.getArgs();
+    private synchronized void onLeScan(final LeScanEvent event) {
 
         final Mesh mesh = this.mApplication.getMesh();
         final int meshAddress = mesh.getDeviceAddress();
@@ -1249,13 +1247,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 params.setNewPassword(mesh.password);
             }
 
-//            com.dadoutek.uled.model.DeviceInfo meshDeviceInfo = new com.dadoutek.uled.model.DeviceInfo();
-//            meshDeviceInfo.meshAddress = meshAddress;
-//            meshDeviceInfo.meshUUID = deviceInfo.meshUUID;
-//            meshDeviceInfo.macAddress=deviceInfo.macAddress;
-            Log.d(TAG, "dadou_scan_mesh: "+meshAddress+"------"+deviceInfo.macAddress);
-//            this.mApplication.getMesh().devices.add(meshDeviceInfo);
+            DeviceInfo deviceInfo = event.getArgs();
+            deviceInfo.meshAddress = meshAddress;
 
+            Log.d(TAG, "onDeviceStatusChanged_onLeScan: "+deviceInfo.meshAddress+"" +
+                    "------"+deviceInfo.macAddress);
             params.setUpdateDeviceList(deviceInfo);
             TelinkLightService.Instance().updateMesh(params);
         }, 200);
@@ -1282,21 +1278,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 deviceInfo1.status = deviceInfo.status;
                 deviceInfo1.meshName = deviceInfo.meshName;
 
-                for (int i = 0; i < this.mApplication.getMesh().devices.size(); i++) {
-                    if (this.mApplication.getMesh().devices.get(i).meshAddress==(deviceInfo1.meshAddress)) {
-                        this.mApplication.getMesh().devices.remove(i);
-                        this.mApplication.getMesh().devices.add(deviceInfo1);
-                        Log.d(TAG, "dadou_scan_UPDATE_MESH_COMPLETED_same: "+deviceInfo1.macAddress);
-                        break;
-                    }
-                }
+                Log.d(TAG, "onDeviceStatusChanged: "+deviceInfo1.macAddress+"-----"+deviceInfo1.meshAddress);
 
-//                this.mApplication.getMesh().devices.add(deviceInfo1);
+                this.mApplication.getMesh().devices.add(deviceInfo1);
                 this.mApplication.getMesh().saveOrUpdate(this);
                 int meshAddress = deviceInfo.meshAddress & 0xFF;
                 DbLight light = this.adapter.get(meshAddress);
-
-                Log.d(TAG, "dadou_scan_onDeviceStatusChanged: "+meshAddress);
 
                 if (light == null) {
                     light = new DbLight();
