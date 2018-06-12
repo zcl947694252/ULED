@@ -153,7 +153,9 @@
     <string name="connected">已连接</string>
     <string name="SceneSetting">场景</string>
     <string name="scene_apply">应用</string>
-    <string name="creat_scene">创建场景</string>
+    <string name="scene_edit">修改</string>
+    <string name="create_scene">创建场景</string>
+    <string name="edit_scene">修改场景</string>
     <string name="tv_scene_name">场景名：</string>
     <string name="plaese_input_scene_name">请输入场景名称</string>
     <string name="scene_tip">请至少选择一个分组！</string>

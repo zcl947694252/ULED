@@ -156,7 +156,9 @@
     <string name="connected">Connected</string>
     <string name="SceneSetting">Scene</string>
     <string name="scene_apply">apply</string>
-    <string name="creat_scene">Create a scene</string>
+    <string name="scene_edit">Edit</string>
+    <string name="create_scene">Create a scene</string>
+    <string name="edit_scene">Edit Scene</string>
     <string name="tv_scene_name">Scene name:</string>
     <string name="plaese_input_scene_name">Please enter the scene name</string>
     <string name="scene_tip">Please select at least one group!</string>

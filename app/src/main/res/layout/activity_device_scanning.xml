@@ -6,8 +6,6 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-
-
     <include
         android:id="@+id/rvToolbar"
         layout="@layout/toolbar"
@@ -15,20 +13,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-        android:id="@+id/scanPb"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:indeterminate="true"
-        app:mpb_progressStyle="horizontal"
-        app:mpb_indeterminateTint="@color/accent"
-        app:mpb_useIntrinsicPadding="false"
-        app:mpb_showProgressBackground="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
-        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding" />
 
 
     <LinearLayout
@@ -177,5 +161,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/scanPb"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_indeterminateTint="@color/accent"
+        app:mpb_useIntrinsicPadding="false"
+        app:mpb_showProgressBackground="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding" />
+
 
 </android.support.constraint.ConstraintLayout>

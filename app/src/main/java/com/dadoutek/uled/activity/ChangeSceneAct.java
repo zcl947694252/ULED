@@ -6,13 +6,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
@@ -45,10 +46,6 @@ import butterknife.OnClick;
  */
 
 public class ChangeSceneAct extends TelinkBaseActivity {
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
     @BindView(R.id.bt_save)
     Button btSave;
     @BindView(R.id.edit_name)
@@ -59,6 +56,10 @@ public class ChangeSceneAct extends TelinkBaseActivity {
     RecyclerView sceneGroupListView;
     @BindView(R.id.bt_add)
     Button btAdd;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.progressbar)
+    ProgressBar progressbar;
 
     private DbScene scene;
     private LayoutInflater inflater;
@@ -80,9 +81,16 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scene_set);
         ButterKnife.bind(this);
+        initToolbar();
         initData();
         initView();
         initClick();
+    }
+
+    private void initToolbar() {
+        toolbar.setTitle(R.string.edit_scene);
+        toolbar.setNavigationIcon(R.drawable.navigation_back);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void initClick() {
@@ -236,8 +244,6 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         adapter.bindToRecyclerView(sceneGroupListView);
 
         inflater = LayoutInflater.from(this);
-        txtHeaderTitle.setText(R.string.creat_scene);
-//        sceneGroupListView.set(this);
         mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         editName.setFocusable(false);//设置输入框不可聚焦，即失去焦点和光标
@@ -247,12 +253,10 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         }
     }
 
-    @OnClick({R.id.img_header_menu_left, R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})
+    @OnClick({R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-            case R.id.img_header_menu_left:
-                finish();
-                break;
+
             case R.id.bt_save:
                 if (checked()) {
                     save();
@@ -284,7 +288,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         showLoadingDialog(getString(R.string.saving));
         new Thread(() -> {
             String name = editName.getText().toString().trim();
-        List<ItemGroup> itemGroups = itemGroupArrayList;
+            List<ItemGroup> itemGroups = itemGroupArrayList;
 
             scene.setName(name);
             DBUtils.updateScene(scene);
@@ -297,15 +301,15 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                 sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
-            sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-            DBUtils.saveSceneActions(sceneActions);
+                sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
+                DBUtils.saveSceneActions(sceneActions);
             }
             try {
                 Thread.sleep(100);
                 updateScene(idAction);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }finally {
+            } finally {
                 hideLoadingDialog();
                 finish();
             }

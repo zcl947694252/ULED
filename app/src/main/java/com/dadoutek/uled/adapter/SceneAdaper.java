@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.dadoutek.uled.model.DbModel.DbScene;
@@ -56,7 +55,7 @@ public class SceneAdaper extends BaseAdapter implements View.OnClickListener {
             convertView = mLayoutInflater.inflate(R.layout.item_scene, null);
             holder = new ViewHolder();
 
-            holder.apply = convertView.findViewById(R.id.scene_apply);
+            holder.apply = convertView.findViewById(R.id.scene_edit);
             holder.delete = convertView.findViewById(R.id.scene_delete);
             holder.sceneName = convertView.findViewById(R.id.scene_name);
 

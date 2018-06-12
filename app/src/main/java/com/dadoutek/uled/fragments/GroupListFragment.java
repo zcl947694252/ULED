@@ -49,21 +49,8 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
     private TelinkLightApplication application;
     private Toolbar toolbar;
 
-    private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
-
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
-//            Group men_group = adapter.getItem(position);
-//
-//            Intent intent = new Intent(mContext, GroupSettingActivity.class);
-//            intent.putExtra("groupAddress", men_group.meshAddress);
-//
-//            startActivityForResult(intent, 0);
-
-            return true;
-        }
+    private OnItemLongClickListener itemLongClickListener = (parent, view, position, id) -> {
+        return true;
     };
     private GridView gridView;
 

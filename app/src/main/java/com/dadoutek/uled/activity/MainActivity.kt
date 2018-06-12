@@ -477,13 +477,14 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onLogout() {
-
-        val lights = Lights.getInstance().get()
-        for (light in lights) {
-            light.status = ConnectionStatus.OFFLINE
-            light.updateIcon()
-        }
-        runOnUiThread { deviceFragment?.notifyDataSetChanged() }
+        autoConnect()
+//
+//        val lights = Lights.getInstance().get()
+//        for (light in lights) {
+//            light.status = ConnectionStatus.OFFLINE
+//            light.updateIcon()
+//        }
+//        runOnUiThread { deviceFragment?.notifyDataSetChanged() }
     }
 
     private fun onAlarmGet(notificationEvent: NotificationEvent) {

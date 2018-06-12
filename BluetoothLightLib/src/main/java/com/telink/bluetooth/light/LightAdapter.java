@@ -1076,27 +1076,6 @@ public class LightAdapter {
             TelinkLog.d("onLoginFail "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
-
-            /*setStatus(STATUS_LOGOUT, true);
-
-            int mode = getMode();
-
-            if (mode == MODE_UPDATE_MESH) {
-                setState(STATE_RUNNING);
-                if (LightAdapter.this.status.get() != STATUS_UPDATE_MESH_COMPLETED && LightAdapter.this.status.get() != STATUS_UPDATE_ALL_MESH_COMPLETED) {
-                    setStatus(STATUS_UPDATE_MESH_FAILURE);
-                }
-            } else if (mode == MODE_AUTO_CONNECT_MESH) {
-                mScannedLights.clear();
-//                mScannedLights.removeTop();
-                nextLightIndex.set(0);
-//                lastLogoutTime = 0;
-                setState(STATE_RUNNING);
-                enableLoop(true);
-            } else if (mode == MODE_OTA) {
-                setState(STATE_PENDING);
-                setStatus(STATUS_OTA_FAILURE);
-            }*/
             int mode = getMode();
 
             if (mode == MODE_UPDATE_MESH) {
