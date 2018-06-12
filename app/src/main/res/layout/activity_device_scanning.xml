@@ -139,7 +139,7 @@
         android:layout_marginTop="10dp"
         android:background="@color/primary"
         android:gravity="center"
-        android:text="@string/add_groups"
+        android:text="@string/set_group"
         android:textColor="@android:color/white"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/grouping_completed"

@@ -4,18 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -25,9 +22,10 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddMeshActivity;
+import com.dadoutek.uled.activity.DeviceScanningNewActivity;
 import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
-import com.dadoutek.uled.activity.SelectDeviceTypeActivity;
+import com.dadoutek.uled.activity.ScanningSwitchActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -37,7 +35,7 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class GroupListFragment extends Fragment implements Toolbar.OnMenuItemClickListener{
+public final class GroupListFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
 
     private LayoutInflater inflater;
     private GroupListAdapter adapter;
@@ -98,9 +96,9 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 //        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.men_group);
         toolbar.setOnMenuItemClickListener(this);
-        if(SharedPreferencesUtils.isDeveloperModel()){
+        if (SharedPreferencesUtils.isDeveloperModel()) {
             toolbar.getMenu().findItem(R.id.menu_setting).setVisible(false);
-        }else{
+        } else {
             toolbar.getMenu().findItem(R.id.menu_setting).setVisible(false);
         }
 
@@ -163,12 +161,30 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
                 startActivity(intent);
                 break;
 
-            case R.id.menu_add:
-                TelinkLightService.Instance().idleMode(true);
-                startActivity(new Intent(mContext, SelectDeviceTypeActivity.class));
+            case R.id.menu_install:
+                showPopupMenu(toolbar.findViewById(R.id.menu_install));
                 break;
         }
         return false;
+    }
+
+    private void showPopupMenu(View view) {
+        // 这里的view代表popupMenu需要依附的view
+        PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+        popupMenu.getMenuInflater().inflate(R.menu.menu_select_device_type, popupMenu.getMenu());
+        popupMenu.show();
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.popup_install_light:
+                    startActivity(new Intent(mContext, DeviceScanningNewActivity.class));
+                    break;
+                case R.id.popup_install_switch:
+                    startActivity(new Intent(mContext, ScanningSwitchActivity.class));
+                    break;
+            }
+            return true;
+        });
+
     }
 
     private static class GroupItemHolder {

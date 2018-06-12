@@ -793,7 +793,7 @@ public class LightAdapter {
             this.mCallback.onNotify(this.mLightCtrl.getCurrentLight(), getMode(),
                     opcode, src, params);
 
-        Log.d("dadouDD", "onNotification: " + data[5]);
+//        Log.d("dadouDD", "onNotification: " + data[5]);
     }
 
     /********************************************************************************

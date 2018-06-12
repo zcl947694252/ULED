@@ -213,7 +213,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
                 adaper.changeState(isDelete);
                 refreshData();
                 break;
-            case R.id.menu_add:
+            case R.id.menu_install:
                 if (!SharedPreferencesUtils.getConnectState(getActivity())) {
 //                    return;
                 } else {

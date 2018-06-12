@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/popup_install_light"
+        android:title="@string/install_light" />
+    <item
+        android:id="@+id/popup_install_switch"
+        android:title="@string/install_switch" />
+
+</menu>

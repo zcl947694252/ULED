@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,7 +39,6 @@ import com.dadoutek.uled.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.NetworkFactory;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
-import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -68,7 +66,6 @@ import com.telink.bluetooth.light.Parameters;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -120,13 +117,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private TelinkLightApplication mApplication;
     private RxPermissions mRxPermission;
-    private Handler mHandler = new Handler();
     private static final String TAG = DeviceScanningNewActivity.class.getSimpleName();
     private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
     private Dialog loadDialog;
-    private final DeviceScanningNewActivity.MyHandler handler = new DeviceScanningNewActivity.MyHandler(this);
     //分组所含灯的缓存
     private List<DbLight> nowLightList;
     private LayoutInflater inflater;
@@ -171,38 +166,34 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             this.updateList.add(light);
             nowLightList.get(position).selected = true;
 //            getDeviceGroup(light);
-            checkSelectLamp(light);
-            startBlink(light);
-//            startBlink(light);
+//            checkSelectLamp(light);
+
+            btnAddGroups.setText(R.string.set_group);
+
+            if (hasGroup()) {
+                startBlink(light);
+            } else {
+                ToastUtils.showLong(R.string.tip_add_group);
+            }
         } else {
             nowLightList.get(position).selected = false;
             this.updateList.remove(light);
             stopBlink(light);
-//            controlLightOnOrOff(light.getMeshAddr(), true);
+            if ((!isSelectLight()) && isAllLightsGrouped()) {
+                btnAddGroups.setText(R.string.complete);
+            }
         }
     }
 
-    private void checkSelectLamp(DbLight light) {
+    private boolean hasGroup() {
         if (groups.size() == 0) {
-//            mDataManager.creatGroup(true, 0);
             groups = new ArrayList<>();
-            ToastUtils.showLong(R.string.tip_add_group);
-            return;
+            return false;
+        } else {
+            return true;
         }
-//        groups = mDataManager.initGroupsChecked();
-//        DbGroup group = groups.get(0);
-//        Log.d("ScanGroup", "checkSelectLamp: " + groups.size());
 
-
-//        int groupAddress = group.getMeshAddr();
-//        int dstAddress = light.getMeshAddr();
-//        byte opcode = (byte) Opcode.SET_GROUP;
-//        byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
-//                (byte) (groupAddress >> 8 & 0xFF)};
-//        params[0] = 0x01;
-//        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
     }
-
 
     /**
      * 让灯开始闪烁
@@ -222,27 +213,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
         params[0] = 0x01;
+        //每隔1s发一次，就是为了让灯一直闪.
         mBlinkDisposables.put(dstAddress, Observable.interval(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-//                    boolean on;
-                    //第一次执行为true，第二次为false，第三次为true，如此循环。
-//                    on = aLong % 2 != 0;
-//                    controlLightOnOrOff(dstAddress, on);
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
                 }));
-    }
-
-    private void controlLightOnOrOff(int dstAddress, boolean on) {
-        byte parmOnOrOff;
-        if (on) {
-            parmOnOrOff = 0x01;
-        } else
-            parmOnOrOff = 0x00;
-        byte[] params = new byte[]{parmOnOrOff, 0x00, 0x00};
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF, dstAddress,
-                params);
     }
 
     private void stopBlink(DbLight light) {
@@ -250,50 +227,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         disposable.dispose();
     }
 
-    @Override
-    protected void onLocationEnable() {
-
-    }
-
-    private static class MyHandler extends Handler {
-        //防止内存溢出
-        private final WeakReference<DeviceScanningNewActivity> mWeakActivity;
-
-        private MyHandler(DeviceScanningNewActivity mWeakActivity) {
-            this.mWeakActivity = new WeakReference<>(mWeakActivity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            DeviceScanningNewActivity activity = mWeakActivity.get();
-            switch (msg.what) {
-                case Cmd.SCANCOMPLET:
-                    if (msg.arg1 == Cmd.SCANFAIL) {
-                        activity.scanFail();
-                    } else if (msg.arg1 == Cmd.SCANSUCCESS) {
-                        Log.d(TAG, "Cmd.SCANSUCCESS");
-                        activity.scanSuccess();
-                    }
-                    break;
-
-                case Cmd.UPDATEDATA:
-                    break;
-            }
-        }
-    }
-
     //扫描失败处理方法
     private void scanFail() {
         btnAddGroups.setVisibility(View.VISIBLE);
         groupingCompleted.setVisibility(View.GONE);
         btnAddGroups.setText(R.string.rescan);
-        btnAddGroups.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startScan(1000);
-                btnAddGroups.setVisibility(View.GONE);
-            }
+        btnAddGroups.setOnClickListener(v -> {
+            startScan(1000);
+            btnAddGroups.setVisibility(View.GONE);
         });
         scanPb.setVisibility(View.GONE);
         showToast(getString(R.string.scan_end));
@@ -385,6 +326,22 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     }
 
+    private void navigationToHome() {
+//        showToast(getString(R.string.group_completed));
+        //页面跳转前进行分组数据保存
+//                mDataManager.saveGroups(groups);
+//                mDataManager.updateLights(nowLightList);
+
+//        TelinkLightService.Instance().idleMode(true);
+
+        if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
+            ActivityUtils.finishToActivity(MainActivity.class, false, true);
+        else {
+            ActivityUtils.startActivity(MainActivity.class);
+            finish();
+        }
+    }
+
     /**
      * 开始分组
      */
@@ -395,7 +352,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         //完成分组
         groupingCompleted.setOnClickListener(v -> {
             //判定是否还有灯没有分组，如果没有允许跳转到下一个页面
-            if (checkLightsHaveGroup()) {//所有灯都有分组可以跳转
+            if (isAllLightsGrouped()) {//所有灯都有分组可以跳转
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
 //                mDataManager.saveGroups(groups);
@@ -420,17 +377,27 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         //确定当前分组
         btnAddGroups.setText(R.string.sure_group);
         btnAddGroups.setOnClickListener(v -> {
-            sureGroups();
+            if (isAllLightsGrouped() && !isSelectLight()) {
+                navigationToHome();
+            } else {
+                sureGroups();
+            }
         });
     }
 
-    private void sureGroups() {
-        boolean hasBeSelected = false;//有无被勾选的用来分组的灯
-        if (updateList != null && updateList.size() != 0) {
-            hasBeSelected = true;
-        }
 
-        if (hasBeSelected) {
+    /**
+     * 有无被选中的用来分组的灯
+     *
+     * @return true: 选中了       false:没选中
+     */
+    private boolean isSelectLight() {
+        return getCurrentSelectLights().size() > 0;
+
+    }
+
+    private void sureGroups() {
+        if (isSelectLight()) {
             //进行分组操作
             //获取当前选择的分组
             DbGroup group = getCurrentGroup();
@@ -448,7 +415,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 setGroups(group, selectLights);
             }
 
-        } else if (!hasBeSelected) {
+        } else {
             showToast(getString(R.string.selected_lamp_tip));
         }
     }
@@ -458,14 +425,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             Toast.makeText(mApplication, R.string.select_group_tip, Toast.LENGTH_SHORT).show();
             return;
         }
-
-
-//        for (int i = 0; i < indexList.size(); i++) {
-//            nowLightList.get(indexList.get(i)).hasGroup = true;
-//
-//            nowLightList.get(indexList.get(i)).setBelongGroupId(group.getId());
-//            DBUtils.updateLight(nowLightList.get(indexList.get(i)));
-//        }
 
         mGroupingDisposable = Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
             int index = 0;
@@ -487,8 +446,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     for (int i = 0; i < 10; i++) {
                         sendGroupData(light, group, index);
                         Thread.sleep(500);
-//                        getDeviceGroup(light);
-//                        Thread.sleep(200);
 
                         if (groupingSuccess) {
 //                            sendGroupData(light, group, index);
@@ -520,17 +477,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         }
                         adapter.notifyDataSetChanged();
                         hideLoadingDialog();
-                        checkLightsHaveGroup();
+                        if (isAllLightsGrouped()) {
+                            btnAddGroups.setText(R.string.complete);
+                        }
                     }
                 });
 
         mDisposable.add(mGroupingDisposable);
-//
-//        new Handler().postDelayed(() -> {
-//
-//            closeDialog();
-//
-//        }, selectLights.size() * 3 * 300);
     }
 
     private void updateGroupResult(DbLight light, DbGroup group) {
@@ -616,18 +569,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     /**
-     * 检测是否还有没有分组的灯
+     * 是否所有灯都分了组
      *
      * @return false还有没有分组的灯 true所有灯都已经分组
      */
-    private boolean checkLightsHaveGroup() {
+    private boolean isAllLightsGrouped() {
         for (int j = 0; j < nowLightList.size(); j++) {
             if (DBUtils.getGroupByID(nowLightList.get(j).getBelongGroupId()).getMeshAddr() == 0xffff) {
-                groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
+//                groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
                 return false;
             }
         }
-        groupingCompleted.setBackgroundColor(getResources().getColor(R.color.primary));
+//        groupingCompleted.setBackgroundColor(getResources().getColor(R.color.primary));
         return true;
     }
 
@@ -638,7 +591,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         deviceListView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         btnAddGroups.setVisibility(View.VISIBLE);
-        groupingCompleted.setVisibility(View.VISIBLE);
+//        groupingCompleted.setVisibility(View.VISIBLE);
         groupsBottom.setVisibility(View.VISIBLE);
         LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -784,11 +737,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRxPermission = new RxPermissions(this);
@@ -898,17 +846,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d("ScanningTest", "remove all listener");
         this.mApplication.removeEventListener(this);
         this.updateList = null;
-        this.mHandler.removeCallbacksAndMessages(null);
         mDisposable.dispose();  //销毁时取消订阅.
         if (mTimer != null)
             mTimer.dispose();
@@ -922,6 +864,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             if (disposable != null)
                 disposable.dispose();
         }
+    }
+
+    @Override
+    protected void onLocationEnable() {
+
     }
 
 
@@ -1081,7 +1028,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void onGetGroupEvent(NotificationEvent event) {
-        NotificationEvent e = (NotificationEvent) event;
+        NotificationEvent e = event;
         NotificationInfo info = e.getArgs();
 
         int srcAddress = info.src & 0xFF;
@@ -1145,17 +1092,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
-            creatMessage(Cmd.SCANCOMPLET, Cmd.SCANSUCCESS);
+            scanSuccess();
         } else {
-            creatMessage(Cmd.SCANCOMPLET, Cmd.SCANFAIL);
+            scanFail();
         }
-    }
-
-    private void creatMessage(int what, int arg) {
-        Message message = new Message();
-        message.what = what;
-        message.arg1 = arg;
-        handler.sendMessage(message);
     }
 
     /**
@@ -1165,7 +1105,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         //添加进disposable，防止内存溢出.
 
         if (grouping) {
-            Log.d(TAG, "startScanddd: " + "ddddddddddd");
             return;
         }
 
@@ -1175,26 +1114,24 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     if (granted) {
                         handleIfSupportBle();
                         TelinkLightService.Instance().idleMode(true);
-                        mHandler.postDelayed(() -> {
-                            if (mApplication.isEmptyMesh())
-                                return;
-                            Mesh mesh = mApplication.getMesh();
-                            //扫描参数
-                            LeScanParameters params = LeScanParameters.create();
-                            params.setMeshName(mesh.factoryName);
-                            params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
-                            params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
-                            params.setScanMode(true);
-                            //                params.setScanMac("FF:FF:7A:68:6B:7F");
-                            TelinkLightService.Instance().startScan(params);
-                            startTimer();
-//                            openLoadingDialog(getString(R.string.loading));
-                            scanPb.setVisibility(View.VISIBLE);
+                        if (mApplication.isEmptyMesh())
+                            return;
+                        Mesh mesh = mApplication.getMesh();
+                        //扫描参数
+                        LeScanParameters params = LeScanParameters.create();
+                        params.setMeshName(mesh.factoryName);
+                        params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
+                        params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
+                        params.setScanMode(true);
+                        scanPb.setVisibility(View.VISIBLE);
+                        startTimer();
+                        mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(aLong -> {
+                                    TelinkLightService.Instance().startScan(params);
+                                }));
 
-                        }, delay);
-
-                        new Thread(() -> {
-                        }).start();
                     } else {
                         DialogUtils.INSTANCE.showNoBlePermissionDialog(this, () -> {
                             startScan(0);
@@ -1237,31 +1174,33 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             return;
         }
 
-        mHandler.postDelayed(() -> {
-            //更新参数
-            String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                    Constant.DB_NAME_KEY, "dadou");
-            LeUpdateParameters params = Parameters.createUpdateParameters();
-            params.setOldMeshName(mesh.factoryName);
-            params.setOldPassword(mesh.factoryPassword);
-            params.setNewMeshName(mesh.name);
-            if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
-                    , Constant.USER_TYPE, Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)) {
-                params.setNewPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(mesh.password) + account));
-            } else {
-                params.setNewPassword(mesh.password);
-            }
+        //更新参数
+        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou");
+        LeUpdateParameters params = Parameters.createUpdateParameters();
+        params.setOldMeshName(mesh.factoryName);
+        params.setOldPassword(mesh.factoryPassword);
+        params.setNewMeshName(mesh.name);
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
+                , Constant.USER_TYPE, Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)) {
+            params.setNewPassword(NetworkFactory.md5(
+                    NetworkFactory.md5(mesh.password) + account));
+        } else {
+            params.setNewPassword(mesh.password);
+        }
 
-            DeviceInfo deviceInfo = event.getArgs();
-            deviceInfo.meshAddress = meshAddress;
+        DeviceInfo deviceInfo = event.getArgs();
+        deviceInfo.meshAddress = meshAddress;
 
-            Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
-                    "------" + deviceInfo.macAddress);
-            params.setUpdateDeviceList(deviceInfo);
-            TelinkLightService.Instance().updateMesh(params);
-        }, 200);
-
+        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
+                "------" + deviceInfo.macAddress);
+        params.setUpdateDeviceList(deviceInfo);
+        mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
+                    TelinkLightService.Instance().updateMesh(params);
+                }));
 
     }
 
@@ -1286,8 +1225,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
 
-//                this.mApplication.getMesh().devices.add(deviceInfo1);
-                this.mApplication.getMesh().saveOrUpdate(this);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this);
+                    }
+                }).start();
                 int meshAddress = deviceInfo.meshAddress & 0xFF;
                 DbLight light = this.adapter.get(meshAddress);
 

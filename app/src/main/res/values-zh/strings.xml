@@ -75,6 +75,7 @@
     <string name="btn_ok">确定</string>
     <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
+    <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">扫描完成，没有发现设备！</string>
     <string name="device_login_tip">正在登陆设备，请稍候！</string>
@@ -265,5 +266,7 @@
     <string name="error_disconnect_tip">断开连接,请链接后再重试</string>
     <string name="scene_16_tip">场景上限为16个！</string>
     <string name="server_exception">服务器异常</string>
+    <string name="install_light">安装灯</string>
+    <string name="install_device">安装设备</string>
 
 </resources>

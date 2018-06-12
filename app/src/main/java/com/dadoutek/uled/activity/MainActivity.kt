@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
@@ -43,14 +44,15 @@ import com.telink.bluetooth.light.*
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.powerManager
 import java.util.concurrent.TimeUnit
 
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
@@ -186,8 +188,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             progressBar?.visibility = View.VISIBLE
             mConnectingSnackbar = null      //只有当为空时进入connecting才会显示
             this.autoConnect()
-        }else{
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),Constant.CONNECT_STATE_SUCCESS_KEY,true);
+        } else {
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
         }
     }
 
@@ -286,13 +288,19 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val delaySeconds: Long = 10
         //如果超过 delaySeconds 还没有变为连接中状态，则显示为超时
         mConnectTimer = Observable.timer(delaySeconds, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
                     if (mConnectingSnackbar != null) {
                         if (retryConnectTime < MAX_RETRY_CONNECT_TIME) {
                             retryConnectTime++
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
+                            LogUtils.d("connect timeout retry $retryConnectTime time")
+
                         } else {
+
+                            LogUtils.d("retry time is over MAX_RETRY_CONNECT_TIME")
                             indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                                 TelinkLightService.Instance().idleMode(true)
                                 autoConnect()
@@ -300,6 +308,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                         }
                     } else {
+                        LogUtils.d(R.string.not_found_light)
                         indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
@@ -318,7 +327,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     private fun autoConnect() {
 
-        if(SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)){
+        if (SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)) {
             return
         }
 
@@ -371,7 +380,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         }
                         //自动重连
                         TelinkLightService.Instance().autoConnect(connectParams)
-                        startConnectTimer();
+                        startConnectTimer()
 
 
                     }
@@ -556,7 +565,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 light.updateIcon()
                 lights.add(light)
 
-                SharedPreferencesHelper.putObject(this,Constant.LIGHT_STATE_KEY,lights)
+                SharedPreferencesHelper.putObject(this, Constant.LIGHT_STATE_KEY, lights)
             }
 
         }

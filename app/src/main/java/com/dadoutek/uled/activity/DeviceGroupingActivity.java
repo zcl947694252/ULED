@@ -2,18 +2,15 @@ package com.dadoutek.uled.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AbsListView;
@@ -39,8 +36,6 @@ import com.telink.util.Event;
 import com.telink.util.EventListener;
 
 import java.util.List;
-
-import butterknife.BindView;
 
 
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements
@@ -283,7 +278,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
                 onBackPressed();
                 break;
 
-            case R.id.menu_add:
+            case R.id.menu_install:
                 addNewGroup();
                 break;
         }
@@ -292,7 +287,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_grouping, menu);
+        getMenuInflater().inflate(R.menu.menu_group_fragment, menu);
         return true;
     }
 

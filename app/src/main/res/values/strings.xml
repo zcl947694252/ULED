@@ -75,6 +75,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add a group</string>
+    <string name="set_group">Set Group</string>
     <string name="loading">Loading</string>
     <string name="scan_end">The scan was completed and no equipment was found!</string>
     <string name="device_login_tip">Logging, please wait!</string>
@@ -263,5 +264,7 @@
     <string name="error_disconnect_tip">Disconnect, please link and try again</string>
     <string name="scene_16_tip">The maximum number of scenes is 16!</string>
     <string name="server_exception">Server exception</string>
+    <string name="install_light">Install lights</string>
+    <string name="install_device">Install Device</string>
 
 </resources>
