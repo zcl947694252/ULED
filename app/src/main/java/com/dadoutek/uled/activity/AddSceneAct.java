@@ -5,14 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -45,10 +44,6 @@ import butterknife.OnClick;
  */
 
 public class AddSceneAct extends TelinkBaseActivity {
-    @BindView(R.id.img_header_menu_left)
-    ImageView imgHeaderMenuLeft;
-    @BindView(R.id.txt_header_title)
-    TextView txtHeaderTitle;
     @BindView(R.id.bt_save)
     Button btSave;
     @BindView(R.id.edit_name)
@@ -59,6 +54,8 @@ public class AddSceneAct extends TelinkBaseActivity {
     RecyclerView sceneGroupListView;
     @BindView(R.id.bt_add)
     Button btAdd;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     private Scenes scenes;
     private LayoutInflater inflater;
@@ -80,8 +77,15 @@ public class AddSceneAct extends TelinkBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scene_set);
         ButterKnife.bind(this);
+        initToolbar();
         initData();
         initView();
+    }
+
+    private void initToolbar() {
+        toolbar.setTitle(R.string.create_scene);
+        toolbar.setNavigationIcon(R.drawable.navigation_back);
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void initData() {
@@ -196,8 +200,6 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void initView() {
         inflater = LayoutInflater.from(this);
-        txtHeaderTitle.setText(R.string.creat_scene);
-//        sceneGroupListView.set(this);
         mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         editName.setFocusable(false);//设置输入框不可聚焦，即失去焦点和光标
@@ -206,7 +208,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         }
     }
 
-    @OnClick({R.id.img_header_menu_left, R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})
+    @OnClick({R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.img_header_menu_left:

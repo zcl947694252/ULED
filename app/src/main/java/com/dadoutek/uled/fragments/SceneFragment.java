@@ -4,11 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +19,6 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.activity.ChangeSceneAct;
-import com.dadoutek.uled.activity.MainActivity;
 import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
@@ -36,7 +32,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -46,7 +41,8 @@ import butterknife.Unbinder;
 public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener,
         Toolbar.OnMenuItemClickListener {
 
-//    @BindView(R.id.img_header_menu_left)
+    private static final int SCENE_MAX_COUNT = 16;
+    //    @BindView(R.id.img_header_menu_left)
 //    ImageView imgHeaderMenuLeft;
 //    @BindView(R.id.txt_header_title)
 //    TextView txtHeaderTitle;
@@ -77,7 +73,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         layoutInflater = inflater;
         View view = layoutInflater.inflate(R.layout.fragment_scene, null);
         unbinder = ButterKnife.bind(this, view);
-        toolbar= view.findViewById(R.id.toolbar);
+        toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.SceneSetting);
 //        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.menu_scene);
@@ -135,8 +131,12 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
 //                dataManager.deleteScene(scenesListData.get(position));
                 deleteScene(position);
                 refreshData();
-            } else if (v.getId() == R.id.scene_apply) {
-                setScene(scenesListData.get(position).getId());
+            } else if (v.getId() == R.id.scene_edit) {
+//                setScene(scenesListData.get(position).getId());
+                DbScene scene = scenesListData.get(position);
+                Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
+                intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
+                startActivityForResult(intent, 0);
             }
         }
     };
@@ -185,10 +185,9 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        DbScene scene = scenesListData.get(position);
-        Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
-        intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
-        startActivityForResult(intent,0);
+
+
+        setScene(scenesListData.get(position).getId());
     }
 
     @Override
@@ -203,7 +202,7 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_delete:
                 if (isDelete) {
                     isDelete = false;
@@ -214,13 +213,13 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
                 adaper.changeState(isDelete);
                 refreshData();
                 break;
-            case R.id.menu_add:
+            case R.id.menu_install:
                 if (!SharedPreferencesUtils.getConnectState(getActivity())) {
 //                    return;
                 } else {
-                    if(scenesListData.size()>=16){
+                    if (scenesListData.size() >= SCENE_MAX_COUNT) {
                         ToastUtils.showLong(R.string.scene_16_tip);
-                    }else{
+                    } else {
                         Intent intent = new Intent(getActivity(), AddSceneAct.class);
                         startActivityForResult(intent, 0);
                     }

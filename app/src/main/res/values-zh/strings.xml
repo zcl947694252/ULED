@@ -75,6 +75,7 @@
     <string name="btn_ok">确定</string>
     <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
+    <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">扫描完成，没有发现设备！</string>
     <string name="device_login_tip">正在登陆设备，请稍候！</string>
@@ -153,7 +154,9 @@
     <string name="connected">已连接</string>
     <string name="SceneSetting">场景</string>
     <string name="scene_apply">应用</string>
-    <string name="creat_scene">创建场景</string>
+    <string name="scene_edit">修改</string>
+    <string name="create_scene">创建场景</string>
+    <string name="edit_scene">修改场景</string>
     <string name="tv_scene_name">场景名：</string>
     <string name="plaese_input_scene_name">请输入场景名称</string>
     <string name="scene_tip">请至少选择一个分组！</string>
@@ -266,5 +269,7 @@
     <string name="start_sync">即将开始数据同步。。。</string>
     <string name="sync_complet">同步完成</string>
     <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
+    <string name="install_light">安装灯</string>
+    <string name="install_device">安装设备</string>
 
 </resources>

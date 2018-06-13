@@ -7,8 +7,8 @@
         android:id="@+id/listview_group"
         android:layout_width="wrap_content"
         android:layout_height="200dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="5dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:divider="@color/primary"
         android:dividerHeight="1dp" />
 </LinearLayout>

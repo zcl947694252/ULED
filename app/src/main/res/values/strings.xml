@@ -75,6 +75,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add a group</string>
+    <string name="set_group">Set Group</string>
     <string name="loading">Loading</string>
     <string name="scan_end">The scan was completed and no equipment was found!</string>
     <string name="device_login_tip">Logging, please wait!</string>
@@ -156,7 +157,9 @@
     <string name="connected">Connected</string>
     <string name="SceneSetting">Scene</string>
     <string name="scene_apply">apply</string>
-    <string name="creat_scene">Create a scene</string>
+    <string name="scene_edit">Edit</string>
+    <string name="create_scene">Create a scene</string>
+    <string name="edit_scene">Edit Scene</string>
     <string name="tv_scene_name">Scene name:</string>
     <string name="plaese_input_scene_name">Please enter the scene name</string>
     <string name="scene_tip">Please select at least one group!</string>
@@ -264,5 +267,7 @@
     <string name="start_sync">即将开始数据同步。。。</string>
     <string name="sync_complet">同步完成</string>
     <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
+    <string name="install_light">Install lights</string>
+    <string name="install_device">Install Device</string>
 
 </resources>

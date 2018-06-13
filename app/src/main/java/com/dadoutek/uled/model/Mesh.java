@@ -3,6 +3,8 @@ package com.dadoutek.uled.model;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.util.FileSystem;
 import com.telink.util.MeshUtils;
 
@@ -26,16 +28,16 @@ public class Mesh implements Serializable {
     //    public List<Integer> allocDeviceAddress;
     public List<DeviceInfo> devices = new ArrayList<>();
 
-
     public int getDeviceAddress() {
-        if (devices == null || devices.size() == 0) {
+        List<DbLight> lights = DBUtils.getAllLight();
+        if (lights == null || lights.size() == 0) {
             return 1;
         }
 
         flag_index:
         for (int i = MeshUtils.DEVICE_ADDRESS_MIN; i < MeshUtils.DEVICE_ADDRESS_MAX; i++) {
-            for (DeviceInfo lxDeviceInfo : devices) {
-                if (lxDeviceInfo.meshAddress == i) {
+            for (DbLight light : lights) {
+                if (light.getMeshAddr() == i) {
                     continue flag_index;
                 }
             }

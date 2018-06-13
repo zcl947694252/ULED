@@ -139,11 +139,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        TelinkLightService.Instance().disconnect()
-    }
-
     override fun onResume() {
         super.onResume()
         addEventListener()

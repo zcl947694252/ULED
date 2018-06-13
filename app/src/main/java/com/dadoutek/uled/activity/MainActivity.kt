@@ -21,8 +21,10 @@ import android.view.View
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.R.id.*
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.TelinkMeshErrorDealActivity
@@ -43,14 +45,15 @@ import com.telink.bluetooth.light.*
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
-import org.jetbrains.anko.powerManager
 import java.util.concurrent.TimeUnit
 
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
@@ -182,12 +185,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         super.onStart()
 
         if (TelinkLightApplication.getInstance().connectDevice == null) {
-            indefiniteSnackbar(root, getString(R.string.scanning_devices))
             progressBar?.visibility = View.VISIBLE
             mConnectingSnackbar = null      //只有当为空时进入connecting才会显示
             this.autoConnect()
-        }else{
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),Constant.CONNECT_STATE_SUCCESS_KEY,true);
+        } else {
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
         }
     }
 
@@ -286,13 +288,19 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val delaySeconds: Long = 10
         //如果超过 delaySeconds 还没有变为连接中状态，则显示为超时
         mConnectTimer = Observable.timer(delaySeconds, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Consumer {
                     if (mConnectingSnackbar != null) {
                         if (retryConnectTime < MAX_RETRY_CONNECT_TIME) {
                             retryConnectTime++
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
+                            LogUtils.d("connect timeout retry $retryConnectTime time")
+
                         } else {
+
+                            LogUtils.d("retry time is over MAX_RETRY_CONNECT_TIME")
                             indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                                 TelinkLightService.Instance().idleMode(true)
                                 autoConnect()
@@ -300,6 +308,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                         }
                     } else {
+                        LogUtils.d(R.string.not_found_light)
                         indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
@@ -318,9 +327,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     private fun autoConnect() {
 
-        if(SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)){
-            return
-        }
+//        if (SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)) {
+//            snackbar(root, "factoring")
+//            return
+//        }
 
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {
@@ -328,13 +338,17 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 //授予了权限
                 if (TelinkLightService.Instance() != null) {
 
+                    indefiniteSnackbar(root, getString(R.string.scanning_devices))
+
                     if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
 //                ToastUtils.showLong(getString(R.string.connect_state))
                         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                        if (this.mApplication!!.isEmptyMesh)
+                        if (this.mApplication!!.isEmptyMesh) {
+                            snackbar(root, "mesh empty")
                             return@Consumer
+                        }
 
                         //                Lights.getInstance().clear();
                         this.mApplication!!.refreshLights()
@@ -346,6 +360,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                         if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
                             TelinkLightService.Instance().idleMode(true)
+                            snackbar(root, "mesh name or password empty")
                             return@Consumer
                         }
                         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -371,7 +386,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         }
                         //自动重连
                         TelinkLightService.Instance().autoConnect(connectParams)
-                        startConnectTimer();
+                        startConnectTimer()
 
 
                     }
@@ -477,13 +492,14 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onLogout() {
-
-        val lights = Lights.getInstance().get()
-        for (light in lights) {
-            light.status = ConnectionStatus.OFFLINE
-            light.updateIcon()
-        }
-        runOnUiThread { deviceFragment?.notifyDataSetChanged() }
+        autoConnect()
+//
+//        val lights = Lights.getInstance().get()
+//        for (light in lights) {
+//            light.status = ConnectionStatus.OFFLINE
+//            light.updateIcon()
+//        }
+//        runOnUiThread { deviceFragment?.notifyDataSetChanged() }
     }
 
     private fun onAlarmGet(notificationEvent: NotificationEvent) {
@@ -555,7 +571,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 light.updateIcon()
                 lights.add(light)
 
-                SharedPreferencesHelper.putObject(this,Constant.LIGHT_STATE_KEY,lights)
+                SharedPreferencesHelper.putObject(this, Constant.LIGHT_STATE_KEY, lights)
             }
 
         }

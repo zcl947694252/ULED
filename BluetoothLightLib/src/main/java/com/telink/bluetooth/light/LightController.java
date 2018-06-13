@@ -953,9 +953,9 @@ public final class LightController extends EventBus<Integer> implements LightPer
         byte[] macAddress = light.getMacBytes();
         byte[] nonce = getSecIVS(macAddress);
 
-        for(int i=0;i<data.length;i++){
-            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
-        }
+//        for(int i=0;i<data.length;i++){
+//            Log.d("NewNotify Data --> ", "onNotify: "+data[i]);
+//        }
 
         System.arraycopy(data, 0, nonce, 3, 5);
         byte[] result = AES.decrypt(this.sessionKey, nonce, data);
