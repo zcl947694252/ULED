@@ -4,18 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,14 +37,10 @@ import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
-import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.telink.bluetooth.event.DeviceEvent;
-import com.telink.bluetooth.event.LeScanEvent;
-import com.telink.bluetooth.event.MeshEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
-import com.telink.bluetooth.light.OnlineStatusNotificationParser;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
@@ -92,7 +85,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     private Dialog loadDialog;
     private TelinkLightApplication mApplication;
     private DbLight currentLight;
-    private boolean isDeleteSuccess=false;
+    private boolean isDeleteSuccess = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -160,7 +153,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
 
     long[] mHints = new long[6];//初始全部为0
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup,R.id.one_click_reset})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -189,73 +182,77 @@ public class MeFragment extends Fragment implements EventListener<String> {
     }
 
     private void showSureResetDialog() {
-        AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.tip_reset_sure);
         builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
         });
         builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
-            resetAllLight();
+            if (TelinkLightApplication.getInstance().getConnectDevice() != null)
+                resetAllLight();
+            else {
+                ToastUtils.showShort(R.string.device_not_connected);
+            }
         });
-        AlertDialog dialog=builder.create();
+        AlertDialog dialog = builder.create();
         dialog.show();
     }
 
     private void resetAllLight() {
         showLoadingDialog(getString(R.string.reset_all_now));
-        SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,true);
+        SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, true);
         new Thread(() -> {
             List<DbGroup> list = DBUtils.getGroupList();
-            List<DbLight> lightList=new ArrayList<>();
-            DeviceInfo deviceInfo=TelinkLightApplication.getInstance().getConnectDevice();
-            if(deviceInfo==null){
+            List<DbLight> lightList = new ArrayList<>();
+            DeviceInfo deviceInfo = TelinkLightApplication.getInstance().getConnectDevice();
+            if (deviceInfo == null) {
                 ToastUtils.showLong(R.string.disconected);
                 return;
             }
 
-            for(int i=0;i<list.size();i++){
+            for (int i = 0; i < list.size(); i++) {
                 lightList.addAll(DBUtils.getLightByGroupID(list.get(i).getId()));
             }
 
-            if(lightList.size()==0){
+            if (lightList.size() == 0) {
                 hideLoadingDialog();
                 ToastUtils.showLong(R.string.reset_fail_tip1);
                 return;
             }
 
-            int index1=0;
-            int index2=0;
-            for(int k=0;k<lightList.size();k++){
-                if(lightList.get(k).getMeshAddr()==deviceInfo.meshAddress){
-                    index2=k;
+            int index1 = 0;
+            int index2 = 0;
+            for (int k = 0; k < lightList.size(); k++) {
+                if (lightList.get(k).getMeshAddr() == deviceInfo.meshAddress) {
+                    index2 = k;
                     break;
                 }
             }
-            Collections.swap(lightList,index1,index2);
+            Collections.swap(lightList, index1, index2);
 
-            for(int j=lightList.size()-1;j>=0;j--){
-                if(deviceInfo!=null){
-                        try {
-                            if(TelinkLightApplication.getInstance().getConnectDevice()==null){
-                                ToastUtils.showLong(R.string.error_disconnect_tip);
-                                SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,false);
-                                break;
-                            }
-
-                            for(int k=0;k<5;k++){
-                                byte opcode = (byte) Opcode.KICK_OUT;
-                                TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                                Thread.sleep(500);
-                            }
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }finally {
-                                DBUtils.deleteLight(lightList.get(j));
-                                if(j==0){
-                                    hideLoadingDialog();
-                                    SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,false);
-                                }
+            for (int j = lightList.size() - 1; j >= 0; j--) {
+                if (deviceInfo != null) {
+                    try {
+                        if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
+                            ToastUtils.showLong(R.string.error_disconnect_tip);
+                            SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
+                            break;
                         }
+
+                        for (int k = 0; k < 5; k++) {
+                            byte opcode = (byte) Opcode.KICK_OUT;
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
+                            Thread.sleep(500);
+                        }
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } finally {
+                        DBUtils.deleteLight(lightList.get(j));
+                        if (j == 0) {
+                            hideLoadingDialog();
+                            SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
+                        }
+                    }
                 }
             }
         }).start();
@@ -303,7 +300,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
      */
     @Override
     public void performed(Event<String> event) {
-        switch (event.getType()){
+        switch (event.getType()) {
             case NotificationEvent.ONLINE_STATUS:
 //                onOnlineStatusNotify((NotificationEvent)event);
                 break;
@@ -342,7 +339,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         switch (tableName) {
             case "DB_GROUPS":
                 DbGroup group = DBUtils.getGroupByID(changeId);
-                switch (type){
+                switch (type) {
                     case Constant.DB_ADD:
                         break;
                     case Constant.DB_DELETE:
@@ -353,7 +350,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 break;
             case "DB_LIGHT":
                 DbLight light = DBUtils.getLightByID(changeId);
-                switch (type){
+                switch (type) {
                     case Constant.DB_ADD:
                         break;
                     case Constant.DB_DELETE:
@@ -364,7 +361,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 break;
             case "DB_REGION":
                 DbRegion region = DBUtils.getRegionByID(changeId);
-                switch (type){
+                switch (type) {
                     case Constant.DB_ADD:
                         break;
                     case Constant.DB_DELETE:
@@ -375,7 +372,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 break;
             case "DB_SCENE":
                 DbScene scene = DBUtils.getSceneByID(changeId);
-                switch (type){
+                switch (type) {
                     case Constant.DB_ADD:
                         break;
                     case Constant.DB_DELETE:
@@ -386,7 +383,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 break;
             case "DB_SCENE_ACTIONS":
                 DbSceneActions actions = DBUtils.getSceneActionsByID(changeId);
-                switch (type){
+                switch (type) {
                     case Constant.DB_ADD:
                         break;
                     case Constant.DB_DELETE:
@@ -397,7 +394,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 break;
             case "DB_USER":
                 DbUser user = DBUtils.getUserByID(changeId);
-                switch (type){
+                switch (type) {
                     case Constant.DB_ADD:
                         break;
                     case Constant.DB_DELETE:

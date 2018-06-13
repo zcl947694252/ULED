@@ -24,6 +24,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.R.id.*
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.TelinkMeshErrorDealActivity
@@ -327,9 +328,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     private fun autoConnect() {
 
-        if (SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)) {
-            return
-        }
+//        if (SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)) {
+//            snackbar(root, "factoring")
+//            return
+//        }
 
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {

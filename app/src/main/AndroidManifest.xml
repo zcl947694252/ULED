@@ -119,7 +119,6 @@
             android:screenOrientation="portrait" />
         <activity android:name=".activity.SelectDeviceTypeActivity" />
         <activity android:name=".activity.ScanningSwitchActivity" />
-        <activity android:name=".activity.SceneSwitchActivity" />
         <activity
             android:name=".activity.SelectGroupForSwitchActivity"
             android:label="@string/title_activity_switch_group" />
