@@ -138,6 +138,8 @@ class LoginActivity : TelinkBaseActivity(),View.OnClickListener {
                             if(!SharedPreferencesUtils.getCurrentUserList().contains(dbUser.account)){
                                 showLoadingDialog(getString(R.string.sync_now))
                                 syncGetDataStart(dbUser)
+                            }else{
+                                TransformView()
                             }
                         }
 
@@ -243,6 +245,7 @@ class LoginActivity : TelinkBaseActivity(),View.OnClickListener {
                     override fun onNext(item: List<DbScene>) {
                         ToastUtils.showLong(getString(R.string.sync_complet))
                         SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
                         hideLoadingDialog()
                         TransformView()
                     }
