@@ -86,10 +86,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
 
     private Dialog loadDialog;
     private TelinkLightApplication mApplication;
-
-    private long sleepTime=250;
     private DbLight currentLight;
     private boolean isDeleteSuccess = false;
+
+    private long sleepTime=250;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -251,9 +251,9 @@ public class MeFragment extends Fragment implements EventListener<String> {
                         for (int k = 0; k < 5; k++) {
                             byte opcode = (byte) Opcode.KICK_OUT;
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                            Thread.sleep(500);
+                            Thread.sleep(sleepTime);
                         }
-                        Thread.sleep(500);
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } finally {
