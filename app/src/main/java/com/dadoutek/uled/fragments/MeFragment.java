@@ -280,7 +280,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
         //loadDialog没显示才把它显示出来
         if (!loadDialog.isShowing()) {
-            loadDialog.setCancelable(true);
+            loadDialog.setCancelable(false);
             loadDialog.setCanceledOnTouchOutside(false);
             loadDialog.setContentView(layout);
             loadDialog.show();
