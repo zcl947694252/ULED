@@ -86,4 +86,13 @@ public class DbSceneActions {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "DbSceneActions{" +
+                "groupAddr=" + groupAddr +
+                ", brightness=" + brightness +
+                ", colorTemperature=" + colorTemperature +
+                '}';
+    }
 }

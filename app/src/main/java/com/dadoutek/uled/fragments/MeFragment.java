@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -26,6 +27,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.activity.EmptyAddActivity;
 import com.dadoutek.uled.activity.SplashActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -42,6 +44,7 @@ import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
 import com.telink.bluetooth.event.MeshEvent;
@@ -87,12 +90,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
     Button oneClickReset;
     private LayoutInflater inflater;
 
-    private DbDataChange dbDataChange;
-    private List<DbDataChange> dbDataChangeList;
     private Dialog loadDialog;
     private TelinkLightApplication mApplication;
-    private DbLight currentLight;
-    private boolean isDeleteSuccess=false;
+
+    private long sleepTime=250;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,6 +101,12 @@ public class MeFragment extends Fragment implements EventListener<String> {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
         this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
+
+        if(android.os.Build.BRAND.contains("Huawei")){
+           sleepTime=500;
+        }else{
+            sleepTime=200;
+        }
     }
 
     @Nullable
@@ -179,7 +186,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-                syncDataStep1();
+                SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity());
                 break;
             case R.id.one_click_reset:
                 showSureResetDialog();
@@ -244,9 +251,9 @@ public class MeFragment extends Fragment implements EventListener<String> {
                             for(int k=0;k<5;k++){
                                 byte opcode = (byte) Opcode.KICK_OUT;
                                 TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                                Thread.sleep(500);
+                                Thread.sleep(sleepTime);
                             }
-                            Thread.sleep(500);
+                            Thread.sleep(sleepTime);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }finally {
@@ -254,6 +261,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
                                 if(j==0){
                                     hideLoadingDialog();
                                     SharedPreferencesHelper.putBoolean(getActivity(),Constant.DELETEING,false);
+                                    startActivity(new Intent(getActivity(),EmptyAddActivity.class));
+                                    getActivity().finish();
                                 }
                         }
                 }
@@ -328,86 +337,6 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //            }
 //        }
 //    }
-
-    private void syncDataStep1() {
-        dbDataChangeList = DBUtils.getDataChangeAll();
-        for (int i = 0; i < dbDataChangeList.size(); i++) {
-            getLocalData(dbDataChangeList.get(i).getTableName(),
-                    dbDataChangeList.get(i).getChangeId(),
-                    dbDataChangeList.get(i).getChangeType());
-        }
-    }
-
-    private void getLocalData(String tableName, Long changeId, String type) {
-        switch (tableName) {
-            case "DB_GROUPS":
-                DbGroup group = DBUtils.getGroupByID(changeId);
-                switch (type){
-                    case Constant.DB_ADD:
-                        break;
-                    case Constant.DB_DELETE:
-                        break;
-                    case Constant.DB_UPDATE:
-                        break;
-                }
-                break;
-            case "DB_LIGHT":
-                DbLight light = DBUtils.getLightByID(changeId);
-                switch (type){
-                    case Constant.DB_ADD:
-                        break;
-                    case Constant.DB_DELETE:
-                        break;
-                    case Constant.DB_UPDATE:
-                        break;
-                }
-                break;
-            case "DB_REGION":
-                DbRegion region = DBUtils.getRegionByID(changeId);
-                switch (type){
-                    case Constant.DB_ADD:
-                        break;
-                    case Constant.DB_DELETE:
-                        break;
-                    case Constant.DB_UPDATE:
-                        break;
-                }
-                break;
-            case "DB_SCENE":
-                DbScene scene = DBUtils.getSceneByID(changeId);
-                switch (type){
-                    case Constant.DB_ADD:
-                        break;
-                    case Constant.DB_DELETE:
-                        break;
-                    case Constant.DB_UPDATE:
-                        break;
-                }
-                break;
-            case "DB_SCENE_ACTIONS":
-                DbSceneActions actions = DBUtils.getSceneActionsByID(changeId);
-                switch (type){
-                    case Constant.DB_ADD:
-                        break;
-                    case Constant.DB_DELETE:
-                        break;
-                    case Constant.DB_UPDATE:
-                        break;
-                }
-                break;
-            case "DB_USER":
-                DbUser user = DBUtils.getUserByID(changeId);
-                switch (type){
-                    case Constant.DB_ADD:
-                        break;
-                    case Constant.DB_DELETE:
-                        break;
-                    case Constant.DB_UPDATE:
-                        break;
-                }
-                break;
-        }
-    }
 
 //    private void change(String table,){
 //

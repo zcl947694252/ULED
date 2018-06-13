@@ -16,7 +16,4 @@ class NetworkTransformer<T> : ObservableTransformer<Response<T>, T> {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
-
-
 }

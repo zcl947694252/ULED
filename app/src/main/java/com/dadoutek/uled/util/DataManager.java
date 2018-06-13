@@ -193,7 +193,7 @@ public class DataManager {
             SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
                     mMeshName + mPwd + Constant.GROUPS_KEY, groups);
             //新增数据库保存
-            DBUtils.saveGroup(group);
+            DBUtils.saveGroup(group,false);
         }
     }
 

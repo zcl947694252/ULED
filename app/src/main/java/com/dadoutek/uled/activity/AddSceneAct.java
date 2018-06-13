@@ -249,7 +249,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             DbScene dbScene = new DbScene();
             dbScene.setName(name);
             dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
-            DBUtils.saveScene(dbScene);
+            DBUtils.saveScene(dbScene,false);
 
             long idAction = dbScene.getId();
 

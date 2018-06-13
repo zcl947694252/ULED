@@ -1,12 +1,16 @@
 package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
-import android.util.Log
+import com.blankj.utilcode.util.ToastUtils
+import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
+import com.dadoutek.uled.intf.NetworkFactory
+import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.intf.NetworkFactory
+import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,7 +18,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
-import java.util.*
 
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
@@ -40,46 +43,57 @@ object AccountModel {
                 }
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    setIsLogin(true)
                     initDatBase(it)
-                    setupMesh(account)
+                    syncIsNewUser(it.token,it.account,it)
+                    Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun update(token: String, avatar: String, name: String, email: String, introduction: String): Observable<String>? {
+        return NetworkFactory.getApi()
+                .updateUser(token, avatar, name, email, introduction)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
     private fun oldDataConvertToNewData(name: String, pwd: String) {
         launch(CommonPool) {
             delay(500L)
-            oldDataConvertToNewDataGroup(name,pwd)
+            oldDataConvertToNewDataGroup(name, pwd)
             delay(500L)
-            oldDataConvertToNewDataLight(name,pwd)
+            oldDataConvertToNewDataLight(name, pwd)
             delay(200L)
 
             //原有数据转化完成清空本地数据
             SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    name+pwd+Constant.LIGHTS_KEY,null)
+                    name + pwd + Constant.LIGHTS_KEY, null)
             SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                    name+pwd+Constant.GROUPS_KEY,null)
+                    name + pwd + Constant.GROUPS_KEY, null)
         }
     }
 
     private fun oldDataConvertToNewDataLight(name: String, pwd: String) {
-        val lights= SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
-                name+pwd+Constant.LIGHTS_KEY) as? Lights
+        val lights = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+                name + pwd + Constant.LIGHTS_KEY) as? Lights
 
-        if(lights!!.get()!=null&&lights.get().size>0){
-            for(item in lights.get()){
-                var light : DbLight = DbLight()
-                if(item.belongGroups.size>0){
+        if (lights!!.get() != null && lights.get().size > 0) {
+            for (item in lights.get()) {
+                var light: DbLight = DbLight()
+                if (item.belongGroups.size > 0) {
                     light.belongGroupId = DBUtils.getGroupByMesh(item.belongGroups.get(0)).id
-                }else{
+                } else {
                     light.belongGroupId = 1
                 }
-                light.brightness=item.brightness
-                light.colorTemperature=item.temperature
-                light.meshAddr=item.meshAddress
-                light.name=item.name
-                light.macAddr=item.macAddress
+                light.brightness = item.brightness
+                light.colorTemperature = item.temperature
+                light.meshAddr = item.meshAddress
+                light.name = item.name
+                light.macAddr = item.macAddress
                 if (item.raw != null) {
                     light.meshUUID = item.raw.meshUUID
                     light.productUUID = item.raw.productUUID
@@ -93,25 +107,25 @@ object AccountModel {
     }
 
     private fun oldDataConvertToNewDataGroup(name: String, pwd: String) {
-       val groups= SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
-               name+pwd+Constant.GROUPS_KEY) as? Groups
+        val groups = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+                name + pwd + Constant.GROUPS_KEY) as? Groups
 
-        val dbRegion=DBUtils.getLastRegion()
+        val dbRegion = DBUtils.getLastRegion()
 
-       if(groups!=null){
-          for(item in groups.get()){
-              var dbGroup : DbGroup = DbGroup()
-              if(item.meshAddress==0xffff){
-                  continue
-              }
-              dbGroup.belongRegionId = dbRegion.id.toInt()
-              dbGroup.brightness=item.brightness
-              dbGroup.colorTemperature=item.temperature
-              dbGroup.meshAddr=item.meshAddress
-              dbGroup.name=item.name
-              DBUtils.saveGroup(dbGroup)
-          }
-       }
+        if (groups != null) {
+            for (item in groups.get()) {
+                var dbGroup: DbGroup = DbGroup()
+                if (item.meshAddress == 0xffff) {
+                    continue
+                }
+                dbGroup.belongRegionId = dbRegion.id.toInt()
+                dbGroup.brightness = item.brightness
+                dbGroup.colorTemperature = item.temperature
+                dbGroup.meshAddr = item.meshAddress
+                dbGroup.name = item.name
+                DBUtils.saveGroup(dbGroup, false)
+            }
+        }
     }
 
     private fun initDatBase(user: DbUser) {
@@ -136,9 +150,9 @@ object AccountModel {
         val regionList = DBUtils.getRegionAll()
 
         //数据库有区域数据直接加载
-        if(regionList.size!=0){
+        if (regionList.size != 0) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
-            val dbRegion=DBUtils.getLastRegion()
+            val dbRegion = DBUtils.getLastRegion()
             val application = getApplication() as TelinkLightApplication
             val mesh = application.mesh
             mesh.name = dbRegion.controlMesh
@@ -168,14 +182,14 @@ object AccountModel {
 //            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(), Constant.NEW_MESH_PASSWORD)
             saveToDataBase(mesh.factoryName, mesh.password, mesh.name, mesh.password)
             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                    Constant.USER_TYPE,Constant.USER_TYPE_NEW)
-        }else{
-            saveToDataBase(Constant.DEFAULT_MESH_FACTORY_NAME, Constant.DEFAULT_MESH_FACTORY_PASSWORD,name, pwd)
-            oldDataConvertToNewData(name,pwd)
-            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(),null)
-            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(),null)
+                    Constant.USER_TYPE, Constant.USER_TYPE_NEW)
+        } else {
+            saveToDataBase(Constant.DEFAULT_MESH_FACTORY_NAME, Constant.DEFAULT_MESH_FACTORY_PASSWORD, name, pwd)
+            oldDataConvertToNewData(name, pwd)
+            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(), null)
+            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(), null)
             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                    Constant.USER_TYPE,Constant.USER_TYPE_OLD)
+                    Constant.USER_TYPE, Constant.USER_TYPE_OLD)
         }
     }
 
@@ -187,7 +201,7 @@ object AccountModel {
         dbRegio.controlMeshPwd = mNewMeshPwd
         dbRegio.installMesh = factoryName
         dbRegio.installMeshPwd = factoryPwd
-        DBUtils.saveRegion(dbRegio)
+        DBUtils.saveRegion(dbRegio, false)
 
         val application = getApplication() as TelinkLightApplication
         val mesh = application.mesh
@@ -202,4 +216,27 @@ object AccountModel {
     }
 
 
+    private fun syncIsNewUser(token: String,account: String,user: DbUser){
+
+        NetworkFactory.getApi()
+                .getRegionList(token)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : NetworkObserver<List<DbRegion>>() {
+                    override fun onNext(t: List<DbRegion>) {
+                        //非首次在当前手机登录或者是首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
+                        if (t.size == 0 || SharedPreferencesUtils.getCurrentUserList().contains(account)) {
+                                setIsLogin(true)
+                                setupMesh(account)
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                    }
+                })
+    }
 }

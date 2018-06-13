@@ -1000,7 +1000,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
             if (this.lights == null)
                 this.lights = new ArrayList<>();
-            DBUtils.saveLight(light);
+            DBUtils.saveLight(light,false);
             this.lights.add(light);
         }
 

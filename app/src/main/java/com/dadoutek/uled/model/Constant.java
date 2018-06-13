@@ -60,6 +60,9 @@ public class Constant implements Serializable {
     //当前使用的区域默认为0
     public static String CURRENT_USE_REGION_KEY="CURRENT_USE_REGION_KEY";
 
+    //当前使用过此手机登录的用户列表
+    public static String CURRENT_USE_LIST_KEY="CURRENT_USE_LIST_KEY";
+
     //是否是开发者模式
     public static String IS_DEVELOPER_MODE="IS_DEVELOPER_MODE";
 

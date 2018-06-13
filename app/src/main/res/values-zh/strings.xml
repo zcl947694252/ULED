@@ -147,7 +147,7 @@
     <string name="install_switch_tips3">3.USB右边的指示灯会常亮</string>
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
-    <string name="connecting">连接中</string>
+    <string name="connecting">连接中...</string>
     <string name="connect_failed">连接失败</string>
     <string name="group_failed">分组失败</string>
     <string name="connected">已连接</string>
@@ -263,5 +263,8 @@
     <string name="error_disconnect_tip">断开连接,请链接后再重试</string>
     <string name="scene_16_tip">场景上限为16个！</string>
     <string name="server_exception">服务器异常</string>
+    <string name="start_sync">即将开始数据同步。。。</string>
+    <string name="sync_complet">同步完成</string>
+    <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
 
 </resources>

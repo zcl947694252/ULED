@@ -2,15 +2,19 @@ package com.dadoutek.uled.model.HttpModel
 
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkTransformer
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DbModel.DbRegion
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-object GroupMdodel {
-    fun add(token: String, meshAddr: Int, name: String,brightness: Int,colorTemperature: Int,belongRegionId: Int,id: Long): Observable<String>? {
+object LightModel {
+    fun add(token: String, meshAddr: Int, name: String,brightness: Int,colorTemperature: Int,
+            macAddr:String,meshUUID: Int,productUUID: Int,belongGroupId: Int,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .addGroup(token,meshAddr,name,brightness,colorTemperature,belongRegionId)
+                .addLight(token,meshAddr,name,brightness,colorTemperature,
+                        macAddr,meshUUID,productUUID,belongGroupId)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -19,9 +23,10 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String,brightness: Int,colorTemperature: Int,id: Long): Observable<String>? {
+    fun update(token: String, rid: Int, name: String,brightness: Int,
+               colorTemperature: Int,belongGroupId: Int,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .updateGroup(token,rid,name,brightness,colorTemperature)
+                .updateLight(token,rid,name,brightness,colorTemperature,belongGroupId)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -32,7 +37,7 @@ object GroupMdodel {
 
     fun delete(token: String, rid: Int,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .deleteGroup(token,rid)
+                .deleteLight(token,rid)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -41,14 +46,14 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun get(token: String): Observable<MutableList<DbGroup>>? {
+    fun get(token: String): Observable<MutableList<DbLight>>? {
         return NetworkFactory.getApi()
-                .getGroupList(token)
+                .getLightList(token)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     for(item in it){
-                        DBUtils.saveGroup(item,true)
+                        DBUtils.saveLight(item,true)
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())

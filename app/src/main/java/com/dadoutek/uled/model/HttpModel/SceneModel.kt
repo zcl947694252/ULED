@@ -2,15 +2,20 @@ package com.dadoutek.uled.model.HttpModel
 
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkTransformer
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbRegion
+import com.dadoutek.uled.model.DbModel.DbScene
+import com.google.gson.JsonArray
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONArray
 
-object GroupMdodel {
-    fun add(token: String, meshAddr: Int, name: String,brightness: Int,colorTemperature: Int,belongRegionId: Int,id: Long): Observable<String>? {
+object SceneModel {
+    fun add(token: String, name: String, actions: JsonArray,
+            belongRegionId: Int,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .addGroup(token,meshAddr,name,brightness,colorTemperature,belongRegionId)
+                .addScene(token,name,actions,belongRegionId)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -19,9 +24,10 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String,brightness: Int,colorTemperature: Int,id: Long): Observable<String>? {
+    fun update(token: String, rid: Int, name: String,actions: JsonArray
+               ,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .updateGroup(token,rid,name,brightness,colorTemperature)
+                .updateScene(token,rid,name,actions)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -29,10 +35,11 @@ object GroupMdodel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
 
     fun delete(token: String, rid: Int,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .deleteGroup(token,rid)
+                .deleteScene(token,rid)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -41,14 +48,17 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun get(token: String): Observable<MutableList<DbGroup>>? {
+    fun get(token: String): Observable<MutableList<DbScene>>? {
         return NetworkFactory.getApi()
-                .getGroupList(token)
+                .getSceneList(token)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     for(item in it){
-                        DBUtils.saveGroup(item,true)
+                        DBUtils.saveScene(item,true)
+                        for(action in item.actions){
+                            DBUtils.saveSceneActions(action)
+                        }
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())

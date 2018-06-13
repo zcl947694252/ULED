@@ -150,7 +150,7 @@
     <string name="title_activity_switch_group">SwitchGroupActivity</string>
     <string name="select_group">Select group</string>
     <string name="please_select_group">Please select a group at least</string>
-    <string name="connecting">Connecting</string>
+    <string name="connecting">Connecting...</string>
     <string name="connect_failed">Connect failed</string>
     <string name="group_failed">Group failed</string>
     <string name="connected">Connected</string>
@@ -261,5 +261,8 @@
     <string name="error_disconnect_tip">Disconnect, please link and try again</string>
     <string name="scene_16_tip">The maximum number of scenes is 16!</string>
     <string name="server_exception">Server exception</string>
+    <string name="start_sync">即将开始数据同步。。。</string>
+    <string name="sync_complet">同步完成</string>
+    <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
 
 </resources>
