@@ -185,7 +185,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         super.onStart()
 
         if (TelinkLightApplication.getInstance().connectDevice == null) {
-            indefiniteSnackbar(root, getString(R.string.scanning_devices))
             progressBar?.visibility = View.VISIBLE
             mConnectingSnackbar = null      //只有当为空时进入connecting才会显示
             this.autoConnect()
@@ -339,13 +338,17 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 //授予了权限
                 if (TelinkLightService.Instance() != null) {
 
+                    indefiniteSnackbar(root, getString(R.string.scanning_devices))
+
                     if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
 //                ToastUtils.showLong(getString(R.string.connect_state))
                         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                        if (this.mApplication!!.isEmptyMesh)
+                        if (this.mApplication!!.isEmptyMesh) {
+                            snackbar(root, "mesh empty")
                             return@Consumer
+                        }
 
                         //                Lights.getInstance().clear();
                         this.mApplication!!.refreshLights()
@@ -357,6 +360,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                         if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
                             TelinkLightService.Instance().idleMode(true)
+                            snackbar(root, "mesh name or password empty")
                             return@Consumer
                         }
                         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
