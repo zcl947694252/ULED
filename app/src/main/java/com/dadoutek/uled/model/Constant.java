@@ -51,6 +51,9 @@ public class Constant implements Serializable {
     //网络请求服务器正式地址
     public static final String BASE_URL = "https://mqtt.beesmartnet.com/";
 
+//    //网络请求服务器正式地址
+//    public static final String BASE_URL = "https://mqtt.beesmartnet.com/";
+
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY="DB_NAME_KEY";
 
