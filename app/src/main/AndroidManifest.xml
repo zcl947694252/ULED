@@ -129,7 +129,7 @@
             android:name=".activity.AddSceneAct"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SelectSceneForSwitchActivity"
+            android:name=".activity.ConfigSceneSwitchActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LoginActivity"

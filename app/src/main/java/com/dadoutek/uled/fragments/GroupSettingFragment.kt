@@ -8,14 +8,9 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
 import butterknife.OnClick
-import butterknife.Unbinder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
@@ -24,28 +19,17 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.widget.ColorPicker
+import kotlinx.android.synthetic.main.fragment_group_setting.*
 import java.util.*
 
 class GroupSettingFragment : Fragment() {
-
-    @BindView(R.id.btn_remove_group)
-    internal var btnRemoveGroup: Button? = null
-    @BindView(R.id.btn_rename)
-    internal var btnRename: Button? = null
-    internal lateinit var unbinder: Unbinder
-    @BindView(R.id.tv_brightness)
-    internal var tvBrightness: TextView? = null
-    @BindView(R.id.tv_temperature)
-    internal var tvTemperature: TextView? = null
 
     private var brightnessBar: SeekBar? = null
     private var temperatureBar: SeekBar? = null
     private var colorPicker: ColorPicker? = null
     private var mApplication: TelinkLightApplication? = null
     var group: DbGroup? = null
-    private val dataManager: DataManager? = null
 
     private val barChangeListener = object : OnSeekBarChangeListener {
 
@@ -88,7 +72,7 @@ class GroupSettingFragment : Fragment() {
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
                 DBUtils.updateGroup(group)
-                tvBrightness!!.text = getString(R.string.device_setting_brightness, progress.toString() + "")
+                tv_brightness!!.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
 
             } else if (view === temperatureBar) {
@@ -97,7 +81,7 @@ class GroupSettingFragment : Fragment() {
                 params = byteArrayOf(0x05, progress.toByte())
                 group!!.colorTemperature = progress
                 DBUtils.updateGroup(group)
-                tvTemperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
+                tv_temperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
             }
         }
@@ -157,15 +141,14 @@ class GroupSettingFragment : Fragment() {
 
         this.colorPicker = view.findViewById<View>(R.id.color_picker) as ColorPicker
 
-        unbinder = ButterKnife.bind(this, view)
         return view
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr == 0xFFFF) {
-            btnRemoveGroup!!.visibility = View.GONE
-            btnRename!!.visibility = View.GONE
+            btn_remove_group!!.visibility = View.GONE
+            btn_rename!!.visibility = View.GONE
         }
     }
 
@@ -173,9 +156,9 @@ class GroupSettingFragment : Fragment() {
         super.onResume()
         checkGroupIsSystemGroup()
         brightnessBar!!.progress = group!!.brightness
-        tvBrightness!!.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
+        tv_brightness!!.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
         temperatureBar!!.progress = group!!.colorTemperature
-        tvTemperature!!.text = getString(R.string.device_setting_temperature, group!!.colorTemperature.toString() + "")
+        tv_temperature!!.text = getString(R.string.device_setting_temperature, group!!.colorTemperature.toString() + "")
 
 
         this.brightnessBar!!.setOnSeekBarChangeListener(this.barChangeListener)
@@ -185,14 +168,13 @@ class GroupSettingFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        unbinder.unbind()
     }
 
     @OnClick(R.id.btn_remove_group, R.id.btn_rename)
     fun onViewClicked(view: View) {
         when (view.id) {
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(activity)).setMessage(R.string.delete_group_confirm)
-                    .setPositiveButton(R.string.btn_ok) { dialog, which ->
+                    .setPositiveButton(R.string.btn_ok) { _, _ ->
                         CmdDelete(group!!.id!!, group!!.meshAddr)
                         DBUtils.deleteGroup(group!!)
                         activity!!.setResult(Constant.RESULT_OK)

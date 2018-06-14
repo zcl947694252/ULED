@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
@@ -47,7 +46,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     private var mScanned: Boolean = false
     private var mLogged: Boolean = false
 
-    lateinit var mDeviceInfo: DeviceInfo
+    private var mDeviceInfo: DeviceInfo? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,7 +120,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)
-                TelinkLightService.Instance().startScan(params)
+                TelinkLightService.Instance()?.startScan(params)
 
                 progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                 progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
@@ -185,7 +184,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             val mesh = mApplication.mesh
             val LOGIN_TIMEOUT: Int = 15 //设一个比较长的超时，防止卡住
             mLogged = false
-            val loginResult = TelinkLightService.Instance().login(Strings.stringToBytes(mesh.factoryName, 16),
+            val loginResult = TelinkLightService.Instance()?.login(Strings.stringToBytes(mesh.factoryName, 16),
                     Strings.stringToBytes(mesh.factoryPassword, 16))
             launch(UI) {
                 delay(LOGIN_TIMEOUT.toLong(), TimeUnit.SECONDS) //超时后执行下方代码
@@ -193,7 +192,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 if (!mLogged)
                     onLoginFailed()
             }
-            if (!loginResult) {  //直接返回false就说明没有连接
+            if (loginResult == false) {  //直接返回false就说明没有连接
                 connect()   //重新进行连接
             }
             mRetryLoginCount++
@@ -215,11 +214,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 progressBtn.progress = 100  //进度控件显示成完成状态
 //                launch(UI) {
 //                    delay(100, TimeUnit.MILLISECONDS)
-                if (mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH ||
-                        mDeviceInfo.productUUID == DeviceType.NORMAL_SWITCH2) {
+                if (mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH ||
+                        mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH2) {
                     startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
                 } else {
-                    startActivity<SelectSceneForSwitchActivity>("deviceInfo" to mDeviceInfo)
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo)
                 }
 //                }
             }
@@ -249,7 +248,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         val TIMEOUTSECONDS: Int = 15
         launch(UI) {
             mConnected = false
-            TelinkLightService.Instance().connect(mDeviceInfo.macAddress, TIMEOUTSECONDS)
+            TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, TIMEOUTSECONDS)
             delay(TIMEOUTSECONDS.toLong(), TimeUnit.SECONDS)
             if (!mConnected) {
                 onConnectFailed()
@@ -284,8 +283,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
 
 
-//        mDeviceInfo.meshAddress = meshAddress
-
 
         Log.d("Saw", "onLeScan leScanEvent.args.productUUID = " + leScanEvent.args.productUUID)
         if (!mScanned)
@@ -316,7 +313,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     progressBtn.text = getString(R.string.connecting)
                 }
                 else -> {
-                    ToastUtils.showShort("Switch UUID = ${leScanEvent.args.productUUID}")
+                    LogUtils.d("Switch UUID = ${leScanEvent.args.productUUID}")
                     TelinkLightService.Instance()?.idleMode(true)
 //                //如果扫到的不是以上两种设备，就重新进行扫描
 //                if (mRetryLoginCount > 3) {
