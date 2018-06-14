@@ -135,12 +135,12 @@ class LoginActivity : TelinkBaseActivity(),View.OnClickListener {
                             ToastUtils.showLong(R.string.login_success)
                             hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            if(!SharedPreferencesUtils.getCurrentUserList().contains(dbUser.account)){
-                                showLoadingDialog(getString(R.string.sync_now))
-                                syncGetDataStart(dbUser)
-                            }else{
+//                            if(!SharedPreferencesUtils.getCurrentUserList().contains(dbUser.account)){
+////                                showLoadingDialog(getString(R.string.sync_now))
+////                                syncGetDataStart(dbUser)
+//                            }else{
                                 TransformView()
-                            }
+//                            }
                         }
 
                         override fun onError(e: Throwable) {

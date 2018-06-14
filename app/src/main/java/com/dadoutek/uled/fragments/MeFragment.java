@@ -182,7 +182,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-                SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity());
+//                SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity());
                 break;
             case R.id.one_click_reset:
                 showSureResetDialog();
@@ -254,13 +254,16 @@ public class MeFragment extends Fragment implements EventListener<String> {
                             Thread.sleep(sleepTime);
                         }
                         Thread.sleep(sleepTime);
+                        DBUtils.deleteLight(lightList.get(j));
                     } catch (InterruptedException e) {
+                        hideLoadingDialog();
                         e.printStackTrace();
                     } finally {
-                        DBUtils.deleteLight(lightList.get(j));
                         if (j == 0) {
                             hideLoadingDialog();
                             SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
+                            getActivity().startActivity(new Intent(getActivity(),EmptyAddActivity.class));
+                            getActivity().finish();
                         }
                     }
                 }
