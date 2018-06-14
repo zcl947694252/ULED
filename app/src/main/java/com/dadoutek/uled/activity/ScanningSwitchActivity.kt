@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
@@ -109,10 +110,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
                 handleIfSupportBle()
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
@@ -134,7 +135,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             } else {
 
             }
-        })
+        }
 
     }
 
@@ -315,7 +316,8 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     progressBtn.text = getString(R.string.connecting)
                 }
                 else -> {
-                    LogUtils.d("leScanEvent.args.productUUID = ${leScanEvent.args.productUUID}")
+                    ToastUtils.showShort("Switch UUID = ${leScanEvent.args.productUUID}")
+                    TelinkLightService.Instance()?.idleMode(true)
 //                //如果扫到的不是以上两种设备，就重新进行扫描
 //                if (mRetryLoginCount > 3) {
 //                    progressBtn.progress = -1    //控件显示Error状态

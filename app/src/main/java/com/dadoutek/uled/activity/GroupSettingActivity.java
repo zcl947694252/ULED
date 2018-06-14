@@ -46,7 +46,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
         this.settingFragment = (GroupSettingFragment) this.getSupportFragmentManager()
                 .findFragmentById(R.id.group_setting_fragment);
 
-        this.settingFragment.group = group;
+        this.settingFragment.setGroup(group);
     }
 
     private OnClickListener clickListener = new OnClickListener() {
