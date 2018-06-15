@@ -4,6 +4,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.model.DbModel.DbSceneBody;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 import com.google.gson.JsonArray;
@@ -11,6 +12,8 @@ import com.google.gson.JsonArray;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.RequestBody;
+import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -55,122 +58,122 @@ public interface RequestInterface {
 
     //添加区域
     @FormUrlEncoded
-    @POST("api/ext/soybean/region/add")
+    @POST("api/ext/soybean/region/add/{rid}")
     Observable<Response<String>> addRegion(@Header("token") String token,
-                                         @Field("controlMesh") String controlMesh,
-                                         @Field("controlMeshPwd") String controlMeshPwd,
-                                         @Field("installMesh") String installMesh,
-                                         @Field("installMeshPwd") String installMeshPwd);
+                                           @Field("controlMesh") String controlMesh,
+                                           @Field("controlMeshPwd") String controlMeshPwd,
+                                           @Field("installMesh") String installMesh,
+                                           @Field("installMeshPwd") String installMeshPwd,
+                                           @Path("rid") int rid);
 
     //获取区域列表
     @GET("api/ext/soybean/region/list")
     Observable<Response<List<DbRegion>>> getRegionList(@Header("token") String token);
 
     //更新区域
-    @PUT("api/ext/soybean/region/update")
+    @PUT("api/ext/soybean/region/update/{rid}")
     Observable<Response<String>> updateRegion(@Header("token") String token,
-                                            @Query("rid") int rid,
-                                            @Query("controlMesh") String controlMesh,
-                                            @Query("controlMeshPwd") String controlMeshPwd,
-                                            @Query("installMesh") String installMesh,
-                                            @Query("installMeshPwd") String installMeshPwd);
+                                              @Path("rid") int rid,
+                                              @Query("controlMesh") String controlMesh,
+                                              @Query("controlMeshPwd") String controlMeshPwd,
+                                              @Query("installMesh") String installMesh,
+                                              @Query("installMeshPwd") String installMeshPwd);
 
     //删除区域
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("api/ext/soybean/region/remove")
     Observable<Response<String>> deleteRegion(@Header("token") String token,
-                                            @Query("rid") int rid);
+                                              @Path("rid") int rid);
 
     //组相关接口
 
     //添加组
     @FormUrlEncoded
-    @POST("api/ext/soybean/group/add/{region_id}")
+    @POST("api/ext/soybean/group/add/{region_id}/{gid}")
     Observable<Response<String>> addGroup(@Header("token") String token,
-                                        @Field("meshAddr") int meshAddr,
-                                        @Field("name") String name,
-                                        @Field("brightness") int brightness,
-                                        @Field("colorTemperature") int colorTemperature,
-                                          @Path("region_id") int region_id);
+                                          @Field("meshAddr") int meshAddr,
+                                          @Field("name") String name,
+                                          @Field("brightness") int brightness,
+                                          @Field("colorTemperature") int colorTemperature,
+                                          @Path("region_id") int region_id,
+                                          @Path("gid") int gid);
 
     //获取组列表
     @GET("api/ext/soybean/group/list")
     Observable<Response<List<DbGroup>>> getGroupList(@Header("token") String token);
 
     //更新组
-    @PUT("api/ext/soybean/region/group/update")
+    @PUT("api/ext/soybean/region/group/update/{rid}")
     Observable<Response<String>> updateGroup(@Header("token") String token,
-                                           @Query("rid") int rid,
-                                           @Query("name") String name,
-                                           @Query("brightness") int brightness,
-                                           @Query("colorTemperature") int colorTemperature);
+                                             @Path("rid") int rid,
+                                             @Query("name") String name,
+                                             @Query("brightness") int brightness,
+                                             @Query("colorTemperature") int colorTemperature);
 
     //删除组
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
-    @DELETE("api/ext/soybean/group/remove")
+    @DELETE("api/ext/soybean/group/remove/{rid}")
     Observable<Response<String>> deleteGroup(@Header("token") String token,
-                                           @Query("rid") int rid);
+                                             @Path("rid") int rid);
 
     //灯相关接口
 
     //添加灯
     @FormUrlEncoded
-    @POST("api/ext/soybean/light/add")
+    @POST("api/ext/soybean/light/add/{lid}")
     Observable<Response<String>> addLight(@Header("token") String token,
-                                        @Field("meshAddr") int meshAddr,
-                                        @Field("name") String name,
-                                        @Field("brightness") int brightness,
-                                        @Field("colorTemperature") int colorTemperature,
-                                        @Field("macAddr") String macAddr,
-                                        @Field("meshUUID") int meshUUID,
-                                        @Field("productUUID") int productUUID,
-                                        @Field("belongGroupId") int belongGroupId);
+                                          @Field("meshAddr") int meshAddr,
+                                          @Field("name") String name,
+                                          @Field("brightness") int brightness,
+                                          @Field("colorTemperature") int colorTemperature,
+                                          @Field("macAddr") String macAddr,
+                                          @Field("meshUUID") int meshUUID,
+                                          @Field("productUUID") int productUUID,
+                                          @Field("belongGroupId") int belongGroupId,
+                                          @Path("lid") int lid);
 
     //获取灯列表
     @GET("api/ext/soybean/light/list")
     Observable<Response<List<DbLight>>> getLightList(@Header("token") String token);
 
     //更新灯
-    @PUT("api/ext/soybean/region/light/update")
+    @PUT("api/ext/soybean/region/light/update/{lid}")
     Observable<Response<String>> updateLight(@Header("token") String token,
-                                           @Query("rid") int rid,
-                                           @Query("name") String name,
-                                           @Query("brightness") int brightness,
-                                           @Query("colorTemperature") int colorTemperature,
-                                           @Query("belongGroupId") int belongGroupId);
+                                             @Query("name") String name,
+                                             @Query("brightness") int brightness,
+                                             @Query("colorTemperature") int colorTemperature,
+                                             @Query("belongGroupId") int belongGroupId,
+                                             @Path("lid") int lid);
 
     //删除灯
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
-    @DELETE("api/ext/soybean/light/remove")
+    @DELETE("api/ext/soybean/light/remove/{lid}")
     Observable<Response<String>> deleteLight(@Header("token") String token,
-                                           @Query("rid") int rid);
+                                             @Path("lid") int lid);
 
     //场景相关接口
 
     //添加场景
-    @FormUrlEncoded
-    @POST("api/ext/soybean/scene/add")
+    @POST("api/ext/soybean/scene/add/{sid}")
     Observable<Response<String>> addScene(@Header("token") String token,
-                                        @Field("name") String name,
-                                        @Field("actions") JsonArray actions,
-                                        @Field("belongRegionId") int belongRegionId);
+                                          @Body RequestBody body,
+                                          @Path("sid") int sid);
 
     //获取场景列表
     @GET("api/ext/soybean/scene/list")
     Observable<Response<List<DbScene>>> getSceneList(@Header("token") String token);
 
     //更新场景
-    @PUT("api/ext/soybean/region/scene/update")
+    @PUT("api/ext/soybean/region/scene/update/{rid}")
     Observable<Response<String>> updateScene(@Header("token") String token,
-                                           @Query("rid") int rid,
-                                           @Query("name") String name,
-                                           @Query("actions") JsonArray actions);
+                                             @Path("rid") int rid,
+                                             @Body RequestBody body);
 
     //删除场景
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
-    @DELETE("api/ext/soybean/scene/remove")
+    @DELETE("api/ext/soybean/scene/remove/{rid}")
     Observable<Response<String>> deleteScene(@Header("token") String token,
-                                           @Query("rid") int rid);
+                                             @Path("rid") int rid);
 
     //获取用户信息
     @GET("api/user/info/mine")
@@ -179,8 +182,8 @@ public interface RequestInterface {
     //修改用户信息
     @PUT("api/user/update")
     Observable<Response<String>> updateUser(@Header("token") String token,
-                                           @Query("avatar") String avatar,
-                                           @Query("name") String name,
-                                           @Query("email") String email,
-                                           @Query("introduction") String introduction);
+                                            @Query("avatar") String avatar,
+                                            @Query("name") String name,
+                                            @Query("email") String email,
+                                            @Query("introduction") String introduction);
 }

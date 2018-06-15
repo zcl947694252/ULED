@@ -15,6 +15,7 @@ import com.dadoutek.uled.dao.DbSceneDao;
 import com.dadoutek.uled.dao.DbUserDao;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import org.greenrobot.greendao.query.Query;
@@ -190,6 +191,7 @@ public class DBUtils {
                 recordingChange(dbRegion.getId(),
                         DaoSessionInstance.getInstance().getDbRegionDao().getTablename(),
                         Constant.DB_ADD);
+                //创建新区域首先创建一个所有灯的分组
                 createAllLightControllerGroup();
             } else {//更新数据库
                 dbRegion.setId(dbRegionOld.getId());
@@ -288,6 +290,19 @@ public class DBUtils {
 //        recordingChange(sceneActions.getId(),
 //                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
 //                Constant.DB_ADD);
+    }
+
+    public static void saveSceneActions(DbSceneActions sceneActions,Long id,
+                                        Long sceneId) {
+        DbSceneActions actions=new DbSceneActions();
+        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou");
+        actions.setBelongAccount(account);
+        actions.setActionId(sceneId);
+        actions.setBrightness(sceneActions.getBrightness());
+        actions.setColorTemperature(sceneActions.getColorTemperature());
+        actions.setGroupAddr(sceneActions.getGroupAddr());
+
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().save(actions);
     }
 
     /********************************************更改*******************************/

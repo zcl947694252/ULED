@@ -1,20 +1,20 @@
 package com.dadoutek.uled.util
 
+import android.app.Dialog
 import android.content.Context
 import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.TelinkLightApplication
-import com.dadoutek.uled.intf.NetworkFactory
+import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.NetworkObserver
-import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.DbModel.DbSceneBody
 import com.dadoutek.uled.model.HttpModel.*
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.mob.tools.utils.DeviceHelper
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import okhttp3.MediaType
+import okhttp3.RequestBody
+
 
 class SyncDataPutOrGetUtils {
     companion object {
@@ -28,23 +28,33 @@ class SyncDataPutOrGetUtils {
 
                 val dbUser = DBUtils.getLastUser()
 
+//                val loadDialog = Dialog(context,
+//                        R.style.FullHeightDialog)
+
                 for (i in dbDataChangeList.indices) {
+//                    DialogUtils.showLoadingDialog(context.getString(R.string.tip_start_sync), context, loadDialog)
                     getLocalData(dbDataChangeList[i].tableName,
                             dbDataChangeList[i].changeId,
                             dbDataChangeList[i].changeType,
                             dbUser.token, dbDataChangeList[i].id!!)
+                    if (i == dbDataChangeList.size - 1) {
+                        ToastUtils.showLong(context.getString(R.string.tip_completed_sync))
+//                        DialogUtils.hideLoadingDialog(loadDialog)
+                    }
                 }
             }.start()
         }
 
         @Synchronized
-        private fun getLocalData(tableName: String, changeId: Long?, type: String, token: String, id: Long) {
+        private fun getLocalData(tableName: String, changeId: Long?, type: String,
+                                 token: String, id: Long) {
             when (tableName) {
                 "DB_GROUP" -> {
                     val group = DBUtils.getGroupByID(changeId!!)
                     when (type) {
                         Constant.DB_ADD -> GroupMdodel.add(token, group.meshAddr, group.name,
-                                group.brightness, group.colorTemperature, group.belongRegionId, id)!!.subscribe(object : NetworkObserver<String>() {
+                                group.brightness, group.colorTemperature,
+                                group.belongRegionId, id,changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -60,7 +70,9 @@ class SyncDataPutOrGetUtils {
                                 super.onError(e)
                             }
                         })
-                        Constant.DB_UPDATE -> GroupMdodel.update(token, changeId.toInt(), group.name, group.brightness, group.colorTemperature, id)!!.subscribe(object : NetworkObserver<String>() {
+                        Constant.DB_UPDATE -> GroupMdodel.update(token, changeId.toInt(),
+                                group.name, group.brightness, group.colorTemperature, id,group.id)!!.
+                                subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -76,7 +88,7 @@ class SyncDataPutOrGetUtils {
                         Constant.DB_ADD -> LightModel.add(token, light.meshAddr, light.name,
                                 light.brightness, light.colorTemperature, light.macAddr,
                                 light.meshUUID, light.productUUID, light.belongGroupId!!.toInt(),
-                                id)!!.subscribe(object : NetworkObserver<String>() {
+                                id, changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
 
                             }
@@ -86,7 +98,7 @@ class SyncDataPutOrGetUtils {
                             }
                         })
                         Constant.DB_DELETE -> LightModel.delete(token,
-                                changeId.toInt(), id)!!.subscribe(object : NetworkObserver<String>() {
+                                 id, light.id.toInt())!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -94,10 +106,10 @@ class SyncDataPutOrGetUtils {
                                 super.onError(e)
                             }
                         })
-                        Constant.DB_UPDATE -> LightModel.update(token, changeId.toInt(),
+                        Constant.DB_UPDATE -> LightModel.update(token,
                                 light.name, light.brightness,
                                 light.colorTemperature, light.belongGroupId!!.toInt(),
-                                id)!!.subscribe(object : NetworkObserver<String>() {
+                                id,light.id.toInt())!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -112,7 +124,7 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> RegionModel.add(token, region.controlMesh,
                                 region.controlMeshPwd, region.installMesh,
-                                region.installMeshPwd, id)!!.subscribe(object : NetworkObserver<String>() {
+                                region.installMeshPwd, id,changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -143,21 +155,19 @@ class SyncDataPutOrGetUtils {
                 }
                 "DB_SCENE" -> {
                     val scene = DBUtils.getSceneByID(changeId!!)
-                    val jsonArray = JsonArray()
-                    val listActions = scene.actions
-                    for (i in listActions.indices) {
-                        val `object` = JsonObject()
-                        `object`.addProperty("groupAddr",
-                                scene.actions[i].groupAddr)
-                        `object`.addProperty("brightness",
-                                scene.actions[i].brightness)
-                        `object`.addProperty("colorTemperature",
-                                scene.actions[i].colorTemperature)
-                        jsonArray.add(`object`)
-                    }
+                    var body : DbSceneBody = DbSceneBody()
+                    var gson : Gson = Gson()
+                    body.name=scene.name
+                    body.belongRegionId=scene.belongRegionId
+                    body.actions=scene.actions
+
+                    val postInfoStr = gson.toJson(body)
+
+                    val bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+
                     when (type) {
-                        Constant.DB_ADD -> SceneModel.add(token, scene.name, jsonArray,
-                                scene.belongRegionId!!.toInt(), id)!!.subscribe(object : NetworkObserver<String>() {
+                        Constant.DB_ADD -> SceneModel.add(token, bodyScene
+                                , id,changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -174,8 +184,7 @@ class SyncDataPutOrGetUtils {
                                 super.onError(e)
                             }
                         })
-                        Constant.DB_UPDATE -> SceneModel.update(token, changeId.toInt(),
-                                scene.name, jsonArray, id)!!.subscribe(object : NetworkObserver<String>() {
+                        Constant.DB_UPDATE -> SceneModel.update(token, changeId.toInt(), bodyScene, id)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -205,8 +214,10 @@ class SyncDataPutOrGetUtils {
                     val user = DBUtils.getUserByID(changeId!!)
                     when (type) {
                         Constant.DB_ADD -> {
+                            //注册时已经添加
                         }
                         Constant.DB_DELETE -> {
+                            //无用户删除操作
                         }
                         Constant.DB_UPDATE ->
                             AccountModel.update(token, user.avatar, user.name,
@@ -218,8 +229,7 @@ class SyncDataPutOrGetUtils {
                                     super.onError(e)
                                 }
                             })
-                    }//注册时已经添加
-                    //无用户删除操作
+                    }
                 }
             }
         }

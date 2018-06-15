@@ -269,5 +269,7 @@
     <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
     <string name="install_light">Install lights</string>
     <string name="install_device">Install Device</string>
+    <string name="tip_start_sync">开始同步。。。</string>
+    <string name="tip_completed_sync">同步完成</string>
 
 </resources>

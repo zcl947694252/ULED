@@ -93,7 +93,6 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 
         toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.group_list_header);
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.men_group);
         toolbar.setOnMenuItemClickListener(this);
         if (SharedPreferencesUtils.isDeveloperModel()) {
@@ -117,18 +116,6 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 
         }
     }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
-//        if(SharedPreferencesUtils.isDeveloperModel()){
-//            menu.findItem(R.id.menu_setting).setVisible(true);
-//        }else{
-//            menu.findItem(R.id.menu_setting).setVisible(false);
-//        }
-//    }
-
 
     @Override
     public void onHiddenChanged(boolean hidden) {
