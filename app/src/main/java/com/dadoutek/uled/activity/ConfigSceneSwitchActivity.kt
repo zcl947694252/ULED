@@ -1,26 +1,20 @@
 package com.dadoutek.uled.activity
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AnimationUtils
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.R
+import com.dadoutek.uled.TelinkBaseActivity
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.telink.bluetooth.event.DeviceEvent
@@ -36,7 +30,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
-class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> {
+class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
@@ -63,10 +57,12 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         fab.setOnClickListener { _ ->
-            //            if (mAdapter.selectedPos != -1) {
-//                progressBar.visibility = View.VISIBLE
-            openLoadingDialog(getString(R.string.setting_switch))
-            setSceneForSwitch()
+            showLoadingDialog(getString(R.string.setting_switch))
+            Thread {
+                setSceneForSwitch()
+                updateNameForSwitch()
+            }.start()
+
 //
 //            }
 //            else {
@@ -99,11 +95,10 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
 
-        closeDialog()
+        hideLoadingDialog()
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                progressBar.visibility = View.GONE
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
@@ -153,7 +148,6 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
         }
 
         Thread.sleep(100)
-        updateNameForSwitch()
     }
 
     private fun updateNameForSwitch() {
@@ -217,39 +211,4 @@ class SelectSceneForSwitchActivity : AppCompatActivity(), EventListener<String> 
     }
 
 
-    @SuppressLint("ResourceType")
-    fun openLoadingDialog(content: String) {
-        val inflater = LayoutInflater.from(this)
-        val v = inflater.inflate(R.layout.dialogview, null)
-
-        val layout = v.findViewById<View>(R.id.dialog_view) as LinearLayout
-        val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
-        tvContent.text = content
-
-//        val spaceshipImage = v.findViewById<View>(R.id.img) as ImageView
-
-//        @SuppressLint("ResourceType") val hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
-//                R.animator.load_animation)
-//
-//        spaceshipImage.startAnimation(hyperspaceJumpAnimation)
-
-        if (loadDialog == null) {
-            loadDialog = Dialog(this,
-                    R.style.FullHeightDialog)
-        }
-        //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing) {
-            loadDialog!!.setCancelable(true)
-            loadDialog!!.setCanceledOnTouchOutside(false)
-            loadDialog!!.setContentView(layout, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT))
-            loadDialog!!.show()
-        }
-    }
-
-    fun closeDialog() {
-        if (loadDialog != null) {
-            loadDialog!!.dismiss()
-        }
-    }
 }

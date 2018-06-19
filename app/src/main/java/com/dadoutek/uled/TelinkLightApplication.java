@@ -3,6 +3,8 @@ package com.dadoutek.uled;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
@@ -37,6 +39,11 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.onCreate();
         //this.doInit();
         Utils.init(this);
+        if (!AppUtils.isAppDebug()) {
+            LogUtils.getConfig().setLogSwitch(false);
+        }
+
+
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
 //        CrashReport.testJavaCrash();

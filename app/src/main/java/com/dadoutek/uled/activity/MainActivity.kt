@@ -24,7 +24,6 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.R.id.*
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.TelinkMeshErrorDealActivity
@@ -38,6 +37,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
@@ -47,7 +47,6 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
@@ -77,9 +76,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private var connectMeshAddress: Int = 0
 
     private val mDelayHandler = Handler()
-    private var mConnectingSnackbar: Snackbar? = null
+    private var mConnectingSnackbar: Snackbar? = null   //用来判断要不要重试的,如果跑到过CONNECTING的状态才重试
 
     private var retryConnectTime = 0
+    private var snackbarScanning: Snackbar? = null
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -181,18 +181,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         bnve.setupWithViewPager(viewPager)
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
-            progressBar?.visibility = View.VISIBLE
-            mConnectingSnackbar = null      //只有当为空时进入connecting才会显示
-            this.autoConnect()
-        } else {
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
-        }
-    }
-
     override fun onRestart() {
         super.onRestart()
         Log.d(TAG, "onRestart")
@@ -200,13 +188,17 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     override fun onPause() {
         super.onPause()
+
+        snackbarScanning?.dismiss()
+        progressBar.visibility = View.GONE
+
         //移除事件
         this.mApplication!!.removeEventListener(this)
         Log.d(TAG, "onPause")
         stopConnectTimer()
 
         if (mWakeLock != null) {
-            mWakeLock!!.acquire()
+            mWakeLock?.acquire()
         }
     }
 
@@ -215,7 +207,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         super.onResume()
 
         if (mWakeLock != null) {
-            mWakeLock!!.acquire()
+            mWakeLock?.acquire()
         }
 
         addEventListeners()
@@ -236,6 +228,18 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     indefiniteSnackbar(root, R.string.open_location_service, R.string.btn_ok) {
                         BleUtils.jumpLocationSetting()
                     }
+                } else {
+                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                        while (TelinkApplication.getInstance()?.serviceStarted == true) {
+                            this.autoConnect()
+                            break;
+                        }
+
+                    } else {
+                        progressBar?.visibility = View.GONE
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                    }
+
                 }
             }
 
@@ -281,115 +285,112 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
 
-    private var mConnectTimer: Disposable? = null
+    private var mConnectTimer: CompositeDisposable = CompositeDisposable()
 
 
     private fun startConnectTimer() {
         val delaySeconds: Long = 10
         //如果超过 delaySeconds 还没有变为连接中状态，则显示为超时
-        mConnectTimer = Observable.timer(delaySeconds, TimeUnit.SECONDS)
+        LogUtils.d("startConnectTimer")
+        Observable.timer(delaySeconds, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(Consumer {
+                .subscribe({
+                    LogUtils.d("onNext it = $it")
                     if (mConnectingSnackbar != null) {
                         if (retryConnectTime < MAX_RETRY_CONNECT_TIME) {
                             retryConnectTime++
-                            TelinkLightService.Instance().idleMode(true)
-                            autoConnect()
                             LogUtils.d("connect timeout retry $retryConnectTime time")
+                            autoConnect()
 
                         } else {
-
                             LogUtils.d("retry time is over MAX_RETRY_CONNECT_TIME")
                             indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                                 TelinkLightService.Instance().idleMode(true)
                                 autoConnect()
                             }
-
                         }
                     } else {
-                        LogUtils.d(R.string.not_found_light)
+                        LogUtils.d(getString(R.string.not_found_light))
+                        progressBar.visibility = View.GONE
                         indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
                         }
 
                     }
+                }, {
+                    LogUtils.d("timer error = ${it.message}")
+                }, {
+                    LogUtils.d("onComplete")
+                }, {
+                    LogUtils.d("onSubscribe")
+                    mConnectTimer.add(it)
                 })
     }
 
     private fun stopConnectTimer() {
-        mConnectTimer?.dispose()
+        LogUtils.d("mConnectTimer?.dispose() mConnectTimer = ${mConnectTimer.size()}")
+        mConnectTimer.clear()
     }
+
 
     /**
      * 自动重连
      */
     private fun autoConnect() {
-
-//        if (SharedPreferencesHelper.getBoolean(this, Constant.DELETEING, false)) {
-//            snackbar(root, "factoring")
-//            return
-//        }
-
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {
             if (it) {
                 //授予了权限
                 if (TelinkLightService.Instance() != null) {
+                    progressBar?.visibility = View.VISIBLE
+                    mConnectingSnackbar = null
+                    TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_IDLE
 
-                    indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                    SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                    if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-
-//                ToastUtils.showLong(getString(R.string.connect_state))
-                        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
-
-                        if (this.mApplication!!.isEmptyMesh) {
-                            snackbar(root, "mesh empty")
-                            return@Consumer
-                        }
-
-                        //                Lights.getInstance().clear();
-                        this.mApplication!!.refreshLights()
+                    //                Lights.getInstance().clear();
+                    this.mApplication!!.refreshLights()
 
 
-                        this.deviceFragment.notifyDataSetChanged()
+                    this.deviceFragment.notifyDataSetChanged()
 
-                        val mesh = this.mApplication!!.mesh
+                    val mesh = this.mApplication?.mesh
 
-                        if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
-                            TelinkLightService.Instance().idleMode(true)
-                            snackbar(root, "mesh name or password empty")
-                            return@Consumer
-                        }
-                        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                Constant.DB_NAME_KEY, "dadou")
-                        //自动重连参数
-                        val connectParams = Parameters.createAutoConnectParameters()
-                        connectParams.setMeshName(mesh?.name)
-                        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                            connectParams.setPassword(NetworkFactory.md5(
-                                    NetworkFactory.md5(mesh?.password) + account))
-                        } else {
-                            connectParams.setPassword(mesh?.password)
-                        }
-                        connectParams.autoEnableNotification(true)
-
-                        // 之前是否有在做MeshOTA操作，是则继续
-                        if (mesh.isOtaProcessing) {
-                            connectParams.setConnectMac(mesh.otaDevice.mac)
-                            saveLog("Action: AutoConnect:" + mesh.otaDevice.mac)
-                        } else {
-                            saveLog("Action: AutoConnect:NULL")
-                        }
-                        //自动重连
-                        TelinkLightService.Instance().autoConnect(connectParams)
-                        startConnectTimer()
-
-
+                    if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
+                        TelinkLightService.Instance().idleMode(true)
+                        snackbar(root, "mesh name or password empty")
+                        ToastUtils.showShort("mesh name or password empty")
+                        return@Consumer
                     }
+                    val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                            Constant.DB_NAME_KEY, "dadou")
+                    //自动重连参数
+                    val connectParams = Parameters.createAutoConnectParameters()
+                    connectParams.setMeshName(mesh?.name)
+                    if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                    Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+                        connectParams.setPassword(NetworkFactory.md5(
+                                NetworkFactory.md5(mesh?.password) + account))
+                    } else {
+                        connectParams.setPassword(mesh?.password)
+                    }
+                    connectParams.autoEnableNotification(true)
+
+                    // 之前是否有在做MeshOTA操作，是则继续
+                    if (mesh?.isOtaProcessing == true) {
+                        connectParams.setConnectMac(mesh.otaDevice.mac)
+                        saveLog("Action: AutoConnect:" + mesh.otaDevice.mac)
+                    } else {
+                        saveLog("Action: AutoConnect:NULL")
+                    }
+                    //自动重连
+                    LogUtils.d("Start auto connect")
+                    snackbarScanning = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                    TelinkLightService.Instance().autoConnect(connectParams)
+                    runOnUiThread(Runnable { startConnectTimer() })
+
 
                     //刷新Notify参数
                     val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
@@ -434,6 +435,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {
                 runOnUiThread {
                     retryConnectTime = 0
+                    LogUtils.d(getString(R.string.connect_success))
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE
@@ -583,7 +585,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         mDisposable.add(RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted!!) {
-                this.autoConnect()
+//                this.autoConnect()
             } else {
                 val dialog = AlertDialog.Builder(this)
                 dialog.setMessage(resources.getString(R.string.scan_tip))
