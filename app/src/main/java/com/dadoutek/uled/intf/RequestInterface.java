@@ -103,7 +103,7 @@ public interface RequestInterface {
     Observable<Response<List<DbGroup>>> getGroupList(@Header("token") String token);
 
     //更新组
-    @PUT("api/ext/soybean/region/group/update/{rid}")
+    @PUT("api/ext/soybean/group/update/{rid}")
     Observable<Response<String>> updateGroup(@Header("token") String token,
                                              @Path("rid") int rid,
                                              @Query("name") String name,
@@ -164,7 +164,7 @@ public interface RequestInterface {
     Observable<Response<List<DbScene>>> getSceneList(@Header("token") String token);
 
     //更新场景
-    @PUT("api/ext/soybean/region/scene/update/{rid}")
+    @PUT("api/ext/soybean/scene/update/{rid}")
     Observable<Response<String>> updateScene(@Header("token") String token,
                                              @Path("rid") int rid,
                                              @Body RequestBody body);

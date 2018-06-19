@@ -3,6 +3,8 @@ package com.dadoutek.uled.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.os.PowerManager
 import android.view.MenuItem
 import android.view.View
@@ -16,6 +18,7 @@ import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
@@ -24,6 +27,7 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.mob.tools.utils.DeviceHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -136,7 +140,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             if (!SharedPreferencesUtils.getCurrentUserList().contains(dbUser.account)) {
                                 showLoadingDialog(getString(R.string.sync_now))
-                                syncGetDataStart(dbUser)
+                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser,handler)
                             } else {
                                 TransformView()
                             }
@@ -152,6 +156,22 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+
+    var handler: Handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            when (msg.what) {
+                Cmd.SYNCCMD -> showLoadingDialog(getString(R.string.tip_start_sync))
+                Cmd.SYNCCOMPLETCMD -> syncComplet()
+            }
+        }
+    }
+
+    private fun syncComplet() {
+        ToastUtils.showLong(getString(R.string.sync_complet))
+        hideLoadingDialog()
+        TransformView()
+    }
 
     private fun TransformView() {
         //        if (isFirstLauch) {
@@ -191,90 +211,5 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         val IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH"
     }
 
-    fun syncGetDataStart(dbUser: DbUser) {
-        val token = dbUser.token
-        startGet(token, dbUser.account)
-    }
-
-    private fun startGet(token: String, accountNow: String) {
-        NetworkFactory.getApi()
-                .getRegionList(token)
-                .compose(NetworkTransformer())
-                .flatMap {
-                    for (item in it) {
-                        DBUtils.saveRegion(item, true)
-                    }
-
-                    if (it.size != 0) {
-                        setupMesh()
-                        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                                Constant.USER_TYPE, Constant.USER_TYPE_NEW)
-                    }
-                    NetworkFactory.getApi()
-                            .getLightList(token)
-                            .compose(NetworkTransformer())
-                }
-                .flatMap {
-                    for (item in it) {
-                        DBUtils.saveLight(item, true)
-                    }
-                    NetworkFactory.getApi()
-                            .getGroupList(token)
-                            .compose(NetworkTransformer())
-                }
-                .flatMap {
-                    for (item in it) {
-                        DBUtils.saveGroup(item, true)
-                    }
-                    NetworkFactory.getApi()
-                            .getSceneList(token)
-                            .compose(NetworkTransformer())
-                }
-                .observeOn(Schedulers.io())
-                .doOnNext {
-                    for (item in it) {
-                        DBUtils.saveScene(item, true)
-                        for (i in item.actions.indices) {
-                           var k =i+1
-                            DBUtils.saveSceneActions(item.actions.get(i),k.toLong(),item.id)
-                        }
-                    }
-                }
-                .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
-                object : NetworkObserver<List<DbScene>>() {
-                    override fun onNext(item: List<DbScene>) {
-                        ToastUtils.showLong(getString(R.string.sync_complet))
-                        SharedPreferencesUtils.saveCurrentUserList(accountNow)
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                        hideLoadingDialog()
-                        TransformView()
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                    }
-                }
-        )
-    }
-
-    private fun setupMesh() {
-        val regionList = DBUtils.getRegionAll()
-
-        //数据库有区域数据直接加载
-        if (regionList.size != 0) {
-//            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
-            val dbRegion = DBUtils.getLastRegion()
-            val application = DeviceHelper.getApplication() as TelinkLightApplication
-            val mesh = application.mesh
-            mesh.name = dbRegion.controlMesh
-            mesh.password = dbRegion.controlMeshPwd
-            mesh.factoryName = dbRegion.installMesh
-            mesh.password = dbRegion.installMeshPwd
-//            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
-            application.setupMesh(mesh)
-            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
-            return
-        }
-    }
 
 }

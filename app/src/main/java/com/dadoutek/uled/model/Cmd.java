@@ -15,4 +15,7 @@ public class Cmd implements Serializable {
     public static final int GETACCOUNT = 0X06;
     public static final int GETSALT = 0X07;
     public static final int STLOGIN = 0X08;
+    public static final int SYNCCMD = 0X09;
+    public static final int SYNCCOMPLETCMD = 0X10;
+    public static final int SYNCERRORCMD = 0X11;
 }

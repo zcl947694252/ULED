@@ -4,10 +4,14 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -26,6 +30,7 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.EmptyAddActivity;
 import com.dadoutek.uled.activity.SplashActivity;
+import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -34,6 +39,7 @@ import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -174,7 +180,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-                SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity());
+                checkNetworkAndSync(getActivity(),handler);
                 break;
             case R.id.one_click_reset:
                 showSureResetDialog();
@@ -182,6 +188,42 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
 
     }
+
+    // 如果没有网络，则弹出网络设置对话框
+    public static void checkNetworkAndSync(final Activity activity,Handler handler) {
+        if (!NetWorkUtils.isNetworkAvalible(activity)) {
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.network_tip_title)
+                    .setMessage(R.string.net_disconnect_tip_message)
+                    .setPositiveButton(R.string.btn_sure,
+                            (dialog, whichButton) -> {
+                                // 跳转到设置界面
+                                activity.startActivityForResult(new Intent(
+                                                Settings.ACTION_WIRELESS_SETTINGS),
+                                        0);
+                            }).create().show();
+        }else{
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity,handler);
+        }
+    }
+
+    public Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case Cmd.SYNCCMD:
+                    showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
+                    break;
+                case Cmd.SYNCCOMPLETCMD:
+                    hideLoadingDialog();
+                    break;
+                case Cmd.SYNCERRORCMD:
+                    hideLoadingDialog();
+                    break;
+            }
+        }
+    };
 
     private void showSureResetDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
