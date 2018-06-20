@@ -22,6 +22,8 @@ import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -236,6 +238,15 @@ public class DBUtils {
             recordingChange(group.getId(),
                     DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                     Constant.DB_ADD);
+
+            //本地匹配index
+            List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
+                    getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+            if(dbOldGroupList!=null){
+                dbOldGroupList.add(group);
+                SharedPreferencesHelper.
+                        putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+            }
         }
     }
 
@@ -312,6 +323,20 @@ public class DBUtils {
         recordingChange(group.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                 Constant.DB_UPDATE);
+
+        //本地匹配index
+        List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
+                getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+        if(dbOldGroupList!=null){
+            for(int k=0;k<dbOldGroupList.size();k++){
+                if(group.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
+                    dbOldGroupList.set(k,group);
+                    SharedPreferencesHelper.
+                            putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+                    break;
+                }
+            }
+        }
     }
 
     public static void updateLight(DbLight light) {

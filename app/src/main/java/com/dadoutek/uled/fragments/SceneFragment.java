@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -14,13 +16,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.activity.ChangeSceneAct;
-import com.dadoutek.uled.adapter.SceneAdaper;
-import com.dadoutek.uled.intf.AdapterOnClickListner;
+import com.dadoutek.uled.adapter.SceneRecycleListAdapter;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
@@ -38,21 +40,15 @@ import butterknife.Unbinder;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class SceneFragment extends Fragment implements AdapterView.OnItemClickListener,
+public class SceneFragment extends Fragment implements
         Toolbar.OnMenuItemClickListener {
 
     private static final int SCENE_MAX_COUNT = 16;
-    //    @BindView(R.id.img_header_menu_left)
-//    ImageView imgHeaderMenuLeft;
-//    @BindView(R.id.txt_header_title)
-//    TextView txtHeaderTitle;
-//    @BindView(R.id.img_header_menu_right)
-//    ImageView imgHeaderMenuRight;
     @BindView(R.id.scene_list)
-    ListView sceneList;
+    RecyclerView recyclerView;
     Unbinder unbinder;
     private LayoutInflater layoutInflater;
-    private SceneAdaper adaper;
+    private SceneRecycleListAdapter adaper;
 
     private Toolbar toolbar;
     TextView toolbarTitle;
@@ -75,18 +71,12 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         unbinder = ButterKnife.bind(this, view);
         toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.SceneSetting);
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.menu_scene);
         toolbar.setOnMenuItemClickListener(this);
         setHasOptionsMenu(true);
         initData();
         initView();
-        initClick();
         return view;
-    }
-
-    private void initClick() {
-        sceneList.setOnItemClickListener(this);
     }
 
     private void initData() {
@@ -95,9 +85,32 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
     private void initView() {
-        adaper = new SceneAdaper(scenesListData, getActivity(), isDelete, adapterOnClickListner);
-        sceneList.setAdapter(adaper);
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(getActivity());
+        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutmanager);
+        adaper = new SceneRecycleListAdapter(R.layout.item_scene,scenesListData,isDelete);
+        adaper.setOnItemClickListener(onItemClickListener);
+        adaper.setOnItemChildClickListener(onItemChildClickListener);
+        adaper.bindToRecyclerView(recyclerView);
     }
+
+    BaseQuickAdapter.OnItemClickListener onItemClickListener= (adapter, view, position) -> {
+        setScene(scenesListData.get(position).getId());
+    };
+
+    BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener= (adapter, view, position) -> {
+        if (view.getId() == R.id.scene_delete) {
+//                dataManager.deleteScene(scenesListData.get(position));
+            deleteScene(position);
+            refreshData();
+        } else if (view.getId() == R.id.scene_edit) {
+//                setScene(scenesListData.get(position).getId());
+            DbScene scene = scenesListData.get(position);
+            Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
+            intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
+            startActivityForResult(intent, 0);
+        }
+    };
 
     private void refreshData() {
         adaper.notifyDataSetChanged();
@@ -124,23 +137,6 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         }
     }
 
-    AdapterOnClickListner adapterOnClickListner = new AdapterOnClickListner() {
-        @Override
-        public void adapterOnClick(View v, int position) {
-            if (v.getId() == R.id.scene_delete) {
-//                dataManager.deleteScene(scenesListData.get(position));
-                deleteScene(position);
-                refreshData();
-            } else if (v.getId() == R.id.scene_edit) {
-//                setScene(scenesListData.get(position).getId());
-                DbScene scene = scenesListData.get(position);
-                Intent intent = new Intent(getActivity(), ChangeSceneAct.class);
-                intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
-                startActivityForResult(intent, 0);
-            }
-        }
-    };
-
     private void deleteScene(int position) {
         byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
@@ -148,14 +144,6 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
         new Thread(() -> {
-//            for (int i = 0; i < list.size(); i++) {
-//                try {
-//                    Thread.sleep(100);
-//                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
         }).start();
         DBUtils.deleteScene(scenesListData.get(position));
@@ -169,25 +157,8 @@ public class SceneFragment extends Fragment implements AdapterView.OnItemClickLi
             byte[] params;
             params = new byte[]{(byte) id};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
-//            for (int i = 0; i < list.size(); i++) {
-//
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
-//            }
         }).start();
 
-    }
-
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-
-        setScene(scenesListData.get(position).getId());
     }
 
     @Override
