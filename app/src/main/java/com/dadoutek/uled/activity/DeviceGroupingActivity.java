@@ -29,6 +29,8 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbSceneActions;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.StringUtils;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.NotificationInfo;
@@ -66,11 +68,26 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
                 finish();
             } else {
                 deletePreGroup();
+                deletePreScene();
                 allocDeviceGroup(group);
                 saveInfo();
             }
         }
     };
+
+    private void deletePreScene() {
+        byte opcode = Opcode.SCENE_ADD_OR_DEL;
+        byte[] params;
+        params = new byte[]{0x00, (byte) 0xff};
+        new Thread(() -> {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), params);
+        }).start();
+    }
 
     private void deletePreGroup() {
         int groupAddress = DBUtils.getGroupByID(light.getBelongGroupId()).getMeshAddr();
@@ -108,7 +125,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
-
+//        this.mApplication.addEventListener(NotificationEvent.GET_SCENE, this);
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_grouping);
@@ -131,6 +148,16 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
         listView.setAdapter(adapter);
 
         this.getDeviceGroup();
+//        getScene();
+    }
+
+    private void getScene() {
+        byte opcode = (byte) 0xc0;
+        int dstAddress = light.getMeshAddr();
+        byte[] params = new byte[]{0x10,0x00};
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+        TelinkLightService.Instance().updateNotification();
     }
 
     @Override
@@ -212,6 +239,15 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
 
             mHandler.obtainMessage(UPDATE).sendToTarget();
         }
+//        else if(event.getType() == NotificationEvent.GET_SCENE){
+//            NotificationEvent e = (NotificationEvent) event;
+//            NotificationInfo info = e.getArgs();
+//            int srcAddress = info.src & 0xFF;
+//            byte[] params = info.params;
+//            if (srcAddress != light.getMeshAddr())
+//                return;
+//
+//        }
     }
 
     private void addNewGroup() {

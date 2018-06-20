@@ -180,7 +180,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-                checkNetworkAndSync(getActivity(),handler);
+//                checkNetworkAndSync(getActivity(),handler);
+                ToastUtils.showLong(R.string.devoloping);
                 break;
             case R.id.one_click_reset:
                 showSureResetDialog();

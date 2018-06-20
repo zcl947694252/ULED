@@ -275,5 +275,6 @@
     <string name="tip_completed_sync">同步完成</string>
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请设置网络！</string>
+    <string name="devoloping">开发中。。。敬请期待！</string>
 
 </resources>

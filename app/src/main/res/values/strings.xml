@@ -273,5 +273,6 @@
     <string name="tip_completed_sync">Completed synchronously</string>
     <string name="network_tip_title">Network status prompt</string>
     <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
+    <string name="devoloping">In development. . . Stay tuned!</string>
 
 </resources>
