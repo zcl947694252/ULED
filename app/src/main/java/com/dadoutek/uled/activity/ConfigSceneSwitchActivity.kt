@@ -135,19 +135,17 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 2 -> keyNum = 0x06          //左下按键
                 3 -> keyNum = 0x04          //右下按键
             }
-            val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0xff.toByte(), map.getValue(key).id.toByte(),
-                    0xff.toByte())
+            val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, map.getValue(key).id.toByte(),
+                    0x00)
 
-            Thread.sleep(100)
 
             TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_SCENE_FOR_SWITCH,
                     mDeviceInfo.meshAddress,
                     paramBytes)
 
-            Thread.sleep(100)
+            Thread.sleep(200)
         }
 
-        Thread.sleep(100)
     }
 
     private fun updateNameForSwitch() {

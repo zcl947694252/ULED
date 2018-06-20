@@ -162,13 +162,13 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             lightList = DBUtils.getLightByGroupID(group.id)
         }
-        val lights=SharedPreferencesHelper.getObject(this,Constant.LIGHT_STATE_KEY) as Lights?
-        if(lights!=null){
-            for(j in lightList.indices){
-                for(i in lights.get().indices){
-                    if(lightList.get(j).meshAddr==lights.get(i).meshAddress){
-                        lightList.get(j).icon=lights.get(i).icon
-                        lightList.get(j).status=lights.get(i).status
+        val lights = SharedPreferencesHelper.getObject(this, Constant.LIGHT_STATE_KEY) as Lights?
+        if (lights != null) {
+            for (j in lightList.indices) {
+                for (i in lights.get().indices) {
+                    if (lightList.get(j).meshAddr == lights.get(i).meshAddress) {
+                        lightList.get(j).icon = lights.get(i).icon
+                        lightList.get(j).status = lights.get(i).status
                     }
                 }
             }
@@ -229,8 +229,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
                             return@Consumer
                         }
 
-                        val account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                Constant.DB_NAME_KEY,"dadou")
+                        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                Constant.DB_NAME_KEY, "dadou")
                         //自动重连参数
                         val connectParams = Parameters.createAutoConnectParameters()
                         connectParams.setMeshName(mesh?.name)
@@ -375,6 +375,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQ_LIGHT_SETTING -> {
+                    adapter?.notifyDataSetChanged()
                     val isConnect = data?.getBooleanExtra("data", false) ?: false
                     if (isConnect) {
                         scanPb.visibility = View.VISIBLE

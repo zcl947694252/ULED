@@ -180,7 +180,7 @@ object AccountModel {
             application.setupMesh(mesh)
 //            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(), phone)
 //            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(), Constant.NEW_MESH_PASSWORD)
-            saveToDataBase(mesh.factoryName, mesh.password, mesh.name, mesh.password)
+            saveToDataBase(mesh.factoryName, mesh.factoryPassword, mesh.name, mesh.password)
             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
                     Constant.USER_TYPE, Constant.USER_TYPE_NEW)
         } else {
@@ -208,7 +208,7 @@ object AccountModel {
         mesh.name = dbRegio.controlMesh
         mesh.password = dbRegio.controlMeshPwd
         mesh.factoryName = dbRegio.installMesh
-        mesh.password = dbRegio.installMeshPwd
+        mesh.factoryPassword = dbRegio.installMeshPwd
 //        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
         application.setupMesh(mesh)
 

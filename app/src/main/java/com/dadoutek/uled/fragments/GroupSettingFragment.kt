@@ -8,9 +8,9 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
-import butterknife.OnClick
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
@@ -21,14 +21,17 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.widget.ColorPicker
 import kotlinx.android.synthetic.main.fragment_group_setting.*
+import org.jetbrains.anko.find
 import java.util.*
 
-class GroupSettingFragment : Fragment() {
+class GroupSettingFragment : Fragment(), View.OnClickListener {
 
     private var brightnessBar: SeekBar? = null
     private var temperatureBar: SeekBar? = null
     private var colorPicker: ColorPicker? = null
     private var mApplication: TelinkLightApplication? = null
+    private var btn_remove_group: Button? = null
+    private var btn_rename: Button? = null
     var group: DbGroup? = null
 
     private val barChangeListener = object : OnSeekBarChangeListener {
@@ -128,6 +131,7 @@ class GroupSettingFragment : Fragment() {
         super.onCreate(savedInstanceState)
         mApplication = activity!!.application as TelinkLightApplication
 
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -140,6 +144,11 @@ class GroupSettingFragment : Fragment() {
 
 
         this.colorPicker = view.findViewById<View>(R.id.color_picker) as ColorPicker
+        btn_rename = view.findViewById<Button>(R.id.btn_rename)
+        btn_remove_group = view.findViewById<Button>(R.id.btn_remove_group)
+
+        btn_remove_group?.setOnClickListener(this)
+        btn_rename?.setOnClickListener(this)
 
         return view
     }
@@ -166,25 +175,21 @@ class GroupSettingFragment : Fragment() {
         this.colorPicker!!.setOnColorChangeListener(this.colorChangedListener)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
-    @OnClick(R.id.btn_remove_group, R.id.btn_rename)
-    fun onViewClicked(view: View) {
-        when (view.id) {
+    override fun onClick(v: View?) {
+        when (v?.id) {
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(activity)).setMessage(R.string.delete_group_confirm)
                     .setPositiveButton(R.string.btn_ok) { _, _ ->
-                        CmdDelete(group!!.id!!, group!!.meshAddr)
+                        CmdDelete(group?.id!!, group!!.meshAddr)
                         DBUtils.deleteGroup(group!!)
-                        activity!!.setResult(Constant.RESULT_OK)
-                        activity!!.finish()
+                        activity?.setResult(Constant.RESULT_OK)
+                        activity?.finish()
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
             R.id.btn_rename -> renameGp()
         }
     }
+
 
     private fun CmdDelete(id: Long, groupAddress: Int) {
         val lights = DBUtils.getLightByGroupID(id)

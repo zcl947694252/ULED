@@ -20,8 +20,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 39
-        versionName "1.1.34"
+        versionCode 45
+        versionName "1.1.40"
 
         multiDexEnabled true
 
@@ -89,7 +89,7 @@ dependencies {
     implementation 'com.tencent.bugly:crashreport:latest.release'
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 
     implementation 'com.jakewharton:butterknife:8.8.1'
