@@ -52,40 +52,40 @@ public class Constant implements Serializable {
     public static final String BASE_URL = "https://mqtt.beesmartnet.com/";
 
     //用于标记当前数据库名的本地存储
-    public static String DB_NAME_KEY="DB_NAME_KEY";
+    public static String DB_NAME_KEY = "DB_NAME_KEY";
 
     //用于标记当前数据库名的本地存储
-    public static String DB_TOken_KEY="DB_NAME_KEY";
+    public static String DB_TOken_KEY = "DB_NAME_KEY";
 
     //当前使用的区域默认为0
-    public static long CURRENT_USE_REGION_ID=0;
+    public static long CURRENT_USE_REGION_ID = 0;
 
     //当前使用的区域默认为0
-    public static String CURRENT_USE_REGION_KEY="CURRENT_USE_REGION_KEY";
+    public static String CURRENT_USE_REGION_KEY = "CURRENT_USE_REGION_KEY";
 
     //当前使用过此手机登录的用户列表
-    public static String CURRENT_USE_LIST_KEY="CURRENT_USE_LIST_KEY";
+    public static String CURRENT_USE_LIST_KEY = "CURRENT_USE_LIST_KEY";
 
     //是否是开发者模式
-    public static String IS_DEVELOPER_MODE="IS_DEVELOPER_MODE";
+    public static String IS_DEVELOPER_MODE = "IS_DEVELOPER_MODE";
 
     //用于标记数据库改变增加
-    public static final String DB_ADD="DB_ADD";
+    public static final String DB_ADD = "DB_ADD";
     //用于标记数据库改变删除
-    public static final String DB_DELETE="DB_DELETE";
+    public static final String DB_DELETE = "DB_DELETE";
     //用于标记数据库改变修改
-    public static final String DB_UPDATE="DB_UPDATE";
+    public static final String DB_UPDATE = "DB_UPDATE";
     //用户类型
-    public static String USER_TYPE="USER_TYPE";
+    public static String USER_TYPE = "USER_TYPE";
     //用户类型老用户
-    public static String USER_TYPE_OLD="OLD_USER";
+    public static String USER_TYPE_OLD = "OLD_USER";
     //用户类型新用户
-    public static String USER_TYPE_NEW="NEW_USER";
+    public static String USER_TYPE_NEW = "NEW_USER";
     //用户类型新用户
-    public static int CTROL_PASSWORD_REGION=1000000000;
+    public static int CTROL_PASSWORD_REGION = 1000000000;
 
-    public static String LIGHT_STATE_KEY="LIGHT_STATE_KEY";
+    public static String LIGHT_STATE_KEY = "LIGHT_STATE_KEY";
 
     //是否在一键恢复出厂设置
-    public static String DELETEING="DELETEING";
+    public static String DELETEING = "DELETEING";
 }

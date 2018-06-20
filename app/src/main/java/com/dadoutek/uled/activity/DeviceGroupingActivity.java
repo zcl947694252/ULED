@@ -29,7 +29,6 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.util.StringUtils;
 import com.telink.bluetooth.event.NotificationEvent;
@@ -41,7 +40,7 @@ import java.util.List;
 
 
 public final class DeviceGroupingActivity extends TelinkBaseActivity implements
-        EventListener{
+        EventListener {
 
     private final static int UPDATE = 1;
 
@@ -67,15 +66,19 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
                 ToastUtils.showLong(R.string.tip_selected_group);
                 finish();
             } else {
-                deletePreGroup();
-                deletePreScene();
+                deletePreGroup(light.getMeshAddr());
+                deleteAllSceneByLightAddr(light.getMeshAddr());
                 allocDeviceGroup(group);
                 saveInfo();
             }
         }
     };
 
-    private void deletePreScene() {
+    /**
+     * 删除指定灯里的所有场景
+     * @param lightMeshAddr 灯的mesh地址
+     */
+    private void deleteAllSceneByLightAddr(int lightMeshAddr) {
         byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
         params = new byte[]{0x00, (byte) 0xff};
@@ -85,18 +88,20 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), params);
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params);
         }).start();
     }
 
-    private void deletePreGroup() {
+    /**
+     * 删除指定灯的之前的分组
+     * @param lightMeshAddr 灯的mesh地址
+     */
+    private void deletePreGroup(int lightMeshAddr) {
         int groupAddress = DBUtils.getGroupByID(light.getBelongGroupId()).getMeshAddr();
-        int dstAddress = light.getMeshAddr();
-        byte opcode = (byte) 0xD7;
-        byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
+        byte opcode = Opcode.SET_GROUP;
+        byte[] params = new byte[]{0x00, (byte) (groupAddress & 0xFF), //0x00表示删除组
                 (byte) (groupAddress >> 8 & 0xFF)};
-        params[0] = 0x00;
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params);
     }
 
     private void saveInfo() {
@@ -154,7 +159,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
     private void getScene() {
         byte opcode = (byte) 0xc0;
         int dstAddress = light.getMeshAddr();
-        byte[] params = new byte[]{0x10,0x00};
+        byte[] params = new byte[]{0x10, 0x00};
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
         TelinkLightService.Instance().updateNotification();
