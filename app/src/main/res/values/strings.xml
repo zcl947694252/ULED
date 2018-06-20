@@ -264,10 +264,15 @@
     <string name="error_disconnect_tip">Disconnect, please link and try again</string>
     <string name="scene_16_tip">The maximum number of scenes is 16!</string>
     <string name="server_exception">Server exception</string>
-    <string name="start_sync">即将开始数据同步。。。</string>
-    <string name="sync_complet">同步完成</string>
-    <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
+    <string name="start_sync">Data synchronization is about to begin. . .</string>
+    <string name="sync_complet">Completed synchronously</string>
+    <string name="sync_now">Syncing server data, please wait. . .</string>
     <string name="install_light">Install lights</string>
     <string name="install_device">Install Device</string>
+    <string name="tip_start_sync">Start synchronization. . .</string>
+    <string name="tip_completed_sync">Completed synchronously</string>
+    <string name="network_tip_title">Network status prompt</string>
+    <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
+    <string name="devoloping">In development. . . Stay tuned!</string>
 
 </resources>

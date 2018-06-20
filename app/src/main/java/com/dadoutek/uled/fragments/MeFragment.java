@@ -8,7 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -27,19 +30,16 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.EmptyAddActivity;
 import com.dadoutek.uled.activity.SplashActivity;
+import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbDataChange;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbRegion;
-import com.dadoutek.uled.model.DbModel.DbScene;
-import com.dadoutek.uled.model.DbModel.DbSceneActions;
-import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -89,7 +89,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     private DbLight currentLight;
     private boolean isDeleteSuccess = false;
 
-    private long sleepTime=250;
+    private long sleepTime = 250;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,10 +98,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
         this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
 
-        if(android.os.Build.BRAND.contains("Huawei")){
-           sleepTime=500;
-        }else{
-            sleepTime=200;
+        if (android.os.Build.BRAND.contains("Huawei")) {
+            sleepTime = 500;
+        } else {
+            sleepTime = 200;
         }
     }
 
@@ -124,7 +124,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         updateIte.setVisibility(View.GONE);
         if (SharedPreferencesUtils.isDeveloperModel()) {
             copyDataBase.setVisibility(View.VISIBLE);
-            chearCache.setVisibility(View.VISIBLE);
+            chearCache.setVisibility(View.GONE);
         } else {
             copyDataBase.setVisibility(View.GONE);
             chearCache.setVisibility(View.GONE);
@@ -161,9 +161,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
     }
 
-    long[] mHints = new long[6];//初始全部为0
-
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup,R.id.one_click_reset})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -182,7 +180,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-//                SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity());
+//                checkNetworkAndSync(getActivity(),handler);
+                ToastUtils.showLong(R.string.devoloping);
                 break;
             case R.id.one_click_reset:
                 showSureResetDialog();
@@ -190,6 +189,42 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
 
     }
+
+    // 如果没有网络，则弹出网络设置对话框
+    public static void checkNetworkAndSync(final Activity activity,Handler handler) {
+        if (!NetWorkUtils.isNetworkAvalible(activity)) {
+            new AlertDialog.Builder(activity)
+                    .setTitle(R.string.network_tip_title)
+                    .setMessage(R.string.net_disconnect_tip_message)
+                    .setPositiveButton(R.string.btn_sure,
+                            (dialog, whichButton) -> {
+                                // 跳转到设置界面
+                                activity.startActivityForResult(new Intent(
+                                                Settings.ACTION_WIRELESS_SETTINGS),
+                                        0);
+                            }).create().show();
+        }else{
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity,handler);
+        }
+    }
+
+    public Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case Cmd.SYNCCMD:
+                    showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
+                    break;
+                case Cmd.SYNCCOMPLETCMD:
+                    hideLoadingDialog();
+                    break;
+                case Cmd.SYNCERRORCMD:
+                    hideLoadingDialog();
+                    break;
+            }
+        }
+    };
 
     private void showSureResetDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -262,7 +297,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                         if (j == 0) {
                             hideLoadingDialog();
                             SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                            getActivity().startActivity(new Intent(getActivity(),EmptyAddActivity.class));
+                            getActivity().startActivity(new Intent(getActivity(), EmptyAddActivity.class));
                             getActivity().finish();
                         }
                     }
@@ -278,14 +313,6 @@ public class MeFragment extends Fragment implements EventListener<String> {
         LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);
         TextView tvContent = (TextView) v.findViewById(R.id.tvContent);
         tvContent.setText(content);
-
-
-//        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
-//
-//        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
-//                R.animator.load_animation);
-
-//        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
 
         if (loadDialog == null) {
             loadDialog = new Dialog(getActivity(),
@@ -348,6 +375,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         restartApplication();
     }
 
+    long[] mHints = new long[6];//初始全部为0
     private void developerMode() {
         //将mHints数组内的所有元素左移一个位置
         System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
@@ -356,7 +384,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
             ToastUtils.showLong(R.string.developer_mode);
             copyDataBase.setVisibility(View.VISIBLE);
-            chearCache.setVisibility(View.VISIBLE);
+            chearCache.setVisibility(View.GONE);
             SharedPreferencesUtils.setDeveloperModel(true);
         }
     }

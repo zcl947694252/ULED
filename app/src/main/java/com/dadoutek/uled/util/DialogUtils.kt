@@ -1,7 +1,12 @@
 package com.dadoutek.uled.util
 
+import android.app.Dialog
 import android.content.Context
 import android.support.v7.app.AlertDialog
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.dadoutek.uled.R
 
 /**
@@ -22,5 +27,27 @@ object DialogUtils {
                 .show()
     }
 
+    fun showLoadingDialog(content: String, context: Context, loadDialog: Dialog) {
+        val inflater = LayoutInflater.from(context)
+        val v = inflater.inflate(R.layout.dialogview, null)
+
+        val layout = v.findViewById<View>(R.id.dialog_view) as LinearLayout
+        val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
+        tvContent.text = content
+
+        //loadDialog没显示才把它显示出来
+        if (!loadDialog!!.isShowing()) {
+            loadDialog!!.setCancelable(false)
+            loadDialog!!.setCanceledOnTouchOutside(false)
+            loadDialog!!.setContentView(layout)
+            loadDialog!!.show()
+        }
+    }
+
+    fun hideLoadingDialog(loadDialog: Dialog) {
+        if (loadDialog != null) {
+            loadDialog!!.dismiss()
+        }
+    }
 
 }

@@ -9,10 +9,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object RegionModel {
-    fun add(token: String, controlMesh: String, controlMeshPwd: String,installMesh: String
-            ,installMeshPwd: String,id: Long): Observable<String>? {
+    fun add(token: String, controlMesh: String, controlMeshPwd: String, installMesh: String
+            , installMeshPwd: String, id: Long, changeId: Long?): Observable<String>? {
         return NetworkFactory.getApi()
-                .addRegion(token,controlMesh,controlMeshPwd,installMesh,installMeshPwd)
+                .addRegion(token,controlMesh,controlMeshPwd,installMesh,installMeshPwd,changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

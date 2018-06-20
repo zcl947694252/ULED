@@ -3,19 +3,19 @@ package com.dadoutek.uled.model.HttpModel
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.DbModel.DbSceneBody
 import com.google.gson.JsonArray
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import org.json.JSONArray
+import okhttp3.RequestBody
 
 object SceneModel {
-    fun add(token: String, name: String, actions: JsonArray,
-            belongRegionId: Int,id: Long): Observable<String>? {
+    fun add(token: String,  body: RequestBody,
+            id: Long, changeId: Long?): Observable<String>? {
         return NetworkFactory.getApi()
-                .addScene(token,name,actions,belongRegionId)
+                .addScene(token,body,changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -24,10 +24,10 @@ object SceneModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String,actions: JsonArray
+    fun update(token: String, rid: Int, body: RequestBody
                ,id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .updateScene(token,rid,name,actions)
+                .updateScene(token,rid,body)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

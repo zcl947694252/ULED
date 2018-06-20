@@ -40,5 +40,6 @@ public class DaoSessionInstance {
 
     public static void destroySession() {
         session = null;
+        name = null;
     }
 }

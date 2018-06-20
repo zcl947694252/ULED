@@ -117,7 +117,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         if (powerManager != null) {
-            mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "WakeLock")
+            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
         }
         //TelinkLog.ENABLE = false;
 //        this.requestWindowFeature(Window.FEATURE_NO_TITLE)

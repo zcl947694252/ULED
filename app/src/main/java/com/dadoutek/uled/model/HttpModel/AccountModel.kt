@@ -1,15 +1,12 @@
 package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
-import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
@@ -44,7 +41,7 @@ object AccountModel {
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
-                    syncIsNewUser(it.token,it.account,it)
+                    syncIsNewUser(it.token, it.account, it)
                     Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -216,29 +213,29 @@ object AccountModel {
     }
 
 
-    private fun syncIsNewUser(token: String,account: String,user: DbUser){
-        setIsLogin(true)
-        setupMesh(account)
+    private fun syncIsNewUser(token: String, account: String, user: DbUser) {
+//        setIsLogin(true)
+//        setupMesh(account)
 
-//        NetworkFactory.getApi()
-//                .getRegionList(token)
-//                .compose(NetworkTransformer())
-//                .observeOn(Schedulers.io())
-//                .doOnNext {
-//                }
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(object : NetworkObserver<List<DbRegion>>() {
-//                    override fun onNext(t: List<DbRegion>) {
-//                        //非首次在当前手机登录或者是首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
-//                        if (t.size == 0 || SharedPreferencesUtils.getCurrentUserList().contains(account)) {
-//                                setIsLogin(true)
-//                                setupMesh(account)
-//                        }
-//                    }
-//
-//                    override fun onError(e: Throwable) {
-//                        super.onError(e)
-//                    }
-//                })
+        NetworkFactory.getApi()
+                .getRegionList(token)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : NetworkObserver<List<DbRegion>>() {
+                    override fun onNext(t: List<DbRegion>) {
+                        //非首次在当前手机登录或者是首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
+                        if (t.size == 0 || SharedPreferencesUtils.getCurrentUserList().contains(account)) {
+                            setIsLogin(true)
+                            setupMesh(account)
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        super.onError(e)
+                    }
+                })
     }
 }

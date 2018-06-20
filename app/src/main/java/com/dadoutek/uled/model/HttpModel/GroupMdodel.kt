@@ -8,9 +8,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object GroupMdodel {
-    fun add(token: String, meshAddr: Int, name: String,brightness: Int,colorTemperature: Int,belongRegionId: Int,id: Long): Observable<String>? {
+    fun add(token: String, meshAddr: Int, name: String, brightness: Int, colorTemperature: Int, belongRegionId: Int, id: Long, changeId: Long?): Observable<String>? {
         return NetworkFactory.getApi()
-                .addGroup(token,meshAddr,name,brightness,colorTemperature,belongRegionId)
+                .addGroup(token,meshAddr,name,brightness,colorTemperature,belongRegionId,changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -19,7 +19,7 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String,brightness: Int,colorTemperature: Int,id: Long): Observable<String>? {
+    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int, id: Long, groupId: Long): Observable<String>? {
         return NetworkFactory.getApi()
                 .updateGroup(token,rid,name,brightness,colorTemperature)
                 .compose(NetworkTransformer())

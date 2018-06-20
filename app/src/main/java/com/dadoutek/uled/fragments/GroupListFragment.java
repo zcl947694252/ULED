@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,6 +21,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -26,6 +30,9 @@ import com.dadoutek.uled.activity.DeviceScanningNewActivity;
 import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
 import com.dadoutek.uled.activity.ScanningSwitchActivity;
+import com.dadoutek.uled.adapter.GroupListRecycleViewAdapter;
+import com.dadoutek.uled.adapter.SceneGroupAdapter;
+import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -38,7 +45,7 @@ import java.util.List;
 public final class GroupListFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
 
     private LayoutInflater inflater;
-    private GroupListAdapter adapter;
+    private GroupListRecycleViewAdapter adapter;
 
     private Activity mContext;
     private TelinkLightApplication mApplication;
@@ -47,10 +54,9 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
     private TelinkLightApplication application;
     private Toolbar toolbar;
 
-    private OnItemLongClickListener itemLongClickListener = (parent, view, position, id) -> {
-        return true;
-    };
-    private GridView gridView;
+//    private GridView gridView;
+    private RecyclerView recyclerView;
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -93,7 +99,6 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 
         toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.group_list_header);
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.men_group);
         toolbar.setOnMenuItemClickListener(this);
         if (SharedPreferencesUtils.isDeveloperModel()) {
@@ -104,8 +109,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 
         setHasOptionsMenu(true);
 
-        gridView = (GridView) view.findViewById(R.id.list_groups);
-        gridView.setOnItemLongClickListener(this.itemLongClickListener);
+        recyclerView = view.findViewById(R.id.list_groups);
 
         this.initData();
         return view;
@@ -117,18 +121,6 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 
         }
     }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        getActivity().getMenuInflater().inflate(R.menu.men_group, menu);
-//        if(SharedPreferencesUtils.isDeveloperModel()){
-//            menu.findItem(R.id.menu_setting).setVisible(true);
-//        }else{
-//            menu.findItem(R.id.menu_setting).setVisible(false);
-//        }
-//    }
-
 
     @Override
     public void onHiddenChanged(boolean hidden) {
@@ -142,12 +134,65 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
     private void initData() {
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
         gpList = DBUtils.getGroupList();
-        this.adapter = new GroupListAdapter(gpList);
-        gridView.setAdapter(this.adapter);
+
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(getActivity());
+        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutmanager);
+        this.adapter = new GroupListRecycleViewAdapter(R.layout.group_item,gpList);
+        adapter.setOnItemChildClickListener(onItemChildClickListener);
+        adapter.bindToRecyclerView(recyclerView);
+        setMove();
+
         application = (TelinkLightApplication) getActivity().getApplication();
         dataManager = new DataManager(TelinkLightApplication.getInstance(),
                 application.getMesh().name, application.getMesh().password);
     }
+
+    private void setMove() {
+//        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+//
+//        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+//
+//        mAdapter.setItemTouchHelper(mItemTouchHelper);
+//
+//        mAdapter.setDragViewId(R.id.iv_drag);
+//
+//        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+    }
+
+    BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener= (adapter, view, position) -> {
+
+        DbGroup group = gpList.get(position);
+
+        byte opcode = (byte) 0xD0;
+        int dstAddr = group.getMeshAddr();
+        Intent intent;
+
+        if (!dataManager.getConnectState(getActivity())) {
+            return;
+        }
+
+        switch (view.getId()){
+            case R.id.btn_on:
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
+                        new byte[]{0x01, 0x00, 0x00});
+                break;
+            case R.id.btn_off:
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
+                        new byte[]{0x00, 0x00, 0x00});
+                break;
+            case R.id.btn_set:
+                intent = new Intent(mContext, GroupSettingActivity.class);
+                intent.putExtra("group", group);
+                startActivityForResult(intent, 0);
+                break;
+            case R.id.txt_name:
+                intent = new Intent(mContext, LightsOfGroupActivity.class);
+                intent.putExtra("group", group);
+                startActivity(intent);
+                break;
+        }
+    };
 
     public void notifyDataSetChanged() {
         this.adapter.notifyDataSetChanged();
@@ -185,144 +230,5 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
             return true;
         });
 
-    }
-
-    private static class GroupItemHolder {
-        public TextView txtName;
-        public TextView btnOn;
-        public TextView btnOff;
-        public TextView btnSet;
-    }
-
-    final class GroupListAdapter extends BaseAdapter implements
-            OnClickListener, OnLongClickListener {
-        ArrayList<DbGroup> groupArrayListNew = new ArrayList<>();
-
-        public GroupListAdapter(List<DbGroup> groups) {
-            if (groupArrayListNew.size() > 0) {
-                groupArrayListNew.clear();
-            }
-            List<DbGroup> groupList = groups;
-            for (DbGroup group : groupList) {
-                groupArrayListNew.add(group);
-            }
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            return false;
-        }
-
-        @Override
-        public int getCount() {
-            return groupArrayListNew.size();
-        }
-
-        @Override
-        public DbGroup getItem(int position) {
-            return groupArrayListNew.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            GroupItemHolder holder;
-
-            if (convertView == null) {
-
-                convertView = inflater.inflate(R.layout.group_item, null);
-
-                TextView txtName = (TextView) convertView
-                        .findViewById(R.id.txt_name);
-                txtName.setOnClickListener(this);
-
-                TextView btnOn = (TextView) convertView.findViewById(R.id.btn_on);
-                btnOn.setOnClickListener(this);
-
-                TextView btnOff = (TextView) convertView.findViewById(R.id.btn_off);
-                btnOff.setOnClickListener(this);
-
-                TextView btnSet = (TextView) convertView.findViewById(R.id.btn_set);
-                btnSet.setOnClickListener(this);
-
-                holder = new GroupItemHolder();
-
-                holder.txtName = txtName;
-                holder.btnOn = btnOn;
-                holder.btnOff = btnOff;
-                holder.btnSet = btnSet;
-
-                convertView.setTag(holder);
-
-            } else {
-                holder = (GroupItemHolder) convertView.getTag();
-            }
-
-            DbGroup group = this.getItem(position);
-
-            if (group != null) {
-                if (group.textColor == 0)
-                    group.textColor = mContext.getResources()
-                            .getColor(R.color.black);
-
-                holder.txtName.setText(group.getName());
-                holder.txtName.setTextColor(group.textColor);
-                holder.txtName.setTag(position);
-                holder.btnOn.setTag(position);
-                holder.btnOff.setTag(position);
-                holder.btnSet.setTag(position);
-            }
-
-            return convertView;
-        }
-
-        @Override
-        public void onClick(View view) {
-
-            int clickId = view.getId();
-            int position = (int) view.getTag();
-
-            DbGroup group = groupArrayListNew.get(position);
-
-            byte opcode = (byte) 0xD0;
-            int dstAddr = group.getMeshAddr();
-            Intent intent;
-
-            if (!dataManager.getConnectState(getActivity())) {
-                return;
-            }
-
-            switch (clickId) {
-                case R.id.btn_on:
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                            new byte[]{0x01, 0x00, 0x00});
-                    break;
-                case R.id.btn_off:
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                            new byte[]{0x00, 0x00, 0x00});
-                    break;
-                case R.id.btn_set:
-                    intent = new Intent(mContext, GroupSettingActivity.class);
-                    intent.putExtra("group", group);
-                    startActivityForResult(intent, 0);
-                    break;
-                case R.id.txt_name:
-                    intent = new Intent(mContext, LightsOfGroupActivity.class);
-                    intent.putExtra("group", group);
-                    startActivity(intent);
-                    break;
-            }
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-
-            return false;
-        }
     }
 }

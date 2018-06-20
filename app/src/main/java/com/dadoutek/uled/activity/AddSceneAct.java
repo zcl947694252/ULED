@@ -288,17 +288,22 @@ public class AddSceneAct extends TelinkBaseActivity {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         byte[] params;
+
         for (int i = 0; i < list.size(); i++) {
-            Thread.sleep(100);
-            byte temperature = (byte) list.get(i).getColorTemperature();
-            if (temperature > 99)
-                temperature = 99;
-            byte light = (byte) list.get(i).getBrightness();
-            if (light > 99)
-                light = 99;
-            params = new byte[]{0x01, (byte) id, light,
-                    (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, temperature};
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+            int count=0;
+            do{
+                count++;
+                Thread.sleep(300);
+                byte temperature = (byte) list.get(i).getColorTemperature();
+                if (temperature > 99)
+                    temperature = 99;
+                byte light = (byte) list.get(i).getBrightness();
+                if (light > 99)
+                    light = 99;
+                params = new byte[]{0x01, (byte) id, light,
+                        (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, temperature};
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+            }while(count<3);
         }
     }
 

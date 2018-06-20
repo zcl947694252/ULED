@@ -443,23 +443,26 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 try {
                     //每个灯发10次分组的命令，确保灯能收到命令.
-                    for (int i = 0; i < 10; i++) {
-                        sendGroupData(light, group, index);
+                    loop1: for (int i = 0; i < 10; i++) {
                         Thread.sleep(500);
-
+                        sendGroupData(light, group, index);
                         if (groupingSuccess) {
 //                            sendGroupData(light, group, index);
                             groupingSuccess = false;
-                            break;
-                        } else if (groupingSuccess == false && i == 9) {
-                            light.setName("");
-                            ToastUtils.showLong(R.string.group_fail_tip);
+                            updateGroupResult(light, group);
+                            break loop1;
+                        } else if (i == 9) {
+                            if(!groupingSuccess){
+                                light.setName("");
+                                ToastUtils.showLong(R.string.group_fail_tip);
+                                updateGroupResult(light, group);
+                            }else{
+                                updateGroupResult(light, group);
+                            }
                         }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                } finally {
-                    updateGroupResult(light, group);
                 }
                 index++;
             }
