@@ -162,6 +162,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
         this.adapter = new GroupListRecycleViewAdapter(R.layout.group_item,showList);
         adapter.setOnItemChildClickListener(onItemChildClickListener);
         adapter.bindToRecyclerView(recyclerView);
+//        adapter.openLoadAnimation(BaseQuickAdapter.ALPHAIN);
         setMove();
 
         application = (TelinkLightApplication) getActivity().getApplication();

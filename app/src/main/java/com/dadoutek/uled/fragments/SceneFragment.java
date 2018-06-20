@@ -22,15 +22,9 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AddSceneAct;
 import com.dadoutek.uled.activity.ChangeSceneAct;
-import com.dadoutek.uled.activity.GroupSettingActivity;
-import com.dadoutek.uled.activity.LightsOfGroupActivity;
-import com.dadoutek.uled.adapter.GroupListRecycleViewAdapter;
-import com.dadoutek.uled.adapter.SceneAdaper;
 import com.dadoutek.uled.adapter.SceneRecycleListAdapter;
-import com.dadoutek.uled.intf.AdapterOnClickListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.Opcode;
@@ -50,12 +44,6 @@ public class SceneFragment extends Fragment implements
         Toolbar.OnMenuItemClickListener {
 
     private static final int SCENE_MAX_COUNT = 16;
-    //    @BindView(R.id.img_header_menu_left)
-//    ImageView imgHeaderMenuLeft;
-//    @BindView(R.id.txt_header_title)
-//    TextView txtHeaderTitle;
-//    @BindView(R.id.img_header_menu_right)
-//    ImageView imgHeaderMenuRight;
     @BindView(R.id.scene_list)
     RecyclerView recyclerView;
     Unbinder unbinder;
@@ -83,7 +71,6 @@ public class SceneFragment extends Fragment implements
         unbinder = ButterKnife.bind(this, view);
         toolbar = view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.SceneSetting);
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         toolbar.inflateMenu(R.menu.menu_scene);
         toolbar.setOnMenuItemClickListener(this);
         setHasOptionsMenu(true);
@@ -157,14 +144,6 @@ public class SceneFragment extends Fragment implements
         List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
         new Thread(() -> {
-//            for (int i = 0; i < list.size(); i++) {
-//                try {
-//                    Thread.sleep(100);
-//                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
         }).start();
         DBUtils.deleteScene(scenesListData.get(position));
@@ -178,15 +157,6 @@ public class SceneFragment extends Fragment implements
             byte[] params;
             params = new byte[]{(byte) id};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
-//            for (int i = 0; i < list.size(); i++) {
-//
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
-//            }
         }).start();
 
     }
