@@ -376,6 +376,20 @@ public class DBUtils {
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                 Constant.DB_DELETE);
+
+        //本地匹配index
+        List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
+                getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+        if(dbOldGroupList!=null){
+            for(int k=0;k<dbOldGroupList.size();k++){
+                if(dbGroup.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
+                    dbOldGroupList.remove(k);
+                    SharedPreferencesHelper.
+                            putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+                    break;
+                }
+            }
+        }
     }
 
     public static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup){
