@@ -276,5 +276,8 @@
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请设置网络！</string>
     <string name="devoloping">开发中。。。敬请期待！</string>
+    <string name="repaet_send">(%1$d s)重新发送</string>
+    <string name="manager_verification">管理员权限验证</string>
+    <string name="manager_phone_error">管理员手机号错误</string>
 
 </resources>

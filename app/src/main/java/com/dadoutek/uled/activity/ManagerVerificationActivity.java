@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +12,8 @@ import android.widget.Button;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.hbb20.CountryCodePicker;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +33,7 @@ import io.reactivex.schedulers.Schedulers;
  * Created by hejiajun on 2018/5/18.
  */
 
-public class PhoneVerificationActivity extends TelinkBaseActivity {
+public class ManagerVerificationActivity extends TelinkBaseActivity {
     @BindView(R.id.ccp)
     CountryCodePicker ccp;
     @BindView(R.id.edit_phone_number)
@@ -46,33 +47,36 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    private String phone;
     private String countryCode;
-    private String transForm;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-    private long TIME_INTERVAL=60;
+    private long TIME_INTERVAL = 60;
+    private String function;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acitvity_phone_verification);
         ButterKnife.bind(this);
-        initData();
         initToolbar();
+        initData();
         initView();
     }
 
+    private void initData() {
+        phone = DBUtils.getLastUser().getPhone();
+        editPhoneNumber.getEditText().setText(phone);
+
+        Intent intent = getIntent();
+        function = intent.getExtras().getString(Constant.ME_FUNCTION);
+    }
+
     private void initToolbar() {
-        toolbar.setTitle(R.string.verification_phone);
+        toolbar.setTitle(R.string.manager_verification);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-
-    private void initData() {
-        Intent intent = getIntent();
-        transForm = intent.getStringExtra("fromLogin");
     }
 
     private void initView() {
@@ -101,8 +105,12 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 sendCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim());
                 break;
             case R.id.btn_verification:
-                submitCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim(),
-                        editVerification.getEditText().getText().toString().trim());
+                if(editPhoneNumber.getEditText().getText().toString().trim().equals(phone)){
+                    submitCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim(),
+                            editVerification.getEditText().getText().toString().trim());
+                }else {
+                    ToastUtils.showLong(R.string.manager_phone_error);
+                }
                 break;
         }
     }
@@ -148,19 +156,19 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
     }
 
     private void timing() {
-        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0,1,TimeUnit.SECONDS)
+        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<Object>() {
                     @Override
                     public void onNext(Object o) {
-                        long num=(59-Long.valueOf((Long) o));
-                        if(num==0){
+                        long num = (59 - Long.valueOf((Long) o));
+                        if (num == 0) {
                             btnSendVerification.setText(getResources().getString(R.string.send_verification));
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.primary));
                             btnSendVerification.setClickable(true);
-                        }else{
-                            btnSendVerification.setText(getString(R.string.repaet_send,num));
+                        } else {
+                            btnSendVerification.setText(getString(R.string.repaet_send, num));
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.gray));
                             btnSendVerification.setClickable(false);
                         }
@@ -180,18 +188,10 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
 
     private void tranformView() {
         ToastUtils.showLong(R.string.successful_verification);
-        Intent intent = null;
-        if (transForm.equals("register")) {
-            intent = new Intent(PhoneVerificationActivity.this, RegisterActivity.class);
-            intent.putExtra("phone", editPhoneNumber.getEditText().getText().toString().trim());
-        } else if (transForm.equals("forgetPassword")) {
-            intent = new Intent(PhoneVerificationActivity.this, ForgetPassWordActivity.class);
-            intent.putExtra("phone", editPhoneNumber.getEditText().getText().toString().trim());
-        }
-        if (intent != null) {
-            startActivity(intent);
-            finish();
-        }
+        Intent intent = new Intent();
+        intent.putExtra(Constant.ME_FUNCTION, function);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
     protected void onDestroy() {
