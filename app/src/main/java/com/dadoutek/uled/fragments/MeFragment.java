@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -211,7 +210,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     }
 
     // 如果没有网络，则弹出网络设置对话框
-    public static void checkNetworkAndSync(final Activity activity,Handler handler) {
+    public static void checkNetworkAndSync(final Activity activity, Handler handler) {
         if (!NetWorkUtils.isNetworkAvalible(activity)) {
             new AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -223,16 +222,16 @@ public class MeFragment extends Fragment implements EventListener<String> {
                                                 Settings.ACTION_WIRELESS_SETTINGS),
                                         0);
                             }).create().show();
-        }else{
-            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity,handler);
+        } else {
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity, handler);
         }
     }
 
-    public Handler handler=new Handler(){
+    public Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case Cmd.SYNCCMD:
                     showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
                     break;
@@ -279,8 +278,16 @@ public class MeFragment extends Fragment implements EventListener<String> {
             }
 
             if (lightList.size() == 0) {
+                for (int i = 0; i < 3; i++) {
+                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, null);
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 hideLoadingDialog();
-                ToastUtils.showLong(R.string.reset_fail_tip1);
                 return;
             }
 
@@ -396,6 +403,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     }
 
     long[] mHints = new long[6];//初始全部为0
+
     private void developerMode() {
         //将mHints数组内的所有元素左移一个位置
         System.arraycopy(mHints, 1, mHints, 0, mHints.length - 1);
