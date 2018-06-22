@@ -274,5 +274,8 @@
     <string name="network_tip_title">Network status prompt</string>
     <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
     <string name="devoloping">In development. . . Stay tuned!</string>
+    <string name="repaet_send">(%1$d s) resend</string>
+    <string name="manager_verification">Administrator authority verification</string>
+    <string name="manager_phone_error">Admin mobile phone number is wrong</string>
 
 </resources>

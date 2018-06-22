@@ -376,6 +376,20 @@ public class DBUtils {
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                 Constant.DB_DELETE);
+
+        //本地匹配index
+        List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
+                getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+        if(dbOldGroupList!=null){
+            for(int k=0;k<dbOldGroupList.size();k++){
+                if(dbGroup.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
+                    dbOldGroupList.remove(k);
+                    SharedPreferencesHelper.
+                            putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+                    break;
+                }
+            }
+        }
     }
 
     public static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup){
@@ -510,11 +524,22 @@ public class DBUtils {
                 if (dataChangeList.get(i).getTableName().equals(changeTable) &
                         dataChangeList.get(i).getChangeId().equals(changeIndex)) {
                     //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
-                    if (!operating.equals(Constant.DB_DELETE)) {
+//                    if (!operating.equals(Constant.DB_DELETE)) {
+//                        break;
+//                    } else {
+//                        saveChange(changeIndex, operating, changeTable);
+//                        break;
+//                    }
+                    if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
+                            &&operating.equals(Constant.DB_DELETE)){
+                        deleteDbDataChange(dataChangeList.get(i).getId());
                         break;
-                    } else {
-                        saveChange(changeIndex, operating, changeTable);
-                        break;
+                    }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_UPDATE)
+                            &&operating.equals(Constant.DB_DELETE)){
+                        deleteDbDataChange(dataChangeList.get(i).getId());
+                    }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
+                            &&operating.equals(Constant.DB_UPDATE)){
+                          break;
                     }
                 }
                 //如果数据表没有该数据直接添加

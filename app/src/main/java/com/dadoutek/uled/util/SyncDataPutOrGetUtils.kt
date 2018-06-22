@@ -106,7 +106,8 @@ class SyncDataPutOrGetUtils {
                 "DB_LIGHT" -> {
                     val light = DBUtils.getLightByID(changeId!!)
                     when (type) {
-                        Constant.DB_ADD -> LightModel.add(token, light.meshAddr, light.name,
+                        Constant.DB_ADD ->
+                            LightModel.add(token, light.meshAddr, light.name,
                                 light.brightness, light.colorTemperature, light.macAddr,
                                 light.meshUUID, light.productUUID, light.belongGroupId!!.toInt(),
                                 id, changeId)!!.subscribe(object : NetworkObserver<String>() {
@@ -120,7 +121,7 @@ class SyncDataPutOrGetUtils {
                             }
                         })
                         Constant.DB_DELETE -> LightModel.delete(token,
-                                 id, light.id.toInt())!!.subscribe(object : NetworkObserver<String>() {
+                                 id, changeId.toInt())!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -182,15 +183,19 @@ class SyncDataPutOrGetUtils {
                 }
                 "DB_SCENE" -> {
                     val scene = DBUtils.getSceneByID(changeId!!)
-                    var body : DbSceneBody = DbSceneBody()
-                    var gson : Gson = Gson()
-                    body.name=scene.name
-                    body.belongRegionId=scene.belongRegionId
-                    body.actions=scene.actions
+                    lateinit var  postInfoStr : String
+                    lateinit var  bodyScene : RequestBody
+                    if(scene!=null){
+                        var body : DbSceneBody = DbSceneBody()
+                        var gson : Gson = Gson()
+                        body.name=scene.name
+                        body.belongRegionId=scene.belongRegionId
+                        body.actions=scene.actions
 
-                    val postInfoStr = gson.toJson(body)
+                         postInfoStr = gson.toJson(body)
 
-                    val bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                         bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                    }
 
                     when (type) {
                         Constant.DB_ADD -> SceneModel.add(token, bodyScene

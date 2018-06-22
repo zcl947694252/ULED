@@ -156,6 +156,10 @@
         <activity
             android:name=".activity.EmptyAddActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.ManagerVerificationActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
