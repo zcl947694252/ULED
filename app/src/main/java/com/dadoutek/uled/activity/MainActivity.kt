@@ -266,7 +266,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         super.onDestroy()
         Log.d(TAG, "onDestroy")
         unregisterReceiver(mReceiver)
-        this.mApplication!!.doDestroy()
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()
@@ -280,7 +279,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         this.mApplication!!.addEventListener(NotificationEvent.GET_ALARM, this)
         this.mApplication!!.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
         this.mApplication!!.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-        this.mApplication!!.addEventListener(MeshEvent.OFFLINE, this)
+//        this.mApplication!!.addEventListener(MeshEvent.OFFLINE, this)
         this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
@@ -494,7 +493,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onLogout() {
-        autoConnect()
+//        autoConnect()
 //
 //        val lights = Lights.getInstance().get()
 //        for (light in lights) {
@@ -536,7 +535,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
-        TelinkLog.i("MainActivity#onOnlineStatusNotify#Thread ID : " + Thread.currentThread().id)
         val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
         notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
@@ -598,6 +596,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private fun onServiceDisconnected(event: ServiceEvent) {
     }
 
+/*
     private fun onMeshOffline(event: MeshEvent) {
         val lights = Lights.getInstance().get()
         val it = lights.iterator()
@@ -636,6 +635,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             mTimeoutBuilder!!.show()
         }
     }
+*/
 
 
     /**
@@ -650,7 +650,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             NotificationEvent.GET_ALARM -> {
             }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
+//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
             NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)

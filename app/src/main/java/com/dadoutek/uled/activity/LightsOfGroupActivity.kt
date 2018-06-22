@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -163,16 +164,16 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
             lightList = DBUtils.getLightByGroupID(group.id)
         }
         val lights = SharedPreferencesHelper.getObject(this, Constant.LIGHT_STATE_KEY) as Lights?
-        if (lights != null) {
-            for (j in lightList.indices) {
-                for (i in lights.get().indices) {
-                    if (lightList.get(j).meshAddr == lights.get(i).meshAddress) {
-                        lightList.get(j).icon = lights.get(i).icon
-                        lightList.get(j).status = lights.get(i).status
-                    }
-                }
-            }
-        }
+//        if (lights != null) {
+//            for (j in lightList.indices) {
+//                for (i in lights.get().indices) {
+//                    if (lightList.get(j).meshAddr == lights.get(i).meshAddress) {
+////                        lightList.get(j).icon = lights.get(i).icon
+//                        lightList.get(j).status = lights.get(i).status
+//                    }
+//                }
+//            }
+//        }
     }
 
 
@@ -335,37 +336,50 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         if (notificationInfoList.isEmpty())
             return
 
-        /*if (this.deviceFragment != null) {
-            this.deviceFragment.onNotify(notificationInfoList);
-        }*/
-
         for (notificationInfo in notificationInfoList) {
 
-            if (currentLight == null) {
-                return
-            }
-
-            currentLight!!.status = notificationInfo.connectionStatus
-
-            if (currentLight!!.meshAddr == TelinkLightApplication.getInstance().connectDevice.meshAddress) {
-                currentLight!!.textColor = ContextCompat.getColor(
+            if (notificationInfo.meshAddress == TelinkApplication.getInstance().connectDevice.meshAddress) {
+                currentLight?.textColor = ContextCompat.getColor(
                         this, R.color.primary)
-            } else {
-                currentLight!!.textColor = ContextCompat.getColor(
-                        this, R.color.black)
             }
 
-            Log.d("connectting", "333")
+            for (dbLight in lightList) {
+                if (notificationInfo.meshAddress == dbLight.meshAddr) {
+                    runOnUiThread {
+                        dbLight.status = notificationInfo.connectionStatus
+                        dbLight.updateIcon()
+                        adapter?.notifyDataSetChanged()
+                    }
 
-            currentLight!!.updateIcon()
-        }
-
-        runOnUiThread {
-            if (lightList.size > 0 && positionCurrent < lightList.size && currentLight != null) {
-                lightList[positionCurrent] = currentLight!!
-                adapter?.notifyItemChanged(positionCurrent)
+                }
             }
+
+//
+//            if (currentLight == null) {
+//                return
+//            }
+//
+//            currentLight!!.status = notificationInfo.connectionStatus
+//
+//            if (currentLight!!.meshAddr == TelinkLightApplication.getInstance().connectDevice.meshAddress) {
+//                currentLight!!.textColor = ContextCompat.getColor(
+//                        this, R.color.primary)
+//            } else {
+//                currentLight!!.textColor = ContextCompat.getColor(
+//                        this, R.color.black)
+//            }
+//
+////            Log.d("connectting", "333")
+//
+//            currentLight!!.updateIcon()
         }
+
+//        runOnUiThread {
+//            if (lightList.size > 0 && positionCurrent < lightList.size && currentLight != null) {
+//                lightList[positionCurrent] = currentLight!!
+//                adapter?.notifyItemChanged(positionCurrent)
+//            }
+//        }
 
     }
 
@@ -375,6 +389,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQ_LIGHT_SETTING -> {
+                    initData()
                     adapter?.notifyDataSetChanged()
                     val isConnect = data?.getBooleanExtra("data", false) ?: false
                     if (isConnect) {

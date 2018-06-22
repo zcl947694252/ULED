@@ -47,9 +47,15 @@ public final class TelinkLightApplication extends TelinkApplication {
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
 //        CrashReport.testJavaCrash();
+
+
+
+
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+
+
     }
 
     public static TelinkLightApplication getApp() {
