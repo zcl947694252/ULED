@@ -187,6 +187,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //                intent.putExtra(Constant.ME_FUNCTION,"me_sync");
 //                startActivityForResult(intent,0);
                 ToastUtils.showLong(R.string.devoloping);
+//                checkNetworkAndSync(getActivity(),handler);
                 break;
             case R.id.one_click_reset:
                 Intent intent1=new Intent(getActivity(), ManagerVerificationActivity.class);
