@@ -28,6 +28,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.EmptyAddActivity;
+import com.dadoutek.uled.activity.MainActivity;
 import com.dadoutek.uled.activity.SplashActivity;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
@@ -304,7 +305,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                         if (j == 0) {
                             hideLoadingDialog();
                             SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                            getActivity().startActivity(new Intent(getActivity(), EmptyAddActivity.class));
+                            ActivityUtils.startActivity(SplashActivity.class);
                             getActivity().finish();
                         }
                     }
