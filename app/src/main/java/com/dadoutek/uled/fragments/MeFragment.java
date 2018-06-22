@@ -190,9 +190,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //                checkNetworkAndSync(getActivity(),handler);
                 break;
             case R.id.one_click_reset:
-                Intent intent1=new Intent(getActivity(), ManagerVerificationActivity.class);
-                intent1.putExtra(Constant.ME_FUNCTION,"me_reset");
-                startActivityForResult(intent1,0);
+//                Intent intent1=new Intent(getActivity(), ManagerVerificationActivity.class);
+//                intent1.putExtra(Constant.ME_FUNCTION,"me_reset");
+//                startActivityForResult(intent1,0);
+                showSureResetDialog();
                 break;
         }
 

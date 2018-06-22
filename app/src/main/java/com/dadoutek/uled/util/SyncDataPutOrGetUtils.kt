@@ -106,7 +106,8 @@ class SyncDataPutOrGetUtils {
                 "DB_LIGHT" -> {
                     val light = DBUtils.getLightByID(changeId!!)
                     when (type) {
-                        Constant.DB_ADD -> LightModel.add(token, light.meshAddr, light.name,
+                        Constant.DB_ADD ->
+                            LightModel.add(token, light.meshAddr, light.name,
                                 light.brightness, light.colorTemperature, light.macAddr,
                                 light.meshUUID, light.productUUID, light.belongGroupId!!.toInt(),
                                 id, changeId)!!.subscribe(object : NetworkObserver<String>() {
