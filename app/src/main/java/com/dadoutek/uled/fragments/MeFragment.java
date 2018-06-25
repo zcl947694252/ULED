@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -27,10 +28,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.activity.EmptyAddActivity;
-import com.dadoutek.uled.activity.ManagerVerificationActivity;
-import com.dadoutek.uled.activity.PhoneVerificationActivity;
-import com.dadoutek.uled.activity.MainActivity;
+import com.dadoutek.uled.activity.AboutSomeQuestionsActivity;
 import com.dadoutek.uled.activity.SplashActivity;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
@@ -59,8 +57,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Created by hejiajun on 2018/4/16.
  */
@@ -86,6 +82,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
     Button oneClickBackup;
     @BindView(R.id.one_click_reset)
     Button oneClickReset;
+    @BindView(R.id.constant_question)
+    Button constantQuestion;
     private LayoutInflater inflater;
 
     private Dialog loadDialog;
@@ -102,7 +100,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
         this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
 
-        if (android.os.Build.BRAND.contains("Huawei")) {
+        if (Build.BRAND.contains("Huawei")) {
             sleepTime = 500;
         } else {
             sleepTime = 200;
@@ -128,10 +126,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
         updateIte.setVisibility(View.GONE);
         if (SharedPreferencesUtils.isDeveloperModel()) {
             copyDataBase.setVisibility(View.VISIBLE);
-            chearCache.setVisibility(View.GONE);
+            chearCache.setVisibility(View.VISIBLE);
         } else {
             copyDataBase.setVisibility(View.GONE);
-            chearCache.setVisibility(View.GONE);
+            chearCache.setVisibility(View.VISIBLE);
         }
     }
 
@@ -165,11 +163,12 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset, R.id.constant_question})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
-                emptyTheCache();
+//                emptyTheCache();
+                ToastUtils.showLong(R.string.devoloping);
                 break;
             case R.id.update_ite:
                 ToastUtils.showShort(R.string.wait_develop);
@@ -184,32 +183,16 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-//                Intent intent=new Intent(getActivity(), ManagerVerificationActivity.class);
-//                intent.putExtra(Constant.ME_FUNCTION,"me_sync");
-//                startActivityForResult(intent,0);
-                ToastUtils.showLong(R.string.devoloping);
-//                checkNetworkAndSync(getActivity(),handler);
+                checkNetworkAndSync(getActivity(), handler);
                 break;
             case R.id.one_click_reset:
-//                Intent intent1=new Intent(getActivity(), ManagerVerificationActivity.class);
-//                intent1.putExtra(Constant.ME_FUNCTION,"me_reset");
-//                startActivityForResult(intent1,0);
-                showSureResetDialog();
+                showSureResetDialogByApp();
+                break;
+            case R.id.constant_question:
+                startActivity(new Intent(getActivity(), AboutSomeQuestionsActivity.class));
                 break;
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==0 && resultCode==RESULT_OK){
-           if(data.getExtras().getString(Constant.ME_FUNCTION).equals("me_sync")){
-               checkNetworkAndSync(getActivity(),handler);
-           }else if(data.getExtras().getString(Constant.ME_FUNCTION).equals("me_reset")){
-               showSureResetDialog();
-           }
-        }
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -248,7 +231,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
     };
 
-    private void showSureResetDialog() {
+    private void showSureResetDialogByApp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.tip_reset_sure);
         builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
@@ -415,7 +398,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
             ToastUtils.showLong(R.string.developer_mode);
             copyDataBase.setVisibility(View.VISIBLE);
-            chearCache.setVisibility(View.GONE);
+            chearCache.setVisibility(View.VISIBLE);
             SharedPreferencesUtils.setDeveloperModel(true);
         }
     }

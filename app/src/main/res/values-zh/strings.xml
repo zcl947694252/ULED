@@ -122,7 +122,7 @@
     <string name="title_scanned_lights_num">扫描完成(已扫到%1$d个灯)</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
-    <string name="empty_cache_tip">是否清除数据？清除后APP将自动重启</string>
+    <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
     <string name="factory_reset">恢复出厂</string>
     <string name="add_str_group">添加组</string>
     <string name="creat_group_fail_tip">创建失败,组名已存在！</string>
@@ -279,5 +279,17 @@
     <string name="repaet_send">(%1$d s)重新发送</string>
     <string name="manager_verification">管理员权限验证</string>
     <string name="manager_phone_error">管理员手机号错误</string>
+    <string name="answer_app">问题解答</string>
+    <string name="click_reset_title">一键恢复</string>
+    <string name="select_type_str">请选择恢复出厂设置的方式</string>
+    <string name="by_app_reset">通过软件</string>
+    <string name="by_light_reset">通过灯具</string>
+    <string name="by_info_reset">了解详情</string>
+    <string name="by_light_reset_title">物理恢复</string>
+    <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
+    <string name="question_1">1.恢复出厂方式</string>
+    <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
+    <string name="qustion_2_anser2">（2）物理恢复：请用电源断电4秒，然后打开电源2秒，重复此操作四次即可硬件强制恢复出厂设置，最后在App端选择对灯恢复，此方式将清除用户所有数据，慎用！</string>
+    <string name="constent_question">常见问题？</string>
 
 </resources>
