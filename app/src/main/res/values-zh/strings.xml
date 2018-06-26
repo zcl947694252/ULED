@@ -279,5 +279,10 @@
     <string name="repaet_send">(%1$d s)重新发送</string>
     <string name="manager_verification">管理员权限验证</string>
     <string name="manager_phone_error">管理员手机号错误</string>
+    <string name="delay_minute">延时(分钟)</string>
+    <string name="minimum_brightness_percentage">最低亮度(百分比)</string>
+    <string name="trigger_lux">触发照度(lux)</string>
+    <string name="params_cannot_be_empty">参数不可为空</string>
+
 
 </resources>

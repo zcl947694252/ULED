@@ -217,7 +217,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-                indefiniteSnackbar(root, R.string.openBluetooth, R.string.btn_ok) {
+                indefiniteSnackbar(configPirRoot, R.string.openBluetooth, R.string.btn_ok) {
                     LeBluetooth.getInstance().enable(applicationContext)
                 }
             } else {
@@ -225,7 +225,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 if (!BleUtils.isLocationEnable(this)) {
                     ToastUtils.showShort(R.string.open_location_service)
 
-                    indefiniteSnackbar(root, R.string.open_location_service, R.string.btn_ok) {
+                    indefiniteSnackbar(configPirRoot, R.string.open_location_service, R.string.btn_ok) {
                         BleUtils.jumpLocationSetting()
                     }
                 } else {
@@ -304,7 +304,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                         } else {
                             LogUtils.d("retry time is over MAX_RETRY_CONNECT_TIME")
-                            indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                            indefiniteSnackbar(configPirRoot, R.string.not_found_light, R.string.retry) {
                                 TelinkLightService.Instance().idleMode(true)
                                 autoConnect()
                             }
@@ -312,7 +312,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     } else {
                         LogUtils.d(getString(R.string.not_found_light))
                         progressBar.visibility = View.GONE
-                        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                        indefiniteSnackbar(configPirRoot, R.string.not_found_light, R.string.retry) {
                             TelinkLightService.Instance().idleMode(true)
                             autoConnect()
                         }
@@ -359,7 +359,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                     if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
                         TelinkLightService.Instance().idleMode(true)
-                        snackbar(root, "mesh name or password empty")
+                        snackbar(configPirRoot, "mesh name or password empty")
                         ToastUtils.showShort("mesh name or password empty")
                         return@Consumer
                     }
@@ -386,7 +386,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     }
                     //自动重连
                     LogUtils.d("Start auto connect")
-                    snackbarScanning = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                    snackbarScanning = indefiniteSnackbar(configPirRoot, getString(R.string.scanning_devices))
                     TelinkLightService.Instance().autoConnect(connectParams)
                     runOnUiThread(Runnable { startConnectTimer() })
 
@@ -439,7 +439,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE
 
-                    snackbar(root, R.string.connect_success)
+                    snackbar(configPirRoot, R.string.connect_success)
                 }
 
 
@@ -464,7 +464,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             LightAdapter.STATUS_CONNECTING -> {
                 runOnUiThread {
                     if (mConnectingSnackbar == null)
-                        mConnectingSnackbar = indefiniteSnackbar(root, getString(R.string.connecting))
+                        mConnectingSnackbar = indefiniteSnackbar(configPirRoot, getString(R.string.connecting))
 
                 }
 

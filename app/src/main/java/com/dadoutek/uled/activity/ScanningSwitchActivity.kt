@@ -111,6 +111,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
+                addEventListener()
                 handleIfSupportBle()
                 TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication.mesh
@@ -141,7 +142,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     override fun onResume() {
         super.onResume()
-        addEventListener()
+//        addEventListener()
     }
 
     override fun onPause() {
@@ -217,10 +218,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 if (mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH ||
                         mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH2) {
                     startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
-                } else {
+                } else if (mDeviceInfo?.productUUID == DeviceType.SCENE_SWITCH) {
                     startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo)
+                } else if (mDeviceInfo?.productUUID == DeviceType.PIR) {
+                    startActivity<ConfigPirAct>("deviceInfo" to mDeviceInfo)
                 }
-//                }
+                mApplication.removeEventListener(this)
             }
             LightAdapter.STATUS_LOGOUT -> {
                 //重试，进行login
@@ -235,12 +238,14 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_failed)
         LogUtils.d("connect failed")
+        mApplication.removeEventListener(this)
     }
 
     private fun onLoginFailed() {
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_failed)
         LogUtils.d("login failed")
+        mApplication.removeEventListener(this)
     }
 
 
@@ -287,15 +292,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         Log.d("Saw", "onLeScan leScanEvent.args.productUUID = " + leScanEvent.args.productUUID)
         if (!mScanned)
             when (leScanEvent.args.productUUID) {
-                DeviceType.NORMAL_SWITCH -> {
-                    mScanned = true
-                    LeBluetooth.getInstance().stopScan()
-                    mDeviceInfo = leScanEvent.args
-                    params.setUpdateDeviceList(mDeviceInfo)
-                    connect()
-                    progressBtn.text = getString(R.string.connecting)
-                }
-                DeviceType.SCENE_SWITCH -> {
+                DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.PIR -> {
                     mScanned = true
                     LeBluetooth.getInstance().stopScan()
                     mDeviceInfo = leScanEvent.args
@@ -304,14 +301,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     progressBtn.text = getString(R.string.connecting)
                 }
 
-                DeviceType.NORMAL_SWITCH2 -> {
-                    mScanned = true
-                    LeBluetooth.getInstance().stopScan()
-                    mDeviceInfo = leScanEvent.args
-                    params.setUpdateDeviceList(mDeviceInfo)
-                    connect()
-                    progressBtn.text = getString(R.string.connecting)
-                }
                 else -> {
                     LogUtils.d("Switch UUID = ${leScanEvent.args.productUUID}")
                     TelinkLightService.Instance()?.idleMode(true)

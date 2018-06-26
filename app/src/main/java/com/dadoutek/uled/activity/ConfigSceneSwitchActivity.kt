@@ -102,7 +102,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                snackbar(root, getString(R.string.pace_fail))
+                snackbar(configPirRoot, getString(R.string.pace_fail))
             }
         }
     }
@@ -139,7 +139,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     0x00)
 
 
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_SCENE_FOR_SWITCH,
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH,
                     mDeviceInfo.meshAddress,
                     paramBytes)
 
@@ -165,7 +165,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
         params.setUpdateDeviceList(mDeviceInfo)
-//        TelinkLightService.Instance().updateMesh(params)
 
         TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
         val meshName = Strings.stringToBytes(mesh.name, 16)
@@ -185,7 +184,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (mSceneList.isEmpty()) {
 //            ToastUtils.showLong(getString(R.string.tip_switch))
             fab.visibility = View.GONE
-            indefiniteSnackbar(root, R.string.tip_switch, R.string.btn_ok) {
+            indefiniteSnackbar(configPirRoot, R.string.tip_switch, R.string.btn_ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             return

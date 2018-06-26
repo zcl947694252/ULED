@@ -19,7 +19,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.util.DataManager
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -145,7 +144,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                snackbar(root, getString(R.string.group_failed))
+                snackbar(configPirRoot, getString(R.string.group_failed))
                 progressBar.visibility = View.GONE
             }
         }
