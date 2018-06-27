@@ -24,7 +24,7 @@ import java.util.List;
 @Entity
 public class DbScene implements Parcelable{
 
-    @Id(autoincrement = true)
+    @Id
     private Long id;
 
     private String name;

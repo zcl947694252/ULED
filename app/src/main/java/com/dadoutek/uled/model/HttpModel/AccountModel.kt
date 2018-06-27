@@ -226,10 +226,10 @@ object AccountModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<List<DbRegion>>() {
                     override fun onNext(t: List<DbRegion>) {
-                        //非首次在当前手机登录或者是首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
-                        if (t.size == 0 || SharedPreferencesUtils.getCurrentUserList().contains(account)) {
+                        //首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
+                        if (t.size == 0) {
                             setIsLogin(true)
-                            setupMesh(account)
+//                            setupMesh(account)
                         }
                     }
 

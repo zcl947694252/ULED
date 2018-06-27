@@ -256,7 +256,6 @@ public class ChangeSceneAct extends TelinkBaseActivity {
     @OnClick({R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-
             case R.id.bt_save:
                 if (checked()) {
                     save();

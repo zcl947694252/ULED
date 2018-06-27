@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Scene;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -249,6 +251,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             List<ItemGroup> itemGroups = itemGroupArrayList;
 
             DbScene dbScene = new DbScene();
+            dbScene.setId(getSceneId());
             dbScene.setName(name);
             dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
             DBUtils.saveScene(dbScene,false);
@@ -281,6 +284,32 @@ public class AddSceneAct extends TelinkBaseActivity {
                 finish();
             }
         }).start();
+    }
+
+    private Long getSceneId() {
+        List<DbScene> list=DBUtils.getSceneList();
+        List<Integer> idList=new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            idList.add(list.get(i).getId().intValue());
+        }
+
+        int id= 0;
+        for(int i=1;i<17;i++){
+            if(idList.contains(i)){
+                Log.d("sceneID", "getSceneId: "+"aaaaa");
+                continue;
+            }else{
+                id=i;
+                Log.d("sceneID", "getSceneId: "+"bbbbb"+id);
+                break;
+            }
+        }
+
+        if(list.size()==0){
+            id=1;
+        }
+
+        return Long.valueOf(id);
     }
 
 

@@ -25,10 +25,10 @@ object LightModel {
 
     fun update(token: String, name: String, brightness: Int,
                colorTemperature: Int, belongGroupId: Int, id: Long
-               , lid: Int): Observable<String>? {
+               , lid: Int): Observable<String> {
         return NetworkFactory.getApi()
-                .updateLight(token,name,brightness,colorTemperature,
-                        belongGroupId,lid)
+                .updateLight(token,lid,name,brightness,colorTemperature,
+                        belongGroupId)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

@@ -3,6 +3,8 @@ package com.dadoutek.uled.util
 import android.content.Context
 import android.os.Handler
 import android.os.Message
+import android.util.Log
+import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
@@ -11,10 +13,7 @@ import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.DbModel.DbSceneBody
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.HttpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.google.gson.Gson
@@ -30,36 +29,43 @@ class SyncDataPutOrGetUtils {
 
         /********************************同步数据之上传数据 */
 
-        fun syncPutDataStart(context: Context,handler: Handler) {
+        fun syncPutDataStart(context: Context, handler: Handler) {
 
             Thread {
-                val dbDataChangeList = DBUtils.getDataChangeAll()
+                var dbDataChangeList = DBUtils.getDataChangeAll()
 
                 val dbUser = DBUtils.getLastUser()
 
+                if (dbDataChangeList.size == 0) {
+                    var message = Message()
+                    ToastUtils.showLong(context.getString(R.string.tip_completed_sync))
+                    message.what = Cmd.SYNCCOMPLETCMD
+                    handler.sendMessage(message)
+                }
+
                 for (i in dbDataChangeList.indices) {
-                   if(i==0){
-                       var message = Message()
-                       message.what= Cmd.SYNCCMD
-                       handler.sendMessage(message)
-                   }
+                    if (i == 0) {
+                        var message = Message()
+                        message.what = Cmd.SYNCCMD
+                        handler.sendMessage(message)
+                    }
                     getLocalData(dbDataChangeList[i].tableName,
                             dbDataChangeList[i].changeId,
                             dbDataChangeList[i].changeType,
-                            dbUser.token, dbDataChangeList[i].id!!,handler)
+                            dbUser.token, dbDataChangeList[i].id!!, handler)
                     if (i == dbDataChangeList.size - 1) {
                         var message = Message()
                         ToastUtils.showLong(context.getString(R.string.tip_completed_sync))
-                        message.what= Cmd.SYNCCOMPLETCMD
+                        message.what = Cmd.SYNCCOMPLETCMD
                         handler.sendMessage(message)
                     }
                 }
             }.start()
         }
 
-        private fun showError(handler: Handler){
+        private fun showError(handler: Handler) {
             var message = Message()
-            message.what= Cmd.SYNCERRORCMD
+            message.what = Cmd.SYNCERRORCMD
             handler.sendMessage(message)
         }
 
@@ -69,10 +75,14 @@ class SyncDataPutOrGetUtils {
             when (tableName) {
                 "DB_GROUP" -> {
                     val group = DBUtils.getGroupByID(changeId!!)
+                    if (group == null && type != Constant.DELETEING) {
+                        Log.d("组数据出错", "")
+                        return
+                    }
                     when (type) {
                         Constant.DB_ADD -> GroupMdodel.add(token, group.meshAddr, group.name,
                                 group.brightness, group.colorTemperature,
-                                group.belongRegionId, id,changeId)!!.subscribe(object : NetworkObserver<String>() {
+                                group.belongRegionId, id, changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -91,8 +101,7 @@ class SyncDataPutOrGetUtils {
                             }
                         })
                         Constant.DB_UPDATE -> GroupMdodel.update(token, changeId.toInt(),
-                                group.name, group.brightness, group.colorTemperature, id,group.id)!!.
-                                subscribe(object : NetworkObserver<String>() {
+                                group.name, group.brightness, group.colorTemperature, id)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -105,23 +114,27 @@ class SyncDataPutOrGetUtils {
                 }
                 "DB_LIGHT" -> {
                     val light = DBUtils.getLightByID(changeId!!)
+                    if (light == null && type != Constant.DELETEING) {
+                        Log.d("灯数据出错", "")
+                        return
+                    }
                     when (type) {
                         Constant.DB_ADD ->
                             LightModel.add(token, light.meshAddr, light.name,
-                                light.brightness, light.colorTemperature, light.macAddr,
-                                light.meshUUID, light.productUUID, light.belongGroupId!!.toInt(),
-                                id, changeId)!!.subscribe(object : NetworkObserver<String>() {
-                            override fun onNext(t: String) {
+                                    light.brightness, light.colorTemperature, light.macAddr,
+                                    light.meshUUID, light.productUUID, light.belongGroupId!!.toInt(),
+                                    id, changeId)!!.subscribe(object : NetworkObserver<String>() {
+                                override fun onNext(t: String) {
 
-                            }
+                                }
 
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                showError(handler)
-                            }
-                        })
+                                override fun onError(e: Throwable) {
+                                    super.onError(e)
+                                    showError(handler)
+                                }
+                            })
                         Constant.DB_DELETE -> LightModel.delete(token,
-                                 id, changeId.toInt())!!.subscribe(object : NetworkObserver<String>() {
+                                id, changeId.toInt())!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -130,26 +143,35 @@ class SyncDataPutOrGetUtils {
                                 showError(handler)
                             }
                         })
-                        Constant.DB_UPDATE -> LightModel.update(token,
-                                light.name, light.brightness,
-                                light.colorTemperature, light.belongGroupId!!.toInt(),
-                                id,light.id.toInt())!!.subscribe(object : NetworkObserver<String>() {
-                            override fun onNext(t: String) {
-                            }
+                        Constant.DB_UPDATE -> {
 
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                showError(handler)
-                            }
-                        })
+                            LightModel.update(token,
+                                    light.name, light.brightness,
+                                    light.colorTemperature, light.belongGroupId.toInt(),
+                                    id, changeId.toInt())
+                                    .subscribe(object : NetworkObserver<String>() {
+                                        override fun onNext(t: String) {
+                                            ToastUtils.showShort(t)
+                                        }
+
+                                        override fun onError(e: Throwable) {
+                                            super.onError(e)
+                                            showError(handler)
+                                        }
+                                    })
+                        }
                     }
                 }
                 "DB_REGION" -> {
                     val region = DBUtils.getRegionByID(changeId!!)
+                    if (region == null && type != Constant.DELETEING) {
+                        Log.d("区域数据出错", "")
+                        return
+                    }
                     when (type) {
                         Constant.DB_ADD -> RegionModel.add(token, region.controlMesh,
                                 region.controlMeshPwd, region.installMesh,
-                                region.installMeshPwd, id,changeId)!!.subscribe(object : NetworkObserver<String>() {
+                                region.installMeshPwd, id, changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -183,23 +205,29 @@ class SyncDataPutOrGetUtils {
                 }
                 "DB_SCENE" -> {
                     val scene = DBUtils.getSceneByID(changeId!!)
-                    lateinit var  postInfoStr : String
-                    lateinit var  bodyScene : RequestBody
-                    if(scene!=null){
-                        var body : DbSceneBody = DbSceneBody()
-                        var gson : Gson = Gson()
-                        body.name=scene.name
-                        body.belongRegionId=scene.belongRegionId
-                        body.actions=scene.actions
 
-                         postInfoStr = gson.toJson(body)
+                    if (scene == null && type != Constant.DELETEING) {
+                        Log.d("场景数据出错", "")
+                        return
+                    }
 
-                         bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                    lateinit var postInfoStr: String
+                    lateinit var bodyScene: RequestBody
+                    if (scene != null) {
+                        var body: DbSceneBody = DbSceneBody()
+                        var gson: Gson = Gson()
+                        body.name = scene.name
+                        body.belongRegionId = scene.belongRegionId
+                        body.actions = scene.actions
+
+                        postInfoStr = gson.toJson(body)
+
+                        bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
                     }
 
                     when (type) {
                         Constant.DB_ADD -> SceneModel.add(token, bodyScene
-                                , id,changeId)!!.subscribe(object : NetworkObserver<String>() {
+                                , id, changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
                             }
 
@@ -247,6 +275,12 @@ class SyncDataPutOrGetUtils {
             //                break;
                 "DB_USER" -> {
                     val user = DBUtils.getUserByID(changeId!!)
+
+                    if (user == null && type != Constant.DELETEING) {
+                        Log.d("用户数据出错", "")
+                        return
+                    }
+
                     when (type) {
                         Constant.DB_ADD -> {
                             //注册时已经添加
@@ -272,12 +306,12 @@ class SyncDataPutOrGetUtils {
 
         /********************************同步数据之下拉数据 */
 
-        fun syncGetDataStart(dbUser: DbUser,handler: Handler) {
+        fun syncGetDataStart(dbUser: DbUser, handler: Handler) {
             val token = dbUser.token
-            startGet(token, dbUser.account,handler)
+            startGet(token, dbUser.account, handler)
         }
 
-        private fun startGet(token: String, accountNow: String,handler: Handler) {
+        private fun startGet(token: String, accountNow: String, handler: Handler) {
 
             var message = Message()
 
@@ -293,6 +327,8 @@ class SyncDataPutOrGetUtils {
                             setupMesh()
                             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
                                     Constant.USER_TYPE, Constant.USER_TYPE_NEW)
+                        } else {
+                            setupMeshCreat(accountNow)
                         }
                         NetworkFactory.getApi()
                                 .getLightList(token)
@@ -319,8 +355,8 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveScene(item, true)
                             for (i in item.actions.indices) {
-                                var k =i+1
-                                DBUtils.saveSceneActions(item.actions.get(i),k.toLong(),item.id)
+                                var k = i + 1
+                                DBUtils.saveSceneActions(item.actions.get(i), k.toLong(), item.id)
                             }
                         }
                     }
@@ -329,7 +365,7 @@ class SyncDataPutOrGetUtils {
                         override fun onNext(item: List<DbScene>) {
                             SharedPreferencesUtils.saveCurrentUserList(accountNow)
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                            message.what=Cmd.SYNCCOMPLETCMD
+                            message.what = Cmd.SYNCCOMPLETCMD
                             handler.sendMessage(message)
                         }
 
@@ -358,6 +394,26 @@ class SyncDataPutOrGetUtils {
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
                 return
             }
+        }
+
+        private fun setupMeshCreat(account: String) {
+            val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
+            val dbRegio = DbRegion()
+            dbRegio.belongAccount = account
+            dbRegio.controlMesh = account
+            dbRegio.controlMeshPwd = account
+            dbRegio.installMesh = Constant.DEFAULT_MESH_FACTORY_NAME
+            dbRegio.installMeshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD
+            DBUtils.saveRegion(dbRegio, false)
+
+            val application = DeviceHelper.getApplication() as TelinkLightApplication
+            val mesh = application.mesh
+            mesh.name = dbRegio.controlMesh
+            mesh.password = dbRegio.controlMeshPwd
+            mesh.factoryName = dbRegio.installMesh
+            mesh.factoryPassword = dbRegio.installMeshPwd
+//        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+            application.setupMesh(mesh)
         }
 
     }

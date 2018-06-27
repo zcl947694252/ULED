@@ -78,6 +78,9 @@ public class DBUtils {
     public static DbUser getLastUser() {
         List<DbUser> list = DaoSessionInstance.getInstance().getDbUserDao().
                 queryBuilder().orderDesc(DbUserDao.Properties.Id).list();
+        if(list.size()==0){
+            return null;
+        }
         return list.get(0);
     }
 
@@ -232,7 +235,7 @@ public class DBUtils {
 
     public static void saveGroup(DbGroup group,boolean isFromServer) {
         if(isFromServer){
-            DaoSessionInstance.getInstance().getDbGroupDao().insert(group);
+            DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
         }else{
             DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
             recordingChange(group.getId(),
@@ -289,7 +292,7 @@ public class DBUtils {
         if(isFromServer){
             DaoSessionInstance.getInstance().getDbSceneDao().insert(dbScene);
         }else{
-            DaoSessionInstance.getInstance().getDbSceneDao().save(dbScene);
+            DaoSessionInstance.getInstance().getDbSceneDao().insertOrReplace(dbScene);
             recordingChange(dbScene.getId(),
                     DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
                     Constant.DB_ADD);
@@ -360,6 +363,10 @@ public class DBUtils {
                 Constant.DB_UPDATE);
     }
 
+    public static void updateDbchange(DbDataChange change) {
+        DaoSessionInstance.getInstance().getDbDataChangeDao().update(change);
+    }
+
     /********************************************删除*******************************/
 
     public static void deleteGroup(DbGroup dbGroup) {
@@ -421,6 +428,16 @@ public class DBUtils {
 
     public static void deleteAllData() {
         DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbRegionDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbGroupDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbLightDao().deleteAll();
+        DaoSessionInstance.getInstance().getDbDataChangeDao().deleteAll();
+    }
+
+    public static void deleteLocalData() {
+//        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
         DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
         DaoSessionInstance.getInstance().getDbRegionDao().deleteAll();
@@ -523,6 +540,11 @@ public class DBUtils {
                 //首先确定是同一张表的同一条数据进行操作
                 if (dataChangeList.get(i).getTableName().equals(changeTable) &
                         dataChangeList.get(i).getChangeId().equals(changeIndex)) {
+
+                    if(dataChangeList.get(i).getChangeType().equals(operating)){
+                        break;
+                    }
+
                     //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
                     if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
                             &&operating.equals(Constant.DB_DELETE)){
@@ -530,7 +552,10 @@ public class DBUtils {
                         break;
                     }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_UPDATE)
                             &&operating.equals(Constant.DB_DELETE)){
-                        deleteDbDataChange(dataChangeList.get(i).getId());
+                        dataChangeList.get(i).setChangeType(operating);
+                        updateDbchange(dataChangeList.get(i));
+                        break;
+//                        deleteDbDataChange(dataChangeList.get(i).getId());
                     }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
                             &&operating.equals(Constant.DB_UPDATE)){
                           break;

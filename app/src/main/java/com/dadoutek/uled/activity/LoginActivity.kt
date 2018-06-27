@@ -135,15 +135,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
                             LogUtils.d("logging: " + "登录成功")
+                            DBUtils.deleteLocalData()
                             ToastUtils.showLong(R.string.login_success)
                             hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            if (!SharedPreferencesUtils.getCurrentUserList().contains(dbUser.account)) {
                                 showLoadingDialog(getString(R.string.sync_now))
                                 SyncDataPutOrGetUtils.syncGetDataStart(dbUser,handler)
-                            } else {
-                                TransformView()
-                            }
                         }
 
                         override fun onError(e: Throwable) {

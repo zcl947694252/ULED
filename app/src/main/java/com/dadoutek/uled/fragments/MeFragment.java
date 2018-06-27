@@ -30,11 +30,14 @@ import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AboutSomeQuestionsActivity;
 import com.dadoutek.uled.activity.SplashActivity;
+import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.HttpModel.UserModel;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
@@ -47,6 +50,8 @@ import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,6 +97,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     private boolean isDeleteSuccess = false;
 
     private long sleepTime = 250;
+    boolean isClickExlogin=false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,8 +173,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
-//                emptyTheCache();
-                ToastUtils.showLong(R.string.devoloping);
+                emptyTheCache();
+//                ToastUtils.showLong(R.string.devoloping);
                 break;
             case R.id.update_ite:
                 ToastUtils.showShort(R.string.wait_develop);
@@ -183,8 +189,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-//                checkNetworkAndSync(getActivity(), handler);
-                ToastUtils.showLong(R.string.devoloping);
+                checkNetworkAndSync(getActivity(), handler);
                 break;
             case R.id.one_click_reset:
                 showSureResetDialogByApp();
@@ -223,9 +228,14 @@ public class MeFragment extends Fragment implements EventListener<String> {
                     showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
                     break;
                 case Cmd.SYNCCOMPLETCMD:
+                    if(isClickExlogin){
+                        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                        restartApplication();
+                    }
                     hideLoadingDialog();
                     break;
                 case Cmd.SYNCERRORCMD:
+                    isClickExlogin=false;
                     hideLoadingDialog();
                     break;
             }
@@ -385,8 +395,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //    }
 
     private void exitLogin() {
-        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
-        restartApplication();
+        isClickExlogin=true;
+        checkNetworkAndSync(getActivity(), handler);
     }
 
     long[] mHints = new long[6];//初始全部为0
@@ -412,15 +422,58 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 .setNegativeButton(getActivity().getString(R.string.btn_cancel), (dialog, which) -> {
                 })
                 .setPositiveButton(getActivity().getString(R.string.btn_sure), (dialog, which) -> {
-                    DBUtils.deleteAllData();
-                    CleanUtils.cleanInternalSp();
-                    CleanUtils.cleanExternalCache();
-                    CleanUtils.cleanInternalFiles();
-                    CleanUtils.cleanInternalCache();
-                    ToastUtils.showShort(R.string.clean_tip);
-                    restartApplication();
+                    clearData();
                 })
                 .create().show();
+    }
+
+    private void clearData() {
+
+//        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+//        DBUtils.deleteAllData();
+//        CleanUtils.cleanInternalSp();
+//        CleanUtils.cleanExternalCache();
+//        CleanUtils.cleanInternalFiles();
+//        CleanUtils.cleanInternalCache();
+//        ToastUtils.showShort(R.string.clean_tip);
+//        hideLoadingDialog();
+//        restartApplication();
+//
+        DbUser dbUser=DBUtils.getLastUser();
+
+        if(dbUser==null){
+            ToastUtils.showLong("数据已经为空");
+            return;
+        }
+
+        showLoadingDialog("正在清除用户数据。。。");
+        UserModel.INSTANCE.deleteAllData(dbUser.getToken()).subscribe(new NetworkObserver<String>() {
+            @Override
+            public void onNext(String s) {
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                DBUtils.deleteAllData();
+                CleanUtils.cleanInternalSp();
+                CleanUtils.cleanExternalCache();
+                CleanUtils.cleanInternalFiles();
+                CleanUtils.cleanInternalCache();
+                ToastUtils.showShort(R.string.clean_tip);
+                hideLoadingDialog();
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                restartApplication();
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+                super.onError(e);
+                ToastUtils.showLong("清除失败");
+                hideLoadingDialog();
+            }
+        });
     }
 
     //重启app并杀死原进程

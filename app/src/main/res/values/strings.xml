@@ -277,17 +277,21 @@
     <string name="repaet_send">(%1$d s) resend</string>
     <string name="manager_verification">Administrator authority verification</string>
     <string name="manager_phone_error">Admin mobile phone number is wrong</string>
-    <string name="answer_app">问题解答</string>
-    <string name="click_reset_title">一键恢复</string>
-    <string name="select_type_str">请选择恢复出厂设置的方式</string>
-    <string name="by_app_reset">通过软件</string>
-    <string name="by_light_reset">通过灯具</string>
-    <string name="by_info_reset">了解详情</string>
-    <string name="by_light_reset_title">物理恢复</string>
-    <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
-    <string name="question_1">1.恢复出厂方式</string>
-    <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
-    <string name="qustion_2_anser2">（2）物理恢复：请用电源断电4秒，然后打开电源2秒，重复此操作四次即可硬件强制恢复出厂设置，最后在App端选择对灯恢复，此方式将清除用户所有数据，慎用！</string>
-    <string name="constent_question">常见问题？</string>
+    <string name="answer_app">Questions and answers</string>
+    <string name="click_reset_title">One-click recovery</string>
+    <string name="select_type_str">Please select the way to restore factory settings</string>
+    <string name="by_app_reset">Through software</string>
+    <string name="by_light_reset">Through lamps</string>
+    <string name="by_info_reset">Learn more</string>
+    <string name="by_light_reset_title">Physical recovery</string>
+    <string name="by_light_reset_mesage">I have already physically restored the lamp to factory settings and started initializing APP data?</string>
+    <string name="question_1">1. Restore factory mode: One-click recovery</string>
+    <string name="question_1_anser1">(1) Software Recovery: This mode will restore the factory settings of the lamp directly through the App. In this method, please ensure that the lamp is in a controllable state. If you can also control some lamps after recovery, please use the physical recovery method.</string>
+    <string name="qustion_2_anser2">(2) Physical recovery: Please use the power off for 4 seconds, and then turn on the power for 2 seconds, repeat this operation four times to force the hardware to restore the factory settings, and finally on the App side select to clear the data, At the same time, if there are other mobile phones using this account, you need to log out or re-install the APP to use it normally,this way will clear all user data, Use it with caution!</string>
+    <string name="constent_question">Common problem</string>
+    <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
+    <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
+    <string name="question_3">3. Can not control, not connect</string>
+    <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
 
 </resources>

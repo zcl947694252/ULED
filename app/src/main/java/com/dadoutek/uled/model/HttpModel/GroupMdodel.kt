@@ -19,7 +19,7 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int, id: Long, groupId: Long): Observable<String>? {
+    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int, id: Long): Observable<String>? {
         return NetworkFactory.getApi()
                 .updateGroup(token,rid,name,brightness,colorTemperature)
                 .compose(NetworkTransformer())
