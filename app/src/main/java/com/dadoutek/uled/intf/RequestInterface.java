@@ -137,7 +137,7 @@ public interface RequestInterface {
     Observable<Response<List<DbLight>>> getLightList(@Header("token") String token);
 
     //更新灯
-    @PUT("api/ext/soybean/region/light/update/{lid}")
+    @PUT("api/ext/soybean/light/update/{lid}")
     Observable<Response<String>> updateLight(@Header("token") String token,
                                              @Path("lid") int lid,
                                              @Query("name") String name,
