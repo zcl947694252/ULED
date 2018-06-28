@@ -287,7 +287,12 @@
     <string name="by_light_reset_mesage">I have already physically restored the lamp to factory settings and started initializing APP data?</string>
     <string name="question_1">1. Restore factory mode: One-click recovery</string>
     <string name="question_1_anser1">(1) Software Recovery: This mode will restore the factory settings of the lamp directly through the App. In this method, please ensure that the lamp is in a controllable state. If you can also control some lamps after recovery, please use the physical recovery method.</string>
-    <string name="qustion_2_anser2">(2) Physical recovery: Please use the power off for 4 seconds, and then turn on the power for 2 seconds, repeat this operation four times to force the hardware to restore the factory settings, and finally on the App side select to clear the data, At the same time, if there are other mobile phones using this account, you need to log out or re-install the APP to use it normally,this way will clear all user data, Use it with caution!</string>
+    <string name="qustion_2_anser2">(2) physical recovery: Please use the power off for 6 seconds,
+        and then turn on the power for 1 to 2 seconds, repeat this operation
+        until it succeeds (at least about five times) to force the hardware to restore the factory
+        settings, and finally on the App side select Clear Data, and if other mobile phones are using
+        this account, you need to log out or re-install the APP to use it normally. This
+        method will clear all user data and use it with caution!</string>
     <string name="constent_question">Common problem</string>
     <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
     <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
