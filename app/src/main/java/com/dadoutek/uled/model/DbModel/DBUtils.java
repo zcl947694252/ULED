@@ -531,6 +531,7 @@ public class DBUtils {
                     }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_UPDATE)
                             &&operating.equals(Constant.DB_DELETE)){
                         deleteDbDataChange(dataChangeList.get(i).getId());
+
                     }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
                             &&operating.equals(Constant.DB_UPDATE)){
                           break;

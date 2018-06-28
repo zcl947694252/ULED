@@ -40,16 +40,16 @@ object Commander : EventListener<String> {
 //        mApplication?.addEventListener(MeshEvent.ERROR, this)
     }
 
-    fun addGroup(lightMeshAddr: Int, groupMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
+    fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
 
-        mLightAddr = lightMeshAddr
-        mGroupingAddr = groupMeshAddr
+        mLightAddr = dstAddr
+        mGroupingAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
-        val params = byteArrayOf(0x01, (groupMeshAddr and 0xFF).toByte(), //0x01 代表添加组
-                (groupMeshAddr shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
+                (groupAddr shr 8 and 0xFF).toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -75,6 +75,8 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
+                        onComplete()
+                        failedCallback.invoke()
                         LogUtils.d(e.message)
                     }
                 })

@@ -571,6 +571,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     public void onBackPressed() {
 //        super.onBackPressed();
         if (grouping) {
+
+            for (int i = 0; i < getCurrentSelectLights().size(); i++) {
+                //让选中的灯停下来别再发闪的命令了。
+                stopBlink(getCurrentSelectLights().get(i));
+            }
+
+
             startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
             finish();
         } else {

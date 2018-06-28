@@ -10,6 +10,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkBaseActivity
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.communicate.Commander.addGroup
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
@@ -47,12 +48,12 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int) {
         LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
                 "   triggerValue = $triggerValue")
-        val spGroup = groupConvertSpecialValue(groupAddr)
-        val groupH: Byte = (spGroup shr 8 and 0xff).toByte()
-        val groupL: Byte = (spGroup and 0xff).toByte()
+//        val spGroup = groupConvertSpecialValue(groupAddr)
+        val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
+        val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = byteArrayOf(
                 0x01,
-                groupH, groupL,
+                0x00, 0x04,
                 delayTime.toByte(),
                 minBrightness.toByte(),
                 triggerValue.toByte()
@@ -103,6 +104,11 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
                                 tietDelay.text.toString().toInt(),
                                 tietMinimumBrightness.text.toString().toInt(),
                                 spTriggerLux.selectedItem.toString().toInt())
+
+                        addGroup(mDeviceInfo.meshAddress, mSelectGroupAddr,
+                                { LogUtils.d("success") },
+                                { LogUtils.d("failed") })
+
 
                         Commander.updateMeshName(mDeviceInfo,
                                 { ActivityUtils.finishToActivity(MainActivity::class.java, false, true) },
