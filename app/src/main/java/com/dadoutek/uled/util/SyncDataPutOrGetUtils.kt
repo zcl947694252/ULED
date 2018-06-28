@@ -80,7 +80,8 @@ class SyncDataPutOrGetUtils {
                         return
                     }
                     when (type) {
-                        Constant.DB_ADD -> GroupMdodel.add(token, group.meshAddr, group.name,
+                        Constant.DB_ADD ->
+                            GroupMdodel.add(token, group.meshAddr, group.name,
                                 group.brightness, group.colorTemperature,
                                 group.belongRegionId, id, changeId)!!.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {

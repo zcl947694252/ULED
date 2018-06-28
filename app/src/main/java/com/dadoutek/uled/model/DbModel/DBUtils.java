@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.dao.DbDataChangeDao;
@@ -453,7 +454,7 @@ public class DBUtils {
     /********************************************其他*******************************/
 
     public static void addNewGroup(String name, List<DbGroup> groups, Context context) {
-        if (!checkRepeat(groups, context, name)) {
+        if (!checkRepeat(groups, context, name)&&!checkReachedTheLimit(groups)) {
             int count = groups.size();
             int newMeshAdress;
             DbGroup group = new DbGroup();
@@ -482,6 +483,15 @@ public class DBUtils {
 
     }
 
+    private static boolean checkReachedTheLimit(List<DbGroup> groups) {
+        if(groups.size()>=255){
+            ToastUtils.showLong(R.string.group_limit);
+            return true;
+        }
+        return false;
+    }
+
+    //检查是否重复
     public static boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {
         for (
                 int k = 0; k < groups.size(); k++)

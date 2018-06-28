@@ -442,11 +442,11 @@ public class MeFragment extends Fragment implements EventListener<String> {
         DbUser dbUser=DBUtils.getLastUser();
 
         if(dbUser==null){
-            ToastUtils.showLong("数据已经为空");
+            ToastUtils.showLong(R.string.data_empty);
             return;
         }
 
-        showLoadingDialog("正在清除用户数据。。。");
+        showLoadingDialog(getString(R.string.clear_data_now));
         UserModel.INSTANCE.deleteAllData(dbUser.getToken()).subscribe(new NetworkObserver<String>() {
             @Override
             public void onNext(String s) {
@@ -470,7 +470,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
             @Override
             public void onError(@NotNull Throwable e) {
                 super.onError(e);
-                ToastUtils.showLong("清除失败");
+                ToastUtils.showLong(R.string.clear_fail);
                 hideLoadingDialog();
             }
         });
