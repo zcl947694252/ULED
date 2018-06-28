@@ -15,6 +15,7 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import com.dadoutek.uled.TelinkLightService;
 import com.dadoutek.uled.activity.AboutSomeQuestionsActivity;
 import com.dadoutek.uled.activity.SplashActivity;
 import com.dadoutek.uled.intf.NetworkObserver;
+import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -97,7 +99,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     private boolean isDeleteSuccess = false;
 
     private long sleepTime = 250;
-    boolean isClickExlogin=false;
+    boolean isClickExlogin = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -189,7 +191,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-                checkNetworkAndSync(getActivity(), handler);
+                checkNetworkAndSync(getActivity());
                 break;
             case R.id.one_click_reset:
                 showSureResetDialogByApp();
@@ -202,7 +204,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     }
 
     // 如果没有网络，则弹出网络设置对话框
-    public static void checkNetworkAndSync(final Activity activity, Handler handler) {
+    public void checkNetworkAndSync(final Activity activity) {
         if (!NetWorkUtils.isNetworkAvalible(activity)) {
             new AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -215,31 +217,33 @@ public class MeFragment extends Fragment implements EventListener<String> {
                                         0);
                             }).create().show();
         } else {
-            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity, handler);
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity, syncCallback);
         }
     }
 
-    public Handler handler = new Handler() {
+    SyncCallback syncCallback = new SyncCallback() {
+
         @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case Cmd.SYNCCMD:
-                    showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
-                    break;
-                case Cmd.SYNCCOMPLETCMD:
-                    if(isClickExlogin){
-                        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
-                        restartApplication();
-                    }
-                    hideLoadingDialog();
-                    break;
-                case Cmd.SYNCERRORCMD:
-                    isClickExlogin=false;
-                    hideLoadingDialog();
-                    break;
-            }
+        public void start() {
+            showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
         }
+
+        @Override
+        public void complete() {
+            if (isClickExlogin) {
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                restartApplication();
+            }
+            hideLoadingDialog();
+        }
+
+        @Override
+        public void error(String msg) {
+            isClickExlogin = false;
+            Log.d("SyncLog", "error: "+msg);
+            hideLoadingDialog();
+        }
+
     };
 
     private void showSureResetDialogByApp() {
@@ -395,8 +399,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //    }
 
     private void exitLogin() {
-        isClickExlogin=true;
-        checkNetworkAndSync(getActivity(), handler);
+        isClickExlogin = true;
+        checkNetworkAndSync(getActivity());
     }
 
     long[] mHints = new long[6];//初始全部为0
@@ -439,9 +443,9 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //        hideLoadingDialog();
 //        restartApplication();
 //
-        DbUser dbUser=DBUtils.getLastUser();
+        DbUser dbUser = DBUtils.getLastUser();
 
-        if(dbUser==null){
+        if (dbUser == null) {
             ToastUtils.showLong(R.string.data_empty);
             return;
         }

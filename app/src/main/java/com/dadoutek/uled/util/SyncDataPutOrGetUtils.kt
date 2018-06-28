@@ -1,16 +1,15 @@
 package com.dadoutek.uled.util
 
 import android.content.Context
-import android.os.Handler
 import android.os.Message
 import android.util.Log
-import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
@@ -29,7 +28,7 @@ class SyncDataPutOrGetUtils {
 
         /********************************同步数据之上传数据 */
 
-        fun syncPutDataStart(context: Context, handler: Handler) {
+        fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
 
             Thread {
                 var dbDataChangeList = DBUtils.getDataChangeAll()
@@ -37,41 +36,29 @@ class SyncDataPutOrGetUtils {
                 val dbUser = DBUtils.getLastUser()
 
                 if (dbDataChangeList.size == 0) {
-                    var message = Message()
                     ToastUtils.showLong(context.getString(R.string.tip_completed_sync))
-                    message.what = Cmd.SYNCCOMPLETCMD
-                    handler.sendMessage(message)
+                    syncCallback.complete()
                 }
 
                 for (i in dbDataChangeList.indices) {
                     if (i == 0) {
-                        var message = Message()
-                        message.what = Cmd.SYNCCMD
-                        handler.sendMessage(message)
+                       syncCallback.start()
                     }
                     getLocalData(dbDataChangeList[i].tableName,
                             dbDataChangeList[i].changeId,
                             dbDataChangeList[i].changeType,
-                            dbUser.token, dbDataChangeList[i].id!!, handler)
+                            dbUser.token, dbDataChangeList[i].id!!, syncCallback)
                     if (i == dbDataChangeList.size - 1) {
-                        var message = Message()
                         ToastUtils.showLong(context.getString(R.string.tip_completed_sync))
-                        message.what = Cmd.SYNCCOMPLETCMD
-                        handler.sendMessage(message)
+                        syncCallback.complete()
                     }
                 }
             }.start()
         }
-
-        private fun showError(handler: Handler) {
-            var message = Message()
-            message.what = Cmd.SYNCERRORCMD
-            handler.sendMessage(message)
-        }
-
+        
         @Synchronized
         private fun getLocalData(tableName: String, changeId: Long?, type: String,
-                                 token: String, id: Long, handler: Handler) {
+                                 token: String, id: Long, syncCallback: SyncCallback) {
             when (tableName) {
                 "DB_GROUP" -> {
                     val group = DBUtils.getGroupByID(changeId!!)
@@ -89,7 +76,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_DELETE -> GroupMdodel.delete(token, changeId.toInt(), id)!!.subscribe(object : NetworkObserver<String>() {
@@ -98,7 +85,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_UPDATE -> GroupMdodel.update(token, changeId.toInt(),
@@ -108,7 +95,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                     }
@@ -131,7 +118,7 @@ class SyncDataPutOrGetUtils {
 
                                 override fun onError(e: Throwable) {
                                     super.onError(e)
-                                    showError(handler)
+                                    syncCallback.error(e.message)
                                 }
                             })
                         Constant.DB_DELETE -> LightModel.delete(token,
@@ -141,7 +128,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_UPDATE -> {
@@ -157,7 +144,7 @@ class SyncDataPutOrGetUtils {
 
                                         override fun onError(e: Throwable) {
                                             super.onError(e)
-                                            showError(handler)
+                                            syncCallback.error(e.message)
                                         }
                                     })
                         }
@@ -178,7 +165,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_DELETE -> RegionModel.delete(token, changeId.toInt(),
@@ -188,7 +175,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_UPDATE -> RegionModel.update(token,
@@ -199,7 +186,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                     }
@@ -234,7 +221,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_DELETE -> SceneModel.delete(token,
@@ -244,7 +231,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                         Constant.DB_UPDATE -> SceneModel.update(token, changeId.toInt(), bodyScene, id)!!.subscribe(object : NetworkObserver<String>() {
@@ -253,7 +240,7 @@ class SyncDataPutOrGetUtils {
 
                             override fun onError(e: Throwable) {
                                 super.onError(e)
-                                showError(handler)
+                                syncCallback.error(e.message)
                             }
                         })
                     }
@@ -297,7 +284,7 @@ class SyncDataPutOrGetUtils {
 
                                 override fun onError(e: Throwable) {
                                     super.onError(e)
-                                    showError(handler)
+                                    syncCallback.error(e.message)
                                 }
                             })
                     }
@@ -307,14 +294,12 @@ class SyncDataPutOrGetUtils {
 
         /********************************同步数据之下拉数据 */
 
-        fun syncGetDataStart(dbUser: DbUser, handler: Handler) {
+        fun syncGetDataStart(dbUser: DbUser, syncCallBack: SyncCallback) {
             val token = dbUser.token
-            startGet(token, dbUser.account, handler)
+            startGet(token, dbUser.account, syncCallBack)
         }
 
-        private fun startGet(token: String, accountNow: String, handler: Handler) {
-
-            var message = Message()
+        private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
 
             NetworkFactory.getApi()
                     .getRegionList(token)
@@ -366,12 +351,12 @@ class SyncDataPutOrGetUtils {
                         override fun onNext(item: List<DbScene>) {
                             SharedPreferencesUtils.saveCurrentUserList(accountNow)
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                            message.what = Cmd.SYNCCOMPLETCMD
-                            handler.sendMessage(message)
+                            syncCallBack.complete()
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
+                            syncCallBack.error(e.message)
                         }
                     }
             )

@@ -3,8 +3,6 @@ package com.dadoutek.uled.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Message
 import android.os.PowerManager
 import android.view.MenuItem
 import android.view.View
@@ -14,23 +12,15 @@ import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkBaseActivity
-import com.dadoutek.uled.TelinkLightApplication
-import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkObserver
-import com.dadoutek.uled.intf.NetworkTransformer
-import com.dadoutek.uled.model.Cmd
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.LogUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import com.mob.tools.utils.DeviceHelper
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -40,8 +30,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 
 class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private var dbUser: DbUser? = null
-    private val salt = ""
-    private val MD5Password: String? = null
     private var phone: String? = null
     private var editPassWord: String? = null
     private var isFirstLauch: Boolean = false
@@ -53,9 +41,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
         //页面存在耗时操作 需要保持屏幕常亮
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (powerManager != null) {
-            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
-        }
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
 
         initData()
         initView()
@@ -75,7 +61,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onPause() {
         super.onPause()
-        if (mWakeLock != null) {
+        if (this.mWakeLock != null) {
             mWakeLock!!.acquire()
         }
     }
@@ -140,7 +126,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                             hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                                 showLoadingDialog(getString(R.string.sync_now))
-                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser,handler)
+                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser,syncCallback)
                         }
 
                         override fun onError(e: Throwable) {
@@ -153,15 +139,20 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    internal var syncCallback: SyncCallback = object : SyncCallback {
 
-    var handler: Handler = object : Handler() {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            when (msg.what) {
-                Cmd.SYNCCMD -> showLoadingDialog(getString(R.string.tip_start_sync))
-                Cmd.SYNCCOMPLETCMD -> syncComplet()
-            }
+        override fun start() {
+            showLoadingDialog(getString(R.string.tip_start_sync))
         }
+
+        override fun complete() {
+            syncComplet()
+        }
+
+        override fun error(msg: String) {
+           LogUtils.d("GetDataError:"+msg)
+        }
+
     }
 
     private fun syncComplet() {
