@@ -232,6 +232,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         public void complete() {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().idleMode(true);
                 restartApplication();
             }
             hideLoadingDialog();
@@ -464,7 +465,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 hideLoadingDialog();
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -482,7 +483,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
 
     //重启app并杀死原进程
     private void restartApplication() {
+        ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
-        ActivityUtils.finishAllActivitiesExceptNewest();
+//        com.blankj.utilcode.util.AppUtils.relaunchApp();
     }
 }

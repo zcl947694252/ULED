@@ -7,7 +7,6 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.dao.DbDataChangeDao;
 import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbLightDao;
 import com.dadoutek.uled.dao.DbRegionDao;
@@ -23,8 +22,6 @@ import org.greenrobot.greendao.query.Query;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -37,7 +34,7 @@ public class DBUtils {
 
     public static List<DbSceneActions> searchActionsBySceneId(long id) {
         Query<DbSceneActions> query = DaoSessionInstance.getInstance().getDbSceneActionsDao().queryBuilder().
-                where(DbSceneActionsDao.Properties.ActionId.eq(id)).build();
+                where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build();
         return new ArrayList<>(query.list());
     }
 
@@ -311,8 +308,7 @@ public class DBUtils {
                                         Long sceneId) {
         DbSceneActions actions=new DbSceneActions();
         String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou");
-        actions.setBelongAccount(account);
-        actions.setActionId(sceneId);
+        actions.setBelongSceneId(sceneId);
         actions.setBrightness(sceneActions.getBrightness());
         actions.setColorTemperature(sceneActions.getColorTemperature());
         actions.setGroupAddr(sceneActions.getGroupAddr());

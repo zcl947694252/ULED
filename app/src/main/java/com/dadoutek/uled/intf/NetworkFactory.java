@@ -28,13 +28,10 @@ public class NetworkFactory {
     private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJava2CallAdapterFactory.create();
 
     public NetworkFactory() {
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        if (BuildConfig.DEBUG)
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        else
-            loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(loggingInterceptor).build();
+                .addInterceptor(logging).build();
     }
 
 

@@ -1,7 +1,6 @@
 package com.dadoutek.uled.model;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DbDeleteGroupDao;

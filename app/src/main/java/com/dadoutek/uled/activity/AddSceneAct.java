@@ -260,8 +260,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
             for (int i = 0; i < itemGroups.size(); i++) {
                 DbSceneActions sceneActions = new DbSceneActions();
-                sceneActions.setActionId(idAction);
-                sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
+                sceneActions.setBelongSceneId(idAction);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
 //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组

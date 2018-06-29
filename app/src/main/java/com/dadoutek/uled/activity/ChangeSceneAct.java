@@ -296,8 +296,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
             for (int i = 0; i < itemGroups.size(); i++) {
                 DbSceneActions sceneActions = new DbSceneActions();
-                sceneActions.setActionId(idAction);
-                sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
+                sceneActions.setBelongSceneId(idAction);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
