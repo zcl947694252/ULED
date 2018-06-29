@@ -1022,6 +1022,7 @@ public class LightAdapter {
 
                 LightPeripheral light = mLightCtrl.getCurrentLight();
                 login(light);
+                Log.d("sggs", "onConnected: "+light.getMacAddress());
             } else {
                 mLightCtrl.requestFirmware();
             }
