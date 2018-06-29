@@ -32,7 +32,7 @@ public class DBUtils {
 
     /********************************************查询*******************************/
 
-    public static List<DbSceneActions> searchActionsBySceneId(long id) {
+    public static List<DbSceneActions> getActionsBySceneId(long id) {
         Query<DbSceneActions> query = DaoSessionInstance.getInstance().getDbSceneActionsDao().queryBuilder().
                 where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build();
         return new ArrayList<>(query.list());

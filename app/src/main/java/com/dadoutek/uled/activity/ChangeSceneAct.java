@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -318,7 +317,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         deleteScene(id);
 
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);

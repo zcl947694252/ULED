@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Scene;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -314,7 +313,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         byte[] params;
 
         for (int i = 0; i < list.size(); i++) {

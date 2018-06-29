@@ -3,12 +3,12 @@ package com.dadoutek.uled.intf;
 import android.text.TextUtils;
 
 import com.dadoutek.uled.BuildConfig;
-import com.dadoutek.uled.intf.RequestInterface;
 import com.dadoutek.uled.model.Constant;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -18,24 +18,36 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkFactory {
+    private static final long DEFAULT_TIMEOUT = 15;
     private static RequestInterface api;
     private static RequestInterface loginApi;
     private static RequestInterface registerApi;
     private static RequestInterface getAccountApi;
     private static RequestInterface getSaltApi;
-    private static OkHttpClient okHttpClient = new OkHttpClient();
     private static Converter.Factory gsonConverterFactory = GsonConverterFactory.create();
     private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJava2CallAdapterFactory.create();
+    private static OkHttpClient okHttpClient;
 
-    public NetworkFactory() {
+    private static OkHttpClient initHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(logging).build();
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
+                .readTimeout(3, TimeUnit.SECONDS)
+                .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
+                .writeTimeout(3, TimeUnit.MINUTES)
+                .retryOnConnectionFailure(true);
+
+        if (BuildConfig.DEBUG)
+            okHttpBuilder.addInterceptor(logging);
+
+        return okHttpBuilder.build();
     }
 
 
     public static RequestInterface getApi() {
+        if (okHttpClient == null) {
+            okHttpClient = initHttpClient();
+        }
         if (api == null) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
