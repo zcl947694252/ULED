@@ -147,7 +147,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
         showList=new ArrayList<>();
 
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+                getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
 
         //如果有调整过顺序取本地数据，否则取数据库数据
         if(dbOldGroupList!=null&&dbOldGroupList.size()>0){
@@ -183,7 +183,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
             public void onItemDragEnd(RecyclerView.ViewHolder viewHolder, int pos) {
 //                viewHolder.getItemId();
                 List<DbGroup> list=adapter.getData();
-                SharedPreferencesHelper.putObject(getActivity(),"oldIndexData",list);
+                SharedPreferencesHelper.putObject(getActivity(),Constant.OLD_INDEX_DATA,list);
             }
         };
 

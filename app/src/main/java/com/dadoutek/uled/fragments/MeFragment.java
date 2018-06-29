@@ -456,6 +456,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
             @Override
             public void onNext(String s) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                SharedPreferencesHelper.putObject(getActivity(),Constant.OLD_INDEX_DATA,null);
                 DBUtils.deleteAllData();
                 CleanUtils.cleanInternalSp();
                 CleanUtils.cleanExternalCache();
