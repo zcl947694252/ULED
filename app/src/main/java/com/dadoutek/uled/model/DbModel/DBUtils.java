@@ -242,11 +242,11 @@ public class DBUtils {
 
             //本地匹配index
             List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                    getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+                    getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
             if(dbOldGroupList!=null){
                 dbOldGroupList.add(group);
                 SharedPreferencesHelper.
-                        putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+                        putObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA,dbOldGroupList);
             }
         }
     }
@@ -326,13 +326,13 @@ public class DBUtils {
 
         //本地匹配index
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+                getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
         if(dbOldGroupList!=null){
             for(int k=0;k<dbOldGroupList.size();k++){
                 if(group.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
                     dbOldGroupList.set(k,group);
                     SharedPreferencesHelper.
-                            putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+                            putObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA,dbOldGroupList);
                     break;
                 }
             }
@@ -383,13 +383,13 @@ public class DBUtils {
 
         //本地匹配index
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                getObject(TelinkLightApplication.getInstance(),"oldIndexData");
+                getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
         if(dbOldGroupList!=null){
             for(int k=0;k<dbOldGroupList.size();k++){
                 if(dbGroup.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
                     dbOldGroupList.remove(k);
                     SharedPreferencesHelper.
-                            putObject(TelinkLightApplication.getInstance(),"oldIndexData",dbOldGroupList);
+                            putObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA,dbOldGroupList);
                     break;
                 }
             }

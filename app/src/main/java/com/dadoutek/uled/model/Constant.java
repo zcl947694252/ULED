@@ -91,4 +91,7 @@ public class Constant implements Serializable {
 
     //管理权限本地保存key
     public static String ME_FUNCTION = "ME_FUNCTION";
+
+    //管理权限本地保存key
+    public static String OLD_INDEX_DATA = "oldIndexData";
 }
