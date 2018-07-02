@@ -24,6 +24,8 @@ import org.greenrobot.greendao.query.QueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.dadoutek.uled.model.Constant.MAX_GROUP_COUNT;
+
 /**
  * Created by hejiajun on 2018/5/18.
  */
@@ -76,7 +78,7 @@ public class DBUtils {
     public static DbUser getLastUser() {
         List<DbUser> list = DaoSessionInstance.getInstance().getDbUserDao().
                 queryBuilder().orderDesc(DbUserDao.Properties.Id).list();
-        if(list.size()==0){
+        if (list.size() == 0) {
             return null;
         }
         return list.get(0);
@@ -175,14 +177,14 @@ public class DBUtils {
 
     /********************************************保存*******************************/
 
-    public static void saveRegion(DbRegion dbRegion,boolean isFromServer) {
-        if(isFromServer){
+    public static void saveRegion(DbRegion dbRegion, boolean isFromServer) {
+        if (isFromServer) {
             DbRegion dbRegionOld = DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
                     where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.getControlMesh())).unique();
             if (dbRegionOld == null) {
                 DaoSessionInstance.getInstance().getDbRegionDao().insert(dbRegion);
             }
-        }else{
+        } else {
             //判断原来是否保存过这个区域
             DbRegion dbRegionOld = DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
                     where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.getControlMesh())).unique();
@@ -231,10 +233,10 @@ public class DBUtils {
         }
     }
 
-    public static void saveGroup(DbGroup group,boolean isFromServer) {
-        if(isFromServer){
+    public static void saveGroup(DbGroup group, boolean isFromServer) {
+        if (isFromServer) {
             DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
-        }else{
+        } else {
             DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
             recordingChange(group.getId(),
                     DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
@@ -242,25 +244,25 @@ public class DBUtils {
 
             //本地匹配index
             List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                    getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
-            if(dbOldGroupList!=null){
+                    getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA);
+            if (dbOldGroupList != null) {
                 dbOldGroupList.add(group);
                 SharedPreferencesHelper.
-                        putObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA,dbOldGroupList);
+                        putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, dbOldGroupList);
             }
         }
     }
 
     public static void saveDeleteGroup(DbGroup group) {
-        DbDeleteGroup dbDeleteGroup=new DbDeleteGroup();
+        DbDeleteGroup dbDeleteGroup = new DbDeleteGroup();
         dbDeleteGroup.setGroupAress(group.getMeshAddr());
         DaoSessionInstance.getInstance().getDbDeleteGroupDao().save(dbDeleteGroup);
     }
 
-    public static void saveLight(DbLight light,boolean isFromServer) {
-        if(isFromServer){
+    public static void saveLight(DbLight light, boolean isFromServer) {
+        if (isFromServer) {
             DaoSessionInstance.getInstance().getDbLightDao().insert(light);
-        }else{
+        } else {
             //保存灯之前先把所有的灯都分配到当前的所有组去
             DbGroup dbGroup = getGroupNull();
             light.setBelongGroupId(dbGroup.getId());
@@ -286,10 +288,10 @@ public class DBUtils {
                 Constant.DB_ADD);
     }
 
-    public static void saveScene(DbScene dbScene,boolean isFromServer) {
-        if(isFromServer){
+    public static void saveScene(DbScene dbScene, boolean isFromServer) {
+        if (isFromServer) {
             DaoSessionInstance.getInstance().getDbSceneDao().insert(dbScene);
-        }else{
+        } else {
             DaoSessionInstance.getInstance().getDbSceneDao().insertOrReplace(dbScene);
             recordingChange(dbScene.getId(),
                     DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
@@ -304,9 +306,9 @@ public class DBUtils {
 //                Constant.DB_ADD);
     }
 
-    public static void saveSceneActions(DbSceneActions sceneActions,Long id,
+    public static void saveSceneActions(DbSceneActions sceneActions, Long id,
                                         Long sceneId) {
-        DbSceneActions actions=new DbSceneActions();
+        DbSceneActions actions = new DbSceneActions();
         String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou");
         actions.setBelongSceneId(sceneId);
         actions.setBrightness(sceneActions.getBrightness());
@@ -326,13 +328,13 @@ public class DBUtils {
 
         //本地匹配index
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
-        if(dbOldGroupList!=null){
-            for(int k=0;k<dbOldGroupList.size();k++){
-                if(group.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
-                    dbOldGroupList.set(k,group);
+                getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA);
+        if (dbOldGroupList != null) {
+            for (int k = 0; k < dbOldGroupList.size(); k++) {
+                if (group.getMeshAddr() == dbOldGroupList.get(k).getMeshAddr()) {
+                    dbOldGroupList.set(k, group);
                     SharedPreferencesHelper.
-                            putObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA,dbOldGroupList);
+                            putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, dbOldGroupList);
                     break;
                 }
             }
@@ -383,20 +385,20 @@ public class DBUtils {
 
         //本地匹配index
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
-        if(dbOldGroupList!=null){
-            for(int k=0;k<dbOldGroupList.size();k++){
-                if(dbGroup.getMeshAddr()==dbOldGroupList.get(k).getMeshAddr()){
+                getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA);
+        if (dbOldGroupList != null) {
+            for (int k = 0; k < dbOldGroupList.size(); k++) {
+                if (dbGroup.getMeshAddr() == dbOldGroupList.get(k).getMeshAddr()) {
                     dbOldGroupList.remove(k);
                     SharedPreferencesHelper.
-                            putObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA,dbOldGroupList);
+                            putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, dbOldGroupList);
                     break;
                 }
             }
         }
     }
 
-    public static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup){
+    public static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup) {
         DaoSessionInstance.getInstance().getDbDeleteGroupDao().delete(dbDeleteGroup);
     }
 
@@ -443,24 +445,24 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbDataChangeDao().deleteAll();
     }
 
-    public static void deleteDbDataChange(long id){
+    public static void deleteDbDataChange(long id) {
         DaoSessionInstance.getInstance().getDbDataChangeDao().deleteByKey(id);
     }
 
     /********************************************其他*******************************/
 
     public static void addNewGroup(String name, List<DbGroup> groups, Context context) {
-        if (!checkRepeat(groups, context, name)&&!checkReachedTheLimit(groups)) {
+        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
             int count = groups.size();
             int newMeshAdress;
             DbGroup group = new DbGroup();
 
-            List<DbDeleteGroup> list=getDeleteGroups();
-            if(list.size()>0){
-                newMeshAdress=list.get(0).getGroupAress();
+            List<DbDeleteGroup> list = getDeleteGroups();
+            if (list.size() > 0) {
+                newMeshAdress = list.get(0).getGroupAress();
                 group.setMeshAddr(newMeshAdress);
                 deleteDeleteGroup(list.get(0));
-            }else {
+            } else {
                 newMeshAdress = ++count;
                 group.setMeshAddr(0x8001 + newMeshAdress);
             }
@@ -470,7 +472,7 @@ public class DBUtils {
             group.setBelongRegionId((int) SharedPreferencesUtils.getCurrentUseRegion());//目前暂无分区 区域ID暂为0
             groups.add(group);
             //新增数据库保存
-            DBUtils.saveGroup(group,false);
+            DBUtils.saveGroup(group, false);
 
             recordingChange(group.getId(),
                     DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
@@ -480,7 +482,7 @@ public class DBUtils {
     }
 
     private static boolean checkReachedTheLimit(List<DbGroup> groups) {
-        if(groups.size()>=255){
+        if (groups.size() >= MAX_GROUP_COUNT) {
             ToastUtils.showLong(R.string.group_limit);
             return true;
         }
@@ -547,24 +549,24 @@ public class DBUtils {
                 if (dataChangeList.get(i).getTableName().equals(changeTable) &
                         dataChangeList.get(i).getChangeId().equals(changeIndex)) {
 
-                    if(dataChangeList.get(i).getChangeType().equals(operating)){
+                    if (dataChangeList.get(i).getChangeType().equals(operating)) {
                         break;
                     }
 
                     //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
-                    if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
-                            &&operating.equals(Constant.DB_DELETE)){
+                    if (dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
+                            && operating.equals(Constant.DB_DELETE)) {
                         deleteDbDataChange(dataChangeList.get(i).getId());
                         break;
-                    }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_UPDATE)
-                            &&operating.equals(Constant.DB_DELETE)){
+                    } else if (dataChangeList.get(i).getChangeType().equals(Constant.DB_UPDATE)
+                            && operating.equals(Constant.DB_DELETE)) {
                         dataChangeList.get(i).setChangeType(operating);
                         updateDbchange(dataChangeList.get(i));
                         break;
 //                        deleteDbDataChange(dataChangeList.get(i).getId());
-                    }else if(dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
-                            &&operating.equals(Constant.DB_UPDATE)){
-                          break;
+                    } else if (dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
+                            && operating.equals(Constant.DB_UPDATE)) {
+                        break;
                     }
                 }
                 //如果数据表没有该数据直接添加
