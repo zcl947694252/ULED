@@ -410,7 +410,7 @@ class SyncDataPutOrGetUtils {
                 mesh.name = dbRegion.controlMesh
                 mesh.password = dbRegion.controlMeshPwd
                 mesh.factoryName = dbRegion.installMesh
-                mesh.password = dbRegion.installMeshPwd
+                mesh.factoryPassword = dbRegion.installMeshPwd
 //            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
                 application.setupMesh(mesh)
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
