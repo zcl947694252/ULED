@@ -298,7 +298,7 @@ public class DBUtils {
     }
 
     public static void saveSceneActions(DbSceneActions sceneActions) {
-        DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().insertOrReplace(sceneActions);
 //        recordingChange(sceneActions.getId(),
 //                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
 //                Constant.DB_ADD);

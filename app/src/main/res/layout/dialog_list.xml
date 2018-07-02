@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/listview_group"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="200dp"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:divider="@color/primary"
-        android:dividerHeight="1dp" />
+        />
+
+    <Button
+        android:id="@+id/btn_sure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_sure"
+        android:layout_gravity="center"
+        />
 </LinearLayout>

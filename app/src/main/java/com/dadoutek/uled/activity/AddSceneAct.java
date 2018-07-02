@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
 import com.dadoutek.uled.TelinkLightApplication;
@@ -60,7 +61,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private Scenes scenes;
     private LayoutInflater inflater;
-    private SceneGroupAdapter adapter;
+    private SceneGroupAdapter sceneGroupAdapter;
 
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
@@ -107,12 +108,12 @@ public class AddSceneAct extends TelinkBaseActivity {
         layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
         sceneGroupListView.setLayoutManager(layoutmanager);
 
-        this.adapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
+        this.sceneGroupAdapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
 //        sceneGroupListView.setAdapter(adapter);
-        adapter.bindToRecyclerView(sceneGroupListView);
+        sceneGroupAdapter.bindToRecyclerView(sceneGroupListView);
 
         //删除时恢复可添加组标记
-        adapter.setOnItemChildClickListener((adapter, view, position) -> {
+        sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (groupArrayList.size() != 0) {
                 if (adapter.getItemCount() == 1) {
                     for (int k = 0; k < groupArrayList.size(); k++) {
@@ -148,24 +149,67 @@ public class AddSceneAct extends TelinkBaseActivity {
         AlertDialog.Builder builder;
         AlertDialog dialog;
         List<DbGroup> showList = getShowList();
+        ArrayList<DbGroup> selectGroupList=new ArrayList<>();
+
         View bottomView = View.inflate(AddSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
-        ListView lvGp = (ListView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
-        lvGp.setAdapter(new GroupListAdapter(this, showList));//ListView设置适配器
+        RecyclerView lvGp = (RecyclerView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
+        Button btnSure =  bottomView.findViewById(R.id.btn_sure);
+        btnSure.setVisibility(View.GONE);
+
+        GroupListAdapter groupListAdapter;
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        lvGp.setLayoutManager(layoutmanager);
+        groupListAdapter = new GroupListAdapter(R.layout.item_group,showList);
+        groupListAdapter.bindToRecyclerView(lvGp);
 
         builder = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.group_select)).setView(bottomView);
         dialog = builder.create();
 
-        lvGp.setOnItemClickListener((parent, view, position, id) -> {
-            ItemGroup itemGroup = new ItemGroup();
-            itemGroup.brightness = 50;
-            itemGroup.temperature = 50;
-            itemGroup.groupAress = showList.get(position).getMeshAddr();
-            itemGroup.gpName = showList.get(position).getName();
-            changeData(position, showList);
-            adapter.addData(itemGroup);
+        groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
 
-            dialog.dismiss();
+            DbGroup item=showList.get(position);
+            if(item.getMeshAddr()==0xffff){
+                ItemGroup itemGroup = new ItemGroup();
+                itemGroup.brightness = 50;
+                itemGroup.temperature = 50;
+                itemGroup.groupAress = showList.get(position).getMeshAddr();
+                itemGroup.gpName = showList.get(position).getName();
+                changeData(position, showList);
+                sceneGroupAdapter.addData(itemGroup);
+                dialog.dismiss();
+            }else{
+                btnSure.setVisibility(View.VISIBLE);
+                if(showList.get(position).checked){
+                    showList.get(position).checked=false;
+                }else{
+                    showList.get(position).checked=true;
+                }
+
+                if(showList.get(0).getMeshAddr()==0xffff){
+                    adapter.remove(0);
+                }
+                adapter.notifyItemChanged(position);
+            }
+        });
+
+        btnSure.setOnClickListener(v -> {
+           for(int j=0;j<showList.size();j++){
+               if(showList.get(j).checked){
+                   ItemGroup itemGroup = new ItemGroup();
+                   itemGroup.brightness = 50;
+                   itemGroup.temperature = 50;
+                   itemGroup.groupAress = showList.get(j).getMeshAddr();
+                   itemGroup.gpName = showList.get(j).getName();
+                   changeDataList(showList.get(j));
+                   sceneGroupAdapter.addData(itemGroup);
+               }
+
+               if(j==showList.size()-1){
+                   dialog.dismiss();
+               }
+           }
         });
 
         dialog.show();
@@ -189,10 +233,25 @@ public class AddSceneAct extends TelinkBaseActivity {
         }
     }
 
+    private void changeDataList(DbGroup item) {
+        for (int k = 0; k < groupArrayList.size(); k++) {
+                if (groupArrayList.get(k).getMeshAddr() == item.getMeshAddr()) {
+//                    showList.add(groupArrayList.get(k));
+                    groupArrayList.get(k).selected = true;
+                    for (int i = 0; i < groupArrayList.size(); i++) {
+                        if (groupArrayList.get(i).getMeshAddr() == 0xffff) {
+                            groupArrayList.get(i).selected = true;
+                        }
+                    }
+                }
+        }
+    }
+
     private List<DbGroup> getShowList() {
         List<DbGroup> showList = new ArrayList<>();
         for (int k = 0; k < groupArrayList.size(); k++) {
             if (!groupArrayList.get(k).selected) {
+                groupArrayList.get(k).checked=false;
                 showList.add(groupArrayList.get(k));
             }
         }
