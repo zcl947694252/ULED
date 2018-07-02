@@ -231,8 +231,9 @@ public class MeFragment extends Fragment implements EventListener<String> {
         @Override
         public void complete() {
             if (isClickExlogin) {
-                TelinkLightService.Instance().idleMode(true);
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().idleMode(true);
+
                 restartApplication();
             }
             hideLoadingDialog();
@@ -466,7 +467,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 hideLoadingDialog();
 
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(300);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

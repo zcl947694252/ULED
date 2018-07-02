@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.transition.Scene;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -260,8 +259,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
             for (int i = 0; i < itemGroups.size(); i++) {
                 DbSceneActions sceneActions = new DbSceneActions();
-                sceneActions.setActionId(idAction);
-                sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
+                sceneActions.setBelongSceneId(idAction);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
 //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
@@ -315,7 +313,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         byte[] params;
 
         for (int i = 0; i < list.size(); i++) {

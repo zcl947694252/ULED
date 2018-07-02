@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.dadoutek.uled.dao.DaoSession;
-import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.dao.DbSceneDao;
 
 import org.greenrobot.greendao.DaoException;
@@ -14,8 +13,8 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
-import java.io.Serializable;
 import java.util.List;
+import com.dadoutek.uled.dao.DbSceneActionsDao;
 
 /**
  * Created by hejiajun on 2018/5/5.
@@ -32,7 +31,7 @@ public class DbScene implements Parcelable{
     @NotNull
     private Long belongRegionId;
 
-    @ToMany(referencedJoinProperty = "actionId")
+    @ToMany(referencedJoinProperty = "belongSceneId")
     private List<DbSceneActions> actions;
 
     /** Used to resolve relations */

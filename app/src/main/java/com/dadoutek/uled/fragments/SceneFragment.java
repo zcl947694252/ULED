@@ -11,8 +11,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
@@ -141,7 +139,7 @@ public class SceneFragment extends Fragment implements
         byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
         long id = scenesListData.get(position).getId();
-        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
         new Thread(() -> {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
@@ -152,7 +150,7 @@ public class SceneFragment extends Fragment implements
 
     private void setScene(long id) {
         byte opcode = Opcode.SCENE_LOAD;
-        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         new Thread(() -> {
             byte[] params;
             params = new byte[]{(byte) id};

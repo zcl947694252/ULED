@@ -28,11 +28,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
      */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
-        public final static Property ActionId = new Property(1, Long.class, "actionId", false, "ACTION_ID");
+        public final static Property BelongSceneId = new Property(1, long.class, "belongSceneId", false, "BELONG_SCENE_ID");
         public final static Property GroupAddr = new Property(2, int.class, "groupAddr", false, "GROUP_ADDR");
         public final static Property ColorTemperature = new Property(3, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property Brightness = new Property(4, int.class, "brightness", false, "BRIGHTNESS");
-        public final static Property BelongAccount = new Property(5, String.class, "belongAccount", false, "BELONG_ACCOUNT");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -50,11 +49,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"DB_SCENE_ACTIONS\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
-                "\"ACTION_ID\" INTEGER," + // 1: actionId
+                "\"BELONG_SCENE_ID\" INTEGER NOT NULL ," + // 1: belongSceneId
                 "\"GROUP_ADDR\" INTEGER NOT NULL ," + // 2: groupAddr
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 3: colorTemperature
-                "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
-                "\"BELONG_ACCOUNT\" TEXT NOT NULL );"); // 5: belongAccount
+                "\"BRIGHTNESS\" INTEGER NOT NULL );"); // 4: brightness
     }
 
     /** Drops the underlying database table. */
@@ -71,15 +69,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
- 
-        Long actionId = entity.getActionId();
-        if (actionId != null) {
-            stmt.bindLong(2, actionId);
-        }
+        stmt.bindLong(2, entity.getBelongSceneId());
         stmt.bindLong(3, entity.getGroupAddr());
         stmt.bindLong(4, entity.getColorTemperature());
         stmt.bindLong(5, entity.getBrightness());
-        stmt.bindString(6, entity.getBelongAccount());
     }
 
     @Override
@@ -90,15 +83,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
- 
-        Long actionId = entity.getActionId();
-        if (actionId != null) {
-            stmt.bindLong(2, actionId);
-        }
+        stmt.bindLong(2, entity.getBelongSceneId());
         stmt.bindLong(3, entity.getGroupAddr());
         stmt.bindLong(4, entity.getColorTemperature());
         stmt.bindLong(5, entity.getBrightness());
-        stmt.bindString(6, entity.getBelongAccount());
     }
 
     @Override
@@ -110,11 +98,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
     public DbSceneActions readEntity(Cursor cursor, int offset) {
         DbSceneActions entity = new DbSceneActions( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1), // actionId
+            cursor.getLong(offset + 1), // belongSceneId
             cursor.getInt(offset + 2), // groupAddr
             cursor.getInt(offset + 3), // colorTemperature
-            cursor.getInt(offset + 4), // brightness
-            cursor.getString(offset + 5) // belongAccount
+            cursor.getInt(offset + 4) // brightness
         );
         return entity;
     }
@@ -122,11 +109,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
     @Override
     public void readEntity(Cursor cursor, DbSceneActions entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setActionId(cursor.isNull(offset + 1) ? null : cursor.getLong(offset + 1));
+        entity.setBelongSceneId(cursor.getLong(offset + 1));
         entity.setGroupAddr(cursor.getInt(offset + 2));
         entity.setColorTemperature(cursor.getInt(offset + 3));
         entity.setBrightness(cursor.getInt(offset + 4));
-        entity.setBelongAccount(cursor.getString(offset + 5));
      }
     
     @Override
@@ -155,16 +141,16 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
     }
     
     /** Internal query to resolve the "actions" to-many relationship of DbScene. */
-    public List<DbSceneActions> _queryDbScene_Actions(Long actionId) {
+    public List<DbSceneActions> _queryDbScene_Actions(long belongSceneId) {
         synchronized (this) {
             if (dbScene_ActionsQuery == null) {
                 QueryBuilder<DbSceneActions> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.ActionId.eq(null));
+                queryBuilder.where(Properties.BelongSceneId.eq(null));
                 dbScene_ActionsQuery = queryBuilder.build();
             }
         }
         Query<DbSceneActions> query = dbScene_ActionsQuery.forCurrentThread();
-        query.setParameter(0, actionId);
+        query.setParameter(0, belongSceneId);
         return query.list();
     }
 

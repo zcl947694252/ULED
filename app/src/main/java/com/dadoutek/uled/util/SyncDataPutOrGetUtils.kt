@@ -230,7 +230,7 @@ class SyncDataPutOrGetUtils {
                         var gson: Gson = Gson()
                         body.name = scene.name
                         body.belongRegionId = scene.belongRegionId
-                        body.actions = scene.actions
+                        body.actions = DBUtils.getActionsBySceneId(changeId)
 
                         postInfoStr = gson.toJson(body)
 
