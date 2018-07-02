@@ -14,6 +14,8 @@ public class Constant implements Serializable {
 //    public static final String DEFAULT_MESH_FACTORY_NAME="TestLocas";
 //    public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
+    public static final int MAX_GROUP_COUNT = 255;
+
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
