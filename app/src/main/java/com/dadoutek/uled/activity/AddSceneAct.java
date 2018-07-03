@@ -96,7 +96,6 @@ public class AddSceneAct extends TelinkBaseActivity {
         itemGroupArrayList = new ArrayList<>();
 
         for (DbGroup group : groups) {
-//            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
             group.selected = false;
             groupArrayList.add(group);
             groupNameArrayList.add(group.getName());
@@ -147,10 +146,9 @@ public class AddSceneAct extends TelinkBaseActivity {
         AlertDialog.Builder builder;
         AlertDialog dialog;
         List<DbGroup> showList = getShowList();
-        ArrayList<DbGroup> selectGroupList = new ArrayList<>();
 
         View bottomView = View.inflate(AddSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
-        RecyclerView lvGp = (RecyclerView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
+        RecyclerView lvGp = bottomView.findViewById(R.id.listview_group);//初始化ListView控件
         Button btnSure = bottomView.findViewById(R.id.btn_sure);
         btnSure.setVisibility(View.GONE);
 

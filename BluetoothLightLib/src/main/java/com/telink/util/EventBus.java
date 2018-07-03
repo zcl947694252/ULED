@@ -17,6 +17,7 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -146,11 +147,12 @@ public class EventBus<T> {
 
         T eventType = event.getType();
 
-        List<EventListener<T>> listeners = null;
+        CopyOnWriteArrayList<EventListener<T>> listeners = null;
 
         synchronized (this.mEventListeners) {
             if (this.mEventListeners.containsKey(eventType)) {
-                listeners = this.mEventListeners.get(eventType);
+                listeners = new CopyOnWriteArrayList<>(this.mEventListeners.get(eventType));
+//                listeners = this.mEventListeners.get(eventType);
             }
         }
 

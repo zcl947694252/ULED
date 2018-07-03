@@ -3,6 +3,7 @@ package com.dadoutek.uled.activity
 import android.Manifest
 import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -87,6 +88,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     private var retryConnectCount = 0
     private var snackbarScanning: Snackbar? = null
+    private var snackbarNotFoundLight: Snackbar? = null
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -240,7 +242,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);
         this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication!!.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-        this.mApplication!!.addEventListener(NotificationEvent.GET_ALARM, this)
+//        this.mApplication!!.addEventListener(NotificationEvent.GET_ALARM, this)
         this.mApplication!!.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
         this.mApplication!!.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
 //        this.mApplication!!.addEventListener(MeshEvent.OFFLINE, this)
@@ -260,12 +262,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     if (mConnectingSnackbar != null) {
                         retryConnect()
                     } else {
-                        LogUtils.d(getString(R.string.not_found_light))
                         progressBar.visibility = View.GONE
-                        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-                            TelinkLightService.Instance().idleMode(true)
-//                            startScan()
-                            startScan()
+                        if (snackbarNotFoundLight == null){
+                            indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                                TelinkLightService.Instance().idleMode(true)
+                                LeBluetooth.getInstance().stopScan()
+                                startScan()
+                            }
                         }
 
                     }
@@ -462,10 +465,14 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             retryConnectCount++
             startScan()
         } else {
-            indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-                TelinkLightService.Instance().idleMode(true)
-                startScan()
+            if (snackbarNotFoundLight == null){
+                indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                    TelinkLightService.Instance().idleMode(true)
+                    LeBluetooth.getInstance().stopScan()
+                    startScan()
+                }
             }
+
         }
     }
 
@@ -577,9 +584,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-            TelinkLightService.Instance().idleMode(true)
-            startScan()
+
+        if (snackbarNotFoundLight == null){
+            indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                TelinkLightService.Instance().idleMode(true)
+                LeBluetooth.getInstance().stopScan()
+                startScan()
+            }
         }
 
     }
