@@ -163,7 +163,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 .subscribeWith(new DisposableObserver<Object>() {
                     @Override
                     public void onNext(Object o) {
-                        long num=(59-Long.valueOf((Long) o));
+                        long num=(59- (Long) o);
                         if(num==0){
                             btnSendVerification.setText(getResources().getString(R.string.send_verification));
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.primary));
@@ -208,6 +208,4 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
         //用完回调要注销掉，否则可能会出现内存泄露
         SMSSDK.unregisterAllEventHandler();
     }
-
-    ;
 }
