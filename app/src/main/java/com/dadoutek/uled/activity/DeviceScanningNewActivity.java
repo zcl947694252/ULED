@@ -1,10 +1,12 @@
 package com.dadoutek.uled.activity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,6 +42,7 @@ import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.NetworkFactory;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
+import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -48,7 +51,9 @@ import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DialogUtils;
+import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.StringUtils;
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -920,10 +925,38 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
+    // 如果没有网络，则弹出网络设置对话框
+    public void checkNetworkAndSync() {
+        if (NetWorkUtils.isNetworkAvalible(this)) {
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(this, syncCallback);
+        }
+    }
+
+    SyncCallback syncCallback = new SyncCallback() {
+
+        @Override
+        public void start() {
+            showLoadingDialog(getString(R.string.tip_start_sync));
+        }
+
+        @Override
+        public void complete() {
+            hideLoadingDialog();
+        }
+
+        @Override
+        public void error(String msg) {
+            Log.d("SyncLog", "error: " + msg);
+            hideLoadingDialog();
+        }
+
+    };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d("ScanningTest", "remove all listener");
+        checkNetworkAndSync();
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.

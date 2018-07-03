@@ -169,6 +169,16 @@ public class DBUtils {
         return DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
     }
 
+    public synchronized static boolean getDataChangeAllHaveAboutLight() {
+        List<DbDataChange> list=DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
+        for(int i=0;i<list.size();i++){
+            if(list.get(i).getTableName().equals("DB_LIGHT")){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public synchronized static List<DbGroup> getAllGroups() {
         return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
     }

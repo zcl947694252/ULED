@@ -418,7 +418,17 @@ public class MeFragment extends Fragment implements EventListener<String> {
 
     private void exitLogin() {
         isClickExlogin = true;
-        checkNetworkAndSync(getActivity());
+        if(DBUtils.getAllLight().size()==0&&!DBUtils.getDataChangeAllHaveAboutLight()){
+            if (isClickExlogin) {
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().idleMode(true);
+
+                restartApplication();
+            }
+            hideLoadingDialog();
+        }else{
+            checkNetworkAndSync(getActivity());
+        }
     }
 
     long[] mHints = new long[6];//初始全部为0
