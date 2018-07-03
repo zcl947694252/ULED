@@ -228,7 +228,7 @@
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">The current name is already used</string>
-    <string name="One_click_backup">One-click backup</string>
+    <string name="upload_data">Upload data</string>
     <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
     <string name="login_timeout">Login timeout</string>
     <string name="account_not_exist">Account does not exist</string>
@@ -302,5 +302,6 @@
     <string name="data_empty">Data is empty</string>
     <string name="clear_data_now">Clearing user data. . .</string>
     <string name="clear_fail">Clear failed</string>
+    <string name="backup_failed">Backup data failed</string>
 
 </resources>

@@ -32,9 +32,11 @@ object AccountModel {
                 }
                 .flatMap { response: String ->
                     val salt = response
-                    val md5Pwd = NetworkFactory.md5(
+
+                    val md5Pwd = (NetworkFactory.md5(
                             NetworkFactory.md5(
-                                    NetworkFactory.md5(password) + account) + salt)
+                                    NetworkFactory.md5(password) + account) + salt))
+
                     NetworkFactory.getApi().login(account, md5Pwd)
                             .compose(NetworkTransformer())
                 }

@@ -72,7 +72,7 @@
     <Button
         android:id="@+id/one_click_backup"
         android:layout_marginTop="20dp"
-        android:text="@string/One_click_backup"
+        android:text="@string/upload_data"
         android:layout_gravity="center"
         android:textSize="18sp"
         android:background="@color/primary"

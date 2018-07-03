@@ -226,7 +226,7 @@
     <string name="scanning">扫描中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
-    <string name="One_click_backup">一键备份</string>
+    <string name="upload_data">上传数据</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
@@ -257,7 +257,7 @@
     <string name="grouping_fail">分组失败</string>
     <string name="add_scene_gp_tip">请添加需要应用到该场景的分组！</string>
     <string name="group_fail_tip">目前有灯分组失败，请检查或重试！</string>
-    <string name="one_click_reset">一键恢复出厂设置</string>
+    <string name="one_click_reset">恢复出厂设置</string>
     <string name="disconected">未连接</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
@@ -299,5 +299,6 @@
     <string name="data_empty">数据已经为空</string>
     <string name="clear_data_now">正在清除用户数据。。。</string>
     <string name="clear_fail">清除失败</string>
+    <string name="backup_failed">备份失败</string>
 
 </resources>

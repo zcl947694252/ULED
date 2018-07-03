@@ -15,7 +15,6 @@
     </style>
 
 
-
     <style name="FullHeightDialog" parent="Theme.AppCompat.Light.Dialog.MinWidth">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowMinWidthMinor">30%</item>

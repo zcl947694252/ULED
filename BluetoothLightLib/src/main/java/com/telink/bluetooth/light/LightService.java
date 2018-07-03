@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 
@@ -414,6 +413,7 @@ public abstract class LightService extends Service implements
         deviceInfo.meshUUID = light.getMeshUUID();
         deviceInfo.productUUID = light.getProductUUID();
         deviceInfo.status = light.getStatus();
+        deviceInfo.rssi = light.getRssi();
 
         Intent intent = new Intent();
         intent.setAction(ACTION_LE_SCAN);
@@ -516,7 +516,7 @@ public abstract class LightService extends Service implements
     }
 
     @Override
-    public void onErrorReport(int stateCode, int errorCode, int deviceId){
+    public void onErrorReport(int stateCode, int errorCode, int deviceId) {
         Intent intent = new Intent();
         intent.setAction(ACTION_ERROR_REPORT);
         ErrorReportInfo errorReportInfo = new ErrorReportInfo();
