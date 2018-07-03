@@ -2,13 +2,16 @@ package com.dadoutek.uled.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -152,16 +155,26 @@ public class AddSceneAct extends TelinkBaseActivity {
         Button btnSure = bottomView.findViewById(R.id.btn_sure);
         btnSure.setVisibility(View.GONE);
 
-        GroupListAdapter groupListAdapter;
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
-        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
-        lvGp.setLayoutManager(layoutmanager);
-        groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
+        builder = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.group_select))
+                .setView(bottomView);
+        dialog = builder.create();
+
+
+        GroupListAdapter groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        lvGp.setLayoutManager(layoutManager);
+        lvGp.setAdapter(groupListAdapter);
         groupListAdapter.bindToRecyclerView(lvGp);
 
-        builder = new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.group_select)).setView(bottomView);
-        dialog = builder.create();
+        dialog.show();
+
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        dialog.getWindow().setLayout((int) (size.x * 0.7), WindowManager.LayoutParams.WRAP_CONTENT);
+
 
         groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
 
@@ -208,7 +221,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             }
         });
 
-        dialog.show();
+
     }
 
     private void changeData(int position, List<DbGroup> showList) {

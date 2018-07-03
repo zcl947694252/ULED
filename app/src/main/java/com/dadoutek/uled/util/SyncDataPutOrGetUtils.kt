@@ -37,7 +37,7 @@ class SyncDataPutOrGetUtils {
                 val dbUser = DBUtils.getLastUser()
 
                 if (dbDataChangeList.size == 0) {
-                    ToastUtils.showLong(context.getString(R.string.tip_upload_success))
+                    ToastUtils.showLong(context.getString(R.string.upload_data_success))
                     launch(UI) {
                         syncCallback.complete()
                     }
@@ -54,7 +54,7 @@ class SyncDataPutOrGetUtils {
                             dbDataChangeList[i].changeType,
                             dbUser.token, dbDataChangeList[i].id!!, syncCallback)
                     if (i == dbDataChangeList.size - 1) {
-                        ToastUtils.showLong(context.getString(R.string.tip_upload_success))
+                        ToastUtils.showLong(context.getString(R.string.upload_data_success))
                         launch(UI) {
                             syncCallback.complete()
                         }

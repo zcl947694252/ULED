@@ -8,8 +8,10 @@
         android:id="@+id/listview_group"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:paddingEnd="5dp"
-        android:paddingStart="5dp" />
+        android:paddingTop="16dp"
+        android:paddingBottom="6dp"
+        android:paddingEnd="6dp"
+        android:paddingStart="6dp" />
 
     <Button
         android:id="@+id/btn_sure"

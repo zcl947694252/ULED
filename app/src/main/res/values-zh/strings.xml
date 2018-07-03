@@ -78,7 +78,7 @@
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">扫描完成，没有发现设备！</string>
-    <string name="device_login_tip">正在登陆设备，请稍候！</string>
+    <string name="connecting_tip">正在连接…</string>
     <string name="grouping_completed">分组完成</string>
     <string name="allLight">所有灯</string>
     <string name="group">组</string>
@@ -272,7 +272,7 @@
     <string name="install_light">安装灯</string>
     <string name="install_device">安装设备</string>
     <string name="tip_start_sync">开始同步。。。</string>
-    <string name="tip_upload_success">上传数据成功</string>
+    <string name="upload_data_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请设置网络！</string>
     <string name="devoloping">开发中。。。敬请期待！</string>
@@ -300,5 +300,7 @@
     <string name="clear_data_now">正在清除用户数据。。。</string>
     <string name="clear_fail">清除失败</string>
     <string name="backup_failed">备份失败</string>
+    <string name="uploading_data">上传数据中…</string>
+    <string name="upload_data_failed">上传数据失败…</string>
 
 </resources>

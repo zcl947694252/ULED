@@ -22,6 +22,8 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.R.id.progressBar
+import com.dadoutek.uled.R.id.root
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.TelinkMeshErrorDealActivity
@@ -364,6 +366,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 TelinkLightService.Instance().startScan(params)
                 startCheckRSSITimer()
 
+                snackbarNotFoundLight = null
                 snackbarScanning = indefiniteSnackbar(root, getString(R.string.scanning_devices))
 
             } else {
@@ -465,10 +468,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             retryConnectCount++
             startScan()
         } else {
+            TelinkLightService.Instance().idleMode(true)
+
             if (snackbarNotFoundLight == null){
                 indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-                    TelinkLightService.Instance().idleMode(true)
-                    LeBluetooth.getInstance().stopScan()
                     startScan()
                 }
             }
@@ -478,8 +481,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
 
     private fun onLogout() {
-        LogUtils.d("onLogout, retry connect")
-//        retryConnect()
+        LogUtils.d("onLogout")
+        retryConnect()
     }
 
     private fun onAlarmGet(notificationEvent: NotificationEvent) {
@@ -623,7 +626,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-        retryConnect()
+//        retryConnect()
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {

@@ -39,9 +39,9 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.onCreate();
         //this.doInit();
         Utils.init(this);
-        if (!AppUtils.isAppDebug()) {
-            LogUtils.getConfig().setLogSwitch(false);
-        }
+//        if (!AppUtils.isAppDebug()) {
+//            LogUtils.getConfig().setLogSwitch(false);
+//        }
 
 
         MobSDK.init(this);
