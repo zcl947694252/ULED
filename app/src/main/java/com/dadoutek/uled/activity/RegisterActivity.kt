@@ -2,15 +2,9 @@ package com.dadoutek.uled.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.Toast
-import butterknife.BindView
 import butterknife.ButterKnife
-import butterknife.OnClick
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkBaseActivity
@@ -24,9 +18,7 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -173,7 +165,7 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
     }
 
     private fun syncComplet() {
-        ToastUtils.showLong(getString(R.string.sync_complet))
+//        ToastUtils.showLong(getString(R.string.upload_complete))
         hideLoadingDialog()
         TransformView()
     }

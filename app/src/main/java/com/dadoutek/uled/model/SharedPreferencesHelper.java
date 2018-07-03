@@ -143,8 +143,8 @@ public class SharedPreferencesHelper {
             e.printStackTrace();
             return false;
         }
-// 将对象放到OutputStream中
-// 将对象转换成byte数组，并将其进行base64编码
+        // 将对象放到OutputStream中
+        // 将对象转换成byte数组，并将其进行base64编码
         String objectStr = new String(Base64.encode(baos.toByteArray(),
                 Base64.DEFAULT));
         try {

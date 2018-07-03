@@ -228,7 +228,7 @@
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">The current name is already used</string>
-    <string name="One_click_backup">One-click backup</string>
+    <string name="upload_data">Upload data</string>
     <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
     <string name="login_timeout">Login timeout</string>
     <string name="account_not_exist">Account does not exist</string>
@@ -265,12 +265,12 @@
     <string name="scene_16_tip">The maximum number of scenes is 16!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Data synchronization is about to begin. . .</string>
-    <string name="sync_complet">Completed synchronously</string>
+    <string name="download_data_success">Download data success</string>
     <string name="sync_now">Syncing server data, please wait. . .</string>
     <string name="install_light">Install lights</string>
     <string name="install_device">Install Device</string>
     <string name="tip_start_sync">Start synchronization. . .</string>
-    <string name="tip_completed_sync">Completed synchronously</string>
+    <string name="tip_upload_success">Upload data success</string>
     <string name="network_tip_title">Network status prompt</string>
     <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
     <string name="devoloping">In development. . . Stay tuned!</string>
@@ -302,5 +302,6 @@
     <string name="data_empty">Data is empty</string>
     <string name="clear_data_now">Clearing user data. . .</string>
     <string name="clear_fail">Clear failed</string>
+    <string name="backup_failed">Backup data failed</string>
 
 </resources>

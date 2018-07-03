@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -33,7 +31,6 @@ import com.dadoutek.uled.activity.AboutSomeQuestionsActivity;
 import com.dadoutek.uled.activity.SplashActivity;
 import com.dadoutek.uled.intf.NetworkObserver;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Cmd;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -242,7 +239,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         @Override
         public void error(String msg) {
             isClickExlogin = false;
-            Log.d("SyncLog", "error: "+msg);
+            Log.d("SyncLog", "error: " + msg);
             hideLoadingDialog();
         }
 
@@ -325,10 +322,29 @@ public class MeFragment extends Fragment implements EventListener<String> {
                         e.printStackTrace();
                     } finally {
                         if (j == 0) {
-                            hideLoadingDialog();
                             SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                            ActivityUtils.startActivity(SplashActivity.class);
-                            getActivity().finish();
+                            SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity(), new SyncCallback() {
+                                @Override
+                                public void complete() {
+                                    hideLoadingDialog();
+                                    ActivityUtils.startActivity(SplashActivity.class);
+                                    getActivity().finish();
+                                }
+
+                                @Override
+                                public void error(String msg) {
+                                    hideLoadingDialog();
+                                    ToastUtils.showShort(R.string.backup_failed);
+                                    ActivityUtils.startActivity(SplashActivity.class);
+                                    getActivity().finish();
+                                }
+
+                                @Override
+                                public void start() {
+
+                                }
+                            });
+
                         }
                     }
                 }
@@ -457,7 +473,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
             @Override
             public void onNext(String s) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
-                SharedPreferencesHelper.putObject(getActivity(),Constant.OLD_INDEX_DATA,null);
+                SharedPreferencesHelper.putObject(getActivity(), Constant.OLD_INDEX_DATA, null);
                 DBUtils.deleteAllData();
                 CleanUtils.cleanInternalSp();
                 CleanUtils.cleanExternalCache();

@@ -343,7 +343,7 @@ public class Peripheral extends BluetoothGattCallback {
                 break;
             case WRITE_NO_RESPONSE:
                 this.postCommandTimeoutTask();
-                this.writeCharacteristic(commandContext, command.serviceUUID,
+                 this.writeCharacteristic(commandContext, command.serviceUUID,
                         command.characteristicUUID,
                         BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE,
                         command.data);

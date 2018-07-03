@@ -226,7 +226,7 @@
     <string name="scanning">扫描中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
-    <string name="One_click_backup">一键备份</string>
+    <string name="upload_data">上传数据</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
@@ -257,7 +257,7 @@
     <string name="grouping_fail">分组失败</string>
     <string name="add_scene_gp_tip">请添加需要应用到该场景的分组！</string>
     <string name="group_fail_tip">目前有灯分组失败，请检查或重试！</string>
-    <string name="one_click_reset">一键恢复出厂设置</string>
+    <string name="one_click_reset">恢复出厂设置</string>
     <string name="disconected">未连接</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
@@ -266,13 +266,13 @@
     <string name="error_disconnect_tip">断开连接,请链接后再重试</string>
     <string name="scene_16_tip">场景上限为16个！</string>
     <string name="server_exception">服务器异常</string>
-    <string name="start_sync">即将开始数据同步。。。</string>
-    <string name="sync_complet">同步完成</string>
+    <string name="start_sync">即将开始数据同步…</string>
+    <string name="download_data_success">下载数据成功</string>
     <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
     <string name="install_light">安装灯</string>
     <string name="install_device">安装设备</string>
     <string name="tip_start_sync">开始同步。。。</string>
-    <string name="tip_completed_sync">同步完成</string>
+    <string name="tip_upload_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请设置网络！</string>
     <string name="devoloping">开发中。。。敬请期待！</string>
@@ -299,5 +299,6 @@
     <string name="data_empty">数据已经为空</string>
     <string name="clear_data_now">正在清除用户数据。。。</string>
     <string name="clear_fail">清除失败</string>
+    <string name="backup_failed">备份失败</string>
 
 </resources>

@@ -36,48 +36,48 @@ public class DBUtils {
 
     /********************************************查询*******************************/
 
-    public static List<DbSceneActions> getActionsBySceneId(long id) {
+    public synchronized static List<DbSceneActions> getActionsBySceneId(long id) {
         Query<DbSceneActions> query = DaoSessionInstance.getInstance().getDbSceneActionsDao().queryBuilder().
                 where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build();
         return new ArrayList<>(query.list());
     }
 
-    public static String getGroupNameByID(Long id) {
+    public synchronized static String getGroupNameByID(Long id) {
         DbGroup group = DaoSessionInstance.getInstance().getDbGroupDao().load(id);
         return group.getName();
     }
 
-    public static DbGroup getGroupByID(long id) {
+    public synchronized static DbGroup getGroupByID(long id) {
         DbGroup group = DaoSessionInstance.getInstance().getDbGroupDao().load((Long) id);
         return group;
     }
 
-    public static DbLight getLightByID(long id) {
+    public synchronized static DbLight getLightByID(long id) {
         DbLight light = DaoSessionInstance.getInstance().getDbLightDao().load((Long) id);
         return light;
     }
 
-    public static DbRegion getRegionByID(long id) {
+    public synchronized static DbRegion getRegionByID(long id) {
         DbRegion region = DaoSessionInstance.getInstance().getDbRegionDao().load((Long) id);
         return region;
     }
 
-    public static DbScene getSceneByID(long id) {
+    public synchronized static DbScene getSceneByID(long id) {
         DbScene scene = DaoSessionInstance.getInstance().getDbSceneDao().load((Long) id);
         return scene;
     }
 
-    public static DbSceneActions getSceneActionsByID(long id) {
+    public synchronized static DbSceneActions getSceneActionsByID(long id) {
         DbSceneActions actions = DaoSessionInstance.getInstance().getDbSceneActionsDao().load((Long) id);
         return actions;
     }
 
-    public static DbUser getUserByID(long id) {
+    public synchronized static DbUser getUserByID(long id) {
         DbUser user = DaoSessionInstance.getInstance().getDbUserDao().load((Long) id);
         return user;
     }
 
-    public static DbUser getLastUser() {
+    public synchronized static DbUser getLastUser() {
         List<DbUser> list = DaoSessionInstance.getInstance().getDbUserDao().
                 queryBuilder().orderDesc(DbUserDao.Properties.Id).list();
         if (list.size() == 0) {
@@ -86,42 +86,42 @@ public class DBUtils {
         return list.get(0);
     }
 
-    public static DbRegion getCurrentRegion(long id) {
+    public synchronized static DbRegion getCurrentRegion(long id) {
         DbRegion region = DaoSessionInstance.getInstance().getDbRegionDao().load((Long) id);
         return region;
     }
 
-    public static DbRegion getLastRegion() {
+    public synchronized static DbRegion getLastRegion() {
         List<DbRegion> list = DaoSessionInstance.getInstance().getDbRegionDao().
                 queryBuilder().orderDesc(DbRegionDao.Properties.Id).list();
         return list.get(0);
     }
 
-    public static DbLight getLightByMesh(String mesh) {
+    public synchronized static DbLight getLightByMeshAddr(int meshAddr) {
         DbLight dbLight = DaoSessionInstance.getInstance().getDbLightDao().queryBuilder().
-                where(DbLightDao.Properties.MeshAddr.eq(mesh)).unique();
+                where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).unique();
         return dbLight;
     }
 
-    public static DbGroup getGroupByMesh(String mesh) {
+    public synchronized static DbGroup getGroupByMesh(String mesh) {
         DbGroup dbGroup = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().
                 where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique();
         Log.d("datasave", "getGroupByMesh: " + mesh);
         return dbGroup;
     }
 
-    public static List<DbLight> getAllLight() {
+    public synchronized static List<DbLight> getAllLight() {
         List<DbLight> lights = DaoSessionInstance.getInstance().getDbLightDao().loadAll();
         return lights;
     }
 
-    public static List<DbLight> getLightByGroupID(long id) {
+    public synchronized static List<DbLight> getLightByGroupID(long id) {
         Query<DbLight> query = DaoSessionInstance.getInstance().getDbLightDao().queryBuilder().
                 where(DbLightDao.Properties.BelongGroupId.eq(id)).build();
         return new ArrayList<>(query.list());
     }
 
-    public static List<DbGroup> getGroupList() {
+    public synchronized static List<DbGroup> getGroupList() {
         int allGIndex = -1;
         QueryBuilder<DbGroup> qb = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder();
         List<DbGroup> list = qb.where(
@@ -131,7 +131,7 @@ public class DBUtils {
         return list;
     }
 
-    public static List<DbScene> getSceneList() {
+    public synchronized static List<DbScene> getSceneList() {
         int allGIndex = -1;
         QueryBuilder<DbScene> qb = DaoSessionInstance.getInstance().getDbSceneDao().queryBuilder();
         List<DbScene> list = qb.where(
@@ -142,7 +142,7 @@ public class DBUtils {
     }
 
     //未分组
-    public static DbGroup getGroupNull() {
+    public synchronized static DbGroup getGroupNull() {
         int allGIndex = -1;
         QueryBuilder<DbGroup> qb = DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder();
         List<DbGroup> list = qb.where(
@@ -157,29 +157,29 @@ public class DBUtils {
         return null;
     }
 
-    public static List<DbScene> getSceneAll() {
+    public synchronized static List<DbScene> getSceneAll() {
         return DaoSessionInstance.getInstance().getDbSceneDao().loadAll();
     }
 
-    public static List<DbRegion> getRegionAll() {
+    public synchronized static List<DbRegion> getRegionAll() {
         return DaoSessionInstance.getInstance().getDbRegionDao().loadAll();
     }
 
-    public static List<DbDataChange> getDataChangeAll() {
+    public synchronized static List<DbDataChange> getDataChangeAll() {
         return DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
     }
 
-    public static List<DbGroup> getAllGroups() {
+    public synchronized static List<DbGroup> getAllGroups() {
         return DaoSessionInstance.getInstance().getDbGroupDao().queryBuilder().list();
     }
 
-    public static List<DbDeleteGroup> getDeleteGroups() {
+    public synchronized static List<DbDeleteGroup> getDeleteGroups() {
         return DaoSessionInstance.getInstance().getDbDeleteGroupDao().queryBuilder().list();
     }
 
     /********************************************保存*******************************/
 
-    public static void saveRegion(DbRegion dbRegion, boolean isFromServer) {
+    public synchronized static void saveRegion(DbRegion dbRegion, boolean isFromServer) {
         if (isFromServer) {
             DbRegion dbRegionOld = DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
                     where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.getControlMesh())).unique();
@@ -212,7 +212,7 @@ public class DBUtils {
         }
     }
 
-    public static void insertRegion(DbRegion dbRegion) {
+    public synchronized static void insertRegion(DbRegion dbRegion) {
         //判断原来是否保存过这个区域
         DbRegion dbRegionOld = DaoSessionInstance.getInstance().getDbRegionDao().queryBuilder().
                 where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.getControlMesh())).unique();
@@ -235,7 +235,7 @@ public class DBUtils {
         }
     }
 
-    public static void saveGroup(DbGroup group, boolean isFromServer) {
+    public synchronized static void saveGroup(DbGroup group, boolean isFromServer) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().getDbGroupDao().insertOrReplace(group);
         } else {
@@ -255,13 +255,13 @@ public class DBUtils {
         }
     }
 
-    public static void saveDeleteGroup(DbGroup group) {
+    public synchronized static void saveDeleteGroup(DbGroup group) {
         DbDeleteGroup dbDeleteGroup = new DbDeleteGroup();
         dbDeleteGroup.setGroupAress(group.getMeshAddr());
         DaoSessionInstance.getInstance().getDbDeleteGroupDao().save(dbDeleteGroup);
     }
 
-    public static void saveLight(DbLight light, boolean isFromServer) {
+    public synchronized static void saveLight(DbLight light, boolean isFromServer) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().getDbLightDao().insert(light);
         } else {
@@ -276,21 +276,21 @@ public class DBUtils {
         }
     }
 
-    public static void oldToNewSaveLight(DbLight light) {
+    public synchronized static void oldToNewSaveLight(DbLight light) {
         DaoSessionInstance.getInstance().getDbLightDao().save(light);
         recordingChange(light.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
                 Constant.DB_ADD);
     }
 
-    public static void saveUser(DbUser dbUser) {
+    public synchronized static void saveUser(DbUser dbUser) {
         DaoSessionInstance.getInstance().getDbUserDao().insertOrReplace(dbUser);
         recordingChange(dbUser.getId(),
                 DaoSessionInstance.getInstance().getDbUserDao().getTablename(),
                 Constant.DB_ADD);
     }
 
-    public static void saveScene(DbScene dbScene, boolean isFromServer) {
+    public synchronized static void saveScene(DbScene dbScene, boolean isFromServer) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().getDbSceneDao().insert(dbScene);
         } else {
@@ -301,15 +301,15 @@ public class DBUtils {
         }
     }
 
-    public static void saveSceneActions(DbSceneActions sceneActions) {
+    public synchronized static void saveSceneActions(DbSceneActions sceneActions) {
         DaoSessionInstance.getInstance().getDbSceneActionsDao().insertOrReplace(sceneActions);
 //        recordingChange(sceneActions.getId(),
 //                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
 //                Constant.DB_ADD);
     }
 
-    public static void saveSceneActions(DbSceneActions sceneActions, Long id,
-                                        Long sceneId) {
+    public synchronized static void saveSceneActions(DbSceneActions sceneActions, Long id,
+                                                     Long sceneId) {
         DbSceneActions actions = new DbSceneActions();
         String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou");
         actions.setBelongSceneId(sceneId);
@@ -322,7 +322,7 @@ public class DBUtils {
 
     /********************************************更改*******************************/
 
-    public static void updateGroup(DbGroup group) {
+    public synchronized static void updateGroup(DbGroup group) {
         DaoSessionInstance.getInstance().getDbGroupDao().update(group);
         recordingChange(group.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
@@ -343,34 +343,34 @@ public class DBUtils {
         }
     }
 
-    public static void updateLight(DbLight light) {
+    public synchronized static void updateLight(DbLight light) {
         DaoSessionInstance.getInstance().getDbLightDao().update(light);
         recordingChange(light.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
                 Constant.DB_UPDATE);
     }
 
-    public static void updateScene(DbScene scene) {
+    public synchronized static void updateScene(DbScene scene) {
         DaoSessionInstance.getInstance().getDbSceneDao().update(scene);
         recordingChange(scene.getId(),
                 DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
                 Constant.DB_UPDATE);
     }
 
-    public static void updateDbActions(DbSceneActions actions) {
+    public synchronized static void updateDbActions(DbSceneActions actions) {
         DaoSessionInstance.getInstance().getDbSceneActionsDao().update(actions);
         recordingChange(actions.getId(),
                 DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
                 Constant.DB_UPDATE);
     }
 
-    public static void updateDbchange(DbDataChange change) {
+    public synchronized static void updateDbchange(DbDataChange change) {
         DaoSessionInstance.getInstance().getDbDataChangeDao().update(change);
     }
 
     /********************************************删除*******************************/
 
-    public static void deleteGroup(DbGroup dbGroup) {
+    public synchronized static void deleteGroup(DbGroup dbGroup) {
         List<DbLight> lights = DBUtils.getLightByGroupID(dbGroup.getId());
         DbGroup allGroup = getGroupNull();
 
@@ -400,25 +400,26 @@ public class DBUtils {
         }
     }
 
-    public static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup) {
+    public synchronized static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup) {
         DaoSessionInstance.getInstance().getDbDeleteGroupDao().delete(dbDeleteGroup);
     }
 
-    public static void deleteLight(DbLight dbLight) {
+    public synchronized static void deleteLight(DbLight dbLight) {
         DaoSessionInstance.getInstance().getDbLightDao().delete(dbLight);
         recordingChange(dbLight.getId(),
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
                 Constant.DB_DELETE);
     }
 
-    public static void deleteScene(DbScene dbScene) {
+
+    public synchronized static void deleteScene(DbScene dbScene) {
         DaoSessionInstance.getInstance().getDbSceneDao().delete(dbScene);
         recordingChange(dbScene.getId(),
                 DaoSessionInstance.getInstance().getDbSceneDao().getTablename(),
                 Constant.DB_DELETE);
     }
 
-    public static void deleteSceneActionsList(List<DbSceneActions> sceneActionslist) {
+    public synchronized static void deleteSceneActionsList(List<DbSceneActions> sceneActionslist) {
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteInTx(sceneActionslist);
 //        for (int i = 0; i < sceneActionslist.size(); i++) {
 //            recordingChange(sceneActionslist.get(i).getId(),
@@ -427,7 +428,7 @@ public class DBUtils {
 //        }
     }
 
-    public static void deleteAllData() {
+    public synchronized static void deleteAllData() {
         DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
         DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
@@ -437,7 +438,7 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbDataChangeDao().deleteAll();
     }
 
-    public static void deleteLocalData() {
+    public synchronized static void deleteLocalData() {
 //        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
         DaoSessionInstance.getInstance().getDbSceneDao().deleteAll();
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteAll();
@@ -447,13 +448,13 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbDataChangeDao().deleteAll();
     }
 
-    public static void deleteDbDataChange(long id) {
+    public synchronized static void deleteDbDataChange(long id) {
         DaoSessionInstance.getInstance().getDbDataChangeDao().deleteByKey(id);
     }
 
     /********************************************其他*******************************/
 
-    public static void addNewGroup(String name, List<DbGroup> groups, Context context) {
+    public synchronized static void addNewGroup(String name, List<DbGroup> groups, Context context) {
         if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
             int count = groups.size();
             int newMeshAdress;
@@ -492,7 +493,7 @@ public class DBUtils {
     }
 
     //检查是否重复
-    public static boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {
+    public synchronized static boolean checkRepeat(List<DbGroup> groups, Context context, String newName) {
         for (
                 int k = 0; k < groups.size(); k++)
 
@@ -511,7 +512,7 @@ public class DBUtils {
      *
      * @return group对象
      */
-    public static void createAllLightControllerGroup() {
+    public synchronized static void createAllLightControllerGroup() {
         DbGroup groupAllLights = new DbGroup();
         groupAllLights.setName(TelinkLightApplication.getInstance().getString(R.string.allLight));
         groupAllLights.setMeshAddr(0xFFFF);
@@ -539,7 +540,7 @@ public class DBUtils {
      * @param operating   所执行的操作
      */
     @Synchronized
-    public static void recordingChange(Long changeIndex, String changeTable, String operating) {
+    public synchronized static void recordingChange(Long changeIndex, String changeTable, String operating) {
         List<DbDataChange> dataChangeList = DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
 
         if (dataChangeList.size() == 0) {

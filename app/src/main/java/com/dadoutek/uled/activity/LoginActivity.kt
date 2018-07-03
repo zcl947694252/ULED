@@ -156,7 +156,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun syncComplet() {
-        ToastUtils.showLong(getString(R.string.sync_complet))
+        ToastUtils.showLong(getString(R.string.download_data_success))
         hideLoadingDialog()
         TransformView()
     }

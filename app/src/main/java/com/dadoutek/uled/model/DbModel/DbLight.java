@@ -14,7 +14,7 @@ import java.io.Serializable;
  * Created by hejiajun on 2018/5/14.
  */
 @Entity
-public class DbLight implements Serializable{
+public class DbLight implements Serializable {
 
     static final long serialVersionUID = -15515456L;
 
@@ -32,18 +32,18 @@ public class DbLight implements Serializable{
     @Transient
     public boolean selected;//选择状态
     @Transient
-    public boolean hasGroup=false;//当前灯是否有被分组
+    public boolean hasGroup = false;//当前灯是否有被分组
     @Transient
     public int textColor;//文字颜色
-    @Transient
-    public ConnectionStatus status = ConnectionStatus.ON;//链接状态
+
+    public int connectionStatus = 1;//链接状态
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
 
-    @Generated(hash = 125913781)
-    public DbLight(Long id, int meshAddr, String name, int brightness,
-                   int colorTemperature, String macAddr, int meshUUID, int productUUID,
-                   Long belongGroupId) {
+    @Generated(hash = 225780319)
+    public DbLight(Long id, int meshAddr, String name, int brightness, int colorTemperature,
+            String macAddr, int meshUUID, int productUUID, Long belongGroupId,
+            int connectionStatus) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -53,6 +53,7 @@ public class DbLight implements Serializable{
         this.meshUUID = meshUUID;
         this.productUUID = productUUID;
         this.belongGroupId = belongGroupId;
+        this.connectionStatus = connectionStatus;
     }
 
     @Generated(hash = 2075223479)
@@ -145,12 +146,20 @@ public class DbLight implements Serializable{
 
     public void updateIcon() {
 
-        if (this.status == ConnectionStatus.OFFLINE) {
+        if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_light_offline;
-        } else if (this.status == ConnectionStatus.OFF) {
+        } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.icon_light_off;
-        } else if (this.status == ConnectionStatus.ON) {
+        } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_light_on;
         }
+    }
+
+    public int getConnectionStatus() {
+        return this.connectionStatus;
+    }
+
+    public void setConnectionStatus(int connectionStatus) {
+        this.connectionStatus = connectionStatus;
     }
 }
