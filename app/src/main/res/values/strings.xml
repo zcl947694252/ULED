@@ -265,12 +265,12 @@
     <string name="scene_16_tip">The maximum number of scenes is 16!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Data synchronization is about to begin. . .</string>
-    <string name="sync_complet">Completed synchronously</string>
+    <string name="download_data_success">Download data success</string>
     <string name="sync_now">Syncing server data, please wait. . .</string>
     <string name="install_light">Install lights</string>
     <string name="install_device">Install Device</string>
     <string name="tip_start_sync">Start synchronization. . .</string>
-    <string name="tip_completed_sync">Completed synchronously</string>
+    <string name="tip_upload_success">Upload data success</string>
     <string name="network_tip_title">Network status prompt</string>
     <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
     <string name="devoloping">In development. . . Stay tuned!</string>

@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PowerManager
@@ -18,12 +17,10 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
-import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.R.id.*
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
 import com.dadoutek.uled.TelinkMeshErrorDealActivity
@@ -124,48 +121,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         super.onCreate(savedInstanceState)
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (powerManager != null) {
-            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
-        }
-        //TelinkLog.ENABLE = false;
-//        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
+
         this.setContentView(R.layout.activity_main)
-        ButterKnife.bind(this)
-
-
-//        initBottomIconClickListener()
-
         this.mApplication = this.application as TelinkLightApplication
-
-//        this.fragmentManager = this.getFragmentManager()
-
-//        this.deviceFragment = FragmentFactory
-//                .createFragment(R.id.tab_devices) as DeviceListFragment
-//        this.groupFragment = FragmentFactory
-//                .createFragment(R.id.tab_groups) as GroupListFragment
-//        this.meFragment = FragmentFactory
-//                .createFragment(R.id.tab_account) as MeFragment
-//        this.sceneFragment = FragmentFactory
-//                .createFragment(R.id.tab_scene) as SceneFragment
-        //        this.tabs = (ConstraintLayout) this.findViewById(R.id.tabs);
-        //        this.tabs.setOnCheckedChangeListener(this.checkedChangeListener);
-
-
-        //        this.mApplication.doInit();
-
-        TelinkLog.d("-------------------------------------------")
-        TelinkLog.d(Build.MANUFACTURER)
-        TelinkLog.d(Build.TYPE)
-        TelinkLog.d(Build.BOOTLOADER)
-        TelinkLog.d(Build.DEVICE)
-        TelinkLog.d(Build.HARDWARE)
-        TelinkLog.d(Build.SERIAL)
-        TelinkLog.d(Build.BRAND)
-        TelinkLog.d(Build.DISPLAY)
-        TelinkLog.d(Build.FINGERPRINT)
-
-        TelinkLog.d(Build.PRODUCT + ":" + Build.VERSION.SDK_INT + ":" + Build.VERSION.RELEASE + ":" + Build.VERSION.CODENAME + ":" + Build.ID)
-
         val filter = IntentFilter()
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
@@ -343,39 +302,22 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                     val mesh = this.mApplication?.mesh
 
-//                    if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-//                        TelinkLightService.Instance().idleMode(true)
-////                        snackbar(root, "mesh name or password empty")
-//                        ToastUtils.showShort("mesh name or password empty")
-//                        return@Consumer
-//                    }
-
                     val account = DBUtils.getLastUser().account
                     //自动重连参数
                     val connectParams = Parameters.createAutoConnectParameters()
                     connectParams.setMeshName(account)
-                    if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                    Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16))
-                    } else {
-                        connectParams.setPassword(mesh?.password)
-                    }
+                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16))
+//                    LogUtils.d("connect pwd = ${NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)}")
                     connectParams.autoEnableNotification(true)
                     connectParams.setTimeoutSeconds(CONNECT_TIMEOUT)
                     connectParams.setConnectMac(mac)
 
                     TelinkLightService.Instance().idleMode(true)
                     TelinkLightService.Instance().autoConnect(connectParams)
+                    startConnectTimer()
 
                     mConnectingSnackbar = indefiniteSnackbar(root, getString(R.string.connecting))
 
-
-//                    //刷新Notify参数
-//                    val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-//                    refreshNotifyParams.setRefreshRepeatCount(2)
-//                    refreshNotifyParams.setRefreshInterval(2000)
-//                    //开启自动刷新Notify
-//                    TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
                 }
             } else {
                 //没有授予权限
@@ -438,7 +380,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         LeBluetooth.getInstance().stopScan()
                         connect(bestRSSIDevice!!.macAddress)
                     } else {
-                        LogUtils.d("recheck rssi")
                         startCheckRSSITimer()
                     }
                 }
@@ -511,6 +452,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         builder.show()
     }
 
+    /**
+     * 重试
+     * 先扫描到信号比较好的，再连接。
+     */
     private fun retryConnect() {
         stopConnectTimer()
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
@@ -592,7 +537,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
-        LogUtils.d("onServiceConnected")
+//        LogUtils.d("onServiceConnected")
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
@@ -610,7 +555,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
             LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanComplete()
+            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
             NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
             NotificationEvent.GET_ALARM -> {
             }
@@ -626,19 +571,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         }
     }
 
-    private fun onLeScanComplete() {
-        LogUtils.d("onLeScanComplete bestDevice.macAddr = ${bestRSSIDevice?.macAddress} " +
-                "meshAddr = ${bestRSSIDevice?.meshAddress}  rssi = ${bestRSSIDevice?.rssi}")
-        startConnectTimer()
-        TelinkLightService.Instance().connect(bestRSSIDevice?.macAddress, CONNECT_TIMEOUT)
-        //刷新Notify参数
-        val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-        refreshNotifyParams.setRefreshRepeatCount(2)
-        refreshNotifyParams.setRefreshInterval(2000)
-        //开启自动刷新Notify
-        TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
-    }
-
 
     /**
      * 扫描不到任何设备了
@@ -647,7 +579,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private fun onLeScanTimeout() {
         indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
             TelinkLightService.Instance().idleMode(true)
-//                            connect()
             startScan()
         }
 
