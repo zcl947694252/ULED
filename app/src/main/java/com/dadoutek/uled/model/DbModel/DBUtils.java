@@ -24,6 +24,8 @@ import org.greenrobot.greendao.query.QueryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.jvm.Synchronized;
+
 import static com.dadoutek.uled.model.Constant.MAX_GROUP_COUNT;
 
 /**
@@ -300,7 +302,7 @@ public class DBUtils {
     }
 
     public synchronized static void saveSceneActions(DbSceneActions sceneActions) {
-        DaoSessionInstance.getInstance().getDbSceneActionsDao().save(sceneActions);
+        DaoSessionInstance.getInstance().getDbSceneActionsDao().insertOrReplace(sceneActions);
 //        recordingChange(sceneActions.getId(),
 //                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
 //                Constant.DB_ADD);
@@ -537,6 +539,7 @@ public class DBUtils {
      * @param changeTable 变化数据所属表
      * @param operating   所执行的操作
      */
+    @Synchronized
     public synchronized static void recordingChange(Long changeIndex, String changeTable, String operating) {
         List<DbDataChange> dataChangeList = DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
 

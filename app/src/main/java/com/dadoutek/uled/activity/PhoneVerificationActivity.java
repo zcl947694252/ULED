@@ -13,6 +13,7 @@ import android.widget.Button;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.model.Constant;
 import com.hbb20.CountryCodePicker;
 
 import java.util.concurrent.TimeUnit;
@@ -98,7 +99,11 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 finish();
                 break;
             case R.id.btn_send_verification:
-                sendCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim());
+                if(Constant.TEST_REGISTER){
+                    testRegister();
+                }else{
+                    sendCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim());
+                }
                 break;
             case R.id.btn_verification:
                 submitCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim(),
@@ -145,6 +150,10 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
         });
         // 触发操作
         SMSSDK.submitVerificationCode(country, phone, code);
+    }
+
+    public void testRegister(){
+        tranformView();
     }
 
     private void timing() {
