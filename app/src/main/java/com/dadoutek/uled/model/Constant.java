@@ -96,4 +96,7 @@ public class Constant implements Serializable {
 
     //管理权限本地保存key
     public static String OLD_INDEX_DATA = "oldIndexData";
+
+    //是否注册跳过验证码（目前用来测试）
+    public static boolean TEST_REGISTER = false;
 }

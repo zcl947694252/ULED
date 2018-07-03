@@ -18,9 +18,12 @@ import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkFactory.md5
 import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -132,10 +135,18 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
+//                        LogUtils.d("logging: " + "登录成功")
+//                        ToastUtils.showLong(R.string.login_success)
+//                        hideLoadingDialog()
+//                        TransformView()
+
                         LogUtils.d("logging: " + "登录成功")
+                        DBUtils.deleteLocalData()
                         ToastUtils.showLong(R.string.login_success)
                         hideLoadingDialog()
-                        TransformView()
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                        showLoadingDialog(getString(R.string.sync_now))
+                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser,syncCallback)
                     }
 
                     override fun onError(e: Throwable) {
@@ -143,6 +154,28 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                         hideLoadingDialog()
                     }
                 })
+    }
+
+    internal var syncCallback: SyncCallback = object : SyncCallback {
+
+        override fun start() {
+            showLoadingDialog(getString(R.string.tip_start_sync))
+        }
+
+        override fun complete() {
+            syncComplet()
+        }
+
+        override fun error(msg: String) {
+            LogUtils.d("GetDataError:"+msg)
+        }
+
+    }
+
+    private fun syncComplet() {
+        ToastUtils.showLong(getString(R.string.sync_complet))
+        hideLoadingDialog()
+        TransformView()
     }
 
     private fun TransformView() {
