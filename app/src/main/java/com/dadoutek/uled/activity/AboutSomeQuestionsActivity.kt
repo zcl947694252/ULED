@@ -15,7 +15,7 @@ class AboutSomeQuestionsActivity : AppCompatActivity() {
 
     private fun initView() {
         toolbar.title = getString(R.string.common_question)
-        toolbar.setNavigationIcon(R.drawable.navigation_back)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
         }
