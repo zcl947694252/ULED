@@ -146,9 +146,12 @@
     <string name="install_switch_tips1">1.把USB插入开关</string>
     <string name="install_switch_tips2">2.按任意一个按键</string>
     <string name="install_switch_tips3">3.USB右边的指示灯会常亮</string>
+    <string name="install_sensor_tips1">请先把传感器插上电源</string>
+
+
     <string name="select_group">选择分组</string>
     <string name="please_select_group">请至少选择一个分组</string>
-    <string name="connecting">连接中...</string>
+    <string name="connecting">连接中…</string>
     <string name="connect_failed">连接失败</string>
     <string name="group_failed">分组失败</string>
     <string name="connected">已连接</string>
@@ -170,7 +173,8 @@
     <string name="scene3">场景3</string>
     <string name="scene4">场景4</string>
     <string name="scene_set">场景分配</string>
-    <string name="setting_switch">正在配置开关</string>
+    <string name="setting_switch">正在配置开关…</string>
+    <string name="configuring_switch">正在配置传感器…</string>
     <string name="pace_fail">配置失败</string>
     <string name="tip_switch">请先添加场景！再配置开关</string>
     <string name="tip_add_scene">已经添加了所有存在的组！</string>
@@ -307,5 +311,6 @@
     <string name="minimum_brightness_percentage">最低亮度(百分比)</string>
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
+    <string name="install_sensor">安装传感器</string>
 
 </resources>

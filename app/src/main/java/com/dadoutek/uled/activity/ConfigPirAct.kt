@@ -16,6 +16,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_pir.*
+import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
 class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -29,7 +30,15 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_pir)
         fabConfirm.setOnClickListener(this)
+        initToolbar()
         initData()
+    }
+
+    private fun initToolbar() {
+        toolbar.title = getString(R.string.install_sensor)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener { finish() }
+
     }
 
     private fun initData() {
@@ -85,11 +94,11 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 //        if (position == 0)
 //            mSelectGroupAddr = 0xDF
 //        else
-            mSelectGroupAddr = mGroups[position].meshAddr
+        mSelectGroupAddr = mGroups[position].meshAddr
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-            mSelectGroupAddr = 0xFF
+        mSelectGroupAddr = 0xFF
     }
 
 
@@ -99,6 +108,7 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
                 if (tietDelay.text.isEmpty() || tietMinimumBrightness.text.isEmpty()) {
                     snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
                 } else {
+                    showLoadingDialog(getString(R.string.configuring_switch))
                     Thread {
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
@@ -111,8 +121,14 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 
 
                         Commander.updateMeshName(mDeviceInfo,
-                                { ActivityUtils.finishToActivity(MainActivity::class.java, false, true) },
-                                { snackbar(configPirRoot, getString(R.string.pace_fail)) })
+                                {
+                                    hideLoadingDialog()
+                                    ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                                },
+                                {
+                                    snackbar(configPirRoot, getString(R.string.pace_fail))
+                                    hideLoadingDialog()
+                                })
                     }.start()
 
                 }

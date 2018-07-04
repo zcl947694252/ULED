@@ -36,6 +36,7 @@ import com.dadoutek.uled.activity.AddMeshActivity;
 import com.dadoutek.uled.activity.DeviceScanningNewActivity;
 import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
+import com.dadoutek.uled.activity.ScanningSensorActivity;
 import com.dadoutek.uled.activity.ScanningSwitchActivity;
 import com.dadoutek.uled.adapter.GroupListRecycleViewAdapter;
 import com.dadoutek.uled.adapter.SceneGroupAdapter;
@@ -261,6 +262,9 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
                     break;
                 case R.id.popup_install_switch:
                     startActivity(new Intent(mContext, ScanningSwitchActivity.class));
+                    break;
+                case R.id.popup_install_sensor:
+                    startActivity(new Intent(mContext, ScanningSensorActivity.class));
                     break;
             }
             return true;

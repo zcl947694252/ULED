@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.R.id.*
 import com.dadoutek.uled.TelinkBaseActivity
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
