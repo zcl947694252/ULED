@@ -7,7 +7,6 @@ import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

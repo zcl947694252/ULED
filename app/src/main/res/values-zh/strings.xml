@@ -290,7 +290,7 @@
     <string name="question_1">1.恢复出厂方式</string>
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
     <string name="qustion_2_anser2">（2）物理恢复：请用电源断电6秒，然后打开电源1~2秒，重复此操作直到成功为止（至少约需五次）即可硬件强制恢复出厂设置，最后在App端选点击清除数据，同时如果有其他手机正在使用此账号，需要退出登录或者重新安装APP才可以正常使用，此方式将清除用户所有数据，慎用！</string>
-    <string name="constent_question">常见问题</string>
+    <string name="common_question">常见问题</string>
     <string name="question_2">2.部分华为手机存在蓝牙不稳定</string>
     <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
     <string name="question_3">3.无法控制，连接不上</string>
@@ -302,5 +302,6 @@
     <string name="backup_failed">备份失败</string>
     <string name="uploading_data">上传数据中…</string>
     <string name="upload_data_failed">上传数据失败…</string>
+    <string name="phone_cannot_be_empty">手机号不能为空</string>
 
 </resources>

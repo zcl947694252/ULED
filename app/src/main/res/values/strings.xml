@@ -293,7 +293,7 @@
         settings, and finally on the App side select Clear Data, and if other mobile phones are using
         this account, you need to log out or re-install the APP to use it normally. This
         method will clear all user data and use it with caution!</string>
-    <string name="constent_question">Common problem</string>
+    <string name="common_question">Common problem</string>
     <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
     <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
     <string name="question_3">3. Can not control, not connect</string>
@@ -305,5 +305,6 @@
     <string name="backup_failed">Backup data failed</string>
     <string name="uploading_data">Uploading data</string>
     <string name="upload_data_failed">Upload data failed</string>
+    <string name="phone_cannot_be_empty">Phone cannot be empty</string>
 
 </resources>

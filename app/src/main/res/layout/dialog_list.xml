@@ -7,7 +7,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/listview_group"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="400dp"
         android:paddingTop="16dp"
         android:paddingBottom="6dp"
         android:paddingEnd="6dp"

@@ -252,7 +252,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        dialog.getWindow().setLayout((int) (size.x * 0.7), WindowManager.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout((int) (size.x * 0.9), WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     private void changeData(int position, List<DbGroup> showList) {

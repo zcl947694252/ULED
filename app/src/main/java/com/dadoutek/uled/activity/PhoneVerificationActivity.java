@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkBaseActivity;
@@ -50,7 +50,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
     private String countryCode;
     private String transForm;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-    private long TIME_INTERVAL=60;
+    private long TIME_INTERVAL = 60;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,10 +99,15 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                 finish();
                 break;
             case R.id.btn_send_verification:
-                if(Constant.TEST_REGISTER){
+                if (Constant.TEST_REGISTER) {
                     testRegister();
-                }else{
-                    sendCode(countryCode, editPhoneNumber.getEditText().getText().toString().trim());
+                } else {
+                    String phoneNum = editPhoneNumber.getEditText().getText().toString().trim();
+                    if (StringUtils.isEmpty(phoneNum)) {
+                        ToastUtils.showShort(R.string.phone_cannot_be_empty);
+                    } else {
+                        sendCode(countryCode, phoneNum);
+                    }
                 }
                 break;
             case R.id.btn_verification:
@@ -152,24 +157,24 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
         SMSSDK.submitVerificationCode(country, phone, code);
     }
 
-    public void testRegister(){
+    public void testRegister() {
         tranformView();
     }
 
     private void timing() {
-        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0,1,TimeUnit.SECONDS)
+        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<Object>() {
                     @Override
                     public void onNext(Object o) {
-                        long num=(59- (Long) o);
-                        if(num==0){
+                        long num = (59 - (Long) o);
+                        if (num == 0) {
                             btnSendVerification.setText(getResources().getString(R.string.send_verification));
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.primary));
                             btnSendVerification.setClickable(true);
-                        }else{
-                            btnSendVerification.setText(getString(R.string.repaet_send,num));
+                        } else {
+                            btnSendVerification.setText(getString(R.string.repaet_send, num));
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.gray));
                             btnSendVerification.setClickable(false);
                         }
