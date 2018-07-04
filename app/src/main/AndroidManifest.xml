@@ -52,7 +52,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.DeviceSettingActivity"
+            android:name=".light.DeviceSettingActivity"
             android:theme="@style/FullHeightDialogNew" />
         <!--<activity-->
         <!--android:name=".activity.DeviceScanningActivity"-->
@@ -68,23 +68,23 @@
             android:label="@string/activity_mesh_add_lable"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.DeviceGroupingActivity"
+            android:name=".group.DeviceGroupingActivity"
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.GroupSettingActivity"
+            android:name=".group.GroupSettingActivity"
             android:theme="@style/FullHeightDialogNew" />
         <activity
-            android:name=".activity.AddGroupActivity"
+            android:name=".group.AddGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.OtaActivity"
+            android:name=".ota.OtaActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.OtaDeviceListActivity"
+            android:name=".ota.OtaDeviceListActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.BatchOtaActivity"
+            android:name=".ota.BatchOtaActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.LogInfoActivity"
@@ -95,7 +95,7 @@
              android:screenOrientation="portrait" />
         -->
         <activity
-            android:name=".activity.OTAUpdateActivity"
+            android:name=".ota.OTAUpdateActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
@@ -105,7 +105,7 @@
             android:name=".activity.UserAllActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.OnlineStatusTestActivity"
+            android:name=".light.OnlineStatusTestActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".qrcode.QRCodeScanActivity"
@@ -114,53 +114,53 @@
             android:name=".qrcode.QRCodeShareActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.RenameActivity"
+            android:name=".group.RenameActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.RenameLightActivity"
+            android:name=".light.RenameLightActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".activity.SelectDeviceTypeActivity" />
-        <activity android:name=".activity.ScanningSwitchActivity" />
+        <activity android:name=".switches.ScanningSwitchActivity" />
         <activity
-            android:name=".activity.SelectGroupForSwitchActivity"
+            android:name=".switches.SelectGroupForSwitchActivity"
             android:label="@string/title_activity_switch_group" />
         <activity
-            android:name=".activity.LightsOfGroupActivity"
+            android:name=".light.LightsOfGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.AddSceneAct"
+            android:name=".scene.AddSceneAct"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ConfigSceneSwitchActivity"
+            android:name=".switches.ConfigSceneSwitchActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".user.LoginActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".activity.RegisterActivity"
+            android:name=".user.RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.PhoneVerificationActivity"
+            android:name=".user.PhoneVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ForgetPassWordActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".activity.DeviceScanningNewActivity"
+            android:name=".user.ForgetPassWordActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activity.ChangeSceneAct"
+            android:name=".light.DeviceScanningNewActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activity.EmptyAddActivity"
+            android:name=".scene.ChangeSceneAct"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activity.ManagerVerificationActivity"
+            android:name=".light.EmptyAddActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".user.ManagerVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.AboutSomeQuestionsActivity"

@@ -55,7 +55,7 @@
 
         <fragment
             android:id="@+id/device_setting_fragment"
-            android:name="com.dadoutek.uled.fragments.DeviceSettingFragment"
+            android:name="com.dadoutek.uled.light.DeviceSettingFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/fragment_device_setting" />

@@ -6,12 +6,11 @@ import android.os.Bundle;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkMeshErrorDealActivity;
+import com.dadoutek.uled.light.EmptyAddActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.dadoutek.uled.util.DataManager;
-import com.dadoutek.uled.util.FileSystem;
+import com.dadoutek.uled.user.LoginActivity;
 
 /**
  * Created by hejiajun on 2018/3/22.
