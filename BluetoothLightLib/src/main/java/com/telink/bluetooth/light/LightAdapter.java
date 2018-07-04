@@ -404,18 +404,18 @@ public class LightAdapter {
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
 
         if (!this.isStarted.get()) {
-            Log.d("Test", "***********TEST***********1111");
+//            Log.d("Test", "***********TEST***********1111");
             return false;
         }
 
 
         if (!this.mLightCtrl.isLogin()) {
-            Log.d("Test", "***********TEST***********2222");
+//            Log.d("Test", "***********TEST***********2222");
             return false;
         }
 
         if (tag == null) {
-            Log.d("Test", "***********TEST***********");
+            Log.d("Test", "***********sendCommand***********");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, delay);
         } else {
             Log.d("Test", "***********TEST***********ELSE");
@@ -823,7 +823,7 @@ public class LightAdapter {
 
         if (!ignoreStatus) {
             if (this.status.get() == newStatus) {
-                Log.d("Saw", "return cause same status");
+                Log.d("Saw", "return cause same status, status = "+ newStatus);
                 return;
             }
         }
@@ -1022,6 +1022,7 @@ public class LightAdapter {
 
                 LightPeripheral light = mLightCtrl.getCurrentLight();
                 login(light);
+                Log.d("sggs", "onConnected: "+light.getMacAddress());
             } else {
                 mLightCtrl.requestFirmware();
             }

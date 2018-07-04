@@ -24,7 +24,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.Lights
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.DataManager
@@ -70,7 +69,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         val opcode = Opcode.LIGHT_ON_OFF
         if (v.id == R.id.img_light) {
             canBeRefresh = true
-            if (currentLight!!.status == ConnectionStatus.OFF) {
+            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
                         byteArrayOf(0x01, 0x00, 0x00))
             } else {
@@ -163,7 +162,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         } else {
             lightList = DBUtils.getLightByGroupID(group.id)
         }
-        val lights = SharedPreferencesHelper.getObject(this, Constant.LIGHT_STATE_KEY) as Lights?
+//        val lights = SharedPreferencesHelper.getObject(this, Constant.LIGHT_STATE_KEY) as Lights?
 //        if (lights != null) {
 //            for (j in lightList.indices) {
 //                for (i in lights.get().indices) {
@@ -320,7 +319,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     /**
      * 处理[NotificationEvent.ONLINE_STATUS]事件
      */
-    @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
 
         if (canBeRefresh) {
@@ -345,41 +343,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
             for (dbLight in lightList) {
                 if (notificationInfo.meshAddress == dbLight.meshAddr) {
+                    dbLight.connectionStatus = notificationInfo.connectionStatus.value
+                    dbLight.updateIcon()
+                    DBUtils.updateLight(dbLight)
                     runOnUiThread {
-                        dbLight.status = notificationInfo.connectionStatus
-                        dbLight.updateIcon()
                         adapter?.notifyDataSetChanged()
                     }
 
                 }
             }
-
-//
-//            if (currentLight == null) {
-//                return
-//            }
-//
-//            currentLight!!.status = notificationInfo.connectionStatus
-//
-//            if (currentLight!!.meshAddr == TelinkLightApplication.getInstance().connectDevice.meshAddress) {
-//                currentLight!!.textColor = ContextCompat.getColor(
-//                        this, R.color.primary)
-//            } else {
-//                currentLight!!.textColor = ContextCompat.getColor(
-//                        this, R.color.black)
-//            }
-//
-////            Log.d("connectting", "333")
-//
-//            currentLight!!.updateIcon()
         }
 
-//        runOnUiThread {
-//            if (lightList.size > 0 && positionCurrent < lightList.size && currentLight != null) {
-//                lightList[positionCurrent] = currentLight!!
-//                adapter?.notifyItemChanged(positionCurrent)
-//            }
-//        }
 
     }
 

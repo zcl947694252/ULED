@@ -78,7 +78,7 @@
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">扫描完成，没有发现设备！</string>
-    <string name="device_login_tip">正在登陆设备，请稍候！</string>
+    <string name="connecting_tip">正在连接…</string>
     <string name="grouping_completed">分组完成</string>
     <string name="allLight">所有灯</string>
     <string name="group">组</string>
@@ -122,7 +122,7 @@
     <string name="title_scanned_lights_num">扫描完成(已扫到%1$d个灯)</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
-    <string name="empty_cache_tip">是否清除数据？清除后APP将自动重启</string>
+    <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
     <string name="factory_reset">恢复出厂</string>
     <string name="add_str_group">添加组</string>
     <string name="creat_group_fail_tip">创建失败,组名已存在！</string>
@@ -226,7 +226,7 @@
     <string name="scanning">扫描中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
-    <string name="One_click_backup">一键备份</string>
+    <string name="upload_data">上传数据</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
@@ -257,7 +257,7 @@
     <string name="grouping_fail">分组失败</string>
     <string name="add_scene_gp_tip">请添加需要应用到该场景的分组！</string>
     <string name="group_fail_tip">目前有灯分组失败，请检查或重试！</string>
-    <string name="one_click_reset">一键恢复出厂设置</string>
+    <string name="one_click_reset">恢复出厂设置</string>
     <string name="disconected">未连接</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
@@ -266,23 +266,46 @@
     <string name="error_disconnect_tip">断开连接,请链接后再重试</string>
     <string name="scene_16_tip">场景上限为16个！</string>
     <string name="server_exception">服务器异常</string>
-    <string name="start_sync">即将开始数据同步。。。</string>
-    <string name="sync_complet">同步完成</string>
+    <string name="start_sync">即将开始数据同步…</string>
+    <string name="download_data_success">下载数据成功</string>
     <string name="sync_now">正在同步服务器数据，请稍后。。。</string>
     <string name="install_light">安装灯</string>
     <string name="install_device">安装设备</string>
     <string name="tip_start_sync">开始同步。。。</string>
-    <string name="tip_completed_sync">同步完成</string>
+    <string name="upload_data_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请设置网络！</string>
     <string name="devoloping">开发中。。。敬请期待！</string>
     <string name="repaet_send">(%1$d s)重新发送</string>
     <string name="manager_verification">管理员权限验证</string>
     <string name="manager_phone_error">管理员手机号错误</string>
+    <string name="answer_app">问题解答</string>
+    <string name="click_reset_title">一键恢复</string>
+    <string name="select_type_str">请选择恢复出厂设置的方式</string>
+    <string name="by_app_reset">通过软件</string>
+    <string name="by_light_reset">通过灯具</string>
+    <string name="by_info_reset">了解详情</string>
+    <string name="by_light_reset_title">物理恢复</string>
+    <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
+    <string name="question_1">1.恢复出厂方式</string>
+    <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
+    <string name="qustion_2_anser2">（2）物理恢复：请用电源断电6秒，然后打开电源1~2秒，重复此操作直到成功为止（至少约需五次）即可硬件强制恢复出厂设置，最后在App端选点击清除数据，同时如果有其他手机正在使用此账号，需要退出登录或者重新安装APP才可以正常使用，此方式将清除用户所有数据，慎用！</string>
+    <string name="common_question">常见问题</string>
+    <string name="question_2">2.部分华为手机存在蓝牙不稳定</string>
+    <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
+    <string name="question_3">3.无法控制，连接不上</string>
+    <string name="question3_answer">一些手机使用过久可能手机蓝牙会出现无法使用的情况，可以试试把手机蓝牙关掉，再打开，甚至一些低端机型需要重启手机才可以使用蓝牙</string>
+    <string name="group_limit">最多添加255个组,目前已达上限</string>
+    <string name="data_empty">数据已经为空</string>
+    <string name="clear_data_now">正在清除用户数据。。。</string>
+    <string name="clear_fail">清除失败</string>
+    <string name="backup_failed">备份失败</string>
+    <string name="uploading_data">上传数据中…</string>
+    <string name="upload_data_failed">上传数据失败…</string>
+    <string name="phone_cannot_be_empty">手机号不能为空</string>
     <string name="delay_minute">延时(分钟)</string>
     <string name="minimum_brightness_percentage">最低亮度(百分比)</string>
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
-
 
 </resources>

@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -40,6 +39,7 @@ import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.NetworkFactory;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
+import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -48,15 +48,19 @@ import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.DialogUtils;
+import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.StringUtils;
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
+import com.telink.bluetooth.event.ErrorReportEvent;
 import com.telink.bluetooth.event.LeScanEvent;
 import com.telink.bluetooth.event.MeshEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
+import com.telink.bluetooth.light.ErrorReportInfo;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LeScanParameters;
@@ -322,7 +326,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
-                showLoadingDialog(getResources().getString(R.string.device_login_tip));
+                showLoadingDialog(getResources().getString(R.string.connecting_tip));
 
             }
         });
@@ -571,15 +575,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     public void onBackPressed() {
 //        super.onBackPressed();
         if (grouping) {
-
             for (int i = 0; i < getCurrentSelectLights().size(); i++) {
                 //让选中的灯停下来别再发闪的命令了。
                 stopBlink(getCurrentSelectLights().get(i));
             }
-
-
-            startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
-            finish();
+            navigationToHome();
+//            startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
+//            finish();
         } else {
             new AlertDialog.Builder(this)
                     .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
@@ -757,50 +759,40 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void autoConnect() {
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                showLoadingDialog(getResources().getString(R.string.device_login_tip));
+                showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 TelinkLightService.Instance().idleMode(true);
 
-                Log.d("ScanningTest", "this.mApplication.isEmptyMesh() = " + this.mApplication.isEmptyMesh());
-                if (this.mApplication.isEmptyMesh())
-                    return;
+//                Log.d("ScanningTest", "this.mApplication.isEmptyMesh() = " + this.mApplication.isEmptyMesh());
+//                if (this.mApplication.isEmptyMesh())
+//                    return;
 
-                this.mApplication.refreshLights();
+//                this.mApplication.refreshLights();
+//
+//                Mesh mesh = this.mApplication.getMesh();
+//                Log.d("ScanningTest", "mesh.name = " + mesh.name + " mesh.password = " + mesh.password);
+//
+//                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
+//                    TelinkLightService.Instance().idleMode(true);
+//                    return;
+//                }
 
-                Mesh mesh = this.mApplication.getMesh();
-                Log.d("ScanningTest", "mesh.name = " + mesh.name + " mesh.password = " + mesh.password);
-
-                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
-                    TelinkLightService.Instance().idleMode(true);
-                    return;
-                }
-
-                String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY, "dadou");
+                String account = DBUtils.getLastUser().getAccount();
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
-                connectParams.setMeshName(mesh.name);
-                if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
-                        , Constant.USER_TYPE, Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)) {
-                    connectParams.setPassword(NetworkFactory.md5(
-                            NetworkFactory.md5(mesh.password) + account));
-                } else {
-                    connectParams.setPassword(mesh.password);
-                }
-
+                connectParams.setMeshName(account);
+                connectParams.setPassword(NetworkFactory.md5(
+                        NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
-                //连接之前安装的第一个灯，因为第一个灯的信号一般会比较好。
-//                connectParams.setConnectMac(adapter.getItem(0).getMacAddr());
 
-                // 之前是否有在做MeshOTA操作，是则继续
-                if (mesh.isOtaProcessing()) {
-                    connectParams.setConnectMac(mesh.otaDevice.mac);
-                    saveLog("Action: AutoConnect:" + mesh.otaDevice.mac);
-                } else {
-                    saveLog("Action: AutoConnect:NULL");
-                }
-                //自动重连
-                Log.d("ScanningTest", "connecting");
+//                // 之前是否有在做MeshOTA操作，是则继续
+//                if (mesh.isOtaProcessing()) {
+//                    connectParams.setConnectMac(mesh.otaDevice.mac);
+//                    saveLog("Action: AutoConnect:" + mesh.otaDevice.mac);
+//                } else {
+//                    saveLog("Action: AutoConnect:NULL");
+//                }
+                //连接，如断开会自动重连
                 TelinkLightService.Instance().autoConnect(connectParams);
             }
 
@@ -853,7 +845,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
         this.mApplication.addEventListener(MeshEvent.UPDATE_COMPLETED, this);
-        this.mApplication.addEventListener(MeshEvent.ERROR, this);
+        this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
         this.adapter = new DeviceListAdapter();
@@ -922,10 +914,40 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
+    // 如果没有网络，则弹出网络设置对话框
+    public void checkNetworkAndSync() {
+        if (NetWorkUtils.isNetworkAvalible(this)) {
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(this, syncCallback);
+        }
+    }
+
+    SyncCallback syncCallback = new SyncCallback() {
+
+        @Override
+        public void start() {
+//            showLoadingDialog(getString(R.string.tip_start_sync));
+            ToastUtils.showShort(R.string.uploading_data);
+        }
+
+        @Override
+        public void complete() {
+            ToastUtils.showShort(R.string.upload_data_success);
+//            hideLoadingDialog();
+        }
+
+        @Override
+        public void error(String msg) {
+            ToastUtils.showShort(R.string.upload_data_failed);
+//            hideLoadingDialog();
+        }
+
+    };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d("ScanningTest", "remove all listener");
+        checkNetworkAndSync();
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -1088,8 +1110,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             case MeshEvent.ERROR:
                 this.onMeshEvent((MeshEvent) event);
                 break;
+            case ErrorReportEvent.ERROR_REPORT:
+                ErrorReportInfo info = ((ErrorReportEvent) event).getArgs();
+                onErrorReport(info);
+                break;
+
         }
     }
+
 
     private boolean groupingSuccess = false;
     private DbLight groupingLight;
@@ -1103,6 +1131,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
         TelinkLightService.Instance().updateNotification();
     }
+
+    private void onErrorReport(ErrorReportInfo info) {
+//        retryConnect()
+        LogUtils.d("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+    }
+
 
     private void onGetGroupEvent(NotificationEvent event) {
         NotificationEvent e = event;
@@ -1263,13 +1297,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         params.setOldMeshName(mesh.factoryName);
         params.setOldPassword(mesh.factoryPassword);
         params.setNewMeshName(mesh.name);
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
-                , Constant.USER_TYPE, Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh.password) + account));
-        } else {
-            params.setNewPassword(mesh.password);
-        }
+        params.setNewPassword(NetworkFactory.md5(
+                NetworkFactory.md5(mesh.password) + account).substring(0, 16));
 
         DeviceInfo deviceInfo = event.getArgs();
         deviceInfo.meshAddress = meshAddress;

@@ -137,13 +137,14 @@ public interface RequestInterface {
     Observable<Response<List<DbLight>>> getLightList(@Header("token") String token);
 
     //更新灯
-    @PUT("api/ext/soybean/region/light/update/{lid}")
+    @PUT("api/ext/soybean/light/update/{lid}")
     Observable<Response<String>> updateLight(@Header("token") String token,
+                                             @Path("lid") int lid,
                                              @Query("name") String name,
                                              @Query("brightness") int brightness,
                                              @Query("colorTemperature") int colorTemperature,
-                                             @Query("belongGroupId") int belongGroupId,
-                                             @Path("lid") int lid);
+                                             @Query("belongGroupId") int belongGroupId
+                                             );
 
     //删除灯
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
@@ -186,4 +187,7 @@ public interface RequestInterface {
                                             @Query("name") String name,
                                             @Query("email") String email,
                                             @Query("introduction") String introduction);
+    //获取场景列表
+    @POST("api/ext/soybean/clear")
+    Observable<Response<String>> clearUserData(@Header("token") String token);
 }

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+            <include layout="@layout/toolbar"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:id="@+id/question1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="18sp"
+                    android:text="@string/question_1"
+                    />
+
+                <TextView
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="left"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/question_1_anser1"
+                    />
+
+                <TextView
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="left"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/qustion_2_anser2"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:id="@+id/question2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="18sp"
+                    android:text="@string/question_2"
+                    />
+
+                <TextView
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="left"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/question2_answer"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <TextView
+                    android:id="@+id/question3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="18sp"
+                    android:text="@string/question_3"
+                    />
+
+                <TextView
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="left"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/question3_answer"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

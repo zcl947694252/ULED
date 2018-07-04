@@ -7,7 +7,6 @@ import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -32,9 +31,11 @@ object AccountModel {
                 }
                 .flatMap { response: String ->
                     val salt = response
-                    val md5Pwd = NetworkFactory.md5(
+
+                    val md5Pwd = (NetworkFactory.md5(
                             NetworkFactory.md5(
-                                    NetworkFactory.md5(password) + account) + salt)
+                                    NetworkFactory.md5(password) + account) + salt))
+
                     NetworkFactory.getApi().login(account, md5Pwd)
                             .compose(NetworkTransformer())
                 }
@@ -226,10 +227,10 @@ object AccountModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<List<DbRegion>>() {
                     override fun onNext(t: List<DbRegion>) {
-                        //非首次在当前手机登录或者是首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
-                        if (t.size == 0 || SharedPreferencesUtils.getCurrentUserList().contains(account)) {
+                        //首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
+                        if (t.size == 0) {
                             setIsLogin(true)
-                            setupMesh(account)
+//                            setupMesh(account)
                         }
                     }
 

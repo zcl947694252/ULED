@@ -10,8 +10,8 @@ import org.greenrobot.greendao.annotation.Id;
 
 @Entity
 public class DbRegion {
-    @Id(autoincrement = true)
-    private Long id;
+    @Id
+    private Long id= Long.valueOf(1);
 
     private String controlMesh;
     private String controlMeshPwd;

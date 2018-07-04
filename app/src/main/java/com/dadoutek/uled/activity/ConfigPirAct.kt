@@ -22,7 +22,7 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
-    private var mSelectGroupAddr: Int = 0xDF  //代表所有灯
+    private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,15 +82,14 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (position == 0)
-            mSelectGroupAddr = 0xDF
-        else
+//        if (position == 0)
+//            mSelectGroupAddr = 0xDF
+//        else
             mSelectGroupAddr = mGroups[position].meshAddr
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-
-        mSelectGroupAddr = 0xDF
+            mSelectGroupAddr = 0xFF
     }
 
 

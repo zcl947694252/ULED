@@ -1,9 +1,9 @@
 package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/7.
@@ -13,42 +13,47 @@ import org.greenrobot.greendao.annotation.NotNull;
 public class DbSceneActions {
     @Id(autoincrement = true)
     private Long id;
-
-    private Long actionId;
+    @NotNull
+    private long belongSceneId;
     @NotNull
     private int groupAddr;
     @NotNull
     private int colorTemperature;
     @NotNull
     private int brightness;
-    @NotNull
-    private String belongAccount;
 
-    @Generated(hash = 364634455)
-    public DbSceneActions(Long id, Long actionId, int groupAddr,
-                          int colorTemperature, int brightness, @NotNull String belongAccount) {
+    @Generated(hash = 822030848)
+    public DbSceneActions(Long id, long belongSceneId, int groupAddr,
+            int colorTemperature, int brightness) {
         this.id = id;
-        this.actionId = actionId;
+        this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
-        this.belongAccount = belongAccount;
     }
 
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
 
-    public Long getActionId() {
-        return this.actionId;
+    public Long getId() {
+        return id;
     }
 
-    public void setActionId(Long actionId) {
-        this.actionId = actionId;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public long getBelongSceneId() {
+        return belongSceneId;
+    }
+
+    public void setBelongSceneId(long belongSceneId) {
+        this.belongSceneId = belongSceneId;
     }
 
     public int getGroupAddr() {
-        return this.groupAddr;
+        return groupAddr;
     }
 
     public void setGroupAddr(int groupAddr) {
@@ -56,7 +61,7 @@ public class DbSceneActions {
     }
 
     public int getColorTemperature() {
-        return this.colorTemperature;
+        return colorTemperature;
     }
 
     public void setColorTemperature(int colorTemperature) {
@@ -64,35 +69,10 @@ public class DbSceneActions {
     }
 
     public int getBrightness() {
-        return this.brightness;
+        return brightness;
     }
 
     public void setBrightness(int brightness) {
         this.brightness = brightness;
-    }
-
-    public String getBelongAccount() {
-        return this.belongAccount;
-    }
-
-    public void setBelongAccount(String belongAccount) {
-        this.belongAccount = belongAccount;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String toString() {
-        return "DbSceneActions{" +
-                "groupAddr=" + groupAddr +
-                ", brightness=" + brightness +
-                ", colorTemperature=" + colorTemperature +
-                '}';
     }
 }

@@ -45,7 +45,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"DB_REGION\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"CONTROL_MESH\" TEXT," + // 1: controlMesh
                 "\"CONTROL_MESH_PWD\" TEXT," + // 2: controlMeshPwd
                 "\"INSTALL_MESH\" TEXT," + // 3: installMesh

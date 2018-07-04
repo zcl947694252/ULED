@@ -62,9 +62,9 @@ public final class OnlineStatusNotificationParser extends NotificationParser<Lis
             deviceNotifyInfo.reserve = reserve;
             deviceNotifyInfo.status = status;
 
-            Log.d("dadouTest", "params: "+params);
-
-            Log.d("dadouTest", "status: "+status);
+//            Log.d("dadouTest", "params: "+params);
+//
+//            Log.d("dadouTest", "status: "+status);
 
             if (status == 0) {
                 deviceNotifyInfo.connectionStatus = ConnectionStatus.OFFLINE;

@@ -49,6 +49,7 @@ public class DeviceInfo implements Parcelable {
      */
     public int productUUID;
     public int status;
+    public int rssi;
     public byte[] longTermKey = new byte[16];
     /**
      * 设备的firmware版本

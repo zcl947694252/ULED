@@ -14,6 +14,8 @@ public class Constant implements Serializable {
 //    public static final String DEFAULT_MESH_FACTORY_NAME="TestLocas";
 //    public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
+    public static final int MAX_GROUP_COUNT = 255;
+
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
@@ -91,4 +93,10 @@ public class Constant implements Serializable {
 
     //管理权限本地保存key
     public static String ME_FUNCTION = "ME_FUNCTION";
+
+    //管理权限本地保存key
+    public static String OLD_INDEX_DATA = "oldIndexData";
+
+    //是否注册跳过验证码（目前用来测试）
+    public static boolean TEST_REGISTER = false;
 }

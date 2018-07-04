@@ -14,7 +14,6 @@
     <string name="header_groups">Groups</string>
     <string name="header_account">Me</string>
 
-
     <string-array name="trigger_lux_array" translatable="false">
         <item>0</item>
         <item>2</item>
@@ -86,7 +85,7 @@
     <string name="set_group">Set Group</string>
     <string name="loading">Loading</string>
     <string name="scan_end">The scan was completed and no equipment was found!</string>
-    <string name="device_login_tip">Logging, please wait!</string>
+    <string name="connecting_tip">Connecting…</string>
     <string name="grouping_completed">Grouping completed</string>
     <string name="allLight">All Lights</string>
     <string name="group">Group</string>
@@ -130,7 +129,7 @@
     <string name="title_scanned_lights_num">Scan complete(scanned %1$d lights)</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
-    <string name="empty_cache_tip">Clear data? APP will restart automatically after clearing</string>
+    <string name="empty_cache_tip">Need to physically recover the lamp before clearing the data and start clearing the data?</string>
     <string name="factory_reset">Factory reset</string>
     <string name="add_str_group">Add group</string>
     <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
@@ -236,7 +235,7 @@
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">The current name is already used</string>
-    <string name="One_click_backup">One-click backup</string>
+    <string name="upload_data">Upload data</string>
     <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
     <string name="login_timeout">Login timeout</string>
     <string name="account_not_exist">Account does not exist</string>
@@ -273,18 +272,47 @@
     <string name="scene_16_tip">The maximum number of scenes is 16!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Data synchronization is about to begin. . .</string>
-    <string name="sync_complet">Completed synchronously</string>
+    <string name="download_data_success">Download data success</string>
     <string name="sync_now">Syncing server data, please wait. . .</string>
     <string name="install_light">Install lights</string>
     <string name="install_device">Install Device</string>
     <string name="tip_start_sync">Start synchronization. . .</string>
-    <string name="tip_completed_sync">Completed synchronously</string>
+    <string name="upload_data_success">Upload data success</string>
     <string name="network_tip_title">Network status prompt</string>
     <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
     <string name="devoloping">In development. . . Stay tuned!</string>
     <string name="repaet_send">(%1$d s) resend</string>
     <string name="manager_verification">Administrator authority verification</string>
     <string name="manager_phone_error">Admin mobile phone number is wrong</string>
+    <string name="answer_app">Questions and answers</string>
+    <string name="click_reset_title">One-click recovery</string>
+    <string name="select_type_str">Please select the way to restore factory settings</string>
+    <string name="by_app_reset">Through software</string>
+    <string name="by_light_reset">Through lamps</string>
+    <string name="by_info_reset">Learn more</string>
+    <string name="by_light_reset_title">Physical recovery</string>
+    <string name="by_light_reset_mesage">I have already physically restored the lamp to factory settings and started initializing APP data?</string>
+    <string name="question_1">1. Restore factory mode: One-click recovery</string>
+    <string name="question_1_anser1">(1) Software Recovery: This mode will restore the factory settings of the lamp directly through the App. In this method, please ensure that the lamp is in a controllable state. If you can also control some lamps after recovery, please use the physical recovery method.</string>
+    <string name="qustion_2_anser2">(2) physical recovery: Please use the power off for 6 seconds,
+        and then turn on the power for 1 to 2 seconds, repeat this operation
+        until it succeeds (at least about five times) to force the hardware to restore the factory
+        settings, and finally on the App side select Clear Data, and if other mobile phones are using
+        this account, you need to log out or re-install the APP to use it normally. This
+        method will clear all user data and use it with caution!</string>
+    <string name="common_question">Common problem</string>
+    <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
+    <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
+    <string name="question_3">3. Can not control, not connect</string>
+    <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
+    <string name="group_limit">Add up to 255 groups up to the current limit</string>
+    <string name="data_empty">Data is empty</string>
+    <string name="clear_data_now">Clearing user data. . .</string>
+    <string name="clear_fail">Clear failed</string>
+    <string name="backup_failed">Backup data failed</string>
+    <string name="uploading_data">Uploading data</string>
+    <string name="upload_data_failed">Upload data failed</string>
+    <string name="phone_cannot_be_empty">Phone cannot be empty</string>
     <string name="delay_minute">Delay(minute)</string>
     <string name="minimum_brightness_percentage">Minimum brightness(%)</string>
     <string name="trigger_lux">Trigger lux(lux)</string>

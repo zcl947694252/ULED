@@ -6,14 +6,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,16 +27,16 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.activity.EmptyAddActivity;
-import com.dadoutek.uled.activity.ManagerVerificationActivity;
-import com.dadoutek.uled.activity.PhoneVerificationActivity;
-import com.dadoutek.uled.activity.MainActivity;
+import com.dadoutek.uled.activity.AboutSomeQuestionsActivity;
 import com.dadoutek.uled.activity.SplashActivity;
-import com.dadoutek.uled.model.Cmd;
+import com.dadoutek.uled.intf.NetworkObserver;
+import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.HttpModel.UserModel;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.AppUtils;
@@ -50,6 +50,8 @@ import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,8 +60,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by hejiajun on 2018/4/16.
@@ -86,6 +86,8 @@ public class MeFragment extends Fragment implements EventListener<String> {
     Button oneClickBackup;
     @BindView(R.id.one_click_reset)
     Button oneClickReset;
+    @BindView(R.id.constant_question)
+    Button constantQuestion;
     private LayoutInflater inflater;
 
     private Dialog loadDialog;
@@ -94,6 +96,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
     private boolean isDeleteSuccess = false;
 
     private long sleepTime = 250;
+    boolean isClickExlogin = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,7 +105,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
         this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
 
-        if (android.os.Build.BRAND.contains("Huawei")) {
+        if (Build.BRAND.contains("Huawei")) {
             sleepTime = 500;
         } else {
             sleepTime = 200;
@@ -128,10 +131,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
         updateIte.setVisibility(View.GONE);
         if (SharedPreferencesUtils.isDeveloperModel()) {
             copyDataBase.setVisibility(View.VISIBLE);
-            chearCache.setVisibility(View.GONE);
+            chearCache.setVisibility(View.VISIBLE);
         } else {
             copyDataBase.setVisibility(View.GONE);
-            chearCache.setVisibility(View.GONE);
+            chearCache.setVisibility(View.VISIBLE);
         }
     }
 
@@ -165,11 +168,12 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset, R.id.constant_question})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
                 emptyTheCache();
+//                ToastUtils.showLong(R.string.devoloping);
                 break;
             case R.id.update_ite:
                 ToastUtils.showShort(R.string.wait_develop);
@@ -184,36 +188,20 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 exitLogin();
                 break;
             case R.id.one_click_backup:
-//                Intent intent=new Intent(getActivity(), ManagerVerificationActivity.class);
-//                intent.putExtra(Constant.ME_FUNCTION,"me_sync");
-//                startActivityForResult(intent,0);
-                ToastUtils.showLong(R.string.devoloping);
-//                checkNetworkAndSync(getActivity(),handler);
+                checkNetworkAndSync(getActivity());
                 break;
             case R.id.one_click_reset:
-//                Intent intent1=new Intent(getActivity(), ManagerVerificationActivity.class);
-//                intent1.putExtra(Constant.ME_FUNCTION,"me_reset");
-//                startActivityForResult(intent1,0);
-                showSureResetDialog();
+                showSureResetDialogByApp();
+                break;
+            case R.id.constant_question:
+                startActivity(new Intent(getActivity(), AboutSomeQuestionsActivity.class));
                 break;
         }
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==0 && resultCode==RESULT_OK){
-           if(data.getExtras().getString(Constant.ME_FUNCTION).equals("me_sync")){
-               checkNetworkAndSync(getActivity(),handler);
-           }else if(data.getExtras().getString(Constant.ME_FUNCTION).equals("me_reset")){
-               showSureResetDialog();
-           }
-        }
     }
 
     // 如果没有网络，则弹出网络设置对话框
-    public static void checkNetworkAndSync(final Activity activity, Handler handler) {
+    public void checkNetworkAndSync(final Activity activity) {
         if (!NetWorkUtils.isNetworkAvalible(activity)) {
             new AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -226,29 +214,38 @@ public class MeFragment extends Fragment implements EventListener<String> {
                                         0);
                             }).create().show();
         } else {
-            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity, handler);
+            SyncDataPutOrGetUtils.Companion.syncPutDataStart(activity, syncCallback);
         }
     }
 
-    public Handler handler = new Handler() {
+    SyncCallback syncCallback = new SyncCallback() {
+
         @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case Cmd.SYNCCMD:
-                    showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
-                    break;
-                case Cmd.SYNCCOMPLETCMD:
-                    hideLoadingDialog();
-                    break;
-                case Cmd.SYNCERRORCMD:
-                    hideLoadingDialog();
-                    break;
-            }
+        public void start() {
+            showLoadingDialog(getActivity().getString(R.string.tip_start_sync));
         }
+
+        @Override
+        public void complete() {
+            if (isClickExlogin) {
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().idleMode(true);
+
+                restartApplication();
+            }
+            hideLoadingDialog();
+        }
+
+        @Override
+        public void error(String msg) {
+            isClickExlogin = false;
+            Log.d("SyncLog", "error: " + msg);
+            hideLoadingDialog();
+        }
+
     };
 
-    private void showSureResetDialog() {
+    private void showSureResetDialogByApp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.tip_reset_sure);
         builder.setNegativeButton(R.string.btn_cancel, (dialog, which) -> {
@@ -325,10 +322,29 @@ public class MeFragment extends Fragment implements EventListener<String> {
                         e.printStackTrace();
                     } finally {
                         if (j == 0) {
-                            hideLoadingDialog();
                             SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                            ActivityUtils.startActivity(SplashActivity.class);
-                            getActivity().finish();
+                            SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity(), new SyncCallback() {
+                                @Override
+                                public void complete() {
+                                    hideLoadingDialog();
+                                    ActivityUtils.startActivity(SplashActivity.class);
+                                    getActivity().finish();
+                                }
+
+                                @Override
+                                public void error(String msg) {
+                                    hideLoadingDialog();
+                                    ToastUtils.showShort(R.string.backup_failed);
+                                    ActivityUtils.startActivity(SplashActivity.class);
+                                    getActivity().finish();
+                                }
+
+                                @Override
+                                public void start() {
+
+                                }
+                            });
+
                         }
                     }
                 }
@@ -401,8 +417,18 @@ public class MeFragment extends Fragment implements EventListener<String> {
 //    }
 
     private void exitLogin() {
-        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
-        restartApplication();
+        isClickExlogin = true;
+        if(DBUtils.getAllLight().size()==0&&!DBUtils.getDataChangeAllHaveAboutLight()){
+            if (isClickExlogin) {
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().idleMode(true);
+
+                restartApplication();
+            }
+            hideLoadingDialog();
+        }else{
+            checkNetworkAndSync(getActivity());
+        }
     }
 
     long[] mHints = new long[6];//初始全部为0
@@ -415,7 +441,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
             ToastUtils.showLong(R.string.developer_mode);
             copyDataBase.setVisibility(View.VISIBLE);
-            chearCache.setVisibility(View.GONE);
+            chearCache.setVisibility(View.VISIBLE);
             SharedPreferencesUtils.setDeveloperModel(true);
         }
     }
@@ -428,20 +454,64 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 .setNegativeButton(getActivity().getString(R.string.btn_cancel), (dialog, which) -> {
                 })
                 .setPositiveButton(getActivity().getString(R.string.btn_sure), (dialog, which) -> {
-                    DBUtils.deleteAllData();
-                    CleanUtils.cleanInternalSp();
-                    CleanUtils.cleanExternalCache();
-                    CleanUtils.cleanInternalFiles();
-                    CleanUtils.cleanInternalCache();
-                    ToastUtils.showShort(R.string.clean_tip);
-                    restartApplication();
+                    clearData();
                 })
                 .create().show();
     }
 
+    private void clearData() {
+
+//        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+//        DBUtils.deleteAllData();
+//        CleanUtils.cleanInternalSp();
+//        CleanUtils.cleanExternalCache();
+//        CleanUtils.cleanInternalFiles();
+//        CleanUtils.cleanInternalCache();
+//        ToastUtils.showShort(R.string.clean_tip);
+//        hideLoadingDialog();
+//        restartApplication();
+//
+        DbUser dbUser = DBUtils.getLastUser();
+
+        if (dbUser == null) {
+            ToastUtils.showLong(R.string.data_empty);
+            return;
+        }
+
+        showLoadingDialog(getString(R.string.clear_data_now));
+        UserModel.INSTANCE.deleteAllData(dbUser.getToken()).subscribe(new NetworkObserver<String>() {
+            @Override
+            public void onNext(String s) {
+                SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                SharedPreferencesHelper.putObject(getActivity(), Constant.OLD_INDEX_DATA, null);
+                DBUtils.deleteAllData();
+                CleanUtils.cleanInternalSp();
+                CleanUtils.cleanExternalCache();
+                CleanUtils.cleanInternalFiles();
+                CleanUtils.cleanInternalCache();
+                ToastUtils.showShort(R.string.clean_tip);
+                hideLoadingDialog();
+
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                restartApplication();
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+                super.onError(e);
+                ToastUtils.showLong(R.string.clear_fail);
+                hideLoadingDialog();
+            }
+        });
+    }
+
     //重启app并杀死原进程
     private void restartApplication() {
+        ActivityUtils.finishAllActivities(true);
         ActivityUtils.startActivity(SplashActivity.class);
-        ActivityUtils.finishAllActivitiesExceptNewest();
     }
 }

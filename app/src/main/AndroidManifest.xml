@@ -21,9 +21,6 @@
         android:name="android.hardware.bluetooth_le"
         android:required="true" />
 
-    <meta-data
-        android:name="android.max_aspect"
-        android:value="2.1" />
 
     <application
         android:name=".TelinkLightApplication"
@@ -31,6 +28,11 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+
         <service
             android:name=".TelinkLightService"
             android:enabled="true" />
@@ -156,7 +158,13 @@
         <activity
             android:name=".activity.ManagerVerificationActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.ConfigPirAct"></activity>
+       <activity
+            android:name=".activity.ConfigPirAct"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AboutSomeQuestionsActivity"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

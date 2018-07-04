@@ -2,15 +2,9 @@ package com.dadoutek.uled.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.TextInputLayout
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.Toast
-import butterknife.BindView
 import butterknife.ButterKnife
-import butterknife.OnClick
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkBaseActivity
@@ -18,12 +12,13 @@ import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkFactory.md5
 import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.util.LogUtils
-import io.reactivex.Observer
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -132,10 +127,18 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
+//                        LogUtils.d("logging: " + "登录成功")
+//                        ToastUtils.showLong(R.string.login_success)
+//                        hideLoadingDialog()
+//                        TransformView()
+
                         LogUtils.d("logging: " + "登录成功")
+                        DBUtils.deleteLocalData()
                         ToastUtils.showLong(R.string.login_success)
                         hideLoadingDialog()
-                        TransformView()
+                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                        showLoadingDialog(getString(R.string.sync_now))
+                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser,syncCallback)
                     }
 
                     override fun onError(e: Throwable) {
@@ -143,6 +146,28 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                         hideLoadingDialog()
                     }
                 })
+    }
+
+    internal var syncCallback: SyncCallback = object : SyncCallback {
+
+        override fun start() {
+            showLoadingDialog(getString(R.string.tip_start_sync))
+        }
+
+        override fun complete() {
+            syncComplet()
+        }
+
+        override fun error(msg: String) {
+            LogUtils.d("GetDataError:"+msg)
+        }
+
+    }
+
+    private fun syncComplet() {
+//        ToastUtils.showLong(getString(R.string.upload_complete))
+        hideLoadingDialog()
+        TransformView()
     }
 
     private fun TransformView() {

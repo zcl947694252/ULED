@@ -3,18 +3,19 @@ package com.dadoutek.uled.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -63,7 +64,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
     private DbScene scene;
     private LayoutInflater inflater;
-    private SceneGroupAdapter adapter;
+    private SceneGroupAdapter sceneGroupAdapter;
 
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
@@ -89,13 +90,13 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
     private void initToolbar() {
         toolbar.setTitle(R.string.edit_scene);
-        toolbar.setNavigationIcon(R.drawable.navigation_back);
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white);
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void initClick() {
         //删除时恢复可添加组标记
-        adapter.setOnItemChildClickListener((adapter, view, position) -> {
+        sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {
             if (groupArrayList.size() != 0) {
                 if (adapter.getItemCount() == 1) {
                     for (int k = 0; k < groupArrayList.size(); k++) {
@@ -183,26 +184,74 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         AlertDialog.Builder builder;
         AlertDialog dialog;
         List<DbGroup> showList = getShowList();
+        ArrayList<DbGroup> selectGroupList=new ArrayList<>();
+
         View bottomView = View.inflate(ChangeSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
-        ListView lvGp = (ListView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
-        lvGp.setAdapter(new GroupListAdapter(this, showList));//ListView设置适配器
+        RecyclerView lvGp = (RecyclerView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
+        Button btnSure =  bottomView.findViewById(R.id.btn_sure);
+        btnSure.setVisibility(View.GONE);
+
+        GroupListAdapter groupListAdapter;
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        lvGp.setLayoutManager(layoutmanager);
+        groupListAdapter = new GroupListAdapter(R.layout.item_group,showList);
+        groupListAdapter.bindToRecyclerView(lvGp);
 
         builder = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.group_select)).setView(bottomView);
         dialog = builder.create();
 
-        lvGp.setOnItemClickListener((parent, view, position, id) -> {
-            ItemGroup itemGroup = new ItemGroup();
-            itemGroup.brightness = 50;
-            itemGroup.temperature = 50;
-            itemGroup.groupAress = showList.get(position).getMeshAddr();
-            itemGroup.gpName = showList.get(position).getName();
-            changeData(position, showList);
-            adapter.addData(itemGroup);
-            dialog.dismiss();
+        groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
+
+            DbGroup item=showList.get(position);
+            if(item.getMeshAddr()==0xffff){
+                ItemGroup itemGroup = new ItemGroup();
+                itemGroup.brightness = 50;
+                itemGroup.temperature = 50;
+                itemGroup.groupAress = showList.get(position).getMeshAddr();
+                itemGroup.gpName = showList.get(position).getName();
+                changeData(position, showList);
+                sceneGroupAdapter.addData(itemGroup);
+                dialog.dismiss();
+            }else{
+                btnSure.setVisibility(View.VISIBLE);
+                if(showList.get(position).checked){
+                    showList.get(position).checked=false;
+                }else{
+                    showList.get(position).checked=true;
+                }
+
+                if(showList.get(0).getMeshAddr()==0xffff){
+                    adapter.remove(0);
+                }
+                adapter.notifyItemChanged(position);
+            }
+        });
+
+        btnSure.setOnClickListener(v -> {
+            for(int j=0;j<showList.size();j++){
+                if(showList.get(j).checked){
+                    ItemGroup itemGroup = new ItemGroup();
+                    itemGroup.brightness = 50;
+                    itemGroup.temperature = 50;
+                    itemGroup.groupAress = showList.get(j).getMeshAddr();
+                    itemGroup.gpName = showList.get(j).getName();
+                    changeDataList(showList.get(j));
+                    sceneGroupAdapter.addData(itemGroup);
+                }
+
+                if(j==showList.size()-1){
+                    dialog.dismiss();
+                }
+            }
         });
 
         dialog.show();
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        dialog.getWindow().setLayout((int) (size.x * 0.9), WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     private void changeData(int position, List<DbGroup> showList) {
@@ -223,10 +272,25 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         }
     }
 
+    private void changeDataList(DbGroup item) {
+        for (int k = 0; k < groupArrayList.size(); k++) {
+            if (groupArrayList.get(k).getMeshAddr() == item.getMeshAddr()) {
+//                    showList.add(groupArrayList.get(k));
+                groupArrayList.get(k).selected = true;
+                for (int i = 0; i < groupArrayList.size(); i++) {
+                    if (groupArrayList.get(i).getMeshAddr() == 0xffff) {
+                        groupArrayList.get(i).selected = true;
+                    }
+                }
+            }
+        }
+    }
+
     private List<DbGroup> getShowList() {
         List<DbGroup> showList = new ArrayList<>();
         for (int k = 0; k < groupArrayList.size(); k++) {
             if (!groupArrayList.get(k).selected) {
+                groupArrayList.get(k).checked=false;
                 showList.add(groupArrayList.get(k));
             }
         }
@@ -239,9 +303,9 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
         sceneGroupListView.setLayoutManager(layoutmanager);
 
-        this.adapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
+        this.sceneGroupAdapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
 //        sceneGroupListView.setAdapter(adapter);
-        adapter.bindToRecyclerView(sceneGroupListView);
+        sceneGroupAdapter.bindToRecyclerView(sceneGroupListView);
 
         inflater = LayoutInflater.from(this);
         mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -256,7 +320,6 @@ public class ChangeSceneAct extends TelinkBaseActivity {
     @OnClick({R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})
     public void onViewClicked(View view) {
         switch (view.getId()) {
-
             case R.id.bt_save:
                 if (checked()) {
                     save();
@@ -297,8 +360,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
             for (int i = 0; i < itemGroups.size(); i++) {
                 DbSceneActions sceneActions = new DbSceneActions();
-                sceneActions.setActionId(idAction);
-                sceneActions.setBelongAccount(telinkLightApplication.getMesh().name);
+                sceneActions.setBelongSceneId(idAction);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
@@ -320,7 +382,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         deleteScene(id);
 
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DBUtils.searchActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);
