@@ -48,9 +48,9 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int) {
         LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
                 "   triggerValue = $triggerValue")
-        val spGroup = groupConvertSpecialValue(groupAddr)
-        val groupH: Byte = (spGroup shr 8 and 0xff).toByte()
-        val groupL: Byte = (spGroup and 0xff).toByte()
+//        val spGroup = groupConvertSpecialValue(groupAddr)
+        val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
+        val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = byteArrayOf(
                 0x01,
                 groupH, groupL,
