@@ -1,5 +1,6 @@
 package com.dadoutek.uled.aboutswitches
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -143,6 +144,8 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
                 Log.d("Saw", "SelectGroupForSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
                 progressBar.visibility = View.GONE
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+//                startActivity(Intent(this,MainActivity::class.java))
+//                finish()
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(root, getString(R.string.group_failed))
@@ -229,8 +232,6 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.adapter = mAdapter
-
-
     }
 
 }

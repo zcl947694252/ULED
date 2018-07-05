@@ -432,6 +432,7 @@ public class DBUtils {
     public synchronized static void deleteSceneActionsList(List<DbSceneActions> sceneActionslist) {
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteInTx(sceneActionslist);
 //        for (int i = 0; i < sceneActionslist.size(); i++) {
+//            DaoSessionInstance.getInstance().getDbSceneActionsDao().delete(sceneActionslist.get(i));
 //            recordingChange(sceneActionslist.get(i).getId(),
 //                    DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
 //                    Constant.DB_DELETE);
