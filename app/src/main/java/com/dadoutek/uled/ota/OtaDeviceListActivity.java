@@ -13,9 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkBaseActivity;
-import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.TelinkLightService;
+import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.model.DeviceInfo;
 
 import java.util.List;

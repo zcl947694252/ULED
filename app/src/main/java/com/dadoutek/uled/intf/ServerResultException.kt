@@ -1,7 +1,7 @@
 package com.dadoutek.uled.intf
 
 import com.dadoutek.uled.R
-import com.dadoutek.uled.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.model.Response
 
 /**

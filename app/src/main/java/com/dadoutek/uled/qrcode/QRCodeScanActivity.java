@@ -20,7 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.qrcode.camera.Cameras;
 
 

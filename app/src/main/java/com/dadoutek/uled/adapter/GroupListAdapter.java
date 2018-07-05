@@ -1,12 +1,11 @@
 package com.dadoutek.uled.adapter;
 
 import android.support.annotation.Nullable;
-import android.view.View;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 
 import java.util.List;

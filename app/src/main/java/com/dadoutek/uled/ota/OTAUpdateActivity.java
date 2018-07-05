@@ -14,11 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.TelinkLightService;
-import com.dadoutek.uled.TelinkMeshErrorDealActivity;
-import com.dadoutek.uled.activity.FileSelectActivity;
-import com.dadoutek.uled.activity.MainActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
+import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
+import com.dadoutek.uled.othersview.FileSelectActivity;
+import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
 import com.dadoutek.uled.model.Mesh;

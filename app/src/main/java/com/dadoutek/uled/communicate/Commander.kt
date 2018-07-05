@@ -1,8 +1,8 @@
 package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.TelinkLightApplication
-import com.dadoutek.uled.TelinkLightService
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.model.Opcode
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.MeshEvent

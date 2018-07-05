@@ -23,7 +23,7 @@
 
 
     <application
-        android:name=".TelinkLightApplication"
+        android:name=".tellink.TelinkLightApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -34,11 +34,11 @@
             android:value="2.1" />
 
         <service
-            android:name=".TelinkLightService"
+            android:name=".tellink.TelinkLightService"
             android:enabled="true" />
 
         <activity
-            android:name=".activity.SplashActivity"
+            android:name=".othersview.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -48,11 +48,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".othersview.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.DeviceSettingActivity"
+            android:name=".aboutlight.DeviceSettingActivity"
             android:theme="@style/FullHeightDialogNew" />
         <!--<activity-->
         <!--android:name=".activity.DeviceScanningActivity"-->
@@ -60,22 +60,22 @@
         <!--android:screenOrientation="portrait"-->
         <!-- />-->
         <activity
-            android:name=".activity.DeviceBatchScanningActivity"
+            android:name=".othersview.DeviceBatchScanningActivity"
             android:label="@string/activity_device_scanning_label"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.AddMeshActivity"
+            android:name=".othersview.AddMeshActivity"
             android:label="@string/activity_mesh_add_lable"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".group.DeviceGroupingActivity"
+            android:name=".aboutgroup.DeviceGroupingActivity"
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".group.GroupSettingActivity"
+            android:name=".aboutgroup.GroupSettingActivity"
             android:theme="@style/FullHeightDialogNew" />
         <activity
-            android:name=".group.AddGroupActivity"
+            android:name=".aboutgroup.AddGroupActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ota.OtaActivity"
@@ -87,7 +87,7 @@
             android:name=".ota.BatchOtaActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.LogInfoActivity"
+            android:name=".othersview.LogInfoActivity"
             android:screenOrientation="portrait" />
         <!--
              <activity
@@ -99,13 +99,13 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.FileSelectActivity"
+            android:name=".othersview.FileSelectActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.UserAllActivity"
+            android:name=".othersview.UserAllActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.OnlineStatusTestActivity"
+            android:name=".aboutlight.OnlineStatusTestActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".qrcode.QRCodeScanActivity"
@@ -114,56 +114,56 @@
             android:name=".qrcode.QRCodeShareActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".group.RenameActivity"
+            android:name=".aboutgroup.RenameActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.RenameLightActivity"
+            android:name=".aboutlight.RenameLightActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.SelectDeviceTypeActivity" />
-        <activity android:name=".switches.ScanningSwitchActivity" />
+        <activity android:name=".othersview.SelectDeviceTypeActivity" />
+        <activity android:name=".aboutswitches.ScanningSwitchActivity" />
         <activity
-            android:name=".switches.SelectGroupForSwitchActivity"
+            android:name=".aboutswitches.SelectGroupForSwitchActivity"
             android:label="@string/title_activity_switch_group" />
         <activity
-            android:name=".light.LightsOfGroupActivity"
+            android:name=".aboutlight.LightsOfGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".scene.AddSceneAct"
+            android:name=".aboutscene.AddSceneAct"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".switches.ConfigSceneSwitchActivity"
+            android:name=".aboutswitches.ConfigSceneSwitchActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".user.LoginActivity"
+            android:name=".aboutuser.LoginActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".user.RegisterActivity"
+            android:name=".aboutuser.RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".user.PhoneVerificationActivity"
+            android:name=".aboutuser.PhoneVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".user.ForgetPassWordActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".light.DeviceScanningNewActivity"
+            android:name=".aboutuser.ForgetPassWordActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".scene.ChangeSceneAct"
+            android:name=".aboutlight.DeviceScanningNewActivity"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".light.EmptyAddActivity"
+            android:name=".aboutscene.ChangeSceneAct"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".user.ManagerVerificationActivity"
+            android:name=".aboutlight.EmptyAddActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".aboutuser.ManagerVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.AboutSomeQuestionsActivity"
+            android:name=".othersview.AboutSomeQuestionsActivity"
             android:screenOrientation="portrait" />
     </application>
 

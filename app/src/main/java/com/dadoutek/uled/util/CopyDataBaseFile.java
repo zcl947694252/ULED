@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.os.Environment;
 
-import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 

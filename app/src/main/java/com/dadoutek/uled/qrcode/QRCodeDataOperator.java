@@ -2,7 +2,7 @@ package com.dadoutek.uled.qrcode;
 
 import android.text.TextUtils;
 
-import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.DeviceInfo;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
