@@ -144,6 +144,7 @@ public class SceneFragment extends Fragment implements
         new Thread(() -> {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
         }).start();
+        DBUtils.deleteSceneActionsList(list);
         DBUtils.deleteScene(scenesListData.get(position));
         scenesListData.remove(position);
     }

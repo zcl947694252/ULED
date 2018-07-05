@@ -262,6 +262,8 @@ public class AddSceneAct extends TelinkBaseActivity {
             if (!groupArrayList.get(k).selected) {
                 groupArrayList.get(k).checked = false;
                 showList.add(groupArrayList.get(k));
+            }else{
+                groupArrayList.get(k).checked=false;
             }
         }
         return showList;

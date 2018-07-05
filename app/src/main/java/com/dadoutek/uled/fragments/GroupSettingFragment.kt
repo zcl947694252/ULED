@@ -11,17 +11,21 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.TelinkLightApplication
 import com.dadoutek.uled.TelinkLightService
+import com.dadoutek.uled.activity.GroupSettingActivity
 import com.dadoutek.uled.activity.RenameActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.widget.ColorPicker
 import kotlinx.android.synthetic.main.fragment_group_setting.*
-import org.jetbrains.anko.find
 import java.util.*
 
 class GroupSettingFragment : Fragment(), View.OnClickListener {
@@ -179,10 +183,18 @@ class GroupSettingFragment : Fragment(), View.OnClickListener {
         when (v?.id) {
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(activity)).setMessage(R.string.delete_group_confirm)
                     .setPositiveButton(R.string.btn_ok) { _, _ ->
-                        CmdDelete(group?.id!!, group!!.meshAddr)
-                        DBUtils.deleteGroup(group!!)
-                        activity?.setResult(Constant.RESULT_OK)
-                        activity?.finish()
+                        (activity as GroupSettingActivity).showLoadingDialog(getString(R.string.deleting))
+
+                        deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
+                                successCallback = {
+                                    (activity as GroupSettingActivity).hideLoadingDialog()
+                                    activity?.setResult(Constant.RESULT_OK)
+                                    activity?.finish()
+                                },
+                                failedCallback = {
+                                    (activity as GroupSettingActivity).hideLoadingDialog()
+                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                })
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
@@ -191,22 +203,59 @@ class GroupSettingFragment : Fragment(), View.OnClickListener {
     }
 
 
-    private fun CmdDelete(id: Long, groupAddress: Int) {
-        val lights = DBUtils.getLightByGroupID(id)
-        for (k in lights.indices) {
-            val dstAddress = lights[k].meshAddr
-            val opcode = 0xD7.toByte()
-            val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
-            params[0] = 0x00
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
-        }
+    /**
+     * 删除组，并且把组里的灯的组也都删除。
+     */
+    private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
+                            successCallback: () -> Unit, failedCallback: () -> Unit) {
+        Thread {
+            if (lights.count() != 0) {
+                val maxRetryCount = 3
+                if (retryCount <= maxRetryCount) {
+                    val light = lights[0]
+                    val lightMeshAddr = light.meshAddr
+                    Commander.deleteGroup(lightMeshAddr,
+                            successCallback = {
+                                light.belongGroupId = DBUtils.getGroupNull().id
+                                DBUtils.updateLight(light)
+                                lights.remove(light)
+                                if (lights.count() == 0) {
+                                    DBUtils.deleteGroupOnly(group)
+                                    activity?.runOnUiThread {
+                                        successCallback.invoke()
+                                    }
+                                } else
+                                    deleteGroup(lights, group,
+                                            successCallback = successCallback,
+                                            failedCallback = failedCallback)
+
+                            },
+                            failedCallback = {
+                                deleteGroup(lights, group, retryCount = retryCount + 1,
+                                        successCallback = successCallback,
+                                        failedCallback = failedCallback)
+                            })
+                } else {    //超过了重试次数
+                    activity?.runOnUiThread {
+                        failedCallback.invoke()
+                    }
+                    LogUtils.d("retry delete group timeout")
+                }
+            } else {
+                DBUtils.deleteGroupOnly(group)
+                activity?.runOnUiThread {
+                    successCallback.invoke()
+                }
+            }
+        }.start()
+
     }
 
     private fun renameGp() {
         val intent = Intent(activity, RenameActivity::class.java)
         intent.putExtra("group", group)
         startActivity(intent)
-        activity!!.finish()
+        activity?.finish()
     }
 
 

@@ -124,8 +124,9 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
         Intent intent = getIntent();
         scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
-        scene.__setDaoSession(DaoSessionInstance.getInstance());
-        List<DbSceneActions> actions = scene.getActions();
+//        scene.__setDaoSession(DaoSessionInstance.getInstance());
+
+        List<DbSceneActions> actions = DBUtils.getActionsBySceneId(scene.getId());
 
         boolean includeAll = false;
         loop2:
@@ -290,8 +291,10 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         List<DbGroup> showList = new ArrayList<>();
         for (int k = 0; k < groupArrayList.size(); k++) {
             if (!groupArrayList.get(k).selected) {
-                groupArrayList.get(k).checked=false;
+                groupArrayList.get(k).checked = false;
                 showList.add(groupArrayList.get(k));
+            }else{
+                groupArrayList.get(k).checked=false;
             }
         }
         return showList;
@@ -356,7 +359,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
             scene.setName(name);
             DBUtils.updateScene(scene);
             long idAction = scene.getId();
-            DBUtils.deleteSceneActionsList(scene.getActions());
+            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene.getId()));
 
             for (int i = 0; i < itemGroups.size(); i++) {
                 DbSceneActions sceneActions = new DbSceneActions();
@@ -380,7 +383,6 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
     private void updateScene(long id) throws InterruptedException {
         deleteScene(id);
-
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
         List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
         byte[] params;
@@ -404,7 +406,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         params = new byte[]{0x00, (byte) id};
         try {
             Thread.sleep(100);
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xff, params);
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

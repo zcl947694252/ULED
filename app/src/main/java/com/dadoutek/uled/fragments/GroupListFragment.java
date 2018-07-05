@@ -2,9 +2,7 @@ package com.dadoutek.uled.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -15,20 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.TextView;
 
-import com.chad.library.adapter.base.BaseItemDraggableAdapter;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.chad.library.adapter.base.BaseViewHolder;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
-import com.chad.library.adapter.base.listener.OnItemSwipeListener;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.TelinkLightApplication;
 import com.dadoutek.uled.TelinkLightService;
@@ -38,8 +27,6 @@ import com.dadoutek.uled.activity.GroupSettingActivity;
 import com.dadoutek.uled.activity.LightsOfGroupActivity;
 import com.dadoutek.uled.activity.ScanningSwitchActivity;
 import com.dadoutek.uled.adapter.GroupListRecycleViewAdapter;
-import com.dadoutek.uled.adapter.SceneGroupAdapter;
-import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -62,7 +49,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
     private TelinkLightApplication application;
     private Toolbar toolbar;
 
-//    private GridView gridView;
+    //    private GridView gridView;
     private RecyclerView recyclerView;
     List<DbGroup> showList;
 
@@ -144,22 +131,22 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
         gpList = DBUtils.getGroupList();
 
-        showList=new ArrayList<>();
+        showList = new ArrayList<>();
 
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
-                getObject(TelinkLightApplication.getInstance(),Constant.OLD_INDEX_DATA);
+                getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA);
 
         //如果有调整过顺序取本地数据，否则取数据库数据
-        if(dbOldGroupList!=null&&dbOldGroupList.size()>0){
-            showList=dbOldGroupList;
-        }else{
-            showList=gpList;
+        if (dbOldGroupList != null && dbOldGroupList.size() > 0) {
+            showList = dbOldGroupList;
+        } else {
+            showList = gpList;
         }
 
         LinearLayoutManager layoutmanager = new LinearLayoutManager(getActivity());
         layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutmanager);
-        this.adapter = new GroupListRecycleViewAdapter(R.layout.group_item,showList);
+        this.adapter = new GroupListRecycleViewAdapter(R.layout.group_item, showList);
         adapter.setOnItemChildClickListener(onItemChildClickListener);
         adapter.bindToRecyclerView(recyclerView);
 //        adapter.openLoadAnimation(BaseQuickAdapter.ALPHAIN);
@@ -173,17 +160,20 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
     private void setMove() {
         OnItemDragListener onItemDragListener = new OnItemDragListener() {
             @Override
-            public void onItemDragStart(RecyclerView.ViewHolder viewHolder, int pos){}
+            public void onItemDragStart(RecyclerView.ViewHolder viewHolder, int pos) {
+            }
+
             @Override
             public void onItemDragMoving(RecyclerView.ViewHolder source, int from,
                                          RecyclerView.ViewHolder target, int to) {
 
             }
+
             @Override
             public void onItemDragEnd(RecyclerView.ViewHolder viewHolder, int pos) {
 //                viewHolder.getItemId();
-                List<DbGroup> list=adapter.getData();
-                SharedPreferencesHelper.putObject(getActivity(),Constant.OLD_INDEX_DATA,list);
+                List<DbGroup> list = adapter.getData();
+                SharedPreferencesHelper.putObject(getActivity(), Constant.OLD_INDEX_DATA, list);
             }
         };
 
@@ -196,7 +186,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
     }
 
 
-    BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener= (adapter, view, position) -> {
+    BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener = (adapter, view, position) -> {
 
         DbGroup group = showList.get(position);
 
@@ -208,7 +198,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
             return;
         }
 
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_on:
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
                         new byte[]{0x01, 0x00, 0x00});
