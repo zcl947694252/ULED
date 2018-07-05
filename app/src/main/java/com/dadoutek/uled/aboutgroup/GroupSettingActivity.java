@@ -27,7 +27,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
         super.onCreate(savedInstanceState);
 
 //		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.setContentView(R.layout.activity_group_setting);
+        setContentView(R.layout.activity_group_setting);
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         this.group = (DbGroup) this.getIntent().getExtras().get("group");
