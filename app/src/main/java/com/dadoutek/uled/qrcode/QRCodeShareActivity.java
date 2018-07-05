@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkBaseActivity;
+import com.dadoutek.uled.tellink.TelinkBaseActivity;
 
 
 public final class QRCodeShareActivity extends TelinkBaseActivity {

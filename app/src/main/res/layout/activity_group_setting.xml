@@ -44,7 +44,7 @@
 
         <fragment
             android:id="@+id/group_setting_fragment"
-            android:name="com.dadoutek.uled.fragments.GroupSettingFragment"
+            android:name="com.dadoutek.uled.aboutgroup.GroupSettingFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </FrameLayout>

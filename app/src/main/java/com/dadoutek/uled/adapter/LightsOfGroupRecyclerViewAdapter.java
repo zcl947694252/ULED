@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener;
 import com.dadoutek.uled.util.DataManager;
 

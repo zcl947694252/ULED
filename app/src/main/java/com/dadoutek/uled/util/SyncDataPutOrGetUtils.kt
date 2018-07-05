@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.NetworkObserver
 import com.dadoutek.uled.intf.NetworkTransformer

@@ -2,9 +2,6 @@ package com.dadoutek.uled.util;
 
 import android.content.Context;
 
-import com.dadoutek.uled.TelinkLightApplication;
-import com.dadoutek.uled.model.DaoSessionInstance;
-
 /**
  * Created by hejiajun on 2018/5/10.
  */
