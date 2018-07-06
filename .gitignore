@@ -54,7 +54,5 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
-# Daofile
-/app/src/main/java/com/dadoutek/uled/dao/DaoMaster.java
-/app/src/main/java/com/dadoutek/uled/dao/DaoSession.java
+
 BluetoothLightDemo/release/output.json
