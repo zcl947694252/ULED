@@ -1,7 +1,7 @@
 package com.dadoutek.uled.model.HttpModel
 
-import com.dadoutek.uled.intf.NetworkFactory
-import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.model.DbModel.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers

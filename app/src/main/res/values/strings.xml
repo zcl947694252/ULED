@@ -306,5 +306,9 @@
     <string name="uploading_data">Uploading data</string>
     <string name="upload_data_failed">Upload data failed</string>
     <string name="phone_cannot_be_empty">Phone cannot be empty</string>
+    <string name="delete_group_failed">Delete group failed</string>
+    <string name="deleting">Deleting</string>
+    <string name="move_out_some_lights_in_group_failed">Move some lights out in group failed</string>
+
 
 </resources>

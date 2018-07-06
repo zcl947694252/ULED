@@ -2,9 +2,9 @@ package com.dadoutek.uled.model;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 
 /**
  * Created by hejiajun on 2018/5/19.

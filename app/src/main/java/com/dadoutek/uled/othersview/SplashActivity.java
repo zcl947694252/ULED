@@ -6,11 +6,11 @@ import android.os.Bundle;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
-import com.dadoutek.uled.aboutlight.EmptyAddActivity;
+import com.dadoutek.uled.light.EmptyAddActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
-import com.dadoutek.uled.aboutuser.LoginActivity;
+import com.dadoutek.uled.user.LoginActivity;
 
 /**
  * Created by hejiajun on 2018/3/22.

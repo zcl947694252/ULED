@@ -5,9 +5,9 @@ import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.intf.NetworkFactory
-import com.dadoutek.uled.intf.NetworkObserver
-import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*

@@ -3,18 +3,18 @@ package com.dadoutek.uled.model.DbModel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.dadoutek.uled.dao.DaoSession;
-import com.dadoutek.uled.dao.DbSceneDao;
 
-import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
 import java.util.List;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
+import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.DaoException;
+import com.dadoutek.uled.dao.DaoSession;
+import com.dadoutek.uled.dao.DbSceneDao;
 
 /**
  * Created by hejiajun on 2018/5/5.
@@ -34,25 +34,6 @@ public class DbScene implements Parcelable{
     @ToMany(referencedJoinProperty = "belongSceneId")
     private List<DbSceneActions> actions;
 
-    /** Used to resolve relations */
-    @Generated(hash = 2040040024)
-    private transient DaoSession daoSession;
-
-    /** Used for active entity operations. */
-    @Generated(hash = 1485122994)
-    private transient DbSceneDao myDao;
-
-    @Generated(hash = 1820180226)
-    public DbScene(Long id, String name, @NotNull Long belongRegionId) {
-        this.id = id;
-        this.name = name;
-        this.belongRegionId = belongRegionId;
-    }
-
-    @Generated(hash = 662958756)
-    public DbScene() {
-    }
-
     protected DbScene(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -67,6 +48,17 @@ public class DbScene implements Parcelable{
         }
     }
 
+    @Generated(hash = 1820180226)
+    public DbScene(Long id, String name, @NotNull Long belongRegionId) {
+        this.id = id;
+        this.name = name;
+        this.belongRegionId = belongRegionId;
+    }
+
+    @Generated(hash = 662958756)
+    public DbScene() {
+    }
+
     public static final Creator<DbScene> CREATOR = new Creator<DbScene>() {
         @Override
         public DbScene createFromParcel(Parcel in) {
@@ -78,6 +70,39 @@ public class DbScene implements Parcelable{
             return new DbScene[size];
         }
     };
+
+    /** Used to resolve relations */
+    @Generated(hash = 2040040024)
+    private transient DaoSession daoSession;
+
+    /** Used for active entity operations. */
+    @Generated(hash = 1485122994)
+    private transient DbSceneDao myDao;
+
+
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        dest.writeString(name);
+        if (belongRegionId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(belongRegionId);
+        }
+    }
 
     public Long getId() {
         return this.id;
@@ -172,28 +197,5 @@ public class DbScene implements Parcelable{
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getDbSceneDao() : null;
-    }
-
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        if (id == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeLong(id);
-        }
-        dest.writeString(name);
-        if (belongRegionId == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeLong(belongRegionId);
-        }
     }
 }

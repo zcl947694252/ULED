@@ -32,6 +32,50 @@ object Commander : EventListener<String> {
 //        mApplication?.addEventListener(MeshEvent.ERROR, this)
     }
 
+    fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
+        mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
+
+        mLightAddr = lightMeshAddr
+        mGroupingAddr = 0xFFFF
+        mGroupSuccess = false
+        val opcode = Opcode.SET_GROUP          //0xD7 代表设置 组的指令
+//        val params = byteArrayOf(0x01, (groupMeshAddr and 0xFF).toByte(), //0x00 代表删除组
+//                (groupMeshAddr shr 8 and 0xFF).toByte())
+        val params = byteArrayOf(0x00, 0xFF.toByte(), //0x00 代表删除组
+                0xFF.toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<Long?> {
+                    var mDisposable: Disposable? = null
+                    override fun onComplete() {
+                        mDisposable?.dispose()
+                        mApplication?.removeEventListener(Commander)
+                    }
+
+                    override fun onSubscribe(d: Disposable) {
+                        mDisposable = d
+                    }
+
+                    override fun onNext(t: Long) {
+                        LogUtils.d("mGroupSuccess = $mGroupSuccess")
+                        if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                            onComplete()
+                            failedCallback.invoke()
+                        } else if (mGroupSuccess) {
+                            onComplete()
+                            successCallback.invoke()
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        LogUtils.d(e.message)
+                    }
+                })
+    }
+
+
     fun addGroup(lightMeshAddr: Int, groupMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
 
@@ -102,11 +146,11 @@ object Commander : EventListener<String> {
         for (j in 0 until len) {
 
             groupAddress = params[j].toInt()
-
-            if (groupAddress == 0x00 || groupAddress == 0xFF)
-                break
-
-            groupAddress = groupAddress or 0x8000
+            if (mGroupingAddr != 0xFFFF) {
+                groupAddress = groupAddress or 0x8000
+            } else {
+                groupAddress = mGroupingAddr
+            }
 
             if (mGroupingAddr == groupAddress) {
                 LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, mLightAddr))

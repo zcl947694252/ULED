@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.dadoutek.uled.R
-import com.dadoutek.uled.aboutlight.DeviceScanningNewActivity
-import com.dadoutek.uled.aboutswitches.ScanningSwitchActivity
+import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.switches.ScanningSwitchActivity
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.sdk25.coroutines.onClick

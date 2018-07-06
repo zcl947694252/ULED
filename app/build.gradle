@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.android.application'
-apply plugin: 'org.greenrobot.greendao'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
 apply plugin: 'com.mob.sdk'
 
 // 在MobSDK的扩展中注册SMSSDK的相关信息
@@ -20,8 +20,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 61
-        versionName "1.2.3"
+        versionCode 62
+        versionName "1.2.4"
 
         multiDexEnabled true
 
@@ -65,7 +65,7 @@ kotlin {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 5
+    schemaVersion 6
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录

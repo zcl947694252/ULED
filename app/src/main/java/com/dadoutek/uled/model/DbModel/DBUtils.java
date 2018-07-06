@@ -170,9 +170,9 @@ public class DBUtils {
     }
 
     public synchronized static boolean getDataChangeAllHaveAboutLight() {
-        List<DbDataChange> list=DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
-        for(int i=0;i<list.size();i++){
-            if(list.get(i).getTableName().equals("DB_LIGHT")){
+        List<DbDataChange> list = DaoSessionInstance.getInstance().getDbDataChangeDao().loadAll();
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getTableName().equals("DB_LIGHT")) {
                 return true;
             }
         }
@@ -380,6 +380,22 @@ public class DBUtils {
 
     /********************************************删除*******************************/
 
+    /**
+     * 只删除分组，不动组里的灯
+     * @param dbGroup
+     */
+    public synchronized static void deleteGroupOnly(DbGroup dbGroup) {
+        saveDeleteGroup(dbGroup);
+        DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
+        recordingChange(dbGroup.getId(),
+                DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
+                Constant.DB_DELETE);
+    }
+
+    /**
+     * 连带组里的所有灯的分组都删掉
+     * @param dbGroup
+     */
     public synchronized static void deleteGroup(DbGroup dbGroup) {
         List<DbLight> lights = DBUtils.getLightByGroupID(dbGroup.getId());
         DbGroup allGroup = getGroupNull();
@@ -420,7 +436,6 @@ public class DBUtils {
                 DaoSessionInstance.getInstance().getDbLightDao().getTablename(),
                 Constant.DB_DELETE);
     }
-
 
     public synchronized static void deleteScene(DbScene dbScene) {
         DaoSessionInstance.getInstance().getDbSceneDao().delete(dbScene);

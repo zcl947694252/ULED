@@ -2,9 +2,9 @@ package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.intf.NetworkFactory
-import com.dadoutek.uled.intf.NetworkObserver
-import com.dadoutek.uled.intf.NetworkTransformer
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
 import com.mob.tools.utils.DeviceHelper.getApplication

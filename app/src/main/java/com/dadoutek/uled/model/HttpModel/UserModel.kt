@@ -1,9 +1,7 @@
 package com.dadoutek.uled.model.HttpModel
 
-import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.intf.NetworkFactory
-import com.dadoutek.uled.intf.NetworkTransformer
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

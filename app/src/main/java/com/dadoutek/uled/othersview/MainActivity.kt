@@ -24,10 +24,10 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
-import com.dadoutek.uled.aboutlight.DeviceListFragment
-import com.dadoutek.uled.aboutgroup.GroupListFragment
-import com.dadoutek.uled.aboutscene.SceneFragment
-import com.dadoutek.uled.intf.NetworkFactory
+import com.dadoutek.uled.light.DeviceListFragment
+import com.dadoutek.uled.group.GroupListFragment
+import com.dadoutek.uled.scene.SceneFragment
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.Lights
