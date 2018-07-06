@@ -385,7 +385,7 @@ public class DBUtils {
      * @param dbGroup
      */
     public synchronized static void deleteGroupOnly(DbGroup dbGroup) {
-        saveDeleteGroup(dbGroup);
+//        saveDeleteGroup(dbGroup);
         DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
@@ -405,7 +405,7 @@ public class DBUtils {
             updateLight(lights.get(i));
         }
 
-        saveDeleteGroup(dbGroup);
+//        saveDeleteGroup(dbGroup);
         DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
