@@ -157,12 +157,12 @@
             android:name=".user.ManagerVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ConfigPirAct"
+            android:name=".pir.ConfigPirAct"
             android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.AboutSomeQuestionsActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.ScanningSensorActivity"></activity>
+        <activity android:name=".pir.ScanningSensorActivity"></activity>
     </application>
 
 </manifest>
