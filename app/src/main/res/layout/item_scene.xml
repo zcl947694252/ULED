@@ -40,6 +40,13 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:padding="5dp"
-        android:background="@drawable/btn_rec_selector"
+        android:background="@drawable/btn_rec_blue_bt"
         android:layout_marginEnd="8dp" />
+
+    <TextView
+        android:layout_below="@id/scene_edit"
+        android:layout_width="match_parent"
+        android:background="@color/primary"
+        android:layout_marginTop="6dp"
+        android:layout_height="0.5dp" />
 </RelativeLayout>

@@ -61,7 +61,9 @@
 
     <Button
         android:id="@+id/btn_login"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_marginEnd="75dp"
+        android:layout_marginStart="75dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:background="@drawable/btn_rec_blue_bt"
@@ -71,26 +73,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_user_password" />
 
-    <Button
+    <TextView
         android:id="@+id/btn_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:background="@drawable/btn_rec_blue_bt"
         android:text="@string/register_name"
-        android:textSize="18sp"
+        android:textColor="@color/primary"
+        android:layout_marginStart="30dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginEnd="75dp"
         app:layout_constraintTop_toBottomOf="@+id/btn_login" />
 
     <TextView
         android:id="@+id/forget_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/primary"
+        android:layout_marginLeft="75dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_register"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_login"
+        android:layout_marginTop="24dp"
         android:text="@string/forget_password" />
 </android.support.constraint.ConstraintLayout>
