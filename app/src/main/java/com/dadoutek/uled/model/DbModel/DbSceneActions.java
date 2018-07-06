@@ -21,7 +21,6 @@ public class DbSceneActions {
     private int colorTemperature;
     @NotNull
     private int brightness;
-
     @Generated(hash = 822030848)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
             int colorTemperature, int brightness) {
@@ -31,48 +30,38 @@ public class DbSceneActions {
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
     }
-
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
-
     public Long getId() {
-        return id;
+        return this.id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public long getBelongSceneId() {
-        return belongSceneId;
+        return this.belongSceneId;
     }
-
     public void setBelongSceneId(long belongSceneId) {
         this.belongSceneId = belongSceneId;
     }
-
     public int getGroupAddr() {
-        return groupAddr;
+        return this.groupAddr;
     }
-
     public void setGroupAddr(int groupAddr) {
         this.groupAddr = groupAddr;
     }
-
     public int getColorTemperature() {
-        return colorTemperature;
+        return this.colorTemperature;
     }
-
     public void setColorTemperature(int colorTemperature) {
         this.colorTemperature = colorTemperature;
     }
-
     public int getBrightness() {
-        return brightness;
+        return this.brightness;
     }
-
     public void setBrightness(int brightness) {
         this.brightness = brightness;
     }
+
 }

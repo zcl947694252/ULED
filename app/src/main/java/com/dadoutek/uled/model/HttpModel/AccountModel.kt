@@ -134,8 +134,7 @@ object AccountModel {
         DaoSessionInstance.destroySession()
         DaoSessionInstance.getInstance()
 
-        //从云端用户表同步数据到本地
-//        dbUser = user
+
         DBUtils.saveUser(user)
     }
 

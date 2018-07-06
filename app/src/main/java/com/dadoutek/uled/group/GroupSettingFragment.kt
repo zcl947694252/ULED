@@ -77,7 +77,7 @@ class GroupSettingFragment : Fragment(), View.OnClickListener {
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
                 DBUtils.updateGroup(group)
-                tv_brightness!!.text = getString(R.string.device_setting_brightness, progress.toString() + "")
+                tv_brightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
 
             } else if (view === temperatureBar) {
@@ -167,7 +167,7 @@ class GroupSettingFragment : Fragment(), View.OnClickListener {
         super.onResume()
         checkGroupIsSystemGroup()
         brightnessBar!!.progress = group!!.brightness
-        tv_brightness!!.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
+        tv_brightness.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
         temperatureBar!!.progress = group!!.colorTemperature
         tv_temperature!!.text = getString(R.string.device_setting_temperature, group!!.colorTemperature.toString() + "")
 

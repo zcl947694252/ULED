@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.R.id.progressBtn
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.network.NetworkFactory
@@ -52,8 +53,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
         this.mApplication = this.application as TelinkLightApplication
+        TelinkLightService.Instance()?.idleMode(true)
         initView()
         initListener()
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -93,26 +96,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
-    private fun handleIfSupportBle() {
-        //检查是否支持蓝牙设备
-        if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
-            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
-            this.finish()
-            return
-        }
-
-        if (!LeBluetooth.getInstance().isEnabled) {
-            LeBluetooth.getInstance().enable(applicationContext)
-        }
-    }
-
 
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
-                handleIfSupportBle()
-                TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
