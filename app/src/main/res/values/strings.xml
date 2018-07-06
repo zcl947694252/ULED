@@ -14,6 +14,13 @@
     <string name="header_groups">Groups</string>
     <string name="header_account">Me</string>
 
+    <string-array name="trigger_lux_array" translatable="false">
+        <item>0</item>
+        <item>2</item>
+        <item>10</item>
+        <item>50</item>
+    </string-array>
+
     <!-- DeviceSchema List -->
     <string name="device_list_header">Lights</string>
     <string name="device_list_menu_left">Meshs</string>
@@ -141,6 +148,7 @@
     <string name="install_switch_tips1">1.Plug micro USB to your Switch</string>
     <string name="install_switch_tips2">2.Press any button one time</string>
     <string name="install_switch_tips3">3.The indicator on the right of USB will stay on</string>
+    <string name="install_sensor_tips1">Please power on your Sensor first</string>
 
     <string name="search">Search</string>
     <string name="complete">complete</string>
@@ -151,7 +159,7 @@
     <string name="title_activity_switch_group">SwitchGroupActivity</string>
     <string name="select_group">Select group</string>
     <string name="please_select_group">Please select a group at least</string>
-    <string name="connecting">Connecting...</string>
+    <string name="connecting">Connecting…</string>
     <string name="connect_failed">Connect failed</string>
     <string name="group_failed">Group failed</string>
     <string name="connected">Connected</string>
@@ -172,7 +180,8 @@
     <string name="scene3">scene 3</string>
     <string name="scene4">scene 4</string>
     <string name="scene_set">Scene assignment</string>
-    <string name="setting_switch">Configuring switch</string>
+    <string name="setting_switch">Configuring switch…</string>
+    <string name="configuring_switch">Configuring sensor…</string>
     <string name="pace_fail">Configuration failed</string>
     <string name="tip_switch">Please add scene first! Reconfiguration switch</string>
     <string name="tip_add_scene">All existing groups have been added!</string>
@@ -306,9 +315,8 @@
     <string name="uploading_data">Uploading data</string>
     <string name="upload_data_failed">Upload data failed</string>
     <string name="phone_cannot_be_empty">Phone cannot be empty</string>
-    <string name="delete_group_failed">Delete group failed</string>
-    <string name="deleting">Deleting</string>
-    <string name="move_out_some_lights_in_group_failed">Move some lights out in group failed</string>
+    <string name="minimum_brightness_percentage">Minimum brightness(%)</string>
+    <string name="params_cannot_be_empty">Params cannot be empty</string>
 
 
 </resources>

@@ -1,15 +1,15 @@
-package com.dadoutek.uled.switches
+package com.dadoutek.uled.activity
 
 import android.Manifest
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.MenuItem
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -35,9 +35,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
-class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
+class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private val SCAN_TIMEOUT_SECOND: Int = 10
-
     private lateinit var mApplication: TelinkLightApplication
     private var mRetryLoginCount: Int = 0
     private var mRetryConnectCount: Int = 0
@@ -47,31 +46,20 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private var mDeviceInfo: DeviceInfo? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scanning_switch)
+        setContentView(R.layout.activity_scanning_sensor)
         this.mApplication = this.application as TelinkLightApplication
-        TelinkLightService.Instance()?.idleMode(true)
-        initView()
+        initToolbar()
         initListener()
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
 
-    private fun initView() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.install_switch)
+    private fun initToolbar() {
+        toolbar.title = getString(R.string.install_sensor)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
     private fun initListener() {
@@ -94,12 +82,27 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
+    private fun handleIfSupportBle() {
+        //检查是否支持蓝牙设备
+        if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
+            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
+            this.finish()
+            return
+        }
+
+        if (!LeBluetooth.getInstance().isEnabled) {
+            LeBluetooth.getInstance().enable(applicationContext)
+        }
+    }
+
 
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
                 addEventListener()
+                handleIfSupportBle()
+                TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
@@ -118,18 +121,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                         onLeScanTimeout()
                     }
                 }
-            } else {
-
             }
         }
 
     }
 
-
-    override fun onResume() {
-        super.onResume()
-//        addEventListener()
-    }
 
     override fun onPause() {
         super.onPause()
@@ -137,7 +133,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     override fun performed(event: Event<String>?) {
-        when (event?.type) {
+        when (event?.getType()) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
             LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout()
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
@@ -197,15 +193,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
             }
             LightAdapter.STATUS_LOGIN -> {
-                mApplication.removeEventListener(this)
                 mLogged = true
                 progressBtn.progress = 100  //进度控件显示成完成状态
-                if (mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH ||
-                        mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo!!)
-                } else if (mDeviceInfo?.productUUID == DeviceType.SCENE_SWITCH) {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo!!)
+                if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+                    startActivity<ConfigPirAct>("deviceInfo" to mDeviceInfo)
                 }
+                mApplication.removeEventListener(this)
             }
             LightAdapter.STATUS_LOGOUT -> {
                 //重试，进行login
@@ -259,22 +252,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
+        val account = DBUtils.getLastUser().account
+        params.setNewPassword(NetworkFactory.md5(
+                NetworkFactory.md5(mesh?.password) + account))
 
-
-
-        Log.d("Saw", "onLeScan leScanEvent.args.productUUID = " + leScanEvent.args.productUUID)
         if (!mScanned)
             when (leScanEvent.args.productUUID) {
-                DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+                DeviceType.SENSOR -> {
                     mScanned = true
                     LeBluetooth.getInstance().stopScan()
                     mDeviceInfo = leScanEvent.args
@@ -282,7 +266,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     connect()
                     progressBtn.text = getString(R.string.connecting)
                 }
-
                 else -> {
                     LogUtils.d("Switch UUID = ${leScanEvent.args.productUUID}")
                     TelinkLightService.Instance()?.idleMode(true)

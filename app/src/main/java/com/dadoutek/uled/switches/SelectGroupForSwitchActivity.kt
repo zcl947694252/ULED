@@ -146,7 +146,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 //                finish()
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                snackbar(root, getString(R.string.group_failed))
+                snackbar(configPirRoot, getString(R.string.group_failed))
                 progressBar.visibility = View.GONE
             }
         }

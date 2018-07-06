@@ -86,7 +86,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void initToolbar() {
         toolbar.setTitle(R.string.create_scene);
-        toolbar.setNavigationIcon(R.drawable.navigation_back);
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white);
         toolbar.setNavigationOnClickListener(v -> finish());
     }
 

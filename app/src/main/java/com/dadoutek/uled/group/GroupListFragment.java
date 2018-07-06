@@ -24,6 +24,7 @@ import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.othersview.AddMeshActivity;
 import com.dadoutek.uled.light.DeviceScanningNewActivity;
 import com.dadoutek.uled.light.LightsOfGroupActivity;
+import com.dadoutek.uled.activity.ScanningSensorActivity;
 import com.dadoutek.uled.switches.ScanningSwitchActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -249,6 +250,9 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
                     break;
                 case R.id.popup_install_switch:
                     startActivity(new Intent(mContext, ScanningSwitchActivity.class));
+                    break;
+                case R.id.popup_install_sensor:
+                    startActivity(new Intent(mContext, ScanningSensorActivity.class));
                     break;
             }
             return true;
