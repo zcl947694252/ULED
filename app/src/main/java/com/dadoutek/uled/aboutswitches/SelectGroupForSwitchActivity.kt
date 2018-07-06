@@ -1,6 +1,5 @@
 package com.dadoutek.uled.aboutswitches
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -14,7 +13,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.adapter.SelectSwitchGroupRvAdapter
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils

@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter
+package com.dadoutek.uled.othersview
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager

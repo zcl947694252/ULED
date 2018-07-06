@@ -40,7 +40,7 @@
 //import com.dadoutek.uled.tellink.TelinkLightApplication;
 //import com.dadoutek.uled.tellink.TelinkLightService;
 //import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
-//import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
+//import com.dadoutek.uled.aboutgroup.GroupsRecyclerViewAdapter;
 //import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 //import com.dadoutek.uled.model.Cmd;
 //import com.dadoutek.uled.model.Constant;

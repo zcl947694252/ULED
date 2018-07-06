@@ -17,7 +17,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.adapter.LightsOfGroupRecyclerViewAdapter
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener
 import com.dadoutek.uled.model.Constant

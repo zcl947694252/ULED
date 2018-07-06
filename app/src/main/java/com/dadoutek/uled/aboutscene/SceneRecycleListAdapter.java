@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter;
+package com.dadoutek.uled.aboutscene;
 
 import android.support.annotation.Nullable;
 import android.view.View;

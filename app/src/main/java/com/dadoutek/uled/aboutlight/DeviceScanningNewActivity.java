@@ -38,7 +38,7 @@ import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.othersview.LogInfoActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
-import com.dadoutek.uled.adapter.GroupsRecyclerViewAdapter;
+import com.dadoutek.uled.aboutgroup.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.NetworkFactory;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;

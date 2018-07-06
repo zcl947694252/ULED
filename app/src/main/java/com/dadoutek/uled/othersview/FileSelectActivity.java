@@ -9,7 +9,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.adapter.FileListAdapter;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 
 import java.io.File;

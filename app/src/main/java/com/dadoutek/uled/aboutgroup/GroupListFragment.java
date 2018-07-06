@@ -25,7 +25,6 @@ import com.dadoutek.uled.othersview.AddMeshActivity;
 import com.dadoutek.uled.aboutlight.DeviceScanningNewActivity;
 import com.dadoutek.uled.aboutlight.LightsOfGroupActivity;
 import com.dadoutek.uled.aboutswitches.ScanningSwitchActivity;
-import com.dadoutek.uled.adapter.GroupListRecycleViewAdapter;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;

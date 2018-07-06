@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter;
+package com.dadoutek.uled.aboutlight;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

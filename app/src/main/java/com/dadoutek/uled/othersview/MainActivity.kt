@@ -24,7 +24,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
-import com.dadoutek.uled.adapter.ViewPagerAdapter
 import com.dadoutek.uled.aboutlight.DeviceListFragment
 import com.dadoutek.uled.aboutgroup.GroupListFragment
 import com.dadoutek.uled.aboutscene.SceneFragment

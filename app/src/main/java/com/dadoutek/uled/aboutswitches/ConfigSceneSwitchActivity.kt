@@ -11,7 +11,6 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.adapter.SwitchSceneGroupAdapter
 import com.dadoutek.uled.intf.NetworkFactory
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils

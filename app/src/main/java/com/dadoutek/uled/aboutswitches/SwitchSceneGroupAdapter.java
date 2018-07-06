@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter;
+package com.dadoutek.uled.aboutswitches;
 
 import android.content.Context;
 import android.util.Log;

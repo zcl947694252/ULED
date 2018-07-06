@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter
+package com.dadoutek.uled.aboutswitches
 
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder

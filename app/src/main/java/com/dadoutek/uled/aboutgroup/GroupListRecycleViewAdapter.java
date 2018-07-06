@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter;
+package com.dadoutek.uled.aboutgroup;
 
 import android.support.annotation.Nullable;
 

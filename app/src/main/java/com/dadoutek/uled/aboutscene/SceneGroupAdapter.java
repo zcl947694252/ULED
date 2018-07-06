@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter;
+package com.dadoutek.uled.aboutscene;
 
 import android.widget.SeekBar;
 import android.widget.TextView;

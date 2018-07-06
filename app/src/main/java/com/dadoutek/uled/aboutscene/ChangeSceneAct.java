@@ -15,7 +15,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.blankj.utilcode.util.ToastUtils;
@@ -23,8 +22,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.adapter.GroupListAdapter;
-import com.dadoutek.uled.adapter.SceneGroupAdapter;
+import com.dadoutek.uled.aboutgroup.GroupListAdapter;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.DbModel.DBUtils;
