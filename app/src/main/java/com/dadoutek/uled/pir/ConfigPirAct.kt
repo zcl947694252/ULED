@@ -1,4 +1,4 @@
-package com.dadoutek.uled.activity
+package com.dadoutek.uled.pir
 
 import android.os.Bundle
 import android.view.View

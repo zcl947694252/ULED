@@ -390,26 +390,6 @@ public class DBUtils {
         recordingChange(dbGroup.getId(),
                 DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
                 Constant.DB_DELETE);
-    }
-
-    /**
-     * 连带组里的所有灯的分组都删掉
-     * @param dbGroup
-     */
-    public synchronized static void deleteGroup(DbGroup dbGroup) {
-        List<DbLight> lights = DBUtils.getLightByGroupID(dbGroup.getId());
-        DbGroup allGroup = getGroupNull();
-
-        for (int i = 0; i < lights.size(); i++) {
-            lights.get(i).setBelongGroupId(allGroup.getId());
-            updateLight(lights.get(i));
-        }
-
-//        saveDeleteGroup(dbGroup);
-        DaoSessionInstance.getInstance().getDbGroupDao().delete(dbGroup);
-        recordingChange(dbGroup.getId(),
-                DaoSessionInstance.getInstance().getDbGroupDao().getTablename(),
-                Constant.DB_DELETE);
 
         //本地匹配index
         List<DbGroup> dbOldGroupList = (List<DbGroup>) SharedPreferencesHelper.
@@ -424,10 +404,6 @@ public class DBUtils {
                 }
             }
         }
-    }
-
-    public synchronized static void deleteDeleteGroup(DbDeleteGroup dbDeleteGroup) {
-        DaoSessionInstance.getInstance().getDbDeleteGroupDao().delete(dbDeleteGroup);
     }
 
     public synchronized static void deleteLight(DbLight dbLight) {
@@ -446,12 +422,6 @@ public class DBUtils {
 
     public synchronized static void deleteSceneActionsList(List<DbSceneActions> sceneActionslist) {
         DaoSessionInstance.getInstance().getDbSceneActionsDao().deleteInTx(sceneActionslist);
-//        for (int i = 0; i < sceneActionslist.size(); i++) {
-//            DaoSessionInstance.getInstance().getDbSceneActionsDao().delete(sceneActionslist.get(i));
-//            recordingChange(sceneActionslist.get(i).getId(),
-//                    DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
-//                    Constant.DB_DELETE);
-//        }
     }
 
     public synchronized static void deleteAllData() {
@@ -472,6 +442,7 @@ public class DBUtils {
         DaoSessionInstance.getInstance().getDbGroupDao().deleteAll();
         DaoSessionInstance.getInstance().getDbLightDao().deleteAll();
         DaoSessionInstance.getInstance().getDbDataChangeDao().deleteAll();
+        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, null);
     }
 
     public synchronized static void deleteDbDataChange(long id) {

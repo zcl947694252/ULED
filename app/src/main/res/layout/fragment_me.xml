@@ -62,7 +62,7 @@
                 android:text="@string/exit_login"
                 android:layout_gravity="center"
                 android:textSize="18sp"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content" />
 
@@ -72,7 +72,7 @@
                 android:text="@string/chear_cache"
                 android:layout_gravity="center"
                 android:textSize="18sp"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content" />
 
@@ -82,7 +82,7 @@
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:text="@string/copy_data_base"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:visibility="gone"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content" />
@@ -93,7 +93,7 @@
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:text="@string/one_click_reset"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:visibility="visible"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content" />
@@ -104,7 +104,7 @@
                 android:text="@string/upload_data"
                 android:layout_gravity="center"
                 android:textSize="18sp"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
@@ -116,7 +116,7 @@
                 android:text="@string/update_ite"
                 android:layout_gravity="center"
                 android:textSize="18sp"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content" />
 
@@ -126,19 +126,21 @@
                 android:text="@string/common_question"
                 android:layout_gravity="center"
                 android:textSize="18sp"
-                android:background="@color/primary"
+                android:background="@drawable/btn_rec_blue_bt"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
+                android:layout_width="200dp"
+                android:layout_gravity="center"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
                 android:gravity="center"
-                android:background="@color/primary">
+                android:background="@drawable/btn_rec_blue_bt"
+                >
 
                 <TextView
                     android:id="@+id/app_version_name"
@@ -151,7 +153,7 @@
                 <TextView
                     android:id="@+id/app_version"
                     android:text="1.0.0"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="20dp"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:layout_width="wrap_content"

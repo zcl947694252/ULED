@@ -24,7 +24,7 @@ import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.othersview.AddMeshActivity;
 import com.dadoutek.uled.light.DeviceScanningNewActivity;
 import com.dadoutek.uled.light.LightsOfGroupActivity;
-import com.dadoutek.uled.activity.ScanningSensorActivity;
+import com.dadoutek.uled.pir.ScanningSensorActivity;
 import com.dadoutek.uled.switches.ScanningSwitchActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
