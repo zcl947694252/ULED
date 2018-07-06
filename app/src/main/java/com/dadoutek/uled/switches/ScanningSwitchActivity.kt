@@ -216,9 +216,9 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //                    delay(100, TimeUnit.MILLISECONDS)
                 if (mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH ||
                         mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                    startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo)
+                    startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo!!)
                 } else {
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo)
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo!!)
                 }
 //                }
             }

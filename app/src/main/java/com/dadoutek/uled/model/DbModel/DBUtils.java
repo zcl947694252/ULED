@@ -482,19 +482,10 @@ public class DBUtils {
 
     public synchronized static void addNewGroup(String name, List<DbGroup> groups, Context context) {
         if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-            int count = groups.size();
             int newMeshAdress;
             DbGroup group = new DbGroup();
-
-            List<DbDeleteGroup> list = getDeleteGroups();
-            if (list.size() > 0) {
-                newMeshAdress = list.get(0).getGroupAress();
-                group.setMeshAddr(newMeshAdress);
-                deleteDeleteGroup(list.get(0));
-            } else {
-                newMeshAdress = ++count;
-                group.setMeshAddr(0x8001 + newMeshAdress);
-            }
+            newMeshAdress = getGroupAdress();
+            group.setMeshAddr(newMeshAdress);
             group.setName(name);
             group.setBrightness(100);
             group.setColorTemperature(100);
@@ -508,6 +499,40 @@ public class DBUtils {
                     Constant.DB_ADD);
         }
 
+    }
+
+    private static int getGroupAdress() {
+        List<DbGroup> list = DBUtils.getGroupList();
+        List<Integer> idList = new ArrayList<>();
+
+        //去掉所有组，避免影响判断
+        for(int i=list.size()-1;i>=0;i--){
+            if(list.get(i).getMeshAddr()==0xffff){
+                list.remove(i);
+            }
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            idList.add(list.get(i).getMeshAddr());
+        }
+
+        int id = 0;
+        for (int i = 0x8001; i <0x8100 ; i++) {
+            if (idList.contains(i)) {
+                Log.d("sceneID", "getSceneId: " + "aaaaa");
+                continue;
+            } else {
+                id = i;
+                Log.d("sceneID", "getSceneId: " + "bbbbb" + id);
+                break;
+            }
+        }
+
+        if (list.size() == 0) {
+            id = 0x8001;
+        }
+
+        return id;
     }
 
     private static boolean checkReachedTheLimit(List<DbGroup> groups) {
