@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -25,9 +27,6 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.network.NetworkObserver;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -37,6 +36,9 @@ import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.HttpModel.UserModel;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.network.NetworkObserver;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.NetWorkUtils;
@@ -86,6 +88,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
     Button oneClickReset;
     @BindView(R.id.constant_question)
     Button constantQuestion;
+    @BindView(R.id.user_icon)
+    ImageView userIcon;
+    @BindView(R.id.user_name)
+    TextView userName;
     private LayoutInflater inflater;
 
     private Dialog loadDialog;
@@ -134,6 +140,9 @@ public class MeFragment extends Fragment implements EventListener<String> {
             copyDataBase.setVisibility(View.GONE);
             chearCache.setVisibility(View.VISIBLE);
         }
+
+        userIcon.setBackgroundResource(R.drawable.ic_launcher);
+        userName.setText(DBUtils.getLastUser().getPhone());
     }
 
     @Override
@@ -416,7 +425,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
 
     private void exitLogin() {
         isClickExlogin = true;
-        if(DBUtils.getAllLight().size()==0&&!DBUtils.getDataChangeAllHaveAboutLight()){
+        if (DBUtils.getAllLight().size() == 0 && !DBUtils.getDataChangeAllHaveAboutLight()) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
                 TelinkLightService.Instance().idleMode(true);
@@ -424,7 +433,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 restartApplication();
             }
             hideLoadingDialog();
-        }else{
+        } else {
             checkNetworkAndSync(getActivity());
         }
     }

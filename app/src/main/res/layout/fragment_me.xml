@@ -4,129 +4,159 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/header_height"
-        android:background="@color/primary">
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_height"
+                android:background="@color/primary">
 
-        <TextView
-            android:id="@+id/txt_header_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignWithParentIfMissing="false"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="30dp"
-            android:gravity="center_vertical"
-            android:singleLine="true"
-            android:text="@string/fragment_name_me"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/txt_header_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignWithParentIfMissing="false"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="30dp"
+                    android:layout_marginStart="30dp"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="@string/fragment_name_me"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+            </RelativeLayout>
 
-    <Button
-        android:id="@+id/exit_login"
-        android:layout_marginTop="20dp"
-        android:text="@string/exit_login"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:background="@color/primary"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                >
 
-    <Button
-        android:id="@+id/chear_cache"
-        android:layout_marginTop="20dp"
-        android:text="@string/chear_cache"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:background="@color/primary"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content" />
+                <ImageView
+                    android:id="@+id/user_icon"
+                    android:layout_marginTop="30dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/copy_data_base"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:text="@string/copy_data_base"
-        android:background="@color/primary"
-        android:visibility="gone"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/user_name"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/one_click_reset"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:text="@string/one_click_reset"
-        android:background="@color/primary"
-        android:visibility="visible"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content" />
+            </LinearLayout>
 
-    <Button
-        android:id="@+id/one_click_backup"
-        android:layout_marginTop="20dp"
-        android:text="@string/upload_data"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:background="@color/primary"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        />
+            <Button
+                android:id="@+id/exit_login"
+                android:layout_marginTop="20dp"
+                android:text="@string/exit_login"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:background="@color/primary"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/update_ite"
-        android:layout_marginTop="20dp"
-        android:text="@string/update_ite"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:background="@color/primary"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/chear_cache"
+                android:layout_marginTop="20dp"
+                android:text="@string/chear_cache"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:background="@color/primary"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/constant_question"
-        android:layout_marginTop="20dp"
-        android:text="@string/common_question"
-        android:layout_gravity="center"
-        android:textSize="18sp"
-        android:background="@color/primary"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/copy_data_base"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:text="@string/copy_data_base"
+                android:background="@color/primary"
+                android:visibility="gone"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:gravity="center"
-        android:background="@color/primary">
+            <Button
+                android:id="@+id/one_click_reset"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:text="@string/one_click_reset"
+                android:background="@color/primary"
+                android:visibility="visible"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/app_version_name"
-            android:text="@string/app_version_name"
-            android:textSize="18sp"
-            android:textColor="@color/white"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/one_click_backup"
+                android:layout_marginTop="20dp"
+                android:text="@string/upload_data"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:background="@color/primary"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                />
 
-        <TextView
-            android:id="@+id/app_version"
-            android:text="1.0.0"
-            android:layout_marginStart="8dp"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/update_ite"
+                android:layout_marginTop="20dp"
+                android:text="@string/update_ite"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:background="@color/primary"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content" />
 
+            <Button
+                android:id="@+id/constant_question"
+                android:layout_marginTop="20dp"
+                android:text="@string/common_question"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:background="@color/primary"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:gravity="center"
+                android:background="@color/primary">
+
+                <TextView
+                    android:id="@+id/app_version_name"
+                    android:text="@string/app_version_name"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/app_version"
+                    android:text="1.0.0"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
