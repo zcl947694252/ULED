@@ -315,5 +315,9 @@
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
     <string name="install_sensor">安装传感器</string>
+    <string name="button1">按键1</string>
+    <string name="button2">按键2</string>
+    <string name="button3">按键3</string>
+    <string name="button4">按键4</string>
 
 </resources>

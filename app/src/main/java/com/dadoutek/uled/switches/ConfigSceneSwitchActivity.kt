@@ -191,12 +191,12 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-        mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
-        mSwitchList = ArrayList<String>()
-        mSwitchList.add(getString(R.string.scene1))
-        mSwitchList.add(getString(R.string.scene2))
-        mSwitchList.add(getString(R.string.scene3))
-        mSwitchList.add(getString(R.string.scene4))
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        mSwitchList = ArrayList()
+        mSwitchList.add(getString(R.string.button1))
+        mSwitchList.add(getString(R.string.button2))
+        mSwitchList.add(getString(R.string.button3))
+        mSwitchList.add(getString(R.string.button4))
 
         mSceneList = DBUtils.getSceneAll()
     }

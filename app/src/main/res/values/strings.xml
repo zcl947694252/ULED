@@ -317,6 +317,10 @@
     <string name="phone_cannot_be_empty">Phone cannot be empty</string>
     <string name="minimum_brightness_percentage">Minimum brightness(%)</string>
     <string name="params_cannot_be_empty">Params cannot be empty</string>
+    <string name="button1">Button 1</string>
+    <string name="button2">Button 2</string>
+    <string name="button3">Button 3</string>
+    <string name="button4">Button 4</string>
 
 
 </resources>

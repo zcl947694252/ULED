@@ -10,15 +10,15 @@ import android.view.View
 import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -31,7 +31,6 @@ import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
-import java.util.*
 
 
 class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> {
@@ -82,37 +81,39 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
             }
         }
 
-        mAdapter.setOnItemChildClickListener { _, view, position ->
+        mAdapter.setOnItemChildClickListener { adapter, view, position ->
             when (view.id) {
-                R.id.btnOn -> {
-                    val dstAddr = mGroupArrayList.get(position).meshAddr
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF, dstAddr,
-                            byteArrayOf(0x01, 0x00, 0x00))
-                }
-
-                R.id.btnOff -> {
-                    val dstAddr = mGroupArrayList.get(position).meshAddr
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF, dstAddr,
-                            byteArrayOf(0x00, 0x00, 0x00))
-                }
                 R.id.checkBox -> {
-                    val checkBox = view as CheckBox
-                    if (checkBox.isChecked) {
-//                        val oldPosition = mAdapter.selectedPos
+                    if (mAdapter.selectedPos != position) {
+                        //取消上个Item的勾选状态
+                        mGroupArrayList[mAdapter.selectedPos].checked = false
+                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
+
+                        //设置新的item的勾选状态
                         mAdapter.selectedPos = position
-//                        mAdapter.notifyItemChanged(oldPosition)
-//                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
-
-                        for (i in 0..(mGroupArrayList.size - 1)) {
-                            if (i != mAdapter.selectedPos) {
-                                val cb = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox) as CheckBox
-                                cb.isChecked = false
-                            }
-                        }
+                        mGroupArrayList[mAdapter.selectedPos].checked = true
+                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
                     } else {
-
-                        mAdapter.selectedPos = -1   // 设置成-1 代表没有选中任何item
+                        mGroupArrayList[mAdapter.selectedPos].checked = true
+                        mAdapter.notifyItemChanged(mAdapter.selectedPos)
                     }
+//                    val checkBox = view as CheckBox
+//                    if (checkBox.isChecked) {
+//                        mAdapter.selectedPos = position
+//
+//                        for (i in 0..(mGroupArrayList.size - 1)) {
+//                            if (i != mAdapter.selectedPos) {
+//                                val view = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox)
+//                                if (view != null) {
+//                                    val cb = view as CheckBox
+//                                    cb.isChecked = false
+//                                }
+//                            }
+//                        }
+//                    } else {
+//
+//                        mAdapter.selectedPos = -1   // 设置成-1 代表没有选中任何item
+//                    }
                 }
             }
         }
@@ -202,8 +203,8 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
         var password = Strings.stringToBytes(mesh.password, 16)
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                         Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-             password = Strings.stringToBytes(NetworkFactory.md5(
-                     NetworkFactory.md5(mesh?.password) + account), 16)
+            password = Strings.stringToBytes(NetworkFactory.md5(
+                    NetworkFactory.md5(mesh?.password) + account), 16)
         } else {
             password = Strings.stringToBytes(mesh.password, 16)
         }
@@ -222,14 +223,18 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
-                mGroupArrayList.add(group)
+            group.checked = false
+            mGroupArrayList.add(group)
         }
-
+        if (groupList.size > 0) {
+            groupList[0].checked = true
+        }
 
         mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        recyclerView.adapter = mAdapter
+        mAdapter.bindToRecyclerView(recyclerView)
+
     }
 
 }
