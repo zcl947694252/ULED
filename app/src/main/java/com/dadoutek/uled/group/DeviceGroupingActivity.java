@@ -62,16 +62,16 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             DbGroup group = adapter.getItem(position);
-            if (group.checked) {
-                ToastUtils.showLong(R.string.tip_selected_group);
-                finish();
-            } else {
+//            if (group.checked) {
+//                ToastUtils.showLong(R.string.tip_selected_group);
+//                finish();
+//            } else {
                 deletePreGroup(light.getMeshAddr());
                 deleteAllSceneByLightAddr(light.getMeshAddr());
                 allocDeviceGroup(group);
                 saveInfo();
             }
-        }
+//        }
     };
 
     /**
