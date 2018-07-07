@@ -106,6 +106,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
 
     private void saveInfo() {
         DBUtils.updateLight(light);
+        ToastUtils.showLong(R.string.update_group_tip);
         finish();
     }
 

@@ -319,5 +319,6 @@
     <string name="button2">按键2</string>
     <string name="button3">按键3</string>
     <string name="button4">按键4</string>
+    <string name="update_group_tip">检测到分组变动,如需场景对该灯生效,请前往场景页更新场景！</string>
 
 </resources>
