@@ -98,9 +98,12 @@ public class DBUtils {
     }
 
     public synchronized static DbLight getLightByMeshAddr(int meshAddr) {
-        DbLight dbLight = DaoSessionInstance.getInstance().getDbLightDao().queryBuilder().
-                where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).unique();
-        return dbLight;
+        List<DbLight> dbLightList=DaoSessionInstance.getInstance().getDbLightDao().queryBuilder().
+                where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list();
+        if(dbLightList.size()>0){
+            return dbLightList.get(0);
+        }
+       return null;
     }
 
     public synchronized static DbGroup getGroupByMesh(String mesh) {
