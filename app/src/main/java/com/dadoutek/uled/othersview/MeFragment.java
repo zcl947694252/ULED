@@ -151,21 +151,21 @@ public class MeFragment extends Fragment implements EventListener<String> {
         userIcon.setBackgroundResource(R.drawable.ic_launcher);
         userName.setText(DBUtils.getLastUser().getPhone());
 
-        getVersion();
+//        getVserion();
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isVisibleToUser) {
-            getVersion();
+            getVserion();
         }
     }
 
-    private void getVersion() {
-        int dstAddress= 0;
+    private void getVserion() {
+        int dstAdress= 0;
         if(TelinkApplication.getInstance().getConnectDevice()!=null){
-            dstAddress=TelinkApplication.getInstance().getConnectDevice().meshAddress;
-            Commander.INSTANCE.getLightVersion(dstAddress, () -> {
+            dstAdress=TelinkApplication.getInstance().getConnectDevice().meshAddress;
+            Commander.INSTANCE.getLightVersion(dstAdress, () -> {
                 lightVersion.setVisibility(View.VISIBLE);
                 lightVersionName.setVisibility(View.VISIBLE);
                 String version=SharedPreferencesUtils.getCurrentLightVersion();
@@ -177,7 +177,7 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 return null;
             });
         }else{
-            dstAddress=0;
+            dstAdress=0;
         }
     }
 

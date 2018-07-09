@@ -14,9 +14,7 @@ public class LogUtils {
     static String methodName;//方法名
     static int lineNumber;//行数
 
-    private LogUtils() {
-        /* Protect from instantiations */
-    }
+
 
     public static boolean isDebuggable() {
         return BuildConfig.DEBUG;

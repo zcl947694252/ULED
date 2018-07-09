@@ -765,20 +765,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 TelinkLightService.Instance().idleMode(true);
 
-//                Log.d("ScanningTest", "this.mApplication.isEmptyMesh() = " + this.mApplication.isEmptyMesh());
-//                if (this.mApplication.isEmptyMesh())
-//                    return;
-
-//                this.mApplication.refreshLights();
-//
-//                Mesh mesh = this.mApplication.getMesh();
-//                Log.d("ScanningTest", "mesh.name = " + mesh.name + " mesh.password = " + mesh.password);
-//
-//                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
-//                    TelinkLightService.Instance().idleMode(true);
-//                    return;
-//                }
-
                 String account = DBUtils.getLastUser().getAccount();
 
                 //自动重连参数
@@ -788,13 +774,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
-//                // 之前是否有在做MeshOTA操作，是则继续
-//                if (mesh.isOtaProcessing()) {
-//                    connectParams.setConnectMac(mesh.otaDevice.mac);
-//                    saveLog("Action: AutoConnect:" + mesh.otaDevice.mac);
-//                } else {
-//                    saveLog("Action: AutoConnect:NULL");
-//                }
                 //连接，如断开会自动重连
                 TelinkLightService.Instance().autoConnect(connectParams);
             }
