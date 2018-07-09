@@ -14,6 +14,8 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
+import com.tencent.bugly.Bugly;
+import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.text.SimpleDateFormat;
@@ -44,7 +46,8 @@ public final class TelinkLightApplication extends TelinkApplication {
 
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
-//        CrashReport.testJavaCrash();
+        BuglyLog.v("ss","sadasdsdasf");
+        CrashReport.testJavaCrash();
 
 
 

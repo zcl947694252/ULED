@@ -203,7 +203,7 @@ object Commander : EventListener<String> {
     override fun performed(event: Event<String>?) {
         when (event?.type) {
             NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
-            NotificationEvent.GET_DEVICE_STATE -> this.OnGetLightVersion(event as NotificationEvent)
+            NotificationEvent.GET_DEVICE_STATE -> this.onGetLightVersion(event as NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
         }
@@ -298,40 +298,19 @@ object Commander : EventListener<String> {
                  })
      }
 
-    private fun OnGetLightVersion(event: NotificationEvent){
+    private fun onGetLightVersion(event: NotificationEvent){
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             val version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size-1))
 //            val version = Strings.bytesToString(data)
             val meshAddress = event.args.src
 
-            val light = DBUtils.getLightByMeshAddr(meshAddress)
-            light.version = version
+//            val light = DBUtils.getLightByMeshAddr(meshAddress)
+//            light.version = version
 
             mGetVsersionSuccess=true
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
-            /* if (!version.equals(mFileVersion) && !devices.contains(light)) {
-                        devices.add(light);
-                        mHandler.post(uiTask);
-                    }*/
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
     }
-
-//    u.getVersion = function () {
-//        var tlink = api.require('dsTelink');
-//        //var op = (0x3c|0xc0);
-//        var op = (0x3c | 0xc0);
-//        var buf = [];
-//        buf.push(0x0);
-//        buf.push(0x0);
-//        var param = {cmd: op, para: buf, dst: parseInt("0", 16)};
-//        //tlink.DDMeshControl(param);
-//        api.sendEvent({
-//            name: 'testevent',
-//            extra: {type: "DDMeshControl", param: param}
-//        });
-//        console.log(JSON.stringify(param));
-//    }
-
 }
