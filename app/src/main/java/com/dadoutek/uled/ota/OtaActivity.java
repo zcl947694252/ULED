@@ -185,8 +185,8 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         otaCompleted = false;
         Mesh currentMesh = this.mApp.getMesh();
         LeOtaParameters params = LeOtaParameters.create();
-        params.setMeshName(currentMesh.name);
-        params.setPassword(currentMesh.password);
+        params.setMeshName(currentMesh.getName());
+        params.setPassword(currentMesh.getPassword());
         params.setLeScanTimeoutSeconds(10);
 
         Manufacture.Builder builder = new Manufacture.Builder();

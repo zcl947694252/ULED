@@ -170,7 +170,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mApp = (TelinkLightApplication) this.getActivity().getApplication();
-        manager = new DataManager(mApp, mApp.getMesh().name, mApp.getMesh().password);
+        manager = new DataManager(mApp, mApp.getMesh().getName(), mApp.getMesh().getPassword());
     }
 
     @Override
@@ -311,7 +311,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
                 Mesh mesh = this.mApp.getMesh();
 
-                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
+                if (TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
                     TelinkLightService.Instance().idleMode(true);
                     return;
                 }
@@ -321,19 +321,19 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
-                connectParams.setMeshName(mesh.name);
+                connectParams.setMeshName(mesh.getName());
                 if(SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
                         ,Constant.USER_TYPE,Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)){
                     connectParams.setPassword(NetworkFactory.md5(
-                            NetworkFactory.md5(mesh.password)+account));
+                            NetworkFactory.md5(mesh.getPassword())+account));
                 }else{
-                    connectParams.setPassword(mesh.password);
+                    connectParams.setPassword(mesh.getPassword());
                 }
                 connectParams.autoEnableNotification(true);
 
                 // 之前是否有在做MeshOTA操作，是则继续
                 if (mesh.isOtaProcessing()) {
-                    connectParams.setConnectMac(mesh.otaDevice.mac);
+                    connectParams.setConnectMac(mesh.getOtaDevice().mac);
                 }
                 //自动重连
                 TelinkLightService.Instance().autoConnect(connectParams);

@@ -34,7 +34,7 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
         TelinkLightService.Instance().idleMode(true);
         setContentView(R.layout.activity_ota_device_list);
         mApp = (TelinkLightApplication) this.getApplication();
-        mDevices = mApp.getMesh().devices;
+        mDevices = mApp.getMesh().getDevices();
         normal();
         mDeviceAdapter = new DeviceListAdapter();
         mDeviceListView = (GridView) findViewById(R.id.devices);

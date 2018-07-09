@@ -50,8 +50,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             } else if (v == btnShare) {
                 startActivity(new Intent(AddMeshActivity.this, QRCodeShareActivity.class));
             } else if (v == btnClear) {
-                if (mApplication.getMesh().devices != null) {
-                    mApplication.getMesh().devices.clear();
+                if (mApplication.getMesh().getDevices() != null) {
+                    mApplication.getMesh().getDevices().clear();
                     mApplication.getMesh().saveOrUpdate(AddMeshActivity.this);
 
                     DataManager dataManager = new DataManager(AddMeshActivity.this, mNewMeshName, mNewMeshPwd);
@@ -149,13 +149,13 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         Mesh mesh = this.mApplication.getMesh();
 
-        txtMeshName.setText(mesh.name);
-        txtPassword.setText(mesh.password);
-        txtFactoryMeshName.setText(mesh.factoryName);
-        txtFactoryPassword.setText(mesh.factoryPassword);
+        txtMeshName.setText(mesh.getName());
+        txtPassword.setText(mesh.getPassword());
+        txtFactoryMeshName.setText(mesh.getFactoryName());
+        txtFactoryPassword.setText(mesh.getFactoryPassword());
 
-        mOldMeshName = mesh.name;
-        mOldMeshPwd = mesh.password;
+        mOldMeshName = mesh.getName();
+        mOldMeshPwd = mesh.getPassword();
 
     }
 
@@ -208,17 +208,17 @@ public final class AddMeshActivity extends TelinkBaseActivity {
 
         if (mesh == null) {
             mesh = new Mesh();
-            mesh.name = mNewMeshName;
-            mesh.password = mNewMeshPwd;
+            mesh.setName(mNewMeshName);
+            mesh.setPassword(mNewMeshPwd);
         }
 
-        mesh.factoryName = factoryName;
-        mesh.factoryPassword = factoryPwd;
+        mesh.setFactoryName(factoryName);
+        mesh.setFactoryPassword(factoryPwd);
 
         if (mesh.saveOrUpdate(this)) {
             this.mApplication.setupMesh(mesh);
-            SharedPreferencesHelper.saveMeshName(this, mesh.name);
-            SharedPreferencesHelper.saveMeshPassword(this, mesh.password);
+            SharedPreferencesHelper.saveMeshName(this, mesh.getName());
+            SharedPreferencesHelper.saveMeshPassword(this, mesh.getPassword());
 //            this.showToast("Save Mesh Success");
             saveToDataBase(factoryName,factoryPwd,mNewMeshName,mNewMeshPwd);
 

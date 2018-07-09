@@ -153,7 +153,7 @@ public final class GroupListFragment extends Fragment implements Toolbar.OnMenuI
 
         application = (TelinkLightApplication) getActivity().getApplication();
         dataManager = new DataManager(TelinkLightApplication.getInstance(),
-                application.getMesh().name, application.getMesh().password);
+                application.getMesh().getName(), application.getMesh().getPassword());
     }
 
     private void setMove() {

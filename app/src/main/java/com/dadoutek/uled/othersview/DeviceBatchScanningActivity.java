@@ -137,7 +137,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
                 //扫描参数
                 LeScanParameters params = LeScanParameters.create();
-                params.setMeshName(mesh.factoryName);
+                params.setMeshName(mesh.getFactoryName());
                 params.setOutOfMeshName("kick");
                 params.setTimeoutSeconds(10);
                 params.setScanMode(false);
@@ -162,7 +162,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
             return;
         }
         Mesh mesh = this.mApplication.getMesh();
-        int meshAddress = mesh.getDeviceAddress();
+        int meshAddress = mesh.generateMeshAddr();
 
         if (meshAddress == -1) {
             this.showToast("哎呦，网络里的灯泡太多了！目前可以有256灯");
@@ -172,10 +172,10 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
         //更新参数
         LeUpdateParameters params = Parameters.createUpdateParameters();
-        params.setOldMeshName(mesh.factoryName);
-        params.setOldPassword(mesh.factoryPassword);
-        params.setNewMeshName(mesh.name);
-        params.setNewPassword(mesh.password);
+        params.setOldMeshName(mesh.getFactoryName());
+        params.setOldPassword(mesh.getFactoryPassword());
+        params.setNewMeshName(mesh.getName());
+        params.setNewPassword(mesh.getPassword());
 
         /*DeviceInfo deviceInfo = event.getArgs();
         deviceInfo.meshAddress = meshAddress;*/
@@ -215,7 +215,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
                 deviceInfo1.productUUID = deviceInfo.productUUID;
                 deviceInfo1.status = deviceInfo.status;
                 deviceInfo1.meshName = deviceInfo.meshName;
-                this.mApplication.getMesh().devices.add(deviceInfo1);
+                this.mApplication.getMesh().getDevices().add(deviceInfo1);
                 this.mApplication.getMesh().saveOrUpdate(this);
                 int meshAddress = deviceInfo.meshAddress & 0xFF;
                 Light light = this.adapter.get(meshAddress);

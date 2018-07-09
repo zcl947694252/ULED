@@ -602,7 +602,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
         val mesh = this.mApplication?.mesh
-        val meshAddress = mesh?.deviceAddress
+        val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
         if (bestRSSIDevice != null) {

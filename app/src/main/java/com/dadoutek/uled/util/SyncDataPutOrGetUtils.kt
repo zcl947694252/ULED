@@ -367,6 +367,8 @@ class SyncDataPutOrGetUtils {
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
                     object : NetworkObserver<List<DbScene>>() {
                         override fun onNext(item: List<DbScene>) {
+                            //登录后同步数据完成再上传一次数据
+                            syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
                             SharedPreferencesUtils.saveCurrentUserList(accountNow)
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
                             launch(UI) {
@@ -382,6 +384,22 @@ class SyncDataPutOrGetUtils {
                         }
                     }
             )
+        }
+
+        internal var syncCallbackSY: SyncCallback = object : SyncCallback {
+
+            override fun start() {
+
+            }
+
+            override fun complete() {
+                LogUtils.d("putSuccess:"+"上传成功")
+            }
+
+            override fun error(msg: String) {
+                LogUtils.d("GetDataError:"+msg)
+            }
+
         }
 
         private fun setupMesh() {

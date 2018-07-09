@@ -32,6 +32,8 @@ public class DbLight implements Serializable {
     @Transient
     public boolean selected;//选择状态
     @Transient
+    public String version;//选择状态
+    @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
     @Transient
     public int textColor;//文字颜色

@@ -23,13 +23,13 @@ public class QRCodeDataOperator {
             return "{}";
         }
         TmpMesh tmpMesh = new TmpMesh();
-        tmpMesh.n = mesh.name;
-        tmpMesh.p = mesh.password;
-        if (mesh.devices != null) {
+        tmpMesh.n = mesh.getName();
+        tmpMesh.p = mesh.getPassword();
+        if (mesh.getDevices() != null) {
             List<TmpDeviceInfo> deviceInfoList = new ArrayList<>();
 
             TmpDeviceInfo tmpDeviceInfo;
-            for (DeviceInfo deviceInfo : mesh.devices) {
+            for (DeviceInfo deviceInfo : mesh.getDevices()) {
                 tmpDeviceInfo = new TmpDeviceInfo();
                 tmpDeviceInfo.m = deviceInfo.macAddress;
                 tmpDeviceInfo.a = deviceInfo.meshAddress;
@@ -62,12 +62,12 @@ public class QRCodeDataOperator {
             Mesh newMesh = new Mesh();
             Mesh oldMesh = TelinkLightApplication.getApp().getMesh();
 
-            newMesh.name = tmpMesh.n;
-            newMesh.password = tmpMesh.p;
-            newMesh.factoryName = oldMesh.factoryName;
-            newMesh.factoryPassword = oldMesh.factoryPassword;
+            newMesh.setName(tmpMesh.n);
+            newMesh.setPassword(tmpMesh.p);
+            newMesh.setFactoryName(oldMesh.getFactoryName());
+            newMesh.setFactoryPassword(oldMesh.getFactoryPassword());
 
-            newMesh.devices = new ArrayList<>();
+            newMesh.setDevices(new ArrayList<>());
             if (tmpMesh.d != null) {
                 DeviceInfo deviceInfo;
                 for (TmpDeviceInfo tmpDeviceInfo : tmpMesh.d) {
@@ -76,12 +76,12 @@ public class QRCodeDataOperator {
                     deviceInfo.meshAddress = tmpDeviceInfo.a;
                     deviceInfo.firmwareRevision = tmpDeviceInfo.v;
                     deviceInfo.productUUID = tmpDeviceInfo.pu;
-                    newMesh.devices.add(deviceInfo);
+                    newMesh.getDevices().add(deviceInfo);
                 }
             }
             newMesh.saveOrUpdate(TelinkLightApplication.getApp());
-            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getApp(), newMesh.name);
-            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getApp(), newMesh.password);
+            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getApp(), newMesh.getName());
+            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getApp(), newMesh.getPassword());
             TelinkLightApplication.getApp().setupMesh(newMesh);
             return true;
         }

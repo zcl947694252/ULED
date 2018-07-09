@@ -143,6 +143,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    var isSuccess : Boolean =true
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
         override fun start() {
@@ -150,10 +151,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         override fun complete() {
-            syncComplet()
+            if(isSuccess){
+                syncComplet()
+            }
         }
 
         override fun error(msg: String) {
+            isSuccess=false
+            hideLoadingDialog()
            LogUtils.d("GetDataError:"+msg)
         }
 

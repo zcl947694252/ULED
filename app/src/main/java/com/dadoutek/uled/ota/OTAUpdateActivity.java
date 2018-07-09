@@ -146,7 +146,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         addEventListener();
         TelinkLightService.Instance().enableNotification();
         mesh = TelinkLightApplication.getApp().getMesh();
-        if (mesh == null || TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
+        if (mesh == null || TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
             toast("Mesh Error!");
             finish();
             return;
@@ -298,11 +298,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     // start
     private void sendStartMeshOTACommand() {
         // save mesh info
-        mesh.otaDevice = new OtaDevice();
+        mesh.setOtaDevice(new OtaDevice());
         DeviceInfo curDevice = TelinkLightApplication.getApp().getConnectDevice();
-        mesh.otaDevice.mac = curDevice.macAddress;
-        mesh.otaDevice.meshName = mesh.name;
-        mesh.otaDevice.meshPwd = mesh.password;
+        mesh.getOtaDevice().mac = curDevice.macAddress;
+        mesh.getOtaDevice().meshName = mesh.getName();
+        mesh.getOtaDevice().meshPwd = mesh.getPassword();
         mesh.saveOrUpdate(this);
 
         visibleHandler.obtainMessage(View.VISIBLE, meshOtaProgress).sendToTarget();
@@ -420,7 +420,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private void startScan() {
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
-        params.setMeshName(mesh.name);
+        params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(15);
         TelinkLightService.Instance().startScan(params);
         log("startScan ");
@@ -450,7 +450,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void login() {
         log("login");
-        TelinkLightService.Instance().login(Strings.stringToBytes(mesh.name, 16), Strings.stringToBytes(mesh.password, 16));
+        TelinkLightService.Instance().login(Strings.stringToBytes(mesh.getName(), 16), Strings.stringToBytes(mesh.getPassword(), 16));
     }
 
     private boolean isConnectting = false;
@@ -463,7 +463,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
             mesh = TelinkLightApplication.getApp().getMesh();
-            if (mesh.isOtaProcessing() && mesh.otaDevice.mac.equals(deviceInfo.macAddress)) {
+            if (mesh.isOtaProcessing() && mesh.getOtaDevice().mac.equals(deviceInfo.macAddress)) {
                 log("Mesh OTA Target device discovered mesh Address:" + Integer.toHexString(deviceInfo.meshAddress) + " mac:" + deviceInfo.macAddress);
                 if (!isConnectting) {
                     connectDevice(deviceInfo.macAddress);
@@ -570,7 +570,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     }
                 }, 5 * 1000);
                 Mesh mesh = TelinkLightApplication.getApp().getMesh();
-                mesh.otaDevice = null;
+                mesh.setOtaDevice(null);
                 mesh.saveOrUpdate(this);
                 sendGetVersionCommand();
             }
@@ -670,7 +670,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private void doFinish() {
         this.mode = MODE_COMPLETE;
         Mesh mesh = TelinkLightApplication.getApp().getMesh();
-        mesh.otaDevice = null;
+        mesh.setOtaDevice(null);
         mesh.saveOrUpdate(this);
         log("Finish: Success Count : " + successCount);
     }
@@ -691,7 +691,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     public void onClick(DialogInterface dialog, int which) {
                         sendStopMeshOTACommand();
                         Mesh mesh = TelinkLightApplication.getApp().getMesh();
-                        mesh.otaDevice = null;
+                        mesh.setOtaDevice(null);
                         mesh.saveOrUpdate(OTAUpdateActivity.this);
                         dialog.dismiss();
                         doFinish();
@@ -752,7 +752,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     public void onClick(DialogInterface dialog, int which) {
                         sendStopMeshOTACommand();
                         Mesh mesh = TelinkLightApplication.getApp().getMesh();
-                        mesh.otaDevice = null;
+                        mesh.setOtaDevice(null);
                         mesh.saveOrUpdate(OTAUpdateActivity.this);
                         dialog.dismiss();
                         finish();

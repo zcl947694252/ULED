@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -27,6 +26,7 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -44,6 +44,7 @@ import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
+import com.telink.TelinkApplication;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
@@ -60,6 +61,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * Created by hejiajun on 2018/4/16.
@@ -92,6 +95,10 @@ public class MeFragment extends Fragment implements EventListener<String> {
     ImageView userIcon;
     @BindView(R.id.user_name)
     TextView userName;
+    @BindView(R.id.light_version_name)
+    TextView lightVersionName;
+    @BindView(R.id.light_version)
+    TextView lightVersion;
     private LayoutInflater inflater;
 
     private Dialog loadDialog;
@@ -143,6 +150,35 @@ public class MeFragment extends Fragment implements EventListener<String> {
 
         userIcon.setBackgroundResource(R.drawable.ic_launcher);
         userName.setText(DBUtils.getLastUser().getPhone());
+
+        getVserion();
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        if (isVisibleToUser) {
+            getVserion();
+        }
+    }
+
+    private void getVserion() {
+        int dstAdress= 0;
+        if(TelinkApplication.getInstance().getConnectDevice()!=null){
+            dstAdress=TelinkApplication.getInstance().getConnectDevice().meshAddress;
+            Commander.INSTANCE.getLightVersion(dstAdress, () -> {
+                lightVersion.setVisibility(View.VISIBLE);
+                lightVersionName.setVisibility(View.VISIBLE);
+                String version=SharedPreferencesUtils.getCurrentLightVersion();
+                lightVersion.setText(version);
+                return null;
+            }, () -> {
+               lightVersion.setVisibility(View.GONE);
+               lightVersionName.setVisibility(View.GONE);
+                return null;
+            });
+        }else{
+            dstAdress=0;
+        }
     }
 
     @Override

@@ -27,6 +27,16 @@ public class SharedPreferencesUtils {
                 Constant.CURRENT_USE_REGION_KEY,-1);
     }
 
+    public static void saveCurrentLightVsersion(String vsersion){
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                Constant.CURRENT_LIGHT_VSERSION_KEY,vsersion);
+    }
+
+    public static String getCurrentLightVersion(){
+        return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.CURRENT_LIGHT_VSERSION_KEY,"");
+    }
+
     public static void saveCurrentUserList(String account){
         List<String> userList=getCurrentUserList();
         if(userList==null){

@@ -93,7 +93,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     private void initData() {
         scenes = new Scenes();
         telinkLightApplication = (TelinkLightApplication) this.getApplication();
-        dataManager = new DataManager(this, telinkLightApplication.getMesh().name, telinkLightApplication.getMesh().password);
+        dataManager = new DataManager(this, telinkLightApplication.getMesh().getName(), telinkLightApplication.getMesh().getPassword());
         groups = DBUtils.getGroupList();
         itemGroupArrayList = new ArrayList<>();
 

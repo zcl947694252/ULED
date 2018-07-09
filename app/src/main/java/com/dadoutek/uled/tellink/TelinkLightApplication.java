@@ -82,10 +82,10 @@ public final class TelinkLightApplication extends TelinkApplication {
                 String pwd = dbRegion.getControlMeshPwd();
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
                     mesh = new Mesh();
-                    mesh.name = name;
-                    mesh.password = pwd;
-                    mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME;
-                    mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD;
+                    mesh.setName(name);
+                    mesh.setPassword(pwd);
+                    mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
+                    mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
                     setupMesh(mesh);
                 }
             }
@@ -104,8 +104,8 @@ public final class TelinkLightApplication extends TelinkApplication {
     public Mesh getMesh() {
         if (this.mesh == null) {
             this.mesh = new Mesh();
-            this.mesh.factoryName = "dadousmart";
-            this.mesh.factoryPassword = "123";
+            this.mesh.setFactoryName("dadousmart");
+            this.mesh.setFactoryPassword("123");
         }
         return this.mesh;
     }
@@ -136,7 +136,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     public boolean isEmptyMesh() {
 
-        return this.mesh == null || TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password);
+        return this.mesh == null || TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword());
     }
 
     /**********************************************

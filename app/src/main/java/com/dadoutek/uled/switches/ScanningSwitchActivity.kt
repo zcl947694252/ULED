@@ -247,7 +247,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
         val mesh = this.mApplication.mesh
-        val meshAddress = mesh.deviceAddress
+        val meshAddress = mesh.generateMeshAddr()
 
         if (meshAddress == -1) {
 //            this.showToast(getString(R.string.much_lamp_tip))

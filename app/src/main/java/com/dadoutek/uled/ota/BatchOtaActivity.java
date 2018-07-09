@@ -188,7 +188,7 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
      */
     private void startScan() {
         LeScanParameters params = Parameters.createScanParameters();
-        params.setMeshName(mApp.getMesh().name);
+        params.setMeshName(mApp.getMesh().getName());
         params.setTimeoutSeconds(20);
         /*params.set(Parameters.PARAM_MESH_NAME, this.selectedDevice.meshName);
         params.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, 10);*/
@@ -224,12 +224,12 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
 
     private void login() {
         Mesh currentMesh = this.mApp.getMesh();
-        TelinkLightService.Instance().login(Strings.stringToBytes(currentMesh.name, 16), Strings.stringToBytes(currentMesh.password, 16));
+        TelinkLightService.Instance().login(Strings.stringToBytes(currentMesh.getName(), 16), Strings.stringToBytes(currentMesh.getPassword(), 16));
     }
 
     private List<DeviceHolder> getSelectedDevices() {
         List<DeviceHolder> devices = new ArrayList<>();
-        for (DeviceInfo deviceInfo : mApp.getMesh().devices) {
+        for (DeviceInfo deviceInfo : mApp.getMesh().getDevices()) {
             if (deviceInfo.selected) {
                 devices.add(new DeviceHolder(deviceInfo));
             }

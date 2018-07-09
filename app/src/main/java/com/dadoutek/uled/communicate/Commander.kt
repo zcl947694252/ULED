@@ -4,9 +4,14 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.Lights
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.event.NotificationEvent
@@ -21,13 +26,16 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.experimental.and
 
 object Commander : EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
     private var mGroupingAddr: Int = 0
     private var mLightAddr: Int = 0
     private var mGroupSuccess: Boolean = false
+    private var mGetVsersionSuccess: Boolean = false
     private var mUpdateMeshSuccess: Boolean = false
 
     init {
@@ -195,6 +203,7 @@ object Commander : EventListener<String> {
     override fun performed(event: Event<String>?) {
         when (event?.type) {
             NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
+            NotificationEvent.GET_DEVICE_STATE -> this.OnGetLightVersion(event as NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
         }
@@ -249,5 +258,80 @@ object Commander : EventListener<String> {
         }
     }
 
+     fun getLightVersion(dstAddr: Int,  successCallback: () -> Unit, failedCallback: () -> Unit){
+         mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+
+         mLightAddr = dstAddr
+         mGetVsersionSuccess = false
+         val opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
+         val params = byteArrayOf(0x00,0x00)
+         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe(object : Observer<Long?> {
+                     var mDisposable: Disposable? = null
+                     override fun onComplete() {
+                         mDisposable?.dispose()
+                         mApplication?.removeEventListener(Commander)
+                     }
+
+                     override fun onSubscribe(d: Disposable) {
+                         mDisposable = d
+                     }
+
+                     override fun onNext(t: Long) {
+                         if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                             onComplete()
+                             failedCallback.invoke()
+                         } else if (mGetVsersionSuccess) {
+                             onComplete()
+                             successCallback.invoke()
+                         }
+                     }
+
+                     override fun onError(e: Throwable) {
+                         onComplete()
+                         failedCallback.invoke()
+                         LogUtils.d(e.message)
+                     }
+                 })
+     }
+
+    private fun OnGetLightVersion(event: NotificationEvent){
+        val data = event.args.params
+        if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
+            val version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size-1))
+//            val version = Strings.bytesToString(data)
+            val meshAddress = event.args.src
+
+            val light = DBUtils.getLightByMeshAddr(meshAddress)
+            light.version = version
+
+            mGetVsersionSuccess=true
+            SharedPreferencesUtils.saveCurrentLightVsersion(version)
+            /* if (!version.equals(mFileVersion) && !devices.contains(light)) {
+                        devices.add(light);
+                        mHandler.post(uiTask);
+                    }*/
+            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
+        }
+    }
+
+//    u.getVersion = function () {
+//        var tlink = api.require('dsTelink');
+//        //var op = (0x3c|0xc0);
+//        var op = (0x3c | 0xc0);
+//        var buf = [];
+//        buf.push(0x0);
+//        buf.push(0x0);
+//        var param = {cmd: op, para: buf, dst: parseInt("0", 16)};
+//        //tlink.DDMeshControl(param);
+//        api.sendEvent({
+//            name: 'testevent',
+//            extra: {type: "DDMeshControl", param: param}
+//        });
+//        console.log(JSON.stringify(param));
+//    }
 
 }

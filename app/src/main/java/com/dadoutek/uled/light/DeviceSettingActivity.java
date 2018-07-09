@@ -57,7 +57,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
         this.gpAddress = this.getIntent().getIntExtra(Constant.GROUP_ARESS_KEY, 0);
 
         mApplication = (TelinkLightApplication) this.getApplication();
-        dataManager = new DataManager(this, mApplication.getMesh().name, mApplication.getMesh().password);
+        dataManager = new DataManager(this, mApplication.getMesh().getName(), mApplication.getMesh().getPassword());
 
         if (light != null) {
             TextView txtTitle = (TextView) this

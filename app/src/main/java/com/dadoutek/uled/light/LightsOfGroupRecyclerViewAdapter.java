@@ -40,7 +40,7 @@ public class LightsOfGroupRecyclerViewAdapter extends
         this.onCheckedChangeListener = onCheckedChangeListener;
         mLayoutInflater = LayoutInflater.from(mContext);
         mApplication = (TelinkLightApplication) TelinkLightApplication.getInstance();
-        dataManager = new DataManager(mContext, mApplication.getMesh().name, mApplication.getMesh().password);
+        dataManager = new DataManager(mContext, mApplication.getMesh().getName(), mApplication.getMesh().getPassword());
     }
 
     @NonNull

@@ -1239,7 +1239,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
-                        params.setMeshName(mesh.factoryName);
+                        params.setMeshName(mesh.getFactoryName());
                         params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
                         params.setScanMode(true);
@@ -1285,7 +1285,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private synchronized void onLeScan(final LeScanEvent event) {
 
         final Mesh mesh = this.mApplication.getMesh();
-        final int meshAddress = mesh.getDeviceAddress();
+        final int meshAddress = mesh.generateMeshAddr();
 
         if (meshAddress == -1) {
             this.showToast(getString(R.string.much_lamp_tip));
@@ -1297,11 +1297,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                 Constant.DB_NAME_KEY, "dadou");
         LeUpdateParameters params = Parameters.createUpdateParameters();
-        params.setOldMeshName(mesh.factoryName);
-        params.setOldPassword(mesh.factoryPassword);
-        params.setNewMeshName(mesh.name);
+        params.setOldMeshName(mesh.getFactoryName());
+        params.setOldPassword(mesh.getFactoryPassword());
+        params.setNewMeshName(mesh.getName());
         params.setNewPassword(NetworkFactory.md5(
-                NetworkFactory.md5(mesh.password) + account).substring(0, 16));
+                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
 
         DeviceInfo deviceInfo = event.getArgs();
         deviceInfo.meshAddress = meshAddress;

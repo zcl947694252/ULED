@@ -322,5 +322,6 @@
     <string name="button3">Button 3</string>
     <string name="button4">Button 4</string>
     <string name="update_group_tip">A packet change is detected. If the scene is required for the light, go to the scene page to update the scene!</string>
+    <string name="light_version">灯版本号：</string>
 
 </resources>

@@ -252,7 +252,7 @@ public final class DeviceListFragment extends Fragment {
         testStarted = false;
         testCount = 0;
         this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-        mDataManager = new DataManager(getActivity(), mApplication.getMesh().name, mApplication.getMesh().password);
+        mDataManager = new DataManager(getActivity(), mApplication.getMesh().getName(), mApplication.getMesh().getPassword());
     }
 
     @Override
