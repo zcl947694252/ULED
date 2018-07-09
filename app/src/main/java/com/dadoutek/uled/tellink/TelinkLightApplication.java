@@ -46,8 +46,8 @@ public final class TelinkLightApplication extends TelinkApplication {
 
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
-        BuglyLog.v("ss","sadasdsdasf");
-        CrashReport.testJavaCrash();
+//        BuglyLog.v("ss","sadasdsdasf");
+//        CrashReport.testJavaCrash();
 
 
 
