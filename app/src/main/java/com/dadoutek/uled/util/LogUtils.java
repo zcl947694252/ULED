@@ -3,6 +3,7 @@ package com.dadoutek.uled.util;
 import android.util.Log;
 
 import com.dadoutek.uled.BuildConfig;
+import com.tencent.bugly.crashreport.BuglyLog;
 
 /**
  * Created by hejiajun on 2018/4/23.
@@ -43,6 +44,7 @@ public class LogUtils {
         // Throwable instance must be created before any methods
         getMethodNames(new Throwable().getStackTrace());
         Log.e(className, createLog(message));
+        BuglyLog.e(className, message);
     }
 
 
@@ -52,6 +54,7 @@ public class LogUtils {
 
         getMethodNames(new Throwable().getStackTrace());
         Log.i(className, createLog(message));
+        BuglyLog.i(className, message);
     }
 
     public static void d(String message) {
@@ -60,6 +63,7 @@ public class LogUtils {
 
         getMethodNames(new Throwable().getStackTrace());
         Log.d(className, createLog(message));
+        BuglyLog.d(className, message);
     }
 
     public static void v(String message) {
@@ -68,6 +72,7 @@ public class LogUtils {
 
         getMethodNames(new Throwable().getStackTrace());
         Log.v(className, createLog(message));
+        BuglyLog.v(className, message);
     }
 
     public static void w(String message) {
@@ -76,6 +81,7 @@ public class LogUtils {
 
         getMethodNames(new Throwable().getStackTrace());
         Log.w(className, createLog(message));
+        BuglyLog.w(className, message);
     }
 
     public static void wtf(String message) {
