@@ -132,10 +132,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun listenerConnect() {
-        Log.d("Saw", "isConnected = ${TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected}");
+        if(TelinkLightService.Instance()!=null&&TelinkLightService.Instance().adapter.mLightCtrl.currentLight!=null){
+            Log.d("Saw", "isConnected = ${TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected}");
 
-        if (!TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
-            autoConnect()
+            if (!TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                autoConnect()
+            }
         }
     }
 
