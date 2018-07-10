@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private var bestRSSIDevice: DeviceInfo? = null
     private val MAX_RETRY_CONNECT_TIME = 3
-    private val CONNECT_TIMEOUT = 15
+    private val CONNECT_TIMEOUT = 10
     private val SCAN_TIMEOUT_SECOND: Int = 10
     val CHECK_RSSI_TIMEOUT: Long = 1500
 

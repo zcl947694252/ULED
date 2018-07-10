@@ -667,13 +667,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
-//                // 之前是否有在做MeshOTA操作，是则继续
-//                if (mesh.isOtaProcessing()) {
-//                    connectParams.setConnectMac(mesh.otaDevice.mac);
-//                    saveLog("Action: AutoConnect:" + mesh.otaDevice.mac);
-//                } else {
-//                    saveLog("Action: AutoConnect:NULL");
-//                }
                 //连接，如断开会自动重连
                 TelinkLightService.Instance().autoConnect(connectParams);
             }
