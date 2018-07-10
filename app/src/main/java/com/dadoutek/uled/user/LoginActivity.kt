@@ -124,7 +124,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             AccountModel.login(phone!!, editPassWord!!, dbUser!!.channel)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
-                            LogUtils.d("logging: " + "登录成功")
                             DBUtils.deleteLocalData()
                             ToastUtils.showLong(R.string.login_success)
                             hideLoadingDialog()
@@ -135,6 +134,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
+                            LogUtils.d("logging: " + "登录错误"+e.message)
                             hideLoadingDialog()
                         }
                     })

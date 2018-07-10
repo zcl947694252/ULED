@@ -19,6 +19,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.othersview.BaseFragment;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.othersview.AddMeshActivity;
@@ -36,7 +37,7 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class GroupListFragment extends Fragment implements Toolbar.OnMenuItemClickListener {
+public final class GroupListFragment extends BaseFragment implements Toolbar.OnMenuItemClickListener {
 
     private LayoutInflater inflater;
     private GroupListRecycleViewAdapter adapter;

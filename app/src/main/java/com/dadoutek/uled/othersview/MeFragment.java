@@ -68,7 +68,7 @@ import kotlin.jvm.functions.Function0;
  * Created by hejiajun on 2018/4/16.
  */
 
-public class MeFragment extends Fragment implements EventListener<String> {
+public class MeFragment extends BaseFragment implements EventListener<String> {
 
     @BindView(R.id.txt_header_title)
     TextView txtHeaderTitle;
@@ -101,7 +101,6 @@ public class MeFragment extends Fragment implements EventListener<String> {
     TextView lightVersion;
     private LayoutInflater inflater;
 
-    private Dialog loadDialog;
     private TelinkLightApplication mApplication;
     private DbLight currentLight;
     private boolean isDeleteSuccess = false;
@@ -169,7 +168,9 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 lightVersion.setVisibility(View.VISIBLE);
                 lightVersionName.setVisibility(View.VISIBLE);
                 String version=SharedPreferencesUtils.getCurrentLightVersion();
-                lightVersion.setText(version);
+                if(version!=null){
+                    lightVersion.setText(version);
+                }
                 return null;
             }, () -> {
                lightVersion.setVisibility(View.GONE);
@@ -395,33 +396,6 @@ public class MeFragment extends Fragment implements EventListener<String> {
         }).start();
     }
 
-    public void showLoadingDialog(String content) {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View v = inflater.inflate(R.layout.dialogview, null);
-
-        LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);
-        TextView tvContent = (TextView) v.findViewById(R.id.tvContent);
-        tvContent.setText(content);
-
-        if (loadDialog == null) {
-            loadDialog = new Dialog(getActivity(),
-                    R.style.FullHeightDialog);
-        }
-        //loadDialog没显示才把它显示出来
-        if (!loadDialog.isShowing()) {
-            loadDialog.setCancelable(false);
-            loadDialog.setCanceledOnTouchOutside(false);
-            loadDialog.setContentView(layout);
-            loadDialog.show();
-        }
-    }
-
-    public void hideLoadingDialog() {
-        if (loadDialog != null) {
-            loadDialog.dismiss();
-        }
-    }
-
     /**
      * 事件处理方法
      *
@@ -435,29 +409,6 @@ public class MeFragment extends Fragment implements EventListener<String> {
                 break;
         }
     }
-
-//    private void onOnlineStatusNotify(NotificationEvent event) {
-////        List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList;
-//
-//        List<OnlineStatusNotificationParser.DeviceNotificationInfo> notificationInfoList =
-//                (List<OnlineStatusNotificationParser.DeviceNotificationInfo>) event.parse();
-//
-//        if (notificationInfoList.isEmpty())
-//            return;
-//
-//        for (OnlineStatusNotificationParser.DeviceNotificationInfo notificationInfo : notificationInfoList) {
-//            int  meshAddress = notificationInfo.meshAddress;
-//            if(currentLight!=null && currentLight.getMeshAddr() == meshAddress){
-//                isDeleteSuccess=true;
-//            }else{
-//                isDeleteSuccess=false;
-//            }
-//        }
-//    }
-
-//    private void change(String table,){
-//
-//    }
 
     private void exitLogin() {
         isClickExlogin = true;
@@ -503,17 +454,6 @@ public class MeFragment extends Fragment implements EventListener<String> {
     }
 
     private void clearData() {
-
-//        SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
-//        DBUtils.deleteAllData();
-//        CleanUtils.cleanInternalSp();
-//        CleanUtils.cleanExternalCache();
-//        CleanUtils.cleanInternalFiles();
-//        CleanUtils.cleanInternalCache();
-//        ToastUtils.showShort(R.string.clean_tip);
-//        hideLoadingDialog();
-//        restartApplication();
-//
         DbUser dbUser = DBUtils.getLastUser();
 
         if (dbUser == null) {

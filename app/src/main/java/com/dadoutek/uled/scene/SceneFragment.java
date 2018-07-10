@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.othersview.BaseFragment;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.model.Constant;
@@ -35,7 +36,7 @@ import butterknife.Unbinder;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class SceneFragment extends Fragment implements
+public class SceneFragment extends BaseFragment implements
         Toolbar.OnMenuItemClickListener {
 
     private static final int SCENE_MAX_COUNT = 16;

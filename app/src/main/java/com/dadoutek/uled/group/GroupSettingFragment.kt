@@ -20,13 +20,14 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.widget.ColorPicker
 import kotlinx.android.synthetic.main.fragment_group_setting.*
 import java.util.*
 
-class GroupSettingFragment : Fragment(), View.OnClickListener {
+class GroupSettingFragment : BaseFragment(), View.OnClickListener {
 
     private var brightnessBar: SeekBar? = null
     private var temperatureBar: SeekBar? = null
