@@ -42,7 +42,7 @@ public class StringUtils {
         };
         //特殊字符过滤器
         InputFilter specialCharFilter = (source, start, end, dest, dstart, dend) -> {
-            String regexStr = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+            String regexStr = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？_-]";
             Pattern pattern = Pattern.compile(regexStr);
             Matcher matcher = pattern.matcher(source.toString());
             if (matcher.matches()) {
