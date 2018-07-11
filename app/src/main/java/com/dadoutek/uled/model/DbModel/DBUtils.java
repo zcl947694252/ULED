@@ -101,6 +101,9 @@ public class DBUtils {
         List<DbLight> dbLightList=DaoSessionInstance.getInstance().getDbLightDao().queryBuilder().
                 where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list();
         if(dbLightList.size()>0){
+//            for(int i=0;i<dbLightList.size();i++){
+////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
+//            }
             return dbLightList.get(0);
         }
        return null;

@@ -165,16 +165,20 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         if(TelinkApplication.getInstance().getConnectDevice()!=null){
             dstAdress=TelinkApplication.getInstance().getConnectDevice().meshAddress;
             Commander.INSTANCE.getLightVersion(dstAdress, () -> {
-                lightVersion.setVisibility(View.VISIBLE);
-                lightVersionName.setVisibility(View.VISIBLE);
+                if(lightVersion!=null&&lightVersionName!=null){
+                    lightVersion.setVisibility(View.VISIBLE);
+                    lightVersionName.setVisibility(View.VISIBLE);
+                }
                 String version=SharedPreferencesUtils.getCurrentLightVersion();
-                if(version!=null){
+                if(lightVersion!=null&&version!=null){
                     lightVersion.setText(version);
                 }
                 return null;
             }, () -> {
-               lightVersion.setVisibility(View.GONE);
-               lightVersionName.setVisibility(View.GONE);
+                if(lightVersion!=null&&lightVersionName!=null){
+                    lightVersion.setVisibility(View.GONE);
+                    lightVersionName.setVisibility(View.GONE);
+                }
                 return null;
             });
         }else{

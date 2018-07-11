@@ -296,7 +296,7 @@ object Commander : EventListener<String> {
                      }
 
                      override fun onNext(t: Long) {
-                         if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                         if (t >= 30) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                              onComplete()
                              failedCallback.invoke()
                          } else if (mGetVsersionSuccess) {
@@ -317,6 +317,17 @@ object Commander : EventListener<String> {
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             val version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size-1))
+//            val version = Strings.bytesToString(data)
+            val meshAddress = event.args.src
+
+//            val light = DBUtils.getLightByMeshAddr(meshAddress)
+//            light.version = version
+
+            mGetVsersionSuccess=true
+            SharedPreferencesUtils.saveCurrentLightVsersion(version)
+            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
+        }else{
+            val version = Strings.bytesToString(data)
 //            val version = Strings.bytesToString(data)
             val meshAddress = event.args.src
 
