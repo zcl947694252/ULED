@@ -45,15 +45,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
     private final static int UPDATE = 1;
 
     private LayoutInflater inflater;
-    private GroupListAdapter adapter;
+    private DeviceGroupingAdapter adapter;
     private List<DbGroup> groupsInit;
 
     private DbLight light;
     private int gpAdress;
-
-//    private Button btnAdd;
-
-//    private OnClickListener clickListener = v -> finish();
 
     private GridView listView;
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
@@ -62,10 +58,6 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             DbGroup group = adapter.getItem(position);
-//            if (group.checked) {
-//                ToastUtils.showLong(R.string.tip_selected_group);
-//                finish();
-//            } else {
                 deletePreGroup(light.getMeshAddr());
                 deleteAllSceneByLightAddr(light.getMeshAddr());
                 allocDeviceGroup(group);
@@ -150,7 +142,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
         listView = (GridView) this.findViewById(R.id.list_groups);
         listView.setOnItemClickListener(this.itemClickListener);
 
-        adapter = new GroupListAdapter();
+        adapter = new DeviceGroupingAdapter(groupsInit,this);
         listView.setAdapter(adapter);
 
         this.getDeviceGroup();
@@ -193,11 +185,6 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
         params[0] = 0x01;
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
         light.setBelongGroupId(group.getId());
-//
-//        } else {
-//            params[0] = 0x00;
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-//        }
     }
 
     @Override
@@ -245,19 +232,11 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
 
             mHandler.obtainMessage(UPDATE).sendToTarget();
         }
-//        else if(event.getType() == NotificationEvent.GET_SCENE){
-//            NotificationEvent e = (NotificationEvent) event;
-//            NotificationInfo info = e.getArgs();
-//            int srcAddress = info.src & 0xFF;
-//            byte[] params = info.params;
-//            if (srcAddress != light.getMeshAddr())
-//                return;
-//
-//        }
     }
 
     private void addNewGroup() {
         final EditText textGp = new EditText(this);
+        StringUtils.initEditTextFilter(textGp);
         new AlertDialog.Builder(DeviceGroupingActivity.this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -282,19 +261,7 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
     private void refreshView() {
         groupsInit = DBUtils.getGroupList();
 
-//        for(int k=0;k<groupsInit.size();k++){
-//            if(k==groupsInit.size()-1){
-//                groupsInit.get(k).checked=true;
-//                deletePreGroup();
-//                allocDeviceGroup(groupsInit.get(k));
-//                light.setBelongGroupId(groupsInit.get(k).getId());
-//                DBUtils.updateLight(light);
-//            }else{
-//                groupsInit.get(k).checked=false;
-//            }
-//        }
-
-        adapter = new GroupListAdapter();
+        adapter = new DeviceGroupingAdapter(groupsInit,this);
         listView.setAdapter(this.adapter);
         adapter.notifyDataSetChanged();
     }
@@ -331,87 +298,5 @@ public final class DeviceGroupingActivity extends TelinkBaseActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_group_fragment, menu);
         return true;
-    }
-
-    private static class GroupItemHolder {
-        public TextView name;
-    }
-
-    private final class GroupListAdapter extends BaseAdapter {
-
-        public GroupListAdapter() {
-        }
-
-        @Override
-        public int getCount() {
-            return groupsInit.size();
-        }
-
-        @Override
-        public DbGroup getItem(int position) {
-            return groupsInit.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        public DbGroup get(int addr) {
-            for (int j = 0; j < groupsInit.size(); j++) {
-                if (addr == groupsInit.get(j).getMeshAddr()) {
-                    return groupsInit.get(j);
-                }
-            }
-            return null;
-        }
-
-        @Override
-        @Deprecated
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            GroupItemHolder holder;
-
-//            if (convertView == null) {
-
-            convertView = inflater.inflate(R.layout.grouping_item, null);
-
-            TextView txtName = (TextView) convertView
-                    .findViewById(R.id.txt_name);
-
-            holder = new GroupItemHolder();
-            holder.name = txtName;
-
-            convertView.setTag(holder);
-//
-//            } else {
-//                holder = (GroupItemHolder) convertView.getTag();
-//            }
-
-            DbGroup group = this.getItem(position);
-
-            if (group != null) {
-                holder.name.setText(group.getName());
-
-                Activity mContext = DeviceGroupingActivity.this;
-                if (group.checked) {
-                    ColorStateList color = mContext.getResources()
-                            .getColorStateList(R.color.primary);
-                    holder.name.setTextColor(color);
-                } else {
-                    ColorStateList color = mContext.getResources()
-                            .getColorStateList(R.color.black);
-                    holder.name.setTextColor(color);
-                }
-
-            }
-
-            if (position == 0) {
-                AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(1, 1);
-                convertView.setLayoutParams(layoutParams);
-            }
-
-            return convertView;
-        }
     }
 }

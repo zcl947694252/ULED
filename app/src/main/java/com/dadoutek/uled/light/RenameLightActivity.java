@@ -14,6 +14,7 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.util.StringUtils;
 
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class RenameLightActivity extends TelinkBaseActivity {
         mApplication = (TelinkLightApplication) this.getApplication();
         this.light = (DbLight) this.getIntent().getExtras().get("light");
 //        Lights lights1=dataManager.getLights();
+        StringUtils.initEditTextFilter(editRename);
     }
 
     @OnClick({R.id.img_header_menu_left, R.id.edit_rename, R.id.btn_sure})

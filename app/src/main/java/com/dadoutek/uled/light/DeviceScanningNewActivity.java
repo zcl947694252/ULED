@@ -587,6 +587,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void addNewGroup() {
         final EditText textGp = new EditText(this);
+        StringUtils.initEditTextFilter(textGp);
         new AlertDialog.Builder(DeviceScanningNewActivity.this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)

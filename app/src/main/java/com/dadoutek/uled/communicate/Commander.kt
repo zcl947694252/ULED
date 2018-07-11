@@ -33,6 +33,7 @@ import kotlin.experimental.and
 object Commander : EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
     private var mGroupingAddr: Int = 0
+    private var mGroupAddr: Int = 0
     private var mLightAddr: Int = 0
     private var mGroupSuccess: Boolean = false
     private var mGetVsersionSuccess: Boolean = false
@@ -46,6 +47,20 @@ object Commander : EventListener<String> {
 //        mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 //        mApplication?.addEventListener(MeshEvent.UPDATE_COMPLETED, this)
 //        mApplication?.addEventListener(MeshEvent.ERROR, this)
+    }
+
+    fun openOrCloseLights(groupAddr: Int,isOpen : Boolean){
+        val opcode = Opcode.LIGHT_ON_OFF
+        mGroupAddr= groupAddr
+        val params: ByteArray
+
+        if(isOpen){
+            params=byteArrayOf(0x01, 0x00, 0x00)
+        }else{
+            params=byteArrayOf(0x00, 0x00, 0x00)
+        }
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
     fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {

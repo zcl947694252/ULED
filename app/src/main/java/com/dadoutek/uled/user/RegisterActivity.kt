@@ -18,6 +18,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -90,6 +91,8 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                 edit_user_phone!!.editText!!.setText(phone)
         }
         register_completed.setOnClickListener(this)
+        StringUtils.initEditTextFilter(edit_user_password!!.editText)
+        StringUtils.initEditTextFilter(edit_user_phone!!.editText)
     }
 
     private fun initToolbar() {

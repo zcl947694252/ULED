@@ -12,6 +12,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.util.StringUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +42,7 @@ public class RenameActivity extends TelinkBaseActivity {
         ButterKnife.bind(this);
         mApplication = (TelinkLightApplication) this.getApplication();
         this.group = (DbGroup) this.getIntent().getExtras().get("group");
+        StringUtils.initEditTextFilter(editRename);
     }
 
     @OnClick({R.id.img_header_menu_left, R.id.edit_rename, R.id.btn_sure})

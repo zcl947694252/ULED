@@ -3,6 +3,7 @@ package com.dadoutek.uled.group;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -19,6 +20,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.othersview.BaseFragment;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -49,7 +51,6 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
     private TelinkLightApplication application;
     private Toolbar toolbar;
 
-    //    private GridView gridView;
     private RecyclerView recyclerView;
     List<DbGroup> showList;
 
@@ -75,7 +76,6 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("dadougg", "onResume: ");
         this.initData();
         this.notifyDataSetChanged();
     }
@@ -88,7 +88,13 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = getView(inflater);
+        this.initData();
+        return view;
+    }
 
+    @NonNull
+    private View getView(LayoutInflater inflater) {
         this.inflater = inflater;
 
         View view = inflater.inflate(R.layout.fragment_group_list, null);
@@ -106,15 +112,12 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
         setHasOptionsMenu(true);
 
         recyclerView = view.findViewById(R.id.list_groups);
-
-        this.initData();
         return view;
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isVisibleToUser) {
-
         }
     }
 
@@ -149,7 +152,6 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
         this.adapter = new GroupListRecycleViewAdapter(R.layout.group_item, showList);
         adapter.setOnItemChildClickListener(onItemChildClickListener);
         adapter.bindToRecyclerView(recyclerView);
-//        adapter.openLoadAnimation(BaseQuickAdapter.ALPHAIN);
         setMove();
 
         application = (TelinkLightApplication) getActivity().getApplication();
@@ -189,8 +191,6 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
     BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener = (adapter, view, position) -> {
 
         DbGroup group = showList.get(position);
-
-        byte opcode = (byte) 0xD0;
         int dstAddr = group.getMeshAddr();
         Intent intent;
 
@@ -200,12 +200,10 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
 
         switch (view.getId()) {
             case R.id.btn_on:
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                        new byte[]{0x01, 0x00, 0x00});
+                Commander.INSTANCE.openOrCloseLights(dstAddr,true);
                 break;
             case R.id.btn_off:
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                        new byte[]{0x00, 0x00, 0x00});
+                Commander.INSTANCE.openOrCloseLights(dstAddr,false);
                 break;
             case R.id.btn_set:
                 intent = new Intent(mContext, GroupSettingActivity.class);

@@ -276,6 +276,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         if (mInputMethodManager.isActive()) {
             mInputMethodManager.hideSoftInputFromWindow(editName.getWindowToken(), 0);// 隐藏输入法
         }
+        StringUtils.initEditTextFilter(editName);
     }
 
     @OnClick({R.id.bt_save, R.id.edit_name, R.id.btn_sure_edit, R.id.bt_add})

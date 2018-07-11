@@ -16,6 +16,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.network.NetworkFactory;
+import com.dadoutek.uled.util.StringUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,6 +64,9 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.update_password);
+
+        StringUtils.initEditTextFilter(editNewPassword.getEditText());
+        StringUtils.initEditTextFilter(editNewPasswordSure.getEditText());
     }
 
     @Override
