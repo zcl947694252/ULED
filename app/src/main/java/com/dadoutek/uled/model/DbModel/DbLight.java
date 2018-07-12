@@ -38,7 +38,7 @@ public class DbLight implements Serializable {
     @Transient
     public int textColor;//文字颜色
 
-    public int connectionStatus = 1;//链接状态
+    public int connectionStatus = 2;//链接状态
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
 

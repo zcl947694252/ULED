@@ -42,7 +42,6 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.TelinkApplication;
-import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.util.Event;
@@ -53,11 +52,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by hejiajun on 2018/4/16.
@@ -90,10 +94,10 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     ImageView userIcon;
     @BindView(R.id.user_name)
     TextView userName;
-    @BindView(R.id.light_version_name)
-    TextView lightVersionName;
-    @BindView(R.id.light_version)
-    TextView lightVersion;
+    @BindView(R.id.tvLightVersionText)
+    TextView tvLightVersionText;
+    @BindView(R.id.tvLightVersion)
+    TextView tvLightVersion;
     private LayoutInflater inflater;
 
     private TelinkLightApplication mApplication;
@@ -102,13 +106,13 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
     private long sleepTime = 250;
     boolean isClickExlogin = false;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.mApplication = (TelinkLightApplication) getActivity().getApplication();
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
-        this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
+//        this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
+
 
         if (Build.BRAND.contains("Huawei")) {
             sleepTime = 500;
@@ -151,7 +155,13 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isVisibleToUser) {
+            this.mApplication = TelinkLightApplication.getApp();
+            MainActivity mainAct = (MainActivity) getActivity();
+            this.mApplication.removeEventListener(NotificationEvent.ONLINE_STATUS, mainAct);
+//            this.mApplication.removeEventListeners();
             getVersion();
+        } else {
+            compositeDisposable.dispose();
         }
     }
 
@@ -160,19 +170,19 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         if (TelinkApplication.getInstance().getConnectDevice() != null) {
             dstAdress = TelinkApplication.getInstance().getConnectDevice().meshAddress;
             Commander.INSTANCE.getLightVersion(dstAdress, () -> {
-                if (lightVersion != null && lightVersionName != null) {
-                    lightVersion.setVisibility(View.VISIBLE);
-                    lightVersionName.setVisibility(View.VISIBLE);
+                if (tvLightVersion != null && tvLightVersionText != null) {
+                    tvLightVersion.setVisibility(View.VISIBLE);
+                    tvLightVersionText.setVisibility(View.VISIBLE);
                 }
                 String version = SharedPreferencesUtils.getCurrentLightVersion();
-                if (lightVersion != null && version != null) {
-                    lightVersion.setText(version);
+                if (tvLightVersion != null && version != null) {
+                    tvLightVersion.setText(version);
                 }
                 return null;
             }, () -> {
-                if (lightVersion != null && lightVersionName != null) {
-                    lightVersion.setVisibility(View.GONE);
-                    lightVersionName.setVisibility(View.GONE);
+                if (tvLightVersion != null && tvLightVersionText != null) {
+                    tvLightVersion.setVisibility(View.GONE);
+                    tvLightVersionText.setVisibility(View.GONE);
                 }
                 return null;
             });
@@ -370,16 +380,27 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                                 @Override
                                 public void complete() {
                                     hideLoadingDialog();
-                                    ActivityUtils.startActivity(SplashActivity.class);
-                                    getActivity().finish();
+                                    Disposable disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(aLong -> {
+                                                hideLightVersion();
+//                                                addEventListener(); //加回连接状态监听。
+                                            });
+                                    if (compositeDisposable.isDisposed()) {
+                                        compositeDisposable = new CompositeDisposable();
+                                    }
+                                    compositeDisposable.add(disposable);
+
+//                                    ActivityUtils.startActivity(SplashActivity.class);
+//                                    getActivity().finish();
                                 }
 
                                 @Override
                                 public void error(String msg) {
                                     hideLoadingDialog();
                                     ToastUtils.showShort(R.string.backup_failed);
-                                    ActivityUtils.startActivity(SplashActivity.class);
-                                    getActivity().finish();
+//                                    ActivityUtils.startActivity(SplashActivity.class);
+//                                    getActivity().finish();
                                 }
 
                                 @Override
@@ -393,6 +414,17 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                 }
             }
         }).start();
+    }
+
+    private void hideLightVersion() {
+        tvLightVersionText.setVisibility(View.GONE);
+        tvLightVersion.setVisibility(View.GONE);
+    }
+
+    private void addEventListener() {
+        MainActivity act = (MainActivity) getActivity();
+        if (act != null)
+            act.addEventListeners();
     }
 
     /**

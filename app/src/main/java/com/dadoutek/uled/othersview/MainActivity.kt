@@ -21,19 +21,17 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.group.GroupListFragment
+import com.dadoutek.uled.light.DeviceListFragment
+import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
-import com.dadoutek.uled.light.DeviceListFragment
-import com.dadoutek.uled.group.GroupListFragment
-import com.dadoutek.uled.scene.SceneFragment
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.Lights
-import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.model.UpdateStatusDeviceType
-import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -42,6 +40,7 @@ import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.*
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
@@ -131,6 +130,17 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
+
+        initConnect()
+    }
+
+    private fun initConnect() {
+        val list: List<DbLight>
+        list = DBUtils.getAllLight()
+        for (i in list.indices) {
+            list.get(i).connectionStatus = 2
+            DBUtils.updateLight(list.get(i))
+        }
     }
 
     private fun initBottomNavigation() {
@@ -261,7 +271,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         retryConnect()
                     } else {
                         progressBar.visibility = View.GONE
-                        if (snackbarNotFoundLight == null){
+                        if (snackbarNotFoundLight == null) {
                             indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                                 TelinkLightService.Instance().idleMode(true)
                                 LeBluetooth.getInstance().stopScan()
@@ -466,7 +476,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         } else {
             TelinkLightService.Instance().idleMode(true)
 
-            if (snackbarNotFoundLight == null){
+            if (snackbarNotFoundLight == null) {
                 indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                     startScan()
                 }
@@ -497,6 +507,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         if (info != null) {
             when (info.reserve) {
                 UpdateStatusDeviceType.OLD_NORMAL_SWITCH.toInt() -> return false
+                UpdateStatusDeviceType.OLD_NORMAL_SWITCH2.toInt() -> return false
             //                case DeviceType.NORMAL_SWITCH2:
             //                    return false;
             //                case DeviceType.SCENE_SWITCH:
@@ -535,6 +546,17 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     dbLight.updateIcon()
                     DBUtils.updateLight(dbLight)
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                } else {
+                    val dbLightNew = DbLight()
+                    dbLightNew.setConnectionStatus(connectionStatus.value)
+                    dbLightNew.updateIcon()
+                    dbLightNew.belongGroupId = DBUtils.getGroupNull().id
+                    dbLightNew.brightness = brightness
+                    dbLightNew.colorTemperature = 0
+                    dbLightNew.meshAddr = meshAddress
+                    dbLightNew.name = getString(R.string.allLight)
+                    dbLightNew.macAddr = "0"
+                    DBUtils.saveLight(dbLightNew, false)
                 }
             }
 
@@ -584,7 +606,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     private fun onLeScanTimeout() {
 
-        if (snackbarNotFoundLight == null){
+        if (snackbarNotFoundLight == null) {
             indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                 TelinkLightService.Instance().idleMode(true)
                 LeBluetooth.getInstance().stopScan()
@@ -592,6 +614,20 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             }
         }
 
+    }
+
+    private fun isSwitch(uuid: Int): Boolean{
+        var result = false
+        when (uuid) {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+                com.dadoutek.uled.util.LogUtils.d("This is switch")
+                result = true
+            }
+            else -> {
+                result = false
+            }
+        }
+        return result
     }
 
     /**
@@ -605,15 +641,18 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
-        if (bestRSSIDevice != null) {
-            if (deviceInfo.rssi > bestRSSIDevice!!.rssi) {
-                LogUtils.d("change to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+
+        if (!isSwitch(deviceInfo.productUUID)){
+            if (bestRSSIDevice != null) {
+                if (deviceInfo.rssi > bestRSSIDevice!!.rssi) {
+                    LogUtils.d("change to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    bestRSSIDevice = deviceInfo
+                }
+            } else {
                 bestRSSIDevice = deviceInfo
             }
-        } else {
-            bestRSSIDevice = deviceInfo
-        }
 
+        }
 
     }
 

@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -33,7 +34,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
 
-class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> {
+class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
@@ -140,7 +141,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                Log.d("Saw", "SelectGroupForSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
+                Log.d("Saw", "ConfigNormalSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
                 progressBar.visibility = View.GONE
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
 //                startActivity(Intent(this,MainActivity::class.java))
@@ -176,7 +177,7 @@ class SelectGroupForSwitchActivity : AppCompatActivity(), EventListener<String> 
                 (groupAddress shr 8 and 0xFF).toByte())
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
                 paramBytes)
-
+//        Commander.addGroup(mDeviceInfo.meshAddress,groupAddress,)
     }
 
     private fun updateNameForSwitch() {

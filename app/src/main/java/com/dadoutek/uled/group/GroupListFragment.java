@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,18 +19,18 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback;
 import com.chad.library.adapter.base.listener.OnItemDragListener;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
-import com.dadoutek.uled.othersview.BaseFragment;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.othersview.AddMeshActivity;
 import com.dadoutek.uled.light.DeviceScanningNewActivity;
 import com.dadoutek.uled.light.LightsOfGroupActivity;
-import com.dadoutek.uled.pir.ScanningSensorActivity;
-import com.dadoutek.uled.switches.ScanningSwitchActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.othersview.AddMeshActivity;
+import com.dadoutek.uled.othersview.BaseFragment;
+import com.dadoutek.uled.othersview.MainActivity;
+import com.dadoutek.uled.pir.ScanningSensorActivity;
+import com.dadoutek.uled.switches.ScanningSwitchActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
@@ -118,6 +116,9 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isVisibleToUser) {
+            MainActivity act = (MainActivity) getActivity();
+            if (act != null)
+                act.addEventListeners();
         }
     }
 
@@ -200,10 +201,10 @@ public final class GroupListFragment extends BaseFragment implements Toolbar.OnM
 
         switch (view.getId()) {
             case R.id.btn_on:
-                Commander.INSTANCE.openOrCloseLights(dstAddr,true);
+                Commander.INSTANCE.openOrCloseLights(dstAddr, true);
                 break;
             case R.id.btn_off:
-                Commander.INSTANCE.openOrCloseLights(dstAddr,false);
+                Commander.INSTANCE.openOrCloseLights(dstAddr, false);
                 break;
             case R.id.btn_set:
                 intent = new Intent(mContext, GroupSettingActivity.class);

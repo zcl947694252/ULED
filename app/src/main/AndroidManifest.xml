@@ -120,7 +120,7 @@
         <activity android:name=".othersview.SelectDeviceTypeActivity" />
         <activity android:name=".switches.ScanningSwitchActivity" />
         <activity
-            android:name=".switches.SelectGroupForSwitchActivity"
+            android:name=".switches.ConfigNormalSwitchActivity"
             android:label="@string/title_activity_switch_group" />
         <activity
             android:name=".light.LightsOfGroupActivity"

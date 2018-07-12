@@ -174,7 +174,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/light_version_name"
+                    android:id="@+id/tvLightVersionText"
                     android:text="@string/light_version"
                     android:textSize="18sp"
                     android:textColor="@color/white"
@@ -184,7 +184,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/light_version"
+                    android:id="@+id/tvLightVersion"
                     android:text="1.0.0"
                     android:layout_marginStart="1dp"
                     android:textColor="@color/white"

@@ -193,7 +193,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.progress = 100  //进度控件显示成完成状态
         if (mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH ||
                 mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<SelectGroupForSwitchActivity>("deviceInfo" to mDeviceInfo!!)
+            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to mDeviceInfo!!)
         } else if (mDeviceInfo?.productUUID == DeviceType.SCENE_SWITCH) {
             startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo!!)
         }

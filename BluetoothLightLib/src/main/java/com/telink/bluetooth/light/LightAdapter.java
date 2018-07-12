@@ -415,10 +415,10 @@ public class LightAdapter {
         }
 
         if (tag == null) {
-            Log.d("Test", "***********sendCommand***********");
+//            Log.d("Test", "***********sendCommand***********");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, delay);
         } else {
-            Log.d("Test", "***********TEST***********ELSE");
+//            Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
         }
     }

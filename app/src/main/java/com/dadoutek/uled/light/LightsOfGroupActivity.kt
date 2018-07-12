@@ -182,6 +182,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
         adapter = LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener)
         recycler_view_lights.adapter = adapter
+        for(i in lightList.indices){
+            lightList[i].updateIcon()
+        }
     }
 
 

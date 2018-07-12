@@ -2,14 +2,11 @@ package com.dadoutek.uled.model
 
 import android.content.Context
 import android.text.TextUtils
-
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.util.FileSystem
 import com.telink.util.MeshUtils
-
 import java.io.Serializable
-import java.util.ArrayList
+import java.util.*
 
 class Mesh : Serializable {
 
@@ -32,7 +29,8 @@ class Mesh : Serializable {
             this.allocDeviceAddress.add(address);
         }
 
-        return address;*/ val deviceAddress: Int
+        return address;*/
+    val deviceAddress: Int
         get() {
             val lights = DBUtils.getAllLight()
             if (lights == null || lights.size == 0) {
