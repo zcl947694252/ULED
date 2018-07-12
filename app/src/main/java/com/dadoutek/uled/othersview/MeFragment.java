@@ -3,7 +3,6 @@ package com.dadoutek.uled.othersview;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -12,14 +11,12 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
@@ -61,8 +58,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 
 /**
  * Created by hejiajun on 2018/4/16.
@@ -156,33 +151,33 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         if (isVisibleToUser) {
-            getVserion();
+            getVersion();
         }
     }
 
-    private void getVserion() {
-        int dstAdress= 0;
-        if(TelinkApplication.getInstance().getConnectDevice()!=null){
-            dstAdress=TelinkApplication.getInstance().getConnectDevice().meshAddress;
+    private void getVersion() {
+        int dstAdress = 0;
+        if (TelinkApplication.getInstance().getConnectDevice() != null) {
+            dstAdress = TelinkApplication.getInstance().getConnectDevice().meshAddress;
             Commander.INSTANCE.getLightVersion(dstAdress, () -> {
-                if(lightVersion!=null&&lightVersionName!=null){
+                if (lightVersion != null && lightVersionName != null) {
                     lightVersion.setVisibility(View.VISIBLE);
                     lightVersionName.setVisibility(View.VISIBLE);
                 }
-                String version=SharedPreferencesUtils.getCurrentLightVersion();
-                if(lightVersion!=null&&version!=null){
+                String version = SharedPreferencesUtils.getCurrentLightVersion();
+                if (lightVersion != null && version != null) {
                     lightVersion.setText(version);
                 }
                 return null;
             }, () -> {
-                if(lightVersion!=null&&lightVersionName!=null){
+                if (lightVersion != null && lightVersionName != null) {
                     lightVersion.setVisibility(View.GONE);
                     lightVersionName.setVisibility(View.GONE);
                 }
                 return null;
             });
-        }else{
-            dstAdress=0;
+        } else {
+            dstAdress = 0;
         }
     }
 
