@@ -38,6 +38,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
+import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
@@ -59,9 +60,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * Created by hejiajun on 2018/4/16.
@@ -293,6 +299,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         public void error(String msg) {
             isClickExlogin = false;
             Log.d("SyncLog", "error: " + msg);
+            ToastUtils.showLong(getString(R.string.sync_error_contant)+msg);
             hideLoadingDialog();
         }
 
@@ -329,6 +336,8 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             for (int i = 0; i < list.size(); i++) {
                 lightList.addAll(DBUtils.getLightByGroupID(list.get(i).getId()));
             }
+
+            mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
 
             if (lightList.size() == 0) {
                 for (int i = 0; i < 3; i++) {
@@ -416,6 +425,75 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         }).start();
     }
 
+//    private void resetAllLight() {
+//        showLoadingDialog(getString(R.string.reset_all_now));
+//        List<DbGroup> list = DBUtils.getGroupList();
+//        List<DbLight> lightList = new ArrayList<>();
+//
+//        new Thread(() -> {
+//            DeviceInfo deviceInfo = TelinkLightApplication.getInstance().getConnectDevice();
+//            if (deviceInfo == null) {
+//                ToastUtils.showLong(R.string.disconected);
+//                return;
+//            }
+//
+//            for (int i = 0; i < list.size(); i++) {
+//                lightList.addAll(DBUtils.getLightByGroupID(list.get(i).getId()));
+//            }
+//
+//            int index1 = lightList.size()-1;
+//            int index2 = 0;
+//            for (int k = 0; k < lightList.size(); k++) {
+//                if (lightList.get(k).getMeshAddr() == deviceInfo.meshAddress) {
+//                    index2 = k;
+//                    break;
+//                }
+//            }
+//            Collections.swap(lightList, index1, index2);
+//
+//            resetLight(lightList,0);
+//
+//        }).start();
+//    }
+
+    private void resetLight(List<DbLight> dbLightList, int index) {
+        new Thread(() -> {
+            DbLight dbLight = dbLightList.get(index);
+            int lightMeshAddr = dbLight.getMeshAddr();
+            Commander.INSTANCE.kickOutLight(lightMeshAddr,
+                    () -> {
+                        //成功
+//                    LogUtils.d("Reset"+"我成功了---"+lightMeshAddr);
+                        deleteLight(dbLight);
+                        if (index + 1 > dbLightList.size() - 1)
+                            completeResetLights();
+                        else
+                            resetLight(dbLightList, index + 1);
+                        Log.d("", "resetLight: ");
+                        return null;
+                    }, () -> {
+                        //失败
+//                    LogUtils.d("Reset"+"我失败了---"+lightMeshAddr);
+                        if (index + 1 > dbLightList.size() - 1)
+                            completeResetLights();
+                        else
+                            resetLight(dbLightList, index + 1);
+                        Log.d("", "resetLight: ");
+                        return null;
+                    });
+        }).start();
+    }
+
+    private void completeResetLights() {
+        hideLoadingDialog();
+        hideLightVersion();
+        addEventListener();
+    }
+
+    private void deleteLight(DbLight dbLight) {
+        DBUtils.deleteLight(dbLight);
+    }
+
     private void hideLightVersion() {
         tvLightVersionText.setVisibility(View.GONE);
         tvLightVersion.setVisibility(View.GONE);
@@ -436,9 +514,13 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     public void performed(Event<String> event) {
         switch (event.getType()) {
             case NotificationEvent.ONLINE_STATUS:
-//                onOnlineStatusNotify((NotificationEvent)event);
+                onOnlineStatusNotify((NotificationEvent) event);
                 break;
         }
+    }
+
+    private void onOnlineStatusNotify(NotificationEvent event) {
+        Log.d("NNDadou", "onOnlineStatusNotify: " + event.getType());
     }
 
     private void exitLogin() {

@@ -428,6 +428,10 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 //            }
 //        }
 //        ToastUtils.showLong(R.string.scene_tip);
+        if (itemGroupArrayList.size() == 0) {
+            ToastUtils.showLong(R.string.add_scene_gp_tip);
+            return false;
+        }
         return true;
     }
 }

@@ -99,6 +99,7 @@ public class NotificationEvent extends DataEvent<NotificationInfo> {
         register(Opcode.BLE_GATT_OP_CTRL_FC, GET_DEVICE_STATE);
         register(Opcode.BLE_GATT_OP_CTRL_EA, GET_DEVICE_STATE);
         register(Opcode.BLE_GATT_OP_CTRL_EB, USER_ALL_NOTIFY);
+        register(Opcode.BLE_GATT_OP_CTRL_E3, USER_ALL_NOTIFY);
     }
 
     /**

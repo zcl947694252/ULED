@@ -12,6 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.network.NetworkObserver;
+
+import org.jetbrains.annotations.NotNull;
 
 public class BaseFragment extends Fragment {
 

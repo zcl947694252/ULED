@@ -458,7 +458,8 @@ public class DBUtils {
     /********************************************其他*******************************/
 
     public synchronized static void addNewGroup(String name, List<DbGroup> groups, Context context) {
-        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+//        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        if (!checkReachedTheLimit(groups)) {
             int newMeshAdress;
             DbGroup group = new DbGroup();
             newMeshAdress = getGroupAdress();

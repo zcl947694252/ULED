@@ -23,6 +23,8 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.Delay
+import kotlinx.coroutines.experimental.delay
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
@@ -33,6 +35,7 @@ object Commander : EventListener<String> {
     private var mGroupAddr: Int = 0
     private var mLightAddr: Int = 0
     private var mGroupSuccess: Boolean = false
+    private var mResetSuccess: Boolean = false
     private var mGetVsersionSuccess: Boolean = false
     private var mUpdateMeshSuccess: Boolean = false
 
@@ -58,6 +61,47 @@ object Commander : EventListener<String> {
         }
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
+    }
+
+     fun kickOutLight(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit){
+        mApplication?.addEventListener(NotificationEvent.USER_ALL_NOTIFY, this)
+        mLightAddr = lightMeshAddr
+        val opcode = Opcode.KICK_OUT    //0xE3 代表恢复出厂指令
+        com.dadoutek.uled.util.LogUtils.d("Reset----sendCode------")
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, mLightAddr, null)
+        mResetSuccess=false
+
+        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<Long?> {
+                    var mDisposable: Disposable? = null
+                    override fun onComplete() {
+                        mDisposable?.dispose()
+                        mApplication?.removeEventListener(Commander)
+                    }
+
+                    override fun onSubscribe(d: Disposable) {
+                        mDisposable = d
+                    }
+
+                    override fun onNext(t: Long) {
+                        LogUtils.d("mGroupSuccess = $mResetSuccess")
+                        if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                            com.dadoutek.uled.util.LogUtils.d("Reset----timeout------")
+                            onComplete()
+                            failedCallback.invoke()
+                        } else if (mResetSuccess) {
+                            com.dadoutek.uled.util.LogUtils.d("Reset----success------")
+                            onComplete()
+                            successCallback.invoke()
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        LogUtils.d(e.message)
+                    }
+                })
     }
 
     fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
@@ -216,6 +260,7 @@ object Commander : EventListener<String> {
         when (event?.type) {
             NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
             NotificationEvent.GET_DEVICE_STATE -> this.onGetLightVersion(event as NotificationEvent)
+            NotificationEvent.USER_ALL_NOTIFY->this.OnKickoutEvent(event as  NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
         }
@@ -338,5 +383,16 @@ object Commander : EventListener<String> {
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
+    }
+
+    private fun OnKickoutEvent(notificationEvent: NotificationEvent) {
+        val data = notificationEvent.args.params
+        for(i in data.indices){
+            com.dadoutek.uled.util.LogUtils.d("Res----------"+data[i].toInt())
+        }
+        com.dadoutek.uled.util.LogUtils.d("Reset----------"+data[0].toInt()+"=="+ mLightAddr)
+//        if(data[0].toInt()== mLightAddr){
+            mResetSuccess=true
+//        }
     }
 }

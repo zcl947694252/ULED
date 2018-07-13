@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -105,7 +106,11 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun setSceneForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        params.setOldMeshName(mesh.factoryName)
+        if(BuildConfig.DEBUG){
+            params.setOldMeshName(Constant.TEST_MESH_NAME)
+        }else{
+            params.setOldMeshName(mesh.factoryName)
+        }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -145,7 +150,11 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun updateNameForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        params.setOldMeshName(mesh.factoryName)
+        if(BuildConfig.DEBUG){
+            params.setOldMeshName(Constant.TEST_MESH_NAME)
+        }else{
+            params.setOldMeshName(mesh.factoryName)
+        }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import com.blankj.utilcode.util.LogUtils
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
@@ -98,7 +99,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 val mesh = mApplication.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
-                params.setMeshName(mesh.factoryName)
+                if(BuildConfig.DEBUG){
+                    params.setMeshName(Constant.TEST_MESH_NAME)
+                }else{
+                    params.setMeshName(mesh.factoryName)
+                }
+
                 params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)
@@ -214,7 +220,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             val mesh = TelinkLightApplication.getApp().mesh
             //自动重连参数
             val connectParams = Parameters.createAutoConnectParameters()
-            connectParams.setMeshName(mesh.factoryName)
+            if(BuildConfig.DEBUG){
+                connectParams.setMeshName(Constant.TEST_MESH_NAME)
+            }else{
+                connectParams.setMeshName(mesh.factoryName)
+            }
             connectParams.setPassword(mesh.factoryPassword)
             connectParams.autoEnableNotification(true)
             connectParams.setConnectMac(mDeviceInfo?.macAddress)
@@ -245,7 +255,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
         //更新参数
         val params = Parameters.createUpdateParameters()
-        params.setOldMeshName(mesh.factoryName)
+        if(BuildConfig.DEBUG){
+            params.setOldMeshName(Constant.TEST_MESH_NAME)
+        }else{
+            params.setOldMeshName(mesh.factoryName)
+        }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),

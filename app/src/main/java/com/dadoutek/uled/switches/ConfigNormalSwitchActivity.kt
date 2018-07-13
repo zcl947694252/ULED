@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
@@ -31,6 +32,8 @@ import com.telink.util.Strings
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.design.snackbar
 
 
@@ -142,14 +145,18 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
                 Log.d("Saw", "ConfigNormalSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
-                progressBar.visibility = View.GONE
+                launch(UI){
+                    progressBar.visibility = View.GONE
+                }
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
 //                startActivity(Intent(this,MainActivity::class.java))
 //                finish()
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(configPirRoot, getString(R.string.group_failed))
-                progressBar.visibility = View.GONE
+                launch(UI){
+                    progressBar.visibility = View.GONE
+                }
             }
         }
     }
@@ -158,7 +165,11 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun setGroupForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        params.setOldMeshName(mesh.factoryName)
+        if(BuildConfig.DEBUG){
+            params.setOldMeshName(Constant.TEST_MESH_NAME)
+        }else{
+            params.setOldMeshName(mesh.factoryName)
+        }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -183,7 +194,11 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun updateNameForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        params.setOldMeshName(mesh.factoryName)
+        if(BuildConfig.DEBUG){
+            params.setOldMeshName(Constant.TEST_MESH_NAME)
+        }else{
+            params.setOldMeshName(mesh.factoryName)
+        }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),

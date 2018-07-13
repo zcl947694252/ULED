@@ -115,6 +115,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     private var mWakeLock: PowerManager.WakeLock? = null
 
+    override fun onStart() {
+        super.onStart()
+        initConnect()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -130,16 +135,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
-
-        initConnect()
     }
 
     private fun initConnect() {
-        val list: List<DbLight>
-        list = DBUtils.getAllLight()
+        val list: List<DbLight> = DBUtils.getAllLight()
         for (i in list.indices) {
-            list.get(i).connectionStatus = 2
-            DBUtils.updateLight(list.get(i))
+            list[i].connectionStatus = 2
+            DBUtils.updateLight(list[i])
         }
     }
 

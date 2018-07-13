@@ -15,7 +15,10 @@ import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.google.gson.Gson
 import com.mob.tools.utils.DeviceHelper
+import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
@@ -28,10 +31,13 @@ class SyncDataPutOrGetUtils {
 
         /********************************同步数据之上传数据 */
 
+//        var isSuccess: Boolean = true
+
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
 
             Thread {
+
                 val dbDataChangeList = DBUtils.getDataChangeAll()
 
                 val dbUser = DBUtils.getLastUser()
@@ -41,7 +47,11 @@ class SyncDataPutOrGetUtils {
                     launch(UI) {
                         syncCallback.complete()
                     }
+                    return@Thread
                 }
+
+                val observableList = ArrayList<Observable<String>>()
+//                val observableList : MutableList<Observable<String>> = ArrayList<Observable<String>>()
 
                 for (i in dbDataChangeList.indices) {
                     if (i == 0) {
@@ -49,67 +59,64 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                    getLocalData(dbDataChangeList[i].tableName,
+                    var observable: Observable<String> = this.sendDataToServer(dbDataChangeList[i].tableName,
                             dbDataChangeList[i].changeId,
                             dbDataChangeList[i].changeType,
-                            dbUser.token, dbDataChangeList[i].id!!, syncCallback)
+                            dbUser.token, dbDataChangeList[i].id!!)!!
+                    observableList.add(observable)
+
                     if (i == dbDataChangeList.size - 1) {
-                        ToastUtils.showLong(context.getString(R.string.upload_data_success))
-                        launch(UI) {
-                            syncCallback.complete()
-                        }
+//                                observableNew = observableList.get(j).mergeWith(observableList.get(j-1))
+//                                observableNew=Observable.merge(observableList)
+                        val observables = arrayOfNulls<Observable<String>>(observableList.size)
+                        observableList.toArray(observables)
+
+                        Observable.mergeArrayDelayError<String>(*observables)
+                                .doFinally {
+                                }
+                                .subscribe(object : Observer<String?> {
+                                    override fun onComplete() {
+                                        launch(UI) {
+                                            syncCallback.complete()
+                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
+                                        }
+                                    }
+                                    override fun onSubscribe(d: Disposable) {
+                                    }
+
+                                    override fun onNext(t: String) {
+                                    }
+
+                                    override fun onError(e: Throwable) {
+                                        launch(UI) {
+                                            syncCallback.error(e.cause.toString())
+//                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
+                                        }
+                                    }
+                                })
                     }
                 }
+
             }.start()
         }
 
         @Synchronized
-        private fun getLocalData(tableName: String, changeId: Long, type: String,
-                                 token: String, id: Long, syncCallback: SyncCallback) {
+        private fun sendDataToServer(tableName: String, changeId: Long, type: String,
+                                     token: String, id: Long): Observable<String>? {
+            var result: Observable<String>?
             when (tableName) {
                 "DB_GROUP" -> {
                     when (type) {
                         Constant.DB_ADD -> {
                             val group = DBUtils.getGroupByID(changeId)
-                            GroupMdodel.add(token, group, group.belongRegionId, id, changeId)!!
-                                    .subscribe(object :
-                                            NetworkObserver<String>() {
-                                        override fun onNext(t: String) {
-                                        }
+                            return GroupMdodel.add(token, group, group.belongRegionId, id, changeId)!!
 
-                                        override fun onError(e: Throwable) {
-                                            super.onError(e)
-                                            launch(UI) {
-                                                syncCallback.error(e.message)
-                                            }
-                                        }
-                                    })
                         }
-                        Constant.DB_DELETE -> GroupMdodel.delete(token, changeId.toInt(), id)?.subscribe(object : NetworkObserver<String>() {
-                            override fun onNext(t: String) {
-                            }
-
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                launch(UI) {
-                                    syncCallback.error(e.message)
-                                }
-                            }
-                        })
+                        Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                         Constant.DB_UPDATE -> {
                             val group = DBUtils.getGroupByID(changeId)
-                            GroupMdodel.update(token, changeId.toInt(),
-                                    group.name, group.brightness, group.colorTemperature, id)?.subscribe(object : NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                            return GroupMdodel.update(token, changeId.toInt(),
+                                    group.name, group.brightness, group.colorTemperature, id)
                         }
                     }
                 }
@@ -118,52 +125,18 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val light = DBUtils.getLightByID(changeId)
-                            LightModel.add(token, light, id, changeId)?.subscribe(object :
-                                    NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                            return LightModel.add(token, light, id, changeId)
                         }
                         Constant.DB_DELETE -> {
-                            LightModel.delete(token,
-                                    id, changeId.toInt())?.subscribe(object : NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                            return LightModel.delete(token,
+                                    id, changeId.toInt())
                         }
                         Constant.DB_UPDATE -> {
                             val light = DBUtils.getLightByID(changeId)
-                            LightModel.update(token,
+                            return LightModel.update(token,
                                     light.name, light.brightness,
                                     light.colorTemperature, light.belongGroupId.toInt(),
                                     id, changeId.toInt())
-                                    .subscribe(object : NetworkObserver<String>() {
-                                        override fun onNext(t: String) {
-//                                            ToastUtils.showShort(t)
-                                        }
-
-                                        override fun onError(e: Throwable) {
-                                            super.onError(e)
-                                            launch(UI) {
-                                                syncCallback.error(e.message)
-                                            }
-                                        }
-                                    })
                         }
                     }
                 }
@@ -171,46 +144,14 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val region = DBUtils.getRegionByID(changeId)
-                            RegionModel.add(token, region, id, changeId)?.subscribe(object :
-                                    NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                            return RegionModel.add(token, region, id, changeId)
                         }
-                        Constant.DB_DELETE -> RegionModel.delete(token, changeId.toInt(),
-                                id)?.subscribe(object : NetworkObserver<String>() {
-                            override fun onNext(t: String) {
-                            }
-
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                launch(UI) {
-                                    syncCallback.error(e.message)
-                                }
-                            }
-                        })
+                        Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(),
+                                id)
                         Constant.DB_UPDATE -> {
                             val region = DBUtils.getRegionByID(changeId)
-                            RegionModel.update(token,
-                                    changeId.toInt(), region, id)?.subscribe(object :
-                                    NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                            return RegionModel.update(token,
+                                    changeId.toInt(), region, id)
                         }
                     }
                 }
@@ -234,43 +175,13 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val scene = DBUtils.getSceneByID(changeId)
-                            SceneModel.add(token, bodyScene
-                                    , id, changeId)?.subscribe(object : NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                }
-
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                            return SceneModel.add(token, bodyScene
+                                    , id, changeId)
                         }
-                        Constant.DB_DELETE -> SceneModel.delete(token,
-                                changeId.toInt(), id)?.subscribe(object : NetworkObserver<String>() {
-                            override fun onNext(t: String) {
-                            }
+                        Constant.DB_DELETE -> return SceneModel.delete(token,
+                                changeId.toInt(), id)
+                        Constant.DB_UPDATE -> return SceneModel.update(token, changeId.toInt(), bodyScene, id)
 
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                launch(UI) {
-                                    syncCallback.error(e.message)
-                                }
-                            }
-                        })
-                        Constant.DB_UPDATE -> SceneModel.update(token, changeId.toInt(), bodyScene, id)
-                                ?.subscribe(object : NetworkObserver<String>() {
-                                    override fun onNext(t: String) {
-                                    }
-
-                                    override fun onError(e: Throwable) {
-                                        super.onError(e)
-                                        launch(UI) {
-                                            syncCallback.error(e.message)
-                                        }
-                                    }
-                                })
                     }
                 }
 
@@ -279,32 +190,24 @@ class SyncDataPutOrGetUtils {
 
                     if (user == null && type != Constant.DELETEING) {
                         Log.d("用户数据出错", "")
-                        return
                     }
 
                     when (type) {
                         Constant.DB_ADD -> {
                             //注册时已经添加
+                            return null
                         }
                         Constant.DB_DELETE -> {
                             //无用户删除操作
+                            return null
                         }
                         Constant.DB_UPDATE ->
-                            AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")
-                                    ?.subscribe(object : NetworkObserver<String>() {
-                                        override fun onNext(t: String) {
-                                        }
+                            return AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")
 
-                                        override fun onError(e: Throwable) {
-                                            super.onError(e)
-                                            launch(UI) {
-                                                syncCallback.error(e.message)
-                                            }
-                                        }
-                                    })
                     }
                 }
             }
+            return null
         }
 
         /********************************同步数据之下拉数据 */
@@ -439,6 +342,5 @@ class SyncDataPutOrGetUtils {
 //        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
             application.setupMesh(mesh)
         }
-
     }
 }
