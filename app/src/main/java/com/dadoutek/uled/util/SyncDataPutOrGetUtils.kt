@@ -4,15 +4,15 @@ import android.content.Context
 import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.HttpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.google.gson.Gson
 import com.mob.tools.utils.DeviceHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -71,19 +71,19 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val group = DBUtils.getGroupByID(changeId)
-                            GroupMdodel.add(token, group.meshAddr, group.name,
-                                    group.brightness, group.colorTemperature,
-                                    group.belongRegionId, id, changeId)!!.subscribe(object : NetworkObserver<String>() {
-                                override fun onNext(t: String) {
-                                }
+                            GroupMdodel.add(token, group, group.belongRegionId, id, changeId)!!
+                                    .subscribe(object :
+                                            NetworkObserver<String>() {
+                                        override fun onNext(t: String) {
+                                        }
 
-                                override fun onError(e: Throwable) {
-                                    super.onError(e)
-                                    launch(UI) {
-                                        syncCallback.error(e.message)
-                                    }
-                                }
-                            })
+                                        override fun onError(e: Throwable) {
+                                            super.onError(e)
+                                            launch(UI) {
+                                                syncCallback.error(e.message)
+                                            }
+                                        }
+                                    })
                         }
                         Constant.DB_DELETE -> GroupMdodel.delete(token, changeId.toInt(), id)?.subscribe(object : NetworkObserver<String>() {
                             override fun onNext(t: String) {
@@ -118,10 +118,8 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val light = DBUtils.getLightByID(changeId)
-                            LightModel.add(token, light.meshAddr, light.name,
-                                    light.brightness, light.colorTemperature, light.macAddr,
-                                    light.meshUUID, light.productUUID, light.belongGroupId.toInt(),
-                                    id, changeId)?.subscribe(object : NetworkObserver<String>() {
+                            LightModel.add(token, light, id, changeId)?.subscribe(object :
+                                    NetworkObserver<String>() {
                                 override fun onNext(t: String) {
 
                                 }
@@ -173,9 +171,8 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val region = DBUtils.getRegionByID(changeId)
-                            RegionModel.add(token, region.controlMesh,
-                                    region.controlMeshPwd, region.installMesh,
-                                    region.installMeshPwd, id, changeId)?.subscribe(object : NetworkObserver<String>() {
+                            RegionModel.add(token, region, id, changeId)?.subscribe(object :
+                                    NetworkObserver<String>() {
                                 override fun onNext(t: String) {
                                 }
 
@@ -202,8 +199,8 @@ class SyncDataPutOrGetUtils {
                         Constant.DB_UPDATE -> {
                             val region = DBUtils.getRegionByID(changeId)
                             RegionModel.update(token,
-                                    changeId.toInt(), region.controlMesh, region.controlMeshPwd,
-                                    region.installMesh, region.installMeshPwd, id)?.subscribe(object : NetworkObserver<String>() {
+                                    changeId.toInt(), region, id)?.subscribe(object :
+                                    NetworkObserver<String>() {
                                 override fun onNext(t: String) {
                                 }
 
@@ -393,11 +390,11 @@ class SyncDataPutOrGetUtils {
             }
 
             override fun complete() {
-                LogUtils.d("putSuccess:"+"上传成功")
+                LogUtils.d("putSuccess:" + "上传成功")
             }
 
             override fun error(msg: String) {
-                LogUtils.d("GetDataError:"+msg)
+                LogUtils.d("GetDataError:" + msg)
             }
 
         }

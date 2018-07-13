@@ -1,20 +1,17 @@
 package com.dadoutek.uled.model.HttpModel
 
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object LightModel {
-    fun add(token: String, meshAddr: Int, name: String, brightness: Int, colorTemperature: Int,
-            macAddr:String, meshUUID: Int, productUUID: Int, belongGroupId: Int,
-            id: Long, changeId: Long?): Observable<String>? {
+    fun add(token: String,light: DbLight, id: Long, changeId: Long?): Observable<String>? {
         return NetworkFactory.getApi()
-                .addLight(token,meshAddr,name,brightness,colorTemperature,
-                        macAddr,meshUUID,productUUID,belongGroupId,changeId!!.toInt())
+                .addLight(token,light,changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -26,9 +23,13 @@ object LightModel {
     fun update(token: String, name: String, brightness: Int,
                colorTemperature: Int, belongGroupId: Int, id: Long
                , lid: Int): Observable<String> {
+        val dbLight = DbLight()
+        dbLight.name = name
+        dbLight.brightness = brightness
+        dbLight.colorTemperature = colorTemperature
+        dbLight.belongGroupId = belongGroupId.toLong()
         return NetworkFactory.getApi()
-                .updateLight(token,lid,name,brightness,colorTemperature,
-                        belongGroupId)
+                .updateLight(token,lid,dbLight)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

@@ -1,16 +1,18 @@
 package com.dadoutek.uled.model.HttpModel
 
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
-import com.dadoutek.uled.model.DbModel.*
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object GroupMdodel {
-    fun add(token: String, meshAddr: Int, name: String, brightness: Int, colorTemperature: Int, belongRegionId: Int, id: Long, changeId: Long?): Observable<String>? {
+    fun add(token: String, dbGroup: DbGroup, belongRegionId: Int, id: Long, changeId: Long?):
+            Observable<String>? {
         return NetworkFactory.getApi()
-                .addGroup(token,meshAddr,name,brightness,colorTemperature,belongRegionId,changeId!!.toInt())
+                .addGroup(token, dbGroup, belongRegionId, changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -20,8 +22,12 @@ object GroupMdodel {
     }
 
     fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int, id: Long): Observable<String>? {
+        val dbGroup = DbGroup()
+        dbGroup.name = name
+        dbGroup.brightness = brightness
+        dbGroup.colorTemperature = colorTemperature
         return NetworkFactory.getApi()
-                .updateGroup(token,rid,name,brightness,colorTemperature)
+                .updateGroup(token, rid, dbGroup)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -30,9 +36,9 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun delete(token: String, rid: Int,id: Long): Observable<String>? {
+    fun delete(token: String, rid: Int, id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .deleteGroup(token,rid)
+                .deleteGroup(token, rid)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -47,8 +53,8 @@ object GroupMdodel {
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    for(item in it){
-                        DBUtils.saveGroup(item,true)
+                    for (item in it) {
+                        DBUtils.saveGroup(item, true)
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())

@@ -733,6 +733,7 @@ public class Peripheral extends BluetoothGattCallback {
         CommandContext commandContext = this.mNotificationCallbacks.get(key);
 
         if (commandContext != null) {
+            byte[] value = characteristic.getValue();
 
             this.onNotify(characteristic.getValue(),
                     commandContext.command.serviceUUID,
