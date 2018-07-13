@@ -106,6 +106,9 @@ public final class TelinkLightApplication extends TelinkApplication {
             this.mesh = new Mesh();
             this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
             this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
+        }else{
+            this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
+            this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
         }
         return this.mesh;
     }

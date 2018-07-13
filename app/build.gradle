@@ -20,8 +20,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 70
-        versionName "1.2.12"
+        versionCode 71
+        versionName "1.2.13"
 
         multiDexEnabled true
 

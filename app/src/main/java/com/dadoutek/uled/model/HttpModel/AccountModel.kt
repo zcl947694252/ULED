@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
+import android.util.Config
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver

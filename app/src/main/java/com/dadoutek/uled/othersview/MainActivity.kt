@@ -547,16 +547,20 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     DBUtils.updateLight(dbLight)
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
                 } else {
-                    val dbLightNew = DbLight()
-                    dbLightNew.setConnectionStatus(connectionStatus.value)
-                    dbLightNew.updateIcon()
-                    dbLightNew.belongGroupId = DBUtils.getGroupNull().id
-                    dbLightNew.brightness = brightness
-                    dbLightNew.colorTemperature = 0
-                    dbLightNew.meshAddr = meshAddress
-                    dbLightNew.name = getString(R.string.allLight)
-                    dbLightNew.macAddr = "0"
-                    DBUtils.saveLight(dbLightNew, false)
+                    if(connectionStatus!=ConnectionStatus.OFFLINE){
+                        val dbLightNew = DbLight()
+                        dbLightNew.setConnectionStatus(connectionStatus.value)
+                        dbLightNew.updateIcon()
+                        dbLightNew.belongGroupId = DBUtils.getGroupNull().id
+                        dbLightNew.brightness = brightness
+                        dbLightNew.colorTemperature = 0
+                        dbLightNew.meshAddr = meshAddress
+                        dbLightNew.name = getString(R.string.allLight)
+                        dbLightNew.macAddr = "0"
+                        DBUtils.saveLight(dbLightNew, false)
+
+                        com.dadoutek.uled.util.LogUtils.d("creat_light"+dbLightNew.meshAddr)
+                    }
                 }
             }
 

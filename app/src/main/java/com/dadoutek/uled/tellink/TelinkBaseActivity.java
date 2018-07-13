@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.util.StringUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,19 +101,6 @@ public class TelinkBaseActivity extends AppCompatActivity {
     }
 
     public boolean compileExChar(String str) {
-        
-        if(str.isEmpty()){
-            return true;
-        }
-
-        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？ ]";
-
-        Pattern pattern = Pattern.compile(limitEx);
-        Matcher m = pattern.matcher(str);
-
-        if (m.find()||str.contains("\\")) {
-            return true;
-        }
-        return false;
+        return StringUtils.compileExChar(str);
     }
 }

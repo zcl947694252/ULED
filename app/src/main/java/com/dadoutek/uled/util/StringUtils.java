@@ -17,7 +17,8 @@ public class StringUtils {
 
     public static boolean compileExChar(String str) {
 
-        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+//        String limitEx = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        String limitEx = "[`~\\\\!()+=|{}':;',\\[\\].<>/?~！￥……（）——+|{}【】‘；：”“’。，、？]";
 
         Pattern pattern = Pattern.compile(limitEx);
         Matcher m = pattern.matcher(str);
@@ -42,7 +43,7 @@ public class StringUtils {
         };
         //特殊字符过滤器
         InputFilter specialCharFilter = (source, start, end, dest, dstart, dend) -> {
-            String regexStr = "[`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？_-]";
+            String regexStr = "[`~\\\\!()+=|{}':;',\\[\\].<>/?~！￥……（）——+|{}【】‘；：”“’。，、？]";
             Pattern pattern = Pattern.compile(regexStr);
             Matcher matcher = pattern.matcher(source.toString());
             if (matcher.matches()) {
