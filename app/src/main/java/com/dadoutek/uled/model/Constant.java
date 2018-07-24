@@ -23,7 +23,7 @@ public class Constant implements Serializable {
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG?"test9":"dadousmart";
+    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG?"test5":"dadousmart";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -34,7 +34,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG?"test9":"out_of_mesh";
+    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG?"test5":"out_of_mesh";
 
     public static final String TEST_MESH_NAME = "dadousmart";
 
@@ -88,8 +88,10 @@ public class Constant implements Serializable {
     public static final String DB_UPDATE = "DB_UPDATE";
     //用户类型
     public static String USER_TYPE = "USER_TYPE";
-    //用户类型老用户
-    public static String USER_TYPE_OLD = "OLD_USER";
+    //    //用户类型老用户
+//    public static String USER_TYPE_OLD = "OLD_USER";
+    //用户类型老用户（2018-7-23：取消新老用户的标识，全部标记为新用户数据类型）
+    public static String USER_TYPE_OLD = "NEW_USER";
     //用户类型新用户
     public static String USER_TYPE_NEW = "NEW_USER";
     //用户类型新用户

@@ -35,8 +35,11 @@ public class EventBus<T> {
             new LinkedBlockingQueue<>(128);
     private static final ThreadFactory sThreadFactory = new DefaultThreadFactory();
 
+//    private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+//            TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory); //Executors.newCachedThreadPool(new DefaultThreadFactory());
+
     private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
-            TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory); //Executors.newCachedThreadPool(new DefaultThreadFactory());
+            TimeUnit.SECONDS, sPoolWorkQueue, sThreadFactory, new ThreadPoolExecutor.DiscardOldestPolicy());
 
     protected final Map<T, List<EventListener<T>>> mEventListeners = new ConcurrentHashMap<>();
     protected final Queue<Event<T>> mEventQueue = new ConcurrentLinkedQueue<>();

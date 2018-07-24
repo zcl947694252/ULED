@@ -115,14 +115,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     private var mWakeLock: PowerManager.WakeLock? = null
 
-    override fun onStart() {
-        super.onStart()
-        initConnect()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
+        initConnect()
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
@@ -175,9 +172,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         }
     }
 
-
     override fun onResume() {
         super.onResume()
+
+        //检测service是否为空，为空则重启
+        if(TelinkLightService.Instance()==null){
+            mApplication!!.startLightService(TelinkLightService::class.java)
+        }
 
         if (mWakeLock != null) {
             mWakeLock?.acquire()

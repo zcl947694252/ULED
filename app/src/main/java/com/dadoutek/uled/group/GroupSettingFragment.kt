@@ -42,12 +42,13 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
         private val delayTime = 20
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            this.onValueChange(seekBar, seekBar.progress)
+            this.onValueChange(seekBar, seekBar.progress, true)
+            LogUtils.d("seekBarstop"+seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             this.preTime = System.currentTimeMillis()
-            this.onValueChange(seekBar, seekBar.progress)
+            this.onValueChange(seekBar, seekBar.progress, false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
@@ -63,10 +64,11 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 return
             }
 
-            this.onValueChange(seekBar, progress)
+            LogUtils.d("seekBarChange"+seekBar.progress)
+            this.onValueChange(seekBar, progress, false)
         }
 
-        private fun onValueChange(view: View, progress: Int) {
+        private fun onValueChange(view: View, progress: Int,immediate: Boolean) {
 
             val addr = group!!.meshAddr
             val opcode: Byte
@@ -78,7 +80,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 group!!.brightness = progress
                 DBUtils.updateGroup(group)
                 tv_brightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
 
             } else if (view === temperatureBar) {
 
@@ -87,7 +89,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 group!!.colorTemperature = progress
                 DBUtils.updateGroup(group)
                 tv_temperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
             }
         }
     }

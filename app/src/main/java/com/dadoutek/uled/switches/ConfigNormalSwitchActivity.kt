@@ -60,6 +60,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
+                TelinkLightService.Instance().idleMode(true)
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                 return true
             }
@@ -68,6 +69,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     override fun onBackPressed() {
+        TelinkLightService.Instance().idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 

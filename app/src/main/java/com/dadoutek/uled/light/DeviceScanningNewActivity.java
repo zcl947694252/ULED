@@ -1224,7 +1224,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 Log.d("ScanningTest", "update mesh success");
                 mRetryCount = 0;
-                this.startScan(1000);
+                this.startScan(0);
                 break;
             case LightAdapter.STATUS_UPDATE_MESH_FAILURE:
                 //加灯失败继续扫描
@@ -1232,7 +1232,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     mRetryCount++;
                     Log.d("ScanningTest", "update mesh failed , retry count = " + mRetryCount);
                     stopTimer();
-                    this.startScan(1000);
+                    this.startScan(0);
                 } else {
                     Log.d("ScanningTest", "update mesh failed , do not retry");
                 }

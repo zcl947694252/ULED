@@ -62,7 +62,9 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
                     tvBrightness.setText(progress + "%");
                     opcode = (byte) 0xD2;
                     params = new byte[]{(byte) progress};
-                    new Thread(() -> TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)).start();
+                    new Thread(
+                            () ->
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)).start();
                 }
             } else if (seekBar.getId() == R.id.sb_temperature) {
                 TextView tvTemperature = (TextView) getViewByPosition(position, R.id.tv_temperature);

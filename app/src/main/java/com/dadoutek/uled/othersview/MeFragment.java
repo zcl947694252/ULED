@@ -299,7 +299,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         public void error(String msg) {
             isClickExlogin = false;
             Log.d("SyncLog", "error: " + msg);
-            ToastUtils.showLong(getString(R.string.sync_error_contant)+msg);
+            ToastUtils.showLong(getString(R.string.sync_error_contant));
             hideLoadingDialog();
         }
 

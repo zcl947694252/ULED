@@ -68,9 +68,18 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            android.R.id.home -> ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+            android.R.id.home -> {
+                TelinkLightService.Instance().idleMode(true)
+                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        TelinkLightService.Instance().idleMode(true)
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
     override fun onDestroy() {
