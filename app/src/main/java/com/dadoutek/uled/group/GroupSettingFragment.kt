@@ -48,7 +48,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             this.preTime = System.currentTimeMillis()
-            this.onValueChange(seekBar, seekBar.progress, false)
+            this.onValueChange(seekBar, seekBar.progress, true)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
@@ -65,7 +65,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
             }
 
             LogUtils.d("seekBarChange"+seekBar.progress)
-            this.onValueChange(seekBar, progress, false)
+            this.onValueChange(seekBar, progress, true)
         }
 
         private fun onValueChange(view: View, progress: Int,immediate: Boolean) {
