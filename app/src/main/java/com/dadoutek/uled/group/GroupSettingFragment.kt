@@ -25,6 +25,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.widget.ColorPicker
 import kotlinx.android.synthetic.main.fragment_group_setting.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GroupSettingFragment : BaseFragment(), View.OnClickListener {
 
@@ -35,6 +36,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
     private var btn_remove_group: Button? = null
     private var btn_rename: Button? = null
     var group: DbGroup? = null
+    private var stopTracking = false
 
     private val barChangeListener = object : OnSeekBarChangeListener {
 
@@ -42,11 +44,13 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
         private val delayTime = 20
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
+            stopTracking=true
             this.onValueChange(seekBar, seekBar.progress, true)
             LogUtils.d("seekBarstop"+seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
+            stopTracking=false
             this.preTime = System.currentTimeMillis()
             this.onValueChange(seekBar, seekBar.progress, true)
         }
@@ -82,6 +86,9 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 tv_brightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
 
+                if(stopTracking){
+                    updateLights(progress,"brightness", group!!)
+                }
             } else if (view === temperatureBar) {
 
                 opcode = Opcode.SET_TEMPERATURE
@@ -90,9 +97,38 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 DBUtils.updateGroup(group)
                 tv_temperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
+
+                if(stopTracking){
+                    updateLights(progress,"colorTemperature",group!!)
+                }
             }
         }
     }
+
+    @Synchronized
+    private fun updateLights(progress: Int, type: String,group: DbGroup) {
+         var lightList: MutableList<DbLight> = ArrayList()
+
+        if (group.meshAddr == 0xffff) {
+            //            lightList = DBUtils.getAllLight();
+            val list = DBUtils.getGroupList()
+            for (j in list.indices) {
+                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+            }
+        } else {
+            lightList = DBUtils.getLightByGroupID(group.id)
+        }
+
+         for (dbLight : DbLight in lightList){
+             if(type == "brightness"){
+                 dbLight.brightness=progress
+             }else if (type == "colorTemperature"){
+                 dbLight.colorTemperature=progress
+             }
+             DBUtils.updateLight(dbLight)
+         }
+    }
+
     private val colorChangedListener = object : ColorPicker.OnColorChangeListener {
 
         private var preTime: Long = 0

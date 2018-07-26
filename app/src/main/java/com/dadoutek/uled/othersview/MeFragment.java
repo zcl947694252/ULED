@@ -24,6 +24,7 @@ import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
+import com.dadoutek.uled.group.DeviceGroupingActivity;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -41,6 +42,7 @@ import com.dadoutek.uled.util.DBManager;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
+import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.event.NotificationEvent;
@@ -297,12 +299,26 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
         @Override
         public void error(String msg) {
-            isClickExlogin = false;
-            Log.d("SyncLog", "error: " + msg);
-            ToastUtils.showLong(getString(R.string.sync_error_contant));
-            hideLoadingDialog();
-        }
+            if(isClickExlogin){
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.sync_error_exlogin)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+                            SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                            TelinkLightService.Instance().idleMode(true);
+                            dialog.dismiss();
+                            restartApplication();
+                        })
+                        .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                            dialog.dismiss();
+                            isClickExlogin = false;
+                            hideLoadingDialog();
+                        }).show();
+            }
 
+            Log.d("SyncLog", "error: " + msg);
+//            ToastUtils.showLong(getString(R.string.sync_error_contant));
+        }
     };
 
     private void showSureResetDialogByApp() {
