@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
+import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -12,6 +13,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dd.processbutton.iml.ActionProcessButton
@@ -60,13 +62,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         TelinkLightService.Instance()?.idleMode(true)
         initView()
         initListener()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                finish()
+                doFinish()
                 return true
             }
         }
@@ -87,7 +88,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             mConnected = false
             startScan()
         }
-
     }
 
 
@@ -99,9 +99,9 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 val mesh = mApplication.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
-                if(BuildConfig.DEBUG){
+                if (BuildConfig.DEBUG) {
                     params.setMeshName(Constant.TEST_MESH_NAME)
-                }else{
+                } else {
                     params.setMeshName(mesh.factoryName)
                 }
 
@@ -159,7 +159,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.progress = -1   //控件显示Error状态
         progressBtn.text = getString(R.string.not_found_switch)
     }
-
 
 
     /**
@@ -220,9 +219,9 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             val mesh = TelinkLightApplication.getApp().mesh
             //自动重连参数
             val connectParams = Parameters.createAutoConnectParameters()
-            if(BuildConfig.DEBUG){
+            if (BuildConfig.DEBUG) {
                 connectParams.setMeshName(Constant.TEST_MESH_NAME)
-            }else{
+            } else {
                 connectParams.setMeshName(mesh.factoryName)
             }
             connectParams.setPassword(mesh.factoryPassword)
@@ -243,6 +242,15 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     }
 
+    private fun doFinish() {
+        this.mApplication.removeEventListener(this)
+        TelinkLightService.Instance().idleMode(true)
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
+
+    override fun onBackPressed() {
+        this.doFinish()
+    }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
         val mesh = this.mApplication.mesh
@@ -250,14 +258,14 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         if (meshAddress == -1) {
 //            this.showToast(getString(R.string.much_lamp_tip))
-            this.finish()
+            this.doFinish()
             return
         }
         //更新参数
         val params = Parameters.createUpdateParameters()
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             params.setOldMeshName(Constant.TEST_MESH_NAME)
-        }else{
+        } else {
             params.setOldMeshName(mesh.factoryName)
         }
         params.setOldPassword(mesh.factoryPassword)

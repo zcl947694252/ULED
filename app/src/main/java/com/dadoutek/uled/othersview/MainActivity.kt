@@ -57,6 +57,7 @@ import org.jetbrains.anko.design.snackbar
 import java.util.concurrent.TimeUnit
 
 class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
+    private val connectFailedDeviceMacAddr: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
     private val MAX_RETRY_CONNECT_TIME = 3
     private val CONNECT_TIMEOUT = 10
@@ -159,6 +160,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     override fun onPause() {
         super.onPause()
+        mConnectingSnackbar = null;
 
         snackbarScanning?.dismiss()
         progressBar.visibility = View.GONE
@@ -176,7 +178,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         super.onResume()
 
         //检测service是否为空，为空则重启
-        if(TelinkLightService.Instance()==null){
+        if (TelinkLightService.Instance() == null) {
             mApplication!!.startLightService(TelinkLightService::class.java)
         }
 
@@ -245,12 +247,15 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         mDisposable.dispose()
     }
 
-
-    fun addEventListeners() {
-        // 监听各种事件
+    private fun addScanListeners() {
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this);
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);
+    }
+
+    fun addEventListeners() {
+        // 监听各种事件
+        addScanListeners()
         this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication!!.addEventListener(NotificationEvent.ONLINE_STATUS, this)
 //        this.mApplication!!.addEventListener(NotificationEvent.GET_ALARM, this)
@@ -266,7 +271,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     private fun startConnectTimer() {
         //如果超过 delaySeconds 还没有变为连接中状态，则显示为超时
-        Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
+        Observable.timer(CONNECT_TIMEOUT.toLong() * 2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -364,14 +369,19 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe {
             if (it) {
+                LeBluetooth.getInstance().stopScan()
                 bestRSSIDevice = null
                 //扫描参数
                 val account = DBUtils.getLastUser().account
                 val params = LeScanParameters.create()
+                Log.d("SawTest", "set params: meshName = $account")
+
                 params.setMeshName(account)
                 params.setOutOfMeshName(account)
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                params.setScanMode(false)
+                params.setScanMode(true)
+
+                addScanListeners()
                 TelinkLightService.Instance().startScan(params)
                 startCheckRSSITimer()
 
@@ -386,13 +396,14 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun startCheckRSSITimer() {
-        Observable.timer(CHECK_RSSI_TIMEOUT, TimeUnit.MILLISECONDS)
+        Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (bestRSSIDevice != null) {
                         LogUtils.d("connect to meshAddr = ${bestRSSIDevice!!.meshAddress}  rssi = ${bestRSSIDevice!!.rssi}")
                         LeBluetooth.getInstance().stopScan()
+                        bestRSSIDevice!!.macAddress
                         connect(bestRSSIDevice!!.macAddress)
                     } else {
                         startCheckRSSITimer()
@@ -443,7 +454,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
             }
             LightAdapter.STATUS_LOGOUT -> {
-                onLogout()
+//                onLogout()
             }
 
             LightAdapter.STATUS_ERROR_N -> onNError(event)
@@ -547,10 +558,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    DBUtils.updateLight(dbLight)
+                    DBUtils.updateLightLocal(dbLight)
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
                 } else {
-                    if(connectionStatus!=ConnectionStatus.OFFLINE){
+                    if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbLight()
                         dbLightNew.setConnectionStatus(connectionStatus.value)
                         dbLightNew.updateIcon()
@@ -562,7 +573,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         dbLightNew.macAddr = "0"
                         DBUtils.saveLight(dbLightNew, false)
 
-                        com.dadoutek.uled.util.LogUtils.d("creat_light"+dbLightNew.meshAddr)
+                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
@@ -612,18 +623,20 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-
-        if (snackbarNotFoundLight == null) {
+        LogUtils.d("onErrorReport: onLeScanTimeout")
+        if (mConnectingSnackbar == null) {
             indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
                 TelinkLightService.Instance().idleMode(true)
                 LeBluetooth.getInstance().stopScan()
                 startScan()
             }
+        } else {
+            retryConnect()
         }
 
     }
 
-    private fun isSwitch(uuid: Int): Boolean{
+    private fun isSwitch(uuid: Int): Boolean {
         var result = false
         when (uuid) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
@@ -648,10 +661,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
-
-        if (!isSwitch(deviceInfo.productUUID)){
+        if (!isSwitch(deviceInfo.productUUID)) {
             if (bestRSSIDevice != null) {
-                if (deviceInfo.rssi > bestRSSIDevice!!.rssi) {
+                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                if (deviceInfo.rssi > bestRSSIDevice!!.rssi &&
+                        !connectFailedDeviceMacAddr.contains(deviceInfo.macAddress)) {
                     LogUtils.d("change to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                     bestRSSIDevice = deviceInfo
                 }
@@ -668,7 +682,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-//        retryConnect()
+        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice!!.macAddress}")
+        connectFailedDeviceMacAddr.add(bestRSSIDevice!!.macAddress)
+        retryConnect()
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {

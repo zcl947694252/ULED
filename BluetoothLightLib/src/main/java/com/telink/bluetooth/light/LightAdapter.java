@@ -424,7 +424,6 @@ public class LightAdapter {
     }
 
     synchronized public void startScan(Parameters params, Callback callback) {
-        Log.d("Saw", "this.isStarted.get() = " + this.isStarted.get());
 
         if (!this.isStarted.get())
             return;
@@ -750,7 +749,7 @@ public class LightAdapter {
         byte[] meshName1 = light.getMeshName();
 
         if (mode == MODE_SCAN_MESH) {
-
+            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
             if (scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac))
                 return false;

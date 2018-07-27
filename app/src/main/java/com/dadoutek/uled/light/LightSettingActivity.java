@@ -16,11 +16,11 @@ import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.util.DataManager;
 
-public final class DeviceSettingActivity extends TelinkBaseActivity {
+public final class LightSettingActivity extends TelinkBaseActivity {
 
     private ImageView backView;
     private ImageView editView;
-    private DeviceSettingFragment settingFragment;
+    private LightSettingFragment settingFragment;
 
     private DbLight light;
     private int gpAddress;
@@ -34,8 +34,8 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == editView) {
-                Intent intent = new Intent(DeviceSettingActivity.this,
-                        LightGroupingActivity.class);
+                Intent intent = new Intent(LightSettingActivity.this,
+                        DeviceGroupingActivity.class);
                 intent.putExtra("light", light);
                 intent.putExtra("gpAddress", gpAddress);
                 startActivity(intent);
@@ -73,7 +73,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 .findViewById(R.id.img_header_menu_right);
         this.editView.setOnClickListener(this.clickListener);
 
-        this.settingFragment = (DeviceSettingFragment) this
+        this.settingFragment = (LightSettingFragment) this
                 .getSupportFragmentManager().findFragmentById(
                         R.id.device_setting_fragment);
 
