@@ -8,6 +8,7 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -18,6 +19,8 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -52,6 +55,33 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         initData()
         initView()
         initListener()
+        getVersion()
+    }
+
+    private fun getVersion() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            dstAdress = TelinkApplication.getInstance().connectDevice.meshAddress
+            Commander.getLightVersion(dstAdress, {
+                if (tvLightVersion != null && tvLightVersionText != null) {
+                    tvLightVersion.setVisibility(View.VISIBLE)
+                    tvLightVersionText.setVisibility(View.VISIBLE)
+                }
+                val version = SharedPreferencesUtils.getCurrentLightVersion()
+                if (tvLightVersion != null && version != null) {
+                    tvLightVersion.setText(version)
+                }
+                null
+            }, {
+                if (tvLightVersion != null && tvLightVersionText != null) {
+                    tvLightVersion.setVisibility(View.GONE)
+                    tvLightVersionText.setVisibility(View.GONE)
+                }
+                null
+            })
+        } else {
+            dstAdress = 0
+        }
     }
 
     private fun initListener() {
@@ -216,8 +246,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         mSwitchList = ArrayList()
         mSwitchList.add(getString(R.string.button1))
-        mSwitchList.add(getString(R.string.button2))
         mSwitchList.add(getString(R.string.button3))
+        mSwitchList.add(getString(R.string.button2))
         mSwitchList.add(getString(R.string.button4))
 
         mSceneList = DBUtils.getSceneAll()
