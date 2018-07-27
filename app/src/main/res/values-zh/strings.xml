@@ -324,5 +324,6 @@
     <string name="error_tip">部分数据同步失败</string>
     <string name="sync_error_contant">同步出错</string>
     <string name="change_account">切换账号</string>
+    <string name="grouping">分组中</string>
 
 </resources>

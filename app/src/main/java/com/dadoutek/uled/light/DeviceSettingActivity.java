@@ -8,7 +8,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.group.DeviceGroupingActivity;
+import com.dadoutek.uled.group.LightGroupingActivity;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
@@ -35,7 +35,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 finish();
             } else if (v == editView) {
                 Intent intent = new Intent(DeviceSettingActivity.this,
-                        DeviceGroupingActivity.class);
+                        LightGroupingActivity.class);
                 intent.putExtra("light", light);
                 intent.putExtra("gpAddress", gpAddress);
                 startActivity(intent);

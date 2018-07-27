@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Toast
+import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dd.processbutton.iml.ActionProcessButton
@@ -59,7 +61,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private fun initToolbar() {
         toolbar.title = getString(R.string.install_sensor)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener { doFinish() }
     }
 
     private fun initListener() {
@@ -75,6 +77,15 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         }
 
     }
+    override fun onBackPressed() {
+        this.doFinish()
+    }
+
+    private fun doFinish() {
+        this.mApplication.removeEventListener(this)
+        TelinkLightService.Instance().idleMode(true)
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
 
     private fun addEventListener() {
         this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
@@ -86,7 +97,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
             Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
-            this.finish()
+            this.doFinish()
             return
         }
 
@@ -244,7 +255,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
         if (meshAddress == -1) {
 //            this.showToast(getString(R.string.much_lamp_tip))
-            this.finish()
+            this.doFinish()
             return
         }
         //更新参数

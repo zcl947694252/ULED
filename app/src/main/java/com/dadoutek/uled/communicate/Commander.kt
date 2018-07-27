@@ -2,6 +2,7 @@ package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
@@ -23,8 +24,6 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.Delay
-import kotlinx.coroutines.experimental.delay
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
@@ -63,13 +62,13 @@ object Commander : EventListener<String> {
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
-     fun kickOutLight(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit){
+    fun kickOutLight(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.USER_ALL_NOTIFY, this)
         mLightAddr = lightMeshAddr
         val opcode = Opcode.KICK_OUT    //0xE3 代表恢复出厂指令
         com.dadoutek.uled.util.LogUtils.d("Reset----sendCode------")
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mLightAddr, null)
-        mResetSuccess=false
+        mResetSuccess = false
 
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -102,6 +101,23 @@ object Commander : EventListener<String> {
                         LogUtils.d(e.message)
                     }
                 })
+    }
+
+    fun updateScene(sceneId: Long) {
+        val opcode = Opcode.SCENE_ADD_OR_DEL
+        val list = DBUtils.getActionsBySceneId(sceneId)
+        var params: ByteArray
+        for (i in list.indices) {
+            Thread.sleep(100)
+            var temperature = list[i].colorTemperature.toByte()
+            if (temperature > 99)
+                temperature = 99
+            var light = list[i].brightness.toByte()
+            if (light > 99)
+                light = 99
+            params = byteArrayOf(0x01, sceneId.toByte(), light, 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), temperature)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+        }
     }
 
     fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
@@ -260,7 +276,7 @@ object Commander : EventListener<String> {
         when (event?.type) {
             NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
             NotificationEvent.GET_DEVICE_STATE -> this.onGetLightVersion(event as NotificationEvent)
-            NotificationEvent.USER_ALL_NOTIFY->this.OnKickoutEvent(event as  NotificationEvent)
+            NotificationEvent.USER_ALL_NOTIFY -> this.OnKickoutEvent(event as NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
         }
@@ -387,12 +403,12 @@ object Commander : EventListener<String> {
 
     private fun OnKickoutEvent(notificationEvent: NotificationEvent) {
         val data = notificationEvent.args.params
-        for(i in data.indices){
-            com.dadoutek.uled.util.LogUtils.d("Res----------"+data[i].toInt())
+        for (i in data.indices) {
+            com.dadoutek.uled.util.LogUtils.d("Res----------" + data[i].toInt())
         }
-        com.dadoutek.uled.util.LogUtils.d("Reset----------"+data[0].toInt()+"=="+ mLightAddr)
+        com.dadoutek.uled.util.LogUtils.d("Reset----------" + data[0].toInt() + "==" + mLightAddr)
 //        if(data[0].toInt()== mLightAddr){
-            mResetSuccess=true
+        mResetSuccess = true
 //        }
     }
 }

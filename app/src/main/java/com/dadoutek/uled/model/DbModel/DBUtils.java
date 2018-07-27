@@ -366,6 +366,11 @@ public class DBUtils {
                 Constant.DB_UPDATE);
     }
 
+    public synchronized static void updateLightLocal(DbLight light) {
+        DaoSessionInstance.getInstance().getDbLightDao().update(light);
+    }
+
+
     public synchronized static void updateScene(DbScene scene) {
         DaoSessionInstance.getInstance().getDbSceneDao().update(scene);
         recordingChange(scene.getId(),

@@ -14,6 +14,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_pir.*
@@ -102,6 +103,10 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
         mSelectGroupAddr = 0xFF
     }
 
+    private fun doFinish() {
+        TelinkLightService.Instance().idleMode(true)
+        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -124,7 +129,7 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
                         Commander.updateMeshName(mDeviceInfo,
                                 {
                                     hideLoadingDialog()
-                                    ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                                    doFinish()
                                 },
                                 {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))

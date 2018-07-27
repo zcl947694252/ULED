@@ -7,11 +7,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.CheckBox
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -21,6 +19,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -60,17 +59,21 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                TelinkLightService.Instance().idleMode(true)
-                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                doFinish()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
+    private fun doFinish() {
+        this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
+
+    override fun onBackPressed() {
+        doFinish();
     }
 
     private fun initListener() {
@@ -147,16 +150,16 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
                 Log.d("Saw", "ConfigNormalSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
-                launch(UI){
+                launch(UI) {
                     progressBar.visibility = View.GONE
                 }
-                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                doFinish();
 //                startActivity(Intent(this,MainActivity::class.java))
 //                finish()
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(configPirRoot, getString(R.string.group_failed))
-                launch(UI){
+                launch(UI) {
                     progressBar.visibility = View.GONE
                 }
             }
@@ -167,9 +170,9 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun setGroupForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             params.setOldMeshName(Constant.TEST_MESH_NAME)
-        }else{
+        } else {
             params.setOldMeshName(mesh.factoryName)
         }
         params.setOldPassword(mesh.factoryPassword)
@@ -196,9 +199,9 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun updateNameForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             params.setOldMeshName(Constant.TEST_MESH_NAME)
-        }else{
+        } else {
             params.setOldMeshName(mesh.factoryName)
         }
         params.setOldPassword(mesh.factoryPassword)
