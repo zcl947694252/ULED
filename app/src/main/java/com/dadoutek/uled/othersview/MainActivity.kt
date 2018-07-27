@@ -369,7 +369,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe {
             if (it) {
-                LeBluetooth.getInstance().stopScan()
+                TelinkLightService.Instance().idleMode(true)
                 bestRSSIDevice = null
                 //扫描参数
                 val account = DBUtils.getLastUser().account
@@ -379,7 +379,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 params.setMeshName(account)
                 params.setOutOfMeshName(account)
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                params.setScanMode(true)
+                params.setScanMode(false)
 
                 addScanListeners()
                 TelinkLightService.Instance().startScan(params)
@@ -682,7 +682,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice!!.macAddress}")
+        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
         connectFailedDeviceMacAddr.add(bestRSSIDevice!!.macAddress)
         retryConnect()
         when (info.stateCode) {
