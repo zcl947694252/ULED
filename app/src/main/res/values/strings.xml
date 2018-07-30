@@ -327,6 +327,7 @@
     <string name="sync_error_contant">Sync error</string>
     <string name="change_account">Switch account</string>
     <string name="grouping">Grouping</string>
-    <string name="sync_error_exlogin">同步数据失败,可能会丢失一些数据,仍然退出？</string>
+    <string name="sync_error_exlogin">Failed to sync data, some data may be lost, still exit?</string>
+    <string name="switch_version">Switch version number:</string>
 
 </resources>

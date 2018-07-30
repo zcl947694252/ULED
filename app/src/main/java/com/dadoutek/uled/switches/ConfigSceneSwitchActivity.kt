@@ -168,13 +168,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val map: Map<Int, DbScene> = mAdapter.getSceneMap()
         for (key in map.keys) {
             when (key) {
-//                0 -> keyNum = 0x05          //左上按键
-//                1 -> keyNum = 0x03          //右上按键
-//                2 -> keyNum = 0x06          //左下按键
-//                3 -> keyNum = 0x04          //右下按键
                 0 -> keyNum = 0x05          //左上按键
-                1 -> keyNum = 0x06          //右上按键
-                2 -> keyNum = 0x03          //左下按键
+                1 -> keyNum = 0x03          //右上按键
+                2 -> keyNum = 0x06          //左下按键
                 3 -> keyNum = 0x04          //右下按键
             }
             val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, map.getValue(key).id.toByte(),
