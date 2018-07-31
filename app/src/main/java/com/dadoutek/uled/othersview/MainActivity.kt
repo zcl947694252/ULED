@@ -18,7 +18,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
@@ -34,6 +33,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.LogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -683,7 +683,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     private fun onErrorReport(info: ErrorReportInfo) {
         LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
-        connectFailedDeviceMacAddr.add(bestRSSIDevice!!.macAddress)
+        if(bestRSSIDevice!=null){
+            connectFailedDeviceMacAddr.add(bestRSSIDevice!!.macAddress)
+        }
         retryConnect()
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {

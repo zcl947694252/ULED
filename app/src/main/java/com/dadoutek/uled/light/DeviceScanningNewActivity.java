@@ -804,6 +804,15 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //检测service是否为空，为空则重启
+        if (TelinkLightService.Instance() == null) {
+            mApplication.startLightService(TelinkLightService.class);
+        }
+    }
+
     // 如果没有网络，则弹出网络设置对话框
     public void checkNetworkAndSync() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
