@@ -24,7 +24,6 @@ import com.blankj.utilcode.util.CleanUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
-import com.dadoutek.uled.group.DeviceGroupingActivity;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -39,10 +38,8 @@ import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DBManager;
-import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
-import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.event.NotificationEvent;
@@ -62,14 +59,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 
 /**
  * Created by hejiajun on 2018/4/16.
@@ -177,7 +169,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         int dstAdress = 0;
         if (TelinkApplication.getInstance().getConnectDevice() != null) {
             dstAdress = TelinkApplication.getInstance().getConnectDevice().meshAddress;
-            Commander.INSTANCE.getLightVersion(dstAdress, () -> {
+            Commander.INSTANCE.getDeviceVersion(dstAdress, () -> {
                 if (tvLightVersion != null && tvLightVersionText != null) {
                     tvLightVersion.setVisibility(View.VISIBLE);
                     tvLightVersionText.setVisibility(View.VISIBLE);

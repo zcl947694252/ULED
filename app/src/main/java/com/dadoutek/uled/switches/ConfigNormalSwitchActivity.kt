@@ -10,6 +10,7 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -19,7 +20,8 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.telink.bluetooth.LeBluetooth
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -54,6 +56,33 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         initView()
         initListener()
+        getVersion()
+    }
+
+    private fun getVersion() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            dstAdress = TelinkApplication.getInstance().connectDevice.meshAddress
+            Commander.getDeviceVersion(dstAdress, {
+                if (tvLightVersion != null && tvLightVersionText != null) {
+                    tvLightVersion.setVisibility(View.VISIBLE)
+                    tvLightVersionText.setVisibility(View.VISIBLE)
+                }
+                val version = SharedPreferencesUtils.getCurrentLightVersion()
+                if (tvLightVersion != null && version != null) {
+                    tvLightVersion.setText(version)
+                }
+                null
+            }, {
+                if (tvLightVersion != null && tvLightVersionText != null) {
+                    tvLightVersion.setVisibility(View.GONE)
+                    tvLightVersionText.setVisibility(View.GONE)
+                }
+                null
+            })
+        } else {
+            dstAdress = 0
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

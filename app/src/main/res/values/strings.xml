@@ -328,6 +328,6 @@
     <string name="change_account">Switch account</string>
     <string name="grouping">Grouping</string>
     <string name="sync_error_exlogin">Failed to sync data, some data may be lost, still exit?</string>
-    <string name="switch_version">Switch version number:</string>
+    <string name="switch_version">version:</string>
 
 </resources>

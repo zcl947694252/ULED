@@ -333,7 +333,7 @@ object Commander : EventListener<String> {
     }
 
 
-    fun getLightVersion(dstAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
+    fun getDeviceVersion(dstAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 
         mLightAddr = dstAddr

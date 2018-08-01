@@ -62,7 +62,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
             dstAdress = TelinkApplication.getInstance().connectDevice.meshAddress
-            Commander.getLightVersion(dstAdress, {
+            Commander.getDeviceVersion(dstAdress, {
                 if (tvLightVersion != null && tvLightVersionText != null) {
                     tvLightVersion.setVisibility(View.VISIBLE)
                     tvLightVersionText.setVisibility(View.VISIBLE)
