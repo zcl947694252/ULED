@@ -99,17 +99,21 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                TelinkLightService.Instance().idleMode(true)
-                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                doFinish()
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
+    private fun doFinish() {
+        this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
+
+    override fun onBackPressed() {
+        doFinish()
     }
 
     override fun onDestroy() {
@@ -133,8 +137,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                doFinish()
             }
+
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(configPirRoot, getString(R.string.pace_fail))
             }
