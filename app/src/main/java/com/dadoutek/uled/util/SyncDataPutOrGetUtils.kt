@@ -24,6 +24,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import java.util.concurrent.TimeUnit
 
 
 class SyncDataPutOrGetUtils {
@@ -74,7 +75,7 @@ class SyncDataPutOrGetUtils {
                         Observable.mergeArrayDelayError<String>(*observables)
                                 .doFinally {
                                 }
-                                .subscribe(object : Observer<String?> {
+                                .subscribe(object : NetworkObserver<String?>() {
                                     override fun onComplete() {
                                         launch(UI) {
                                             syncCallback.complete()

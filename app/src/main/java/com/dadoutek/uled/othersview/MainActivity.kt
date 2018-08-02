@@ -138,7 +138,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private fun initConnect() {
         val list: List<DbLight> = DBUtils.getAllLight()
         for (i in list.indices) {
-            list[i].connectionStatus = 2
+            list[i].connectionStatus = 1
             DBUtils.updateLight(list[i])
         }
     }

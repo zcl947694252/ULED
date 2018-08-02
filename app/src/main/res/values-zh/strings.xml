@@ -328,5 +328,6 @@
     <string name="grouping">分组中</string>
     <string name="switch_version">版本：</string>
     <string name="group_fail">分组失败，蓝牙未连接,请检查蓝牙状态</string>
+    <string name="delete">删除</string>
 
 </resources>

@@ -40,6 +40,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -47,6 +48,7 @@ import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.LogInfoActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
+import com.dadoutek.uled.switches.ConfigNormalSwitchActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -1167,14 +1169,25 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        params.setUpdateDeviceList(deviceInfo);
-        mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> {
-                    TelinkLightService.Instance().updateMesh(params);
-                }));
+        if(checkIsLight(deviceInfo.productUUID)){
+            params.setUpdateDeviceList(deviceInfo);
+            mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aLong -> {
+                        TelinkLightService.Instance().updateMesh(params);
+                    }));
+        }
+    }
 
+    private boolean checkIsLight(int productUUID){
+        if (productUUID == DeviceType.NORMAL_SWITCH ||
+                productUUID == DeviceType.NORMAL_SWITCH2 ||
+                productUUID == DeviceType.SCENE_SWITCH) {
+            return false;
+        }else{
+            return true;
+        }
     }
 
     private void onDeviceStatusChanged(DeviceEvent event) {
@@ -1199,22 +1212,26 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
 
                 new Thread(() -> DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this)).start();
-                int meshAddress = deviceInfo.meshAddress & 0xFF;
-                DbLight light = this.adapter.get(meshAddress);
 
-                if (light == null) {
-                    light = new DbLight();
-                    light.setName(deviceInfo.meshName);
-                    light.setMeshAddr(meshAddress);
-                    light.textColor = this.getResources().getColor(
-                            R.color.black);
-                    light.setBelongGroupId(-1L);
-                    light.setMacAddr(deviceInfo.macAddress);
-                    light.setMeshUUID(deviceInfo.meshUUID);
-                    light.setProductUUID(deviceInfo.productUUID);
-                    light.setSelected(false);
-                    this.adapter.add(light);
-                    this.adapter.notifyDataSetChanged();
+                if(checkIsLight(deviceInfo1.productUUID)){
+                    int meshAddress = deviceInfo.meshAddress & 0xFF;
+                    DbLight light = this.adapter.get(meshAddress);
+
+
+                    if (light == null) {
+                        light = new DbLight();
+                        light.setName(deviceInfo.meshName);
+                        light.setMeshAddr(meshAddress);
+                        light.textColor = this.getResources().getColor(
+                                R.color.black);
+                        light.setBelongGroupId(-1L);
+                        light.setMacAddr(deviceInfo.macAddress);
+                        light.setMeshUUID(deviceInfo.meshUUID);
+                        light.setProductUUID(deviceInfo.productUUID);
+                        light.setSelected(false);
+                        this.adapter.add(light);
+                        this.adapter.notifyDataSetChanged();
+                    }
                 }
 
                 //扫描出灯就设置为非首次进入

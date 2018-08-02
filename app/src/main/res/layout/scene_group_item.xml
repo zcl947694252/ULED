@@ -30,7 +30,7 @@
 
             <TextView
                 android:id="@+id/btn_delete"
-                android:text="删除"
+                android:text="@string/delete"
                 android:padding="5dp"
                 android:background="@drawable/btn_rec_red_bt"
                 android:textColor="@color/white"
