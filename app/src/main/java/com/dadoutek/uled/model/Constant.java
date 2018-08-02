@@ -21,7 +21,7 @@ public class Constant implements Serializable {
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "test2" : "dadousmart";
+    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "dadousmart" : "dadousmart";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -32,12 +32,12 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "test2" : "out_of_mesh";
+    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "out_of_mesh" : "out_of_mesh";
 
     public static final String TEST_MESH_NAME = "dadousmart";
 
     public static final int RESULT_OK = 1;
-    public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";
+    public static final String LIGHT_ARESS_KEY = "LIGHT_ARESS_KEY";fffffffff
     public static final String GROUP_ARESS_KEY = "GROUP_ARESS_KEY";
     public static final String LIGHT_REFRESH_KEY = "LIGHT_REFRESH_KEY";
     public static final String LIGHT_REFRESH_KEY_OK = "LIGHT_REFRESH_KEY_OK";
