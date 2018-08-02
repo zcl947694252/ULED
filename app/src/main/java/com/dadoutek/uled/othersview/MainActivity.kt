@@ -536,6 +536,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     /**
      * 处理[NotificationEvent.ONLINE_STATUS]事件
      */
+    @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
         val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 

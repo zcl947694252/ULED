@@ -29,6 +29,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.StringUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.light.NotificationInfo
 import com.telink.util.Event
@@ -50,24 +51,27 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private val itemClickListener = OnItemClickListener { parent, view, position, id ->
         val group = adapter!!.getItem(position)
         if (group != null) {
-            showLoadingDialog(getString(R.string.grouping))
-            object : Thread({
-                val sceneIds = getRelatedSceneIds(group.meshAddr)
-                deletePreGroup(light!!.meshAddr)
-                deleteAllSceneByLightAddr(light!!.meshAddr)
-                allocDeviceGroup(group)
-                for (sceneId in sceneIds) {
-                    Commander.updateScene(sceneId)
-                }
-                DBUtils.updateLight(light)
-                runOnUiThread {
-                    hideLoadingDialog()
-                    finish()
-                }
-            }) {
+            if(TelinkApplication.getInstance().connectDevice == null){
+                ToastUtils.showLong(R.string.group_fail)
+            }else{
+                showLoadingDialog(getString(R.string.grouping))
+                object : Thread({
+                    val sceneIds = getRelatedSceneIds(group.meshAddr)
+                    deletePreGroup(light!!.meshAddr)
+                    deleteAllSceneByLightAddr(light!!.meshAddr)
+                    allocDeviceGroup(group)
+                    for (sceneId in sceneIds) {
+                        Commander.updateScene(sceneId)
+                    }
+                    DBUtils.updateLight(light)
+                    runOnUiThread {
+                        hideLoadingDialog()
+                        finish()
+                    }
+                }) {
 
-            }.start()
-
+                }.start()
+            }
         } else {
             //                Toast.makeText(mApplication, "", Toast.LENGTH_SHORT).show();
             LogUtils.d("group is null")
