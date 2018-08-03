@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkObserver;
 import com.dadoutek.uled.ota.BatchOtaActivity;
+import com.dadoutek.uled.ota.OTAUpdateActivity;
 import com.dadoutek.uled.ota.OtaActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -254,9 +255,9 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                 startActivity(new Intent(getActivity(), AboutSomeQuestionsActivity.class));
                 break;
             case R.id.firmware_upgrade:
-                Intent intent=new Intent(getActivity(), OtaActivity.class);
-                int mesh=TelinkApplication.getInstance().getConnectDevice().meshAddress;
-                intent.putExtra("meshAddress",mesh);
+                Intent intent=new Intent(getActivity(), OTAUpdateActivity.class);
+//                int mesh=TelinkApplication.getInstance().getConnectDevice().meshAddress;
+//                intent.putExtra("meshAddress",mesh);
                 startActivity(intent);
                 break;
         }

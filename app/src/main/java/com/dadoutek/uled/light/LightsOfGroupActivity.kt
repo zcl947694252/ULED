@@ -165,9 +165,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         if (group.meshAddr == 0xffff) {
             //            lightList = DBUtils.getAllLight();
             val list = DBUtils.getGroupList()
-            for (j in list.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
-            }
+//            for (j in list.indices) {
+//                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+//            }
+            lightList=DBUtils.getAllLight()
         } else {
             lightList = DBUtils.getLightByGroupID(group.id)
         }

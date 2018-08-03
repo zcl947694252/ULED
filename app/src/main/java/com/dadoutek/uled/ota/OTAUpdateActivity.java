@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -89,7 +91,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     //    private static final int MODE_SCAN = 8;
     private byte[] mFirmwareData;
-    private List<Light> onlineLights;
+    private List<DbLight> onlineLights;
     private Mesh mesh;
     private String mPath;
     private SimpleDateFormat mTimeFormat;
@@ -155,8 +157,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         initView();
 
         onlineLights = new ArrayList<>();
-        for (Light light : Lights.getInstance().get()) {
-            if (light.status != ConnectionStatus.OFFLINE) {
+        for (DbLight light : DBUtils.getAllLight()) {
+            if (light.connectionStatus != ConnectionStatus.OFFLINE.getValue()) {
                 onlineLights.add(light);
             }
         }
@@ -235,7 +237,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         boolean hasHigh = false;
         boolean hasLow = false;
-        for (Light light : onlineLights) {
+        for (DbLight light : onlineLights) {
             if (light.version == null || light.version.equals("")) continue;
             int compare = compareVersion(light.version, mFileVersion);
             if (compare == 0) {
@@ -252,7 +254,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 this.mode = MODE_OTA;
 
                 int curMeshAddress = TelinkLightApplication.getApp().getConnectDevice().meshAddress;
-                Light light = getLightByMeshAddress(curMeshAddress);
+                DbLight light = getLightByMeshAddress(curMeshAddress);
                 if (light != null && compareVersion(light.version, mFileVersion) == 1) {
                     sendGetDeviceOtaStateCommand();
                 } else {
@@ -279,8 +281,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         DeviceInfo deviceInfo = TelinkLightApplication.getApp().getConnectDevice();
         boolean action = false;
         if (deviceInfo != null) {
-            for (Light light : onlineLights) {
-                if (light.meshAddress == deviceInfo.meshAddress && light.version != null && light.version.equals(mFileVersion)) {
+            for (DbLight light : onlineLights) {
+                if (light.getMeshAddr() == deviceInfo.meshAddress && light.version != null && light.version.equals(mFileVersion)) {
                     action = true;
                     break;
                 }
@@ -404,7 +406,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private boolean hasLow() {
         boolean hasLow = false;
-        for (Light light : onlineLights) {
+        for (DbLight light : onlineLights) {
             if (light.version == null || light.version.equals("")) continue;
             if (compareVersion(light.version, mFileVersion) == 1) {
                 hasLow = true;
@@ -469,8 +471,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     connectDevice(deviceInfo.macAddress);
                 }
             } else {
-                for (Light light : onlineLights) {
-                    if (light.meshAddress == deviceInfo.meshAddress && mFileVersion.equals(light.version)) {
+                for (DbLight light : onlineLights) {
+                    if (light.getMeshAddr() == deviceInfo.meshAddress && mFileVersion.equals(light.version)) {
                         log("Mesh OTA Target device discovered mesh Address:" + Integer.toHexString(deviceInfo.meshAddress) + " mac:" + deviceInfo.macAddress);
                         connectDevice(deviceInfo.macAddress);
                         return;
@@ -478,7 +480,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 }
             }
         } else if (this.mode == MODE_OTA) {
-            Light light = getLightByMeshAddress(deviceInfo.meshAddress);
+            DbLight light = getLightByMeshAddress(deviceInfo.meshAddress);
             if (light != null && compareVersion(light.version, mFileVersion) == 1) {
                 connectDevice(deviceInfo.macAddress);
             }
@@ -527,15 +529,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
             if (this.mode == MODE_CONTINUE_MESH_OTA) {
                 if (!hasLight(meshAddress)) {
-                    Light light = new Light();
-                    light.meshAddress = meshAddress;
+                    DbLight light = new DbLight();
+                    light.setMeshAddr(meshAddress);
                     light.version = version;
                     onlineLights.add(light);
 //                    log("addLight to online lights-- " + "meshAddress:" + meshAddress + " version:" + version);
                 }
             } else {
-                for (Light light : onlineLights) {
-                    if (light.meshAddress == meshAddress) {
+                for (DbLight light : onlineLights) {
+                    if (light.getMeshAddr() == meshAddress) {
 //                        log("version: " + version + " -- light version:" + light.version + " --mode: " + this.mode);
                         if (this.mode == MODE_COMPLETE) {
                             if (!version.equals(light.version)) {
@@ -645,8 +647,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 log("OTA complete");
                 msgHandler.obtainMessage(MSG_OTA_PROGRESS, "OTA complete").sendToTarget();
                 DeviceInfo deviceInfo_1 = event.getArgs();
-                for (Light light : onlineLights) {
-                    if (light.meshAddress == deviceInfo_1.meshAddress) {
+                for (DbLight light : onlineLights) {
+                    if (light.getMeshAddr() == deviceInfo_1.meshAddress) {
                         light.version = mFileVersion;
                     }
                 }
@@ -835,10 +837,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return Float.valueOf(version.substring(1));
     }*/
 
-    private Light getLightByMeshAddress(int meshAddress) {
+    private DbLight getLightByMeshAddress(int meshAddress) {
         if (onlineLights == null || onlineLights.size() == 0) return null;
-        for (Light light : onlineLights) {
-            if (light.meshAddress == meshAddress) {
+        for (DbLight light : onlineLights) {
+            if (light.getMeshAddr() == meshAddress) {
                 return light;
             }
         }
@@ -850,8 +852,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private boolean hasLight(int meshAddress) {
-        for (Light light : onlineLights) {
-            if (light.meshAddress == meshAddress) {
+        for (DbLight light : onlineLights) {
+            if (light.getMeshAddr() == meshAddress) {
                 return true;
             }
         }
