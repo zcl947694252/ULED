@@ -35,7 +35,11 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
         if (group != null) {
             TextView txtTitle = (TextView) this
                     .findViewById(R.id.txt_header_title);
-            txtTitle.setText(group.getName());
+            if(group.getMeshAddr()==0xffff){
+                txtTitle.setText(getString(R.string.allLight));
+            }else{
+                txtTitle.setText(group.getName());
+            }
         }
 
         this.backView = (ImageView) this

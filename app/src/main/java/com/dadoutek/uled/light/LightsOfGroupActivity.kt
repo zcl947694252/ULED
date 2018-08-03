@@ -71,9 +71,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
                         byteArrayOf(0x01, 0x00, 0x00))
+                currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
                         byteArrayOf(0x00, 0x00, 0x00))
+                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+            }
+
+            currentLight!!.updateIcon()
+            DBUtils.updateLight(currentLight)
+            runOnUiThread {
+                adapter?.notifyDataSetChanged()
             }
         } else if (v.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
@@ -92,7 +100,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         super.onStart()
         // 监听各种事件
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
@@ -178,7 +186,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun initView() {
-        toolbar.title = group.name ?: ""
+        if(group.meshAddr==0xffff){
+            toolbar.title = getString(R.string.allLight)
+        }else{
+            toolbar.title = group.name ?: ""
+        }
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
         adapter = LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener)
         recycler_view_lights.adapter = adapter
