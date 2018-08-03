@@ -332,5 +332,6 @@
     <string name="switch_version">version:</string>
     <string name="group_fail">Packet failed, Bluetooth is not connected, please check Bluetooth status</string>
     <string name="delete">delete</string>
+    <string name="firmware_upgrade">固件升级</string>
 
 </resources>
