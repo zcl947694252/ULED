@@ -169,12 +169,12 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         int dstAdress = 0;
         if (TelinkApplication.getInstance().getConnectDevice() != null) {
             dstAdress = TelinkApplication.getInstance().getConnectDevice().meshAddress;
-            Commander.INSTANCE.getDeviceVersion(dstAdress, () -> {
+            Commander.INSTANCE.getDeviceVersion(dstAdress, (s) -> {
                 if (tvLightVersion != null && tvLightVersionText != null) {
                     tvLightVersion.setVisibility(View.VISIBLE);
                     tvLightVersionText.setVisibility(View.VISIBLE);
                 }
-                String version = SharedPreferencesUtils.getCurrentLightVersion();
+                String version = s;
                 if (tvLightVersion != null && version != null) {
                     tvLightVersion.setText(version);
                 }
@@ -282,6 +282,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         public void complete() {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().disconnect();
                 TelinkLightService.Instance().idleMode(true);
 
                 restartApplication();
@@ -539,6 +540,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         if (DBUtils.getAllLight().size() == 0 && !DBUtils.getDataChangeAllHaveAboutLight()) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
+                TelinkLightService.Instance().disconnect();
                 TelinkLightService.Instance().idleMode(true);
 
                 restartApplication();

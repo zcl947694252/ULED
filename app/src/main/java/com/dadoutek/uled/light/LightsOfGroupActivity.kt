@@ -14,7 +14,6 @@ import android.view.View
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -22,6 +21,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -140,7 +140,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun listenerConnect() {
-        if(TelinkLightService.Instance()!=null&&TelinkLightService.Instance().adapter.mLightCtrl.currentLight!=null){
+        if (TelinkLightService.Instance() != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null) {
             Log.d("Saw", "isConnected = ${TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected}");
 
             if (!TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
@@ -186,15 +186,15 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun initView() {
-        if(group.meshAddr==0xffff){
+        if (group.meshAddr == 0xffff) {
             toolbar.title = getString(R.string.allLight)
-        }else{
+        } else {
             toolbar.title = group.name ?: ""
         }
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
         adapter = LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener)
         recycler_view_lights.adapter = adapter
-        for(i in lightList.indices){
+        for (i in lightList.indices) {
             lightList[i].updateIcon()
         }
     }
