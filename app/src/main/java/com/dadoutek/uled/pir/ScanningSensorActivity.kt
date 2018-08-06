@@ -206,7 +206,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {
                 mLogged = true
                 progressBtn.progress = 100  //进度控件显示成完成状态
-                if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+                if (mDeviceInfo?.productUUID == DeviceType.SENSOR||mDeviceInfo?.productUUID == DeviceType.NORMAL_SWITCH) {
                     startActivity<ConfigPirAct>("deviceInfo" to mDeviceInfo)
                 }
                 mApplication.removeEventListener(this)
@@ -269,6 +269,14 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
         if (!mScanned)
             when (leScanEvent.args.productUUID) {
+                DeviceType.NORMAL_SWITCH ->{
+                    mScanned = true
+                    LeBluetooth.getInstance().stopScan()
+                    mDeviceInfo = leScanEvent.args
+                    params.setUpdateDeviceList(mDeviceInfo)
+                    connect()
+                    progressBtn.text = getString(R.string.connecting)
+                }
                 DeviceType.SENSOR -> {
                     mScanned = true
                     LeBluetooth.getInstance().stopScan()

@@ -35,8 +35,9 @@ object Commander : EventListener<String> {
     private var mLightAddr: Int = 0
     private var mGroupSuccess: Boolean = false
     private var mResetSuccess: Boolean = false
-    private var mGetVsersionSuccess: Boolean = false
+    private var mGetVersionSuccess: Boolean = false
     private var mUpdateMeshSuccess: Boolean = false
+    private var version: String? = null
 
     init {
         mApplication = TelinkLightApplication.getApp()
@@ -333,11 +334,12 @@ object Commander : EventListener<String> {
     }
 
 
-    fun getDeviceVersion(dstAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
+    fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit,
+                         failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 
         mLightAddr = dstAddr
-        mGetVsersionSuccess = false
+        mGetVersionSuccess = false
         val opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
         val params = byteArrayOf(0x00, 0x00)
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
@@ -356,12 +358,12 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        if (t >= 30) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                        if (t >= 30) {   //30次 * 200 = 6000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
-                        } else if (mGetVsersionSuccess) {
+                        } else if (mGetVersionSuccess) {
                             onComplete()
-                            successCallback.invoke()
+                            successCallback.invoke(version)
                         }
                     }
 
@@ -376,7 +378,7 @@ object Commander : EventListener<String> {
     private fun onGetLightVersion(event: NotificationEvent) {
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
-            val version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
+            version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
 //            va
 // l version = Strings.bytesToString(data)
             val meshAddress = event.args.src
@@ -384,7 +386,7 @@ object Commander : EventListener<String> {
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
 //            light.version = version
 
-            mGetVsersionSuccess = true
+            mGetVersionSuccess = true
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
@@ -395,7 +397,7 @@ object Commander : EventListener<String> {
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
 //            light.version = version
 
-            mGetVsersionSuccess = true
+            mGetVersionSuccess = true
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }

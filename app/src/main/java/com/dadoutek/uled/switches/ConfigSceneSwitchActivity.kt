@@ -9,17 +9,16 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -59,28 +58,21 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun getVersion() {
-        var dstAdress = 0
+        var dstAddress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = TelinkApplication.getInstance().connectDevice.meshAddress
-            Commander.getDeviceVersion(dstAdress, {
-                if (tvLightVersion != null && tvLightVersionText != null) {
-                    tvLightVersion.setVisibility(View.VISIBLE)
-                    tvLightVersionText.setVisibility(View.VISIBLE)
-                }
-                val version = SharedPreferencesUtils.getCurrentLightVersion()
-                if (tvLightVersion != null && version != null) {
-                    tvLightVersion.setText(version)
-                }
-                null
-            }, {
-                if (tvLightVersion != null && tvLightVersionText != null) {
-                    tvLightVersion.setVisibility(View.GONE)
-                    tvLightVersionText.setVisibility(View.GONE)
-                }
-                null
-            })
+            dstAddress = mDeviceInfo.meshAddress
+            Commander.getDeviceVersion(dstAddress,
+                    successCallback = {
+                        if (tvLightVersion != null && tvLightVersionText != null) {
+                            versionLayout.visibility = View.VISIBLE
+                        }
+                        tvLightVersion.text = it
+                    },
+                    failedCallback = {
+                        versionLayout.visibility = View.GONE
+                    })
         } else {
-            dstAdress = 0
+            dstAddress = 0
         }
     }
 
@@ -109,6 +101,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
+        finish()
+    }
+
+    private fun configureComplete(){
+        this.mApplication.removeEventListener(this)
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -122,7 +122,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun performed(event: Event<String>?) {
-        when (event?.getType()) {
+        when (event?.type) {
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
 //            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
 //            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
@@ -137,7 +137,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                doFinish()
+                configureComplete()
             }
 
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
@@ -150,9 +150,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun setSceneForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             params.setOldMeshName(Constant.TEST_MESH_NAME)
-        }else{
+        } else {
             params.setOldMeshName(mesh.factoryName)
         }
         params.setOldPassword(mesh.factoryPassword)
@@ -194,9 +194,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun updateNameForSwitch() {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
-        if(BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             params.setOldMeshName(Constant.TEST_MESH_NAME)
-        }else{
+        } else {
             params.setOldMeshName(mesh.factoryName)
         }
         params.setOldPassword(mesh.factoryPassword)

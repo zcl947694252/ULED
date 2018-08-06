@@ -20,7 +20,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -52,7 +51,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         supportActionBar?.title = getString(R.string.select_group)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mApplication = getApplication() as TelinkLightApplication
+        mApplication = application as TelinkLightApplication
 
         initView()
         initListener()
@@ -62,24 +61,15 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun getVersion() {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = TelinkApplication.getInstance().connectDevice.meshAddress
-            Commander.getDeviceVersion(dstAdress, {
-                if (tvLightVersion != null && tvLightVersionText != null) {
-                    tvLightVersion.setVisibility(View.VISIBLE)
-                    tvLightVersionText.setVisibility(View.VISIBLE)
-                }
-                val version = SharedPreferencesUtils.getCurrentLightVersion()
-                if (tvLightVersion != null && version != null) {
-                    tvLightVersion.setText(version)
-                }
-                null
-            }, {
-                if (tvLightVersion != null && tvLightVersionText != null) {
-                    tvLightVersion.setVisibility(View.GONE)
-                    tvLightVersionText.setVisibility(View.GONE)
-                }
-                null
-            })
+            dstAdress = mDeviceInfo.meshAddress
+            Commander.getDeviceVersion(dstAdress,
+                    successCallback = {
+                        versionLayout.visibility = View.VISIBLE
+                        tvLightVersion.text = it
+                    },
+                    failedCallback = {
+                        versionLayout.visibility = View.GONE
+                    })
         } else {
             dstAdress = 0
         }
@@ -98,6 +88,14 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
+        finish()
+    }
+
+    private fun configureComplete(){
+        this.mApplication.removeEventListener(this)
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -165,7 +163,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     override fun performed(event: Event<String>?) {
-        when (event?.getType()) {
+        when (event?.type) {
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
 //            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
 //            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
@@ -178,13 +176,10 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                Log.d("Saw", "ConfigNormalSwitchActivity setStatus STATUS_UPDATE_MESH_COMPLETED")
                 launch(UI) {
                     progressBar.visibility = View.GONE
                 }
-                doFinish();
-//                startActivity(Intent(this,MainActivity::class.java))
-//                finish()
+                configureComplete()
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
                 snackbar(configPirRoot, getString(R.string.group_failed))
