@@ -454,6 +454,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             when (info.reserve) {
                 UpdateStatusDeviceType.OLD_NORMAL_SWITCH.toInt() -> return false
                 UpdateStatusDeviceType.OLD_NORMAL_SWITCH2.toInt() -> return false
+                UpdateStatusDeviceType.OLD_NORMAL_SWITCH3.toInt() -> return false
                 else -> return true
             }
         }

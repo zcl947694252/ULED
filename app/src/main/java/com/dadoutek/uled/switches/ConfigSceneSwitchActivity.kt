@@ -101,6 +101,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
+        finish()
+    }
+
+    private fun configureComplete(){
+        this.mApplication.removeEventListener(this)
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -129,7 +137,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                doFinish()
+                configureComplete()
             }
 
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {

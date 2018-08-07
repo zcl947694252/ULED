@@ -25,6 +25,8 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 
@@ -119,11 +121,13 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      * @param lightMeshAddr 灯的mesh地址
      */
     private fun deletePreGroup(lightMeshAddr: Int) {
-        val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!).meshAddr
-        val opcode = Opcode.SET_GROUP
-        val params = byteArrayOf(0x00, (groupAddress and 0xFF).toByte(), //0x00表示删除组
-                (groupAddress shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        if(DBUtils.getGroupByID(light!!.belongGroupId!!)!=null){
+            val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!).meshAddr
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x00, (groupAddress and 0xFF).toByte(), //0x00表示删除组
+                    (groupAddress shr 8 and 0xFF).toByte())
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        }
     }
 
     private fun saveInfo() {

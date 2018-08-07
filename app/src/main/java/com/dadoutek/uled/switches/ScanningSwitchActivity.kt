@@ -110,10 +110,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
 
                     TelinkLightService.Instance()?.startScan(params)
+                }.start()
 
                     progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                     progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                }.start()
 
                 scanDisposable?.dispose()
                 scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
@@ -231,8 +231,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onLeScanTimeout() {
         LogUtils.d("onLeScanTimeout")
-        progressBtn.progress = -1   //控件显示Error状态
-        progressBtn.text = getString(R.string.not_found_switch)
+        launch(UI){
+            progressBtn.progress = -1   //控件显示Error状态
+            progressBtn.text = getString(R.string.not_found_switch)
+        }
     }
 
 

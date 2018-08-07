@@ -160,7 +160,7 @@ class SyncDataPutOrGetUtils {
                     val scene = DBUtils.getSceneByID(changeId)
 
                     lateinit var postInfoStr: String
-                    lateinit var bodyScene: RequestBody
+                    var bodyScene: RequestBody? = null
                     if (scene != null && type != Constant.DB_DELETE) {
                         val body: DbSceneBody = DbSceneBody()
                         val gson: Gson = Gson()
@@ -176,12 +176,23 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val scene = DBUtils.getSceneByID(changeId)
-                            return SceneModel.add(token, bodyScene
-                                    , id, changeId)
+                            LogUtils.d("scene_add--id=="+changeId)
+                            if(bodyScene!=null){
+                                return SceneModel.add(token, bodyScene
+                                        , id, changeId)
+                            }
                         }
-                        Constant.DB_DELETE -> return SceneModel.delete(token,
-                                changeId.toInt(), id)
-                        Constant.DB_UPDATE -> return SceneModel.update(token, changeId.toInt(), bodyScene, id)
+                        Constant.DB_DELETE -> {
+                            LogUtils.d("scene_delete--id=="+changeId)
+                            return SceneModel.delete(token,
+                                    changeId.toInt(), id)
+                        }
+                        Constant.DB_UPDATE -> {
+                            LogUtils.d("scene_update--id=="+changeId)
+                            if(bodyScene!=null){
+                                return SceneModel.update(token, changeId.toInt(), bodyScene, id)
+                            }
+                        }
 
                     }
                 }

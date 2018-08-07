@@ -605,6 +605,11 @@ public class DBUtils {
                     } else if (dataChangeList.get(i).getChangeType().equals(Constant.DB_ADD)
                             && operating.equals(Constant.DB_UPDATE)) {
                         break;
+                    } else if (dataChangeList.get(i).getChangeType().equals(Constant.DB_DELETE)
+                            && operating.equals(Constant.DB_ADD)) {
+                        dataChangeList.get(i).setChangeType(operating);
+                        updateDbchange(dataChangeList.get(i));
+                        break;
                     }
                 }
                 //如果数据表没有该数据直接添加

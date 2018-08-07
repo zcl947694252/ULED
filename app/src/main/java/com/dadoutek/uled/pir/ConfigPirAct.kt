@@ -105,7 +105,12 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 
     private fun doFinish() {
         TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+    }
+
+    override fun onBackPressed() {
+        doFinish()
     }
 
     override fun onClick(v: View?) {
