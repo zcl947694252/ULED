@@ -390,7 +390,7 @@ object Commander : EventListener<String> {
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
-            val version = Strings.bytesToString(data)
+            version = Strings.bytesToString(data)
 //            val version = Strings.bytesToString(data)
             val meshAddress = event.args.src
 
