@@ -43,6 +43,7 @@ public class LogUtils {
         getMethodNames(new Throwable().getStackTrace());
         Log.e(className, createLog(message));
         BuglyLog.e(className, message);
+//        com.blankj.utilcode.util.LogUtils.file();
     }
 
 

@@ -332,5 +332,7 @@
     <string name="switch_version">version:</string>
     <string name="group_fail">Packet failed, Bluetooth is not connected, please check Bluetooth status</string>
     <string name="delete">delete</string>
+    <string name="select_all">select all</string>
+    <string name="cancel">cancel</string>
 
 </resources>

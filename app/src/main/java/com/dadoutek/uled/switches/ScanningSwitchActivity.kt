@@ -244,6 +244,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 onLogin()
+                LogUtils.d("登陆成功")
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
@@ -252,6 +253,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             LightAdapter.STATUS_CONNECTED -> {
                 connectDisposable?.dispose()
                 login()
+                LogUtils.d("开始登陆")
             }
         }
 
@@ -307,6 +309,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
+            LogUtils.d("开始连接")
         }.start()
 
         launch(UI) {

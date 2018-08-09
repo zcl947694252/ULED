@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +98,7 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
  */
 
 public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
-        implements AdapterView.OnItemClickListener, EventListener<String> {
+        implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     private static final int MAX_RETRY_COUNT = 5;   //update mesh failed的重试次数设置为5次
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -165,6 +166,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private int dstAddress;
     private Disposable mConnectTimer;
     private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
+    private boolean isSelectAll=false;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -191,6 +193,36 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             if ((!isSelectLight()) && isAllLightsGrouped()) {
                 btnAddGroups.setText(R.string.complete);
             }
+        }
+    }
+
+    private void isSelectAll(){
+        if(isSelectAll){
+            for(int j=0;j<nowLightList.size();j++){
+                this.updateList.add(nowLightList.get(j));
+                nowLightList.get(j).selected = true;
+
+                btnAddGroups.setText(R.string.set_group);
+
+                if (hasGroup()) {
+                    startBlink(nowLightList.get(j));
+                } else {
+                    ToastUtils.showLong(R.string.tip_add_group);
+                }
+            }
+
+            this.adapter.notifyDataSetChanged();
+        }else{
+            for(int j=0;j<nowLightList.size();j++){
+                this.updateList.remove(nowLightList.get(j));
+                nowLightList.get(j).selected = false;
+                stopBlink(nowLightList.get(j));
+                if ((!isSelectLight()) && isAllLightsGrouped()) {
+                    btnAddGroups.setText(R.string.complete);
+                }
+            }
+
+            this.adapter.notifyDataSetChanged();
         }
     }
 
@@ -483,6 +515,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             return;
         }
 
+        if(isSelectAll){
+            toolbar.getMenu().findItem(R.id.menu_select_all).setTitle(getString(R.string.select_all));
+            isSelectAll=false;
+        }
+
         for (int i = 0; i < selectLights.size(); i++) {
             //让选中的灯停下来别再发闪的命令了。
             stopBlink(selectLights.get(i));
@@ -577,6 +614,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     //分组页面调整
     private void changeGroupView() {
         grouping = true;
+        toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        toolbar.setOnMenuItemClickListener(this);
         deviceListView.setOnItemClickListener(this);
         deviceListView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -589,6 +628,23 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
 
         disableEventListenerInGrouping();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_select_all:
+                if(isSelectAll){
+                    isSelectAll=false;
+                    item.setTitle(R.string.select_all);
+                }else{
+                    isSelectAll=true;
+                    item.setTitle(R.string.cancel);
+                }
+                isSelectAll();
+                break;
+        }
+        return false;
     }
 
     private void disableEventListenerInGrouping() {
@@ -773,6 +829,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -849,7 +910,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     protected void onLocationEnable() {
 
     }
-
 
     private static class DeviceItemHolder {
         public ImageView icon;
