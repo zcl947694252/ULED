@@ -5,10 +5,13 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.SearchView
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import butterknife.ButterKnife
@@ -27,6 +30,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.LogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -48,8 +52,7 @@ import java.util.*
  * Created by hejiajun on 2018/4/24.
  */
 
-class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
-
+class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener {
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
@@ -59,6 +62,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
     private var adapter: LightsOfGroupRecyclerViewAdapter? = null
     private var positionCurrent: Int = 0
     private var currentLight: DbLight? = null
+    private var searchView: SearchView? = null
     private var canBeRefresh = true
 
 
@@ -119,6 +123,47 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         actionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if(newText!=null&&!newText.isEmpty()){
+            filter(newText,true)
+            adapter!!.notifyDataSetChanged()
+        }else{
+            filter(newText,false)
+            adapter!!.notifyDataSetChanged()
+        }
+        return false
+    }
+
+
+    private fun filter(groupName:String?,isSearch:Boolean){
+        val list = DBUtils.getGroupList()
+        if(lightList!=null&&lightList.size>0){
+            lightList.clear()
+        }
+        if(isSearch){
+            for(i in list.indices){
+                if(groupName==list[i].name){
+                    lightList.addAll(DBUtils.getLightByGroupID(list[i].id))
+                }
+            }
+
+        }else{
+            for (i in list.indices) {
+                if (list.get(i).meshAddr == 0xffff) {
+                    Collections.swap(list, 0, i)
+                }
+            }
+
+            for (j in list.indices) {
+                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+            }
+        }
+    }
+
     private fun initParameter() {
         this.group = this.intent.extras!!.get("group") as DbGroup
         this.mApplication = this.application as TelinkLightApplication
@@ -164,27 +209,29 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String> {
         lightList = ArrayList()
         if (group.meshAddr == 0xffff) {
             //            lightList = DBUtils.getAllLight();
-            val list = DBUtils.getGroupList()
-
-            for(i in list.indices){
-                if(list.get(i).meshAddr==0xffff){
-                   Collections.swap(list,0,i)
-                }
-            }
-
-            for (j in list.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
-            }
 //            lightList=DBUtils.getAllLight()
+            filter("",false)
         } else {
             lightList = DBUtils.getLightByGroupID(group.id)
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        getMenuInflater().inflate(R.menu.menu_search, menu)
+        searchView = MenuItemCompat.getActionView(menu!!.findItem(R.id.action_search)) as SearchView
+        searchView!!.setOnQueryTextListener(this)
+        searchView!!.setQueryHint(getString(R.string.input_groupAdress))
+        return true
+    }
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
             toolbar.title = getString(R.string.allLight)
+//            if(searchView==null){
+//                toolbar.inflateMenu(R.menu.menu_search)
+//                searchView = MenuItemCompat.getActionView(toolbar.menu.findItem(R.id.action_search)) as SearchView
+//                searchView!!.setOnQueryTextListener(this)
+//            }
         } else {
             toolbar.title = group.name ?: ""
         }

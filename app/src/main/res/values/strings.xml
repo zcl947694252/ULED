@@ -334,5 +334,7 @@
     <string name="delete">delete</string>
     <string name="select_all">select all</string>
     <string name="cancel">cancel</string>
+    <string name="search_light">搜索</string>
+    <string name="input_groupAdress">请输入组名</string>
 
 </resources>
