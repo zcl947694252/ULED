@@ -110,7 +110,7 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
         finish()
     }
 
-    private fun configureComplete(){
+    private fun configureComplete() {
         TelinkLightService.Instance().idleMode(true)
         TelinkLightService.Instance().disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -131,25 +131,24 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 
                         val mApplication = this.application as TelinkLightApplication
                         val mesh = mApplication.getMesh()
-                        val meshAddress = mesh.generateMeshAddr()
-                        mDeviceInfo.meshAddress = Constant.SWITCH_PIR_ADDRESS
 
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
                                 tietMinimumBrightness.text.toString().toInt(),
                                 spTriggerLux.selectedItem.toString().toInt())
+                        Thread.sleep(300)
+//
+//                        addGroup(mDeviceInfo.meshAddress, mSelectGroupAddr,
+//                                { LogUtils.d("success") },
+//                                { LogUtils.d("failed") })
+//                        Thread.sleep(300)
 
-                        addGroup(mDeviceInfo.meshAddress, mSelectGroupAddr,
-                                { LogUtils.d("success") },
-                                { LogUtils.d("failed") })
-
-
-                        Commander.updateMeshName(mDeviceInfo,
-                                {
+                        Commander.updateMeshName(
+                                successCallback = {
                                     hideLoadingDialog()
                                     configureComplete()
                                 },
-                                {
+                                failedCallback = {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))
                                     hideLoadingDialog()
                                 })

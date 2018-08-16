@@ -1,11 +1,9 @@
 package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -14,9 +12,7 @@ import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.event.NotificationEvent
-import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
-import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -203,51 +199,29 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
-                        LogUtils.d(e.message)
+                        LogUtils.d("addGroup error: ${e.message}")
                     }
                 })
     }
 
 
-    fun updateMeshName(deviceInfo: DeviceInfo, successCallback: () -> Unit, failedCallback: () -> Unit) {
-        mUpdateMeshSuccess=false
+    fun updateMeshName(newMeshName: String = DBUtils.getLastUser().account, newMeshAddr: Int =
+            Constant.SWITCH_PIR_ADDRESS,
+                       successCallback: () -> Unit,
+                       failedCallback: () -> Unit) {
+        mUpdateMeshSuccess = false
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val mesh = mApplication!!.mesh
-        val params = Parameters.createUpdateParameters()
 
-        if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-        } else {
-            params.setOldMeshName(mesh.factoryName)
-        }
+        val password: ByteArray
+        password = Strings.stringToBytes(NetworkFactory.md5(
+                NetworkFactory.md5(mesh?.password) + newMeshName), 16)
 
-        params.setOldPassword(mesh.factoryPassword)
-        params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account).substring(0,16))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
-
-        params.setUpdateDeviceList(deviceInfo)
-
-        val meshName = Strings.stringToBytes(mesh.name, 16)
-        var password = Strings.stringToBytes(mesh.password, 16)
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            password = Strings.stringToBytes(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account), 16)
-        } else {
-            password = Strings.stringToBytes(mesh.password, 16)
-        }
 
         TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
-        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress=deviceInfo.meshAddress
-        TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
+        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress = newMeshAddr
+        TelinkLightService.Instance().adapter.mLightCtrl.reset(
+                Strings.stringToBytes(newMeshName, 16), password, null)
 //        TelinkLightService.Instance().enableNotification()
 //        TelinkLightService.Instance().updateMesh(params)
 
@@ -276,7 +250,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
-                        LogUtils.d(e.message)
+                        LogUtils.d("updateMeshName error: ${e.message}")
                     }
                 })
 
