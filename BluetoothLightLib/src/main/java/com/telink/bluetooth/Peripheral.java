@@ -739,7 +739,7 @@ public class Peripheral extends BluetoothGattCallback {
         if (commandContext != null) {
             byte[] value = characteristic.getValue();
 
-//            Log.d("Reset", "onCharacteristicChanged: "+characteristic.getStringValue(7));
+            Log.d("Reset", "onCharacteristicChanged: "+characteristic.getStringValue(7));
             this.onNotify(characteristic.getValue(),
                     commandContext.command.serviceUUID,
                     commandContext.command.characteristicUUID,

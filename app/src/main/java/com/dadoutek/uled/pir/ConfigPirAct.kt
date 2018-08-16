@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.communicate.Commander.addGroup
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
@@ -106,6 +107,12 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
     private fun doFinish() {
         TelinkLightService.Instance().idleMode(true)
         TelinkLightService.Instance().disconnect()
+        finish()
+    }
+
+    private fun configureComplete(){
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -121,6 +128,12 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
                 } else {
                     showLoadingDialog(getString(R.string.configuring_switch))
                     Thread {
+
+                        val mApplication = this.application as TelinkLightApplication
+                        val mesh = mApplication.getMesh()
+                        val meshAddress = mesh.generateMeshAddr()
+                        mDeviceInfo.meshAddress = Constant.SWITCH_PIR_ADDRESS
+
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
                                 tietMinimumBrightness.text.toString().toInt(),
@@ -134,7 +147,7 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
                         Commander.updateMeshName(mDeviceInfo,
                                 {
                                     hideLoadingDialog()
-                                    doFinish()
+                                    configureComplete()
                                 },
                                 {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))

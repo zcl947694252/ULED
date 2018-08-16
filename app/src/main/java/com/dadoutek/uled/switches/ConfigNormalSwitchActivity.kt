@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -195,7 +194,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.TEST_MESH_NAME)
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh.factoryName)
         }
@@ -221,10 +220,11 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     private fun updateNameForSwitch() {
+        mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.TEST_MESH_NAME)
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh.factoryName)
         }
@@ -255,6 +255,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
 
         TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
+        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress=mDeviceInfo.meshAddress
         TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
     }
 

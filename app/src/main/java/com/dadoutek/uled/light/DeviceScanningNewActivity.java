@@ -49,7 +49,6 @@ import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.LogInfoActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
-import com.dadoutek.uled.switches.ConfigNormalSwitchActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -166,7 +165,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private int dstAddress;
     private Disposable mConnectTimer;
     private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
-    private boolean isSelectAll=false;
+    private boolean isSelectAll = false;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -196,9 +195,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-    private void isSelectAll(){
-        if(isSelectAll){
-            for(int j=0;j<nowLightList.size();j++){
+    private void isSelectAll() {
+        if (isSelectAll) {
+            for (int j = 0; j < nowLightList.size(); j++) {
                 this.updateList.add(nowLightList.get(j));
                 nowLightList.get(j).selected = true;
 
@@ -212,8 +211,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             }
 
             this.adapter.notifyDataSetChanged();
-        }else{
-            for(int j=0;j<nowLightList.size();j++){
+        } else {
+            for (int j = 0; j < nowLightList.size(); j++) {
                 this.updateList.remove(nowLightList.get(j));
                 nowLightList.get(j).selected = false;
                 stopBlink(nowLightList.get(j));
@@ -515,9 +514,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             return;
         }
 
-        if(isSelectAll){
+        if (isSelectAll) {
             toolbar.getMenu().findItem(R.id.menu_select_all).setTitle(getString(R.string.select_all));
-            isSelectAll=false;
+            isSelectAll = false;
         }
 
         for (int i = 0; i < selectLights.size(); i++) {
@@ -634,11 +633,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_select_all:
-                if(isSelectAll){
-                    isSelectAll=false;
+                if (isSelectAll) {
+                    isSelectAll = false;
                     item.setTitle(R.string.select_all);
-                }else{
-                    isSelectAll=true;
+                } else {
+                    isSelectAll = true;
                     item.setTitle(R.string.cancel);
                 }
                 isSelectAll();
@@ -1229,7 +1228,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        if(checkIsLight(deviceInfo.productUUID)){
+        if (checkIsLight(deviceInfo.productUUID)) {
             params.setUpdateDeviceList(deviceInfo);
             mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
@@ -1240,12 +1239,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-    private boolean checkIsLight(int productUUID){
+    private boolean checkIsLight(int productUUID) {
         if (productUUID == DeviceType.NORMAL_SWITCH ||
                 productUUID == DeviceType.NORMAL_SWITCH2 ||
-                productUUID == DeviceType.SCENE_SWITCH) {
+                productUUID == DeviceType.SCENE_SWITCH ||
+                productUUID == DeviceType.SENSOR
+                ) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
@@ -1273,7 +1274,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this)).start();
 
-                if(checkIsLight(deviceInfo1.productUUID)){
+                if (checkIsLight(deviceInfo1.productUUID)) {
                     int meshAddress = deviceInfo.meshAddress & 0xFF;
                     DbLight light = this.adapter.get(meshAddress);
 

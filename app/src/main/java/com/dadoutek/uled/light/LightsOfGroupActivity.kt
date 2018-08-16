@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -46,7 +47,9 @@ import com.telink.util.EventListener
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.backgroundColor
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by hejiajun on 2018/4/24.
@@ -124,6 +127,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
+        searchView!!.clearFocus()
         return false
     }
 
@@ -135,18 +139,25 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             filter(newText,false)
             adapter!!.notifyDataSetChanged()
         }
+
         return false
     }
 
 
     private fun filter(groupName:String?,isSearch:Boolean){
         val list = DBUtils.getGroupList()
+//        val nameList : ArrayList<String> = ArrayList()
         if(lightList!=null&&lightList.size>0){
             lightList.clear()
         }
+
+//        for(i in list.indices){
+//            nameList.add(list[i].name)
+//        }
+
         if(isSearch){
             for(i in list.indices){
-                if(groupName==list[i].name){
+                if(groupName==list[i].name || (list[i].name).startsWith(groupName!!)){
                     lightList.addAll(DBUtils.getLightByGroupID(list[i].id))
                 }
             }
@@ -217,10 +228,16 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        getMenuInflater().inflate(R.menu.menu_search, menu)
-        searchView = MenuItemCompat.getActionView(menu!!.findItem(R.id.action_search)) as SearchView
-        searchView!!.setOnQueryTextListener(this)
-        searchView!!.setQueryHint(getString(R.string.input_groupAdress))
+        if (group.meshAddr == 0xffff) {
+            getMenuInflater().inflate(R.menu.menu_search, menu)
+            searchView = (menu!!.findItem(R.id.action_search)).actionView as SearchView
+            searchView!!.setOnQueryTextListener(this)
+            searchView!!.imeOptions=EditorInfo.IME_ACTION_SEARCH
+            searchView!!.setQueryHint(getString(R.string.input_groupAdress))
+            searchView!!.setSubmitButtonEnabled(true)
+            searchView!!.backgroundColor=resources.getColor(R.color.blue)
+            searchView!!.alpha=0.3f
+        }
         return true
     }
 

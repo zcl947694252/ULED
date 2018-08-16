@@ -97,7 +97,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     //扫描参数
                     val params = LeScanParameters.create()
                     if (BuildConfig.DEBUG) {
-                        params.setMeshName(Constant.TEST_MESH_NAME)
+                        params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
@@ -244,7 +244,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 onLogin()
-                LogUtils.d("登陆成功")
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
@@ -253,7 +252,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             LightAdapter.STATUS_CONNECTED -> {
                 connectDisposable?.dispose()
                 login()
-                LogUtils.d("开始登陆")
             }
         }
 
@@ -261,7 +259,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun login() {
         val mesh = TelinkLightApplication.getApp().mesh
-        TelinkLightService.Instance().login(Strings.stringToBytes(mesh.factoryName, 16)
+        TelinkLightService.Instance().login(Strings.stringToBytes(Constant.PIR_SWITCH_MESH_NAME, 16)
                 , Strings.stringToBytes(mesh.factoryPassword, 16))
 
     }
@@ -297,7 +295,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //            //自动重连参数
 //            val connectParams = Parameters.createAutoConnectParameters()
 //            if (BuildConfig.DEBUG) {
-//                connectParams.setMeshName(Constant.TEST_MESH_NAME)
+//                connectParams.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
 //            } else {
 //                connectParams.setMeshName(mesh.factoryName)
 //            }
@@ -309,7 +307,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-            LogUtils.d("开始连接")
         }.start()
 
         launch(UI) {
@@ -347,7 +344,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         //更新参数
 //        val params = Parameters.createUpdateParameters()
 //        if (BuildConfig.DEBUG) {
-//            params.setOldMeshName(Constant.TEST_MESH_NAME)
+//            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
 //        } else {
 //            params.setOldMeshName(mesh.factoryName)
 //        }

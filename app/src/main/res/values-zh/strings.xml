@@ -333,5 +333,6 @@
     <string name="cancel">取消</string>
     <string name="search_light">搜索</string>
     <string name="input_groupAdress">请输入组名</string>
+    <string name="not_find_pir">未找到传感器</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.Opcode
@@ -209,10 +210,17 @@ object Commander : EventListener<String> {
 
 
     fun updateMeshName(deviceInfo: DeviceInfo, successCallback: () -> Unit, failedCallback: () -> Unit) {
+        mUpdateMeshSuccess=false
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val mesh = mApplication!!.mesh
         val params = Parameters.createUpdateParameters()
-        params.setOldMeshName(mesh.factoryName)
+
+        if (BuildConfig.DEBUG) {
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+        } else {
+            params.setOldMeshName(mesh.factoryName)
+        }
+
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -220,14 +228,13 @@ object Commander : EventListener<String> {
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                         Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
+                    NetworkFactory.md5(mesh?.password) + account).substring(0,16))
         } else {
             params.setNewPassword(mesh?.password)
         }
 
         params.setUpdateDeviceList(deviceInfo)
 
-        TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
         val meshName = Strings.stringToBytes(mesh.name, 16)
         var password = Strings.stringToBytes(mesh.password, 16)
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -238,7 +245,11 @@ object Commander : EventListener<String> {
             password = Strings.stringToBytes(mesh.password, 16)
         }
 
+        TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
+        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress=deviceInfo.meshAddress
         TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
+//        TelinkLightService.Instance().enableNotification()
+//        TelinkLightService.Instance().updateMesh(params)
 
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())

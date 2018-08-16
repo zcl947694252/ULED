@@ -82,6 +82,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         fab.setOnClickListener { _ ->
             showLoadingDialog(getString(R.string.setting_switch))
             Thread {
+//                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
                 setSceneForSwitch()
                 updateNameForSwitch()
             }.start()
@@ -151,7 +152,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.TEST_MESH_NAME)
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh.factoryName)
         }
@@ -195,7 +196,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val mesh = this.mApplication.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.TEST_MESH_NAME)
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh.factoryName)
         }
@@ -224,6 +225,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             password = Strings.stringToBytes(mesh.password, 16)
         }
 
+//        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress=mDeviceInfo.meshAddress
         TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
     }
 

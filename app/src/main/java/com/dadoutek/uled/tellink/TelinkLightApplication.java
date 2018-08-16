@@ -1,8 +1,10 @@
 package com.dadoutek.uled.tellink;
 
+import android.os.Environment;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
@@ -18,6 +20,7 @@ import com.tencent.bugly.Bugly;
 import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -33,6 +36,7 @@ public final class TelinkLightApplication extends TelinkApplication {
     private int onlineCount = 0;
 
     private static DaoSession daoSession;
+    private static String LOG_PATH_DIR=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
     @Override
     public void onCreate() {
@@ -53,7 +57,8 @@ public final class TelinkLightApplication extends TelinkApplication {
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 
-
+        LogUtils.getConfig().setLog2FileSwitch(true);
+        LogUtils.getConfig().setDir(LOG_PATH_DIR);
     }
 
     public static TelinkLightApplication getApp() {
