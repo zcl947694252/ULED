@@ -235,7 +235,7 @@ public final class AddMeshActivity extends TelinkBaseActivity {
         dbRegio.setControlMeshPwd(mNewMeshPwd);
         dbRegio.setInstallMesh(factoryName);
         dbRegio.setInstallMeshPwd(factoryPwd);
-        DBUtils.saveRegion(dbRegio,false);
+        DBUtils.INSTANCE.saveRegion(dbRegio,false);
     }
 
 }

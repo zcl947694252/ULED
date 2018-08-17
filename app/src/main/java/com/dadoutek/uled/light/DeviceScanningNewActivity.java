@@ -241,7 +241,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void startBlink(DbLight light) {
 //        int dstAddress = light.getMeshAddr();
         DbGroup group;
-        DbGroup groupOfTheLight = DBUtils.getGroupByID(light.getBelongGroupId());
+        DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId());
         if (groupOfTheLight == null)
             group = groups.get(0);
         else
@@ -534,7 +534,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     nowLightList.get(i).hasGroup = true;
                     nowLightList.get(i).setBelongGroupId(group.getId());
                     nowLightList.get(i).setName(group.getName());
-                    DBUtils.updateLight(light);
+                    DBUtils.INSTANCE.updateLight(light);
                 } else {
                     nowLightList.get(i).hasGroup = false;
                     nowLightList.get(i).setName(getString(R.string.grouping_fail));
@@ -603,7 +603,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      */
     private boolean isAllLightsGrouped() {
         for (int j = 0; j < nowLightList.size(); j++) {
-            if (DBUtils.getGroupByID(nowLightList.get(j).getBelongGroupId()).getMeshAddr() == 0xffff) {
+            if (DBUtils.INSTANCE.getGroupByID(nowLightList.get(j).getBelongGroupId()).getMeshAddr() == 0xffff) {
                 return false;
             }
         }
@@ -670,7 +670,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         ToastUtils.showShort(getString(R.string.rename_tip_check));
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroup(textGp.getText().toString().trim(), groups, this);
+                        DBUtils.INSTANCE.addNewGroup(textGp.getText().toString().trim(), groups, this);
                         refreshView();
                         dialog.dismiss();
                     }
@@ -730,7 +730,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 TelinkLightService.Instance().idleMode(true);
 
-                String account = DBUtils.getLastUser().getAccount();
+                String account = DBUtils.INSTANCE.getLastUser().getAccount();
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
@@ -847,7 +847,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         nowLightList = new ArrayList<>();
         if (groups == null) {
             groups = new ArrayList<>();
-            groups.addAll(DBUtils.getGroupList());
+            groups.addAll(DBUtils.INSTANCE.getGroupList());
         }
 
         if (groups.size() > 1) {
@@ -987,7 +987,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
             if (this.lights == null)
                 this.lights = new ArrayList<>();
-            DBUtils.saveLight(light, false);
+            DBUtils.INSTANCE.saveLight(light, false);
             this.lights.add(light);
         }
 
@@ -1012,7 +1012,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private String getDeviceName(DbLight light) {
         if (light.getName().isEmpty()) {
-            return DBUtils.getGroupNameByID(light.getBelongGroupId());
+            return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
         } else {
             return light.getName();
         }

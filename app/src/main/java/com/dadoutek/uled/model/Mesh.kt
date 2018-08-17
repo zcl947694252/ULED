@@ -32,7 +32,7 @@ class Mesh : Serializable {
         return address;*/
     val deviceAddress: Int
         get() {
-            val lights = DBUtils.getAllLight()
+            val lights = DBUtils.allLight
             if (lights == null || lights.size == 0) {
                 return 1
             }
@@ -50,7 +50,7 @@ class Mesh : Serializable {
         }
 
     fun generateMeshAddr(): Int {
-        val lights = DBUtils.getAllLight()
+        val lights = DBUtils.allLight
 
         var meshAddress: Int = -1
         when {

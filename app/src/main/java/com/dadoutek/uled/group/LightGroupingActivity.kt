@@ -34,7 +34,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var inflater: LayoutInflater? = null
     private var adapter: DeviceGroupingAdapter? = null
-    private var groupsInit: List<DbGroup>? = null
+    private var groupsInit: MutableList<DbGroup>? = null
 
     private var light: DbLight? = null
     private var gpAdress: Int = 0
@@ -58,7 +58,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     for (sceneId in sceneIds) {
                         Commander.updateScene(sceneId)
                     }
-                    DBUtils.updateLight(light)
+                    DBUtils.updateLight(light!!)
                     runOnUiThread {
                         hideLoadingDialog()
                         finish()
@@ -89,7 +89,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
         val sceneIds = ArrayList<Long>()
-        val dbSceneList = DBUtils.getSceneList()
+        val dbSceneList = DBUtils.sceneList
         sceneLoop@ for (dbScene in dbSceneList) {
             val dbActions = DBUtils.getActionsBySceneId(dbScene.id)
             for (action in dbActions) {
@@ -130,10 +130,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun saveInfo() {
-        DBUtils.updateLight(light)
-        finish()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,7 +151,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
         this.inflater = this.layoutInflater
 
-        groupsInit = DBUtils.getGroupList()
+        groupsInit = DBUtils.groupList
         listView = this.findViewById<View>(R.id.list_groups) as GridView
         listView!!.onItemClickListener = this.itemClickListener
 
@@ -259,7 +255,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, groupsInit, this)
+                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, groupsInit!!, this)
                         refreshView()
                         dialog.dismiss()
                     }
@@ -268,7 +264,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun refreshView() {
-        groupsInit = DBUtils.getGroupList()
+        groupsInit = DBUtils.groupList
 
         adapter = DeviceGroupingAdapter(groupsInit!!, this)
         listView!!.adapter = this.adapter

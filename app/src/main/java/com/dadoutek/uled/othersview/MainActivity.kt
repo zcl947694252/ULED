@@ -148,7 +148,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun initConnect() {
-        val list: List<DbLight> = DBUtils.getAllLight()
+        val list: List<DbLight> = DBUtils.allLight
         for (i in list.indices) {
             list[i].connectionStatus = 1
             DBUtils.updateLight(list[i])
@@ -344,7 +344,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 TelinkLightService.Instance().idleMode(true)
                 bestRSSIDevice = null
                 //扫描参数
-                val account = DBUtils.getLastUser().account
+                val account = DBUtils.lastUser!!.account
                 val params = LeScanParameters.create()
 
                 params.setMeshName(account)
@@ -418,7 +418,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
     private fun login() {
-        val account = DBUtils.getLastUser().account
+        val account = DBUtils.lastUser!!.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
@@ -515,7 +515,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         val dbLightNew = DbLight()
                         dbLightNew.setConnectionStatus(connectionStatus.value)
                         dbLightNew.updateIcon()
-                        dbLightNew.belongGroupId = DBUtils.getGroupNull().id
+                        dbLightNew.belongGroupId = DBUtils.groupNull!!.id
                         dbLightNew.brightness = brightness
                         dbLightNew.colorTemperature = 0
                         dbLightNew.meshAddr = meshAddress

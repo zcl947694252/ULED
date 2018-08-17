@@ -86,7 +86,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
 
             currentLight!!.updateIcon()
-            DBUtils.updateLight(currentLight)
+            DBUtils.updateLight(currentLight!!)
             runOnUiThread {
                 adapter?.notifyDataSetChanged()
             }
@@ -145,7 +145,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
 
     private fun filter(groupName:String?,isSearch:Boolean){
-        val list = DBUtils.getGroupList()
+        val list = DBUtils.groupList
 //        val nameList : ArrayList<String> = ArrayList()
         if(lightList!=null&&lightList.size>0){
             lightList.clear()

@@ -96,7 +96,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         if (group.meshAddr == 0xffff) {
             //            lightList = DBUtils.getAllLight();
-            val list = DBUtils.getGroupList()
+            val list = DBUtils.groupList
             for (j in list.indices) {
                 lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
             }
@@ -185,7 +185,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private fun initData() {
         this.mApplication = activity!!.application as TelinkLightApplication
-        gpList = DBUtils.getGroupList()
+        gpList = DBUtils.groupList
 
         showList = ArrayList()
 

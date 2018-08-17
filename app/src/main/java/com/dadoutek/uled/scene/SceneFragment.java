@@ -77,7 +77,7 @@ public class SceneFragment extends BaseFragment implements
 
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getActivity().getApplication();
-        scenesListData = DBUtils.getSceneList();
+        scenesListData = DBUtils.INSTANCE.getSceneList();
     }
 
     private void initView() {
@@ -137,19 +137,19 @@ public class SceneFragment extends BaseFragment implements
         byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
         long id = scenesListData.get(position).getId();
-        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
         params = new byte[]{0x00, (byte) id};
         new Thread(() -> {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
         }).start();
-        DBUtils.deleteSceneActionsList(list);
-        DBUtils.deleteScene(scenesListData.get(position));
+        DBUtils.INSTANCE.deleteSceneActionsList(list);
+        DBUtils.INSTANCE.deleteScene(scenesListData.get(position));
         scenesListData.remove(position);
     }
 
     private void setScene(long id) {
         byte opcode = Opcode.SCENE_LOAD;
-        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
         new Thread(() -> {
             byte[] params;
             params = new byte[]{(byte) id};

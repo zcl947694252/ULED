@@ -72,7 +72,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 
 
         if (currentRegionID != -1) {
-            DbRegion dbRegion = DBUtils.getCurrentRegion(currentRegionID);
+            DbRegion dbRegion = DBUtils.INSTANCE.getCurrentRegion(currentRegionID);
 
             if (dbRegion != null) {
                 String name = dbRegion.getControlMesh();

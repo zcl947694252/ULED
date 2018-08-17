@@ -117,25 +117,25 @@ public class ChangeSceneAct extends TelinkBaseActivity{
     private void initData() {
         telinkLightApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, telinkLightApplication.getMesh().getName(), telinkLightApplication.getMesh().getPassword());
-        groups = DBUtils.getGroupList();
+        groups = DBUtils.INSTANCE.getGroupList();
         itemGroupArrayList = new ArrayList<>();
 
         Intent intent = getIntent();
         scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
 //        scene.__setDaoSession(DaoSessionInstance.getInstance());
 
-        List<DbSceneActions> actions = DBUtils.getActionsBySceneId(scene.getId());
+        List<DbSceneActions> actions = DBUtils.INSTANCE.getActionsBySceneId(scene.getId());
 
         boolean includeAll = false;
 
-        for (DbGroup group1 : groups) {
+        for (DbGroup group : groups) {
 //            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
-            DbGroup group=new DbGroup();
-            group.setBelongRegionId(group1.getBelongRegionId());
-            group.setBrightness(group1.getBrightness());
-            group.setColorTemperature(group1.getColorTemperature());
-            group.setMeshAddr(group1.getMeshAddr());
-            group.setName(group1.getName());
+//            DbGroup group=new DbGroup();
+//            group.setBelongRegionId(group1.getBelongRegionId());
+//            group.setBrightness(group1.getBrightness());
+//            group.setColorTemperature(group1.getColorTemperature());
+//            group.setMeshAddr(group1.getMeshAddr());
+//            group.setName(group1.getName());
 
             group.selected = false;
 
@@ -143,8 +143,6 @@ public class ChangeSceneAct extends TelinkBaseActivity{
             for (int i = 0; i < actions.size(); i++) {
                 if (group.getMeshAddr() == actions.get(i).getGroupAddr()) {
                     group.selected = true;
-                    group.setBrightness(actions.get(i).getBrightness());
-                    group.setColorTemperature(actions.get(i).getColorTemperature());
 
                     ItemGroup itemGroup = new ItemGroup();
                     itemGroup.brightness = actions.get(i).getBrightness();
@@ -363,9 +361,9 @@ public class ChangeSceneAct extends TelinkBaseActivity{
             List<ItemGroup> itemGroups = itemGroupArrayList;
 
             scene.setName(name);
-            DBUtils.updateScene(scene);
+            DBUtils.INSTANCE.updateScene(scene);
             long idAction = scene.getId();
-            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene.getId()));
+            DBUtils.INSTANCE.deleteSceneActionsList(DBUtils.INSTANCE.getActionsBySceneId(scene.getId()));
 
             for (int i = 0; i < itemGroups.size(); i++) {
                 DbSceneActions sceneActions = new DbSceneActions();
@@ -373,7 +371,7 @@ public class ChangeSceneAct extends TelinkBaseActivity{
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                DBUtils.saveSceneActions(sceneActions);
+                DBUtils.INSTANCE.saveSceneActions(sceneActions);
             }
             try {
                 Thread.sleep(100);
@@ -390,7 +388,7 @@ public class ChangeSceneAct extends TelinkBaseActivity{
     private void updateScene(long id) throws InterruptedException {
         deleteScene(id);
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
         byte[] params;
         for (int i = 0; i < list.size(); i++) {
             Thread.sleep(100);

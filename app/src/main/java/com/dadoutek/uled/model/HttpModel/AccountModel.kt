@@ -110,7 +110,7 @@ object AccountModel {
         val groups = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
                 name + pwd + Constant.GROUPS_KEY) as? Groups
 
-        val dbRegion = DBUtils.getLastRegion()
+        val dbRegion = DBUtils.lastRegion
 
         if (groups != null) {
             for (item in groups.get()) {
@@ -146,12 +146,12 @@ object AccountModel {
 
     private fun setupMesh(account: String) {
 
-        val regionList = DBUtils.getRegionAll()
+        val regionList = DBUtils.regionAll
 
         //数据库有区域数据直接加载
         if (regionList.size != 0) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
-            val dbRegion = DBUtils.getLastRegion()
+            val dbRegion = DBUtils.lastRegion
             val application = getApplication() as TelinkLightApplication
             val mesh = application.mesh
             mesh.name = dbRegion.controlMesh

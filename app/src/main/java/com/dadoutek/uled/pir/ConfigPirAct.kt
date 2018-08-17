@@ -48,7 +48,7 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
-        mGroups = DBUtils.getAllGroups()
+        mGroups = DBUtils.allGroups
         val mGroupsName: ArrayList<String> = ArrayList()
         for (item in mGroups) {
             mGroupsName.add(item.name)

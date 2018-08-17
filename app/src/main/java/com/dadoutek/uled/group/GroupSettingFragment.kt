@@ -82,7 +82,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
-                DBUtils.updateGroup(group)
+                DBUtils.updateGroup(group!!)
                 tv_brightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
 
@@ -94,7 +94,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, progress.toByte())
                 group!!.colorTemperature = progress
-                DBUtils.updateGroup(group)
+                DBUtils.updateGroup(group!!)
                 tv_temperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
 
@@ -111,7 +111,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
 
         if (group.meshAddr == 0xffff) {
             //            lightList = DBUtils.getAllLight();
-            val list = DBUtils.getGroupList()
+            val list = DBUtils.groupList
             for (j in list.indices) {
                 lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
             }
@@ -252,7 +252,7 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                     val lightMeshAddr = light.meshAddr
                     Commander.deleteGroup(lightMeshAddr,
                             successCallback = {
-                                light.belongGroupId = DBUtils.getGroupNull().id
+                                light.belongGroupId = DBUtils.groupNull!!.id
                                 DBUtils.updateLight(light)
                                 lights.remove(light)
                                 if (lights.count() == 0) {

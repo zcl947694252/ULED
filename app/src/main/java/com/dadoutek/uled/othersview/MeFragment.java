@@ -149,7 +149,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         }
 
         userIcon.setBackgroundResource(R.drawable.ic_launcher);
-        userName.setText(DBUtils.getLastUser().getPhone());
+        userName.setText(DBUtils.INSTANCE.getLastUser().getPhone());
 
 //        getVserion();
     }
@@ -339,7 +339,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         showLoadingDialog(getString(R.string.reset_all_now));
         SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, true);
         new Thread(() -> {
-            List<DbGroup> list = DBUtils.getGroupList();
+            List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
             List<DbLight> lightList = new ArrayList<>();
             DeviceInfo deviceInfo = TelinkLightApplication.getInstance().getConnectDevice();
             if (deviceInfo == null) {
@@ -348,7 +348,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             }
 
             for (int i = 0; i < list.size(); i++) {
-                lightList.addAll(DBUtils.getLightByGroupID(list.get(i).getId()));
+                lightList.addAll(DBUtils.INSTANCE.getLightByGroupID(list.get(i).getId()));
             }
 
             mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
@@ -392,7 +392,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                             Thread.sleep(sleepTime);
                         }
                         Thread.sleep(sleepTime);
-                        DBUtils.deleteLight(lightList.get(j));
+                        DBUtils.INSTANCE.deleteLight(lightList.get(j));
                     } catch (InterruptedException e) {
                         hideLoadingDialog();
                         e.printStackTrace();
@@ -505,7 +505,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     }
 
     private void deleteLight(DbLight dbLight) {
-        DBUtils.deleteLight(dbLight);
+        DBUtils.INSTANCE.deleteLight(dbLight);
     }
 
     private void hideLightVersion() {
@@ -539,7 +539,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
     private void exitLogin() {
         isClickExlogin = true;
-        if (DBUtils.getAllLight().size() == 0 && !DBUtils.getDataChangeAllHaveAboutLight()) {
+        if (DBUtils.INSTANCE.getAllLight().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutLight()) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
                 TelinkLightService.Instance().disconnect();
@@ -586,7 +586,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     }
 
     private void clearData() {
-        DbUser dbUser = DBUtils.getLastUser();
+        DbUser dbUser = DBUtils.INSTANCE.getLastUser();
 
         if (dbUser == null) {
             ToastUtils.showLong(R.string.data_empty);
@@ -599,7 +599,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             public void onNext(String s) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
                 SharedPreferencesHelper.putObject(getActivity(), Constant.OLD_INDEX_DATA, null);
-                DBUtils.deleteAllData();
+                DBUtils.INSTANCE.deleteAllData();
                 CleanUtils.cleanInternalSp();
                 CleanUtils.cleanExternalCache();
                 CleanUtils.cleanInternalFiles();

@@ -39,9 +39,9 @@ class SyncDataPutOrGetUtils {
 
             Thread {
 
-                val dbDataChangeList = DBUtils.getDataChangeAll()
+                val dbDataChangeList = DBUtils.dataChangeAll
 
-                val dbUser = DBUtils.getLastUser()
+                val dbUser = DBUtils.lastUser
 
                 if (dbDataChangeList.size == 0) {
                     ToastUtils.showLong(context.getString(R.string.upload_data_success))
@@ -63,7 +63,7 @@ class SyncDataPutOrGetUtils {
                     var observable: Observable<String> = this.sendDataToServer(dbDataChangeList[i].tableName,
                             dbDataChangeList[i].changeId,
                             dbDataChangeList[i].changeType,
-                            dbUser.token, dbDataChangeList[i].id!!)!!
+                            dbUser!!.token, dbDataChangeList[i].id!!)!!
                     observableList.add(observable)
 
                     if (i == dbDataChangeList.size - 1) {
@@ -315,12 +315,12 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun setupMesh() {
-            val regionList = DBUtils.getRegionAll()
+            val regionList = DBUtils.regionAll
 
             //数据库有区域数据直接加载
             if (regionList.size != 0) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
-                val dbRegion = DBUtils.getLastRegion()
+                val dbRegion = DBUtils.lastRegion
                 val application = DeviceHelper.getApplication() as TelinkLightApplication
                 val mesh = application.mesh
                 mesh.name = dbRegion.controlMesh

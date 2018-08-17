@@ -94,7 +94,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         scenes = new Scenes();
         telinkLightApplication = (TelinkLightApplication) this.getApplication();
         dataManager = new DataManager(this, telinkLightApplication.getMesh().getName(), telinkLightApplication.getMesh().getPassword());
-        groups = DBUtils.getGroupList();
+        groups = DBUtils.INSTANCE.getGroupList();
         itemGroupArrayList = new ArrayList<>();
 
         for (DbGroup group : groups) {
@@ -323,7 +323,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             dbScene.setId(getSceneId());
             dbScene.setName(name);
             dbScene.setBelongRegionId((long) SharedPreferencesUtils.getCurrentUseRegion());
-            DBUtils.saveScene(dbScene, false);
+            DBUtils.INSTANCE.saveScene(dbScene, false);
 
             long idAction = dbScene.getId();
 
@@ -338,7 +338,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 //                break;
 //            } else {
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
-                DBUtils.saveSceneActions(sceneActions);
+                DBUtils.INSTANCE.saveSceneActions(sceneActions);
 //            }
             }
 
@@ -355,7 +355,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     }
 
     private Long getSceneId() {
-        List<DbScene> list = DBUtils.getSceneList();
+        List<DbScene> list = DBUtils.INSTANCE.getSceneList();
         List<Integer> idList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
             idList.add(list.get(i).getId().intValue());
@@ -383,7 +383,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
     private void addScene(long id) throws InterruptedException {
         byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
-        List<DbSceneActions> list = DBUtils.getActionsBySceneId(id);
+        List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
         byte[] params;
 
         for (int i = 0; i < list.size(); i++) {

@@ -108,7 +108,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
                 light.setBrightness(progress);
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-                DBUtils.updateLight(light);
+                DBUtils.INSTANCE.updateLight(light);
             } else if (view == temperatureBar) {
 
                 opcode = (byte) Opcode.SET_TEMPERATURE;
@@ -117,7 +117,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
                 light.setColorTemperature(progress);
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-                DBUtils.updateLight(light);
+                DBUtils.INSTANCE.updateLight(light);
             }
         }
     };
@@ -260,7 +260,7 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                         if (TelinkLightService.Instance().getAdapter().mLightCtrl.getCurrentLight().isConnected()) {
                             byte opcode = (byte) Opcode.KICK_OUT;
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, light.getMeshAddr(), null);
-                            DBUtils.deleteLight(light);
+                            DBUtils.INSTANCE.deleteLight(light);
                             if (TelinkLightApplication.getApp().getMesh().removeDeviceByMeshAddress(light.getMeshAddr())) {
                                 TelinkLightApplication.getApp().getMesh().saveOrUpdate(getActivity());
                             }

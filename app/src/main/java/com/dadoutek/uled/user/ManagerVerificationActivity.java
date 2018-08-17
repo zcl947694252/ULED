@@ -64,7 +64,7 @@ public class ManagerVerificationActivity extends TelinkBaseActivity {
     }
 
     private void initData() {
-        phone = DBUtils.getLastUser().getPhone();
+        phone = DBUtils.INSTANCE.getLastUser().getPhone();
         editPhoneNumber.getEditText().setText(phone);
 
         Intent intent = getIntent();

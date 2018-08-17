@@ -196,7 +196,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         val mesh = mApplication.mesh
 //        val dataManager = DataManager(this, mesh.name, mesh.password)
         mGroupArrayList = ArrayList<DbGroup>()
-        val groupList = DBUtils.getGroupList()
+        val groupList = DBUtils.groupList
 //        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
 
         for (group in groupList) {

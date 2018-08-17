@@ -209,7 +209,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mSwitchList.add(getString(R.string.button2))
         mSwitchList.add(getString(R.string.button4))
 
-        mSceneList = DBUtils.getSceneAll()
+        mSceneList = DBUtils.sceneAll
     }
 
 

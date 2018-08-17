@@ -205,7 +205,7 @@ object Commander : EventListener<String> {
     }
 
 
-    fun updateMeshName(newMeshName: String = DBUtils.getLastUser().account, newMeshAddr: Int =
+    fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.account, newMeshAddr: Int =
             Constant.SWITCH_PIR_ADDRESS,
                        successCallback: () -> Unit,
                        failedCallback: () -> Unit) {

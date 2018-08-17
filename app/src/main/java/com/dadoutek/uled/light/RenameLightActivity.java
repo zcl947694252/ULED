@@ -76,7 +76,7 @@ public class RenameLightActivity extends TelinkBaseActivity {
 
     private void saveName() {
         light.setName(newName);
-        DBUtils.updateLight(light);
+        DBUtils.INSTANCE.updateLight(light);
         finish();
     }
 
@@ -86,7 +86,7 @@ public class RenameLightActivity extends TelinkBaseActivity {
             return false;
         }
 
-        List<DbLight> lights=DBUtils.getAllLight();
+        List<DbLight> lights= DBUtils.INSTANCE.getAllLight();
         for(int k=0;k<lights.size();k++){
             if(lights.get(k).getName().equals(newName)){
                 ToastUtils.showLong(R.string.tip_used_name);

@@ -193,7 +193,7 @@ public class DataManager {
             SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
                     mMeshName + mPwd + Constant.GROUPS_KEY, groups);
             //新增数据库保存
-            DBUtils.saveGroup(group,false);
+            DBUtils.INSTANCE.saveGroup(group,false);
         }
     }
 
@@ -327,15 +327,15 @@ public class DataManager {
 
     public String getLightName(DbLight light) {
 
-        if(DBUtils.getGroupByID(light.getBelongGroupId())==null){
+        if(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId())==null){
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
         }
 
         //如果当前灯没分组  显示未分组
-        if(DBUtils.getGroupByID(light.getBelongGroupId()).getMeshAddr()==0xffff){
+        if(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getMeshAddr()==0xffff){
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
         }else{
-            return DBUtils.getGroupByID(light.getBelongGroupId()).getName();
+            return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
         }
 //        if(light.getName()==null||light.getName().isEmpty()){
 //            return light.getLabel();

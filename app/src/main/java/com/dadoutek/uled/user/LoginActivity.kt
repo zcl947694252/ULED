@@ -174,7 +174,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         //        if (isFirstLauch) {
         //            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
         //        } else {
-        if (DBUtils.getAllLight().size == 0) {
+        if (DBUtils.allLight.size == 0) {
             startActivity(Intent(this@LoginActivity, EmptyAddActivity::class.java))
             //            startActivity(new Intent(LoginActivity.this, AddMeshActivity.class));
             finish()
