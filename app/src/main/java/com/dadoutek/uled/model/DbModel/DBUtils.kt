@@ -185,7 +185,7 @@ object DBUtils {
     }
 
     @Synchronized
-    fun getSceneByID(id: Long): DbScene {
+    fun getSceneByID(id: Long): DbScene? {
         return DaoSessionInstance.getInstance().dbSceneDao.load(id)
     }
 

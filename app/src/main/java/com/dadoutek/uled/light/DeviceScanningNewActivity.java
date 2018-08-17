@@ -253,6 +253,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
                 (byte) (groupAddress >> 8 & 0xFF)};
         params[0] = 0x01;
+
+        if(mBlinkDisposables.get(dstAddress)!=null){
+           mBlinkDisposables.get(dstAddress).dispose();
+        }
+
         //每隔1s发一次，就是为了让灯一直闪.
         mBlinkDisposables.put(dstAddress, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
