@@ -91,7 +91,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val sceneIds = ArrayList<Long>()
         val dbSceneList = DBUtils.getSceneList()
         sceneLoop@ for (dbScene in dbSceneList) {
-            val dbActions = dbScene.actions
+            val dbActions = DBUtils.getActionsBySceneId(dbScene.id)
             for (action in dbActions) {
                 if (groupAddress == action.groupAddr || 0xffff == action.groupAddr) {
                     sceneIds.add(dbScene.id)

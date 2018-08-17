@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.CleanUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
@@ -552,6 +554,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     }
 
     long[] mHints = new long[6];//初始全部为0
+    private static String LOG_PATH_DIR= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
     private void developerMode() {
         //将mHints数组内的所有元素左移一个位置
@@ -562,6 +565,9 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             ToastUtils.showLong(R.string.developer_mode);
             copyDataBase.setVisibility(View.VISIBLE);
             chearCache.setVisibility(View.VISIBLE);
+            //开发者模式启动时启动LOG日志
+            LogUtils.getConfig().setLog2FileSwitch(true);
+            LogUtils.getConfig().setDir(LOG_PATH_DIR);
             SharedPreferencesUtils.setDeveloperModel(true);
         }
     }

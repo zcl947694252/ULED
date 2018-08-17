@@ -28,6 +28,7 @@ import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
+import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -91,7 +92,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         finish()
     }
 
-    private fun configureComplete(){
+    private fun configureComplete() {
         this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
         TelinkLightService.Instance().disconnect()
@@ -103,14 +104,25 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     private fun initListener() {
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         fab.setOnClickListener { view ->
             if (mAdapter.selectedPos != -1) {
                 progressBar.visibility = View.VISIBLE
                 setGroupForSwitch()
-                updateNameForSwitch()
-
+//                updateNameForSwitch()
+                Commander.updateMeshName(successCallback = {
+                    launch(UI) {
+                        progressBar.visibility = View.GONE
+                    }
+                    configureComplete()
+                },
+                        failedCallback = {
+                            snackbar(configGroupRoot, getString(R.string.group_failed))
+                            launch(UI) {
+                                progressBar.visibility = View.GONE
+                            }
+                        })
             } else {
                 snackbar(view, getString(R.string.please_select_group))
             }
@@ -132,23 +144,6 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                         mGroupArrayList[mAdapter.selectedPos].checked = true
                         mAdapter.notifyItemChanged(mAdapter.selectedPos)
                     }
-//                    val checkBox = view as CheckBox
-//                    if (checkBox.isChecked) {
-//                        mAdapter.selectedPos = position
-//
-//                        for (i in 0..(mGroupArrayList.size - 1)) {
-//                            if (i != mAdapter.selectedPos) {
-//                                val view = mAdapter.getViewByPosition(recyclerView, i, R.id.checkBox)
-//                                if (view != null) {
-//                                    val cb = view as CheckBox
-//                                    cb.isChecked = false
-//                                }
-//                            }
-//                        }
-//                    } else {
-//
-//                        mAdapter.selectedPos = -1   // 设置成-1 代表没有选中任何item
-//                    }
                 }
             }
         }
@@ -158,37 +153,14 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     override fun onDestroy() {
         super.onDestroy()
-        this.mApplication.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
-//            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
+
         }
 
     }
-
-    private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
-        val deviceInfo = deviceEvent.args
-
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                launch(UI) {
-                    progressBar.visibility = View.GONE
-                }
-                configureComplete()
-            }
-            LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                snackbar(configPirRoot, getString(R.string.group_failed))
-                launch(UI) {
-                    progressBar.visibility = View.GONE
-                }
-            }
-        }
-    }
-
 
     private fun setGroupForSwitch() {
         val mesh = this.mApplication.mesh
@@ -217,46 +189,6 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
                 paramBytes)
 //        Commander.addGroup(mDeviceInfo.meshAddress,groupAddress,)
-    }
-
-    private fun updateNameForSwitch() {
-        mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
-        val mesh = this.mApplication.mesh
-        val params = Parameters.createUpdateParameters()
-        if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-        } else {
-            params.setOldMeshName(mesh.factoryName)
-        }
-        params.setOldPassword(mesh.factoryPassword)
-        params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
-
-        params.setUpdateDeviceList(mDeviceInfo)
-//        TelinkLightService.Instance().updateMesh(params)
-
-
-        val meshName = Strings.stringToBytes(mesh.name, 16)
-        var password = Strings.stringToBytes(mesh.password, 16)
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            password = Strings.stringToBytes(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account), 16)
-        } else {
-            password = Strings.stringToBytes(mesh.password, 16)
-        }
-
-        TelinkLightService.Instance().adapter.mode = MODE_UPDATE_MESH
-        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress=mDeviceInfo.meshAddress
-        TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
     }
 
     private fun initView() {

@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.communicate.Commander.addGroup
@@ -125,7 +127,11 @@ class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnI
             R.id.fabConfirm -> {
                 if (tietDelay.text.isEmpty() || tietMinimumBrightness.text.isEmpty()) {
                     snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
-                } else {
+                }else if(tietMinimumBrightness.text.toString().toInt()>99){
+                    ToastUtils.showLong(getString(R.string.max_tip_brightness))
+                } else if(tietDelay.text.toString().toInt()>30){
+                    ToastUtils.showLong(getString(R.string.time_max_tip))
+                }else {
                     showLoadingDialog(getString(R.string.configuring_switch))
                     Thread {
 

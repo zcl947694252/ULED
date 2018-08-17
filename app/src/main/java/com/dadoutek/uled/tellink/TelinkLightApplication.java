@@ -2,6 +2,7 @@ package com.dadoutek.uled.tellink;
 
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Config;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -24,6 +25,8 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import static com.dadoutek.uled.BuildConfig.DEBUG;
+
 
 public final class TelinkLightApplication extends TelinkApplication {
 
@@ -36,7 +39,6 @@ public final class TelinkLightApplication extends TelinkApplication {
     private int onlineCount = 0;
 
     private static DaoSession daoSession;
-    private static String LOG_PATH_DIR=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
     @Override
     public void onCreate() {
@@ -50,15 +52,11 @@ public final class TelinkLightApplication extends TelinkApplication {
 
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
-//        BuglyLog.v("ss","sadasdsdasf");
 //        CrashReport.testJavaCrash();
 
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
-
-        LogUtils.getConfig().setLog2FileSwitch(true);
-        LogUtils.getConfig().setDir(LOG_PATH_DIR);
     }
 
     public static TelinkLightApplication getApp() {
@@ -67,12 +65,6 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     @Override
     public void doInit() {
-
-//        String fileName = "telink-";
-//        fileName += System.currentTimeMillis();
-//        fileName += ".log";
-//        TelinkLog.LOG2FILE_ENABLE = false;
-//        TelinkLog.onCreate(fileName);
         super.doInit();
         //AES.Security = true;
 

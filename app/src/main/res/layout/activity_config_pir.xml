@@ -27,7 +27,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/delay_minute"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="2"
+            />
     </android.support.design.widget.TextInputLayout>
 
 
@@ -45,7 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/minimum_brightness_percentage"
-            android:inputType="number" />
+            android:inputType="number"
+            android:maxLength="2"/>
     </android.support.design.widget.TextInputLayout>
 
     <TextView

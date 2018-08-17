@@ -337,5 +337,7 @@
     <string name="search_light">搜索</string>
     <string name="input_groupAdress">请输入组名</string>
     <string name="not_find_pir">未找到传感器</string>
+    <string name="max_tip_brightness">亮度最高不能超过99</string>
+    <string name="time_max_tip">时间最高不能超过30</string>
 
 </resources>

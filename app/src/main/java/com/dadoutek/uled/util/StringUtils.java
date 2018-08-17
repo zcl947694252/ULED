@@ -54,6 +54,6 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(16)});
     }
 }

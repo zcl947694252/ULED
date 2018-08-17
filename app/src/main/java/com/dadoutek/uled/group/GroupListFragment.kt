@@ -33,6 +33,7 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.light.ConnectionStatus
 
 import java.util.ArrayList

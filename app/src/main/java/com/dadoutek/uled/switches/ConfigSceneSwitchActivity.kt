@@ -30,6 +30,8 @@ import com.telink.util.Strings
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
@@ -77,14 +79,25 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initListener() {
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
         fab.setOnClickListener { _ ->
             showLoadingDialog(getString(R.string.setting_switch))
             Thread {
 //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
                 setSceneForSwitch()
-                updateNameForSwitch()
+//                updateNameForSwitch()
+                Commander.updateMeshName(successCallback = {
+                    launch(UI) {
+                        hideLoadingDialog()
+                    }
+                    configureComplete()
+                },
+                        failedCallback = {
+                            snackbar(configGroupRoot, getString(R.string.pace_fail))
+                            launch(UI) {
+                                hideLoadingDialog()
+                            }
+                        })
             }.start()
         }
     }
@@ -119,34 +132,14 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     override fun onDestroy() {
         super.onDestroy()
-        this.mApplication.removeEventListener(DeviceEvent.STATUS_CHANGED, this)
     }
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
-//            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
+
         }
 
     }
-
-    private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
-        val deviceInfo = deviceEvent.args
-
-        hideLoadingDialog()
-
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                configureComplete()
-            }
-
-            LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
-                snackbar(configPirRoot, getString(R.string.pace_fail))
-            }
-        }
-    }
-
 
     private fun setSceneForSwitch() {
         val mesh = this.mApplication.mesh
@@ -192,48 +185,11 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
-    private fun updateNameForSwitch() {
-        val mesh = this.mApplication.mesh
-        val params = Parameters.createUpdateParameters()
-        if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-        } else {
-            params.setOldMeshName(mesh.factoryName)
-        }
-        params.setOldPassword(mesh.factoryPassword)
-        params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
-
-        params.setUpdateDeviceList(mDeviceInfo)
-
-        TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
-        val meshName = Strings.stringToBytes(mesh.name, 16)
-        var password = Strings.stringToBytes(mesh.password, 16)
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            password = Strings.stringToBytes(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account), 16)
-        } else {
-            password = Strings.stringToBytes(mesh.password, 16)
-        }
-
-//        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress=mDeviceInfo.meshAddress
-        TelinkLightService.Instance().adapter.mLightCtrl.reset(meshName, password, null)
-    }
-
     private fun initView() {
         if (mSceneList.isEmpty()) {
 //            ToastUtils.showLong(getString(R.string.tip_switch))
             fab.visibility = View.GONE
-            indefiniteSnackbar(configPirRoot, R.string.tip_switch, R.string.btn_ok) {
+            indefiniteSnackbar(configGroupRoot, R.string.tip_switch, R.string.btn_ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             return

@@ -44,7 +44,7 @@ import butterknife.OnClick;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class ChangeSceneAct extends TelinkBaseActivity {
+public class ChangeSceneAct extends TelinkBaseActivity{
     @BindView(R.id.bt_save)
     Button btSave;
     @BindView(R.id.edit_name)
@@ -127,9 +127,16 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         List<DbSceneActions> actions = DBUtils.getActionsBySceneId(scene.getId());
 
         boolean includeAll = false;
-        loop2:
-        for (DbGroup group : groups) {
+
+        for (DbGroup group1 : groups) {
 //            if (group.containsLightList.size() > 0 || group.getMeshAddr() == 0xffff)
+            DbGroup group=new DbGroup();
+            group.setBelongRegionId(group1.getBelongRegionId());
+            group.setBrightness(group1.getBrightness());
+            group.setColorTemperature(group1.getColorTemperature());
+            group.setMeshAddr(group1.getMeshAddr());
+            group.setName(group1.getName());
+
             group.selected = false;
 
             loop1:

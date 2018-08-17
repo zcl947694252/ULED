@@ -94,4 +94,6 @@ public class DbGroup implements Serializable{
     public void setBelongRegionId(int belongRegionId) {
         this.belongRegionId = belongRegionId;
     }
+
+
 }
