@@ -25,8 +25,6 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 
@@ -56,7 +54,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     allocDeviceGroup(group)
                     Thread.sleep(100)
                     for (sceneId in sceneIds) {
-                        Commander.updateScene(sceneId)
+                        Commander.addScene(sceneId, light!!.meshAddr)
                     }
                     DBUtils.updateLight(light!!)
                     runOnUiThread {

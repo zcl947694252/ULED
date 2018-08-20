@@ -44,13 +44,13 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
         private val delayTime = 20
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            stopTracking=true
+            stopTracking = true
             this.onValueChange(seekBar, seekBar.progress, true)
-            LogUtils.d("seekBarstop"+seekBar.progress)
+            LogUtils.d("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
-            stopTracking=false
+            stopTracking = false
             this.preTime = System.currentTimeMillis()
             this.onValueChange(seekBar, seekBar.progress, true)
         }
@@ -68,11 +68,11 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 return
             }
 
-            LogUtils.d("seekBarChange"+seekBar.progress)
+            LogUtils.d("seekBarChange" + seekBar.progress)
             this.onValueChange(seekBar, progress, true)
         }
 
-        private fun onValueChange(view: View, progress: Int,immediate: Boolean) {
+        private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
 
             val addr = group!!.meshAddr
             val opcode: Byte
@@ -84,10 +84,10 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 group!!.brightness = progress
                 DBUtils.updateGroup(group!!)
                 tv_brightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
-                if(stopTracking){
-                    updateLights(progress,"brightness", group!!)
+                if (stopTracking) {
+                    updateLights(progress, "brightness", group!!)
                 }
             } else if (view === temperatureBar) {
 
@@ -96,18 +96,18 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                 group!!.colorTemperature = progress
                 DBUtils.updateGroup(group!!)
                 tv_temperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params,immediate)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
-                if(stopTracking){
-                    updateLights(progress,"colorTemperature",group!!)
+                if (stopTracking) {
+                    updateLights(progress, "colorTemperature", group!!)
                 }
             }
         }
     }
 
     @Synchronized
-    private fun updateLights(progress: Int, type: String,group: DbGroup) {
-         var lightList: MutableList<DbLight> = ArrayList()
+    private fun updateLights(progress: Int, type: String, group: DbGroup) {
+        var lightList: MutableList<DbLight> = ArrayList()
 
         if (group.meshAddr == 0xffff) {
             //            lightList = DBUtils.getAllLight();
@@ -119,14 +119,14 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
             lightList = DBUtils.getLightByGroupID(group.id)
         }
 
-         for (dbLight : DbLight in lightList){
-             if(type == "brightness"){
-                 dbLight.brightness=progress
-             }else if (type == "colorTemperature"){
-                 dbLight.colorTemperature=progress
-             }
-             DBUtils.updateLight(dbLight)
-         }
+        for (dbLight: DbLight in lightList) {
+            if (type == "brightness") {
+                dbLight.brightness = progress
+            } else if (type == "colorTemperature") {
+                dbLight.colorTemperature = progress
+            }
+            DBUtils.updateLight(dbLight)
+        }
     }
 
     private val colorChangedListener = object : ColorPicker.OnColorChangeListener {
@@ -255,20 +255,17 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                                 light.belongGroupId = DBUtils.groupNull!!.id
                                 DBUtils.updateLight(light)
                                 lights.remove(light)
+                                //修改分组成功后删除场景信息。
+                                deleteAllSceneByLightAddr(light.meshAddr)
+                                Thread.sleep(100)
                                 if (lights.count() == 0) {
+                                    //所有灯都删除了分组
                                     DBUtils.deleteGroupOnly(group)
                                     activity?.runOnUiThread {
                                         successCallback.invoke()
                                     }
-                                } else{
-                                    val sceneIds = getRelatedSceneIds(group.meshAddr)
-                                    Thread.sleep(100)
-                                    deleteAllSceneByLightAddr(light!!.meshAddr)
-                                    Thread.sleep(100)
-                                    for (sceneId in sceneIds) {
-                                        Commander.updateScene(sceneId)
-                                    }
-
+                                } else {
+                                    //还有灯要删除分组
                                     deleteGroup(lights, group,
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)

@@ -101,7 +101,7 @@ object Commander : EventListener<String> {
                 })
     }
 
-    fun updateScene(sceneId: Long) {
+    fun addScene(sceneId: Long, meshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val list = DBUtils.getActionsBySceneId(sceneId)
         var params: ByteArray
@@ -114,7 +114,7 @@ object Commander : EventListener<String> {
             if (light > 99)
                 light = 99
             params = byteArrayOf(0x01, sceneId.toByte(), light, 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), temperature)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params)
         }
     }
 
