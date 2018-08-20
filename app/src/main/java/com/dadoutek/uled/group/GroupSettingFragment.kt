@@ -260,11 +260,19 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
                                     activity?.runOnUiThread {
                                         successCallback.invoke()
                                     }
-                                } else
+                                } else{
+                                    val sceneIds = getRelatedSceneIds(group.meshAddr)
+                                    Thread.sleep(100)
+                                    deleteAllSceneByLightAddr(light!!.meshAddr)
+                                    Thread.sleep(100)
+                                    for (sceneId in sceneIds) {
+                                        Commander.updateScene(sceneId)
+                                    }
+
                                     deleteGroup(lights, group,
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)
-
+                                }
                             },
                             failedCallback = {
                                 deleteGroup(lights, group, retryCount = retryCount + 1,
@@ -285,6 +293,33 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
             }
         }.start()
 
+    }
+
+    private fun getRelatedSceneIds(groupAddress: Int): List<Long> {
+        val sceneIds = java.util.ArrayList<Long>()
+        val dbSceneList = DBUtils.sceneList
+        sceneLoop@ for (dbScene in dbSceneList) {
+            val dbActions = DBUtils.getActionsBySceneId(dbScene.id)
+            for (action in dbActions) {
+                if (groupAddress == action.groupAddr || 0xffff == action.groupAddr) {
+                    sceneIds.add(dbScene.id)
+                    continue@sceneLoop
+                }
+            }
+        }
+        return sceneIds
+    }
+
+    /**
+     * 删除指定灯里的所有场景
+     *
+     * @param lightMeshAddr 灯的mesh地址
+     */
+    private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
+        val opcode = Opcode.SCENE_ADD_OR_DEL
+        val params: ByteArray
+        params = byteArrayOf(0x00, 0xff.toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     private fun renameGp() {

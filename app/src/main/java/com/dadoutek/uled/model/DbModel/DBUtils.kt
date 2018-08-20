@@ -200,7 +200,7 @@ object DBUtils {
     }
 
     @Synchronized
-    fun getCurrentRegion(id: Long): DbRegion {
+    fun getCurrentRegion(id: Long): DbRegion? {
         return DaoSessionInstance.getInstance().dbRegionDao.load(id)
     }
 
