@@ -10,6 +10,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -48,6 +49,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private lateinit var mApplication: TelinkLightApplication
 
     private var scanDisposable: Disposable? = null
+    private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,8 +100,8 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
-
-                    params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
+                    //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
+                    params.setOutOfMeshName(mesh.name)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
 
@@ -237,6 +239,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
+        mDeviceMeshName = deviceInfo.meshName
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
@@ -258,8 +261,15 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
     private fun login() {
         val mesh = TelinkLightApplication.getApp().mesh
-        TelinkLightService.Instance().login(Strings.stringToBytes(Constant.PIR_SWITCH_MESH_NAME, 16)
-                , Strings.stringToBytes(mesh.factoryPassword, 16))
+        val pwd: String
+        if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
+            pwd = mesh.factoryPassword.toString()
+        }else{
+            pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName)
+                    .substring(0, 16)
+        }
+        TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16)
+                , Strings.stringToBytes(pwd, 16))
 
     }
 
