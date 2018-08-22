@@ -36,6 +36,9 @@ import com.dadoutek.uled.model.HttpModel.UserModel;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkObserver;
+import com.dadoutek.uled.ota.BatchOtaActivity;
+import com.dadoutek.uled.ota.OTAUpdateActivity;
+import com.dadoutek.uled.ota.OtaActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.AppUtils;
@@ -100,6 +103,8 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     TextView tvLightVersionText;
     @BindView(R.id.tvLightVersion)
     TextView tvLightVersion;
+    @BindView(R.id.firmware_upgrade)
+    Button firmwareUpgrade;
     private LayoutInflater inflater;
 
     private TelinkLightApplication mApplication;
@@ -223,7 +228,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         }
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset, R.id.constant_question})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset, R.id.constant_question,R.id.firmware_upgrade})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -250,6 +255,12 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                 break;
             case R.id.constant_question:
                 startActivity(new Intent(getActivity(), AboutSomeQuestionsActivity.class));
+                break;
+            case R.id.firmware_upgrade:
+                Intent intent=new Intent(getActivity(), OTAUpdateActivity.class);
+//                int mesh=TelinkApplication.getInstance().getConnectDevice().meshAddress;
+//                intent.putExtra("meshAddress",mesh);
+                startActivity(intent);
                 break;
         }
 
@@ -294,7 +305,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
         @Override
         public void error(String msg) {
-            if(isClickExlogin){
+            if (isClickExlogin) {
                 new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
@@ -309,7 +320,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                             isClickExlogin = false;
                             hideLoadingDialog();
                         }).show();
-            }else{
+            } else {
                 isClickExlogin = false;
                 hideLoadingDialog();
             }
