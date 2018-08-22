@@ -280,7 +280,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         scanDisposable?.dispose()
         progressBtn.progress = 100  //进度控件显示成完成状态
         if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
-            startActivity<ConfigPirAct>("deviceInfo" to mDeviceInfo!!)
+            startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
         }
     }
 

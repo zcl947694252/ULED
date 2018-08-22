@@ -157,7 +157,7 @@
             android:name=".user.ManagerVerificationActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".pir.ConfigPirAct"
+            android:name=".pir.ConfigSensorAct"
             android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.AboutSomeQuestionsActivity"

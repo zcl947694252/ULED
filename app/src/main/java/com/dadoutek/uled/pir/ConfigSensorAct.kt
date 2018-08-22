@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
-class ConfigPirAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
