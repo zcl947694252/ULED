@@ -1,5 +1,6 @@
 package com.dadoutek.uled.user
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,20 +12,20 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.R.id.*
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.light.EmptyAddActivity
-import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -75,6 +76,27 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         if (mWakeLock != null) {
             mWakeLock!!.acquire()
         }
+
+        requestPermissions()
+    }
+
+    private fun requestPermissions() {
+        val rxPermission = RxPermissions(this)
+        rxPermission
+                .requestEach(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).subscribe { permission ->
+                    if (permission.granted) {
+                        // 用户已经同意该权限
+
+                    } else if (permission.shouldShowRequestPermissionRationale) {
+                        // 用户拒绝了该权限，没有选中『不再询问』（Never ask again）,那么下次再次启动时，还会提示请求权限的对话框
+
+                    } else {
+                        // 用户拒绝了该权限，并且选中『不再询问』
+
+                    }
+                }
     }
 
     private fun initView() {
@@ -128,13 +150,13 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                             ToastUtils.showLong(R.string.login_success)
                             hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                                showLoadingDialog(getString(R.string.sync_now))
-                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser,syncCallback)
+                            showLoadingDialog(getString(R.string.sync_now))
+                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            LogUtils.d("logging: " + "登录错误"+e.message)
+                            LogUtils.d("logging: " + "登录错误" + e.message)
                             hideLoadingDialog()
                         }
                     })
@@ -143,7 +165,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    var isSuccess : Boolean =true
+    var isSuccess: Boolean = true
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
         override fun start() {
@@ -151,15 +173,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         override fun complete() {
-            if(isSuccess){
+            if (isSuccess) {
                 syncComplet()
             }
         }
 
         override fun error(msg: String) {
-            isSuccess=false
+            isSuccess = false
             hideLoadingDialog()
-           LogUtils.d("GetDataError:"+msg)
+            LogUtils.d("GetDataError:" + msg)
         }
 
     }
