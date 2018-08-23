@@ -13,6 +13,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -99,9 +100,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private TextView otaProgress;
     private TextView meshOtaProgress;
-    private TextView tv_log, tv_version, tv_file;
+    private TextView tv_version, tv_file;
     private View select;
-    private ScrollView sv_log;
 
     private static final int MSG_OTA_PROGRESS = 11;
     private static final int MSG_MESH_OTA_PROGRESS = 12;
@@ -129,12 +129,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
                 case MSG_LOG:
                     String time = mTimeFormat.format(Calendar.getInstance().getTimeInMillis());
-                    tv_log.append("\n" + time + ":" + msg.obj.toString());
-
-//                    int scroll_amount = tv_log.getBottom();
-//                    tv_log.scrollTo(0, scroll_amount);
-                    sv_log.fullScroll(View.FOCUS_DOWN);
-//                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
+//                    tv_log.append("\n" + time + ":" + msg.obj.toString());
+                    LogUtils.d("\n" + time + ":" + msg.obj.toString());
                     break;
             }
         }
@@ -157,7 +153,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         initView();
 
         onlineLights = new ArrayList<>();
-        for (DbLight light : DBUtils.getAllLight()) {
+        for (DbLight light : DBUtils.INSTANCE.getAllLight()) {
             if (light.connectionStatus != ConnectionStatus.OFFLINE.getValue()) {
                 onlineLights.add(light);
             }
@@ -187,8 +183,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private void initView() {
         otaProgress = (TextView) findViewById(R.id.progress_ota);
         meshOtaProgress = (TextView) findViewById(R.id.progress_mesh_ota);
-        tv_log = (TextView) findViewById(R.id.tv_log);
-        sv_log = (ScrollView) findViewById(R.id.sv_log);
+//        tv_log = (TextView) findViewById(R.id.tv_log);
         tv_version = (TextView) findViewById(R.id.tv_version);
         tv_file = (TextView) findViewById(R.id.file);
 

@@ -125,7 +125,7 @@
             <Button
                 android:id="@+id/firmware_upgrade"
                 android:layout_marginTop="20dp"
-                android:text="@string/firmware_upgrade"
+                android:text="@string/ota_str"
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:background="@drawable/btn_rec_blue_bt"

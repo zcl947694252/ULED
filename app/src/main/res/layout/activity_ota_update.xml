@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     android:orientation="vertical">
 
@@ -88,20 +89,15 @@
         android:layout_height="wrap_content"
         android:text="MeshOTA progress" />
 
-    <ScrollView
-        android:id="@+id/sv_log"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <TextView
-            android:id="@+id/tv_log"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Log:" />
-
-    </ScrollView>
+    <com.dinuscxj.progressbar.CircleProgressBar
+        android:id="@+id/progress_view"
+        android:layout_gravity="center"
+        android:layout_marginTop="80dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:background_color="@color/holo_red_light"
+        app:progress_text_color="@color/red"
+        />
     <!--
         <Button
             android:id="@+id/btn_next"

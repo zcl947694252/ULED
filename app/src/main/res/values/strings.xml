@@ -339,5 +339,6 @@
     <string name="not_find_pir">Sensor not found</string>
     <string name="max_tip_brightness">The maximum brightness cannot exceed 99</string>
     <string name="time_max_tip">The maximum time cannot exceed 30</string>
+    <string name="ota_str">固件升级</string>
 
 </resources>
