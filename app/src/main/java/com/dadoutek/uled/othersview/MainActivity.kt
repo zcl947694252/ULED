@@ -421,7 +421,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
-
     }
 
     private fun onNError(event: DeviceEvent) {
