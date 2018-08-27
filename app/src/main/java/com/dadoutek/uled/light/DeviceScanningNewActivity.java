@@ -254,8 +254,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 (byte) (groupAddress >> 8 & 0xFF)};
         params[0] = 0x01;
 
-        if(mBlinkDisposables.get(dstAddress)!=null){
-           mBlinkDisposables.get(dstAddress).dispose();
+        if (mBlinkDisposables.get(dstAddress) != null) {
+            mBlinkDisposables.get(dstAddress).dispose();
         }
 
         //每隔1s发一次，就是为了让灯一直闪.
@@ -274,24 +274,23 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     //扫描失败处理方法
     private void scanFail() {
-        btnAddGroups.setVisibility(View.VISIBLE);
-        groupingCompleted.setVisibility(View.GONE);
-        btnAddGroups.setText(R.string.rescan);
-        btnAddGroups.setOnClickListener(v -> {
-            startScan(1000);
-            btnAddGroups.setVisibility(View.GONE);
-        });
-        scanPb.setVisibility(View.GONE);
+//        btnAddGroups.setVisibility(View.VISIBLE);
+//        groupingCompleted.setVisibility(View.GONE);
+//        btnAddGroups.setText(R.string.rescan);
+//        btnAddGroups.setOnClickListener(v -> {
+//            startScan(1000);
+//            btnAddGroups.setVisibility(View.GONE);
+//        });
+//        scanPb.setVisibility(View.GONE);
         showToast(getString(R.string.scan_end));
-        //判断是否是第一次使用app，启动导航页
-        boolean mIsFirstData = SharedPreferencesHelper.getBoolean(DeviceScanningNewActivity.this,
-                SplashActivity.IS_FIRST_LAUNCH, true);
         doFinish();
     }
 
     private void startTimer() {
         stopTimer();
         // 防止onLescanTimeout不调用，导致UI卡住的问题。设为正常超时时间的2倍
+        if (mTimer != null && !mTimer.isDisposed())
+            mTimer.dispose();
         mTimer = Observable.timer(SCAN_TIMEOUT_SECOND * 2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
                     if (mRetryCount < MAX_RETRY_COUNT) {
@@ -1169,9 +1168,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
                         params.setScanMode(true);
                         scanPb.setVisibility(View.VISIBLE);
-                        mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
+                        mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io())
                                 .subscribe(aLong -> {
                                     TelinkLightService.Instance().startScan(params);
                                 }));
@@ -1207,7 +1204,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      *
      * @param event
      */
-    private synchronized void onLeScan(final LeScanEvent event) {
+    private void onLeScan(final LeScanEvent event) {
 
         final Mesh mesh = this.mApplication.getMesh();
         final int meshAddress = mesh.generateMeshAddr();
@@ -1218,27 +1215,25 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             return;
         }
 
-        //更新参数
-        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou");
-        LeUpdateParameters params = Parameters.createUpdateParameters();
-        params.setOldMeshName(mesh.getFactoryName());
-        params.setOldPassword(mesh.getFactoryPassword());
-        params.setNewMeshName(mesh.getName());
-        params.setNewPassword(NetworkFactory.md5(
-                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
 
         DeviceInfo deviceInfo = event.getArgs();
-        deviceInfo.meshAddress = meshAddress;
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
         if (checkIsLight(deviceInfo.productUUID)) {
-            params.setUpdateDeviceList(deviceInfo);
-            mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
+            mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(aLong -> {
+                        //更新参数
+                        deviceInfo.meshAddress = meshAddress;
+                        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                Constant.DB_NAME_KEY, "dadou");
+                        LeUpdateParameters params = Parameters.createUpdateParameters();
+                        params.setOldMeshName(mesh.getFactoryName());
+                        params.setOldPassword(mesh.getFactoryPassword());
+                        params.setNewMeshName(mesh.getName());
+                        params.setNewPassword(NetworkFactory.md5(
+                                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+                        params.setUpdateDeviceList(deviceInfo);
                         TelinkLightService.Instance().updateMesh(params);
                     }));
         }

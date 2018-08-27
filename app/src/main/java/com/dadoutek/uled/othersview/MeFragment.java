@@ -45,7 +45,6 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.event.NotificationEvent;
-import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
 
@@ -103,8 +102,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     private LayoutInflater inflater;
 
     private TelinkLightApplication mApplication;
-    private DbLight currentLight;
-    private boolean isDeleteSuccess = false;
 
     private long sleepTime = 250;
     boolean isClickExlogin = false;
@@ -150,8 +147,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
         userIcon.setBackgroundResource(R.drawable.ic_launcher);
         userName.setText(DBUtils.INSTANCE.getLastUser().getPhone());
-
-//        getVserion();
     }
 
     @Override
@@ -160,7 +155,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             this.mApplication = TelinkLightApplication.getApp();
             MainActivity mainAct = (MainActivity) getActivity();
             this.mApplication.removeEventListener(NotificationEvent.ONLINE_STATUS, mainAct);
-//            this.mApplication.removeEventListeners();
             getVersion();
         } else {
             compositeDisposable.dispose();
@@ -294,7 +288,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
         @Override
         public void error(String msg) {
-            if(isClickExlogin){
+            if (isClickExlogin) {
                 new AlertDialog.Builder(getActivity())
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
@@ -309,7 +303,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                             isClickExlogin = false;
                             hideLoadingDialog();
                         }).show();
-            }else{
+            } else {
                 isClickExlogin = false;
                 hideLoadingDialog();
             }
@@ -335,179 +329,109 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         dialog.show();
     }
 
+
+    private List<DbLight> getAllLights() {
+        List<DbGroup> groupList = DBUtils.INSTANCE.getGroupList();
+        List<DbLight> lightList = new ArrayList<>();
+
+        for (int i = 0; i < groupList.size(); i++) {
+            lightList.addAll(DBUtils.INSTANCE.getLightByGroupID(groupList.get(i).getId()));
+        }
+        return lightList;
+    }
+
+
     private void resetAllLight() {
         showLoadingDialog(getString(R.string.reset_all_now));
         SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, true);
+        List<DbLight> lightList = getAllLights();
+        Commander.INSTANCE.resetLights(lightList, () -> {
+            SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
+            syncData();
+            hideLoadingDialog();
+            return null;
+        }, () -> {
+            ToastUtils.showLong(R.string.error_disconnect_tip);
+            SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
+            return null;
+        });
+
+
+/*
         new Thread(() -> {
-            List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
-            List<DbLight> lightList = new ArrayList<>();
-            DeviceInfo deviceInfo = TelinkLightApplication.getInstance().getConnectDevice();
-            if (deviceInfo == null) {
-                ToastUtils.showLong(R.string.disconected);
-                return;
-            }
 
-            for (int i = 0; i < list.size(); i++) {
-                lightList.addAll(DBUtils.INSTANCE.getLightByGroupID(list.get(i).getId()));
-            }
 
-            mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
-
-            if (lightList.size() == 0) {
-                for (int i = 0; i < 3; i++) {
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, null);
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                hideLoadingDialog();
-                return;
-            }
-
-            int index1 = 0;
-            int index2 = 0;
+            int lastIndex = lightList.size() - 1;
+            int connectDeviceIndex = 0;
             for (int k = 0; k < lightList.size(); k++) {
                 if (lightList.get(k).getMeshAddr() == deviceInfo.meshAddress) {
-                    index2 = k;
+                    connectDeviceIndex = k;
                     break;
                 }
             }
-            Collections.swap(lightList, index1, index2);
+            Collections.swap(lightList, lastIndex, connectDeviceIndex);
 
-            for (int j = lightList.size() - 1; j >= 0; j--) {
-                if (deviceInfo != null) {
-                    try {
-                        if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
-                            ToastUtils.showLong(R.string.error_disconnect_tip);
-                            SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                            break;
-                        }
+            for (int j = 0; j < lightList.size(); j++) {
+                try {
+                    if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
+                        ToastUtils.showLong(R.string.error_disconnect_tip);
+                        SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
+                        break;
+                    }
 
-                        for (int k = 0; k < 5; k++) {
-                            byte opcode = (byte) Opcode.KICK_OUT;
-                            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                            Thread.sleep(sleepTime);
-                        }
+                    for (int k = 0; k < 5; k++) {
+                        byte opcode = (byte) Opcode.KICK_OUT;
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
                         Thread.sleep(sleepTime);
-                        DBUtils.INSTANCE.deleteLight(lightList.get(j));
-                    } catch (InterruptedException e) {
-                        hideLoadingDialog();
-                        e.printStackTrace();
-                    } finally {
-                        if (j == 0) {
-                            SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                            SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity(), new SyncCallback() {
-                                @Override
-                                public void complete() {
-                                    hideLoadingDialog();
-                                    Disposable disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(aLong -> {
-                                                hideLightVersion();
-//                                                addEventListener(); //加回连接状态监听。
-                                            });
-                                    if (compositeDisposable.isDisposed()) {
-                                        compositeDisposable = new CompositeDisposable();
-                                    }
-                                    compositeDisposable.add(disposable);
+                    }
+                    Thread.sleep(sleepTime);
+                    DBUtils.INSTANCE.deleteLight(lightList.get(j));
+                } catch (InterruptedException e) {
+                    hideLoadingDialog();
+                    e.printStackTrace();
+                } finally {
+                    if (j == 0) {
+                        SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
 
-//                                    ActivityUtils.startActivity(SplashActivity.class);
-//                                    getActivity().finish();
-                                }
-
-                                @Override
-                                public void error(String msg) {
-                                    hideLoadingDialog();
-                                    ToastUtils.showShort(R.string.backup_failed);
-//                                    ActivityUtils.startActivity(SplashActivity.class);
-//                                    getActivity().finish();
-                                }
-
-                                @Override
-                                public void start() {
-
-                                }
-                            });
-
-                        }
                     }
                 }
             }
         }).start();
+*/
     }
 
-//    private void resetAllLight() {
-//        showLoadingDialog(getString(R.string.reset_all_now));
-//        List<DbGroup> list = DBUtils.getGroupList();
-//        List<DbLight> lightList = new ArrayList<>();
-//
-//        new Thread(() -> {
-//            DeviceInfo deviceInfo = TelinkLightApplication.getInstance().getConnectDevice();
-//            if (deviceInfo == null) {
-//                ToastUtils.showLong(R.string.disconected);
-//                return;
-//            }
-//
-//            for (int i = 0; i < list.size(); i++) {
-//                lightList.addAll(DBUtils.getLightByGroupID(list.get(i).getId()));
-//            }
-//
-//            int index1 = lightList.size()-1;
-//            int index2 = 0;
-//            for (int k = 0; k < lightList.size(); k++) {
-//                if (lightList.get(k).getMeshAddr() == deviceInfo.meshAddress) {
-//                    index2 = k;
-//                    break;
-//                }
-//            }
-//            Collections.swap(lightList, index1, index2);
-//
-//            resetLight(lightList,0);
-//
-//        }).start();
-//    }
+    private void syncData(){
+        SyncDataPutOrGetUtils.Companion.syncPutDataStart(getActivity(), new SyncCallback() {
+            @Override
+            public void complete() {
+                hideLoadingDialog();
+                Disposable disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(aLong -> {
+                            hideLightVersion();
+//                                                addEventListener(); //加回连接状态监听。
+                        });
+                if (compositeDisposable.isDisposed()) {
+                    compositeDisposable = new CompositeDisposable();
+                }
+                compositeDisposable.add(disposable);
 
-    private void resetLight(List<DbLight> dbLightList, int index) {
-        new Thread(() -> {
-            DbLight dbLight = dbLightList.get(index);
-            int lightMeshAddr = dbLight.getMeshAddr();
-            Commander.INSTANCE.kickOutLight(lightMeshAddr,
-                    () -> {
-                        //成功
-//                    LogUtils.d("Reset"+"我成功了---"+lightMeshAddr);
-                        deleteLight(dbLight);
-                        if (index + 1 > dbLightList.size() - 1)
-                            completeResetLights();
-                        else
-                            resetLight(dbLightList, index + 1);
-                        Log.d("", "resetLight: ");
-                        return null;
-                    }, () -> {
-                        //失败
-//                    LogUtils.d("Reset"+"我失败了---"+lightMeshAddr);
-                        if (index + 1 > dbLightList.size() - 1)
-                            completeResetLights();
-                        else
-                            resetLight(dbLightList, index + 1);
-                        Log.d("", "resetLight: ");
-                        return null;
-                    });
-        }).start();
+            }
+
+            @Override
+            public void error(String msg) {
+                hideLoadingDialog();
+                ToastUtils.showShort(R.string.backup_failed);
+            }
+
+            @Override
+            public void start() {
+
+            }
+
+        });
+
     }
-
-    private void completeResetLights() {
-        hideLoadingDialog();
-        hideLightVersion();
-        addEventListener();
-    }
-
-    private void deleteLight(DbLight dbLight) {
-        DBUtils.INSTANCE.deleteLight(dbLight);
-    }
-
     private void hideLightVersion() {
         tvLightVersionText.setVisibility(View.GONE);
         tvLightVersion.setVisibility(View.GONE);
@@ -554,7 +478,8 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     }
 
     long[] mHints = new long[6];//初始全部为0
-    private static String LOG_PATH_DIR= Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
+    private static String LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
+
 
     private void developerMode() {
         //将mHints数组内的所有元素左移一个位置
@@ -571,6 +496,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             SharedPreferencesUtils.setDeveloperModel(true);
         }
     }
+
 
     //清空缓存初始化APP
     private void emptyTheCache() {
