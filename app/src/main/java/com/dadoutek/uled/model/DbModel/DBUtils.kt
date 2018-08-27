@@ -243,7 +243,7 @@ object DBUtils {
             if (dbRegionOld == null) {//直接插入
                 DaoSessionInstance.getInstance().dbRegionDao.insert(dbRegion)
                 //暂时用本地保存区域
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
+                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
 
                 recordingChange(dbRegion.id,
                         DaoSessionInstance.getInstance().dbRegionDao.tablename,
@@ -254,7 +254,7 @@ object DBUtils {
                 dbRegion.id = dbRegionOld.id
                 DaoSessionInstance.getInstance().dbRegionDao.update(dbRegion)
                 //暂时用本地保存区域
-                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
+                SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
                 recordingChange(dbRegion.id,
                         DaoSessionInstance.getInstance().dbRegionDao.tablename,
                         Constant.DB_UPDATE)
@@ -269,7 +269,7 @@ object DBUtils {
         if (dbRegionOld == null) {//直接插入
             DaoSessionInstance.getInstance().dbRegionDao.insert(dbRegion)
             //暂时用本地保存区域
-            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
+            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
 
             recordingChange(dbRegion.id,
                     DaoSessionInstance.getInstance().dbRegionDao.tablename,
@@ -278,7 +278,7 @@ object DBUtils {
             dbRegion.id = dbRegionOld.id
             DaoSessionInstance.getInstance().dbRegionDao.update(dbRegion)
             //暂时用本地保存区域
-            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
+            SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
             recordingChange(dbRegion.id,
                     DaoSessionInstance.getInstance().dbRegionDao.tablename,
                     Constant.DB_UPDATE)
@@ -318,7 +318,7 @@ object DBUtils {
         } else {
             //保存灯之前先把所有的灯都分配到当前的所有组去
             val dbGroup = groupNull
-            light.belongGroupId = dbGroup!!.id
+            light.belongGroupId = dbGroup?.id
 
             DaoSessionInstance.getInstance().dbLightDao.save(light)
             recordingChange(light.id,
@@ -365,10 +365,10 @@ object DBUtils {
 
     @Synchronized
     fun saveSceneActions(sceneActions: DbSceneActions, id: Long?,
-                         sceneId: Long?) {
+                         sceneId: Long) {
         val actions = DbSceneActions()
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
-        actions.belongSceneId = sceneId!!
+        actions.belongSceneId = sceneId
         actions.brightness = sceneActions.brightness
         actions.colorTemperature = sceneActions.colorTemperature
         actions.groupAddr = sceneActions.groupAddr
@@ -607,7 +607,7 @@ object DBUtils {
 
                     //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
                     if (dataChangeList[i].changeType == Constant.DB_ADD && operating == Constant.DB_DELETE) {
-                        deleteDbDataChange(dataChangeList[i].id!!)
+                        deleteDbDataChange(dataChangeList[i].id)
                         break
                     } else if (dataChangeList[i].changeType == Constant.DB_UPDATE && operating == Constant.DB_DELETE) {
                         dataChangeList[i].changeType = operating

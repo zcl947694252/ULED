@@ -3,6 +3,7 @@ package com.dadoutek.uled.communicate
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -21,6 +22,8 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
@@ -60,45 +63,44 @@ object Commander : EventListener<String> {
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
-    fun kickOutLight(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
-        mApplication?.addEventListener(NotificationEvent.USER_ALL_NOTIFY, this)
-        mLightAddr = lightMeshAddr
-        val opcode = Opcode.KICK_OUT    //0xE3 代表恢复出厂指令
-        com.dadoutek.uled.util.LogUtils.d("Reset----sendCode------")
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, mLightAddr, null)
-        mResetSuccess = false
+    @Synchronized
+    fun resetLights(lightList: List<DbLight>, successCallback: () -> Unit,
+                    failedCallback: () -> Unit) {
+        val sleepTime: Long = 200
+        val resendCmdTime: Int = 3
+        var connectDeviceIndex: Int = 0
+        val lastIndex = lightList.size - 1
+        val connectDeviceMeshAddr = TelinkLightApplication.getInstance()?.connectDevice?.meshAddress ?: 0x00
 
-        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Long?> {
-                    var mDisposable: Disposable? = null
-                    override fun onComplete() {
-                        mDisposable?.dispose()
-                        mApplication?.removeEventListener(Commander)
+        if (lightList.isNotEmpty()) {
+            Thread {
+                //找到当前连接的灯的mesh地址
+                for (k in lightList.indices) {
+                    if (lightList[k].meshAddr == connectDeviceMeshAddr) {
+                        connectDeviceIndex = k
+                        break
                     }
+                }
+                //把当前连接的灯放到list的最后一个
+                Collections.swap(lightList, lastIndex, connectDeviceIndex)
+                for (light in lightList) {
+                    for (k in 0..resendCmdTime) {
+                        val opcode = Opcode.KICK_OUT
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light.meshAddr, null)
+                        Thread.sleep(sleepTime)
+                    }
+                    Thread.sleep(sleepTime);
+                    DBUtils.deleteLight(light);
+                }
+                launch(UI) {
+                    successCallback.invoke()
+                }
+            }.start()
+        } else {
+            failedCallback.invoke()
+        }
 
-                    override fun onSubscribe(d: Disposable) {
-                        mDisposable = d
-                    }
 
-                    override fun onNext(t: Long) {
-                        LogUtils.d("mGroupSuccess = $mResetSuccess")
-                        if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
-                            com.dadoutek.uled.util.LogUtils.d("Reset----timeout------")
-                            onComplete()
-                            failedCallback.invoke()
-                        } else if (mResetSuccess) {
-                            com.dadoutek.uled.util.LogUtils.d("Reset----success------")
-                            onComplete()
-                            successCallback.invoke()
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        LogUtils.d(e.message)
-                    }
-                })
     }
 
     fun addScene(sceneId: Long, meshAddr: Int) {
@@ -262,7 +264,7 @@ object Commander : EventListener<String> {
         when (event?.type) {
             NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
             NotificationEvent.GET_DEVICE_STATE -> this.onGetLightVersion(event as NotificationEvent)
-            NotificationEvent.USER_ALL_NOTIFY -> this.OnKickoutEvent(event as NotificationEvent)
+            NotificationEvent.USER_ALL_NOTIFY -> this.onKickoutEvent(event as NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
         }
@@ -388,7 +390,7 @@ object Commander : EventListener<String> {
         }
     }
 
-    private fun OnKickoutEvent(notificationEvent: NotificationEvent) {
+    private fun onKickoutEvent(notificationEvent: NotificationEvent) {
         val data = notificationEvent.args.params
         for (i in data.indices) {
             com.dadoutek.uled.util.LogUtils.d("Res----------" + data[i].toInt())
