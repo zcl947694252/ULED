@@ -135,6 +135,15 @@
             android:layout_marginTop="10dp"
             android:background="@color/border_line" />
 
+        <TextView
+            android:id="@+id/light_version"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:visibility="gone"
+            />
+
         <Button
             android:id="@+id/btn_remove"
             android:layout_width="match_parent"

@@ -297,7 +297,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     if (mRetryCount < MAX_RETRY_COUNT) {
                         mRetryCount++;
                         Log.d("ScanningTest", "rxjava timer timeout , retry count = " + mRetryCount);
-                        startScan(1000);
+                        startScan(0);
                     } else {
                         Log.d("ScanningTest", "rxjava timer timeout , do not retry");
                         onLeScanTimeout();
@@ -1169,9 +1169,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
                         params.setScanMode(true);
                         scanPb.setVisibility(View.VISIBLE);
-                        mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
+
+                        Log.d(TAG, "startScan: "+"-------");
+
+                        mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS,Schedulers.io())
                                 .subscribe(aLong -> {
                                     TelinkLightService.Instance().startScan(params);
                                 }));

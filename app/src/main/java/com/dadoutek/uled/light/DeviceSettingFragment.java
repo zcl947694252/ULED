@@ -17,17 +17,19 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.network.NetworkFactory;
+import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.network.NetworkFactory;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.widget.ColorPicker;
+import com.telink.TelinkApplication;
 import com.telink.bluetooth.light.DeviceInfo;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
@@ -55,6 +57,8 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
     Unbinder unbinder;
     @BindView(R.id.btn_rename)
     Button btnRename;
+    @BindView(R.id.light_version)
+    TextView lightVersion;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
@@ -226,6 +230,29 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
 
         this.brightnessBar.setOnSeekBarChangeListener(this.barChangeListener);
         this.temperatureBar.setOnSeekBarChangeListener(this.barChangeListener);
+
+        getVersion();
+    }
+
+    private void getVersion() {
+        int dstAdress = 0;
+        if (TelinkApplication.getInstance().getConnectDevice() != null) {
+            Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
+                String version = s;
+                if (lightVersion!=null) {
+                    lightVersion.setVisibility(View.VISIBLE);
+                    lightVersion.setText(version);
+                }
+                return null;
+            }, () -> {
+                if (lightVersion!=null) {
+                    lightVersion.setVisibility(View.GONE);
+                }
+                return null;
+            });
+        } else {
+            dstAdress = 0;
+        }
     }
 
     private void sendInitCmd(int brightness, int colorTemperature) {
@@ -234,16 +261,16 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
         byte[] params;
 //                progress += 5;
 //                Log.d(TAG, "onValueChange: "+progress);
-            opcode = (byte) Opcode.SET_LUM;
-            params = new byte[]{(byte) brightness};
-            light.setBrightness(brightness);
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+        opcode = (byte) Opcode.SET_LUM;
+        params = new byte[]{(byte) brightness};
+        light.setBrightness(brightness);
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
 
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             opcode = (byte) Opcode.SET_TEMPERATURE;
             params = new byte[]{0x05, (byte) colorTemperature};
             light.setColorTemperature(colorTemperature);
@@ -316,17 +343,17 @@ public final class DeviceSettingFragment extends Fragment implements View.OnClic
                     return;
                 }
 
-                String account=SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY,"dadou");
+                String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.DB_NAME_KEY, "dadou");
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 connectParams.setMeshName(mesh.getName());
-                if(SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
-                        ,Constant.USER_TYPE,Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)){
+                if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
+                        , Constant.USER_TYPE, Constant.USER_TYPE_OLD).equals(Constant.USER_TYPE_NEW)) {
                     connectParams.setPassword(NetworkFactory.md5(
-                            NetworkFactory.md5(mesh.getPassword())+account));
-                }else{
+                            NetworkFactory.md5(mesh.getPassword()) + account));
+                } else {
                     connectParams.setPassword(mesh.getPassword());
                 }
                 connectParams.autoEnableNotification(true);
