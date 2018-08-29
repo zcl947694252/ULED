@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -75,5 +76,15 @@ public class SharedPreferencesUtils {
             return false;
         }
         return true;
+    }
+
+    public static void saveLastUser(String info){
+         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                Constant.USER_INFO,info);
+    }
+
+    public static String getLastUser(){
+        return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.USER_INFO,"");
     }
 }

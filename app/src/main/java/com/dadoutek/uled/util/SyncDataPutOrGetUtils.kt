@@ -282,7 +282,7 @@ class SyncDataPutOrGetUtils {
                             //登录后同步数据完成再上传一次数据
                             syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
                             SharedPreferencesUtils.saveCurrentUserList(accountNow)
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
                             launch(UI) {
                                 syncCallBack.complete()
                             }

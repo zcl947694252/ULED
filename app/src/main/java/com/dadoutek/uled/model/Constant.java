@@ -21,7 +21,7 @@ public class Constant implements Serializable {
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "test6" : "dadousmart";
+    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "test2" : "dadousmart";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -33,7 +33,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "test6" : "out_of_mesh";
+    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "test2" : "out_of_mesh";
 
     public static final String PIR_SWITCH_MESH_NAME = "dadousmart";
 
@@ -78,6 +78,9 @@ public class Constant implements Serializable {
 
     //是否是开发者模式
     public static String IS_DEVELOPER_MODE = "IS_DEVELOPER_MODE";
+
+    //用户信息
+    public static String USER_INFO = "USER_INFO";
 
     //用于标记数据库改变增加
     public static final String DB_ADD = "DB_ADD";

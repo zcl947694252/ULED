@@ -155,7 +155,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
             this.mApplication = TelinkLightApplication.getApp();
             MainActivity mainAct = (MainActivity) getActivity();
             this.mApplication.removeEventListener(NotificationEvent.ONLINE_STATUS, mainAct);
-            getVersion();
+//            getVersion();
         } else {
             compositeDisposable.dispose();
         }

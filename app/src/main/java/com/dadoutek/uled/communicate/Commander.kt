@@ -9,6 +9,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.MeshEvent
@@ -70,7 +71,8 @@ object Commander : EventListener<String> {
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getInstance()?.connectDevice?.meshAddress ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getInstance()?.connectDevice?.meshAddress
+                ?: 0x00
 
         if (lightList.isNotEmpty()) {
             Thread {
@@ -327,8 +329,16 @@ object Commander : EventListener<String> {
 
         mLightAddr = dstAddr
         mGetVersionSuccess = false
-        val opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
-        val params = byteArrayOf(0x00, 0x00)
+        var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
+
+        val params: ByteArray
+        if (TelinkApplication.getInstance().getConnectDevice().meshAddress == dstAddr) {
+            params = byteArrayOf(0x00, 0x00)
+        } else {
+            opcode = Opcode.SEND_MESSAGE_BY_MESH
+            params = byteArrayOf(0x3c, TelinkApplication.getInstance().getConnectDevice().meshAddress.toByte())
+        }
+
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
