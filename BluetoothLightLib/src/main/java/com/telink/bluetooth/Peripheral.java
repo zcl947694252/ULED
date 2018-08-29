@@ -487,6 +487,7 @@ public class Peripheral extends BluetoothGattCallback {
                                      UUID serviceUUID, UUID characteristicUUID, int writeType,
                                      byte[] data) {
 
+
         boolean success = true;
         String errorMsg = "";
 

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.othersview;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -11,6 +12,10 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.user.LoginActivity;
+import com.tbruyelle.rxpermissions2.Permission;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by hejiajun on 2018/3/22.
@@ -71,8 +76,6 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         startActivity(intent);
         finish();
     }
-
-
 
     @Override
     protected void onLocationEnable() {

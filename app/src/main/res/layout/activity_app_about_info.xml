@@ -19,6 +19,58 @@
                 android:orientation="vertical"
                 >
                 <TextView
+                    android:id="@+id/question0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="18sp"
+                    android:text="@string/question0"
+                    />
+
+                <TextView
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="start"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/first_address"
+                    android:autoLink="web"
+                    />
+
+                <TextView
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="start"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/second_address"
+                    android:autoLink="web"
+                    />
+
+                <TextView
+                    android:id="@+id/address_test"
+                    android:layout_marginStart="35dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="start"
+                    android:visibility="gone"
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:text="（内侧版本）：https://www.pgyer.com/dadou"
+                    android:autoLink="web"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <TextView
                     android:id="@+id/question1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

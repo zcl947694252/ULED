@@ -30,6 +30,7 @@ public class Constant implements Serializable {
     public static final String LIGHTS_KEY = "LastLights";
     public static final String DEFAULT_GROUP_ID = "DEFAULT_GROUP_ID";
 
+
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
     public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "test3" : "out_of_mesh";
@@ -77,6 +78,9 @@ public class Constant implements Serializable {
 
     //是否是开发者模式
     public static String IS_DEVELOPER_MODE = "IS_DEVELOPER_MODE";
+
+    //用户信息
+    public static String USER_INFO = "USER_INFO";
 
     //用于标记数据库改变增加
     public static final String DB_ADD = "DB_ADD";

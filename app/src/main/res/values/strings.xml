@@ -340,5 +340,9 @@
     <string name="max_tip_brightness">The maximum brightness cannot exceed 99</string>
     <string name="time_max_tip">The maximum time cannot exceed 30</string>
     <string name="ota_str">固件升级</string>
+    <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
+    <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
+    <string name="question0">Where can I update my app?</string>
+    <string name="update_group">Modify group</string>
 
 </resources>

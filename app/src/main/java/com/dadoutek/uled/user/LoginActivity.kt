@@ -1,5 +1,6 @@
 package com.dadoutek.uled.user
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,20 +12,22 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.R.id.*
-import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.light.EmptyAddActivity
-import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -77,6 +80,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+
     private fun initView() {
         initToolbar()
         //        txtHeaderTitle.setText(R.string.user_login_title);
@@ -87,6 +91,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         btn_login.setOnClickListener(this)
         btn_register.setOnClickListener(this)
         forget_password.setOnClickListener(this)
+
+        com.dadoutek.uled.util.StringUtils.initEditTextFilter(edit_user_phone_or_email!!.editText)
+        com.dadoutek.uled.util.StringUtils.initEditTextFilter(edit_user_password!!.editText)
+
+        val info=SharedPreferencesUtils.getLastUser()
+        if(info!=null&&!info.isEmpty()){
+            val messge = info.split("-")
+           edit_user_phone_or_email!!.editText!!.setText(messge[0])
+            edit_user_password!!.editText!!.setText(messge[1])
+        }
     }
 
     override fun onClick(v: View?) {
@@ -126,15 +140,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                         override fun onNext(dbUser: DbUser) {
                             DBUtils.deleteLocalData()
                             ToastUtils.showLong(R.string.login_success)
+                            SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
                             hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                                showLoadingDialog(getString(R.string.sync_now))
-                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser,syncCallback)
+                            showLoadingDialog(getString(R.string.sync_now))
+                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            LogUtils.d("logging: " + "登录错误"+e.message)
+                            LogUtils.d("logging: " + "登录错误" + e.message)
                             hideLoadingDialog()
                         }
                     })
@@ -143,7 +158,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    var isSuccess : Boolean =true
+    var isSuccess: Boolean = true
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
         override fun start() {
@@ -151,15 +166,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         override fun complete() {
-            if(isSuccess){
+            if (isSuccess) {
                 syncComplet()
             }
         }
 
         override fun error(msg: String) {
-            isSuccess=false
+            isSuccess = false
             hideLoadingDialog()
-           LogUtils.d("GetDataError:"+msg)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
+            LogUtils.d("GetDataError:" + msg)
         }
 
     }
@@ -167,6 +183,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun syncComplet() {
         ToastUtils.showLong(getString(R.string.download_data_success))
         hideLoadingDialog()
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
         TransformView()
     }
 

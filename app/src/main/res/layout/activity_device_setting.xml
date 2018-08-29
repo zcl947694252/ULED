@@ -37,14 +37,17 @@
             android:textColor="@color/white"
             android:textSize="18sp" />
 
-        <ImageView
-            android:id="@+id/img_header_menu_right"
+        <TextView
+            android:id="@+id/tv_ota"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="15dp"
-            android:background="@drawable/icon_top_tab_edit"
+            android:text="OTA"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="gone"
             android:contentDescription="@null" />
     </RelativeLayout>
 
