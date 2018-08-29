@@ -17,7 +17,6 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="10dp"
-            android:onClick="back"
             android:background="@drawable/icon_top_tab_back"
             android:contentDescription="@null" />
 
@@ -64,6 +63,25 @@
     </LinearLayout>
 
     <TextView
+        android:text="@string/update_tip_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        />
+
+    <Button
+        android:id="@+id/btn_start_update"
+        android:text="@string/start_update"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        />
+
+    <TextView
         android:id="@+id/tv_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -92,7 +110,7 @@
     <com.dinuscxj.progressbar.CircleProgressBar
         android:id="@+id/progress_view"
         android:layout_gravity="center"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:layout_width="180dp"
         android:layout_height="180dp"
         app:style="solid"
@@ -101,6 +119,18 @@
         app:progress_background_color="@color/gray_dark"
         app:progress_start_color="@color/primary"
         app:progress_end_color="@color/primary"
+        />
+
+    <TextView
+        android:id="@+id/text_info"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:textColor="@color/red"
+        android:textSize="18sp"
+        android:text="@string/the_last_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
         />
 
     <ScrollView

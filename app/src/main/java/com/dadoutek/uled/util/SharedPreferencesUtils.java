@@ -87,4 +87,14 @@ public class SharedPreferencesUtils {
         return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                 Constant.USER_INFO,"");
     }
+
+    public static void saveUpdateFilePath(String path){
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                Constant.UPDATE_FILE_ADRESS,path);
+    }
+
+    public static String getUpdateFilePath(){
+        return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.UPDATE_FILE_ADRESS,"");
+    }
 }

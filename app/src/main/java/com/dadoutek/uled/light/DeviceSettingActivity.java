@@ -13,10 +13,16 @@ import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.group.LightGroupingActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.ota.OTAUpdateActivity;
+import com.dadoutek.uled.ota.OtaActivity;
+import com.dadoutek.uled.ota.OtaDeviceListActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
 import com.telink.TelinkApplication;
+import com.telink.util.Event;
+import com.telink.util.EventListener;
 
 public final class DeviceSettingActivity extends TelinkBaseActivity {
 
@@ -37,7 +43,11 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == tvOta) {
-
+                TelinkLightService.Instance().idleMode(true);
+                Intent intent=new Intent(DeviceSettingActivity.this, OTAUpdateActivity.class);
+                intent.putExtra(Constant.UPDATE_LIGHT,light);
+                startActivity(intent);
+                finish();
             }
         }
     };

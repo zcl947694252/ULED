@@ -337,5 +337,16 @@
     <string name="max_tip_brightness">亮度最高不能超过99</string>
     <string name="time_max_tip">时间最高不能超过30</string>
     <string name="ota_str">固件升级</string>
-
+    <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
+    <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
+    <string name="question0">去哪更新APP？</string>
+    <string name="update_group">修改分组</string>
+    <string name="the_last_version">该灯当前已经是最新版本！</string>
+    <string name="updateSuccess">升级成功!</string>
+    <string name="update_fail">升级失败！</string>
+    <string name="start_update">开始升级</string>
+    <string name="tip_select_file">请先选择升级文件！</string>
+    <string name="updating">正在升级……</string>
+    <string name="update_tip_user">升级过程中请不要中途退出升级，耐心等待！</string>
+    <string name="exit_update">2s后退出升级页面</string>
 </resources>

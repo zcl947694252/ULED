@@ -344,5 +344,13 @@
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">Where can I update my app?</string>
     <string name="update_group">Modify group</string>
+    <string name="the_last_version">该灯当前已经是最新版本！</string>
+    <string name="updateSuccess">升级成功!</string>
+    <string name="update_fail">升级失败！</string>
+    <string name="start_update">开始升级</string>
+    <string name="tip_select_file">请先选择升级文件！</string>
+    <string name="updating">正在升级……</string>
+    <string name="update_tip_user">升级过程中请不要中途退出升级，耐心等待！</string>
+    <string name="exit_update">2s后退出升级页面</string>
 
 </resources>

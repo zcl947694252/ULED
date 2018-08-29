@@ -407,6 +407,11 @@ object DBUtils {
     }
 
     @Synchronized
+    fun updateLightsLocal(lights: MutableList<DbLight>) {
+        DaoSessionInstance.getInstance().dbLightDao.updateInTx(lights)
+    }
+
+    @Synchronized
     fun updateLightLocal(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
     }

@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -23,7 +25,7 @@ import java.util.List;
 public class OtaDeviceListActivity extends TelinkBaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private TelinkLightApplication mApp;
-    private List<DeviceInfo> mDevices;
+    private List<DbLight> mDevices;
     private GridView mDeviceListView;
     private Button mNext;
     private DeviceListAdapter mDeviceAdapter;
@@ -34,7 +36,7 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
         TelinkLightService.Instance().idleMode(true);
         setContentView(R.layout.activity_ota_device_list);
         mApp = (TelinkLightApplication) this.getApplication();
-        mDevices = mApp.getMesh().getDevices();
+        mDevices = DBUtils.INSTANCE.getAllLight();
         normal();
         mDeviceAdapter = new DeviceListAdapter();
         mDeviceListView = (GridView) findViewById(R.id.devices);
@@ -51,14 +53,14 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
     }
 
     private void normal() {
-        for (DeviceInfo deviceInfo : mDevices) {
+        for (DbLight deviceInfo : mDevices) {
             deviceInfo.selected = false;
         }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        DeviceInfo deviceInfo = this.mDeviceAdapter.getItem(position);
+        DbLight deviceInfo = this.mDeviceAdapter.getItem(position);
         deviceInfo.selected = !deviceInfo.selected;
         DeviceItemHolder holder = (DeviceItemHolder) view.getTag();
         holder.selected.setChecked(deviceInfo.selected);
@@ -67,6 +69,7 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
     @Override
     public void onClick(View v) {
         if (v == mNext) {
+            DBUtils.INSTANCE.updateLightsLocal(mDevices);
             Intent intent = new Intent(this, BatchOtaActivity.class);
             startActivity(intent);
         }
@@ -87,7 +90,7 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
         }
 
         @Override
-        public DeviceInfo getItem(int position) {
+        public DbLight getItem(int position) {
             return mDevices.get(position);
         }
 
@@ -122,10 +125,10 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
                 holder = (DeviceItemHolder) convertView.getTag();
             }
 
-            DeviceInfo deviceInfo = this.getItem(position);
+            DbLight deviceInfo = this.getItem(position);
 
-            holder.txtName.setText(deviceInfo.deviceName);
-            holder.txtMac.setText(deviceInfo.macAddress);
+            holder.txtName.setText(deviceInfo.getName());
+            holder.txtMac.setText(deviceInfo.getMacAddr());
             holder.icon.setImageResource(R.drawable.icon_light_on);
             holder.selected.setChecked(deviceInfo.selected);
 

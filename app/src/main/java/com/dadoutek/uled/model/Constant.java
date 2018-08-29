@@ -21,7 +21,7 @@ public class Constant implements Serializable {
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "test3" : "dadousmart";
+    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "testa" : "dadousmart";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -33,7 +33,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "test3" : "out_of_mesh";
+    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "testa" : "out_of_mesh";
 
     public static final String PIR_SWITCH_MESH_NAME = "dadousmart";
 
@@ -82,6 +82,9 @@ public class Constant implements Serializable {
     //用户信息
     public static String USER_INFO = "USER_INFO";
 
+    //用户信息
+    public static String UPDATE_FILE_ADRESS = "UPDATE_FILE_ADRESS";
+
     //用于标记数据库改变增加
     public static final String DB_ADD = "DB_ADD";
     //用于标记数据库改变删除
@@ -115,4 +118,6 @@ public class Constant implements Serializable {
 
     //是否注册跳过验证码（目前用来测试）
     public static boolean TEST_REGISTER = false;
+
+    public static String UPDATE_LIGHT="UPDATE_LIGHT";
 }

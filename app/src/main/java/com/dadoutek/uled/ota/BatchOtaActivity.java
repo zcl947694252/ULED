@@ -17,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -128,7 +131,8 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
     @Override
     public void onClick(View v) {
         if (v == mChooseFile) {
-            showFileChooser();
+//            showFileChooser();
+            startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
         } else if (v == mStartOta) {
             startOta();
         }
@@ -147,15 +151,16 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
         }
     }
 
+    private static final int REQUEST_CODE_CHOOSE_FILE = 11;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode != Activity.RESULT_OK)
+        if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK)
             return;
-
-        Uri uri = data.getData();
-        mFirmwarePath = uri.getPath();
+        mFirmwarePath = data.getStringExtra("path");
+//        Uri uri = data.getData();
+//        mFirmwarePath = uri.getPath();
         mTip.setText(mFirmwarePath);
         readFirmware(mFirmwarePath);
         TelinkLog.d(mFirmwarePath);
@@ -229,7 +234,7 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
 
     private List<DeviceHolder> getSelectedDevices() {
         List<DeviceHolder> devices = new ArrayList<>();
-        for (DeviceInfo deviceInfo : mApp.getMesh().getDevices()) {
+        for (DbLight deviceInfo : DBUtils.INSTANCE.getAllLight()) {
             if (deviceInfo.selected) {
                 devices.add(new DeviceHolder(deviceInfo));
             }
@@ -239,7 +244,7 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
 
     private DeviceHolder findDeviceHolder(String mac) {
         for (DeviceHolder holder : mDevices) {
-            if (holder.deviceInfo.macAddress.equals(mac))
+            if (holder.deviceInfo.getMacAddr().equals(mac))
                 return holder;
         }
         return null;
@@ -406,13 +411,13 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
     }
 
     private static class DeviceHolder {
-        public DeviceInfo deviceInfo;
+        public DbLight deviceInfo;
         public int failureCount;
         public boolean completed;
         public String firmwareVersion;
         public int progress;
 
-        public DeviceHolder(DeviceInfo deviceInfo) {
+        public DeviceHolder(DbLight deviceInfo) {
             this.deviceInfo = deviceInfo;
         }
     }
@@ -455,8 +460,8 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
             }
 
             DeviceHolder deviceHolder = getItem(position);
-            holder.name.setText(deviceHolder.deviceInfo.deviceName);
-            holder.name.append("\n" + deviceHolder.deviceInfo.macAddress);
+            holder.name.setText(deviceHolder.deviceInfo.getName());
+            holder.name.append("\n" + deviceHolder.deviceInfo.getMacAddr());
             if (deviceHolder.completed) {
                 holder.progress.setText("ota success");
             } else {
