@@ -349,4 +349,5 @@
     <string name="updating">正在升级……</string>
     <string name="update_tip_user">升级过程中请不要中途退出升级，耐心等待！</string>
     <string name="exit_update">2s后退出升级页面</string>
+    <string name="scan_and_connect">扫描连接……</string>
 </resources>

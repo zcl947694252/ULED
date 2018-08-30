@@ -116,6 +116,7 @@
         app:style="solid"
         app:progress_start_degree="-90"
         app:progress_text_color="@color/red"
+        app:progress_text_size="18sp"
         app:progress_background_color="@color/gray_dark"
         app:progress_start_color="@color/primary"
         app:progress_end_color="@color/primary"

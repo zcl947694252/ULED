@@ -146,6 +146,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_OTA_PROGRESS:
+                    if((Integer) msg.obj<100){
+                        btnStartUpdate.setText(R.string.updating);
+                    }
                     otaProgress.setText(getString(R.string.progress_ota, msg.obj.toString()));
                     progressView.setProgress((Integer) msg.obj);
                     break;
@@ -717,7 +720,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
                 successCount++;
                 if (onlineLights.size() <= successCount) {
-                    doFinish();
+                   updateSuccess();
                 } else {
                     this.mode = MODE_MESH_OTA;
                 }
@@ -728,18 +731,18 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 textInfo.setVisibility(View.VISIBLE);
                 textInfo.setText(R.string.update_fail);
                 progressView.setProgress(0);
-                if (this.mode == MODE_COMPLETE) return;
+                btnStartUpdate.setText(R.string.scan_and_connect);
+                if (this.mode == MODE_COMPLETE){
+                    log("OTA FAIL COMPLETE");
+                    return;
+                }
                 startScan();
                 break;
         }
     }
 
-    private void doFinish() {
-        this.mode = MODE_COMPLETE;
-        Mesh mesh = TelinkLightApplication.getApp().getMesh();
-        mesh.setOtaDevice(null);
-        mesh.saveOrUpdate(this);
-        log("Finish: Success Count : " + successCount);
+    private void updateSuccess(){
+        doFinish();
         textInfo.setVisibility(View.VISIBLE);
         textInfo.setText(R.string.updateSuccess);
         btnStartUpdate.setVisibility(View.GONE);
@@ -751,6 +754,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 finish();
             }
         }, 2000);
+    }
+
+    private void doFinish() {
+        this.mode = MODE_COMPLETE;
+        Mesh mesh = TelinkLightApplication.getApp().getMesh();
+        mesh.setOtaDevice(null);
+        mesh.saveOrUpdate(this);
+        log("Finish: Success Count : " + successCount);
     }
 
 
@@ -881,7 +892,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             select.setEnabled(false);
             btnStartUpdate.setVisibility(View.VISIBLE);
             btnStartUpdate.setClickable(false);
-            btnStartUpdate.setText(R.string.updating);
+//            btnStartUpdate.setText(R.string.updating);
+            btnStartUpdate.setText(R.string.scan_and_connect);
 //            if (TelinkLightApplication.getApp().getConnectDevice() != null) {
 //                sendGetVersionCommand();
 //            } else {
