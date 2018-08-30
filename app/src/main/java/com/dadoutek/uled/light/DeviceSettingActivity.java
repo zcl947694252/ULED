@@ -2,17 +2,22 @@ package com.dadoutek.uled.light;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.group.LightGroupingActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.HttpModel.DownLoadFileModel;
+import com.dadoutek.uled.network.NetworkObserver;
 import com.dadoutek.uled.ota.OTAUpdateActivity;
 import com.dadoutek.uled.ota.OtaActivity;
 import com.dadoutek.uled.ota.OtaDeviceListActivity;
@@ -20,9 +25,16 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.NetWorkUtils;
+import com.dadoutek.uled.util.StringUtils;
+import com.laojiang.retrofithttp.weight.downfilesutils.FinalDownFiles;
+import com.laojiang.retrofithttp.weight.downfilesutils.action.FinalDownFileResult;
+import com.laojiang.retrofithttp.weight.downfilesutils.downfiles.DownInfo;
 import com.telink.TelinkApplication;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 public final class DeviceSettingActivity extends TelinkBaseActivity {
 
@@ -30,6 +42,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     private TextView tvOta;
     TextView txtTitle;
     private DeviceSettingFragment settingFragment;
+    private String localVersion;
 
     private DbLight light;
     private int gpAddress;
@@ -43,23 +56,83 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == tvOta) {
-                TelinkLightService.Instance().idleMode(true);
-                Intent intent=new Intent(DeviceSettingActivity.this, OTAUpdateActivity.class);
-                intent.putExtra(Constant.UPDATE_LIGHT,light);
-                startActivity(intent);
-                finish();
+                gotoUpdateView();
             }
         }
     };
+
+    private void gotoUpdateView() {
+        if(checkHaveNetWork()){
+//            //1.获取服务器版本url
+//            String serverVersionUrl=getServerVersion();
+//            //2.对比服务器和本地版本大小
+//            boolean hasLast=compareServerVersion(serverVersionUrl);//返回true服务器有更新;返回false本地和服务器版本一致
+//            //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
+//            if(hasLast){
+//                download(serverVersionUrl);
+////                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
+//            }else{
+//                //4.本地已经是最新直接跳转升级页面
+//                transformView();
+//            }
+
+            transformView();
+        }else{
+            ToastUtils.showLong(R.string.network_disconect);
+        }
+    }
+
+    private boolean compareServerVersion(String serverVersion) {
+        if(!serverVersion.isEmpty()&&!localVersion.isEmpty()){
+            int serverVersionNum= Integer.parseInt(StringUtils.versionResolutionURL(serverVersion,1));
+            int localVersionNum= Integer.parseInt(StringUtils.versionResolution(localVersion,1));
+            if(serverVersionNum>localVersionNum){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            ToastUtils.showLong(R.string.getVsersionFail);
+        }
+        return false;
+    }
+
+    private String getServerVersion() {
+        DownLoadFileModel.INSTANCE.getUrl().subscribe(new NetworkObserver<String>() {
+            @Override
+            public void onNext(String s) {
+//               return s;
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+                super.onError(e);
+                ToastUtils.showLong(R.string.get_server_version_fail);
+            }
+        });
+        return "";
+    }
+
+    private void transformView() {
+        TelinkLightService.Instance().idleMode(true);
+        Intent intent=new Intent(DeviceSettingActivity.this, OTAUpdateActivity.class);
+        intent.putExtra(Constant.UPDATE_LIGHT,light);
+        startActivity(intent);
+        finish();
+    }
+
+    private boolean checkHaveNetWork() {
+        return NetWorkUtils.isNetworkAvalible(this);
+    }
 
     private void getVersion() {
         int dstAdress = 0;
         if (TelinkApplication.getInstance().getConnectDevice() != null) {
             Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
-                String version = s;
+                localVersion = s;
                 if (txtTitle != null) {
                     txtTitle.setVisibility(View.VISIBLE);
-                    txtTitle.setText(version);
+                    txtTitle.setText(localVersion);
                     tvOta.setVisibility(View.VISIBLE);
                 }
                 return null;
@@ -110,5 +183,53 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             this.settingFragment.gpAddress = gpAddress;
         }
         this.settingFragment.light = light;
+    }
+
+    private void download(String url){
+        String[] downUrl=new String[]{url};
+        FinalDownFiles finalDownFiles = new FinalDownFiles(true,this,downUrl[0],
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/L-2.0.8-L208.bin",new FinalDownFileResult(){
+            @Override
+            public void onSuccess(DownInfo downInfo) {
+                super.onSuccess(downInfo);
+                Log.i("成功==",downInfo.toString());
+//                transformView();
+            }
+
+            @Override
+            public void onCompleted() {
+                super.onCompleted();
+                Log.i("完成==","./...");
+            }
+
+            @Override
+            public void onStart() {
+                super.onStart();
+                Log.i("开始==","./...");
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+                Log.i("暂停==","./...");
+            }
+
+            @Override
+            public void onStop(){
+                super.onStop();
+                Log.i("结束了一切","是的没错");
+            }
+            @Override
+            public void onLoading(long readLength, long countLength) {
+                super.onLoading(readLength, countLength);
+                Log.i("下载过程==",countLength+"");
+            }
+
+            @Override
+            public void onErroe(String message, int code) {
+                super.onErroe(message, code);
+                Log.i("错误==",message+"");
+            }
+        });
     }
 }

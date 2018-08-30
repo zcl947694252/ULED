@@ -123,16 +123,6 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:id="@+id/firmware_upgrade"
-                android:layout_marginTop="20dp"
-                android:text="@string/ota_str"
-                android:layout_gravity="center"
-                android:textSize="18sp"
-                android:background="@drawable/btn_rec_blue_bt"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content" />
-
-            <Button
                 android:id="@+id/constant_question"
                 android:layout_marginTop="20dp"
                 android:text="@string/common_question"

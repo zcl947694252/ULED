@@ -3,6 +3,8 @@ package com.dadoutek.uled.util;
 import android.text.InputFilter;
 import android.widget.EditText;
 
+import com.dadoutek.uled.model.Constant;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,5 +57,63 @@ public class StringUtils {
         };
 
         editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(16)});
+    }
+
+    /**
+     * 解析URL地址
+     * @param url 传入地址
+     * @param content 返回内容，传入0返回固件类型灯或者控制器，传入1返回版本号（L-2.0.8-L208.bin）
+     * @return
+     */
+    public static String versionResolutionURL(String url,int content){
+        String[] parts=shift(url,"/");
+        String versionPart=parts[parts.length-1];
+        return versionResolution(versionPart,content);
+    }
+
+    /**
+     * 解析URL地址
+     * @param versionPart 传入版本
+     * @param content 返回内容，传入0返回固件类型灯或者控制器，传入1返回版本号（L-2.0.8-L208.bin）
+     * @return
+     */
+    public static String versionResolution(String versionPart,int content){
+        String[] versionContent=shift(versionPart,"-");
+        switch (content){
+            case 0:
+                String type=versionContent[0];
+                if(type.equals("L")){
+                    return Constant.FIRMWARE_TYPE_LIGHT;
+                }else if(type.equals("C")){
+                    return Constant.FIRMWARE_TYPE_CONTROLLER;
+                }
+                break;
+            case 1:
+                return versionContent[1].replaceAll(".","");
+        }
+        return "";
+    }
+
+    /**
+     * @param str 要分离的字符串
+     * @param sp  分隔符
+     * @return 返回分离后的每一个对象值
+     */
+    public static String[] shift(String str, String sp) {
+        if (str == null) return null;
+        String chs1[] = str.split(sp);
+        return chs1;
+    }
+
+    /**
+     * @param str 要分离的字符串
+     * @param sp  分隔符
+     * @param i   要拿的字符数组中的index
+     * @return 返回分离后的每一个对象值
+     */
+    public static String shift(String str, String sp, int i) {
+        if (str == null) return "";
+        String chs1[] = str.split(sp);
+        return chs1[i];
     }
 }

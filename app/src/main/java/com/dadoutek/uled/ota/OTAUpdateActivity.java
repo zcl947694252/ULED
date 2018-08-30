@@ -96,6 +96,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     @BindView(R.id.file)
     TextView tvFile;
     private int mode = MODE_IDLE;
+    private boolean update_step = false;
     private static final int MODE_IDLE = 1;
     private static final int MODE_OTA = 2;
     private static final int MODE_MESH_OTA = 4;
@@ -675,7 +676,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 TelinkLog.i("OTAUpdate#STATUS_LOGOUT");
                 log("logout");
                 if (this.mode != MODE_COMPLETE) {
-                    startScan();
+                    if(update_step){
+                        startScan();
+                    }
                 }
                 break;
 
@@ -971,6 +974,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void updateStep1() {
         if (mPath != null && !mPath.isEmpty()) {
+            update_step=true;
             parseFile();
         } else {
             ToastUtils.showLong(R.string.tip_select_file);

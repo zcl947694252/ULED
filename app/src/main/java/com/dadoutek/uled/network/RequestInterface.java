@@ -37,6 +37,9 @@ public interface RequestInterface {
     @GET("api/auth/salt")
     Observable<Response<String>> getsalt(@Query("account") String account);
 
+    @GET("api/auth/salt")
+    Observable<Response<String>> getFirmwareUrl();
+
     @GET("api/auth/account")
     Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
 

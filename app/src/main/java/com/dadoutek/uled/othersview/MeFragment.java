@@ -102,8 +102,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     TextView tvLightVersionText;
     @BindView(R.id.tvLightVersion)
     TextView tvLightVersion;
-    @BindView(R.id.firmware_upgrade)
-    Button firmwareUpgrade;
     private LayoutInflater inflater;
 
     private TelinkLightApplication mApplication;
@@ -222,7 +220,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         }
     }
 
-    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset, R.id.constant_question,R.id.firmware_upgrade})
+    @OnClick({R.id.chear_cache, R.id.update_ite, R.id.copy_data_base, R.id.app_version, R.id.exit_login, R.id.one_click_backup, R.id.one_click_reset, R.id.constant_question})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.chear_cache:
@@ -249,12 +247,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                 break;
             case R.id.constant_question:
                 startActivity(new Intent(getActivity(), AboutSomeQuestionsActivity.class));
-                break;
-            case R.id.firmware_upgrade:
-                Intent intent=new Intent(getActivity(), OTAUpdateActivity.class);
-//                int mesh=TelinkApplication.getInstance().getConnectDevice().meshAddress;
-//                intent.putExtra("meshAddress",mesh);
-                startActivity(intent);
                 break;
         }
 

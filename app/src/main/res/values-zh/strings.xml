@@ -350,4 +350,7 @@
     <string name="update_tip_user">升级过程中请不要中途退出升级，耐心等待！</string>
     <string name="exit_update">2s后退出升级页面</string>
     <string name="scan_and_connect">扫描连接……</string>
+    <string name="network_disconect">网络未连接</string>
+    <string name="getVsersionFail">获取版本号失败</string>
+    <string name="get_server_version_fail">获取服务器版本失败！</string>
 </resources>

@@ -120,4 +120,7 @@ public class Constant implements Serializable {
     public static boolean TEST_REGISTER = false;
 
     public static String UPDATE_LIGHT="UPDATE_LIGHT";
+
+    public static String FIRMWARE_TYPE_LIGHT="FIRMWARE_TYPE_LIGHT";
+    public static String FIRMWARE_TYPE_CONTROLLER="FIRMWARE_TYPE_CONTROLLER";
 }
