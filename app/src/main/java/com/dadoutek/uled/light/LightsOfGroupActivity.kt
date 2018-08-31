@@ -47,6 +47,8 @@ import com.telink.util.EventListener
 import io.reactivex.functions.Consumer
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import kotlin.collections.ArrayList
@@ -109,6 +111,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+        LogUtils.d("____onStart")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -196,13 +199,25 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     private fun listenerConnect() {
-        if (TelinkLightService.Instance() != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null) {
-            Log.d("Saw", "isConnected = ${TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected}");
+        LogUtils.d("____onResume")
 
-            if (!TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
-                autoConnect()
+        Thread{
+            Thread.sleep(500)
+            if(TelinkLightApplication.getInstance().connectDevice==null){
+                launch(UI){
+                    autoConnect()
+                }
             }
-        }
+        }.start()
+//        if (TelinkLightService.Instance() != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null) {
+//            Log.d("Saw", "isConnected = ${TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected}");
+//
+//            if (!TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+//                autoConnect()
+//            }
+//        }else if(TelinkLightService.Instance().adapter.mLightCtrl.currentLight == null){
+//            autoConnect()
+//        }
     }
 
     override fun onStop() {
@@ -243,14 +258,14 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight)
+            toolbar.title = getString(R.string.allLight)+" ("+lightList.size+")"
 //            if(searchView==null){
 //                toolbar.inflateMenu(R.menu.menu_search)
 //                searchView = MenuItemCompat.getActionView(toolbar.menu.findItem(R.id.action_search)) as SearchView
 //                searchView!!.setOnQueryTextListener(this)
 //            }
         } else {
-            toolbar.title = group.name ?: ""
+            toolbar.title = (group.name ?: "")+" ("+lightList.size+")"
         }
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
         adapter = LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener)

@@ -130,8 +130,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun login() {
-        phone = edit_user_phone_or_email!!.editText!!.text.toString().trim { it <= ' ' }
-        editPassWord = edit_user_password!!.editText!!.text.toString().trim { it <= ' ' }
+        phone = edit_user_phone_or_email!!.editText!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
+        editPassWord = edit_user_password!!.editText!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
+
 
         if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
