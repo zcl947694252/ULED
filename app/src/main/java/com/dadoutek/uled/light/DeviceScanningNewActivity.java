@@ -1211,7 +1211,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         if (meshAddress == -1) {
             this.showToast(getString(R.string.much_lamp_tip));
-            doFinish();
+            if(adapter.getLights()!=null && adapter.getLights().size()>0){
+                stopTimer();
+                onLeScanTimeout();
+                return;
+            }else{
+                doFinish();
+            }
             return;
         }
 
