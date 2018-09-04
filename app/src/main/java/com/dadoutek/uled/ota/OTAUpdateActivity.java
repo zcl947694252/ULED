@@ -187,7 +187,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_update);
         ButterKnife.bind(this);
-//        TelinkLightService.Instance().idleMode(true);
         mesh = TelinkLightApplication.getApp().getMesh();
         if (mesh == null || TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
             toast("Mesh Error!");
@@ -197,34 +196,16 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         initData();
         initView();
-
-        onlineLights = new ArrayList<>();
-        onlineLights.add(dbLight);
-
-        log("onlineLights:" + onlineLights.size());
-//        Intent intent = getIntent();
-//        if (intent.hasExtra(INTENT_KEY_CONTINUE_MESH_OTA)) {
-//            this.mode = MODE_CONTINUE_MESH_OTA;
-//            this.mFileVersion = TelinkLightApplication.getApp().getConnectDevice().firmwareRevision;
-//            tv_version.setText(getString(R.string.target_version, mFileVersion));
-//            select.setEnabled(false);
-//            continueType = intent.getIntExtra(INTENT_KEY_CONTINUE_MESH_OTA, 0);
-//            if (continueType == CONTINUE_BY_PREVIOUS) {
-//                sendGetDeviceOtaStateCommand();
-////                sendGetVersionCommand();
-//                log("continue mesh ota by previous OTA");
-//            } else {
-//                log("continue mesh ota by progress report");
-//            }
-//            visibleHandler.obtainMessage(View.VISIBLE, meshOtaProgress).sendToTarget();
-////            meshOtaProgress.setVisibility(View.VISIBLE);
-//        }
-
     }
 
     private void initData() {
         dbLight = (DbLight) getIntent().getSerializableExtra(Constant.UPDATE_LIGHT);
         log("current-light-mesh" + dbLight.getMeshAddr());
+
+        onlineLights = new ArrayList<>();
+        onlineLights.add(dbLight);
+
+        log("onlineLights:" + onlineLights.size());
     }
 
     @Override
@@ -352,42 +333,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             sendGetDeviceOtaStateCommand();
         } else {
             // scan and connect high version
-            startScan();
+//            startScan();
         }
     }
-
-    // start
-    private void sendStartMeshOTACommand() {
-        // save mesh info
-        String account = DBUtils.INSTANCE.getLastUser().getAccount();
-        String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account);
-
-        mesh.setOtaDevice(new OtaDevice());
-        DeviceInfo curDevice = TelinkLightApplication.getApp().getConnectDevice();
-        mesh.getOtaDevice().mac = curDevice.macAddress;
-        mesh.getOtaDevice().meshName = account;
-        mesh.getOtaDevice().meshPwd = pwd;
-        mesh.saveOrUpdate(this);
-
-        visibleHandler.obtainMessage(View.VISIBLE, meshOtaProgress).sendToTarget();
-//        meshOtaProgress.setVisibility(View.VISIBLE);
-        byte opcode = (byte) 0xC6;
-        int address = 0x0000;
-        byte[] params = new byte[]{(byte) 0xFF, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
-                params);
-        log("SendCommand 0xC6 startMeshOTA");
-    }
-
-    // stop
-    private void sendStopMeshOTACommand() {
-        byte opcode = (byte) 0xC6;
-        int address = 0xFFFF;
-        byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
-                params);
-    }
-
 
     private int otaStateTimeout = 0;
     private int OTA_STATE_TIMEOUT_MAX = 3;
@@ -478,41 +426,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return hasLow;
     }
 
-    /**
-     * action startScan
-     */
-     private synchronized void startScan() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                TelinkLightService.Instance().idleMode(true);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                LeScanParameters params = Parameters.createScanParameters();
-                params.setMeshName(mesh.getName());
-                params.setTimeoutSeconds(15);
-                TelinkLightService.Instance().startScan(params);
-                log("startScan ");
-            }
-        }).start();
-    }
-
-    private void startOTA() {
-        this.mode = MODE_OTA;
-//        otaProgress.setVisibility(View.VISIBLE);
-        visibleHandler.obtainMessage(View.GONE, otaProgress).sendToTarget();
-
-        if (TelinkLightApplication.getApp().getConnectDevice() != null) {
-            TelinkLightService.Instance().startOta(mFirmwareData);
-        } else {
-            startScan();
-        }
-        log("startOTA ");
-    }
-
     private String mFileVersion;
 
 
@@ -531,237 +444,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private boolean isConnectting = false;
 
-    private void onLeScan(LeScanEvent event) {
-        DeviceInfo deviceInfo = event.getArgs();
-        Log.e("ota progress", "LE_SCAN : " + deviceInfo.macAddress);
-        log("on scan : " + deviceInfo.macAddress);
-
-
-        if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
-            mesh = TelinkLightApplication.getApp().getMesh();
-            if (mesh.isOtaProcessing() && mesh.getOtaDevice().mac.equals(deviceInfo.macAddress)) {
-                log("Mesh OTA Target device discovered mesh Address:" + Integer.toHexString(deviceInfo.meshAddress) + " mac:" + deviceInfo.macAddress);
-                if (!isConnectting) {
-                    connectDevice(deviceInfo.macAddress);
-                }
-            } else {
-                for (DbLight light : onlineLights) {
-                    if (light.getMeshAddr() == deviceInfo.meshAddress && mFileVersion.equals(light.version)) {
-                        log("Mesh OTA Target device discovered mesh Address:" + Integer.toHexString(deviceInfo.meshAddress) + " mac:" + deviceInfo.macAddress);
-                        connectDevice(deviceInfo.macAddress);
-                        return;
-                    }
-                }
-            }
-        } else if (this.mode == MODE_OTA) {
-            DbLight light = getLightByMeshAddress(deviceInfo.meshAddress);
-            if (light != null && light.getMeshAddr()==dbLight.getMeshAddr() && compareVersion(light.version, mFileVersion) == 1) {
-                connectDevice(deviceInfo.macAddress);
-            }
-        } else if (this.mode == MODE_IDLE) {
-            if(dbLight.getMeshAddr() == deviceInfo.meshAddress){
-                connectDevice(deviceInfo.macAddress);
-            }
-        }
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
         if (mWakeLock != null) {
             mWakeLock.acquire();
-        }
-    }
-
-    @Override
-    public void performed(Event<String> event) {
-//        if (this.mode == MODE_COMPLETE) return;
-        switch (event.getType()) {
-            case LeScanEvent.LE_SCAN:
-                onLeScan((LeScanEvent) event);
-                break;
-            case LeScanEvent.LE_SCAN_COMPLETED:
-                // scan complete without results
-                Log.e("ota progress", "LE_SCAN_COMPLETED");
-                log("scan complete");
-                onScanTimeout();
-                break;
-
-            case DeviceEvent.STATUS_CHANGED:
-                onDeviceEvent((DeviceEvent) event);
-                break;
-            case NotificationEvent.GET_DEVICE_STATE:
-                onNotificationEvent((NotificationEvent) event);
-                break;
-        }
-    }
-
-    private void onNotificationEvent(NotificationEvent event) {
-        // 解析版本信息
-        byte[] data = event.getArgs().params;
-        if (data[0] == NotificationEvent.DATA_GET_VERSION) {
-            String version = Strings.bytesToString(Arrays.copyOfRange(data, 1, 5));
-
-            int meshAddress = event.getArgs().src;
-//            meshAddress = src & 0xFF;
-            if (meshAddress == dbLight.getMeshAddr() && !versionDevices.contains(meshAddress)) {
-                versionDevices.add(meshAddress);
-            }
-
-            TelinkLog.w(" src:" + meshAddress + " get version success: " + version);
-            log("getVersion:" + Integer.toHexString(meshAddress) + "  version:" + version);
-
-            if (this.mode == MODE_CONTINUE_MESH_OTA) {
-                if (!hasLight(meshAddress)) {
-                    DbLight light = new DbLight();
-                    light.setMeshAddr(meshAddress);
-                    light.version = version;
-                    onlineLights.add(light);
-//                    log("addLight to online lights-- " + "meshAddress:" + meshAddress + " version:" + version);
-                }
-            } else {
-                for (DbLight light : onlineLights) {
-                    if (light.getMeshAddr() == meshAddress) {
-//                        log("version: " + version + " -- light version:" + light.version + " --mode: " + this.mode);
-                        if (this.mode == MODE_COMPLETE) {
-                            if (!version.equals(light.version)) {
-                                successCount++;
-                            }
-                        }
-                        light.version = version;
-                    }
-                }
-            }
-
-            if (this.mode == MODE_CONTINUE_MESH_OTA && meshAddress == TelinkLightApplication.getApp().getConnectDevice().meshAddress) {
-                TelinkLightApplication.getApp().getConnectDevice().firmwareRevision = version;
-                this.mFileVersion = version;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        tv_version.setText(getString(R.string.target_version, mFileVersion));
-                    }
-                });
-            }
-        } else if (data[0] == NotificationEvent.DATA_GET_MESH_OTA_PROGRESS) {
-            TelinkLog.w("mesh ota progress: " + data[1]);
-            int progress = (int) data[1];
-            msgHandler.obtainMessage(MSG_MESH_OTA_PROGRESS, progress).sendToTarget();
-            if (progress == 100) {
-                this.mode = MODE_COMPLETE;
-                delayHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        doFinish();
-                    }
-                }, 5 * 1000);
-                Mesh mesh = TelinkLightApplication.getApp().getMesh();
-                mesh.setOtaDevice(null);
-                mesh.saveOrUpdate(this);
-                sendGetVersionCommand();
-            }
-        } else if (data[0] == NotificationEvent.DATA_GET_OTA_STATE) {
-            delayHandler.removeCallbacks(deviceOtaStateTimeoutTask);
-            int otaState = data[1];
-            log("OTA State response--" + otaState);
-            if (otaState == NotificationEvent.OTA_STATE_IDLE) {
-//                if (this.mode == MODE_OTA) {
-                    startOTA();
-//                }
-//                else if (this.mode == MODE_MESH_OTA) {
-//                    sendStartMeshOTACommand();
-//                } else if (this.mode == MODE_CONTINUE_MESH_OTA) {
-//                    sendGetVersionCommand();
-//                }
-            }
-//            else if (otaState == NotificationEvent.OTA_STATE_MASTER &&
-//                    (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA)) {
-//                if (this.mode == MODE_MESH_OTA) {
-//                    sendStartMeshOTACommand();
-//                } else {
-//                    sendGetVersionCommand();
-//                }
-//            }
-            else {
-                log("OTA State response: Busy!!! Stopped!--" + otaState);
-                doFinish();
-            }
-        }
-
-    }
-
-    private void onDeviceEvent(DeviceEvent event) {
-        int status = event.getArgs().status;
-        switch (status) {
-            case LightAdapter.STATUS_LOGOUT:
-                TelinkLog.i("OTAUpdate#STATUS_LOGOUT");
-                log("logout");
-                if (this.mode != MODE_COMPLETE) {
-                    if(update_step){
-                        startScan();
-                    }
-                }
-                break;
-
-            case LightAdapter.STATUS_LOGIN:
-                TelinkLog.i("OTAUpdate#STATUS_LOGIN");
-                log("login success");
-                if (this.mode == MODE_COMPLETE) return;
-                TelinkLightService.Instance().enableNotification();
-                if (this.mode == MODE_OTA) {
-                    sendGetDeviceOtaStateCommand();
-                } else if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
-                    TelinkLightService.Instance().enableNotification();
-                    sendGetDeviceOtaStateCommand();
-                } else if (this.mode == MODE_IDLE) {
-                    if (this.mFirmwareData != null) {
-                        sendGetVersionCommand();
-                    }
-                }
-                break;
-
-            case LightAdapter.STATUS_CONNECTED:
-                log("connected");
-                if (this.mode != MODE_COMPLETE)
-                    login();
-                break;
-
-            case LightAdapter.STATUS_OTA_PROGRESS:
-                OtaDeviceInfo deviceInfo = (OtaDeviceInfo) event.getArgs();
-//                log("ota progress :" + deviceInfo.progress + "%");
-                msgHandler.obtainMessage(MSG_OTA_PROGRESS, deviceInfo.progress).sendToTarget();
-                break;
-
-            case LightAdapter.STATUS_OTA_COMPLETED:
-                log("OTA complete");
-                msgHandler.obtainMessage(MSG_OTA_PROGRESS, 100).sendToTarget();
-                DeviceInfo deviceInfo_1 = event.getArgs();
-                for (DbLight light : onlineLights) {
-                    if (light.getMeshAddr() == deviceInfo_1.meshAddress) {
-                        light.version = mFileVersion;
-                    }
-                }
-
-                successCount++;
-                if (onlineLights.size() <= successCount) {
-                   updateSuccess();
-                } else {
-//                    this.mode = MODE_MESH_OTA;
-                }
-                break;
-
-            case LightAdapter.STATUS_OTA_FAILURE:
-                log("OTA fail");
-                textInfo.setVisibility(View.VISIBLE);
-                textInfo.setText(R.string.update_fail);
-                progressView.setProgress(0);
-                btnStartUpdate.setText(R.string.scan_and_connect);
-                if (this.mode == MODE_COMPLETE){
-                    log("OTA FAIL COMPLETE");
-                    return;
-                }
-                startScan();
-                break;
         }
     }
 
@@ -790,44 +477,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
 
     AlertDialog.Builder mScanTimeoutDialog;
-
-    public void onScanTimeout() {
-//        if (this.mode == MODE_OTA || this.mode == MODE_IDLE) {
-            doFinish();
-//        }
-//        else if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
-//            if (mScanTimeoutDialog == null) {
-//                mScanTimeoutDialog = new AlertDialog.Builder(this);
-//                mScanTimeoutDialog.setTitle("Warning!");
-//                mScanTimeoutDialog.setMessage("MeshOTA Connect Fail Quit?");
-//                mScanTimeoutDialog.setNeutralButton("Quit", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        sendStopMeshOTACommand();
-//                        Mesh mesh = TelinkLightApplication.getApp().getMesh();
-//                        mesh.setOtaDevice(null);
-//                        mesh.saveOrUpdate(OTAUpdateActivity.this);
-//                        dialog.dismiss();
-//                        doFinish();
-//                    }
-//                });
-//                mScanTimeoutDialog.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        startScan();
-//                        dialog.dismiss();
-//                    }
-//                });
-//            }
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mScanTimeoutDialog.show();
-//                }
-//            });
-//        }
-    }
-
 
     private void log(String log) {
         msgHandler.obtainMessage(MSG_LOG, log).sendToTarget();
@@ -1018,4 +667,329 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             ToastUtils.showLong(R.string.tip_select_file);
         }
     }
+
+    /**
+     * ****************************************泰麟威升级逻辑********************************************
+     */
+
+    /**
+     * action startScan
+     */
+    private synchronized void startScan() {
+        TelinkLightService.Instance().idleMode(true);
+        LeScanParameters params = Parameters.createScanParameters();
+        params.setMeshName(mesh.getName());
+        params.setTimeoutSeconds(15);
+        TelinkLightService.Instance().startScan(params);
+        log("startScan ");
+    }
+
+    private void startOTA() {
+        this.mode = MODE_OTA;
+//        otaProgress.setVisibility(View.VISIBLE);
+        visibleHandler.obtainMessage(View.GONE, otaProgress).sendToTarget();
+
+        if (TelinkLightApplication.getApp().getConnectDevice() != null) {
+            TelinkLightService.Instance().startOta(mFirmwareData);
+        } else {
+            startScan();
+        }
+        log("startOTA ");
+    }
+
+    @Override
+    public void performed(Event<String> event) {
+//        if (this.mode == MODE_COMPLETE) return;
+        switch (event.getType()) {
+            case LeScanEvent.LE_SCAN:
+                onLeScan((LeScanEvent) event);
+                break;
+            case LeScanEvent.LE_SCAN_COMPLETED:
+                // scan complete without results
+                Log.e("ota progress", "LE_SCAN_COMPLETED");
+                log("scan complete");
+                onScanTimeout();
+                break;
+
+            case DeviceEvent.STATUS_CHANGED:
+                onDeviceEvent((DeviceEvent) event);
+                break;
+            case NotificationEvent.GET_DEVICE_STATE:
+                onNotificationEvent((NotificationEvent) event);
+                break;
+        }
+    }
+
+    private void onLeScan(LeScanEvent event) {
+        DeviceInfo deviceInfo = event.getArgs();
+        Log.e("ota progress", "LE_SCAN : " + deviceInfo.macAddress);
+        log("on scan : " + deviceInfo.macAddress);
+
+
+        if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
+            mesh = TelinkLightApplication.getApp().getMesh();
+            if (mesh.isOtaProcessing() && mesh.getOtaDevice().mac.equals(deviceInfo.macAddress)) {
+                log("Mesh OTA Target device discovered mesh Address:" + Integer.toHexString(deviceInfo.meshAddress) + " mac:" + deviceInfo.macAddress);
+                if (!isConnectting) {
+                    connectDevice(deviceInfo.macAddress);
+                }
+            } else {
+                for (DbLight light : onlineLights) {
+                    if (light.getMeshAddr() == deviceInfo.meshAddress && mFileVersion.equals(light.version)) {
+                        log("Mesh OTA Target device discovered mesh Address:" + Integer.toHexString(deviceInfo.meshAddress) + " mac:" + deviceInfo.macAddress);
+                        connectDevice(deviceInfo.macAddress);
+                        return;
+                    }
+                }
+            }
+        } else if (this.mode == MODE_OTA) {
+            DbLight light = getLightByMeshAddress(deviceInfo.meshAddress);
+            if (light != null && light.getMeshAddr()==dbLight.getMeshAddr() && compareVersion(light.version, mFileVersion) == 1) {
+                connectDevice(deviceInfo.macAddress);
+            }
+        } else if (this.mode == MODE_IDLE) {
+            if(dbLight.getMeshAddr() == deviceInfo.meshAddress){
+                connectDevice(deviceInfo.macAddress);
+            }
+        }
+    }
+
+    public void onScanTimeout() {
+//        if (this.mode == MODE_OTA || this.mode == MODE_IDLE) {
+        doFinish();
+//        }
+//        else if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
+//            if (mScanTimeoutDialog == null) {
+//                mScanTimeoutDialog = new AlertDialog.Builder(this);
+//                mScanTimeoutDialog.setTitle("Warning!");
+//                mScanTimeoutDialog.setMessage("MeshOTA Connect Fail Quit?");
+//                mScanTimeoutDialog.setNeutralButton("Quit", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        sendStopMeshOTACommand();
+//                        Mesh mesh = TelinkLightApplication.getApp().getMesh();
+//                        mesh.setOtaDevice(null);
+//                        mesh.saveOrUpdate(OTAUpdateActivity.this);
+//                        dialog.dismiss();
+//                        doFinish();
+//                    }
+//                });
+//                mScanTimeoutDialog.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        startScan();
+//                        dialog.dismiss();
+//                    }
+//                });
+//            }
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mScanTimeoutDialog.show();
+//                }
+//            });
+//        }
+    }
+
+    private void onNotificationEvent(NotificationEvent event) {
+        // 解析版本信息
+        byte[] data = event.getArgs().params;
+        if (data[0] == NotificationEvent.DATA_GET_VERSION) {
+            String version = Strings.bytesToString(Arrays.copyOfRange(data, 1, 5));
+
+            int meshAddress = event.getArgs().src;
+//            meshAddress = src & 0xFF;
+            if (meshAddress == dbLight.getMeshAddr() && !versionDevices.contains(meshAddress)) {
+                versionDevices.add(meshAddress);
+            }
+
+            TelinkLog.w(" src:" + meshAddress + " get version success: " + version);
+            log("getVersion:" + Integer.toHexString(meshAddress) + "  version:" + version);
+
+            if (this.mode == MODE_CONTINUE_MESH_OTA) {
+                if (!hasLight(meshAddress)) {
+                    DbLight light = new DbLight();
+                    light.setMeshAddr(meshAddress);
+                    light.version = version;
+                    onlineLights.add(light);
+//                    log("addLight to online lights-- " + "meshAddress:" + meshAddress + " version:" + version);
+                }
+            } else {
+                for (DbLight light : onlineLights) {
+                    if (light.getMeshAddr() == meshAddress) {
+//                        log("version: " + version + " -- light version:" + light.version + " --mode: " + this.mode);
+                        if (this.mode == MODE_COMPLETE) {
+                            if (!version.equals(light.version)) {
+                                successCount++;
+                            }
+                        }
+                        light.version = version;
+                    }
+                }
+            }
+
+            if (this.mode == MODE_CONTINUE_MESH_OTA && meshAddress == TelinkLightApplication.getApp().getConnectDevice().meshAddress) {
+                TelinkLightApplication.getApp().getConnectDevice().firmwareRevision = version;
+                this.mFileVersion = version;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv_version.setText(getString(R.string.target_version, mFileVersion));
+                    }
+                });
+            }
+        } else if (data[0] == NotificationEvent.DATA_GET_MESH_OTA_PROGRESS) {
+            TelinkLog.w("mesh ota progress: " + data[1]);
+            int progress = (int) data[1];
+            msgHandler.obtainMessage(MSG_MESH_OTA_PROGRESS, progress).sendToTarget();
+            if (progress == 100) {
+                this.mode = MODE_COMPLETE;
+                delayHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        doFinish();
+                    }
+                }, 5 * 1000);
+                Mesh mesh = TelinkLightApplication.getApp().getMesh();
+                mesh.setOtaDevice(null);
+                mesh.saveOrUpdate(this);
+                sendGetVersionCommand();
+            }
+        } else if (data[0] == NotificationEvent.DATA_GET_OTA_STATE) {
+            delayHandler.removeCallbacks(deviceOtaStateTimeoutTask);
+            int otaState = data[1];
+            log("OTA State response--" + otaState);
+            if (otaState == NotificationEvent.OTA_STATE_IDLE) {
+                if (this.mode == MODE_OTA) {
+                startOTA();
+                }
+//                else if (this.mode == MODE_MESH_OTA) {
+//                    sendStartMeshOTACommand();
+//                } else if (this.mode == MODE_CONTINUE_MESH_OTA) {
+//                    sendGetVersionCommand();
+//                }
+            }
+//            else if (otaState == NotificationEvent.OTA_STATE_MASTER &&
+//                    (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA)) {
+//                if (this.mode == MODE_MESH_OTA) {
+//                    sendStartMeshOTACommand();
+//                } else {
+//                    sendGetVersionCommand();
+//                }
+//            }
+            else {
+                log("OTA State response: Busy!!! Stopped!--" + otaState);
+                doFinish();
+            }
+        }
+
+    }
+
+    private void onDeviceEvent(DeviceEvent event) {
+        int status = event.getArgs().status;
+        switch (status) {
+            case LightAdapter.STATUS_LOGOUT:
+                TelinkLog.i("OTAUpdate#STATUS_LOGOUT");
+                log("logout");
+                if (this.mode != MODE_COMPLETE) {
+                    if(update_step){
+                        startScan();
+                    }
+                }
+                break;
+
+            case LightAdapter.STATUS_LOGIN:
+                TelinkLog.i("OTAUpdate#STATUS_LOGIN");
+                log("login success");
+                if (this.mode == MODE_COMPLETE) return;
+                TelinkLightService.Instance().enableNotification();
+                if (this.mode == MODE_OTA) {
+                    sendGetDeviceOtaStateCommand();
+                } else if (this.mode == MODE_MESH_OTA || this.mode == MODE_CONTINUE_MESH_OTA) {
+                    TelinkLightService.Instance().enableNotification();
+                    sendGetDeviceOtaStateCommand();
+                } else if (this.mode == MODE_IDLE) {
+                    if (this.mFirmwareData != null) {
+                        sendGetVersionCommand();
+                    }
+                }
+                break;
+
+            case LightAdapter.STATUS_CONNECTED:
+                log("connected");
+                if (this.mode != MODE_COMPLETE)
+                    login();
+                break;
+
+            case LightAdapter.STATUS_OTA_PROGRESS:
+                OtaDeviceInfo deviceInfo = (OtaDeviceInfo) event.getArgs();
+//                log("ota progress :" + deviceInfo.progress + "%");
+                msgHandler.obtainMessage(MSG_OTA_PROGRESS, deviceInfo.progress).sendToTarget();
+                break;
+
+            case LightAdapter.STATUS_OTA_COMPLETED:
+                log("OTA complete");
+                msgHandler.obtainMessage(MSG_OTA_PROGRESS, 100).sendToTarget();
+                DeviceInfo deviceInfo_1 = event.getArgs();
+                for (DbLight light : onlineLights) {
+                    if (light.getMeshAddr() == deviceInfo_1.meshAddress) {
+                        light.version = mFileVersion;
+                    }
+                }
+
+                successCount++;
+                if (onlineLights.size() <= successCount) {
+                    updateSuccess();
+                } else {
+//                    this.mode = MODE_MESH_OTA;
+                }
+                break;
+
+            case LightAdapter.STATUS_OTA_FAILURE:
+                log("OTA fail");
+                textInfo.setVisibility(View.VISIBLE);
+                textInfo.setText(R.string.update_fail);
+                progressView.setProgress(0);
+                btnStartUpdate.setText(R.string.scan_and_connect);
+                if (this.mode == MODE_COMPLETE){
+                    log("OTA FAIL COMPLETE");
+                    return;
+                }
+                startScan();
+                break;
+        }
+    }
+
+    // start
+    private void sendStartMeshOTACommand() {
+        // save mesh info
+        String account = DBUtils.INSTANCE.getLastUser().getAccount();
+        String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account);
+
+        mesh.setOtaDevice(new OtaDevice());
+        DeviceInfo curDevice = TelinkLightApplication.getApp().getConnectDevice();
+        mesh.getOtaDevice().mac = curDevice.macAddress;
+        mesh.getOtaDevice().meshName = account;
+        mesh.getOtaDevice().meshPwd = pwd;
+        mesh.saveOrUpdate(this);
+
+        visibleHandler.obtainMessage(View.VISIBLE, meshOtaProgress).sendToTarget();
+//        meshOtaProgress.setVisibility(View.VISIBLE);
+        byte opcode = (byte) 0xC6;
+        int address = 0x0000;
+        byte[] params = new byte[]{(byte) 0xFF, (byte) 0xFF};
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
+                params);
+        log("SendCommand 0xC6 startMeshOTA");
+    }
+
+    // stop
+    private void sendStopMeshOTACommand() {
+        byte opcode = (byte) 0xC6;
+        int address = 0xFFFF;
+        byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
+                params);
+    }
+
 }

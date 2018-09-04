@@ -353,4 +353,5 @@
     <string name="network_disconect">网络未连接</string>
     <string name="getVsersionFail">获取版本号失败</string>
     <string name="get_server_version_fail">获取服务器版本失败！</string>
+    <string name="download_pack_fail">升级包下载失败</string>
 </resources>

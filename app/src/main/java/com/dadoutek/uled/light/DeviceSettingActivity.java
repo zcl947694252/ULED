@@ -223,6 +223,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             public void onErroe(String message, int code) {
                 super.onErroe(message, code);
                 Log.i("错误==", message + "");
+                ToastUtils.showLong(R.string.download_pack_fail);
             }
         });
     }
