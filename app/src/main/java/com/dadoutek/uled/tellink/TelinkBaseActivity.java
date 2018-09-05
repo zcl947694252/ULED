@@ -55,7 +55,7 @@ public class TelinkBaseActivity extends AppCompatActivity {
 
         if (this.toast != null) {
             this.toast.setView(this.toast.getView());
-            this.toast.setDuration(Toast.LENGTH_SHORT);
+            this.toast.setDuration(Toast.LENGTH_LONG);
             this.toast.setText(s);
             this.toast.show();
         }

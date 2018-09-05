@@ -44,7 +44,6 @@ class SyncDataPutOrGetUtils {
                 val dbUser = DBUtils.lastUser
 
                 if (dbDataChangeList.size == 0) {
-                    ToastUtils.showLong(context.getString(R.string.upload_data_success))
                     launch(UI) {
                         syncCallback.complete()
                     }
@@ -101,7 +100,6 @@ class SyncDataPutOrGetUtils {
             }.start()
         }
 
-        @Synchronized
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
                                      token: String, id: Long): Observable<String>? {
             var result: Observable<String>?

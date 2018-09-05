@@ -12,7 +12,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
@@ -33,10 +33,12 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.light.ConnectionStatus
-
-import java.util.ArrayList
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
@@ -52,66 +54,70 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private var recyclerView: RecyclerView? = null
     internal var showList: List<DbGroup>? = null
+    private var  updateLightDisposal: Disposable? = null
 
 
 //     var onItemChildClickListener = { adapter, view, position ->
 //
 //    }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener {
-        adapter, view, position ->
-            val group = showList!![position]
-            val dstAddr = group.meshAddr
-            val intent: Intent
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        val group = showList!![position]
+        val dstAddr = group.meshAddr
+        val intent: Intent
 
-            if (!dataManager!!.getConnectState(activity)) {
-                return@OnItemChildClickListener
-            }
+        if (!dataManager!!.getConnectState(activity)) {
+            return@OnItemChildClickListener
+        }
 
-            when (view.getId()) {
-                R.id.btn_on -> {
-                    Commander.openOrCloseLights(dstAddr, true)
-                    updateLights(true,group)
-                }
-                R.id.btn_off -> {
-                    Commander.openOrCloseLights(dstAddr, false)
-                    updateLights(false,group)
-                }
-                R.id.btn_set -> {
-                    intent = Intent(mContext, GroupSettingActivity::class.java)
-                    intent.putExtra("group", group)
-                    startActivityForResult(intent, 0)
-                }
-                R.id.txt_name -> {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                    intent.putExtra("group", group)
-                    startActivity(intent)
-                }
+        when (view.getId()) {
+            R.id.btn_on -> {
+                Commander.openOrCloseLights(dstAddr, true)
+                updateLights(true, group)
             }
+            R.id.btn_off -> {
+                Commander.openOrCloseLights(dstAddr, false)
+                updateLights(false, group)
+            }
+            R.id.btn_set -> {
+                intent = Intent(mContext, GroupSettingActivity::class.java)
+                intent.putExtra("group", group)
+                startActivityForResult(intent, 0)
+            }
+            R.id.txt_name -> {
+                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                intent.putExtra("group", group)
+                startActivity(intent)
+            }
+        }
     }
 
-    @Synchronized
-    private fun updateLights(isOpen: Boolean,group: DbGroup) {
-        var lightList: MutableList<DbLight> = ArrayList()
+    private fun updateLights(isOpen: Boolean, group: DbGroup) {
+        updateLightDisposal?.dispose()
+        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+                .subscribe {
+                    var lightList: MutableList<DbLight> = ArrayList()
 
-        if (group.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-            val list = DBUtils.groupList
-            for (j in list.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
-            }
-        } else {
-            lightList = DBUtils.getLightByGroupID(group.id)
-        }
+                    if (group.meshAddr == 0xffff) {
+                        //            lightList = DBUtils.getAllLight();
+                        val list = DBUtils.groupList
+                        for (j in list.indices) {
+                            lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+                        }
+                    } else {
+                        lightList = DBUtils.getLightByGroupID(group.id)
+                    }
 
-        for (dbLight : DbLight in lightList){
-            if(isOpen){
-                dbLight.connectionStatus= ConnectionStatus.ON.value
-            }else {
-                dbLight.connectionStatus= ConnectionStatus.OFF.value
-            }
-            DBUtils.updateLightLocal(dbLight)
-        }
+                    for (dbLight: DbLight in lightList) {
+                        if (isOpen) {
+                            dbLight.connectionStatus = ConnectionStatus.ON.value
+                        } else {
+                            dbLight.connectionStatus = ConnectionStatus.OFF.value
+                        }
+                        DBUtils.updateLightLocal(dbLight)
+                    }
+                }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -258,7 +264,13 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         popupMenu.show()
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.popup_install_light -> startActivity(Intent(mContext, DeviceScanningNewActivity::class.java))
+                R.id.popup_install_light -> {
+                    if(DBUtils.allLight.size<254){
+                        startActivity(Intent(mContext, DeviceScanningNewActivity::class.java))
+                    }else{
+                        ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                    }
+                }
                 R.id.popup_install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
                 R.id.popup_install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
             }

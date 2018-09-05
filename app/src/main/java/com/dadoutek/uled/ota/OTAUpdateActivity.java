@@ -381,7 +381,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private void sendGetVersionCommand() {
         versionDevices.clear();
         byte opcode = (byte) 0xC7;
-        int address = 0xFFFF;
+        int address = dbLight.getMeshAddr();
         byte[] params = new byte[]{0x20, 0x00};
         TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
                 params);

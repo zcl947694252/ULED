@@ -32,7 +32,7 @@ import com.dadoutek.uled.model.Constant.MAX_GROUP_COUNT
 object DBUtils {
 
     val lastUser: DbUser?
-        @Synchronized get() {
+         get() {
             val list = DaoSessionInstance.getInstance().dbUserDao.queryBuilder().orderDesc(DbUserDao.Properties.Id).list()
             return if (list.size == 0) {
                 null
@@ -40,16 +40,16 @@ object DBUtils {
         }
 
     val lastRegion: DbRegion
-        @Synchronized get() {
+         get() {
             val list = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().orderDesc(DbRegionDao.Properties.Id).list()
             return list[0]
         }
 
     val allLight: List<DbLight>
-        @Synchronized get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
+         get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
 
     val groupList: MutableList<DbGroup>
-        @Synchronized get() {
+         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
 
@@ -58,7 +58,7 @@ object DBUtils {
                     .list()
         }
 
-//    @Synchronized
+//    
 //    fun getGroupListNew() : MutableList<DbGroup>{
 //        val allGIndex = -1
 //        val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
@@ -69,7 +69,7 @@ object DBUtils {
 //    }
 
     val sceneList: List<DbScene>
-        @Synchronized get() {
+         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()
 
@@ -80,7 +80,7 @@ object DBUtils {
 
     //未分组
     val groupNull: DbGroup?
-        @Synchronized get() {
+         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
             val list = qb.where(
@@ -96,16 +96,16 @@ object DBUtils {
         }
 
     val sceneAll: List<DbScene>
-        @Synchronized get() = DaoSessionInstance.getInstance().dbSceneDao.loadAll()
+         get() = DaoSessionInstance.getInstance().dbSceneDao.loadAll()
 
     val regionAll: List<DbRegion>
-        @Synchronized get() = DaoSessionInstance.getInstance().dbRegionDao.loadAll()
+         get() = DaoSessionInstance.getInstance().dbRegionDao.loadAll()
 
     val dataChangeAll: List<DbDataChange>
-        @Synchronized get() = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
+         get() = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 
     val dataChangeAllHaveAboutLight: Boolean
-        @Synchronized get() {
+         get() {
             val list = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
             for (i in list.indices) {
                 if (list[i].tableName == "DB_LIGHT") {
@@ -116,10 +116,10 @@ object DBUtils {
         }
 
     val allGroups: List<DbGroup>
-        @Synchronized get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
+         get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
 
     val deleteGroups: List<DbDeleteGroup>
-        @Synchronized get() = DaoSessionInstance.getInstance().dbDeleteGroupDao.queryBuilder().list()
+         get() = DaoSessionInstance.getInstance().dbDeleteGroupDao.queryBuilder().list()
 
     private//去掉所有组，避免影响判断
     val groupAdress: Int
@@ -157,54 +157,54 @@ object DBUtils {
 
     /********************************************查询 */
 
-    @Synchronized
+    
     fun getActionsBySceneId(id: Long): List<DbSceneActions> {
         val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
         return ArrayList(query.list())
     }
 
-    @Synchronized
+    
     fun getGroupNameByID(id: Long?): String {
         val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
         return group.name
     }
 
-    @Synchronized
+    
     fun getGroupByID(id: Long): DbGroup {
         return DaoSessionInstance.getInstance().dbGroupDao.load(id)
     }
 
-    @Synchronized
+    
     fun getLightByID(id: Long): DbLight {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
     }
 
-    @Synchronized
+    
     fun getRegionByID(id: Long): DbRegion {
         return DaoSessionInstance.getInstance().dbRegionDao.load(id)
     }
 
-    @Synchronized
+    
     fun getSceneByID(id: Long): DbScene? {
         return DaoSessionInstance.getInstance().dbSceneDao.load(id)
     }
 
-    @Synchronized
+    
     fun getSceneActionsByID(id: Long): DbSceneActions {
         return DaoSessionInstance.getInstance().dbSceneActionsDao.load(id)
     }
 
-    @Synchronized
+    
     fun getUserByID(id: Long): DbUser {
         return DaoSessionInstance.getInstance().dbUserDao.load(id)
     }
 
-    @Synchronized
+    
     fun getCurrentRegion(id: Long): DbRegion? {
         return DaoSessionInstance.getInstance().dbRegionDao.load(id)
     }
 
-    @Synchronized
+    
     fun getLightByMeshAddr(meshAddr: Int): DbLight? {
         val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
@@ -215,14 +215,14 @@ object DBUtils {
         } else null
     }
 
-    @Synchronized
+    
     fun getGroupByMesh(mesh: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
         Log.d("datasave", "getGroupByMesh: $mesh")
         return dbGroup
     }
 
-    @Synchronized
+    
     fun getLightByGroupID(id: Long): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())
@@ -230,7 +230,7 @@ object DBUtils {
 
     /********************************************保存 */
 
-    @Synchronized
+    
     fun saveRegion(dbRegion: DbRegion, isFromServer: Boolean) {
         if (isFromServer) {
             val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
@@ -262,7 +262,7 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun insertRegion(dbRegion: DbRegion) {
         //判断原来是否保存过这个区域
         val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
@@ -285,7 +285,7 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
@@ -304,14 +304,14 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun saveDeleteGroup(group: DbGroup) {
         val dbDeleteGroup = DbDeleteGroup()
         dbDeleteGroup.groupAress = group.meshAddr
         DaoSessionInstance.getInstance().dbDeleteGroupDao.save(dbDeleteGroup)
     }
 
-    @Synchronized
+    
     fun saveLight(light: DbLight, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbLightDao.insert(light)
@@ -327,7 +327,7 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun oldToNewSaveLight(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.save(light)
         recordingChange(light.id,
@@ -335,7 +335,7 @@ object DBUtils {
                 Constant.DB_ADD)
     }
 
-    @Synchronized
+    
     fun saveUser(dbUser: DbUser) {
         DaoSessionInstance.getInstance().dbUserDao.insertOrReplace(dbUser)
         recordingChange(dbUser.id,
@@ -343,7 +343,7 @@ object DBUtils {
                 Constant.DB_ADD)
     }
 
-    @Synchronized
+    
     fun saveScene(dbScene: DbScene, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbSceneDao.insert(dbScene)
@@ -355,7 +355,7 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun saveSceneActions(sceneActions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(sceneActions)
         //        recordingChange(sceneActions.getId(),
@@ -363,7 +363,7 @@ object DBUtils {
         //                Constant.DB_ADD);
     }
 
-    @Synchronized
+    
     fun saveSceneActions(sceneActions: DbSceneActions, id: Long?,
                          sceneId: Long) {
         val actions = DbSceneActions()
@@ -378,7 +378,7 @@ object DBUtils {
 
     /********************************************更改 */
 
-    @Synchronized
+    
     fun updateGroup(group: DbGroup) {
         DaoSessionInstance.getInstance().dbGroupDao.update(group)
         recordingChange(group.id,
@@ -398,7 +398,7 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun updateLight(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
         recordingChange(light.id,
@@ -406,18 +406,17 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
-    @Synchronized
+    
     fun updateLightsLocal(lights: MutableList<DbLight>) {
         DaoSessionInstance.getInstance().dbLightDao.updateInTx(lights)
     }
 
-    @Synchronized
     fun updateLightLocal(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
     }
 
 
-    @Synchronized
+    
     fun updateScene(scene: DbScene) {
         DaoSessionInstance.getInstance().dbSceneDao.update(scene)
         recordingChange(scene.id,
@@ -425,7 +424,7 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
-    @Synchronized
+    
     fun updateDbActions(actions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.update(actions)
         recordingChange(actions.id,
@@ -433,7 +432,7 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
-    @Synchronized
+    
     fun updateDbchange(change: DbDataChange) {
         DaoSessionInstance.getInstance().dbDataChangeDao.update(change)
     }
@@ -444,7 +443,7 @@ object DBUtils {
      * 只删除分组，不动组里的灯
      * @param dbGroup
      */
-    @Synchronized
+    
     fun deleteGroupOnly(dbGroup: DbGroup) {
         //        saveDeleteGroup(dbGroup);
         DaoSessionInstance.getInstance().dbGroupDao.delete(dbGroup)
@@ -465,7 +464,7 @@ object DBUtils {
         }
     }
 
-    @Synchronized
+    
     fun deleteLight(dbLight: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.delete(dbLight)
         recordingChange(dbLight.id,
@@ -473,7 +472,7 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
-    @Synchronized
+    
     fun deleteScene(dbScene: DbScene) {
         DaoSessionInstance.getInstance().dbSceneDao.delete(dbScene)
         recordingChange(dbScene.id,
@@ -481,12 +480,12 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
-    @Synchronized
+    
     fun deleteSceneActionsList(sceneActionslist: List<DbSceneActions>) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteInTx(sceneActionslist)
     }
 
-    @Synchronized
+    
     fun deleteAllData() {
         DaoSessionInstance.getInstance().dbUserDao.deleteAll()
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
@@ -497,7 +496,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteAll()
     }
 
-    @Synchronized
+    
     fun deleteLocalData() {
         //        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
@@ -509,14 +508,14 @@ object DBUtils {
         SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, null)
     }
 
-    @Synchronized
+    
     fun deleteDbDataChange(id: Long) {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteByKey(id)
     }
 
     /********************************************其他 */
 
-    @Synchronized
+    
     fun addNewGroup(name: String, groups: MutableList<DbGroup>, context: Context) {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
         if (!checkReachedTheLimit(groups)) {
@@ -548,7 +547,7 @@ object DBUtils {
     }
 
     //检查是否重复
-    @Synchronized
+    
     fun checkRepeat(groups: List<DbGroup>, context: Context, newName: String): Boolean {
         for (k in groups.indices) {
             if (groups[k].name == newName) {
@@ -565,7 +564,7 @@ object DBUtils {
      *
      * @return group对象
      */
-    @Synchronized
+    
     fun createAllLightControllerGroup() {
         val groupAllLights = DbGroup()
         groupAllLights.name = TelinkLightApplication.getInstance().getString(R.string.allLight)
@@ -593,7 +592,7 @@ object DBUtils {
      * @param changeTable 变化数据所属表
      * @param operating   所执行的操作
      */
-    @Synchronized
+    
     fun recordingChange(changeIndex: Long?, changeTable: String, operating: String) {
         val dataChangeList = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 

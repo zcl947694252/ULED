@@ -366,7 +366,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void doFinish() {
-        checkNetworkAndSync();
+    if(updateList!=null&&updateList.size()>0){
+            checkNetworkAndSync();
+        }
         TelinkLightService.Instance().idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
@@ -891,18 +893,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         @Override
         public void start() {
 //            showLoadingDialog(getString(R.string.tip_start_sync));
-            ToastUtils.showShort(R.string.uploading_data);
+//            ToastUtils.showShort(R.string.uploading_data);
         }
 
         @Override
         public void complete() {
-            ToastUtils.showShort(R.string.upload_data_success);
+//            ToastUtils.showShort(R.string.upload_data_success);
 //            hideLoadingDialog();
         }
 
         @Override
         public void error(String msg) {
-            ToastUtils.showShort(R.string.upload_data_failed);
+            ToastUtils.showLong(R.string.upload_data_failed);
 //            hideLoadingDialog();
         }
 
@@ -1210,7 +1212,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         final int meshAddress = mesh.generateMeshAddr();
 
         if (meshAddress == -1) {
-            this.showToast(getString(R.string.much_lamp_tip));
+            ToastUtils.showLong(getString(R.string.much_lamp_tip));
             if(adapter.getLights()!=null && adapter.getLights().size()>0){
                 stopTimer();
                 onLeScanTimeout();

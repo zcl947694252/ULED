@@ -505,49 +505,51 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
-        val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
-        notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
+        Thread{
+            val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
-        if (notificationInfoList.isEmpty()) {
-            LogUtils.d("notificationInfoList is empty")
-            return
-        }
+            notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
 
-        for (notificationInfo: OnlineStatusNotificationParser.DeviceNotificationInfo in notificationInfoList) {
-
-            val meshAddress = notificationInfo.meshAddress
-            val brightness = notificationInfo.brightness
-            val connectionStatus = notificationInfo.connectionStatus
-//            Log.d("Saw", "meshAddress = " + meshAddress + "  reserve = " + notificationInfo.reserve +
-//                    " status = " + notificationInfo.status + " connectionStatus = " + notificationInfo.connectionStatus.value)
-            if (checkIsLight(notificationInfo)) {
-                val dbLight = DBUtils.getLightByMeshAddr(meshAddress)
-                if (dbLight != null) {
-                    dbLight.connectionStatus = connectionStatus.value
-                    dbLight.updateIcon()
-                    DBUtils.updateLightLocal(dbLight)
-                    runOnUiThread { deviceFragment.notifyDataSetChanged() }
-                } else {
-                    if (connectionStatus != ConnectionStatus.OFFLINE) {
-                        val dbLightNew = DbLight()
-                        dbLightNew.setConnectionStatus(connectionStatus.value)
-                        dbLightNew.updateIcon()
-                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                        dbLightNew.brightness = brightness
-                        dbLightNew.colorTemperature = 0
-                        dbLightNew.meshAddr = meshAddress
-                        dbLightNew.name = getString(R.string.allLight)
-                        dbLightNew.macAddr = "0"
-                        DBUtils.saveLight(dbLightNew, false)
-
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
-                    }
-                }
+            if (notificationInfoList.isEmpty()) {
+                LogUtils.d("notificationInfoList is empty")
+                return@Thread
             }
 
-        }
+            for (notificationInfo: OnlineStatusNotificationParser.DeviceNotificationInfo in notificationInfoList) {
 
+                val meshAddress = notificationInfo.meshAddress
+                val brightness = notificationInfo.brightness
+                val connectionStatus = notificationInfo.connectionStatus
+//            Log.d("Saw", "meshAddress = " + meshAddress + "  reserve = " + notificationInfo.reserve +
+//                    " status = " + notificationInfo.status + " connectionStatus = " + notificationInfo.connectionStatus.value)
+                if (checkIsLight(notificationInfo)) {
+                    val dbLight = DBUtils.getLightByMeshAddr(meshAddress)
+                    if (dbLight != null) {
+                        dbLight.connectionStatus = connectionStatus.value
+                        dbLight.updateIcon()
+                        DBUtils.updateLightLocal(dbLight)
+                        runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                    } else {
+                        if (connectionStatus != ConnectionStatus.OFFLINE) {
+                            val dbLightNew = DbLight()
+                            dbLightNew.setConnectionStatus(connectionStatus.value)
+                            dbLightNew.updateIcon()
+                            dbLightNew.belongGroupId = DBUtils.groupNull?.id
+                            dbLightNew.brightness = brightness
+                            dbLightNew.colorTemperature = 0
+                            dbLightNew.meshAddr = meshAddress
+                            dbLightNew.name = getString(R.string.allLight)
+                            dbLightNew.macAddr = "0"
+                            DBUtils.saveLight(dbLightNew, false)
+
+                            com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        }
+                    }
+                }
+
+            }
+        }.start()
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
