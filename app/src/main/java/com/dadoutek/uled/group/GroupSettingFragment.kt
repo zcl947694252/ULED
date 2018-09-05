@@ -105,28 +105,29 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    @Synchronized
     private fun updateLights(progress: Int, type: String, group: DbGroup) {
-        var lightList: MutableList<DbLight> = ArrayList()
+        Thread{
+            var lightList: MutableList<DbLight> = ArrayList()
 
-        if (group.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-            val list = DBUtils.groupList
-            for (j in list.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+            if (group.meshAddr == 0xffff) {
+                //            lightList = DBUtils.getAllLight();
+                val list = DBUtils.groupList
+                for (j in list.indices) {
+                    lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+                }
+            } else {
+                lightList = DBUtils.getLightByGroupID(group.id)
             }
-        } else {
-            lightList = DBUtils.getLightByGroupID(group.id)
-        }
 
-        for (dbLight: DbLight in lightList) {
-            if (type == "brightness") {
-                dbLight.brightness = progress
-            } else if (type == "colorTemperature") {
-                dbLight.colorTemperature = progress
+            for (dbLight: DbLight in lightList) {
+                if (type == "brightness") {
+                    dbLight.brightness = progress
+                } else if (type == "colorTemperature") {
+                    dbLight.colorTemperature = progress
+                }
+                DBUtils.updateLight(dbLight)
             }
-            DBUtils.updateLight(dbLight)
-        }
+        }.start()
     }
 
     private val colorChangedListener = object : ColorPicker.OnColorChangeListener {
