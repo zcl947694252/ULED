@@ -1,6 +1,5 @@
 package com.dadoutek.uled.user
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -27,7 +26,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import com.tbruyelle.rxpermissions2.RxPermissions
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -85,7 +83,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         initToolbar()
         //        txtHeaderTitle.setText(R.string.user_login_title);
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
-            TransformView()
+            transformView()
         }
 
         btn_login.setOnClickListener(this)
@@ -95,10 +93,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         com.dadoutek.uled.util.StringUtils.initEditTextFilter(edit_user_phone_or_email!!.editText)
         com.dadoutek.uled.util.StringUtils.initEditTextFilter(edit_user_password!!.editText)
 
-        val info=SharedPreferencesUtils.getLastUser()
-        if(info!=null&&!info.isEmpty()){
+        val info = SharedPreferencesUtils.getLastUser()
+        if (info != null && !info.isEmpty()) {
             val messge = info.split("-")
-           edit_user_phone_or_email!!.editText!!.setText(messge[0])
+            edit_user_phone_or_email!!.editText!!.setText(messge[0])
             edit_user_password!!.editText!!.setText(messge[1])
         }
     }
@@ -182,24 +180,19 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun syncComplet() {
-        ToastUtils.showLong(getString(R.string.download_data_success))
-        hideLoadingDialog()
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-        TransformView()
+        ToastUtils.showLong(getString(R.string.download_data_success))
+        transformView()
+        hideLoadingDialog()
     }
 
-    private fun TransformView() {
-        //        if (isFirstLauch) {
-        //            startActivityForResult(new Intent(this, AddMeshActivity.class), REQ_MESH_SETTING);
-        //        } else {
-        if (DBUtils.allLight.size == 0) {
+    private fun transformView() {
+        if (DBUtils.allLight.isEmpty()) {
             startActivity(Intent(this@LoginActivity, EmptyAddActivity::class.java))
-            //            startActivity(new Intent(LoginActivity.this, AddMeshActivity.class));
             finish()
         } else {
             startActivity(Intent(this@LoginActivity, MainActivity::class.java))
         }
-        //        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {

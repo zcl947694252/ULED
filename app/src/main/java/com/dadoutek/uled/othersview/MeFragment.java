@@ -510,6 +510,7 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
                 .setNegativeButton(getActivity().getString(R.string.btn_cancel), (dialog, which) -> {
                 })
                 .setPositiveButton(getActivity().getString(R.string.btn_sure), (dialog, which) -> {
+                    TelinkLightService.Instance().idleMode(true);
                     clearData();
                 })
                 .create().show();

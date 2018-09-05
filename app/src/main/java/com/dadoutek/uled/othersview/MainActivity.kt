@@ -117,7 +117,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        initConnect()
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
@@ -130,14 +129,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
-    }
-
-    private fun initConnect() {
-        val list: List<DbLight> = DBUtils.allLight
-        for (i in list.indices) {
-            list[i].connectionStatus = 1
-            DBUtils.updateLight(list[i])
-        }
     }
 
     private fun initBottomNavigation() {
@@ -232,7 +223,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val deviceInfo = this.mApplication?.connectDevice
 
         if (deviceInfo != null) {
-            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress ?: 0x00) and 0xFF
+            this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
+                    ?: 0x00) and 0xFF
         }
 
     }
@@ -298,8 +290,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 //
 //                    val mesh = this.mApplication?.mesh
 //
-//                    val account = DBUtils.getLastUser().account
-//                    //自动重连参数
+//                    val account = DBUtils.lastUser?.account
+////                    //自动重连参数
 //                    val connectParams = Parameters.createAutoConnectParameters()
 //                    connectParams.setMeshName(account)
 //                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16))
@@ -307,9 +299,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 //                    connectParams.autoEnableNotification(true)
 //                    connectParams.setTimeoutSeconds(CONNECT_TIMEOUT)
 //                    connectParams.setConnectMac(mac)
-
+//
 //                    TelinkLightService.Instance().autoConnect(connectParams)
-                    LeBluetooth.getInstance().stopScan()
+//                    LeBluetooth.getInstance().stopScan()
                     TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
                     startConnectTimer()
 
@@ -408,6 +400,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 TelinkLightService.Instance().enableNotification()
+                TelinkLightService.Instance().updateNotification()
                 launch(UI) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
@@ -428,7 +421,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 }
             }
             LightAdapter.STATUS_CONNECTED -> {
-                login()
+                if (!TelinkLightService.Instance().isLogin)
+                    login()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)
 
@@ -506,7 +500,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
 
-        Thread{
+
+        Thread {
             val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
             notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
