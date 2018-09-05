@@ -37,7 +37,7 @@ class Mesh : Serializable {
                 return 1
             }
 
-            flag_index@ for (i in MeshUtils.DEVICE_ADDRESS_MIN until MeshUtils.DEVICE_ADDRESS_MAX) {
+            flag_index@ for (i in (MeshUtils.DEVICE_ADDRESS_MIN) until (MeshUtils.DEVICE_ADDRESS_MAX)) {
                 for (light in lights) {
                     if (light.meshAddr == i) {
                         continue@flag_index
@@ -55,9 +55,9 @@ class Mesh : Serializable {
         var meshAddress: Int = -1
         when {
             lights.isEmpty() -> meshAddress = 1
-            lights.size >= MeshUtils.DEVICE_ADDRESS_MAX -> meshAddress = -1
+            lights.size > MeshUtils.DEVICE_ADDRESS_MAX -> meshAddress = -1
             else -> {
-                for (meshAddr in MeshUtils.DEVICE_ADDRESS_MIN until MeshUtils.DEVICE_ADDRESS_MAX) {
+                for (meshAddr in MeshUtils.DEVICE_ADDRESS_MIN .. MeshUtils.DEVICE_ADDRESS_MAX) {
                     val address = lights.map { it.meshAddr }
                     if (!address.contains(meshAddr)) {
                         meshAddress = meshAddr

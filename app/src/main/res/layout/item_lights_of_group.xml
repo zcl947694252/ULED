@@ -5,11 +5,27 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/img_light"
+    <RelativeLayout
         android:layout_width="108dp"
-        android:layout_height="108dp"
-        android:background="@drawable/icon_light_on" />
+        android:layout_height="108dp">
+
+        <ImageView
+            android:id="@+id/img_light"
+            android:layout_width="108dp"
+            android:layout_height="108dp"
+            android:background="@drawable/icon_light_on" />
+
+        <TextView
+            android:id="@+id/tv_setting"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/menubarsetting3x"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:textColor="@android:color/white" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/name"
@@ -24,15 +40,6 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_setting"
-            android:layout_width="50dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/btn_rec_selector"
-            android:gravity="center"
-            android:text="@string/setting"
-            android:textColor="@android:color/white" />
     </LinearLayout>
 
 </LinearLayout>

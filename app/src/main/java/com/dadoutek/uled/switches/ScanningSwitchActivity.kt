@@ -347,7 +347,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
         val mesh = this.mApplication.mesh
-        val meshAddress = mesh.generateMeshAddr()
+        val meshAddress = Constant.SWITCH_PIR_ADDRESS
 
         if (meshAddress == -1) {
 
