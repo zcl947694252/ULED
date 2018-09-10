@@ -510,7 +510,7 @@ public class Peripheral extends BluetoothGattCallback {
                 characteristic.setWriteType(writeType);
 
                 if(data.length>11){
-                    Log.d("seekBarChangeC","--------"+success+"：："+data[10]);
+//                    Log.d("seekBarChangeC","--------"+success+"：："+data[10]);
                 }
 
                 if (!this.gatt.writeCharacteristic(characteristic)) {

@@ -1,8 +1,11 @@
 package com.dadoutek.uled.light;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,21 +16,20 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
+import com.dadoutek.uled.intf.OtaPrepareListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.HttpModel.DownLoadFileModel;
 import com.dadoutek.uled.network.NetworkObserver;
 import com.dadoutek.uled.ota.OTAUpdateActivity;
+import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.NetWorkUtils;
-import com.dadoutek.uled.util.SharedPreferencesUtils;
+import com.dadoutek.uled.util.OtaPrepareUtils;
 import com.dadoutek.uled.util.StringUtils;
-import com.laojiang.retrofithttp.weight.downfilesutils.FinalDownFiles;
-import com.laojiang.retrofithttp.weight.downfilesutils.action.FinalDownFileResult;
-import com.laojiang.retrofithttp.weight.downfilesutils.downfiles.DownInfo;
 import com.telink.TelinkApplication;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,57 +54,65 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == tvOta) {
-                gotoUpdateView();
+                if(checkPermission()){
+                    OtaPrepareUtils.instance().gotoUpdateView(DeviceSettingActivity.this,localVersion,otaPrepareListner);
+                }
             }
         }
     };
 
-    private void gotoUpdateView() {
-        if (checkHaveNetWork()) {
-//            //1.获取服务器版本url
-//            String serverVersionUrl=getServerVersion();
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    private Boolean checkPermission() {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    OtaPrepareListner otaPrepareListner=new OtaPrepareListner() {
+        @Override
+        public void startGetVersion() {
+            showLoadingDialog(getString(R.string.verification_version));
+        }
+
+        @Override
+        public void getVersionSuccess(String s) {
+            ToastUtils.showLong(R.string.verification_version_success);
+            hideLoadingDialog();
+        }
+
+        @Override
+        public void getVersionFail() {
+            ToastUtils.showLong(R.string.verification_version_fail);
+            hideLoadingDialog();
+        }
+
+
+
+        @Override
+        public void downLoadFileSuccess() {
             transformView();
-        } else {
-            ToastUtils.showLong(R.string.network_disconect);
         }
-    }
 
-    //2.对比服务器和本地版本大小
-    private boolean compareServerVersion(String serverVersionUrl) {
-        if (!serverVersionUrl.isEmpty() && !localVersion.isEmpty()) {
-            int serverVersionNum = Integer.parseInt(StringUtils.versionResolutionURL(serverVersionUrl, 1));
-            int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
-            if (serverVersionNum > localVersionNum) {
-                //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
-                download(serverVersionUrl);
-//                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
-                return true;
-            } else {
-                //4.本地已经是最新直接跳转升级页面
-                transformView();
-                return false;
-            }
-        } else {
-            ToastUtils.showLong(R.string.getVsersionFail);
+        @Override
+        public void downLoadFileFail(String message) {
+            ToastUtils.showLong(R.string.download_pack_fail);
         }
-        return false;
-    }
-
-    private String getServerVersion() {
-        DownLoadFileModel.INSTANCE.getUrl().subscribe(new NetworkObserver<String>() {
-            @Override
-            public void onNext(String s) {
-                compareServerVersion(s);
-            }
-
-            @Override
-            public void onError(@NotNull Throwable e) {
-                super.onError(e);
-                ToastUtils.showLong(R.string.get_server_version_fail);
-            }
-        });
-        return "";
-    }
+    };
 
     private void transformView() {
         TelinkLightService.Instance().idleMode(true);
@@ -112,19 +122,21 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
         finish();
     }
 
-    private boolean checkHaveNetWork() {
-        return NetWorkUtils.isNetworkAvalible(this);
-    }
-
     private void getVersion() {
         int dstAdress = 0;
         if (TelinkApplication.getInstance().getConnectDevice() != null) {
             Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
                 localVersion = s;
                 if (txtTitle != null) {
-                    txtTitle.setVisibility(View.VISIBLE);
-                    txtTitle.setText(localVersion);
-                    tvOta.setVisibility(View.VISIBLE);
+                    if(OtaPrepareUtils.instance().checkSupportOta(localVersion)){
+                        txtTitle.setVisibility(View.VISIBLE);
+                        txtTitle.setText(localVersion);
+                        light.version=localVersion;
+                        tvOta.setVisibility(View.VISIBLE);
+                    }else{
+                        txtTitle.setVisibility(View.GONE);
+                        tvOta.setVisibility(View.GONE);
+                    }
                 }
                 return null;
             }, () -> {
@@ -174,57 +186,5 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
             this.settingFragment.gpAddress = gpAddress;
         }
         this.settingFragment.light = light;
-    }
-
-    private void download(String url) {
-        String[] downUrl = new String[]{url};
-        String localPath=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/L-2.0.8-L208.bin";
-        FinalDownFiles finalDownFiles = new FinalDownFiles(true, this, downUrl[0],localPath
-                , new FinalDownFileResult() {
-            @Override
-            public void onSuccess(DownInfo downInfo) {
-                super.onSuccess(downInfo);
-                Log.i("成功==", downInfo.toString());
-                SharedPreferencesUtils.saveUpdateFilePath(localPath);
-                transformView();
-            }
-
-            @Override
-            public void onCompleted() {
-                super.onCompleted();
-                Log.i("完成==", "./...");
-            }
-
-            @Override
-            public void onStart() {
-                super.onStart();
-                Log.i("开始==", "./...");
-            }
-
-            @Override
-            public void onPause() {
-                super.onPause();
-                Log.i("暂停==", "./...");
-            }
-
-            @Override
-            public void onStop() {
-                super.onStop();
-                Log.i("结束了一切", "是的没错");
-            }
-
-            @Override
-            public void onLoading(long readLength, long countLength) {
-                super.onLoading(readLength, countLength);
-                Log.i("下载过程==", countLength + "");
-            }
-
-            @Override
-            public void onErroe(String message, int code) {
-                super.onErroe(message, code);
-                Log.i("错误==", message + "");
-                ToastUtils.showLong(R.string.download_pack_fail);
-            }
-        });
     }
 }

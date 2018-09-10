@@ -1,6 +1,7 @@
 package com.dadoutek.uled.util;
 
 import android.text.InputFilter;
+import android.util.Log;
 import android.widget.EditText;
 
 import com.dadoutek.uled.model.Constant;
@@ -81,15 +82,17 @@ public class StringUtils {
         String[] versionContent=shift(versionPart,"-");
         switch (content){
             case 0:
-                String type=versionContent[0];
-                if(type.equals("L")){
-                    return Constant.FIRMWARE_TYPE_LIGHT;
-                }else if(type.equals("C")){
-                    return Constant.FIRMWARE_TYPE_CONTROLLER;
-                }
-                break;
+                return versionContent[0];
+//                String type=versionContent[0];
+//                if(type.equals("L")){
+//                    return Constant.FIRMWARE_TYPE_LIGHT;
+//                }else if(type.equals("C")){
+//                    return Constant.FIRMWARE_TYPE_CONTROLLER;
+//                }
             case 1:
-                return versionContent[1].replaceAll(".","");
+                return versionContent[1].replaceAll("\\.","").replaceAll("bin","");
+            case 2:
+                return versionPart.replaceAll("\\.bin","");
         }
         return "";
     }

@@ -71,6 +71,28 @@
         android:layout_marginTop="15dp"
         />
 
+    <TextView
+        android:id="@+id/local_version"
+        android:text="@string/local_version"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/server_version"
+        android:text="@string/server_version"
+        android:textColor="@color/black"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        />
+
     <Button
         android:id="@+id/btn_start_update"
         android:text="@string/start_update"

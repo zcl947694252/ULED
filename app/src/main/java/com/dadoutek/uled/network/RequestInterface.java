@@ -37,9 +37,6 @@ public interface RequestInterface {
     @GET("api/auth/salt")
     Observable<Response<String>> getsalt(@Query("account") String account);
 
-    @GET("api/auth/salt")
-    Observable<Response<String>> getFirmwareUrl();
-
     @GET("api/auth/account")
     Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
 
@@ -197,4 +194,8 @@ public interface RequestInterface {
     //获取场景列表
     @POST("api/ext/soybean/clear")
     Observable<Response<String>> clearUserData(@Header("token") String token);
+
+    //获取下载链接
+    @GET("api/ext/soybean/download/bin/{l1}/{l2}")
+    Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1,@Path("l2") int l2);
 }

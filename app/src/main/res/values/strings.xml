@@ -344,18 +344,25 @@
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">Where can I update my app?</string>
     <string name="update_group">Modify group</string>
-    <string name="the_last_version">该灯当前已经是最新版本！</string>
-    <string name="updateSuccess">升级成功!</string>
-    <string name="update_fail">升级失败！</string>
-    <string name="start_update">开始升级</string>
-    <string name="tip_select_file">请先选择升级文件！</string>
-    <string name="updating">正在升级……</string>
-    <string name="update_tip_user">升级过程中请不要中途退出升级，耐心等待！</string>
-    <string name="exit_update">2s后退出升级页面</string>
-    <string name="scan_and_connect">扫描连接……</string>
-    <string name="network_disconect">网络未连接</string>
-    <string name="getVsersionFail">获取版本号失败</string>
-    <string name="get_server_version_fail">获取服务器版本失败！</string>
-    <string name="download_pack_fail">升级包下载失败</string>
+    <string name="the_last_version">This light is currently the latest version!</string>
+    <string name="updateSuccess">update successed!</string>
+    <string name="update_fail">Upgrade failed!</string>
+    <string name="start_update">Start upgrading</string>
+    <string name="tip_select_file">Please select an upgrade file first!</string>
+    <string name="updating">upgrading……</string>
+    <string name="update_tip_user">Please don\'t quit the upgrade during the upgrade process, wait patiently!</string>
+    <string name="exit_update">Exit the upgrade page after 2s</string>
+    <string name="scan_and_connect">Scan connection...</string>
+    <string name="network_disconect">Network not connected</string>
+    <string name="getVsersionFail">Failed to get the version number</string>
+    <string name="get_server_version_fail">Failed to get the server version!</string>
+    <string name="download_pack_fail">Upgrade package download failed</string>
+    <string name="error_pack">Upgrade package error!</string>
+    <string name="verification_version">Start verifying version information!</string>
+    <string name="verification_version_success">Version verification is successful!</string>
+    <string name="verification_version_fail">Version verification failed!</string>
+    <string name="downloading">downloading:</string>
+    <string name="local_version">Pre-upgrade version: %1$s</string>
+    <string name="server_version">Upgraded version: %1$s</string>
 
 </resources>

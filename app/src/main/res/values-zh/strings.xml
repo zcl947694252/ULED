@@ -354,4 +354,11 @@
     <string name="getVsersionFail">获取版本号失败</string>
     <string name="get_server_version_fail">获取服务器版本失败！</string>
     <string name="download_pack_fail">升级包下载失败</string>
+    <string name="error_pack">升级包错误！</string>
+    <string name="verification_version">开始验证版本信息！</string>
+    <string name="verification_version_success">版本验证成功！</string>
+    <string name="verification_version_fail">版本验证失败！</string>
+    <string name="downloading">下载中：</string>
+    <string name="local_version">升级前版本：%1$s</string>
+    <string name="server_version">升级后版本：%1$s</string>
 </resources>
