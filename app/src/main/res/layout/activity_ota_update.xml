@@ -72,6 +72,15 @@
         />
 
     <TextView
+        android:text="@string/update_firmware_tip2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/red"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        />
+
+    <TextView
         android:id="@+id/local_version"
         android:text="@string/local_version"
         android:textColor="@color/black"

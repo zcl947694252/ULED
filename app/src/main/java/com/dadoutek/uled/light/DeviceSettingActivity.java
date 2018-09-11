@@ -115,7 +115,6 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     };
 
     private void transformView() {
-        TelinkLightService.Instance().idleMode(true);
         Intent intent = new Intent(DeviceSettingActivity.this, OTAUpdateActivity.class);
         intent.putExtra(Constant.UPDATE_LIGHT, light);
         startActivity(intent);

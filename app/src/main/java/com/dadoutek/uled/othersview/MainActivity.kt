@@ -625,6 +625,14 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
+        Thread {
+            val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
+            if (dbLight != null && dbLight.macAddr == "0") {
+                dbLight.macAddr = deviceInfo.macAddress
+                DBUtils.updateLight(dbLight)
+            }
+        }.start()
+
         if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
 //            connect(deviceInfo.macAddress)
             if (bestRSSIDevice != null) {

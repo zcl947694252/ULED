@@ -95,7 +95,7 @@ public class OtaPrepareUtils {
         if (!serverVersionUrl.isEmpty() && !localVersion.isEmpty()) {
             int serverVersionNum = Integer.parseInt(StringUtils.versionResolutionURL(serverVersionUrl, 1));
             int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
-            if (serverVersionNum >= localVersionNum) {
+            if (serverVersionNum > localVersionNum) {
                 //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
                 File file = new File(localPath);
                 if (file.exists()) {
