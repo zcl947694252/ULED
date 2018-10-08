@@ -2,9 +2,12 @@ package com.dadoutek.uled.light;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,11 +19,16 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.group.ColorSelectDiyRecyclerViewAdapter;
+import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.group.LightGroupingActivity;
+import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.ItemColorPreset;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -37,6 +45,8 @@ import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.Parameters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -68,12 +78,16 @@ public final class ColorDeviceSettingFragment extends Fragment {
     TextView colorG;
     @BindView(R.id.color_b)
     TextView colorB;
+    @BindView(R.id.diy_color_recycler_list_view)
+    RecyclerView diyColorRecyclerListView;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
     private ColorPickerView colorPicker;
     private Button remove;
     private AlertDialog dialog;
+    private List<ItemColorPreset> presetColors;
+    private ColorSelectDiyRecyclerViewAdapter colorSelectDiyRecyclerViewAdapter;
 
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
@@ -160,9 +174,12 @@ public final class ColorDeviceSettingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_color_device_setting, null);
+        View newView = getView(view);
+        return newView;
+    }
 
+    private View getView(View view) {
         this.brightnessBar = (SeekBar) view.findViewById(R.id.sb_brightness);
         this.temperatureBar = (SeekBar) view.findViewById(R.id.sb_temperature);
 
@@ -176,8 +193,70 @@ public final class ColorDeviceSettingFragment extends Fragment {
 
 
         mConnectDevice = TelinkLightApplication.getInstance().getConnectDevice();
+
+        presetColors= (List<ItemColorPreset>) SharedPreferencesHelper.getObject(getActivity(),Constant.LIGHT_PRESET_COLOR);
+        if(presetColors==null){
+            presetColors=new ArrayList<>();
+            for(int i=0;i<5;i++){
+                ItemColorPreset itemColorPreset=new ItemColorPreset();
+                presetColors.add(itemColorPreset);
+            }
+        }
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(getActivity());
+        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        diyColorRecyclerListView.setLayoutManager(layoutmanager);
+        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
+        colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
+        colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
+        colorSelectDiyRecyclerViewAdapter.bindToRecyclerView(diyColorRecyclerListView);
         return view;
     }
+
+    BaseQuickAdapter.OnItemChildClickListener diyOnItemChildClickListener=new BaseQuickAdapter.OnItemChildClickListener() {
+        @Override
+        public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            int color=presetColors.get(position).getColor();
+            int brightness=presetColors.get(position).getBrightness();
+            int red = (color & 0xff0000) >> 16;
+            int green = (color & 0x00ff00) >> 8;
+            int blue = (color & 0x0000ff);
+            new Thread(() -> {
+                changeColor((byte) red, (byte) green, (byte)blue);
+
+                try {
+                    Thread.sleep(200);
+                    int addr = light.getMeshAddr();
+                    byte opcode;
+                    byte[] params;
+                    opcode = (byte) Opcode.SET_LUM;
+                    params = new byte[]{(byte) brightness};
+                    light.setBrightness(brightness);
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+                    DBUtils.INSTANCE.updateLight(light);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            brightnessBar.setProgress(brightness);
+            colorR.setText(red+"");
+            colorG.setText(green+"");
+            colorB.setText(blue+"");
+        }
+    };
+
+    BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener=new BaseQuickAdapter.OnItemChildLongClickListener() {
+        @Override
+        public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
+            presetColors.get(position).setColor(light.getColor());
+            presetColors.get(position).setBrightness(light.getBrightness());
+            TextView textView= (TextView) adapter.getViewByPosition(position,R.id.btn_diy_preset);
+            textView.setText(light.getBrightness()+"%");
+            textView.setBackgroundColor(light.getColor());
+            SharedPreferencesHelper.putObject(getActivity(),Constant.LIGHT_PRESET_COLOR,presetColors);
+            return false;
+        }
+    };
 
     private ColorEnvelopeListener colorEnvelopeListener = new ColorEnvelopeListener() {
 
@@ -185,42 +264,41 @@ public final class ColorDeviceSettingFragment extends Fragment {
         public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
             int[] argb = envelope.getArgb();
 
-            colorR.setText(argb[1]+"");
-            colorG.setText(argb[2]+"");
-            colorB.setText(argb[3]+"");
-
-            if (fromUser)
-                changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+            colorR.setText(argb[1] + "");
+            colorG.setText(argb[2] + "");
+            colorB.setText(argb[3] + "");
+            int color=Color.argb(255,argb[1],argb[2],argb[3]);
+            light.setColor(color);
+            changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
         }
-
-        private void changeColor(byte R, byte G, byte B) {
-
-            byte red = R;
-            byte green = G;
-            byte blue = B;
-
-            int addr = light.getMeshAddr();
-            byte opcode = (byte) 0xE2;
-
-            byte minVal = (byte) 0x50;
-
-            if ((green & 0xff) <= minVal)
-                green = 0;
-            if ((red & 0xff) <= minVal)
-                red = 0;
-            if ((blue & 0xff) <= minVal)
-                blue = 0;
-
-
-            byte[] params = new byte[]{0x04, red, green, blue};
-
-            String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
-            Log.d("Saw", logStr);
-
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-        }
-
     };
+
+    private void changeColor(byte R, byte G, byte B) {
+
+        byte red = R;
+        byte green = G;
+        byte blue = B;
+
+        int addr = light.getMeshAddr();
+        byte opcode = (byte) 0xE2;
+
+        byte minVal = (byte) 0x50;
+
+        if ((green & 0xff) <= minVal)
+            green = 0;
+        if ((red & 0xff) <= minVal)
+            red = 0;
+        if ((blue & 0xff) <= minVal)
+            blue = 0;
+
+
+        byte[] params = new byte[]{0x04, red, green, blue};
+
+        String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
+        Log.d("Saw", logStr);
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+    }
 
     @Override
     public void onResume() {

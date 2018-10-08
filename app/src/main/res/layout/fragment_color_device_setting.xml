@@ -19,20 +19,20 @@
             android:orientation="horizontal">
 
             <TextView
-                android:text="R"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:background="#621A1B"
                 android:layout_width="20dp"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:background="#621A1B"
+                android:gravity="center"
+                android:text="R"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/color_r"
-                android:text="100"
-                android:textColor="@color/white"
-                android:background="@color/red"
                 android:layout_width="40dp"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:background="@color/red"
+                android:text="100"
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <LinearLayout
@@ -43,20 +43,20 @@
             android:orientation="horizontal">
 
             <TextView
-                android:text="G"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:background="#254216"
                 android:layout_width="20dp"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:background="#254216"
+                android:gravity="center"
+                android:text="G"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/color_g"
-                android:text="100"
-                android:textColor="@color/white"
-                android:background="#95F668"
                 android:layout_width="40dp"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:background="#95F668"
+                android:text="100"
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <LinearLayout
@@ -67,32 +67,32 @@
             android:orientation="horizontal">
 
             <TextView
-                android:text="B"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:background="#001054"
                 android:layout_width="20dp"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:background="#001054"
+                android:gravity="center"
+                android:text="B"
+                android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/color_b"
-                android:text="100"
-                android:textColor="@color/white"
-                android:background="@color/blue"
                 android:layout_width="40dp"
-                android:layout_height="20dp" />
+                android:layout_height="20dp"
+                android:background="@color/blue"
+                android:text="100"
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_height="240dp">
+            android:layout_height="240dp"
+            android:layout_marginTop="10dp">
 
             <com.skydoves.colorpickerview.ColorPickerView
                 android:id="@+id/color_picker"
-                android:layout_centerInParent="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 app:palette="@drawable/palette"
                 app:selector="@drawable/wheel" />
 
@@ -105,6 +105,22 @@
                 android:text="Test"
                 android:visibility="gone" />
         </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/diy_color_recycler_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                >
+            </android.support.v7.widget.RecyclerView>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -132,8 +148,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
             android:background="@color/border_line" />
 
         <!-- Color -->
@@ -143,8 +159,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:visibility="gone"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -171,8 +187,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
             android:background="@color/border_line" />
 
         <!-- Temperature -->
@@ -204,8 +220,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:background="@color/border_line" />
 
         <Button
@@ -215,8 +231,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/click_btn"
             android:text="@string/update_group"
-            android:textColor="@android:color/white"
-            />
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btn_remove"
