@@ -37,6 +37,7 @@ import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 

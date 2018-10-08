@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:text="R"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:background="#621A1B"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/color_r"
+                android:text="100"
+                android:textColor="@color/white"
+                android:background="@color/red"
+                android:layout_width="40dp"
+                android:layout_height="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:text="G"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:background="#254216"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/color_g"
+                android:text="100"
+                android:textColor="@color/white"
+                android:background="#95F668"
+                android:layout_width="40dp"
+                android:layout_height="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:text="B"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:background="#001054"
+                android:layout_width="20dp"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/color_b"
+                android:text="100"
+                android:textColor="@color/white"
+                android:background="@color/blue"
+                android:layout_width="40dp"
+                android:layout_height="20dp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_height="240dp">
+
+            <com.skydoves.colorpickerview.ColorPickerView
+                android:id="@+id/color_picker"
+                android:layout_centerInParent="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:palette="@drawable/palette"
+                app:selector="@drawable/wheel" />
+
+            <Button
+                android:id="@+id/btn_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="Test"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_brightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/device_setting_brightness" />
+
+            <SeekBar
+                android:id="@+id/sb_brightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="95"
+                android:padding="5dp"
+                android:progress="10" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/border_line" />
+
+        <!-- Color -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:text="@string/device_setting_color" />
+
+                <View
+                    android:id="@+id/color_preview"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:background="#000000" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/border_line" />
+
+        <!-- Temperature -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_temperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="@string/device_setting_temperature" />
+
+            <SeekBar
+                android:id="@+id/sb_temperature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:padding="5dp"
+                android:progress="10" />
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/border_line" />
+
+        <Button
+            android:id="@+id/update_group"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/click_btn"
+            android:text="@string/update_group"
+            android:textColor="@android:color/white"
+            />
+
+        <Button
+            android:id="@+id/btn_remove"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/click_btn"
+            android:text="@string/factory_reset"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btn_rename"
+            android:layout_width="match_parent"
+            android:layout_height="46dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/click_btn"
+            android:text="@string/btn_rename_light"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</ScrollView>

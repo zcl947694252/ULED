@@ -4,9 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -19,27 +17,19 @@ import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.OtaPrepareListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.HttpModel.DownLoadFileModel;
-import com.dadoutek.uled.network.NetworkObserver;
 import com.dadoutek.uled.ota.OTAUpdateActivity;
-import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
-import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtaPrepareUtils;
-import com.dadoutek.uled.util.StringUtils;
 import com.telink.TelinkApplication;
 
-import org.jetbrains.annotations.NotNull;
-
-public final class DeviceSettingActivity extends TelinkBaseActivity {
+public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
 
     private ImageView backView;
     private TextView tvOta;
     TextView txtTitle;
-    private DeviceSettingFragment settingFragment;
+    private NormalDeviceSettingFragment settingFragment;
     private String localVersion;
 
     private DbLight light;
@@ -55,7 +45,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 finish();
             } else if (v == tvOta) {
                 if(checkPermission()){
-                    OtaPrepareUtils.instance().gotoUpdateView(DeviceSettingActivity.this,localVersion,otaPrepareListner);
+                    OtaPrepareUtils.instance().gotoUpdateView(NormalDeviceSettingActivity.this,localVersion,otaPrepareListner);
                 }
             }
         }
@@ -115,7 +105,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
     };
 
     private void transformView() {
-        Intent intent = new Intent(DeviceSettingActivity.this, OTAUpdateActivity.class);
+        Intent intent = new Intent(NormalDeviceSettingActivity.this, OTAUpdateActivity.class);
         intent.putExtra(Constant.UPDATE_LIGHT, light);
         startActivity(intent);
         finish();
@@ -176,7 +166,7 @@ public final class DeviceSettingActivity extends TelinkBaseActivity {
                 .findViewById(R.id.tv_ota);
         this.tvOta.setOnClickListener(this.clickListener);
 
-        this.settingFragment = (DeviceSettingFragment) this
+        this.settingFragment = (NormalDeviceSettingFragment) this
                 .getSupportFragmentManager().findFragmentById(
                         R.id.device_setting_fragment);
 

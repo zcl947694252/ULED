@@ -234,7 +234,7 @@ public final class DeviceListFragment extends Fragment {
                                        int position, long id) {
 
             Intent intent = new Intent(getActivity(),
-                    DeviceSettingActivity.class);
+                    NormalDeviceSettingActivity.class);
             Light light = adapter.getItem(position);
             intent.putExtra(Constant.LIGHT_ARESS_KEY, light.meshAddress);
             startActivity(intent);

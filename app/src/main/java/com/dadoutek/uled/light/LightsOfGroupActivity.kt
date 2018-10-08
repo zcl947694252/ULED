@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SearchView
@@ -94,7 +93,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
         } else if (v.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
-                val intent = Intent(this@LightsOfGroupActivity, DeviceSettingActivity::class.java)
+                val intent = Intent(this@LightsOfGroupActivity, ColorDeviceSettingActivity::class.java)
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.dadoutek.uled">
 
     <!-- 蓝牙权限 -->
@@ -26,7 +27,8 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
@@ -50,7 +52,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.DeviceSettingActivity"
+            android:name=".light.NormalDeviceSettingActivity"
             android:theme="@style/FullHeightDialogNew" />
         <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
@@ -163,6 +165,9 @@
             android:name=".othersview.AboutSomeQuestionsActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".pir.ScanningSensorActivity"></activity>
+        <activity
+            android:name=".light.ColorDeviceSettingActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -42,9 +42,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public final class DeviceSettingFragment extends Fragment {
+public final class NormalDeviceSettingFragment extends Fragment {
 
-    public final static String TAG = DeviceSettingFragment.class.getSimpleName();
+    public final static String TAG = NormalDeviceSettingFragment.class.getSimpleName();
 
     public DbLight light;
     public int gpAddress;
@@ -127,46 +127,8 @@ public final class DeviceSettingFragment extends Fragment {
         }
     };
 
-    private ColorPicker.OnColorChangeListener colorChangedListener = new ColorPicker.OnColorChangeListener() {
 
-        private long preTime;
-        private int delayTime = 20;
 
-        @Override
-        public void onStartTrackingTouch(ColorPicker view) {
-            this.preTime = System.currentTimeMillis();
-            this.changeColor(view.getColor());
-        }
-
-        @Override
-        public void onStopTrackingTouch(ColorPicker view) {
-            this.changeColor(view.getColor());
-        }
-
-        @Override
-        public void onColorChanged(ColorPicker view, int color) {
-
-            long currentTime = System.currentTimeMillis();
-
-//            if ((currentTime - this.preTime) >= this.delayTime) {
-//                this.preTime = currentTime;
-//                this.changeColor(color);
-//            }
-        }
-
-        private void changeColor(int color) {
-
-            byte red = (byte) (color >> 16 & 0xFF);
-            byte green = (byte) (color >> 8 & 0xFF);
-            byte blue = (byte) (color & 0xFF);
-
-            int addr = light.getMeshAddr();
-            byte opcode = Opcode.SET_TEMPERATURE;
-            byte[] params = new byte[]{0x04, red, green, blue};
-
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-        }
-    };
     private TelinkLightApplication mApp;
     private DataManager manager;
     private DeviceInfo mConnectDevice;
@@ -201,7 +163,7 @@ public final class DeviceSettingFragment extends Fragment {
         temperatureBar.setMax(100);
 
         this.colorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
-        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
+//        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
 
         unbinder = ButterKnife.bind(this, view);
 

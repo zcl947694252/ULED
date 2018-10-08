@@ -113,4 +113,5 @@ dependencies {
     implementation 'com.dinuscxj:circleprogressbar:1.3.0'
     implementation 'com.liulishuo.filedownloader:library:1.7.5'
     implementation 'com.github.maning0303:MNProgressHUD:V1.1.0'
+    implementation "com.github.skydoves:colorpickerview:2.0.1"
 }
