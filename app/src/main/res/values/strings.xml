@@ -7,6 +7,10 @@
         <item>50</item>
     </string-array>
 
+    <string-array name="startup_mode" translatable="false">
+        <item>Turn on the lights</item>
+        <item>Turn off the lights</item>
+    </string-array>
     <!-- Activity Labels -->
     <string name="app_name">ULed</string>
     <string name="activity_device_setting_label">Device Setting</string>
@@ -316,7 +320,12 @@
     <string name="uploading_data">Uploading data</string>
     <string name="upload_data_failed">Upload data failed</string>
     <string name="phone_cannot_be_empty">Phone cannot be empty</string>
-    <string name="minimum_brightness_percentage">Minimum brightness(%)</string>
+    <string name="delete_group_failed">Deleting a group failed</string>
+    <string name="deleting">deleting</string>
+    <string name="move_out_some_lights_in_group_failed">Lights in some groups failed to move out of the group</string>
+    <string name="delay_minute">Delay (minutes)</string>
+    <string name="minimum_brightness_percentage">Set brightness (percentage)</string>
+    <string name="trigger_lux">Trigger illumination (lux)</string>
     <string name="params_cannot_be_empty">Params cannot be empty</string>
     <string name="button1">Button 1</string>
     <string name="button2">Button 2</string>

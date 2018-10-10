@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.communicate.Commander.addGroup
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -59,7 +57,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
 
-    private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int) {
+    private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
         LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
                 "   triggerValue = $triggerValue")
 //        val spGroup = groupConvertSpecialValue(groupAddr)
@@ -71,7 +69,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
                 delayTime.toByte(),
                 minBrightness.toByte(),
-                triggerValue.toByte()
+                triggerValue.toByte(),
+                mode.toByte()
         )
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_PIR,
                 mDeviceInfo.meshAddress,
@@ -138,10 +137,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         val mApplication = this.application as TelinkLightApplication
                         val mesh = mApplication.getMesh()
 
+                        val mode= getStartupMode()
+
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
                                 tietMinimumBrightness.text.toString().toInt(),
-                                spTriggerLux.selectedItem.toString().toInt())
+                                spTriggerLux.selectedItem.toString().toInt(),mode)
                         Thread.sleep(300)
 //
 //                        addGroup(mDeviceInfo.meshAddress, mSelectGroupAddr,
@@ -162,6 +163,16 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
                 }
             }
+        }
+    }
+
+
+    private fun getStartupMode(): Int {
+        val position=spSelectStartupMode.selectedItemPosition
+        if(position==0){
+            return Constant.TURN_ON_THE_LIGHT_AFTER_PASSING
+        }else{
+            return Constant.TURN_OFF_THE_LIGHT_AFTER_PASSING
         }
     }
 

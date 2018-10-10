@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -22,9 +23,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.group.ColorSelectDiyRecyclerViewAdapter;
-import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.group.LightGroupingActivity;
-import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -80,6 +79,9 @@ public final class ColorDeviceSettingFragment extends Fragment {
     TextView colorB;
     @BindView(R.id.diy_color_recycler_list_view)
     RecyclerView diyColorRecyclerListView;
+    @BindView(R.id.scroll_view)
+    ScrollView scrollView;
+    Unbinder unbinder1;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
@@ -176,6 +178,7 @@ public final class ColorDeviceSettingFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_color_device_setting, null);
         View newView = getView(view);
+        unbinder1 = ButterKnife.bind(this, newView);
         return newView;
     }
 
@@ -194,11 +197,11 @@ public final class ColorDeviceSettingFragment extends Fragment {
 
         mConnectDevice = TelinkLightApplication.getInstance().getConnectDevice();
 
-        presetColors= (List<ItemColorPreset>) SharedPreferencesHelper.getObject(getActivity(),Constant.LIGHT_PRESET_COLOR);
-        if(presetColors==null){
-            presetColors=new ArrayList<>();
-            for(int i=0;i<5;i++){
-                ItemColorPreset itemColorPreset=new ItemColorPreset();
+        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(getActivity(), Constant.LIGHT_PRESET_COLOR);
+        if (presetColors == null) {
+            presetColors = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                ItemColorPreset itemColorPreset = new ItemColorPreset();
                 presetColors.add(itemColorPreset);
             }
         }
@@ -212,16 +215,16 @@ public final class ColorDeviceSettingFragment extends Fragment {
         return view;
     }
 
-    BaseQuickAdapter.OnItemChildClickListener diyOnItemChildClickListener=new BaseQuickAdapter.OnItemChildClickListener() {
+    BaseQuickAdapter.OnItemChildClickListener diyOnItemChildClickListener = new BaseQuickAdapter.OnItemChildClickListener() {
         @Override
         public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-            int color=presetColors.get(position).getColor();
-            int brightness=presetColors.get(position).getBrightness();
+            int color = presetColors.get(position).getColor();
+            int brightness = presetColors.get(position).getBrightness();
             int red = (color & 0xff0000) >> 16;
             int green = (color & 0x00ff00) >> 8;
             int blue = (color & 0x0000ff);
             new Thread(() -> {
-                changeColor((byte) red, (byte) green, (byte)blue);
+                changeColor((byte) red, (byte) green, (byte) blue);
 
                 try {
                     Thread.sleep(200);
@@ -239,21 +242,22 @@ public final class ColorDeviceSettingFragment extends Fragment {
             }).start();
 
             brightnessBar.setProgress(brightness);
-            colorR.setText(red+"");
-            colorG.setText(green+"");
-            colorB.setText(blue+"");
+            scrollView.setBackgroundColor(color);
+            colorR.setText(red + "");
+            colorG.setText(green + "");
+            colorB.setText(blue + "");
         }
     };
 
-    BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener=new BaseQuickAdapter.OnItemChildLongClickListener() {
+    BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener = new BaseQuickAdapter.OnItemChildLongClickListener() {
         @Override
         public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
             presetColors.get(position).setColor(light.getColor());
             presetColors.get(position).setBrightness(light.getBrightness());
-            TextView textView= (TextView) adapter.getViewByPosition(position,R.id.btn_diy_preset);
-            textView.setText(light.getBrightness()+"%");
+            TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
+            textView.setText(light.getBrightness() + "%");
             textView.setBackgroundColor(light.getColor());
-            SharedPreferencesHelper.putObject(getActivity(),Constant.LIGHT_PRESET_COLOR,presetColors);
+            SharedPreferencesHelper.putObject(getActivity(), Constant.LIGHT_PRESET_COLOR, presetColors);
             return false;
         }
     };
@@ -267,9 +271,13 @@ public final class ColorDeviceSettingFragment extends Fragment {
             colorR.setText(argb[1] + "");
             colorG.setText(argb[2] + "");
             colorB.setText(argb[3] + "");
-            int color=Color.argb(255,argb[1],argb[2],argb[3]);
-            light.setColor(color);
-            changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+
+            int color = Color.argb(255, argb[1], argb[2], argb[3]);
+            if(fromUser){
+                scrollView.setBackgroundColor(color);
+                light.setColor(color);
+                changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+            }
         }
     };
 
@@ -307,7 +315,6 @@ public final class ColorDeviceSettingFragment extends Fragment {
 ////            remove.setVisibility(View.GONE);
 //            btnRename.setVisibility(View.GONE);
 //        }
-
         btnRename.setVisibility(View.GONE);
         brightnessBar.setProgress(light.getBrightness());
         tvBrightness.setText(getString(R.string.device_setting_brightness, light.getBrightness() + ""));

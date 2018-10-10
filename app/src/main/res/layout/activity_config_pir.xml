@@ -85,6 +85,17 @@
         app:layout_constraintStart_toEndOf="@+id/tvSelectGroup"
         app:layout_constraintTop_toTopOf="@+id/tvSelectGroup" />
 
+    <Spinner
+        android:id="@+id/spSelectStartupMode"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:entries="@array/startup_mode"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSelectStartupMode"
+        app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/tvSelectStartupMode"
+        app:layout_constraintTop_toTopOf="@+id/tvSelectStartupMode" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabConfirm"
@@ -108,4 +119,15 @@
         app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
         app:layout_constraintTop_toBottomOf="@+id/tvTriggerLux" />
 
+    <TextView
+        android:id="@+id/tvSelectStartupMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="48dp"
+        android:text="启动方式"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@id/tilMinimumBrightness"
+        app:layout_constraintTop_toBottomOf="@id/tvSelectGroup"
+        />
 </android.support.constraint.ConstraintLayout>

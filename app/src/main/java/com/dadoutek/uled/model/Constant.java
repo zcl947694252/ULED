@@ -144,4 +144,7 @@ public class Constant implements Serializable {
     public static int CONTROLLER_TYPE_NO_STROBO_DIMMING=2;
 
     public static int OTA_SUPPORT_LOWEST_VERSION=206;
+
+    public static int TURN_ON_THE_LIGHT_AFTER_PASSING=1;
+    public static int TURN_OFF_THE_LIGHT_AFTER_PASSING=0;
 }
