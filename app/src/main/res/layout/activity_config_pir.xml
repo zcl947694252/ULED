@@ -125,7 +125,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="48dp"
-        android:text="启动方式"
+        android:text="@string/trigger_mode"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@id/tilMinimumBrightness"
         app:layout_constraintTop_toBottomOf="@id/tvSelectGroup"
