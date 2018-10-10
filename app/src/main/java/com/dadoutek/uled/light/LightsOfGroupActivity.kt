@@ -99,7 +99,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 //                }else{
 //
 //                }
-                val intent = Intent(this@LightsOfGroupActivity, ColorDeviceSettingActivity::class.java)
+                val intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
