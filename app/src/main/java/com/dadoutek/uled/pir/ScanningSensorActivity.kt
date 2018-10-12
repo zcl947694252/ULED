@@ -1,6 +1,7 @@
 package com.dadoutek.uled.pir
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -25,8 +26,10 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
 import io.reactivex.Observable
+import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.android.UI
@@ -75,7 +78,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private fun initView() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.install_switch)
+        supportActionBar?.title = getString(R.string.install_sensor)
     }
 
     private fun initListener() {
@@ -86,6 +89,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     }
 
 
+    @SuppressLint("CheckResult")
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
@@ -109,23 +113,22 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
 
                     TelinkLightService.Instance()?.startScan(params)
+
+                    scanDisposable?.dispose()
+                    scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
+                            .SECONDS, Schedulers.io())
+                            .subscribe {
+                                onLeScanTimeout()
+                            }
                 }.start()
 
+                LogUtils.d("pir开始扫描")
                 progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                 progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-
-                scanDisposable?.dispose()
-                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
-                        .SECONDS)
-                        .subscribe {
-                            onLeScanTimeout()
-                        }
-
             } else {
 
             }
         }
-
     }
 
     private fun retryConnect() {

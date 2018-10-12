@@ -20,7 +20,7 @@
         android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include3">
+        app:layout_constraintTop_toBottomOf="@+id/spSelectStartupMode">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/tietDelay"
@@ -47,6 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/minimum_brightness_percentage"
+            android:text="0"
             android:inputType="number"
             android:maxLength="2"/>
     </android.support.design.widget.TextInputLayout>
@@ -91,6 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:entries="@array/startup_mode"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tvSelectStartupMode"
         app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
         app:layout_constraintHorizontal_bias="1.0"
@@ -127,7 +129,44 @@
         android:layout_marginTop="48dp"
         android:text="@string/trigger_mode"
         android:textSize="18sp"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="@id/tilMinimumBrightness"
-        app:layout_constraintTop_toBottomOf="@id/tvSelectGroup"
+        app:layout_constraintTop_toBottomOf="@id/include3"
         />
+
+    <LinearLayout
+        android:id="@+id/versionLayoutPS"
+        android:layout_width="0dp"
+        android:layout_gravity="center"
+        android:layout_height="20dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginBottom="0dp"
+        android:background="@color/primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fabConfirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/tvLightVersionText"
+            android:text="@string/switch_version"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:id="@+id/tvPSVersion"
+            android:text="1.0.0"
+            android:layout_marginStart="1dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

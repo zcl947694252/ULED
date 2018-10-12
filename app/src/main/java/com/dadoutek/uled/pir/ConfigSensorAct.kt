@@ -17,17 +17,18 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
-class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener{
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
-
+    private var isSupportModeSelect = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +36,30 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         fabConfirm.setOnClickListener(this)
         initToolbar()
         initData()
+        getVersion()
+    }
+
+    private fun getVersion() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            dstAdress = mDeviceInfo.meshAddress
+            Commander.getDeviceVersion(dstAdress,
+                    successCallback = {
+                        versionLayoutPS.visibility = View.VISIBLE
+                        tvPSVersion.text = it
+                        isSupportModeSelect = (it ?: "").contains("PS")
+
+                        if (isSupportModeSelect) {
+                            tvSelectStartupMode.visibility = View.VISIBLE
+                            spSelectStartupMode.visibility = View.VISIBLE
+                        }
+                    },
+                    failedCallback = {
+                        versionLayoutPS.visibility = View.GONE
+                    })
+        } else {
+            dstAdress = 0
+        }
     }
 
     private fun initToolbar() {
@@ -54,6 +79,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         val groupsAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupsName)
         spSelectGroup.adapter = groupsAdapter
         spSelectGroup.onItemSelectedListener = this
+        spSelectStartupMode.onItemSelectedListener = this
     }
 
 
@@ -98,7 +124,18 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 //        if (position == 0)
 //            mSelectGroupAddr = 0xDF
 //        else
-        mSelectGroupAddr = mGroups[position].meshAddr
+        when(parent?.id){
+            R.id.spSelectGroup ->{
+                mSelectGroupAddr = mGroups[position].meshAddr
+            }
+            R.id.spSelectStartupMode ->{
+                if(position == 0){
+                    tietMinimumBrightness?.setText("0")
+                }else if(position == 1){
+                    tietMinimumBrightness?.setText("99")
+                }
+            }
+        }
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -126,23 +163,28 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             R.id.fabConfirm -> {
                 if (tietDelay.text.isEmpty() || tietMinimumBrightness.text.isEmpty()) {
                     snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
-                }else if(tietMinimumBrightness.text.toString().toInt()>99){
+                } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
                     ToastUtils.showLong(getString(R.string.max_tip_brightness))
-                } else if(tietDelay.text.toString().toInt()>30){
+                } else if (tietDelay.text.toString().toInt() > 30) {
                     ToastUtils.showLong(getString(R.string.time_max_tip))
-                }else {
+                } else {
                     showLoadingDialog(getString(R.string.configuring_switch))
                     Thread {
 
                         val mApplication = this.application as TelinkLightApplication
                         val mesh = mApplication.getMesh()
 
-                        val mode= getStartupMode()
+                        var mode = 0
+                        if (isSupportModeSelect) {
+                            mode = getStartupMode()
+                        } else {
+                            mode = 0
+                        }
 
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
                                 tietMinimumBrightness.text.toString().toInt(),
-                                spTriggerLux.selectedItem.toString().toInt(),mode)
+                                spTriggerLux.selectedItem.toString().toInt(), mode)
                         Thread.sleep(300)
 //
 //                        addGroup(mDeviceInfo.meshAddress, mSelectGroupAddr,
@@ -168,10 +210,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
 
     private fun getStartupMode(): Int {
-        val position=spSelectStartupMode.selectedItemPosition
-        if(position==0){
+        val position = spSelectStartupMode.selectedItemPosition
+        if (position == 0) {
             return Constant.TURN_ON_THE_LIGHT_AFTER_PASSING
-        }else{
+        } else {
             return Constant.TURN_OFF_THE_LIGHT_AFTER_PASSING
         }
     }

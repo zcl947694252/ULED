@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,8 +45,8 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == tvOta) {
-                if(checkPermission()){
-                    OtaPrepareUtils.instance().gotoUpdateView(NormalDeviceSettingActivity.this,localVersion,otaPrepareListner);
+                if (checkPermission()) {
+                    OtaPrepareUtils.instance().gotoUpdateView(NormalDeviceSettingActivity.this, localVersion, otaPrepareListner);
                 }
             }
         }
@@ -56,6 +57,7 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
     private Boolean checkPermission() {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -73,7 +75,7 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
         }
     }
 
-    OtaPrepareListner otaPrepareListner=new OtaPrepareListner() {
+    OtaPrepareListner otaPrepareListner = new OtaPrepareListner() {
         @Override
         public void startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version));
@@ -92,10 +94,11 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
         }
 
 
-
         @Override
         public void downLoadFileSuccess() {
-            transformView();
+            new Handler().postDelayed(() -> {
+                transformView();
+            }, 200);
         }
 
         @Override
@@ -117,12 +120,12 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
             Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
                 localVersion = s;
                 if (txtTitle != null) {
-                    if(OtaPrepareUtils.instance().checkSupportOta(localVersion)){
+                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)) {
                         txtTitle.setVisibility(View.VISIBLE);
                         txtTitle.setText(localVersion);
-                        light.version=localVersion;
+                        light.version = localVersion;
                         tvOta.setVisibility(View.VISIBLE);
-                    }else{
+                    } else {
                         txtTitle.setVisibility(View.GONE);
                         tvOta.setVisibility(View.GONE);
                     }

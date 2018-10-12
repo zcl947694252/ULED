@@ -1,6 +1,7 @@
 package com.dadoutek.uled.switches
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -89,7 +90,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
     }
 
-
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
@@ -129,7 +129,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
             }
         }
-
     }
 
     private fun retryConnect() {

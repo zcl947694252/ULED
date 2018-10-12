@@ -315,7 +315,7 @@
     <string name="deleting">删除中</string>
     <string name="move_out_some_lights_in_group_failed">部分组里的灯移出组失败</string>
     <string name="delay_minute">延时(分钟)</string>
-    <string name="minimum_brightness_percentage">设置亮度(百分比)</string>
+    <string name="minimum_brightness_percentage">最终亮度(百分比)</string>
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
     <string name="install_sensor">安装传感器</string>

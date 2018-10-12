@@ -143,8 +143,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int MSG_OTA_PROGRESS = 11;
     private static final int MSG_MESH_OTA_PROGRESS = 12;
     private static final int MSG_LOG = 13;
-    private static final int TIME_OUT_SCAN = 30;
-    private static final int TIME_OUT_CONNECT = 8;
+    private static final int TIME_OUT_SCAN = 20;
+    private static final int TIME_OUT_CONNECT = 15;
+    private Disposable mSendataDisposal;
+    private long TIME_OUT_SENDDATA=4;
+
     private Handler delayHandler = new Handler();
     private Handler visibleHandler = new Handler() {
         @Override
@@ -268,7 +271,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void addEventListener() {
         TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN, this);
-        TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);
+//        TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);
         TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
         TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
         TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
@@ -706,9 +709,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 onLeScan((LeScanEvent) event);
                 break;
             case LeScanEvent.LE_SCAN_COMPLETED:
-                // scan complete without results
                 log("scan complete");
-                onScanComplet();
+//                onScanComplet();
                 break;
             case LeScanEvent.LE_SCAN_TIMEOUT:
                 // scan complete without results
@@ -751,8 +753,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 log("onLeScan" + "connectDevice2");
                 if (!connectStart) {
                     LeBluetooth.getInstance().stopScan();
-                    connectDevice(deviceInfo.macAddress);
-//                    startConnectTimer();
+//                    connectDevice(deviceInfo.macAddress);
+                    startConnectTimer();
                 }
                 connectStart = true;
             }
@@ -767,11 +769,17 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         log("onScanComplet : " + successCount);
 
         if(connectRetryCount==0 && TelinkLightApplication.getInstance().getConnectDevice()==null){
+            showUpdateFailView();
+        }
+    }
+
+    private void showUpdateFailView(){
+        runOnUiThread(() -> {
             textInfo.setVisibility(View.VISIBLE);
             textInfo.setText(R.string.update_fail);
             btnStartUpdate.setVisibility(View.GONE);
             btnStartUpdate.setClickable(false);
-        }
+        });
     }
 
     public void onScanTimeout() {
@@ -780,10 +788,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         mesh.setOtaDevice(null);
         mesh.saveOrUpdate(this);
         log("Finish: Success Count : " + successCount);
-        textInfo.setVisibility(View.VISIBLE);
-        textInfo.setText(R.string.update_fail);
-        btnStartUpdate.setVisibility(View.GONE);
-        btnStartUpdate.setClickable(false);
+        showUpdateFailView();
     }
 
     private void onNotificationEvent(NotificationEvent event) {
@@ -818,6 +823,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             if (otaState == NotificationEvent.OTA_STATE_IDLE) {
                 if (this.mode == MODE_OTA) {
                     startOTA();
+                    if(mSendataDisposal!=null){
+                        mSendataDisposal.dispose();
+                    }
+                    mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA,TimeUnit.SECONDS).subscribe(aLong -> {
+                        if(progressView.getProgress()<=0){
+                            showUpdateFailView();
+                        }
+                    });
                 }
             } else {
                 log("OTA State response: Busy!!! Stopped!--" + otaState);
@@ -828,7 +841,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     Disposable mConnectDisposal;
-
     private void startConnectTimer() {
         if(mConnectDisposal!=null){
             mConnectDisposal.dispose();
@@ -864,10 +876,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 if (connectRetryCount > 0) {
                     if (connectRetryCount >= 3) {
 //                    btnStartUpdate.setText(R.string.update_fail);
-                        btnStartUpdate.setClickable(false);
-                        btnStartUpdate.setVisibility(View.GONE);
-                        textInfo.setVisibility(View.VISIBLE);
-                        textInfo.setText(R.string.update_fail);
+                        showUpdateFailView();
                         stopConnectTimer();
                     } else {
                         startConnectTimer();
@@ -929,10 +938,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
             case LightAdapter.STATUS_OTA_FAILURE:
                 log("OTA fail");
-                textInfo.setVisibility(View.VISIBLE);
-                textInfo.setText(R.string.update_fail);
+                showUpdateFailView();
                 progressView.setProgress(0);
-                btnStartUpdate.setVisibility(View.GONE);
                 if (this.mode == MODE_COMPLETE) {
                     log("OTA FAIL COMPLETE");
                     return;

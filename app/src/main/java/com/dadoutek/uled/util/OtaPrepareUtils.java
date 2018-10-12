@@ -95,7 +95,9 @@ public class OtaPrepareUtils {
         if (!serverVersionUrl.isEmpty() && !localVersion.isEmpty()) {
             int serverVersionNum = Integer.parseInt(StringUtils.versionResolutionURL(serverVersionUrl, 1));
             int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
-            if (serverVersionNum > localVersionNum) {
+
+            //开发者模式可以任意升级版本
+            if(SharedPreferencesUtils.isDeveloperModel()){
                 //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
                 File file = new File(localPath);
                 if (file.exists()) {
@@ -105,12 +107,25 @@ public class OtaPrepareUtils {
                     download(serverVersionUrl, otaPrepareListner, context);
                 }
 //                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
-                return true;
-            } else {
-                //4.本地已经是最新直接跳转升级页面
+            }else{
+                //正常模式只能升级服务器最新版本
+                if (serverVersionNum > localVersionNum) {
+                    //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
+                    File file = new File(localPath);
+                    if (file.exists()) {
+                        otaPrepareListner.downLoadFileSuccess();
+                        SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                    } else {
+                        download(serverVersionUrl, otaPrepareListner, context);
+                    }
+//                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
+                    return true;
+                } else {
+                    //4.本地已经是最新直接跳转升级页面
 //                transformView();
-                ToastUtils.showLong(R.string.the_last_version);
-                return false;
+                    ToastUtils.showLong(R.string.the_last_version);
+                    return false;
+                }
             }
         } else {
             ToastUtils.showLong(R.string.getVsersionFail);
@@ -159,6 +174,7 @@ public class OtaPrepareUtils {
         FileDownloader.getImpl().create(url)
                 .setPath(localPath)
                 .setForceReDownload(true)
+                .setCallbackProgressMinInterval(50)
                 .setListener(new FileDownloadListener() {
                     //等待
                     @Override
