@@ -1,6 +1,7 @@
 package com.dadoutek.uled.group;
 
 import android.support.annotation.Nullable;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -21,9 +22,9 @@ public class ColorSelectDiyRecyclerViewAdapter extends BaseQuickAdapter<ItemColo
 
     @Override
     protected void convert(BaseViewHolder helper, ItemColorPreset item) {
-        helper.addOnClickListener(R.id.btn_diy_preset).
-                addOnLongClickListener(R.id.btn_diy_preset).
-                setText(R.id.btn_diy_preset, item.getBrightness() + "%").
-                setBackgroundColor(R.id.btn_diy_preset,item.getColor());
+        helper.addOnClickListener(R.id.btn_diy_preset)
+                .addOnLongClickListener(R.id.btn_diy_preset)
+                .setText(R.id.btn_diy_preset, item.getBrightness() + "%")
+                .setBackgroundColor(R.id.btn_diy_preset,item.getColor());
     }
 }
