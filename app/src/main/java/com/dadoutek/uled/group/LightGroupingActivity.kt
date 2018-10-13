@@ -13,6 +13,7 @@ import android.widget.GridView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -21,6 +22,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
@@ -141,25 +143,45 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_device_grouping)
 
-        this.light = this.intent.extras!!.get("light") as DbLight
-        this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
+        initData()
+        initView()
 
+        this.getDeviceGroup()
+        //        getScene();
+    }
+
+    private fun initView() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         toolbar.setTitle(R.string.activity_device_grouping)
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         this.inflater = this.layoutInflater
-
-        groupsInit = DBUtils.groupList
         listView = this.findViewById<View>(R.id.list_groups) as GridView
         listView!!.onItemClickListener = this.itemClickListener
 
         adapter = DeviceGroupingAdapter(groupsInit!!, this)
         listView!!.adapter = adapter
+    }
 
-        this.getDeviceGroup()
-        //        getScene();
+    private fun initData() {
+        this.light = this.intent.extras!!.get("light") as DbLight
+        this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
+
+        val list = DBUtils.groupList
+        for(i in list.indices){
+            if(light?.productUUID==Constant.NORMAL_UUID){
+                if(OtherUtils.groupIsEmpty(list[i])||OtherUtils.isNormalGroup(list[i])){
+                    groupsInit?.add(list[i])
+                }
+            }else if(light?.productUUID==Constant.RGB_UUID){
+                if(OtherUtils.groupIsEmpty(list[i])||OtherUtils.isRGBGroup(list[i])){
+                    groupsInit?.add(list[i])
+                }
+            }
+//            groupsInit
+        }
+//        groupsInit = DBUtils.groupList
     }
 
     private fun getScene() {
