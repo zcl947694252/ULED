@@ -24,12 +24,12 @@ import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.OtaPrepareUtils;
 import com.telink.TelinkApplication;
 
-public final class ColorDeviceSettingActivity extends TelinkBaseActivity {
+public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
 
     private ImageView backView;
     private TextView tvOta;
     TextView txtTitle;
-    private ColorDeviceSettingFragment settingFragment;
+    private RGBDeviceSettingFragment settingFragment;
     private String localVersion;
 
     private DbLight light;
@@ -45,7 +45,7 @@ public final class ColorDeviceSettingActivity extends TelinkBaseActivity {
                 finish();
             } else if (v == tvOta) {
                 if(checkPermission()){
-                    OtaPrepareUtils.instance().gotoUpdateView(ColorDeviceSettingActivity.this,localVersion,otaPrepareListner);
+                    OtaPrepareUtils.instance().gotoUpdateView(RGBDeviceSettingActivity.this,localVersion,otaPrepareListner);
                 }
             }
         }
@@ -105,7 +105,7 @@ public final class ColorDeviceSettingActivity extends TelinkBaseActivity {
     };
 
     private void transformView() {
-        Intent intent = new Intent(ColorDeviceSettingActivity.this, OTAUpdateActivity.class);
+        Intent intent = new Intent(RGBDeviceSettingActivity.this, OTAUpdateActivity.class);
         intent.putExtra(Constant.UPDATE_LIGHT, light);
         startActivity(intent);
         finish();
@@ -166,7 +166,7 @@ public final class ColorDeviceSettingActivity extends TelinkBaseActivity {
                 .findViewById(R.id.tv_ota);
         this.tvOta.setOnClickListener(this.clickListener);
 
-        this.settingFragment = (ColorDeviceSettingFragment) this
+        this.settingFragment = (RGBDeviceSettingFragment) this
                 .getSupportFragmentManager().findFragmentById(
                         R.id.device_setting_fragment);
 

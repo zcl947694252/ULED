@@ -31,6 +31,8 @@ public class DbGroup implements Serializable{
     public boolean selected;
     @Transient
     public int textColor;//文字颜色
+    @Transient
+    public int color;
 
     @Generated(hash = 55678821)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
@@ -95,5 +97,11 @@ public class DbGroup implements Serializable{
         this.belongRegionId = belongRegionId;
     }
 
+    public int getColor() {
+        return color;
+    }
 
+    public void setColor(int color) {
+        this.color = color;
+    }
 }

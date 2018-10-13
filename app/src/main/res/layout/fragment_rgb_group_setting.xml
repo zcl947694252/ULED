@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:id="@+id/scroll_view"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:scrollbars="none">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <!-- Brightness -->
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -124,25 +125,24 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:layout_marginTop="10dp"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_brightness"
-                android:layout_width="match_parent"
+                android:id="@+id/tv_brightness_rgb"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:text="@string/device_setting_brightness" />
 
             <SeekBar
                 android:id="@+id/sb_brightness"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:max="95"
+                android:max="100"
                 android:padding="5dp"
                 android:progress="10" />
         </LinearLayout>
@@ -150,16 +150,16 @@
         <!-- Color -->
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:orientation="vertical">
 
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -176,20 +176,13 @@
                     android:layout_marginEnd="10dp"
                     android:background="#000000" />
             </RelativeLayout>
-
         </LinearLayout>
 
-        <!--<View-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="1dp"-->
-            <!--android:layout_marginTop="2dp"-->
-            <!--android:layout_marginBottom="2dp"-->
-            <!--android:background="@color/border_line" />-->
 
         <!-- Temperature -->
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
@@ -197,63 +190,95 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_temperature"
-                android:layout_width="match_parent"
+                android:id="@+id/tv_temperature_rgb"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:text="@string/device_setting_temperature" />
 
             <SeekBar
                 android:id="@+id/sb_temperature"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
                 android:padding="5dp"
                 android:progress="10" />
         </LinearLayout>
 
+        <!-- Music -->
 
-        <!--<View-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="1dp"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--android:layout_marginBottom="10dp"-->
-            <!--android:background="@color/border_line" />-->
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:gravity="center"
+                android:text="@string/device_setting_music" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:padding="5dp"
+                android:text="@string/device_setting_sound" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/border_line" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button
-                android:id="@+id/update_group"
+                android:id="@+id/btn_remove_group"
                 android:layout_width="0dp"
                 android:layout_height="46dp"
                 android:layout_weight="1"
                 android:layout_margin="10dp"
                 android:background="@drawable/click_btn"
-                android:text="@string/update_group"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:text="@string/delete_group"/>
 
             <Button
-                android:id="@+id/btn_remove"
+                android:id="@+id/btn_rename"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="46dp"
                 android:layout_margin="10dp"
                 android:background="@drawable/click_btn"
-                android:text="@string/factory_reset"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:text="@string/rename_the_group"/>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_rename"
-            android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:layout_margin="10dp"
-            android:background="@drawable/click_btn"
-            android:text="@string/btn_rename_light"
-            android:textColor="@android:color/white" />
+        <!--<Button-->
+            <!--android:id="@+id/btn_remove_group"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="46dp"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:background="@drawable/click_btn"-->
+            <!--android:text="@string/delete_group"-->
+            <!--android:visibility="visible"-->
+            <!--android:textColor="@android:color/white" />-->
 
+        <!--<Button-->
+            <!--android:id="@+id/btn_rename"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="46dp"-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:background="@drawable/click_btn"-->
+            <!--android:text="@string/rename_the_group"-->
+            <!--android:visibility="visible"-->
+            <!--android:textColor="@android:color/white" />-->
     </LinearLayout>
-
 </ScrollView>

@@ -10,5 +10,7 @@
     <item
         android:id="@+id/popup_install_sensor"
         android:title="@string/install_sensor" />
-
+    <item
+        android:id="@+id/popup_install_rgb_light"
+        android:title="@string/rgb" />
 </menu>

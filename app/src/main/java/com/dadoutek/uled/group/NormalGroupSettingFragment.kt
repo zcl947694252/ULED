@@ -27,7 +27,7 @@ import kotlinx.android.synthetic.main.fragment_group_setting.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class GroupSettingFragment : BaseFragment(), View.OnClickListener {
+class NormalGroupSettingFragment : BaseFragment(), View.OnClickListener {
 
     private var brightnessBar: SeekBar? = null
     private var temperatureBar: SeekBar? = null
@@ -220,16 +220,16 @@ class GroupSettingFragment : BaseFragment(), View.OnClickListener {
         when (v?.id) {
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(activity)).setMessage(R.string.delete_group_confirm)
                     .setPositiveButton(R.string.btn_ok) { _, _ ->
-                        (activity as GroupSettingActivity).showLoadingDialog(getString(R.string.deleting))
+                        (activity as NormalGroupSettingActivity).showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                 successCallback = {
-                                    (activity as GroupSettingActivity).hideLoadingDialog()
+                                    (activity as NormalGroupSettingActivity).hideLoadingDialog()
                                     activity?.setResult(Constant.RESULT_OK)
                                     activity?.finish()
                                 },
                                 failedCallback = {
-                                    (activity as GroupSettingActivity).hideLoadingDialog()
+                                    (activity as NormalGroupSettingActivity).hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }

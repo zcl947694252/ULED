@@ -369,4 +369,5 @@
     <string name="start_connect">连接中……</string>
     <string name="update_firmware_tip2">升级时请尽可能的靠近灯！</string>
     <string name="trigger_mode">触发方式</string>
+    <string name="rgb">RGB灯</string>
 </resources>

@@ -18,8 +18,9 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
+import com.dadoutek.uled.light.RGBDeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -32,12 +33,12 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -65,7 +66,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val group = showList!![position]
         val dstAddr = group.meshAddr
-        val intent: Intent
+        var intent: Intent
 
         if (!dataManager!!.getConnectState(activity)) {
             return@OnItemChildClickListener
@@ -81,7 +82,10 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 updateLights(false, group)
             }
             R.id.btn_set -> {
-                intent = Intent(mContext, GroupSettingActivity::class.java)
+                intent = Intent(mContext, NormalGroupSettingActivity::class.java)
+                if(OtherUtils.isRGBGroup(group)){
+                    intent = Intent(mContext, RGBGroupSettingActivity::class.java)
+                }
                 intent.putExtra("group", group)
                 startActivityForResult(intent, 0)
             }
@@ -267,7 +271,14 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             when (item.itemId) {
                 R.id.popup_install_light -> {
                     if(DBUtils.allLight.size<254){
-                        startActivity(Intent(mContext, DeviceScanningNewActivity::class.java))
+                        startActivity(Intent(mContext, NormalDeviceScanningNewActivity::class.java))
+                    }else{
+                        ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                    }
+                }
+                R.id.popup_install_rgb_light -> {
+                    if(DBUtils.allLight.size<254){
+                        startActivity(Intent(mContext, RGBDeviceScanningNewActivity::class.java))
                     }else{
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }

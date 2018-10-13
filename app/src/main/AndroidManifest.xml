@@ -72,7 +72,7 @@
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".group.GroupSettingActivity"
+            android:name=".group.NormalGroupSettingActivity"
             android:theme="@style/FullHeightDialogNew" />
         <activity
             android:name=".group.AddGroupActivity"
@@ -147,7 +147,7 @@
             android:name=".user.ForgetPassWordActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.DeviceScanningNewActivity"
+            android:name=".light.NormalDeviceScanningNewActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".scene.ChangeSceneAct"
@@ -166,7 +166,13 @@
             android:screenOrientation="portrait" />
         <activity android:name=".pir.ScanningSensorActivity"></activity>
         <activity
-            android:name=".light.ColorDeviceSettingActivity"
+            android:name=".light.RGBDeviceSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".group.RGBGroupSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".light.RGBDeviceScanningNewActivity"
             android:screenOrientation="portrait" />
     </application>
 

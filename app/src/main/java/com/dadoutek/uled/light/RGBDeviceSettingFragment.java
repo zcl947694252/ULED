@@ -53,9 +53,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public final class ColorDeviceSettingFragment extends Fragment {
+public final class RGBDeviceSettingFragment extends Fragment {
 
-    public final static String TAG = ColorDeviceSettingFragment.class.getSimpleName();
+    public final static String TAG = RGBDeviceSettingFragment.class.getSimpleName();
 
     public DbLight light;
     public int gpAddress;
@@ -176,7 +176,7 @@ public final class ColorDeviceSettingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_color_device_setting, null);
+        View view = inflater.inflate(R.layout.fragment_rgb_device_setting, null);
         View newView = getView(view);
         unbinder1 = ButterKnife.bind(this, newView);
         return newView;

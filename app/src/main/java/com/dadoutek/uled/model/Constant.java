@@ -21,7 +21,7 @@ public class Constant implements Serializable {
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
 
-    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "testa" : "dadousmart";
+    public static final String DEFAULT_MESH_FACTORY_NAME = BuildConfig.DEBUG ? "zhuwei" : "dadousmart";
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
@@ -33,7 +33,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY_ALL = "GROUPS_KEY_ALL";
 
-    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "testa" : "out_of_mesh";
+    public static final String OUT_OF_MESH_NAME = BuildConfig.DEBUG ? "zhuwei" : "out_of_mesh";
 
     public static final String PIR_SWITCH_MESH_NAME = "dadousmart";
 
@@ -125,6 +125,7 @@ public class Constant implements Serializable {
     public static String FIRMWARE_TYPE_CONTROLLER="FIRMWARE_TYPE_CONTROLLER";
 
     public static String LIGHT_PRESET_COLOR="LIGHT_PRESET_COLOR";
+    public static String GROUP_PRESET_COLOR="GROUP_PRESET_COLOR";
 
     public static int LIGHT=1;
     public static int CONTROLLER=2;
@@ -147,4 +148,7 @@ public class Constant implements Serializable {
 
     public static int TURN_ON_THE_LIGHT_AFTER_PASSING=0;
     public static int TURN_OFF_THE_LIGHT_AFTER_PASSING=1;
+
+    public static int RGB_UUID=6;
+    public static int NORMAL_UUID=4;
 }

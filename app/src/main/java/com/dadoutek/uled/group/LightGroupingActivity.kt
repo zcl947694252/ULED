@@ -1,5 +1,6 @@
 package com.dadoutek.uled.group
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
@@ -72,7 +73,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
     //        }
 
-    private val mHandler = object : Handler() {
+    private val mHandler = @SuppressLint("HandlerLeak")
+    object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 

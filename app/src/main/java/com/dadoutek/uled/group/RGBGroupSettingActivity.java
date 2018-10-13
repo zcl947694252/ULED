@@ -7,16 +7,16 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.model.Constant;
 
-public final class GroupSettingActivity extends TelinkBaseActivity {
+public final class RGBGroupSettingActivity extends TelinkBaseActivity {
 
     private ImageView backView;
-    private GroupSettingFragment settingFragment;
+    private RGBGroupSettingFragment settingFragment;
     private TelinkLightApplication mApplication;
 
     private DbGroup group;
@@ -27,7 +27,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
         super.onCreate(savedInstanceState);
 
 //		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_group_setting);
+        setContentView(R.layout.activity_rgb_group_setting);
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         this.group = (DbGroup) this.getIntent().getExtras().get("group");
@@ -46,7 +46,7 @@ public final class GroupSettingActivity extends TelinkBaseActivity {
                 .findViewById(R.id.img_header_menu_left);
         this.backView.setOnClickListener(this.clickListener);
 
-        this.settingFragment = (GroupSettingFragment) this.getSupportFragmentManager()
+        this.settingFragment = (RGBGroupSettingFragment) this.getSupportFragmentManager()
                 .findFragmentById(R.id.group_setting_fragment);
 
         this.settingFragment.setGroup(group);

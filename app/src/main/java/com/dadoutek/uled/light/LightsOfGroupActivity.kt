@@ -93,13 +93,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
         } else if (v.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
-//                //判断是否为rgb灯
-//                if(currentLight.productUUID==?){
-//
-//                }else{
-//
-//                }
-                val intent = Intent(this@LightsOfGroupActivity, ColorDeviceSettingActivity::class.java)
+                //判断是否为rgb灯
+                var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
+                if(currentLight?.productUUID==Constant.RGB_UUID){
+                    intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
+                }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
