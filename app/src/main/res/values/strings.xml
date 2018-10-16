@@ -210,7 +210,7 @@
     <string name="user_login_title">User login</string>
     <string name="logging_tip">logging in</string>
     <string name="login_success">login successful</string>
-    <string name="register_name">registered</string>
+    <string name="user_register">User register</string>
     <string name="login_fail">Login failed</string>
     <string name="name_or_password_error">wrong user name or password!</string>
     <string name="phone_current">Current phone number: %1$s</string>
@@ -288,7 +288,8 @@
     <string name="network_tip_title">Network status prompt</string>
     <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
     <string name="devoloping">In development. . . Stay tuned!</string>
-    <string name="repaet_send">(%1$d s) resend</string>
+    <string name="regetCount">Resend(%1$d) </string>
+    <string name="reget">Resend</string>
     <string name="manager_verification">Administrator authority verification</string>
     <string name="manager_phone_error">Admin mobile phone number is wrong</string>
     <string name="answer_app">Questions and answers</string>
@@ -378,7 +379,7 @@
     <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
     <string name="trigger_mode">Trigger mode</string>
     <string name="rgb">RGB灯</string>
-    <string name="btn_get_verificationCode">获取</string>
+    <string name="btn_get_verificationCode">Get</string>
     <string name="register">注册</string>
     <string name="set_password">设置密码</string>
     <string name="update_permission_tip">请同意相关权限才能升级</string>

@@ -2,7 +2,6 @@ package com.dadoutek.uled.user
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
@@ -26,7 +25,6 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -62,16 +60,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.register_name)
-    }
+        toolbar.title = getString(R.string.user_register)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener { finish() }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onClick(v: View?) {
@@ -127,28 +119,16 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : DisposableObserver<Any>() {
-                    override fun onNext(o: Any) {
-                        val num = 59 - o as Long
-                        if (num == 0L) {
-                            btn_send_verification.setText(resources.getString(R.string.send_verification))
-                            btn_send_verification.setBackgroundColor(resources.getColor(R.color.primary))
-                            btn_send_verification.setClickable(true)
-                        } else {
-                            btn_send_verification.setText(getString(R.string.repaet_send, num))
-                            btn_send_verification.setBackgroundColor(resources.getColor(R.color.gray))
-                            btn_send_verification.setClickable(false)
-                        }
+                .subscribe {
+                    val num = 59 - it as Long
+                    if (num == 0L) {
+                        btn_send_verification.text = resources.getString(R.string.reget)
+                        btn_send_verification.isEnabled = true
+                    } else {
+                        btn_send_verification.text = getString(R.string.regetCount, num)
+                        btn_send_verification.isEnabled = false
                     }
-
-                    override fun onComplete() {
-
-                    }
-
-                    override fun onError(e: Throwable) {
-
-                    }
-                }))
+                })
     }
 
     private fun register() {
@@ -165,10 +145,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
-//                        LogUtils.d("logging: " + "登录成功")
-//                        ToastUtils.showLong(R.string.login_success)
-//                        hideLoadingDialog()
-//                        TransformView()
 
                         LogUtils.d("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
