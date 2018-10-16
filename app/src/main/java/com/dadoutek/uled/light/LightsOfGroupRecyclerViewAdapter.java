@@ -66,8 +66,8 @@ public class LightsOfGroupRecyclerViewAdapter extends
             }
         }
 //        holder.name.setTextColor(light.textColor);
-        holder.tvSetting.setOnClickListener(this);
-        holder.tvSetting.setTag(position);
+        holder.ivSetting.setOnClickListener(this);
+        holder.ivSetting.setTag(position);
         holder.imgLight.setBackgroundResource(light.icon);
         holder.imgLight.setOnClickListener(this);
         holder.imgLight.setTag(position);
@@ -94,7 +94,7 @@ public class LightsOfGroupRecyclerViewAdapter extends
         @BindView(R.id.name)
         TextView name;
         @BindView(R.id.tv_setting)
-        TextView tvSetting;
+        ImageView ivSetting;
 
         ViewHolder(View view) {
             super(view);
