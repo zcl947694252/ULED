@@ -2,11 +2,10 @@ package com.dadoutek.uled.group
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.PopupMenu
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -18,8 +17,8 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
+import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
 import com.dadoutek.uled.light.RGBDeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -56,7 +55,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     private var recyclerView: RecyclerView? = null
     internal var showList: List<DbGroup>? = null
-    private var  updateLightDisposal: Disposable? = null
+    private var updateLightDisposal: Disposable? = null
 
 
 //     var onItemChildClickListener = { adapter, view, position ->
@@ -83,7 +82,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
             R.id.btn_set -> {
                 intent = Intent(mContext, NormalGroupSettingActivity::class.java)
-                if(OtherUtils.isRGBGroup(group)){
+                if (OtherUtils.isRGBGroup(group)) {
                     intent = Intent(mContext, RGBGroupSettingActivity::class.java)
                 }
                 intent.putExtra("group", group)
@@ -145,10 +144,6 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         super.onResume()
         this.initData()
         this.notifyDataSetChanged()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -213,6 +208,16 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
         this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, showList)
+
+        val decoration = DividerItemDecoration(activity!!,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+                .divider)))
+        //添加分割线
+        recyclerView?.addItemDecoration(decoration)
+        recyclerView?.itemAnimator = DefaultItemAnimator()
+
         adapter!!.setOnItemChildClickListener(onItemChildClickListener)
         adapter!!.bindToRecyclerView(recyclerView)
         setMove()
@@ -270,16 +275,16 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.popup_install_light -> {
-                    if(DBUtils.allLight.size<254){
+                    if (DBUtils.allLight.size < 254) {
                         startActivity(Intent(mContext, NormalDeviceScanningNewActivity::class.java))
-                    }else{
+                    } else {
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                 }
                 R.id.popup_install_rgb_light -> {
-                    if(DBUtils.allLight.size<254){
+                    if (DBUtils.allLight.size < 254) {
                         startActivity(Intent(mContext, RGBDeviceScanningNewActivity::class.java))
-                    }else{
+                    } else {
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                 }

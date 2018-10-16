@@ -1,9 +1,12 @@
 package com.dadoutek.uled.scene;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -16,14 +19,14 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.othersview.BaseFragment;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.othersview.BaseFragment;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import java.util.List;
@@ -84,21 +87,32 @@ public class SceneFragment extends BaseFragment implements
         LinearLayoutManager layoutmanager = new LinearLayoutManager(getActivity());
         layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutmanager);
-        adaper = new SceneRecycleListAdapter(R.layout.item_scene,scenesListData,isDelete);
+        //添加分割线
+        DividerItemDecoration decoration = new DividerItemDecoration(getActivity(),
+                DividerItemDecoration
+                .VERTICAL);
+        decoration.setDrawable(new ColorDrawable(ContextCompat.getColor(getActivity(), R.color
+                .divider)));
+        recyclerView.addItemDecoration(decoration);
+        //添加Item变化动画
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        adaper = new SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete);
         adaper.setOnItemClickListener(onItemClickListener);
         adaper.setOnItemChildClickListener(onItemChildClickListener);
         adaper.bindToRecyclerView(recyclerView);
     }
 
-    BaseQuickAdapter.OnItemClickListener onItemClickListener= (adapter, view, position) -> {
+    BaseQuickAdapter.OnItemClickListener onItemClickListener = (adapter, view, position) -> {
         setScene(scenesListData.get(position).getId());
     };
 
-    BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener= (adapter, view, position) -> {
+    BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener = (adapter, view, position) -> {
         if (view.getId() == R.id.scene_delete) {
 //                dataManager.deleteScene(scenesListData.get(position));
             deleteScene(position);
-            refreshData();
+            adapter.notifyItemRemoved(position);
+
+//            refreshData();
         } else if (view.getId() == R.id.scene_edit) {
 //                setScene(scenesListData.get(position).getId());
             DbScene scene = scenesListData.get(position);

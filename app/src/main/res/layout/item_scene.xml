@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="8dp"
-    android:paddingTop="8dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
     android:foreground="?android:attr/selectableItemBackground"
-    >
+    android:paddingStart="16dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:paddingEnd="16dp">
 
     <TextView
         android:id="@+id/scene_delete"
         android:layout_width="38dp"
         android:layout_height="38dp"
         android:background="@drawable/ic_delete_black_24dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="8dp"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/scene_name"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="25sp"
-        android:textColor="?android:attr/textColorPrimary"
         android:layout_centerVertical="true"
-        android:layout_marginStart="10dp"
-        android:layout_toStartOf="@+id/scene_edit"
-        android:layout_toEndOf="@id/scene_delete" />
+        android:text="工作"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scene_edit"
+        app:layout_constraintStart_toEndOf="@+id/scene_delete"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/scene_edit"
@@ -36,17 +37,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
+        android:background="@drawable/btn_rec_blue_bt"
+        android:padding="8dp"
         android:text="@string/scene_edit"
         android:textColor="@color/white"
-        android:textSize="18sp"
-        android:padding="5dp"
-        android:background="@drawable/btn_rec_blue_bt"
-        android:layout_marginEnd="8dp" />
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:layout_below="@id/scene_edit"
-        android:layout_width="match_parent"
-        android:background="@color/primary"
-        android:layout_marginTop="6dp"
-        android:layout_height="0.5dp" />
-</RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
