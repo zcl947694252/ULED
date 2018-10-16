@@ -1,7 +1,11 @@
 package com.dadoutek.uled.group;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -70,6 +74,7 @@ public class RenameActivity extends TelinkBaseActivity {
         group.setName(newName);
         DBUtils.INSTANCE.updateGroup(group);
         finish();
+
     }
 
     private boolean checkName() {
@@ -77,11 +82,35 @@ public class RenameActivity extends TelinkBaseActivity {
             Toast.makeText(RenameActivity.this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show();
             return false;
         }
-
-//        if (dataManager.checkRepeat(groups, this, newName)) {
-//            return false;
-//        }
         return true;
     }
+
+    private void doWhichOperation(int actionId) {
+       switch (actionId) {
+           case EditorInfo.IME_ACTION_DONE:
+                 case EditorInfo.IME_ACTION_GO:
+                 case EditorInfo.IME_ACTION_NEXT:
+                   Log.d("MainActivity", "IME_ACTION_NEXT");
+                   break;
+                 case EditorInfo.IME_ACTION_NONE:
+                   Log.d("MainActivity", "IME_ACTION_NONE");
+                   break;
+                 case EditorInfo.IME_ACTION_PREVIOUS:
+                   Log.d("MainActivity", "IME_ACTION_PREVIOUS");
+                   break;
+                 case EditorInfo.IME_ACTION_SEARCH:
+                   Log.d("MainActivity", "IME_ACTION_SEARCH");
+                   break;
+                 case EditorInfo.IME_ACTION_SEND:
+                   Log.d("MainActivity", "IME_ACTION_SEND");
+                   break;
+                 case EditorInfo.IME_ACTION_UNSPECIFIED:
+                   Log.d("MainActivity", "IME_ACTION_UNSPECIFIED");
+                   break;
+                 default:
+                   break;
+               }
+         }
+
 
 }

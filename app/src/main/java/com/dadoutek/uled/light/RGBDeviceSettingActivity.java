@@ -2,39 +2,27 @@ package com.dadoutek.uled.light;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.OtaPrepareListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.ota.OTAUpdateActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
-import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.OtaPrepareUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.TelinkApplication;
-import com.telink.bluetooth.light.LeScanParameters;
-
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
 
