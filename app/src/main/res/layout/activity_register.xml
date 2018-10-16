@@ -57,14 +57,43 @@
             android:padding="5dp" />
     </android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/edit_verification"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="75dp"
+        android:layout_marginStart="75dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_password"
+        app:layout_constraintVertical_bias="0.3">
+
+        <EditText
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:hint="@string/VerificationCode"
+            android:inputType="phone"
+            android:maxLength="16"
+            android:maxLines="1"
+            android:padding="5dp" />
+
+        <Button
+            android:id="@+id/btn_send_verification"
+            android:text="@string/btn_get_verificationCode"
+            android:layout_gravity="right"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp" />
+    </android.support.design.widget.TextInputLayout>
+
     <Button
         android:id="@+id/register_completed"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="48dp"
         android:background="@drawable/btn_rec_blue_bt"
-        android:text="@string/register_completed"
+        android:text="@string/register"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_password" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_verification" />
 </android.support.constraint.ConstraintLayout>

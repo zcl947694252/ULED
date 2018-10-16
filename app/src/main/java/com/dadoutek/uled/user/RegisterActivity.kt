@@ -79,8 +79,6 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
         setContentView(R.layout.activity_register)
         ButterKnife.bind(this)
         initView()
-
-
     }
 
     private fun initView() {

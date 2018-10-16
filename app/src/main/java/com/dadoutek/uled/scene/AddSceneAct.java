@@ -2,6 +2,7 @@ package com.dadoutek.uled.scene;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
@@ -66,7 +68,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
     private ArrayList<DbGroup> groupArrayList = new ArrayList<>();
-    ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
+    private ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
     private ArrayList<String> groupNameArrayList = new ArrayList<>();
     private List<DbGroup> groups = new ArrayList<>();
     /**
@@ -113,23 +115,35 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         //删除时恢复可添加组标记
         sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            if (groupArrayList.size() != 0) {
-                if (adapter.getItemCount() == 1) {
-                    for (int k = 0; k < groupArrayList.size(); k++) {
+            switch (view.getId()){
+                case R.id.btn_delete:
+                    delete(adapter,position);
+                    break;
+                case R.id.name_rgb:
+//                    Intent intent=new Intent(this,)
+//                    startActivityForResult();
+                    break;
+            }
+        });
+    }
+
+    private void delete(BaseQuickAdapter adapter, int position) {
+        if (groupArrayList.size() != 0) {
+            if (adapter.getItemCount() == 1) {
+                for (int k = 0; k < groupArrayList.size(); k++) {
+                    groupArrayList.get(k).selected = false;
+                }
+                adapter.remove(position);
+            } else {
+                for (int k = 0; k < groupArrayList.size(); k++) {
+                    if (groupArrayList.get(k).getName().equals(itemGroupArrayList.get(position).gpName)) {
                         groupArrayList.get(k).selected = false;
-                    }
-                    adapter.remove(position);
-                } else {
-                    for (int k = 0; k < groupArrayList.size(); k++) {
-                        if (groupArrayList.get(k).getName().equals(itemGroupArrayList.get(position).gpName)) {
-                            groupArrayList.get(k).selected = false;
-                            adapter.remove(position);
-                            break;
-                        }
+                        adapter.remove(position);
+                        break;
                     }
                 }
             }
-        });
+        }
     }
 
     private void addNewItem() {

@@ -378,5 +378,7 @@
     <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
     <string name="trigger_mode">Trigger mode</string>
     <string name="rgb">RGB灯</string>
+    <string name="btn_get_verificationCode">获取</string>
+    <string name="register">注册</string>
 
 </resources>

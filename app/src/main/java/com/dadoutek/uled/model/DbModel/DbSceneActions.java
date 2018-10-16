@@ -4,6 +4,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 /**
  * Created by hejiajun on 2018/5/7.
@@ -21,6 +22,8 @@ public class DbSceneActions {
     private int colorTemperature;
     @NotNull
     private int brightness;
+    @Transient
+    public int color;
     @Generated(hash = 822030848)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
             int colorTemperature, int brightness) {

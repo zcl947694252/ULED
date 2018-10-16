@@ -144,7 +144,7 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.setContentView(R.layout.activity_device_setting);
+        this.setContentView(R.layout.activity_rgb_device_setting);
         initView();
         getVersion();
     }
@@ -168,7 +168,7 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
 
         this.settingFragment = (RGBDeviceSettingFragment) this
                 .getSupportFragmentManager().findFragmentById(
-                        R.id.device_setting_fragment);
+                        R.id.device_setting_rgb_fragment);
 
         if (fromWhere != null && !fromWhere.isEmpty()) {
             this.settingFragment.fromWhere = fromWhere;

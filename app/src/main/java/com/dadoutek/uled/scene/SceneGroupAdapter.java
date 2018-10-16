@@ -6,9 +6,11 @@ import android.widget.TextView;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.ItemGroup;
+import com.dadoutek.uled.util.OtherUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,12 +37,16 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
         helper.setProgress(R.id.sb_temperature, item.temperature);
         helper.setText(R.id.tv_brightness, sbBrightness.getProgress() + "%");
         helper.setText(R.id.tv_temperature, sBtemperature.getProgress() + "%");
+        if(OtherUtils.isRGBGroup(DBUtils.INSTANCE.getGroupByMesh(item.groupAress))){
+            helper.setVisible(R.id.name_rgb, true);
+        }
 
         sbBrightness.setTag(position);
         sBtemperature.setTag(position);
         sbBrightness.setOnSeekBarChangeListener(this);
         sBtemperature.setOnSeekBarChangeListener(this);
         helper.addOnClickListener(R.id.btn_delete);
+        helper.addOnClickListener(R.id.name_rgb);
     }
 
 

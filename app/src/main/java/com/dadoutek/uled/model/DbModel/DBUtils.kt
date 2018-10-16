@@ -222,6 +222,12 @@ object DBUtils {
         return dbGroup
     }
 
+    fun getGroupByMesh(mesh: Int): DbGroup {
+        val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
+        Log.d("datasave", "getGroupByMesh: $mesh")
+        return dbGroup
+    }
+
     
     fun getLightByGroupID(id: Long): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(id)).build()

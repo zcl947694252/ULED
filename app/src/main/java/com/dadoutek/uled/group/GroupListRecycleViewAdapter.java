@@ -7,6 +7,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.util.OtherUtils;
 
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class GroupListRecycleViewAdapter extends BaseItemDraggableAdapter<DbGrou
                 helper.setText(R.id.txt_name, TelinkLightApplication.getInstance().getString(R.string.allLight));
             }else{
                 helper.setText(R.id.txt_name, group.getName());
+                if(OtherUtils.isRGBGroup(group)){
+                    helper.setVisible(R.id.left_view,true);
+                }
             }
             helper.setTextColor(R.id.txt_name, group.textColor)
                     .addOnClickListener(R.id.txt_name).

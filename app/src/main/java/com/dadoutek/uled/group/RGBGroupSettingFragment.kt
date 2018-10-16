@@ -258,7 +258,7 @@ class RGBGroupSettingFragment : BaseFragment(), View.OnClickListener {
         btn_remove_group?.setOnClickListener(this)
         btn_rename?.setOnClickListener(this)
 
-        presetColors = SharedPreferencesHelper.getObject(activity, Constant.GROUP_PRESET_COLOR) as MutableList<ItemColorPreset>
+        presetColors = SharedPreferencesHelper.getObject(activity, Constant.GROUP_PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = java.util.ArrayList<ItemColorPreset>()
             for (i in 0..4) {
