@@ -105,7 +105,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.btn_login -> login()
             R.id.btn_register -> {
-                val intent = Intent(this@LoginActivity, PhoneVerificationActivity::class.java)
+                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")
                 startActivity(intent)
             }

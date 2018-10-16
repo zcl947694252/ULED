@@ -380,5 +380,7 @@
     <string name="rgb">RGB灯</string>
     <string name="btn_get_verificationCode">获取</string>
     <string name="register">注册</string>
+    <string name="set_password">设置密码</string>
+    <string name="update_permission_tip">请同意相关权限才能升级</string>
 
 </resources>

@@ -11,18 +11,30 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.OtaPrepareListner;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.ota.OTAUpdateActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.OtaPrepareUtils;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.TelinkApplication;
+import com.telink.bluetooth.light.LeScanParameters;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
 
@@ -37,6 +49,8 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
     private String fromWhere;
     private TelinkLightApplication mApplication;
     private DataManager dataManager;
+    private CompositeDisposable mDisposable = new CompositeDisposable();
+    private RxPermissions mRxPermission;
     private OnClickListener clickListener = new OnClickListener() {
 
         @Override
@@ -44,33 +58,21 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
             if (v == backView) {
                 finish();
             } else if (v == tvOta) {
-                if(checkPermission()){
-                    OtaPrepareUtils.instance().gotoUpdateView(RGBDeviceSettingActivity.this,localVersion,otaPrepareListner);
-                }
+                checkPermission();
             }
         }
     };
 
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-    private Boolean checkPermission() {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    this,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-            return false;
-        } else {
-            return true;
-        }
+    private void checkPermission(){
+        mDisposable.add(
+                mRxPermission.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe(granted -> {
+                    if (granted) {
+                        OtaPrepareUtils.instance().gotoUpdateView(RGBDeviceSettingActivity.this,localVersion,otaPrepareListner);
+                    } else {
+                        ToastUtils.showLong(R.string.update_permission_tip);
+                    }
+                }));
     }
 
     OtaPrepareListner otaPrepareListner=new OtaPrepareListner() {
@@ -149,6 +151,12 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
         getVersion();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDisposable.dispose();
+    }
+
     private void initView() {
         this.light = (DbLight) this.getIntent().getExtras().get(Constant.LIGHT_ARESS_KEY);
         this.fromWhere = this.getIntent().getStringExtra(Constant.LIGHT_REFRESH_KEY);
@@ -175,5 +183,6 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
             this.settingFragment.gpAddress = gpAddress;
         }
         this.settingFragment.light = light;
+        mRxPermission = new RxPermissions(this);
     }
 }
