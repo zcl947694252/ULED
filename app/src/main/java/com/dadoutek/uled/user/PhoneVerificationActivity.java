@@ -174,7 +174,7 @@ public class PhoneVerificationActivity extends TelinkBaseActivity {
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.primary));
                             btnSendVerification.setClickable(true);
                         } else {
-                            btnSendVerification.setText(getString(R.string.repaet_send, num));
+                            btnSendVerification.setText(getString(R.string.regetCount, num));
                             btnSendVerification.setBackgroundColor(getResources().getColor(R.color.gray));
                             btnSendVerification.setClickable(false);
                         }

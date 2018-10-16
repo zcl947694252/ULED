@@ -136,10 +136,11 @@
         <activity
             android:name=".user.LoginActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
             android:name=".user.RegisterActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
             android:name=".user.PhoneVerificationActivity"
             android:screenOrientation="portrait" />
@@ -164,7 +165,7 @@
         <activity
             android:name=".othersview.AboutSomeQuestionsActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".pir.ScanningSensorActivity"></activity>
+        <activity android:name=".pir.ScanningSensorActivity" />
         <activity
             android:name=".light.RGBDeviceSettingActivity"
             android:screenOrientation="portrait" />
