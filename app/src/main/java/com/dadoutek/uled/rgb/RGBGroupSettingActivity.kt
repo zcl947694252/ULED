@@ -1,8 +1,7 @@
-package com.dadoutek.uled.group
+package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
@@ -22,6 +21,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.NormalGroupSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -313,7 +313,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         if (fromUser) {
             scrollView?.setBackgroundColor(color)
             group?.setColor(color)
-            changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
+            if(argb[1]==0 && argb[2]==0 && argb[3]==0){
+            }else{
+                changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
+            }
         }
     }
 
@@ -339,7 +342,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         val params = byteArrayOf(0x04, red, green, blue)
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-        Log.d("Saw", logStr)
+        Log.d("RGBCOLOR", logStr)
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
     }

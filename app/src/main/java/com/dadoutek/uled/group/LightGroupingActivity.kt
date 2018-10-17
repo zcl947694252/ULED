@@ -167,17 +167,16 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initData() {
         this.light = this.intent.extras!!.get("light") as DbLight
         this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
+        groupsInit= ArrayList()
 
         val list = DBUtils.groupList
         for(i in list.indices){
             if(light?.productUUID==Constant.NORMAL_UUID){
-                if(OtherUtils.groupIsEmpty(list[i])||OtherUtils.isNormalGroup(list[i])){
                     groupsInit?.add(list[i])
-                }
             }else if(light?.productUUID==Constant.RGB_UUID){
-                if(OtherUtils.groupIsEmpty(list[i])||OtherUtils.isRGBGroup(list[i])){
                     groupsInit?.add(list[i])
-                }
+            }else if(OtherUtils.groupIsEmpty(list[i])){
+                groupsInit?.add(list[i])
             }
 //            groupsInit
         }

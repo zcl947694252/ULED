@@ -19,7 +19,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
-import com.dadoutek.uled.light.RGBDeviceScanningNewActivity
+import com.dadoutek.uled.rgb.RGBDeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -29,6 +29,7 @@ import com.dadoutek.uled.othersview.AddMeshActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager

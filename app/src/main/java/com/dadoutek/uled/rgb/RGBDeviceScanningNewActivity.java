@@ -1,4 +1,4 @@
-package com.dadoutek.uled.light;
+package com.dadoutek.uled.rgb;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -856,7 +856,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             groups = new ArrayList<>();
             List<DbGroup> list=DBUtils.INSTANCE.getGroupList();
            for(int i=0;i<list.size();i++){
-               if(OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff){
+               if(OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff ||OtherUtils.groupIsEmpty(list.get(i))){
                    groups.add(list.get(i));
                }
            }

@@ -110,13 +110,13 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
             Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
                 localVersion = s;
                 if (txtTitle != null) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)) {
-                        txtTitle.setVisibility(View.VISIBLE);
-                        txtTitle.setText(localVersion);
-                        light.version = localVersion;
+                    txtTitle.setVisibility(View.VISIBLE);
+                    txtTitle.setText(localVersion);
+                    if(OtaPrepareUtils.instance().checkSupportOta(localVersion)){
+                        light.version=localVersion;
                         tvOta.setVisibility(View.VISIBLE);
-                    } else {
-                        txtTitle.setVisibility(View.GONE);
+                    }else{
+//                        txtTitle.setVisibility(View.GONE);
                         tvOta.setVisibility(View.GONE);
                     }
                 }

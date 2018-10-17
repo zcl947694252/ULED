@@ -167,13 +167,16 @@
             android:screenOrientation="portrait" />
         <activity android:name=".pir.ScanningSensorActivity" />
         <activity
-            android:name=".light.RGBDeviceSettingActivity"
+            android:name=".rgb.RGBDeviceSettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".group.RGBGroupSettingActivity"
+            android:name=".rgb.RGBGroupSettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.RGBDeviceScanningNewActivity"
+            android:name=".rgb.RGBDeviceScanningNewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".rgb.SelectColorActivity"
             android:screenOrientation="portrait" />
     </application>
 

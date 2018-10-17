@@ -39,7 +39,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     private var mApplication: TelinkLightApplication? = null
     private var btn_remove_group: Button? = null
     private var btn_rename: Button? = null
-    var group: DbGroup? = null
+    private var group: DbGroup? = null
     private var stopTracking = false
     private var editTitle: EditText? =null
 

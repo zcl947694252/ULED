@@ -1,4 +1,4 @@
-package com.dadoutek.uled.light;
+package com.dadoutek.uled.rgb;
 
 import android.Manifest;
 import android.content.Intent;
@@ -107,13 +107,13 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
             Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
                 localVersion = s;
                 if (txtTitle != null) {
+                    txtTitle.setVisibility(View.VISIBLE);
+                    txtTitle.setText(localVersion);
                     if(OtaPrepareUtils.instance().checkSupportOta(localVersion)){
-                        txtTitle.setVisibility(View.VISIBLE);
-                        txtTitle.setText(localVersion);
                         light.version=localVersion;
                         tvOta.setVisibility(View.VISIBLE);
                     }else{
-                        txtTitle.setVisibility(View.GONE);
+//                        txtTitle.setVisibility(View.GONE);
                         tvOta.setVisibility(View.GONE);
                     }
                 }

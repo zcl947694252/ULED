@@ -1,4 +1,4 @@
-package com.dadoutek.uled.group
+package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -22,6 +22,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.NormalGroupSettingActivity
+import com.dadoutek.uled.group.RenameActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -32,10 +34,8 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.skydoves.colorpickerview.ColorEnvelope
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
-import kotlinx.android.synthetic.main.fragment_group_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import java.util.*
 import kotlin.collections.ArrayList

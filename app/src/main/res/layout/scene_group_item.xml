@@ -29,7 +29,7 @@
                 android:layout_marginTop="8dp" />
 
             <TextView
-                android:id="@+id/name_rgb"
+                android:id="@+id/btn_rgb"
                 android:text="RGB"
                 android:padding="5dp"
                 android:visibility="gone"

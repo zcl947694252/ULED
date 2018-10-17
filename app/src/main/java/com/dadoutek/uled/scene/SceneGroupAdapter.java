@@ -38,7 +38,7 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
         helper.setText(R.id.tv_brightness, sbBrightness.getProgress() + "%");
         helper.setText(R.id.tv_temperature, sBtemperature.getProgress() + "%");
         if(OtherUtils.isRGBGroup(DBUtils.INSTANCE.getGroupByMesh(item.groupAress))){
-            helper.setVisible(R.id.name_rgb, true);
+            helper.setVisible(R.id.btn_rgb, true);
         }
 
         sbBrightness.setTag(position);
@@ -46,7 +46,7 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
         sbBrightness.setOnSeekBarChangeListener(this);
         sBtemperature.setOnSeekBarChangeListener(this);
         helper.addOnClickListener(R.id.btn_delete);
-        helper.addOnClickListener(R.id.name_rgb);
+        helper.addOnClickListener(R.id.btn_rgb);
     }
 
 

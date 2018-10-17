@@ -38,6 +38,7 @@ import com.dadoutek.uled.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -119,12 +120,20 @@ public class AddSceneAct extends TelinkBaseActivity {
                 case R.id.btn_delete:
                     delete(adapter,position);
                     break;
-                case R.id.name_rgb:
+                case R.id.btn_rgb:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
+                    showPickColorDialog();
                     break;
             }
         });
+    }
+
+    private void showPickColorDialog() {
+//        View view= LayoutInflater.from(this).inflate()
+//        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+//        builder.setTitle(R.string.select_color_title);
+//        builder.setView()
     }
 
     private void delete(BaseQuickAdapter adapter, int position) {

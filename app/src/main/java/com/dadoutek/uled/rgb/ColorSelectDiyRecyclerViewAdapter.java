@@ -1,4 +1,4 @@
-package com.dadoutek.uled.group;
+package com.dadoutek.uled.rgb;
 
 import android.support.annotation.Nullable;
 import android.widget.TextView;

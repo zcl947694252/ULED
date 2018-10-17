@@ -856,7 +856,7 @@ public class NormalDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             groups = new ArrayList<>();
             List<DbGroup> list=DBUtils.INSTANCE.getGroupList();
             for(int i=0;i<list.size();i++){
-                if(OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff){
+                if(OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff || OtherUtils.groupIsEmpty(list.get(i))){
                     groups.add(list.get(i));
                 }
             }

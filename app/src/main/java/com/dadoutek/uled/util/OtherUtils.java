@@ -30,7 +30,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==Constant.RGB_UUID||getFirstLightOfGroupUUID(dbGroup)==-1){
+        if(getFirstLightOfGroupUUID(dbGroup)==Constant.RGB_UUID){
             return true;
         }else{
             return false;
@@ -38,7 +38,7 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==Constant.NORMAL_UUID||getFirstLightOfGroupUUID(dbGroup)==-1){
+        if(getFirstLightOfGroupUUID(dbGroup)==Constant.NORMAL_UUID){
             return true;
         }else{
             return false;
@@ -48,7 +48,7 @@ public class OtherUtils {
     private static int getFirstLightOfGroupUUID(DbGroup dbGroup) {
         List<DbLight> lights = DBUtils.INSTANCE.getLightByGroupID(dbGroup.getId());
         if (lights.size() > 0) {
-            return lights.get(0).getMeshUUID();
+            return lights.get(0).getProductUUID();
         } else {
             return -1;
         }

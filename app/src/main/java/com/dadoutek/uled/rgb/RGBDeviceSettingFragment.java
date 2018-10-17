@@ -1,4 +1,4 @@
-package com.dadoutek.uled.light;
+package com.dadoutek.uled.rgb;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,7 +22,7 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.group.ColorSelectDiyRecyclerViewAdapter;
+import com.dadoutek.uled.light.RenameLightActivity;
 import com.dadoutek.uled.group.LightGroupingActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -276,7 +276,10 @@ public final class RGBDeviceSettingFragment extends Fragment {
             if(fromUser){
                 scrollView.setBackgroundColor(color);
                 light.setColor(color);
-                changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+                if(argb[1]==0 && argb[2]==0 && argb[3]==0){
+                }else{
+                    changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+                }
             }
         }
     };
@@ -303,9 +306,14 @@ public final class RGBDeviceSettingFragment extends Fragment {
         byte[] params = new byte[]{0x04, red, green, blue};
 
         String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
-        Log.d("Saw", logStr);
+        Log.d("RGBCOLOR", logStr);
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+            }
+        }).start();
     }
 
     @Override
