@@ -262,6 +262,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
         }
     };
 
+    int count =0;
     private ColorEnvelopeListener colorEnvelopeListener = new ColorEnvelopeListener() {
 
         @Override
@@ -308,12 +309,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
         String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
         Log.d("RGBCOLOR", logStr);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-            }
-        }).start();
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
     }
 
     @Override

@@ -76,7 +76,7 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
 
         }
 
-        if (position == 0) {
+        if (position == 0 && groupsInit[position].meshAddr==0xffff) {
             val layoutParams = AbsListView.LayoutParams(1, 1)
             convertView.layoutParams = layoutParams
         }

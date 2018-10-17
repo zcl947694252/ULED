@@ -491,7 +491,7 @@ public class Peripheral extends BluetoothGattCallback {
         boolean success = true;
         String errorMsg = "";
 
-//        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
+        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
 
         BluetoothGattService service = this.gatt.getService(serviceUUID);
 

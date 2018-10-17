@@ -170,17 +170,27 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         groupsInit= ArrayList()
 
         val list = DBUtils.groupList
+        filter(list)
+//        groupsInit = DBUtils.groupList
+    }
+
+    private fun filter(list: MutableList<DbGroup>) {
+        groupsInit?.clear()
         for(i in list.indices){
             if(light?.productUUID==Constant.NORMAL_UUID){
+                if(OtherUtils.isNormalGroup(list[i])){
                     groupsInit?.add(list[i])
+                }
             }else if(light?.productUUID==Constant.RGB_UUID){
+                if(OtherUtils.isRGBGroup(list[i])){
                     groupsInit?.add(list[i])
-            }else if(OtherUtils.groupIsEmpty(list[i])){
+                }
+            }
+
+            if(OtherUtils.groupIsEmpty(list[i])){
                 groupsInit?.add(list[i])
             }
-//            groupsInit
         }
-//        groupsInit = DBUtils.groupList
     }
 
     private fun getScene() {
@@ -276,7 +286,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, groupsInit!!, this)
+                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, this)
                         refreshView()
                         dialog.dismiss()
                     }
@@ -285,7 +295,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun refreshView() {
-        groupsInit = DBUtils.groupList
+        val list = DBUtils.groupList
+        filter(list)
 
         adapter = DeviceGroupingAdapter(groupsInit!!, this)
         listView!!.adapter = this.adapter

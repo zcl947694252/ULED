@@ -58,7 +58,7 @@ public class OtherUtils {
     public static boolean groupIsEmpty(DbGroup dbGroup) {
         List<DbLight> dbLights = DBUtils.INSTANCE.getAllLight();
         for (int i = 0; i < dbLights.size(); i++) {
-            if (dbLights.get(i).getBelongGroupId() == dbGroup.getId()) {
+            if (dbLights.get(i).getBelongGroupId().longValue() == dbGroup.getId().longValue()) {
                 return false;
             }
         }

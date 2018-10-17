@@ -83,7 +83,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
             R.id.btn_set -> {
                 intent = Intent(mContext, NormalGroupSettingActivity::class.java)
-                if (OtherUtils.isRGBGroup(group)) {
+                if (OtherUtils.isRGBGroup(group) && group.meshAddr!=0xffff) {
                     intent = Intent(mContext, RGBGroupSettingActivity::class.java)
                 }
                 intent.putExtra("group", group)

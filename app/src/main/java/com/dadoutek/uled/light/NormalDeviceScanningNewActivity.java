@@ -1234,7 +1234,7 @@ public class NormalDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        if (checkIsLight(deviceInfo.productUUID)) {
+        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==Constant.NORMAL_UUID) {
             mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(aLong -> {
                         //更新参数
