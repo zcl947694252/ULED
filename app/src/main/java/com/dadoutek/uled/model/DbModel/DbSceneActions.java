@@ -23,18 +23,20 @@ public class DbSceneActions {
     @NotNull
     private int brightness;
     @Transient
-    public int color;
-    @Generated(hash = 822030848)
+    public String color;
+    
+    @Generated(hash = 885919265)
+    public DbSceneActions() {
+    }
+    @Generated(hash = 511749042)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
-            int colorTemperature, int brightness) {
+            int colorTemperature, int brightness, String color) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
-    }
-    @Generated(hash = 885919265)
-    public DbSceneActions() {
+        this.color = color;
     }
     public Long getId() {
         return this.id;
@@ -65,6 +67,12 @@ public class DbSceneActions {
     }
     public void setBrightness(int brightness) {
         this.brightness = brightness;
+    }
+    public String getColor() {
+        return this.color;
+    }
+    public void setColor(String color) {
+        this.color = color;
     }
 
 }

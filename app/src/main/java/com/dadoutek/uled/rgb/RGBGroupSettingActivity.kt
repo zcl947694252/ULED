@@ -167,11 +167,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
     @SuppressLint("SetTextI18n")
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
-        presetColors?.get(position)!!.color = group!!.getColor()
+        presetColors?.get(position)!!.color = group!!.getColor().toInt()
         presetColors?.get(position)!!.brightness = group!!.brightness
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as TextView?
         textView!!.text = group!!.brightness.toString() + "%"
-        textView.setBackgroundColor(group!!.getColor())
+        textView.setBackgroundColor(group!!.getColor().toInt())
         SharedPreferencesHelper.putObject(this, Constant.GROUP_PRESET_COLOR, presetColors)
         false
     }
@@ -312,7 +312,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         val color = Color.argb(255, argb[1], argb[2], argb[3])
         if (fromUser) {
             scrollView?.setBackgroundColor(color)
-            group?.setColor(color)
+            group?.setColor(color.toString())
             if(argb[1]==0 && argb[2]==0 && argb[3]==0){
             }else{
                 changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())

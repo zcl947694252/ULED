@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.light.EmptyAddActivity;
@@ -56,6 +57,7 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 //            //把是否是第一次进入设为false
 ////            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
 //        } else {
+
         if (mIsLogging) {
             if(DBUtils.INSTANCE.getAllLight()!=null&& DBUtils.INSTANCE.getAllLight().size()==0){
                 startActivity(new Intent(this,EmptyAddActivity.class));

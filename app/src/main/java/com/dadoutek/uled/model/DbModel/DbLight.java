@@ -28,6 +28,8 @@ public class DbLight implements Serializable {
     private int meshUUID;
     private int productUUID;
     private Long belongGroupId;
+    @Transient
+    public String color;//颜色
 
     @Transient
     public boolean selected;//选择状态
@@ -37,28 +39,11 @@ public class DbLight implements Serializable {
     public boolean hasGroup = false;//当前灯是否有被分组
     @Transient
     public int textColor;//文字颜色
-    @Transient
-    public int color;//颜色
 
     public int connectionStatus = 1;//链接状态
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
 
-    @Generated(hash = 225780319)
-    public DbLight(Long id, int meshAddr, String name, int brightness, int colorTemperature,
-            String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int connectionStatus) {
-        this.id = id;
-        this.meshAddr = meshAddr;
-        this.name = name;
-        this.brightness = brightness;
-        this.colorTemperature = colorTemperature;
-        this.macAddr = macAddr;
-        this.meshUUID = meshUUID;
-        this.productUUID = productUUID;
-        this.belongGroupId = belongGroupId;
-        this.connectionStatus = connectionStatus;
-    }
 
     @Generated(hash = 2075223479)
     public DbLight() {
@@ -116,11 +101,11 @@ public class DbLight implements Serializable {
         return this.meshUUID;
     }
 
-    public int getColor() {
+    public String getColor() {
         return color;
     }
 
-    public void setColor(int color) {
+    public void setColor(String color) {
         this.color = color;
     }
 
@@ -174,4 +159,5 @@ public class DbLight implements Serializable {
     public void setConnectionStatus(int connectionStatus) {
         this.connectionStatus = connectionStatus;
     }
+
 }

@@ -2,7 +2,7 @@ package com.dadoutek.uled.scene;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,29 +16,35 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.group.GroupListAdapter;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
+import com.dadoutek.uled.model.ItemColorPreset;
 import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter;
+import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.StringUtils;
+import com.skydoves.colorpickerview.ColorEnvelope;
+import com.skydoves.colorpickerview.ColorPickerView;
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,6 +69,9 @@ public class AddSceneAct extends TelinkBaseActivity {
     Toolbar toolbar;
 
     private Scenes scenes;
+    private int currentColor;
+    private List<ItemColorPreset> presetColors;
+    private int currentPosition;
     private LayoutInflater inflater;
     private SceneGroupAdapter sceneGroupAdapter;
 
@@ -116,13 +125,14 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         //删除时恢复可添加组标记
         sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            switch (view.getId()){
+            switch (view.getId()) {
                 case R.id.btn_delete:
-                    delete(adapter,position);
+                    delete(adapter, position);
                     break;
                 case R.id.btn_rgb:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
+                    currentPosition= position;
                     showPickColorDialog();
                     break;
             }
@@ -130,10 +140,125 @@ public class AddSceneAct extends TelinkBaseActivity {
     }
 
     private void showPickColorDialog() {
-//        View view= LayoutInflater.from(this).inflate()
-//        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.select_color_title);
-//        builder.setView()
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_pick_color, null);
+        ColorPickerView colorPickerView = view.findViewById(R.id.color_picker);
+        colorPickerView.setColorListener(colorEnvelopeListener);
+        RecyclerView diyColorRecyclerListView=view.findViewById(R.id.diy_color_recycler_list_view);
+        ColorSelectDiyRecyclerViewAdapter colorSelectDiyRecyclerViewAdapter;
+
+        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(this, Constant.LIGHT_PRESET_COLOR);
+        if (presetColors == null) {
+            presetColors = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                ItemColorPreset itemColorPreset = new ItemColorPreset();
+                presetColors.add(itemColorPreset);
+            }
+        }
+
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        diyColorRecyclerListView.setLayoutManager(layoutmanager);
+        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
+        colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
+        colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
+        colorSelectDiyRecyclerViewAdapter.bindToRecyclerView(diyColorRecyclerListView);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.select_color_title);
+        builder.setView(view);
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+
+        });
+        builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+            sceneGroupAdapter.getViewByPosition(currentPosition,R.id.btn_rgb).setBackgroundColor(currentColor);
+            sceneGroupAdapter.notifyItemChanged(currentPosition);
+        });
+
+        AlertDialog dialog=builder.create();
+        dialog.show();
+    }
+
+    BaseQuickAdapter.OnItemChildClickListener diyOnItemChildClickListener = new BaseQuickAdapter.OnItemChildClickListener() {
+        @Override
+        public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            int color = presetColors.get(position).getColor();
+            int brightness = presetColors.get(position).getBrightness();
+            int red = (color & 0xff0000) >> 16;
+            int green = (color & 0x00ff00) >> 8;
+            int blue = (color & 0x0000ff);
+            new Thread(() -> {
+                changeColor((byte) red, (byte) green, (byte) blue);
+
+                try {
+                    Thread.sleep(200);
+                    int addr = itemGroupArrayList.get(currentPosition).groupAress;
+                    byte opcode;
+                    byte[] params;
+                    opcode = (byte) Opcode.SET_LUM;
+                    params = new byte[]{(byte) brightness};
+                    itemGroupArrayList.get(currentPosition).brightness=brightness;
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    };
+
+    BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener = new BaseQuickAdapter.OnItemChildLongClickListener() {
+        @Override
+        public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
+            presetColors.get(position).setColor(currentColor);
+//            presetColors.get(position).setBrightness(currentItemGroup.brightness);
+            TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
+            textView.setText("");
+            textView.setBackgroundColor(currentColor);
+            SharedPreferencesHelper.putObject(AddSceneAct.this, Constant.LIGHT_PRESET_COLOR, presetColors);
+            return false;
+        }
+    };
+
+    private ColorEnvelopeListener colorEnvelopeListener = new ColorEnvelopeListener() {
+
+        @Override
+        public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
+            int[] argb = envelope.getArgb();
+
+            currentColor = Color.argb(255, argb[1], argb[2], argb[3]);
+            if (fromUser) {
+                if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+                } else {
+                    changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+                }
+            }
+        }
+    };
+
+    private void changeColor(byte R, byte G, byte B) {
+
+        byte red = R;
+        byte green = G;
+        byte blue = B;
+
+        int addr = itemGroupArrayList.get(currentPosition).groupAress;
+        byte opcode = (byte) 0xE2;
+
+        byte minVal = (byte) 0x50;
+
+        if ((green & 0xff) <= minVal)
+            green = 0;
+        if ((red & 0xff) <= minVal)
+            red = 0;
+        if ((blue & 0xff) <= minVal)
+            blue = 0;
+
+
+        byte[] params = new byte[]{0x04, red, green, blue};
+
+        String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
+        Log.d("RGBCOLOR", logStr);
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
     }
 
     private void delete(BaseQuickAdapter adapter, int position) {
@@ -284,8 +409,8 @@ public class AddSceneAct extends TelinkBaseActivity {
             if (!groupArrayList.get(k).selected) {
                 groupArrayList.get(k).checked = false;
                 showList.add(groupArrayList.get(k));
-            }else{
-                groupArrayList.get(k).checked=false;
+            } else {
+                groupArrayList.get(k).checked = false;
             }
         }
         return showList;

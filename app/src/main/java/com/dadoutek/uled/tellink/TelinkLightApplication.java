@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
@@ -49,6 +50,8 @@ public final class TelinkLightApplication extends TelinkApplication {
 //            LogUtils.getConfig().setLogSwitch(false);
 //        }
 
+//        DaoSessionInstance.destroySession();
+//        DaoSessionInstance.getInstance();
 
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
