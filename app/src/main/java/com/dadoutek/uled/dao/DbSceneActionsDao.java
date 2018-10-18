@@ -32,7 +32,6 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         public final static Property GroupAddr = new Property(2, int.class, "groupAddr", false, "GROUP_ADDR");
         public final static Property ColorTemperature = new Property(3, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property Brightness = new Property(4, int.class, "brightness", false, "BRIGHTNESS");
-        public final static Property Color = new Property(5, String.class, "color", false, "COLOR");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -53,8 +52,7 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
                 "\"BELONG_SCENE_ID\" INTEGER NOT NULL ," + // 1: belongSceneId
                 "\"GROUP_ADDR\" INTEGER NOT NULL ," + // 2: groupAddr
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 3: colorTemperature
-                "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
-                "\"COLOR\" TEXT);"); // 5: color
+                "\"BRIGHTNESS\" INTEGER NOT NULL );"); // 4: brightness
     }
 
     /** Drops the underlying database table. */
@@ -75,11 +73,6 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(3, entity.getGroupAddr());
         stmt.bindLong(4, entity.getColorTemperature());
         stmt.bindLong(5, entity.getBrightness());
- 
-        String color = entity.getColor();
-        if (color != null) {
-            stmt.bindString(6, color);
-        }
     }
 
     @Override
@@ -94,11 +87,6 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(3, entity.getGroupAddr());
         stmt.bindLong(4, entity.getColorTemperature());
         stmt.bindLong(5, entity.getBrightness());
- 
-        String color = entity.getColor();
-        if (color != null) {
-            stmt.bindString(6, color);
-        }
     }
 
     @Override
@@ -113,8 +101,7 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
             cursor.getLong(offset + 1), // belongSceneId
             cursor.getInt(offset + 2), // groupAddr
             cursor.getInt(offset + 3), // colorTemperature
-            cursor.getInt(offset + 4), // brightness
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // color
+            cursor.getInt(offset + 4) // brightness
         );
         return entity;
     }
@@ -126,7 +113,6 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         entity.setGroupAddr(cursor.getInt(offset + 2));
         entity.setColorTemperature(cursor.getInt(offset + 3));
         entity.setBrightness(cursor.getInt(offset + 4));
-        entity.setColor(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
      }
     
     @Override

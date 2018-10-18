@@ -28,15 +28,14 @@ public class DbSceneActions {
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
-    @Generated(hash = 511749042)
+    @Generated(hash = 822030848)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
-            int colorTemperature, int brightness, String color) {
+            int colorTemperature, int brightness) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
-        this.color = color;
     }
     public Long getId() {
         return this.id;

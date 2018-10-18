@@ -49,6 +49,22 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
+    @Generated(hash = 225780319)
+    public DbLight(Long id, int meshAddr, String name, int brightness,
+            int colorTemperature, String macAddr, int meshUUID, int productUUID,
+            Long belongGroupId, int connectionStatus) {
+        this.id = id;
+        this.meshAddr = meshAddr;
+        this.name = name;
+        this.brightness = brightness;
+        this.colorTemperature = colorTemperature;
+        this.macAddr = macAddr;
+        this.meshUUID = meshUUID;
+        this.productUUID = productUUID;
+        this.belongGroupId = belongGroupId;
+        this.connectionStatus = connectionStatus;
+    }
+
     public Long getId() {
         return this.id;
     }

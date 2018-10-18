@@ -39,16 +39,15 @@ public class DbGroup implements Serializable{
     public DbGroup() {
     }
 
-    @Generated(hash = 1627270948)
+    @Generated(hash = 55678821)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
-            int colorTemperature, int belongRegionId, String color) {
+            int colorTemperature, int belongRegionId) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.belongRegionId = belongRegionId;
-        this.color = color;
     }
 
     public Long getId() {

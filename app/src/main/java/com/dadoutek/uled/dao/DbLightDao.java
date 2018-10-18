@@ -33,10 +33,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property MeshUUID = new Property(6, int.class, "meshUUID", false, "MESH_UUID");
         public final static Property ProductUUID = new Property(7, int.class, "productUUID", false, "PRODUCT_UUID");
         public final static Property BelongGroupId = new Property(8, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
-        public final static Property Color = new Property(9, String.class, "color", false, "COLOR");
-        public final static Property Color2 = new Property(10, String.class, "color2", false, "COLOR2");
-        public final static Property Color3 = new Property(11, String.class, "color3", false, "COLOR3");
-        public final static Property ConnectionStatus = new Property(12, int.class, "connectionStatus", false, "CONNECTION_STATUS");
+        public final static Property ConnectionStatus = new Property(9, int.class, "connectionStatus", false, "CONNECTION_STATUS");
     }
 
 
@@ -61,10 +58,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"MESH_UUID\" INTEGER NOT NULL ," + // 6: meshUUID
                 "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 7: productUUID
                 "\"BELONG_GROUP_ID\" INTEGER," + // 8: belongGroupId
-                "\"COLOR\" TEXT," + // 9: color
-                "\"COLOR2\" TEXT," + // 10: color2
-                "\"COLOR3\" TEXT," + // 11: color3
-                "\"CONNECTION_STATUS\" INTEGER NOT NULL );"); // 12: connectionStatus
+                "\"CONNECTION_STATUS\" INTEGER NOT NULL );"); // 9: connectionStatus
     }
 
     /** Drops the underlying database table. */
@@ -101,22 +95,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
- 
-        String color = entity.getColor();
-        if (color != null) {
-            stmt.bindString(10, color);
-        }
- 
-        String color2 = entity.getColor2();
-        if (color2 != null) {
-            stmt.bindString(11, color2);
-        }
- 
-        String color3 = entity.getColor3();
-        if (color3 != null) {
-            stmt.bindString(12, color3);
-        }
-        stmt.bindLong(13, entity.getConnectionStatus());
+        stmt.bindLong(10, entity.getConnectionStatus());
     }
 
     @Override
@@ -147,22 +126,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
- 
-        String color = entity.getColor();
-        if (color != null) {
-            stmt.bindString(10, color);
-        }
- 
-        String color2 = entity.getColor2();
-        if (color2 != null) {
-            stmt.bindString(11, color2);
-        }
- 
-        String color3 = entity.getColor3();
-        if (color3 != null) {
-            stmt.bindString(12, color3);
-        }
-        stmt.bindLong(13, entity.getConnectionStatus());
+        stmt.bindLong(10, entity.getConnectionStatus());
     }
 
     @Override
@@ -182,10 +146,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.getInt(offset + 6), // meshUUID
             cursor.getInt(offset + 7), // productUUID
             cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // belongGroupId
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // color
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // color2
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // color3
-            cursor.getInt(offset + 12) // connectionStatus
+            cursor.getInt(offset + 9) // connectionStatus
         );
         return entity;
     }
@@ -201,10 +162,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setMeshUUID(cursor.getInt(offset + 6));
         entity.setProductUUID(cursor.getInt(offset + 7));
         entity.setBelongGroupId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
-        entity.setColor(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setColor2(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setColor3(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setConnectionStatus(cursor.getInt(offset + 12));
+        entity.setConnectionStatus(cursor.getInt(offset + 9));
      }
     
     @Override
