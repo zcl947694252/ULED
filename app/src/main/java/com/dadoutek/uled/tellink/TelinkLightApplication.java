@@ -1,8 +1,6 @@
 package com.dadoutek.uled.tellink;
 
-import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Config;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -18,15 +16,10 @@ import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
-import com.tencent.bugly.Bugly;
-import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import static com.dadoutek.uled.BuildConfig.DEBUG;
 
 
 public final class TelinkLightApplication extends TelinkApplication {
@@ -44,8 +37,8 @@ public final class TelinkLightApplication extends TelinkApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        //this.doInit();
-//        DaoSessionInstance.updateDatabase();
+        DaoSessionInstance.checkAndUpdateDatabase();
+
         Utils.init(this);
 //        if (!AppUtils.isAppDebug()) {
 //            LogUtils.getConfig().setLogSwitch(false);

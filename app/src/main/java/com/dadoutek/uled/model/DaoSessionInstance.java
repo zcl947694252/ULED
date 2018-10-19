@@ -43,7 +43,7 @@ public class DaoSessionInstance {
         name = null;
     }
 
-    public static void updateDatabase(){
+    public static void checkAndUpdateDatabase(){
         name = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                 Constant.DB_NAME_KEY, "uled") + ".db";
 

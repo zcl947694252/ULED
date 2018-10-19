@@ -1,6 +1,7 @@
 package com.dadoutek.uled.othersview
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -317,6 +318,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     }
 
 
+    @SuppressLint("CheckResult")
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe {
