@@ -1,5 +1,5 @@
 # Built application files
-*.apk
+#*.apk
 *.ap_
 
 # Files for the ART/Dalvik VM
@@ -12,7 +12,7 @@
 bin/
 gen/
 out/
-release/
+#release/
 
 # Gradle files
 .gradle/
