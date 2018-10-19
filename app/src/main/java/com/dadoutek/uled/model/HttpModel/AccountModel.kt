@@ -94,6 +94,7 @@ object AccountModel {
                 light.meshAddr = item.meshAddress
                 light.name = item.name
                 light.macAddr = item.macAddress
+                light.color =item.color.toString()
                 if (item.raw != null) {
                     light.meshUUID = item.raw.meshUUID
                     light.productUUID = item.raw.productUUID
@@ -123,6 +124,7 @@ object AccountModel {
                 dbGroup.colorTemperature = item.temperature
                 dbGroup.meshAddr = item.meshAddress
                 dbGroup.name = item.name
+                dbGroup.color =item.color.toString()
                 DBUtils.saveGroup(dbGroup, false)
             }
         }

@@ -78,7 +78,7 @@ class SyncDataPutOrGetUtils {
                                     override fun onComplete() {
                                         launch(UI) {
                                             syncCallback.complete()
-                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
+//                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                                         }
                                     }
                                     override fun onSubscribe(d: Disposable) {

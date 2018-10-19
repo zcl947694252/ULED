@@ -279,13 +279,14 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
 
         @Override
         public void complete() {
-            ToastUtils.showLong(getActivity().getString(R.string.upload_data_success));
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(getActivity(), Constant.IS_LOGIN, false);
                 TelinkLightService.Instance().disconnect();
                 TelinkLightService.Instance().idleMode(true);
 
                 restartApplication();
+            }else{
+                ToastUtils.showLong(getActivity().getString(R.string.upload_data_success));
             }
             hideLoadingDialog();
         }

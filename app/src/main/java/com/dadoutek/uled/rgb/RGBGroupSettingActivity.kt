@@ -151,6 +151,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 val opcode: Byte = Opcode.SET_LUM
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
                 group?.brightness = brightness!!
+                group?.color = color.toString()
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
                 DBUtils.updateGroup(group!!)
             } catch (e: InterruptedException) {
@@ -296,6 +297,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                     dbLight.brightness = progress
                 } else if (type == "colorTemperature") {
                     dbLight.colorTemperature = progress
+                } else if(type == "rgb_color"){
+                    dbLight.color = progress.toString()
                 }
                 DBUtils.updateLight(dbLight)
             }
@@ -312,10 +315,13 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         val color = Color.argb(255, argb[1], argb[2], argb[3])
         if (fromUser) {
             scrollView?.setBackgroundColor(color)
-            group?.setColor(color.toString())
             if(argb[1]==0 && argb[2]==0 && argb[3]==0){
             }else{
-                changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
+                Thread{
+                    group?.color = color.toString()
+                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
+                    DBUtils.updateGroup(group!!)
+                }.start()
             }
         }
     }

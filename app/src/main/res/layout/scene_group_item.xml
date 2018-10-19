@@ -90,6 +90,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/sb_temperature_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"

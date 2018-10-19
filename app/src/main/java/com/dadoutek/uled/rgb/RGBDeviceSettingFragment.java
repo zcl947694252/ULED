@@ -234,6 +234,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
                     opcode = (byte) Opcode.SET_LUM;
                     params = new byte[]{(byte) brightness};
                     light.setBrightness(brightness);
+                    light.setColor(String.valueOf(color));
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
                     DBUtils.INSTANCE.updateLight(light);
                 } catch (InterruptedException e) {
@@ -275,16 +276,18 @@ public final class RGBDeviceSettingFragment extends Fragment {
             int color = Color.argb(255, argb[1], argb[2], argb[3]);
             if(fromUser){
                 scrollView.setBackgroundColor(color);
-                light.setColor(color+"");
                 if(argb[1]==0 && argb[2]==0 && argb[3]==0){
                 }else{
-                    changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+                    light.setColor(String.valueOf(color));
+                    new Thread(() -> changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]));
                 }
             }
         }
     };
 
     private void changeColor(byte R, byte G, byte B) {
+
+        DBUtils.INSTANCE.updateLight(light);
 
         byte red = R;
         byte green = G;

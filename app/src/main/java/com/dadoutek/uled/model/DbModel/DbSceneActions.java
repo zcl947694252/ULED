@@ -22,20 +22,21 @@ public class DbSceneActions {
     private int colorTemperature;
     @NotNull
     private int brightness;
-    @Transient
+
     public String color;
     
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
-    @Generated(hash = 822030848)
+    @Generated(hash = 511749042)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
-            int colorTemperature, int brightness) {
+            int colorTemperature, int brightness, String color) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
+        this.color = color;
     }
     public Long getId() {
         return this.id;

@@ -532,6 +532,7 @@ object DBUtils {
             group.name = name
             group.brightness = 100
             group.colorTemperature = 100
+            group.color = context.resources.getColor(R.color.gray).toString()
             group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
             groups.add(group)
             //新增数据库保存
@@ -577,6 +578,7 @@ object DBUtils {
         groupAllLights.meshAddr = 0xFFFF
         groupAllLights.brightness = 100
         groupAllLights.colorTemperature = 100
+        groupAllLights.color = TelinkLightApplication.getInstance().resources.getColor(R.color.gray).toString()
         groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
         val list = groupList
         DaoSessionInstance.getInstance().dbGroupDao.insert(groupAllLights)

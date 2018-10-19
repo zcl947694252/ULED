@@ -41,6 +41,7 @@ import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.*
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.util.Arrays
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -59,6 +60,7 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 import java.util.concurrent.TimeUnit
+import kotlin.experimental.and
 
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
@@ -501,7 +503,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      */
     @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
-
+        val data = event.args.params
 
         Thread {
             val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
@@ -525,15 +527,24 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     if (dbLight != null) {
                         dbLight.connectionStatus = connectionStatus.value
                         dbLight.updateIcon()
+                        if((data[3].toInt() and 0xff)==0xff){
+                            dbLight.productUUID=0x04
+                        }
                         DBUtils.updateLightLocal(dbLight)
                         runOnUiThread { deviceFragment.notifyDataSetChanged() }
                     } else {
                         if (connectionStatus != ConnectionStatus.OFFLINE) {
                             val dbLightNew = DbLight()
+                            if((data[3].toInt() and 0xff)==0xff||(data[3].toInt() and 0xff)==0x04){
+                                dbLightNew?.productUUID=0x04
+                            }else if((data[3].toInt() and 0xff)==0x06){
+                                dbLightNew?.productUUID=0x06
+                            }
                             dbLightNew.setConnectionStatus(connectionStatus.value)
                             dbLightNew.updateIcon()
                             dbLightNew.belongGroupId = DBUtils.groupNull?.id
                             dbLightNew.brightness = brightness
+                            dbLightNew.color = "0"
                             dbLightNew.colorTemperature = 0
                             dbLightNew.meshAddr = meshAddress
                             dbLightNew.name = getString(R.string.allLight)

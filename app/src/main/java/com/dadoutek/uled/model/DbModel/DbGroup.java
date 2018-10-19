@@ -24,7 +24,7 @@ public class DbGroup implements Serializable{
     private int brightness;
     private int colorTemperature;
     private int belongRegionId;
-    @Transient
+
     private String color="";
 
     @Transient
@@ -39,15 +39,16 @@ public class DbGroup implements Serializable{
     public DbGroup() {
     }
 
-    @Generated(hash = 55678821)
+    @Generated(hash = 1627270948)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
-            int colorTemperature, int belongRegionId) {
+            int colorTemperature, int belongRegionId, String color) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.belongRegionId = belongRegionId;
+        this.color = color;
     }
 
     public Long getId() {

@@ -170,6 +170,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         });
         builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+            itemGroupArrayList.get(currentPosition).color=currentColor;
             sceneGroupAdapter.getViewByPosition(currentPosition,R.id.btn_rgb).setBackgroundColor(currentColor);
             sceneGroupAdapter.notifyItemChanged(currentPosition);
         });
@@ -479,6 +480,7 @@ public class AddSceneAct extends TelinkBaseActivity {
                 DbSceneActions sceneActions = new DbSceneActions();
                 sceneActions.setBelongSceneId(idAction);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
+                sceneActions.setColor(String.valueOf(itemGroups.get(i).color));
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
 //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
 //                sceneActions.setGroupAddr(0xFFFF);
@@ -545,8 +547,13 @@ public class AddSceneAct extends TelinkBaseActivity {
                 byte light = (byte) list.get(i).getBrightness();
                 if (light > 99)
                     light = 99;
+                int color = Integer.parseInt(list.get(i).getColor());
+                int red = (color & 0xff0000) >> 16;
+                int green = (color & 0x00ff00) >> 8;
+                int blue = (color & 0x0000ff);
+
                 params = new byte[]{0x01, (byte) id, light,
-                        (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, temperature};
+                        (byte) red, (byte) green, (byte) blue, temperature};
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
             } while (count < 3);
         }

@@ -3,11 +3,13 @@ package com.dadoutek.uled.scene;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,22 +18,30 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.group.GroupListAdapter;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
+import com.dadoutek.uled.model.ItemColorPreset;
 import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter;
+import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.StringUtils;
+import com.skydoves.colorpickerview.ColorEnvelope;
+import com.skydoves.colorpickerview.ColorPickerView;
+import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +54,7 @@ import butterknife.OnClick;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class ChangeSceneAct extends TelinkBaseActivity{
+public class ChangeSceneAct extends TelinkBaseActivity {
     @BindView(R.id.bt_save)
     Button btSave;
     @BindView(R.id.edit_name)
@@ -63,6 +73,10 @@ public class ChangeSceneAct extends TelinkBaseActivity{
     private DbScene scene;
     private LayoutInflater inflater;
     private SceneGroupAdapter sceneGroupAdapter;
+
+    private int currentColor;
+    private List<ItemColorPreset> presetColors;
+    private int currentPosition;
 
     private DataManager dataManager;
     private TelinkLightApplication telinkLightApplication;
@@ -95,23 +109,160 @@ public class ChangeSceneAct extends TelinkBaseActivity{
     private void initClick() {
         //删除时恢复可添加组标记
         sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {
-            if (groupArrayList.size() != 0) {
-                if (adapter.getItemCount() == 1) {
-                    for (int k = 0; k < groupArrayList.size(); k++) {
+            switch (view.getId()) {
+                case R.id.btn_delete:
+                    delete(adapter, position);
+                    break;
+                case R.id.btn_rgb:
+//                    Intent intent=new Intent(this,)
+//                    startActivityForResult();
+                    currentPosition = position;
+                    showPickColorDialog();
+                    break;
+            }
+        });
+    }
+
+    private void delete(BaseQuickAdapter adapter, int position) {
+        if (groupArrayList.size() != 0) {
+            if (adapter.getItemCount() == 1) {
+                for (int k = 0; k < groupArrayList.size(); k++) {
+                    groupArrayList.get(k).selected = false;
+                }
+                adapter.remove(position);
+            } else {
+                for (int k = 0; k < groupArrayList.size(); k++) {
+                    if (groupArrayList.get(k).getName().equals(itemGroupArrayList.get(position).gpName)) {
                         groupArrayList.get(k).selected = false;
-                    }
-                    adapter.remove(position);
-                } else {
-                    for (int k = 0; k < groupArrayList.size(); k++) {
-                        if (groupArrayList.get(k).getName().equals(itemGroupArrayList.get(position).gpName)) {
-                            groupArrayList.get(k).selected = false;
-                            adapter.remove(position);
-                            break;
-                        }
+                        adapter.remove(position);
+                        break;
                     }
                 }
             }
+        }
+    }
+
+    private void showPickColorDialog() {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_pick_color, null);
+        ColorPickerView colorPickerView = view.findViewById(R.id.color_picker);
+        colorPickerView.setColorListener(colorEnvelopeListener);
+        RecyclerView diyColorRecyclerListView = view.findViewById(R.id.diy_color_recycler_list_view);
+        ColorSelectDiyRecyclerViewAdapter colorSelectDiyRecyclerViewAdapter;
+
+        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(this, Constant.LIGHT_PRESET_COLOR);
+        if (presetColors == null) {
+            presetColors = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                ItemColorPreset itemColorPreset = new ItemColorPreset();
+                presetColors.add(itemColorPreset);
+            }
+        }
+
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        diyColorRecyclerListView.setLayoutManager(layoutmanager);
+        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
+        colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
+        colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
+        colorSelectDiyRecyclerViewAdapter.bindToRecyclerView(diyColorRecyclerListView);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.select_color_title);
+        builder.setView(view);
+        builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
+
         });
+        builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+            itemGroupArrayList.get(currentPosition).color = currentColor;
+            sceneGroupAdapter.getViewByPosition(currentPosition, R.id.btn_rgb).setBackgroundColor(currentColor);
+            sceneGroupAdapter.notifyItemChanged(currentPosition);
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    BaseQuickAdapter.OnItemChildClickListener diyOnItemChildClickListener = new BaseQuickAdapter.OnItemChildClickListener() {
+        @Override
+        public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+            int color = presetColors.get(position).getColor();
+            int brightness = presetColors.get(position).getBrightness();
+            int red = (color & 0xff0000) >> 16;
+            int green = (color & 0x00ff00) >> 8;
+            int blue = (color & 0x0000ff);
+            new Thread(() -> {
+                changeColor((byte) red, (byte) green, (byte) blue);
+
+                try {
+                    Thread.sleep(200);
+                    int addr = itemGroupArrayList.get(currentPosition).groupAress;
+                    byte opcode;
+                    byte[] params;
+                    opcode = (byte) Opcode.SET_LUM;
+                    params = new byte[]{(byte) brightness};
+                    itemGroupArrayList.get(currentPosition).brightness = brightness;
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+    };
+
+    BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener = new BaseQuickAdapter.OnItemChildLongClickListener() {
+        @Override
+        public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
+            presetColors.get(position).setColor(currentColor);
+//            presetColors.get(position).setBrightness(currentItemGroup.brightness);
+            TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
+            textView.setText("");
+            textView.setBackgroundColor(currentColor);
+            SharedPreferencesHelper.putObject(ChangeSceneAct.this, Constant.LIGHT_PRESET_COLOR, presetColors);
+            return false;
+        }
+    };
+
+    private ColorEnvelopeListener colorEnvelopeListener = new ColorEnvelopeListener() {
+
+        @Override
+        public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
+            int[] argb = envelope.getArgb();
+
+            currentColor = Color.argb(255, argb[1], argb[2], argb[3]);
+            if (fromUser) {
+                if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+                } else {
+                    changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
+                }
+            }
+        }
+    };
+
+    private void changeColor(byte R, byte G, byte B) {
+
+        byte red = R;
+        byte green = G;
+        byte blue = B;
+
+        int addr = itemGroupArrayList.get(currentPosition).groupAress;
+        byte opcode = (byte) 0xE2;
+
+        byte minVal = (byte) 0x50;
+
+        if ((green & 0xff) <= minVal)
+            green = 0;
+        if ((red & 0xff) <= minVal)
+            red = 0;
+        if ((blue & 0xff) <= minVal)
+            blue = 0;
+
+
+        byte[] params = new byte[]{0x04, red, green, blue};
+
+        String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
+        Log.d("RGBCOLOR", logStr);
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
     }
 
     private void initData() {
@@ -149,6 +300,8 @@ public class ChangeSceneAct extends TelinkBaseActivity{
                     itemGroup.temperature = actions.get(i).getColorTemperature();
                     itemGroup.groupAress = actions.get(i).getGroupAddr();
                     itemGroup.gpName = group.getName();
+                    itemGroup.color = Integer.parseInt(actions.get(i).getColor() == null ?
+                            getResources().getColor(R.color.primary) + "" : actions.get(i).getColor());
                     itemGroupArrayList.add(itemGroup);
 
                     if (group.getMeshAddr() != 0xffff) {
@@ -188,18 +341,18 @@ public class ChangeSceneAct extends TelinkBaseActivity{
         AlertDialog.Builder builder;
         AlertDialog dialog;
         List<DbGroup> showList = getShowList();
-        ArrayList<DbGroup> selectGroupList=new ArrayList<>();
+        ArrayList<DbGroup> selectGroupList = new ArrayList<>();
 
         View bottomView = View.inflate(ChangeSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
         RecyclerView lvGp = (RecyclerView) bottomView.findViewById(R.id.listview_group);//初始化ListView控件
-        Button btnSure =  bottomView.findViewById(R.id.btn_sure);
+        Button btnSure = bottomView.findViewById(R.id.btn_sure);
         btnSure.setVisibility(View.GONE);
 
         GroupListAdapter groupListAdapter;
         LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
         lvGp.setLayoutManager(layoutmanager);
-        groupListAdapter = new GroupListAdapter(R.layout.item_group,showList);
+        groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
         groupListAdapter.bindToRecyclerView(lvGp);
 
         builder = new AlertDialog.Builder(this)
@@ -208,8 +361,8 @@ public class ChangeSceneAct extends TelinkBaseActivity{
 
         groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
 
-            DbGroup item=showList.get(position);
-            if(item.getMeshAddr()==0xffff){
+            DbGroup item = showList.get(position);
+            if (item.getMeshAddr() == 0xffff) {
                 ItemGroup itemGroup = new ItemGroup();
                 itemGroup.brightness = 50;
                 itemGroup.temperature = 50;
@@ -218,15 +371,15 @@ public class ChangeSceneAct extends TelinkBaseActivity{
                 changeData(position, showList);
                 sceneGroupAdapter.addData(itemGroup);
                 dialog.dismiss();
-            }else{
+            } else {
                 btnSure.setVisibility(View.VISIBLE);
-                if(showList.get(position).checked){
-                    showList.get(position).checked=false;
-                }else{
-                    showList.get(position).checked=true;
+                if (showList.get(position).checked) {
+                    showList.get(position).checked = false;
+                } else {
+                    showList.get(position).checked = true;
                 }
 
-                if(showList.get(0).getMeshAddr()==0xffff){
+                if (showList.get(0).getMeshAddr() == 0xffff) {
                     adapter.remove(0);
                 }
                 adapter.notifyItemChanged(position);
@@ -234,8 +387,8 @@ public class ChangeSceneAct extends TelinkBaseActivity{
         });
 
         btnSure.setOnClickListener(v -> {
-            for(int j=0;j<showList.size();j++){
-                if(showList.get(j).checked){
+            for (int j = 0; j < showList.size(); j++) {
+                if (showList.get(j).checked) {
                     ItemGroup itemGroup = new ItemGroup();
                     itemGroup.brightness = 50;
                     itemGroup.temperature = 50;
@@ -245,7 +398,7 @@ public class ChangeSceneAct extends TelinkBaseActivity{
                     sceneGroupAdapter.addData(itemGroup);
                 }
 
-                if(j==showList.size()-1){
+                if (j == showList.size() - 1) {
                     dialog.dismiss();
                 }
             }
@@ -296,8 +449,8 @@ public class ChangeSceneAct extends TelinkBaseActivity{
             if (!groupArrayList.get(k).selected) {
                 groupArrayList.get(k).checked = false;
                 showList.add(groupArrayList.get(k));
-            }else{
-                groupArrayList.get(k).checked=false;
+            } else {
+                groupArrayList.get(k).checked = false;
             }
         }
         return showList;
@@ -371,6 +524,7 @@ public class ChangeSceneAct extends TelinkBaseActivity{
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
+                sceneActions.setColor(itemGroups.get(i).color+"");
                 DBUtils.INSTANCE.saveSceneActions(sceneActions);
             }
             try {
@@ -398,8 +552,13 @@ public class ChangeSceneAct extends TelinkBaseActivity{
             byte light = (byte) list.get(i).getBrightness();
             if (light > 99)
                 light = 99;
+            int color = Integer.parseInt(list.get(i).getColor());
+            int red = (color & 0xff0000) >> 16;
+            int green = (color & 0x00ff00) >> 8;
+            int blue = (color & 0x0000ff);
+
             params = new byte[]{0x01, (byte) id, light,
-                    (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, temperature};
+                    (byte) red, (byte) green, (byte) blue, temperature};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
         }
     }

@@ -28,7 +28,7 @@ public class DbLight implements Serializable {
     private int meshUUID;
     private int productUUID;
     private Long belongGroupId;
-    @Transient
+
     public String color;//颜色
 
     @Transient
@@ -49,10 +49,10 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    @Generated(hash = 225780319)
+    @Generated(hash = 2117051117)
     public DbLight(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, String macAddr, int meshUUID, int productUUID,
-            Long belongGroupId, int connectionStatus) {
+            Long belongGroupId, String color, int connectionStatus) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -62,6 +62,7 @@ public class DbLight implements Serializable {
         this.meshUUID = meshUUID;
         this.productUUID = productUUID;
         this.belongGroupId = belongGroupId;
+        this.color = color;
         this.connectionStatus = connectionStatus;
     }
 
