@@ -46,7 +46,7 @@ public class MigrationHelper {
 
             String divider = "";
             String tableName = daoConfig.tablename;
-            String tempTableName = daoConfig.tablename.concat("_TEMP1");
+            String tempTableName = daoConfig.tablename.concat("_TEMP");
             ArrayList<String> properties = new ArrayList<>();
 
             StringBuilder createTableStringBuilder = new StringBuilder();
@@ -103,7 +103,7 @@ public class MigrationHelper {
         for (int i = 0; i < daoClasses.length; i++) {
             DaoConfig daoConfig = new DaoConfig(db, daoClasses[i]);
             String tableName = daoConfig.tablename;
-            String tempTableName = daoConfig.tablename.concat("_TEMP1");
+            String tempTableName = daoConfig.tablename.concat("_TEMP");
             ArrayList<String> properties = new ArrayList();
 
             for (int j = 0; j < daoConfig.properties.length; j++) {

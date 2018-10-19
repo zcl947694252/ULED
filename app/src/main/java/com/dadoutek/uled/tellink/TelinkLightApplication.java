@@ -45,13 +45,13 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void onCreate() {
         super.onCreate();
         //this.doInit();
+//        DaoSessionInstance.updateDatabase();
         Utils.init(this);
 //        if (!AppUtils.isAppDebug()) {
 //            LogUtils.getConfig().setLogSwitch(false);
 //        }
 
-//        DaoSessionInstance.destroySession();
-//        DaoSessionInstance.getInstance();
+        LogUtils.d();
 
         MobSDK.init(this);
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);

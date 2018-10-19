@@ -42,4 +42,19 @@ public class DaoSessionInstance {
         session = null;
         name = null;
     }
+
+    public static void updateDatabase(){
+        name = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "uled") + ".db";
+
+        //创建数据库shop.db"
+        MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.getInstance()
+                , name);
+        //获取可写数据库
+        SQLiteDatabase db = helper.getWritableDatabase();
+        //获取数据库对象
+        DaoMaster daoMaster = new DaoMaster(db);
+        //获取Dao对象管理者
+        session = daoMaster.newSession();
+    }
 }

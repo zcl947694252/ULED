@@ -744,7 +744,7 @@ public class LightAdapter {
             return false;
 
         byte[] outOfMeshName;
-
+        
         byte[] meshName = Strings.stringToBytes(params.getString(Parameters.PARAM_MESH_NAME), 16);
         byte[] meshName1 = light.getMeshName();
 
