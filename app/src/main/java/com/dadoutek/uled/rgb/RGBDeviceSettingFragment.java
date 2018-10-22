@@ -279,7 +279,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
                 if(argb[1]==0 && argb[2]==0 && argb[3]==0){
                 }else{
                     light.setColor(String.valueOf(color));
-                    new Thread(() -> changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]));
+                    new Thread(() -> changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3])).start();
                 }
             }
         }
