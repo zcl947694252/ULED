@@ -11,6 +11,17 @@
         <item>Turn on the lights</item>
         <item>Turn off the lights</item>
     </string-array>
+
+    <string-array name="switch_mode" translatable="false">
+        <item>moment</item>
+        <item>gradient</item>
+    </string-array>
+
+    <string-array name="delay_unit" translatable="false">
+        <item>minute</item>
+        <item>second</item>
+    </string-array>
+
     <!-- Activity Labels -->
     <string name="app_name">ULed</string>
     <string name="activity_device_setting_label">Device Setting</string>
@@ -324,6 +335,7 @@
     <string name="deleting">deleting</string>
     <string name="move_out_some_lights_in_group_failed">Lights in some groups failed to move out of the group</string>
     <string name="delay_minute">Delay (minutes)</string>
+    <string name="delay_seconds">Delay (seconds)</string>
     <string name="minimum_brightness_percentage">Final brightness (percentage)</string>
     <string name="trigger_lux">Trigger illumination (lux)</string>
     <string name="params_cannot_be_empty">Params cannot be empty</string>
@@ -377,5 +389,7 @@
     <string name="start_connect">Start connecting...</string>
     <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
     <string name="trigger_mode">Trigger mode</string>
+    <string name="switch_mode">开关方式</string>
+    <string name="delay_unit">延时单位</string>
 
 </resources>
