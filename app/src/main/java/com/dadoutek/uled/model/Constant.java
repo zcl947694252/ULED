@@ -124,8 +124,7 @@ public class Constant implements Serializable {
     public static String FIRMWARE_TYPE_LIGHT="FIRMWARE_TYPE_LIGHT";
     public static String FIRMWARE_TYPE_CONTROLLER="FIRMWARE_TYPE_CONTROLLER";
 
-    public static String LIGHT_PRESET_COLOR="LIGHT_PRESET_COLOR";
-    public static String GROUP_PRESET_COLOR="GROUP_PRESET_COLOR";
+    public static String PRESET_COLOR ="PRESET_COLOR";
 
     public static int LIGHT=1;
     public static int CONTROLLER=2;

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/scroll_view"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:scrollbars="none">
+    android:scrollbars="none"
+    tools:ignore="MissingDefaultResource">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -110,10 +112,20 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:paddingStart="15dp"
-            android:paddingEnd="15dp">
+            android:paddingEnd="15dp"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray"
+                android:text="点击小框选择颜色,长按可保存当前颜色"
+                android:gravity="center"
+                />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/diy_color_recycler_list_view"

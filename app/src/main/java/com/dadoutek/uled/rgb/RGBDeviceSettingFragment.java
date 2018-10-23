@@ -197,7 +197,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
 
         mConnectDevice = TelinkLightApplication.getInstance().getConnectDevice();
 
-        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(getActivity(), Constant.LIGHT_PRESET_COLOR);
+        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(getActivity(), Constant.PRESET_COLOR);
         if (presetColors == null) {
             presetColors = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -258,7 +258,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText(light.getBrightness() + "%");
             textView.setBackgroundColor(Integer.parseInt(light.getColor()));
-            SharedPreferencesHelper.putObject(getActivity(), Constant.LIGHT_PRESET_COLOR, presetColors);
+            SharedPreferencesHelper.putObject(getActivity(), Constant.PRESET_COLOR, presetColors);
             return false;
         }
     };

@@ -146,7 +146,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         RecyclerView diyColorRecyclerListView=view.findViewById(R.id.diy_color_recycler_list_view);
         ColorSelectDiyRecyclerViewAdapter colorSelectDiyRecyclerViewAdapter;
 
-        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(this, Constant.LIGHT_PRESET_COLOR);
+        presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR);
         if (presetColors == null) {
             presetColors = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
@@ -214,7 +214,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText("");
             textView.setBackgroundColor(currentColor);
-            SharedPreferencesHelper.putObject(AddSceneAct.this, Constant.LIGHT_PRESET_COLOR, presetColors);
+            SharedPreferencesHelper.putObject(AddSceneAct.this, Constant.PRESET_COLOR, presetColors);
             return false;
         }
     };

@@ -107,7 +107,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         btn_remove_group?.setOnClickListener(this)
         btn_rename?.setOnClickListener(this)
 
-        presetColors = SharedPreferencesHelper.getObject(this, Constant.GROUP_PRESET_COLOR) as? MutableList<ItemColorPreset>
+        presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = java.util.ArrayList<ItemColorPreset>()
             for (i in 0..4) {
@@ -173,7 +173,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as TextView?
         textView!!.text = group!!.brightness.toString() + "%"
         textView.setBackgroundColor(group!!.getColor().toInt())
-        SharedPreferencesHelper.putObject(this, Constant.GROUP_PRESET_COLOR, presetColors)
+        SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
         false
     }
 
