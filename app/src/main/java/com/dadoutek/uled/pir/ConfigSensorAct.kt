@@ -31,9 +31,18 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
-    private var MODE_START_UP_MODE=0
-    private var MODE_DELAY_UNIT=0
-    private var MODE_SWITCH_MODE=0
+
+    private var modeStartUpMode=0
+    private var modeDelayUnit=0
+    private var modeSwitchMode=0
+
+    private val MODE_START_UP_MODE_OPEN=0
+    private val MODE_DELAY_UNIT_SECONDS=0
+    private val MODE_SWITCH_MODE_MOMENT=0
+
+    private val MODE_START_UP_MODE_CLOSE=1
+    private val MODE_DELAY_UNIT_MINUTE=2
+    private val MODE_SWITCH_MODE_GRADIENT=4
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,26 +155,26 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             R.id.spSelectStartupMode ->{
                 if(position == 0){//开灯
                     tietMinimumBrightness?.setText("0")
-                    MODE_START_UP_MODE=0
+                    modeStartUpMode=MODE_START_UP_MODE_OPEN
                 }else if(position == 1){//关灯
                     tietMinimumBrightness?.setText("99")
-                    MODE_START_UP_MODE=0x01
+                    modeStartUpMode=MODE_START_UP_MODE_CLOSE
                 }
             }
             R.id.spSwitchMode ->{
                  if(position==0){
-                     MODE_SWITCH_MODE=0
+                     modeSwitchMode=MODE_SWITCH_MODE_MOMENT
                  }else{
-                     MODE_SWITCH_MODE=0x04
+                     modeSwitchMode=MODE_SWITCH_MODE_GRADIENT
                  }
             }
             R.id.spDelayUnit ->{
                 if(position==0){
                     tilDelay.hint = getString(R.string.delay_minute)
-                    MODE_DELAY_UNIT=0x02
+                    modeDelayUnit=MODE_DELAY_UNIT_MINUTE
                 }else{
                     tilDelay.hint = getString(R.string.delay_seconds)
-                    MODE_DELAY_UNIT=0
+                    modeDelayUnit=MODE_DELAY_UNIT_SECONDS
                 }
             }
         }
@@ -237,8 +246,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun getModeValue(): Int {
-        LogUtils.d("FINAL_VALUE$MODE_START_UP_MODE-$MODE_DELAY_UNIT-$MODE_SWITCH_MODE")
-        LogUtils.d("FINAL_VALUE"+(MODE_START_UP_MODE or MODE_DELAY_UNIT or MODE_SWITCH_MODE))
-        return MODE_START_UP_MODE or MODE_DELAY_UNIT or MODE_SWITCH_MODE
+        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+        LogUtils.d("FINAL_VALUE"+(modeStartUpMode or modeDelayUnit or modeSwitchMode))
+        return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 }
