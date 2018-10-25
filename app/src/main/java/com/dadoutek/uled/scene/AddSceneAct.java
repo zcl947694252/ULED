@@ -152,6 +152,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             presetColors = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 ItemColorPreset itemColorPreset = new ItemColorPreset();
+                itemColorPreset.setBrightness(-1);
                 presetColors.add(itemColorPreset);
             }
         }
@@ -159,7 +160,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 //        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
 //        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(this,5));
-        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
+        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.dialog_color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
         colorSelectDiyRecyclerViewAdapter.bindToRecyclerView(diyColorRecyclerListView);

@@ -161,7 +161,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         diyColorRecyclerListView.setLayoutManager(layoutmanager);
-        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
+        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.dialog_color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
         colorSelectDiyRecyclerViewAdapter.bindToRecyclerView(diyColorRecyclerListView);

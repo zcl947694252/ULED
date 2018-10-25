@@ -24,7 +24,7 @@ public class ColorSelectDiyRecyclerViewAdapter extends BaseQuickAdapter<ItemColo
     protected void convert(BaseViewHolder helper, ItemColorPreset item) {
         helper.addOnClickListener(R.id.btn_diy_preset)
                 .addOnLongClickListener(R.id.btn_diy_preset)
-                .setText(R.id.btn_diy_preset, item.getBrightness() + "%")
+                .setText(R.id.btn_diy_preset, (item.getBrightness()==-1?"":item.getBrightness()) + "%")
                 .setBackgroundColor(R.id.btn_diy_preset,item.getColor());
     }
 }
