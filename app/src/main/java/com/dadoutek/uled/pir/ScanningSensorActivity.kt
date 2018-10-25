@@ -116,7 +116,9 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
                     scanDisposable?.dispose()
                     scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
-                            .SECONDS, Schedulers.io())
+                            .SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 onLeScanTimeout()
                             }
@@ -143,16 +145,6 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                 login()   //重新进行登录
         }
     }
-
-//    private fun retryLogin() {
-//        mRetryConnectCount++
-//        LogUtils.d("reconnect time = $mRetryConnectCount")
-//        if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
-//            showConnectFailed()
-//        } else {
-//            login()   //重新进行连接
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()
@@ -300,18 +292,6 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
     private fun connect() {
         Thread {
-            //            val mesh = TelinkLightApplication.getApp().mesh
-//            //自动重连参数
-//            val connectParams = Parameters.createAutoConnectParameters()
-//            if (BuildConfig.DEBUG) {
-//                connectParams.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
-//            } else {
-//                connectParams.setMeshName(mesh.factoryName)
-//            }
-//            connectParams.setPassword(mesh.factoryPassword)
-//            connectParams.autoEnableNotification(true)
-//            connectParams.setConnectMac(mDeviceInfo?.macAddress)
-//            connectParams.setTimeoutSeconds(CONNECT_TIMEOUT_SECONDS)
 
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSensorActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSensorActivity)
@@ -322,7 +302,9 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         launch(UI) {
             connectDisposable?.dispose()    //取消掉上一个超时计时器
             connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit
-                    .SECONDS, AndroidSchedulers.mainThread())
+                    .SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         LogUtils.d("timeout retryConnect")
                         retryConnect()
@@ -351,31 +333,12 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
             this.doFinish()
             return
         }
-        //更新参数
-//        val params = Parameters.createUpdateParameters()
-//        if (BuildConfig.DEBUG) {
-//            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-//        } else {
-//            params.setOldMeshName(mesh.factoryName)
-//        }
-//        params.setOldPassword(mesh.factoryPassword)
-//        params.setNewMeshName(mesh.name)
-//        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-//                Constant.DB_NAME_KEY, "dadou")
-//        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-//                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-//            params.setNewPassword(NetworkFactory.md5(
-//                    NetworkFactory.md5(mesh?.password) + account))
-//        } else {
-//            params.setNewPassword(mesh?.password)
-//        }
 
         when (leScanEvent.args.productUUID) {
             DeviceType.SENSOR -> {
                 scanDisposable?.dispose()
                 LeBluetooth.getInstance().stopScan()
                 mDeviceInfo = leScanEvent.args
-//                params.setUpdateDeviceList(mDeviceInfo)
                 connect()
                 progressBtn.text = getString(R.string.connecting)
             }

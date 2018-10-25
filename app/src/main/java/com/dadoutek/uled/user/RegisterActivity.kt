@@ -1,123 +1,142 @@
 package com.dadoutek.uled.user
 
+import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import butterknife.ButterKnife
+import cn.smssdk.EventHandler
+import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.light.EmptyAddActivity
+import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkFactory.md5
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
-import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbUser
-import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.hbb20.CCPCountry.setDialogTitle
+import com.hbb20.CountryCodePicker
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_ota_update.view.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by hejiajun on 2018/5/16.
  */
 
-class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
-//    @BindView(R.id.edit_user_password)
-//    internal var editUserPassword: TextInputLayout? = null
-//    @BindView(R.id.register_completed)
-//    internal var registerCompleted: Button? = null
-//    @BindView(R.id.edit_user_phone)
-//    internal var editUserName: TextInputLayout? = null
-//    @BindView(R.id.toolbar)
-//    internal var toolbar: Toolbar? = null
-
+class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private var userName: String? = null
     private var userPassWord: String? = null
     private var MD5PassWord: String? = null
-
-    //    private fun login() {
-    //        phone = edit_user_phone_or_email!!.editText!!.text.toString().trim { it <= ' ' }
-    //        editPassWord = edit_user_password!!.editText!!.text.toString().trim { it <= ' ' }
-    //
-    //        if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
-    //            showLoadingDialog(getString(R.string.logging_tip))
-    //            AccountModel.login(phone!!, editPassWord!!, dbUser!!.channel)
-    //                    .subscribe(object : NetworkObserver<DbUser>() {
-    //                override fun onNext(dbUser: DbUser) {
-    //                    LogUtils.d("logging: " + "登录成功")
-    //                    ToastUtils.showLong(R.string.login_success)
-    //                    hideLoadingDialog()
-    //                    //判断是否用户是首次在这个手机登录此账号，是则同步数据
-    ////                            if(!SharedPreferencesUtils.getCurrentUserList().contains(dbUser.account)){
-    //////                                showLoadingDialog(getString(R.string.sync_now))
-    //////                                syncGetDataStart(dbUser)
-    ////                            }else{
-    //                    TransformView()
-    ////                            }
-    //                }
-    //
-    //                override fun onError(e: Throwable) {
-    //                    super.onError(e)
-    //                    hideLoadingDialog()
-    //                }
-    //            })
-    //        } else {
-    //            Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
-    //        }
-    //    }
+    private var countryCode: String? = null
+    private val mCompositeDisposable = CompositeDisposable()
+    private val TIME_INTERVAL: Long = 60
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
         ButterKnife.bind(this)
         initView()
-
-
     }
 
     private fun initView() {
         initToolbar()
-        val phone = intent.getStringExtra("phone")
-        if (!phone.isEmpty()) {
-            if (edit_user_phone!!.editText != null)
-                edit_user_phone!!.editText!!.setText(phone)
-        }
+        countryCode = ccp.selectedCountryCode
+        ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
-        StringUtils.initEditTextFilter(edit_user_password!!.editText)
+        btn_send_verification.setOnClickListener(this)
         StringUtils.initEditTextFilter(edit_user_phone!!.editText)
+        StringUtils.initEditTextFilter(edit_user_password!!.editText)
     }
 
     private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.user_login_title)
-    }
+        toolbar.title = getString(R.string.user_register)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener { finish() }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onClick(v: View?) {
         when (v!!.id) {
-            R.id.register_completed -> if (checkIsOK()) {
-                register()
+            R.id.register_completed -> {
+                if (checkIsOK()) {
+                    if (Constant.TEST_REGISTER) {
+                        showLoadingDialog(getString(R.string.registing))
+                        register()
+                    } else {
+                        showLoadingDialog(getString(R.string.registing))
+                        submitCode(countryCode
+                                ?: "", userName!!, edit_verification.editText!!.text.toString().trim { it <= ' ' })
+                    }
+                }
             }
+            R.id.btn_send_verification ->
+                send_verification()
         }
     }
 
+    private fun send_verification() {
+        val phoneNum = edit_user_phone.getEditText()!!.getText().toString().trim({ it <= ' ' })
+        if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
+            ToastUtils.showShort(R.string.phone_cannot_be_empty)
+        } else {
+            sendCode(countryCode!!, phoneNum)
+        }
+    }
+
+    // 请求验证码，其中country表示国家代码，如“86”；phone表示手机号码，如“13800138000”
+    fun sendCode(country: String, phone: String) {
+        timing()
+        // 注册一个事件回调，用于处理发送验证码操作的结果
+        SMSSDK.registerEventHandler(object : EventHandler() {
+            override fun afterEvent(event: Int, result: Int, data: Any?) {
+                if (result == SMSSDK.RESULT_COMPLETE) {
+                    // TODO 处理成功得到验证码的结果
+                    // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
+                    ToastUtils.showLong(R.string.send_message_success)
+                } else {
+                    // TODO 处理错误的结果
+                    ToastUtils.showLong(R.string.send_message_fail)
+                }
+
+            }
+        })
+        // 触发操作
+        SMSSDK.getVerificationCode(country, phone)
+    }
+
+    private fun timing() {
+        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    val num = 59 - it as Long
+                    if (num == 0L) {
+                        btn_send_verification.text = resources.getString(R.string.reget)
+                        btn_send_verification.isEnabled = true
+                    } else {
+                        btn_send_verification.text = getString(R.string.regetCount, num)
+                        btn_send_verification.isEnabled = false
+                    }
+                })
+    }
+
     private fun register() {
-        showLoadingDialog(getString(R.string.registing))
         MD5PassWord = md5(userPassWord)
         NetworkFactory.getApi()
                 .register(userName, MD5PassWord, userName)
@@ -131,10 +150,6 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
-//                        LogUtils.d("logging: " + "登录成功")
-//                        ToastUtils.showLong(R.string.login_success)
-//                        hideLoadingDialog()
-//                        TransformView()
 
                         LogUtils.d("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
@@ -142,7 +157,7 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
                         hideLoadingDialog()
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
                         showLoadingDialog(getString(R.string.sync_now))
-                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser,syncCallback)
+                        SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                     }
 
                     override fun onError(e: Throwable) {
@@ -163,7 +178,7 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:"+msg)
+            LogUtils.d("GetDataError:" + msg)
         }
 
     }
@@ -175,7 +190,7 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
     }
 
     private fun TransformView() {
-        startActivity(Intent(this@RegisterActivity, EmptyAddActivity::class.java))
+        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
         finish()
     }
 
@@ -192,5 +207,26 @@ class RegisterActivity : TelinkBaseActivity(),View.OnClickListener {
         } else {
             return true
         }
+    }
+
+    // 提交验证码，其中的code表示验证码，如“1357”
+    fun submitCode(country: String, phone: String, code: String): Boolean {
+        // 注册一个事件回调，用于处理提交验证码操作的结果
+        SMSSDK.registerEventHandler(object : EventHandler() {
+            override fun afterEvent(event: Int, result: Int, data: Any?) {
+                if (result == SMSSDK.RESULT_COMPLETE) {
+                    // TODO 处理验证成功的结果
+                    register()
+                } else {
+                    // TODO 处理错误的结果
+                    ToastUtils.showLong(R.string.verification_code_error)
+                    hideLoadingDialog()
+                }
+
+            }
+        })
+        // 触发操作
+        SMSSDK.submitVerificationCode(country, phone, code)
+        return false
     }
 }

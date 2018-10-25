@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.Config;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.dao.DaoSession;
@@ -45,9 +46,9 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.onCreate();
         //this.doInit();
         Utils.init(this);
-//        if (!AppUtils.isAppDebug()) {
-//            LogUtils.getConfig().setLogSwitch(false);
-//        }
+        if (!AppUtils.isAppDebug()) {
+            LogUtils.getConfig().setLogSwitch(false);
+        }
 
 
         MobSDK.init(this);
