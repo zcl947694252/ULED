@@ -186,6 +186,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         @Override
         public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
             int color = presetColors.get(position).getColor();
+            currentColor = color;
             int brightness = presetColors.get(position).getBrightness();
             int red = (color & 0xff0000) >> 16;
             int green = (color & 0x00ff00) >> 8;

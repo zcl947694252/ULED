@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -155,9 +156,9 @@ public class AddSceneAct extends TelinkBaseActivity {
             }
         }
 
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
-        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        diyColorRecyclerListView.setLayoutManager(layoutmanager);
+//        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+//        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(this,5));
         colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
@@ -183,6 +184,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         @Override
         public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
             int color = presetColors.get(position).getColor();
+            currentColor = color;
             int brightness = presetColors.get(position).getBrightness();
             int red = (color & 0xff0000) >> 16;
             int green = (color & 0x00ff00) >> 8;

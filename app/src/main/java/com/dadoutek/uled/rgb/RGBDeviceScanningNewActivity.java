@@ -1297,6 +1297,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         light = new DbLight();
                         light.setName(deviceInfo.meshName);
                         light.setMeshAddr(meshAddress);
+                        com.blankj.utilcode.util.LogUtils.d("light_mesh_3:"+light.getMeshAddr());
                         light.textColor = this.getResources().getColor(
                                 R.color.black);
                         light.setBelongGroupId(-1L);

@@ -34,6 +34,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import kotlinx.android.synthetic.main.activity_group_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import java.util.*
 import kotlin.experimental.and
@@ -449,6 +450,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
+        btn_sure_edit_rename.visibility=View.VISIBLE
+        btn_sure_edit_rename.setOnClickListener {
+            saveName()
+            btn_sure_edit_rename.visibility=View.GONE
+        }
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
         editTitle?.setOnEditorActionListener(this)
@@ -463,13 +469,18 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         when (actionId) {
             EditorInfo.IME_ACTION_DONE,
             EditorInfo.IME_ACTION_NONE -> {
-                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
-                editTitle?.setFocusableInTouchMode(false)
-                editTitle?.setFocusable(false)
-                checkAndSaveName()
+                saveName()
+                btn_sure_edit_rename.visibility=View.GONE
             }
         }
+    }
+
+    private fun saveName(){
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
+        editTitle?.setFocusableInTouchMode(false)
+        editTitle?.setFocusable(false)
+        checkAndSaveName()
     }
 
     private fun checkAndSaveName(){

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <declare-styleable name="ImageTextButton">
+        <attr name="itb_icon" format="reference"/>
+        <attr name="itb_icon_size" format="dimension"/>
+        <attr name="itb_text" format="string"/>
+        <attr name="itb_text_color" format="color"/>
+        <attr name="itb_text_size" format="dimension"/>
+        <attr name="itb_icon_text_marggin" format="dimension"/>
+        <attr name="itb_icon_position" format="enum">
+            <enum name="left" value="0"/>
+            <enum name="top" value="1"/>
+            <enum name="right" value="2"/>
+            <enum name="bottom" value="3"/>
+        </attr>
+        <attr name="itb_bg" format="color"/>
+        <attr name="itb_bg_pressed" format="color"/>
+        <attr name="itb_bg_disabled" format="color"/>
+        <attr name="itb_radius" format="dimension"/>
+        <attr name="itb_padding" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="EditProfileView">
+        <attr name="epi_text" format="string"/>
+        <attr name="epi_text_size" format="dimension"/>
+        <attr name="epi_right_icon" format="reference"/>
+        <attr name="epi_right_hint" format="string"/>
+        <attr name="epi_right_hint_size" format="dimension"/>
+        <attr name="epi_right_color" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="RoundedImageView">
+        <attr name="corner_radius" format="dimension"/>
+        <attr name="border_width" format="dimension"/>
+        <attr name="border_color" format="color"/>
+        <attr name="mutate_background" format="boolean"/>
+        <attr name="oval" format="boolean"/>
+        <attr name="android:scaleType"/>
+    </declare-styleable>
+
+    <declare-styleable name="AutoTextSizeEditText">
+        <attr name="aet_autoSizeMaxTextSize" format="dimension"/>
+        <attr name="aet_autoSizeMinTextSize" format="dimension"/>
+        <attr name="aet_autoSizeTextType" format="enum">
+            <enum name="none" value="0"/>
+            <enum name="uniform" value="1"/>
+        </attr>
+    </declare-styleable>
+
+</resources>

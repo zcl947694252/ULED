@@ -71,7 +71,7 @@ import io.reactivex.disposables.Disposable;
  * Created by hejiajun on 2018/4/16.
  */
 
-public class MeFragment extends BaseFragment implements EventListener<String> {
+public class MeFragment extends BaseFragment {
 
     @BindView(R.id.txt_header_title)
     TextView txtHeaderTitle;
@@ -113,8 +113,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        this.mApplication.addEventListener(NotificationEvent.ONLINE_STATUS, this);
-
 
         if (Build.BRAND.contains("Huawei")) {
             sleepTime = 500;
@@ -157,7 +155,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         if (isVisibleToUser) {
             this.mApplication = TelinkLightApplication.getApp();
             MainActivity mainAct = (MainActivity) getActivity();
-            this.mApplication.removeEventListener(NotificationEvent.ONLINE_STATUS, mainAct);
 //            getVersion();
         } else {
             compositeDisposable.dispose();
@@ -446,20 +443,6 @@ public class MeFragment extends BaseFragment implements EventListener<String> {
         MainActivity act = (MainActivity) getActivity();
         if (act != null)
             act.addEventListeners();
-    }
-
-    /**
-     * 事件处理方法
-     *
-     * @param event
-     */
-    @Override
-    public void performed(Event<String> event) {
-        switch (event.getType()) {
-            case NotificationEvent.ONLINE_STATUS:
-                onOnlineStatusNotify((NotificationEvent) event);
-                break;
-        }
     }
 
     private void onOnlineStatusNotify(NotificationEvent event) {
