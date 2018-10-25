@@ -16,10 +16,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:text="@string/trigger_mode"
         android:textSize="18sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="@id/tilMinimumBrightness"
         app:layout_constraintTop_toBottomOf="@id/include3"
         />
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:entries="@array/startup_mode"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/tvSelectStartupMode"
         app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
         app:layout_constraintHorizontal_bias="1.0"
@@ -44,7 +44,7 @@
         android:text="@string/switch_mode"
         android:textSize="18sp"
         android:layout_marginTop="32dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="@+id/tvSelectStartupMode"
         app:layout_constraintTop_toBottomOf="@+id/tvSelectStartupMode" />
 
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:entries="@array/switch_mode"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/tvSwitchMode"
         app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
         app:layout_constraintHorizontal_bias="1.0"
@@ -68,7 +68,7 @@
         android:layout_marginTop="32dp"
         android:text="@string/delay_unit"
         android:textSize="18sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="@+id/tvSwitchMode"
         app:layout_constraintTop_toBottomOf="@+id/tvSwitchMode" />
 
@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:entries="@array/delay_unit"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/tvDelayUnit"
         app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
         app:layout_constraintHorizontal_bias="1.0"
@@ -128,12 +128,13 @@
 
     <TextView
         android:id="@+id/tvTriggerLux"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="140dp"
+        android:layout_height="40dp"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:text="@string/trigger_lux"
         android:textSize="18sp"
+        app:autoSizeTextType = "uniform"
         app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
         app:layout_constraintTop_toBottomOf="@+id/tilMinimumBrightness" />
 
@@ -154,7 +155,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:text="@string/select_group"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"

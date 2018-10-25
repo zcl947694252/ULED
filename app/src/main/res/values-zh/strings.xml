@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="startup_mode" translatable="false">
+    <string-array name="startup_mode">
         <item>经过时候开灯</item>
         <item>经过时候关灯</item>
     </string-array>
 
-    <string-array name="switch_mode" translatable="false">
+    <string-array name="switch_mode" >
         <item>瞬间</item>
         <item>渐变</item>
     </string-array>
 
-    <string-array name="delay_unit" translatable="false">
+    <string-array name="delay_unit" >
         <item>分钟</item>
         <item>秒</item>
     </string-array>
@@ -213,7 +213,7 @@
     <string name="user_login_title">用户登录</string>
     <string name="logging_tip">正在登录</string>
     <string name="login_success">登录成功</string>
-    <string name="register_name">新用户注册</string>
+    <string name="user_register">用户注册</string>
     <string name="login_fail">登录失败</string>
     <string name="name_or_password_error">用户名或密码错误！</string>
     <string name="phone_current">当前手机号：%1$s</string>
@@ -295,7 +295,8 @@
     <string name="network_tip_title">网络状态提示</string>
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请设置网络！</string>
     <string name="devoloping">开发中……敬请期待！</string>
-    <string name="repaet_send">(%1$d s)重新发送</string>
+    <string name="regetCount">重新获取(%1$d)</string>
+    <string name="reget">重新获取</string>
     <string name="manager_verification">管理员权限验证</string>
     <string name="manager_phone_error">管理员手机号错误</string>
     <string name="answer_app">问题解答</string>
@@ -381,6 +382,12 @@
     <string name="start_connect">连接中……</string>
     <string name="update_firmware_tip2">升级时请尽可能的靠近灯！</string>
     <string name="trigger_mode">触发方式</string>
+    <string name="rgb">RGB灯</string>
+    <string name="btn_get_verificationCode">获取</string>
+    <string name="register">注册</string>
+    <string name="set_password">设置密码</string>
+    <string name="update_permission_tip">请同意相关权限才能升级</string>
+    <string name="select_color_title">颜色选择</string>
     <string name="switch_mode">开关方式</string>
     <string name="delay_unit">延时单位</string>
 </resources>
