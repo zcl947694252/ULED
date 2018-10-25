@@ -9,7 +9,6 @@ import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.light.EmptyAddActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
@@ -18,6 +17,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkFactory.md5
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.StringUtils
@@ -185,7 +185,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun TransformView() {
-        startActivity(Intent(this@RegisterActivity, EmptyAddActivity::class.java))
+        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
         finish()
     }
 

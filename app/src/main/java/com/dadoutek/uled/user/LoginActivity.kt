@@ -13,7 +13,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
-import com.dadoutek.uled.light.EmptyAddActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
@@ -188,7 +187,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun transformView() {
         if (DBUtils.allLight.isEmpty()) {
-            startActivity(Intent(this@LoginActivity, EmptyAddActivity::class.java))
+            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
             finish()
         } else {
             startActivity(Intent(this@LoginActivity, MainActivity::class.java))

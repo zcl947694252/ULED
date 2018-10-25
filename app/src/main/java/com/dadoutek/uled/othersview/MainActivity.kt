@@ -505,8 +505,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
 
-            val uuid=event.args.deviceInfo.productUUID
-
             val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
             notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
@@ -520,6 +518,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                 val meshAddress = notificationInfo.meshAddress
                 val brightness = notificationInfo.brightness
+                val productUUID = notificationInfo.reserve
                 val connectionStatus = notificationInfo.connectionStatus
 //            Log.d("Saw", "meshAddress = " + meshAddress + "  reserve = " + notificationInfo.reserve +
 //                    " status = " + notificationInfo.status + " connectionStatus = " + notificationInfo.connectionStatus.value)
@@ -528,13 +527,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     if (dbLight != null) {
                         dbLight.connectionStatus = connectionStatus.value
                         dbLight.updateIcon()
-                        val data = event.args.params
-                        if((data[3].toInt() and 0xff)==0xff && dbLight.productUUID==0xff){
+                        if((productUUID and 0xff)==0xff && dbLight.productUUID==0xff){
                             dbLight.productUUID=0x04
 //                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+data[3]+"-"+(data[3].toInt() and 0xff))
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+Arrays.bytesToHexString(data,"-"))
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+dbLight.meshAddr)
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+uuid)
+                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+(productUUID and 0xff))
                         }
                         Thread{
                             DBUtils.updateLightLocal(dbLight)
@@ -543,12 +539,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     } else {
                         if (connectionStatus != ConnectionStatus.OFFLINE) {
                             val dbLightNew = DbLight()
-                            val data = event.args.params
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_2:"+"data="+Arrays.bytesToHexString(data,"-")+";mesh="+meshAddress)
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_2:"+uuid)
-                            if((data[3].toInt() and 0xff)==0xff||(data[3].toInt() and 0xff)==0x04){
+                            com.blankj.utilcode.util.LogUtils.d("light_mesh_2:"+(productUUID and 0xff))
+                            if((productUUID and 0xff)==0xff||(productUUID and 0xff)==0x04){
                                 dbLightNew?.productUUID=0x04
-                            }else if((data[3].toInt() and 0xff)==0x06){
+                            }else if((productUUID and 0xff)==0x06){
                                 dbLightNew?.productUUID=0x06
                             }
                             dbLightNew.setConnectionStatus(connectionStatus.value)
