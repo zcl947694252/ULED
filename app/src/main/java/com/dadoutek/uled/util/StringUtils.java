@@ -90,11 +90,25 @@ public class StringUtils {
 //                    return Constant.FIRMWARE_TYPE_CONTROLLER;
 //                }
             case 1:
-                return versionContent[1].replaceAll("\\.","").replaceAll("bin","");
+                String numVersion=versionContent[1].replaceAll("\\.","").replaceAll("bin","");
+                if(isNumeric(numVersion)){
+                    return numVersion;
+                }else{
+                    return "-1";
+                }
             case 2:
                 return versionPart.replaceAll("\\.bin","");
         }
         return "";
+    }
+
+    public static boolean isNumeric(String str){
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(str);
+        if( !isNum.matches() ){
+            return false;
+        }
+        return true;
     }
 
     /**
