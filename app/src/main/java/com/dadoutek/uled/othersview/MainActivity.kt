@@ -281,77 +281,63 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         mConnectDisposal?.dispose()
     }
 
+    @SuppressLint("CheckResult")
     private fun connect(mac: String) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe(Consumer {
-            if (it) {
-                //授予了权限
-                if (TelinkLightService.Instance() != null) {
-                    progressBar?.visibility = View.VISIBLE
-//                    TelinkLightService.Instance().idleMode(false)
+                Manifest.permission.BLUETOOTH_ADMIN)
+                .subscribe {
+                    if (it) {
+                        //授予了权限
+                        if (TelinkLightService.Instance() != null) {
+                            progressBar?.visibility = View.VISIBLE
+                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                            startConnectTimer()
 
-//                    SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
-//
-//                    val mesh = this.mApplication?.mesh
-//
-//                    val account = DBUtils.lastUser?.account
-////                    //自动重连参数
-//                    val connectParams = Parameters.createAutoConnectParameters()
-//                    connectParams.setMeshName(account)
-//                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16))
-////                    LogUtils.d("connect pwd = ${NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)}")
-//                    connectParams.autoEnableNotification(true)
-//                    connectParams.setTimeoutSeconds(CONNECT_TIMEOUT)
-//                    connectParams.setConnectMac(mac)
-//
-//                    TelinkLightService.Instance().autoConnect(connectParams)
-//                    LeBluetooth.getInstance().stopScan()
-                    TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-                    startConnectTimer()
+                            if (mConnectSnackBar?.isShown != true)
+                                mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
 
-                    if (mConnectSnackBar?.isShown != true)
-                        mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
-
+                        }
+                    } else {
+                        //没有授予权限
+                        DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
+                    }
                 }
-            } else {
-                //没有授予权限
-                DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
-            }
-        })
     }
 
 
     @SuppressLint("CheckResult")
     private fun startScan() {
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe {
-            if (it) {
-                TelinkLightService.Instance().idleMode(true)
-                bestRSSIDevice = null   //扫描前置空信号最好设备。
-                //扫描参数
-                val account = DBUtils.lastUser?.account
-                val params = LeScanParameters.create()
+            RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_ADMIN)
+                    .subscribeOn(Schedulers.io())
+                    .subscribe {
+                        if (it) {
+                            TelinkLightService.Instance().idleMode(true)
+                            bestRSSIDevice = null   //扫描前置空信号最好设备。
+                            //扫描参数
+                            val account = DBUtils.lastUser?.account
+                            val params = LeScanParameters.create()
 
-                params.setMeshName(account)
-                params.setOutOfMeshName(account)
-                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                params.setScanMode(false)
+                            params.setMeshName(account)
+                            params.setOutOfMeshName(account)
+                            params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                            params.setScanMode(false)
 
-                addScanListeners()
-                TelinkLightService.Instance().startScan(params)
-                startCheckRSSITimer()
+                            addScanListeners()
+                            TelinkLightService.Instance().startScan(params)
+                            startCheckRSSITimer()
 
-                if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
-                    mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                            if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
+                                mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
 
-            } else {
-                //没有授予权限
-                DialogUtils.showNoBlePermissionDialog(this, {
-                    retryConnectCount = 0
-                    startScan()
-                }, { finish() })
-            }
-        }
+                        } else {
+                            //没有授予权限
+                            DialogUtils.showNoBlePermissionDialog(this, {
+                                retryConnectCount = 0
+                                startScan()
+                            }, { finish() })
+                        }
+                    }
     }
 
 

@@ -329,20 +329,21 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
     private fun changeColor(R: Byte, G: Byte, B: Byte) {
 
-        var red = R
+        var red  = R
         var green = G
         var blue = B
 
         val addr = group?.meshAddr
         val opcode = 0xE2.toByte()
 
-        val minVal = 0x50.toByte()
+        val minVal = 0x50
 
-        if (green and 0xff.toByte() <= minVal)
+        if ((green.toInt() and 0xff) <= minVal)
             green = 0
-        if (red and 0xff.toByte() <= minVal)
+        if ((red.toInt() and 0xff) <= minVal)
             red = 0
-        if (blue and 0xff.toByte() <= minVal)
+
+        if ((blue.toInt() and 0xff) <= minVal)
             blue = 0
 
 

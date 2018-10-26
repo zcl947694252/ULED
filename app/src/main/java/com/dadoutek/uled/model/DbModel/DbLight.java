@@ -29,7 +29,7 @@ public class DbLight implements Serializable {
     private int productUUID;
     private Long belongGroupId;
 
-    public String color;//颜色
+    public String color="";//颜色
 
     @Transient
     public boolean selected;//选择状态
