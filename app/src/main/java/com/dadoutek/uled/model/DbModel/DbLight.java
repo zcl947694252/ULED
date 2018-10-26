@@ -1,6 +1,7 @@
 package com.dadoutek.uled.model.DbModel;
 
 import com.dadoutek.uled.R;
+import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
@@ -31,16 +32,21 @@ public class DbLight implements Serializable {
 
     public String color="";//颜色
 
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public String version;//选择状态
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean hasGroup = false;//当前灯是否有被分组
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public int textColor;//文字颜色
 
     public int connectionStatus = 1;//链接状态
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
 

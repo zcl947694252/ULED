@@ -1,5 +1,7 @@
 package com.dadoutek.uled.model.DbModel;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -27,10 +29,13 @@ public class DbGroup implements Serializable{
 
     private String color="";
 
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean checked=false;
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;
+    @Expose(serialize = false, deserialize = false)
     @Transient
     public int textColor;//文字颜色
 
