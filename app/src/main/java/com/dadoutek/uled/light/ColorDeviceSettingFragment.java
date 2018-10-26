@@ -252,11 +252,11 @@ public final class ColorDeviceSettingFragment extends Fragment {
     BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener = new BaseQuickAdapter.OnItemChildLongClickListener() {
         @Override
         public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
-            presetColors.get(position).setColor(light.getColor());
+            presetColors.get(position).setColor(Integer.parseInt(light.getColor()));
             presetColors.get(position).setBrightness(light.getBrightness());
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText(light.getBrightness() + "%");
-            textView.setBackgroundColor(light.getColor());
+            textView.setBackgroundColor(Integer.parseInt(light.getColor()));
             SharedPreferencesHelper.putObject(getActivity(), Constant.LIGHT_PRESET_COLOR, presetColors);
             return false;
         }
@@ -275,7 +275,7 @@ public final class ColorDeviceSettingFragment extends Fragment {
             int color = Color.argb(255, argb[1], argb[2], argb[3]);
             if(fromUser){
                 scrollView.setBackgroundColor(color);
-                light.setColor(color);
+                light.setColor(color+"");
                 changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3]);
             }
         }
