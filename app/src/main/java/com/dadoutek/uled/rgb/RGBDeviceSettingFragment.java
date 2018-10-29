@@ -257,7 +257,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             presetColors.get(position).setBrightness(light.getBrightness());
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText(light.getBrightness() + "%");
-            textView.setBackgroundColor(0xff000000|Integer.parseInt(light.getColor()));
+            textView.setBackgroundColor(light.getColor());
             SharedPreferencesHelper.putObject(getActivity(), Constant.PRESET_COLOR, presetColors);
             return false;
         }
@@ -280,7 +280,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
 //                scrollView.setBackgroundColor(0xff000000|color);
                 if(argb[1]==0 && argb[2]==0 && argb[3]==0){
                 }else{
-                    light.setColor(String.valueOf(color));
+                light.setColor(color);
                     new Thread(() -> changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3])).start();
                 }
             }

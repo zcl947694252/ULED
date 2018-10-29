@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="startup_mode" translatable="false">
+    <string-array name="startup_mode">
         <item>经过时候开灯</item>
         <item>经过时候关灯</item>
     </string-array>
+
+    <string-array name="switch_mode" >
+        <item>瞬间</item>
+        <item>渐变</item>
+    </string-array>
+
+    <string-array name="delay_unit" >
+        <item>分钟</item>
+        <item>秒</item>
+    </string-array>
+
     <!-- Activity Labels -->
     <string name="app_name">优乐迪</string>
     <string name="activity_device_setting_label">设备设置</string>
@@ -316,6 +327,7 @@
     <string name="deleting">删除中</string>
     <string name="move_out_some_lights_in_group_failed">部分组里的灯移出组失败</string>
     <string name="delay_minute">延时(分钟)</string>
+    <string name="delay_seconds">延时(秒)</string>
     <string name="minimum_brightness_percentage">最终亮度(百分比)</string>
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
@@ -376,4 +388,6 @@
     <string name="set_password">设置密码</string>
     <string name="update_permission_tip">请同意相关权限才能升级</string>
     <string name="select_color_title">颜色选择</string>
+    <string name="switch_mode">开关方式</string>
+    <string name="delay_unit">延时单位</string>
 </resources>

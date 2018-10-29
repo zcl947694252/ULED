@@ -17,6 +17,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_pir.*
@@ -29,6 +30,19 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private lateinit var mGroups: List<DbGroup>
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
+    private var isSupportDelayUnitSelect = false
+
+    private var modeStartUpMode=0
+    private var modeDelayUnit=0
+    private var modeSwitchMode=0
+
+    private val MODE_START_UP_MODE_OPEN=0
+    private val MODE_DELAY_UNIT_SECONDS=0
+    private val MODE_SWITCH_MODE_MOMENT=0
+
+    private val MODE_START_UP_MODE_CLOSE=1
+    private val MODE_DELAY_UNIT_MINUTE=2
+    private val MODE_SWITCH_MODE_GRADIENT=4
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +59,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             dstAdress = mDeviceInfo.meshAddress
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
+                        val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
                         isSupportModeSelect = (it ?: "").contains("PS")
@@ -52,6 +67,13 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         if (isSupportModeSelect) {
                             tvSelectStartupMode.visibility = View.VISIBLE
                             spSelectStartupMode.visibility = View.VISIBLE
+                            if(versionNum>=113){
+                                isSupportDelayUnitSelect=true
+                                tvSwitchMode.visibility =View.VISIBLE
+                                spSwitchMode.visibility=View.VISIBLE
+                                tvDelayUnit.visibility=View.VISIBLE
+                                spDelayUnit.visibility=View.VISIBLE
+                            }
                         }
                     },
                     failedCallback = {
@@ -80,6 +102,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         spSelectGroup.adapter = groupsAdapter
         spSelectGroup.onItemSelectedListener = this
         spSelectStartupMode.onItemSelectedListener = this
+        spDelayUnit.onItemSelectedListener=this
+        spSwitchMode.onItemSelectedListener=this
     }
 
 
@@ -129,10 +153,28 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 mSelectGroupAddr = mGroups[position].meshAddr
             }
             R.id.spSelectStartupMode ->{
-                if(position == 0){
+                if(position == 0){//开灯
                     tietMinimumBrightness?.setText("0")
-                }else if(position == 1){
+                    modeStartUpMode=MODE_START_UP_MODE_OPEN
+                }else if(position == 1){//关灯
                     tietMinimumBrightness?.setText("99")
+                    modeStartUpMode=MODE_START_UP_MODE_CLOSE
+                }
+            }
+            R.id.spSwitchMode ->{
+                 if(position==0){
+                     modeSwitchMode=MODE_SWITCH_MODE_MOMENT
+                 }else{
+                     modeSwitchMode=MODE_SWITCH_MODE_GRADIENT
+                 }
+            }
+            R.id.spDelayUnit ->{
+                if(position==0){
+                    tilDelay.hint = getString(R.string.delay_minute)
+                    modeDelayUnit=MODE_DELAY_UNIT_MINUTE
+                }else{
+                    tilDelay.hint = getString(R.string.delay_seconds)
+                    modeDelayUnit=MODE_DELAY_UNIT_SECONDS
                 }
             }
         }
@@ -174,12 +216,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         val mApplication = this.application as TelinkLightApplication
                         val mesh = mApplication.getMesh()
 
-                        var mode = 0
-                        if (isSupportModeSelect) {
-                            mode = getStartupMode()
-                        } else {
-                            mode = 0
-                        }
+                        val mode=getModeValue()
 
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
@@ -208,14 +245,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         }
     }
 
-
-    private fun getStartupMode(): Int {
-        val position = spSelectStartupMode.selectedItemPosition
-        if (position == 0) {
-            return Constant.TURN_ON_THE_LIGHT_AFTER_PASSING
-        } else {
-            return Constant.TURN_OFF_THE_LIGHT_AFTER_PASSING
-        }
+    private fun getModeValue(): Int {
+        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+        LogUtils.d("FINAL_VALUE"+(modeStartUpMode or modeDelayUnit or modeSwitchMode))
+        return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
-
 }

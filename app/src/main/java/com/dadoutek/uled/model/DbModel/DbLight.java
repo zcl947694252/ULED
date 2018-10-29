@@ -44,6 +44,7 @@ public class DbLight implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int textColor;//文字颜色
+    public int color;//颜色
 
     public int connectionStatus = 1;//链接状态
     @Expose(serialize = false, deserialize = false)
@@ -124,13 +125,8 @@ public class DbLight implements Serializable {
         return this.meshUUID;
     }
 
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
+    public int getColor() {
+    public void setColor(int color) {
 
     public void setMeshUUID(int meshUUID) {
         this.meshUUID = meshUUID;
@@ -183,4 +179,11 @@ public class DbLight implements Serializable {
         this.connectionStatus = connectionStatus;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 }

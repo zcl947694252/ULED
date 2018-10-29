@@ -7,10 +7,21 @@
         <item>50</item>
     </string-array>
 
-    <string-array name="startup_mode" translatable="false">
+    <string-array name="startup_mode">
         <item>Turn on the lights</item>
         <item>Turn off the lights</item>
     </string-array>
+
+    <string-array name="switch_mode">
+        <item>Instant</item>
+        <item>Gradient</item>
+    </string-array>
+
+    <string-array name="delay_unit">
+        <item>Minute</item>
+        <item>Second</item>
+    </string-array>
+
     <!-- Activity Labels -->
     <string name="app_name">ULed</string>
     <string name="activity_device_setting_label">Device Setting</string>
@@ -153,7 +164,7 @@
     <string name="install_switch_tips2">2.Press any button one time</string>
     <string name="install_switch_tips3">3.The indicator on the right of USB will stay on</string>
     <string name="install_sensor_tips1">Please power on your Sensor first</string>
-    <string name="install_sensor">Mounting sensor</string>
+    <string name="install_sensor">Install sensor</string>
 
     <string name="search">Search</string>
     <string name="complete">complete</string>
@@ -269,7 +280,7 @@
     <string name="grouping_fail">Failed to group</string>
     <string name="add_scene_gp_tip">Please add a group that needs to be applied to this scene!</string>
     <string name="group_fail_tip">There are currently lights failing to group, please check or try again!</string>
-    <string name="one_click_reset">One-touch factory reset</string>
+    <string name="one_click_reset">Factory reset</string>
     <string name="disconected">not connected</string>
     <string name="reset_all_now">Restoring factory settings</string>
     <string name="reset_fail_tip1">There are no lights at the moment, please check if the lights are installed</string>
@@ -308,7 +319,7 @@
         settings, and finally on the App side select Clear Data, and if other mobile phones are using
         this account, you need to log out or re-install the APP to use it normally. This
         method will clear all user data and use it with caution!</string>
-    <string name="common_question">Common problem</string>
+    <string name="common_question">Q&amp;A</string>
     <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
     <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
     <string name="question_3">3. Can not control, not connect</string>
@@ -325,8 +336,9 @@
     <string name="deleting">deleting</string>
     <string name="move_out_some_lights_in_group_failed">Lights in some groups failed to move out of the group</string>
     <string name="delay_minute">Delay (minutes)</string>
+    <string name="delay_seconds">Delay (seconds)</string>
     <string name="minimum_brightness_percentage">Final brightness (percentage)</string>
-    <string name="trigger_lux">Trigger illumination (lux)</string>
+    <string name="trigger_lux">Trigger illumination(lux)</string>
     <string name="params_cannot_be_empty">Params cannot be empty</string>
     <string name="button1">Button 1</string>
     <string name="button2">Button 2</string>
@@ -349,7 +361,7 @@
     <string name="not_find_pir">Sensor not found</string>
     <string name="max_tip_brightness">The maximum brightness cannot exceed 99</string>
     <string name="time_max_tip">The maximum time cannot exceed 30</string>
-    <string name="ota_str">固件升级</string>
+    <string name="ota_str">OTA</string>
     <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
     <string name="question0">Where can I update my app?</string>
@@ -362,7 +374,7 @@
     <string name="updating">upgrading……</string>
     <string name="update_tip_user">Please don\'t quit the upgrade during the upgrade process, wait patiently!</string>
     <string name="exit_update">Exit the upgrade page after 2s</string>
-    <string name="scan_and_connect">Scan connection...</string>
+    <string name="scan_and_connect">Scan connection…</string>
     <string name="network_disconect">Network not connected</string>
     <string name="getVsersionFail">Failed to get the version number</string>
     <string name="get_server_version_fail">Failed to get the server version!</string>
@@ -374,15 +386,17 @@
     <string name="downloading">downloading:</string>
     <string name="local_version">Pre-upgrade version: %1$s</string>
     <string name="server_version">Upgraded version: %1$s</string>
-    <string name="start_scan">Start scanning...</string>
-    <string name="start_connect">Start connecting...</string>
+    <string name="start_scan">Start scanning…</string>
+    <string name="start_connect">Start connecting…</string>
     <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
     <string name="trigger_mode">Trigger mode</string>
-    <string name="rgb">RGB灯</string>
+    <string name="rgb">RGB light</string>
     <string name="btn_get_verificationCode">Get</string>
-    <string name="register">注册</string>
-    <string name="set_password">设置密码</string>
-    <string name="update_permission_tip">请同意相关权限才能升级</string>
-    <string name="select_color_title">颜色选择</string>
+    <string name="register">Register</string>
+    <string name="set_password">Set password</string>
+    <string name="update_permission_tip">Please allow some permissions</string>
+    <string name="select_color_title">select color</string>
+    <string name="switch_mode">Switch mode</string>
+    <string name="delay_unit">Delay mode</string>
 
 </resources>
