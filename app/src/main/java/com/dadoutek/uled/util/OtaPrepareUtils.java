@@ -223,7 +223,7 @@ public class OtaPrepareUtils {
         int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
         if ((localVersion.contains("L-") || localVersion.contains("LNS-")
                 || localVersion.contains("LN-") || localVersion.contains("C-") || localVersion.contains("CS-")
-                || localVersion.contains("RGB-") && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum!=-1)) {
+                || localVersion.contains("RGB-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum!=-1) {
             return true;
         } else {
             return false;
