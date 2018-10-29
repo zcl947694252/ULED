@@ -37,7 +37,7 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
 
         helper.setText(R.id.name_gp, item.gpName);
         helper.setBackgroundColor(R.id.btn_rgb, item.color==0?TelinkLightApplication.
-                getInstance().getResources().getColor(R.color.primary):item.color);
+                getInstance().getResources().getColor(R.color.primary):(0xff000000|item.color));
         helper.setProgress(R.id.sb_brightness, item.brightness);
         helper.setProgress(R.id.sb_temperature, item.temperature);
         helper.setText(R.id.tv_brightness, sbBrightness.getProgress() + "%");

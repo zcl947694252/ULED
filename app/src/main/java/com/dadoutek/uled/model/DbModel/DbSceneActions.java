@@ -23,7 +23,7 @@ public class DbSceneActions {
     @NotNull
     private int brightness;
 
-    public String color;
+    public String color="";
     
     @Generated(hash = 885919265)
     public DbSceneActions() {

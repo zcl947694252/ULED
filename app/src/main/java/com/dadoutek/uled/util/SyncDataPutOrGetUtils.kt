@@ -115,7 +115,7 @@ class SyncDataPutOrGetUtils {
                         Constant.DB_UPDATE -> {
                             val group = DBUtils.getGroupByID(changeId)
                             return GroupMdodel.update(token, changeId.toInt(),
-                                    group.name, group.brightness, group.colorTemperature, id)
+                                    group.name, group.brightness, group.colorTemperature, group.color,id)
                         }
                     }
                 }

@@ -243,7 +243,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             }).start();
 
             brightnessBar.setProgress(brightness);
-            scrollView.setBackgroundColor(color);
+//            scrollView.setBackgroundColor(color);
             colorR.setText(red + "");
             colorG.setText(green + "");
             colorB.setText(blue + "");
@@ -257,7 +257,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             presetColors.get(position).setBrightness(light.getBrightness());
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText(light.getBrightness() + "%");
-            textView.setBackgroundColor(Integer.parseInt(light.getColor()));
+            textView.setBackgroundColor(0xff000000|Integer.parseInt(light.getColor()));
             SharedPreferencesHelper.putObject(getActivity(), Constant.PRESET_COLOR, presetColors);
             return false;
         }
@@ -273,9 +273,11 @@ public final class RGBDeviceSettingFragment extends Fragment {
             colorG.setText(argb[2] + "");
             colorB.setText(argb[3] + "");
 
-            int color = Color.argb(255, argb[1], argb[2], argb[3]);
+//            int color = Color.rgb(argb[1], argb[2], argb[3]);
+            int color = (argb[1]<<16) | (argb[2]<<8) | (argb[3]);
+            Log.d(TAG, "onColorSelected: "+Integer.toHexString(color));
             if(fromUser){
-                scrollView.setBackgroundColor(color);
+//                scrollView.setBackgroundColor(0xff000000|color);
                 if(argb[1]==0 && argb[2]==0 && argb[3]==0){
                 }else{
                     light.setColor(String.valueOf(color));

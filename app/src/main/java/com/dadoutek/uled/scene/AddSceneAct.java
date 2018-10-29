@@ -216,7 +216,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 //            presetColors.get(position).setBrightness(currentItemGroup.brightness);
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText("");
-            textView.setBackgroundColor(currentColor);
+            textView.setBackgroundColor(0xff000000|currentColor);
             SharedPreferencesHelper.putObject(AddSceneAct.this, Constant.PRESET_COLOR, presetColors);
             return false;
         }
@@ -228,7 +228,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
             int[] argb = envelope.getArgb();
 
-            currentColor = Color.argb(255, argb[1], argb[2], argb[3]);
+            currentColor = (argb[1]<<16) | (argb[2]<<8) | (argb[3]);
             if (fromUser) {
                 if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
                 } else {

@@ -161,7 +161,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         }.start()
 
         brightnessBar?.progress = brightness!!
-        scrollView?.setBackgroundColor(color)
+//        scrollView?.setBackgroundColor(color)
         colorR?.text = red.toString()
         colorG?.text = green.toString()
         colorB?.text = blue.toString()
@@ -173,7 +173,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         presetColors?.get(position)!!.brightness = group!!.brightness
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as TextView?
         textView!!.text = group!!.brightness.toString() + "%"
-        textView.setBackgroundColor(group!!.getColor().toInt())
+        textView.setBackgroundColor(0xff000000.toInt() or group!!.getColor().toInt())
         SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
         false
     }
@@ -313,9 +313,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         colorG?.text = argb[2].toString()
         colorB?.text = argb[3].toString()
 
-        val color = Color.argb(255, argb[1], argb[2], argb[3])
+        val color:Int = argb[1] shl 16 or (argb[2] shl 8) or argb[3]
+//        val color =
+        Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
-            scrollView?.setBackgroundColor(color)
+//            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
             if(argb[1]==0 && argb[2]==0 && argb[3]==0){
             }else{
                 Thread{

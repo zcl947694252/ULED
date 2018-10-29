@@ -378,6 +378,7 @@ object DBUtils {
         actions.brightness = sceneActions.brightness
         actions.colorTemperature = sceneActions.colorTemperature
         actions.groupAddr = sceneActions.groupAddr
+        actions.color=sceneActions.color
 
         DaoSessionInstance.getInstance().dbSceneActionsDao.save(actions)
     }

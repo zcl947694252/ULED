@@ -21,11 +21,12 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int, id: Long): Observable<String>? {
+    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int,color: String,id: Long): Observable<String>? {
         val dbGroup = DbGroup()
         dbGroup.name = name
         dbGroup.brightness = brightness
         dbGroup.colorTemperature = colorTemperature
+        dbGroup.color=color
         return NetworkFactory.getApi()
                 .updateGroup(token, rid, dbGroup)
                 .compose(NetworkTransformer())

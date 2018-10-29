@@ -217,7 +217,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 //            presetColors.get(position).setBrightness(currentItemGroup.brightness);
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText("");
-            textView.setBackgroundColor(currentColor);
+            textView.setBackgroundColor(0xff000000|currentColor);
             SharedPreferencesHelper.putObject(ChangeSceneAct.this, Constant.PRESET_COLOR, presetColors);
             return false;
         }
@@ -229,7 +229,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         public void onColorSelected(ColorEnvelope envelope, boolean fromUser) {
             int[] argb = envelope.getArgb();
 
-            currentColor = Color.argb(255, argb[1], argb[2], argb[3]);
+            currentColor = (argb[1]<<16) | (argb[2]<<8) | (argb[3]);
             if (fromUser) {
                 if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
                 } else {
@@ -301,7 +301,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                     itemGroup.temperature = actions.get(i).getColorTemperature();
                     itemGroup.groupAress = actions.get(i).getGroupAddr();
                     itemGroup.gpName = group.getName();
-                    itemGroup.color = Integer.parseInt(actions.get(i).getColor() == null ?
+                    itemGroup.color = Integer.parseInt((actions.get(i).getColor() == null ||  actions.get(i).getColor().isEmpty())?
                             getResources().getColor(R.color.primary) + "" : actions.get(i).getColor());
                     itemGroupArrayList.add(itemGroup);
 
