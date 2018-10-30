@@ -5,7 +5,7 @@ import android.graphics.Color;
 import java.io.Serializable;
 
 public class ItemColorPreset implements Serializable {
-    int color=Color.GRAY;
+    int color=Color.BLUE;
     int brightness = 100;
 
     public int getColor() {

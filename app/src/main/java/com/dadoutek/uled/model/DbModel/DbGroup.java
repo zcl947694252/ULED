@@ -27,7 +27,7 @@ public class DbGroup implements Serializable{
     private int colorTemperature;
     private int belongRegionId;
 
-    private String color="";
+    private int color;
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -44,9 +44,9 @@ public class DbGroup implements Serializable{
     public DbGroup() {
     }
 
-    @Generated(hash = 1627270948)
+    @Generated(hash = 213726775)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
-            int colorTemperature, int belongRegionId, String color) {
+            int colorTemperature, int belongRegionId, int color) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -56,8 +56,12 @@ public class DbGroup implements Serializable{
         this.color = color;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -65,7 +69,7 @@ public class DbGroup implements Serializable{
     }
 
     public int getMeshAddr() {
-        return this.meshAddr;
+        return meshAddr;
     }
 
     public void setMeshAddr(int meshAddr) {
@@ -73,7 +77,7 @@ public class DbGroup implements Serializable{
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -81,7 +85,7 @@ public class DbGroup implements Serializable{
     }
 
     public int getBrightness() {
-        return this.brightness;
+        return brightness;
     }
 
     public void setBrightness(int brightness) {
@@ -89,7 +93,7 @@ public class DbGroup implements Serializable{
     }
 
     public int getColorTemperature() {
-        return this.colorTemperature;
+        return colorTemperature;
     }
 
     public void setColorTemperature(int colorTemperature) {
@@ -97,18 +101,42 @@ public class DbGroup implements Serializable{
     }
 
     public int getBelongRegionId() {
-        return this.belongRegionId;
+        return belongRegionId;
     }
 
     public void setBelongRegionId(int belongRegionId) {
         this.belongRegionId = belongRegionId;
     }
 
-    public String getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(int color) {
         this.color = color;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
     }
 }

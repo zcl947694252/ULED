@@ -36,18 +36,18 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
         SeekBar sBtemperature = helper.getView(R.id.sb_temperature);
 
         helper.setText(R.id.name_gp, item.gpName);
-        helper.setBackgroundColor(R.id.btn_rgb, item.color==0?TelinkLightApplication.
+        helper.setBackgroundColor(R.id.rgb_view, item.color==0?TelinkLightApplication.
                 getInstance().getResources().getColor(R.color.primary):(0xff000000|item.color));
         helper.setProgress(R.id.sb_brightness, item.brightness);
         helper.setProgress(R.id.sb_temperature, item.temperature);
         helper.setText(R.id.tv_brightness, sbBrightness.getProgress() + "%");
         helper.setText(R.id.tv_temperature, sBtemperature.getProgress() + "%");
         if(OtherUtils.isRGBGroup(DBUtils.INSTANCE.getGroupByMesh(item.groupAress))){
-            helper.setVisible(R.id.btn_rgb, true);
-            helper.setVisible(R.id.sb_temperature_layout, false);
+            helper.setGone(R.id.scene_rgb_layout, true);
+            helper.setGone(R.id.sb_temperature_layout, false);
         }else{
-            helper.setVisible(R.id.btn_rgb, false);
-            helper.setVisible(R.id.sb_temperature_layout, true);
+            helper.setGone(R.id.scene_rgb_layout, false);
+            helper.setGone(R.id.sb_temperature_layout, true);
         }
 
         sbBrightness.setTag(position);

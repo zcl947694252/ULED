@@ -130,17 +130,17 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun groupConvertSpecialValue(groupAddr: Int): Int {
-        var groupid = 0;
-        var groupByte = 0;
+        var groupid = 0
+        var groupByte = 0
         if (groupAddr == 0xFFFF) {
-            groupByte = 0;
+            groupByte = 0
         } else {
-            groupid = groupAddr - 0x8001;
+            groupid = groupAddr - 0x8001
             groupByte = (0x1 shl groupid)
         }
 
 //        console.log("groupid" + groupid + " Byte" + groupByte + "group" + group + "GROUPIDSS" + getActualGroup()[group].id);
-        return groupByte;
+        return groupByte
     }
 
 

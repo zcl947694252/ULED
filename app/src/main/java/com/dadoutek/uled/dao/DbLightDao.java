@@ -33,7 +33,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property MeshUUID = new Property(6, int.class, "meshUUID", false, "MESH_UUID");
         public final static Property ProductUUID = new Property(7, int.class, "productUUID", false, "PRODUCT_UUID");
         public final static Property BelongGroupId = new Property(8, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
-        public final static Property Color = new Property(9, String.class, "color", false, "COLOR");
+        public final static Property Color = new Property(9, int.class, "color", false, "COLOR");
         public final static Property ConnectionStatus = new Property(10, int.class, "connectionStatus", false, "CONNECTION_STATUS");
     }
 
@@ -59,7 +59,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"MESH_UUID\" INTEGER NOT NULL ," + // 6: meshUUID
                 "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 7: productUUID
                 "\"BELONG_GROUP_ID\" INTEGER," + // 8: belongGroupId
-                "\"COLOR\" TEXT," + // 9: color
+                "\"COLOR\" INTEGER NOT NULL ," + // 9: color
                 "\"CONNECTION_STATUS\" INTEGER NOT NULL );"); // 10: connectionStatus
     }
 
@@ -97,11 +97,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
- 
-        String color = entity.getColor();
-        if (color != null) {
-            stmt.bindString(10, color);
-        }
+        stmt.bindLong(10, entity.getColor());
         stmt.bindLong(11, entity.getConnectionStatus());
     }
 
@@ -133,11 +129,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(9, belongGroupId);
         }
- 
-        String color = entity.getColor();
-        if (color != null) {
-            stmt.bindString(10, color);
-        }
+        stmt.bindLong(10, entity.getColor());
         stmt.bindLong(11, entity.getConnectionStatus());
     }
 
@@ -158,7 +150,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.getInt(offset + 6), // meshUUID
             cursor.getInt(offset + 7), // productUUID
             cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // belongGroupId
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // color
+            cursor.getInt(offset + 9), // color
             cursor.getInt(offset + 10) // connectionStatus
         );
         return entity;
@@ -175,7 +167,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setMeshUUID(cursor.getInt(offset + 6));
         entity.setProductUUID(cursor.getInt(offset + 7));
         entity.setBelongGroupId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
-        entity.setColor(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setColor(cursor.getInt(offset + 9));
         entity.setConnectionStatus(cursor.getInt(offset + 10));
      }
     

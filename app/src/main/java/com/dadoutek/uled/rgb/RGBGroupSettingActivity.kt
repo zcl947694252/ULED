@@ -152,7 +152,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 val opcode: Byte = Opcode.SET_LUM
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
                 group?.brightness = brightness!!
-                group?.color = color.toString()
+                group?.color = color
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
                 DBUtils.updateGroup(group!!)
             } catch (e: InterruptedException) {
@@ -169,11 +169,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
     @SuppressLint("SetTextI18n")
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
-        presetColors?.get(position)!!.color = group!!.getColor().toInt()
+        presetColors?.get(position)!!.color = group!!.color
         presetColors?.get(position)!!.brightness = group!!.brightness
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as TextView?
         textView!!.text = group!!.brightness.toString() + "%"
-        textView.setBackgroundColor(0xff000000.toInt() or group!!.getColor().toInt())
+        textView.setBackgroundColor(0xff000000.toInt() or group!!.color)
         SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
         false
     }
@@ -186,12 +186,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
                         deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                 successCallback = {
-                                    (this as NormalGroupSettingActivity).hideLoadingDialog()
-                                    this?.setResult(Constant.RESULT_OK)
-                                    this?.finish()
+                                    this.hideLoadingDialog()
+                                    this.setResult(Constant.RESULT_OK)
+                                    this.finish()
                                 },
                                 failedCallback = {
-                                    (this as NormalGroupSettingActivity).hideLoadingDialog()
+                                    this.hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
@@ -299,7 +299,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 } else if (type == "colorTemperature") {
                     dbLight.colorTemperature = progress
                 } else if(type == "rgb_color"){
-                    dbLight.color = progress.toString()
+                    dbLight.color = progress
                 }
                 DBUtils.updateLight(dbLight)
             }
@@ -321,7 +321,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
             if(argb[1]==0 && argb[2]==0 && argb[3]==0){
             }else{
                 Thread{
-                    group?.color = color.toString()
+                    group?.color = color
                     changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
                     DBUtils.updateGroup(group!!)
                 }.start()
@@ -450,8 +450,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 //        intent.putExtra("group", group)
 //        startActivity(intent)
 //        this?.finish()
-        editTitle?.setFocusableInTouchMode(true)
-        editTitle?.setFocusable(true)
+        editTitle?.isFocusableInTouchMode = true
+        editTitle?.isFocusable = true
         editTitle?.requestFocus()
         btn_sure_edit_rename.visibility=View.VISIBLE
         btn_sure_edit_rename.setOnClickListener {

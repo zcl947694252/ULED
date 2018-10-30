@@ -29,26 +29,13 @@
                 android:layout_marginTop="8dp" />
 
             <TextView
-                android:id="@+id/btn_rgb"
-                android:text="RGB"
-                android:padding="5dp"
-                android:visibility="gone"
-                android:background="@drawable/btn_rec_blue_bt"
-                android:textColor="@color/white"
-                android:layout_centerHorizontal="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="8dp" />
-
-            <TextView
                 android:id="@+id/btn_delete"
                 android:text="@string/delete"
                 android:padding="5dp"
                 android:background="@drawable/btn_rec_red_bt"
                 android:textColor="@color/white"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="15dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -72,7 +59,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_brightness_medium_black_24dp" />
+                    android:background="@drawable/brightness_icon" />
 
                 <SeekBar
                     android:id="@+id/sb_brightness"
@@ -95,12 +82,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:visibility="gone"
                 android:layout_marginTop="15dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_invert_colors_black_24dp" />
+                    android:background="@drawable/color_temp_icon" />
 
                 <SeekBar
                     android:id="@+id/sb_temperature"
@@ -115,6 +103,42 @@
                     android:text="50"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/scene_rgb_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="visible"
+                android:layout_marginTop="15dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rgb_icon" />
+
+                <TextView
+                    android:id="@+id/rgb_view"
+                    android:layout_marginStart="15dp"
+                    android:layout_width="100dp"
+                    android:layout_height="28dp"
+                    android:background="@color/primary"
+                    />
+
+                <TextView
+                    android:id="@+id/btn_rgb"
+                    android:text="@string/edit"
+                    android:padding="5dp"
+                    android:layout_marginStart="140dp"
+                    android:visibility="visible"
+                    android:background="@drawable/btn_rec_blue_bt"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    />
             </LinearLayout>
         </LinearLayout>
 

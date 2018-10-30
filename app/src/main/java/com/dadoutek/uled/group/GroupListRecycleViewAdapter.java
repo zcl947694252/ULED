@@ -2,6 +2,7 @@ package com.dadoutek.uled.group;
 
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseItemDraggableAdapter;
@@ -36,7 +37,11 @@ public class GroupListRecycleViewAdapter extends BaseItemDraggableAdapter<DbGrou
                     helper.setVisible(R.id.rgb_icon_circle,true);
                     TextView tvRgbIconCircle=helper.getView(R.id.rgb_icon_circle);
                     GradientDrawable myGrad = (GradientDrawable)tvRgbIconCircle.getBackground();
-                    myGrad.setColor(0Xff000000|Integer.parseInt(group.getColor()));
+                    if(group.getColor()==0){
+                        tvRgbIconCircle.setVisibility(View.GONE);
+                    }else{
+                        myGrad.setColor(0Xff000000|group.getColor());
+                    }
                 }
             }
             helper.setTextColor(R.id.txt_name, group.textColor)

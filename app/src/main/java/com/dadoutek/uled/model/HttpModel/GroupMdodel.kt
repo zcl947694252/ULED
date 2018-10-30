@@ -21,7 +21,7 @@ object GroupMdodel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int,color: String,id: Long): Observable<String>? {
+    fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int,color: Int,id: Long): Observable<String>? {
         val dbGroup = DbGroup()
         dbGroup.name = name
         dbGroup.brightness = brightness

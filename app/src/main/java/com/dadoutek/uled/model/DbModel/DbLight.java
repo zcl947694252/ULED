@@ -30,7 +30,7 @@ public class DbLight implements Serializable {
     private int productUUID;
     private Long belongGroupId;
 
-    public String color="";//颜色
+    public int color;//颜色
 
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -44,7 +44,6 @@ public class DbLight implements Serializable {
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int textColor;//文字颜色
-    public int color;//颜色
 
     public int connectionStatus = 1;//链接状态
     @Expose(serialize = false, deserialize = false)
@@ -56,10 +55,10 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    @Generated(hash = 2117051117)
+    @Generated(hash = 1270224164)
     public DbLight(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, String macAddr, int meshUUID, int productUUID,
-            Long belongGroupId, String color, int connectionStatus) {
+            Long belongGroupId, int color, int connectionStatus) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -73,8 +72,12 @@ public class DbLight implements Serializable {
         this.connectionStatus = connectionStatus;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -82,7 +85,7 @@ public class DbLight implements Serializable {
     }
 
     public int getMeshAddr() {
-        return this.meshAddr;
+        return meshAddr;
     }
 
     public void setMeshAddr(int meshAddr) {
@@ -90,7 +93,7 @@ public class DbLight implements Serializable {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -98,7 +101,7 @@ public class DbLight implements Serializable {
     }
 
     public int getBrightness() {
-        return this.brightness;
+        return brightness;
     }
 
     public void setBrightness(int brightness) {
@@ -106,7 +109,7 @@ public class DbLight implements Serializable {
     }
 
     public int getColorTemperature() {
-        return this.colorTemperature;
+        return colorTemperature;
     }
 
     public void setColorTemperature(int colorTemperature) {
@@ -114,7 +117,7 @@ public class DbLight implements Serializable {
     }
 
     public String getMacAddr() {
-        return this.macAddr;
+        return macAddr;
     }
 
     public void setMacAddr(String macAddr) {
@@ -122,18 +125,15 @@ public class DbLight implements Serializable {
     }
 
     public int getMeshUUID() {
-        return this.meshUUID;
+        return meshUUID;
     }
-
-    public int getColor() {
-    public void setColor(int color) {
 
     public void setMeshUUID(int meshUUID) {
         this.meshUUID = meshUUID;
     }
 
     public int getProductUUID() {
-        return this.productUUID;
+        return productUUID;
     }
 
     public void setProductUUID(int productUUID) {
@@ -141,11 +141,19 @@ public class DbLight implements Serializable {
     }
 
     public Long getBelongGroupId() {
-        return this.belongGroupId;
+        return belongGroupId;
     }
 
     public void setBelongGroupId(Long belongGroupId) {
         this.belongGroupId = belongGroupId;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 
     public boolean isSelected() {
@@ -154,6 +162,46 @@ public class DbLight implements Serializable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public boolean isHasGroup() {
+        return hasGroup;
+    }
+
+    public void setHasGroup(boolean hasGroup) {
+        this.hasGroup = hasGroup;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    public int getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    public void setConnectionStatus(int connectionStatus) {
+        this.connectionStatus = connectionStatus;
+    }
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
     }
 
     public String getLabel() {
@@ -169,21 +217,5 @@ public class DbLight implements Serializable {
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_light_on;
         }
-    }
-
-    public int getConnectionStatus() {
-        return this.connectionStatus;
-    }
-
-    public void setConnectionStatus(int connectionStatus) {
-        this.connectionStatus = connectionStatus;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
     }
 }

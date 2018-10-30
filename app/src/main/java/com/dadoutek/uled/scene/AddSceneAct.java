@@ -33,11 +33,13 @@ import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter;
 import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.skydoves.colorpickerview.ColorEnvelope;
@@ -69,6 +71,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    private AlertDialog dialog;
     private Scenes scenes;
     private int currentColor;
     private List<ItemColorPreset> presetColors;
@@ -145,7 +148,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         ColorPickerView colorPickerView = view.findViewById(R.id.color_picker);
         colorPickerView.setColorListener(colorEnvelopeListener);
         RecyclerView diyColorRecyclerListView=view.findViewById(R.id.diy_color_recycler_list_view);
-        ColorSelectDiyRecyclerViewAdapter colorSelectDiyRecyclerViewAdapter;
+        ColorSceneSelectDiyRecyclerViewAdapter colorSelectDiyRecyclerViewAdapter;
 
         presetColors = (List<ItemColorPreset>) SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR);
         if (presetColors == null) {
@@ -153,6 +156,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             for (int i = 0; i < 5; i++) {
                 ItemColorPreset itemColorPreset = new ItemColorPreset();
                 itemColorPreset.setBrightness(-1);
+                itemColorPreset.setColor(OtherUtils.getCreateInitColor(i));
                 presetColors.add(itemColorPreset);
             }
         }
@@ -160,7 +164,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 //        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
 //        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(this,5));
-        colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.dialog_color_select_diy_item, presetColors);
+        colorSelectDiyRecyclerViewAdapter = new ColorSceneSelectDiyRecyclerViewAdapter(R.layout.dialog_color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
         colorSelectDiyRecyclerViewAdapter.bindToRecyclerView(diyColorRecyclerListView);
@@ -173,12 +177,18 @@ public class AddSceneAct extends TelinkBaseActivity {
         });
         builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
             itemGroupArrayList.get(currentPosition).color=currentColor;
-            sceneGroupAdapter.getViewByPosition(currentPosition,R.id.btn_rgb).setBackgroundColor(currentColor);
+            sceneGroupAdapter.getViewByPosition(currentPosition,R.id.rgb_view).setBackgroundColor(currentColor);
             sceneGroupAdapter.notifyItemChanged(currentPosition);
         });
 
-        AlertDialog dialog=builder.create();
+        dialog= builder.create();
         dialog.show();
+    }
+
+    private void hideSelectDialog(){
+        if(dialog!=null){
+            dialog.dismiss();
+        }
     }
 
     BaseQuickAdapter.OnItemChildClickListener diyOnItemChildClickListener = new BaseQuickAdapter.OnItemChildClickListener() {
@@ -193,19 +203,25 @@ public class AddSceneAct extends TelinkBaseActivity {
             new Thread(() -> {
                 changeColor((byte) red, (byte) green, (byte) blue);
 
-                try {
-                    Thread.sleep(200);
-                    int addr = itemGroupArrayList.get(currentPosition).groupAress;
-                    byte opcode;
-                    byte[] params;
-                    opcode = (byte) Opcode.SET_LUM;
-                    params = new byte[]{(byte) brightness};
-                    itemGroupArrayList.get(currentPosition).brightness=brightness;
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    Thread.sleep(200);
+//                    int addr = itemGroupArrayList.get(currentPosition).groupAress;
+//                    byte opcode;
+//                    byte[] params;
+//                    opcode = (byte) Opcode.SET_LUM;
+//                    params = new byte[]{(byte) brightness};
+//                    itemGroupArrayList.get(currentPosition).brightness=brightness;
+//                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
             }).start();
+
+            hideSelectDialog();
+            itemGroupArrayList.get(currentPosition).color=currentColor;
+            sceneGroupAdapter.getViewByPosition(currentPosition,R.id.rgb_view).setBackgroundColor(currentColor);
+            sceneGroupAdapter.notifyItemChanged(currentPosition);
         }
     };
 
@@ -483,7 +499,7 @@ public class AddSceneAct extends TelinkBaseActivity {
                 DbSceneActions sceneActions = new DbSceneActions();
                 sceneActions.setBelongSceneId(idAction);
                 sceneActions.setBrightness(itemGroups.get(i).brightness);
-                sceneActions.setColor(String.valueOf(itemGroups.get(i).color));
+                sceneActions.setColor(itemGroups.get(i).color);
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
 //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
 //                sceneActions.setGroupAddr(0xFFFF);
@@ -550,7 +566,7 @@ public class AddSceneAct extends TelinkBaseActivity {
                 byte light = (byte) list.get(i).getBrightness();
                 if (light > 99)
                     light = 99;
-                int color = Integer.parseInt(list.get(i).getColor());
+                int color = list.get(i).getColor();
                 int red = (color & 0xff0000) >> 16;
                 int green = (color & 0x00ff00) >> 8;
                 int blue = (color & 0x0000ff);

@@ -535,7 +535,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                             dbLightNew.updateIcon()
                             dbLightNew.belongGroupId = DBUtils.groupNull?.id
                             dbLightNew.brightness = brightness
-                            dbLightNew.color = "0"
+                            dbLightNew.color = 0
                             dbLightNew.colorTemperature = 0
                             dbLightNew.meshAddr = meshAddress
                             dbLightNew.name = getString(R.string.allLight)

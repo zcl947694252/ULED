@@ -23,56 +23,68 @@ public class DbSceneActions {
     @NotNull
     private int brightness;
 
-    public String color="";
+    public int color;
     
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
-    @Generated(hash = 511749042)
+
+    @Generated(hash = 1872468931)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
-            int colorTemperature, int brightness, String color) {
+            int colorTemperature, int brightness, int color) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
-        this.color = color;
-    }
-    public Long getId() {
-        return this.id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public long getBelongSceneId() {
-        return this.belongSceneId;
-    }
-    public void setBelongSceneId(long belongSceneId) {
-        this.belongSceneId = belongSceneId;
-    }
-    public int getGroupAddr() {
-        return this.groupAddr;
-    }
-    public void setGroupAddr(int groupAddr) {
-        this.groupAddr = groupAddr;
-    }
-    public int getColorTemperature() {
-        return this.colorTemperature;
-    }
-    public void setColorTemperature(int colorTemperature) {
-        this.colorTemperature = colorTemperature;
-    }
-    public int getBrightness() {
-        return this.brightness;
-    }
-    public void setBrightness(int brightness) {
-        this.brightness = brightness;
-    }
-    public String getColor() {
-        return this.color;
-    }
-    public void setColor(String color) {
         this.color = color;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public long getBelongSceneId() {
+        return belongSceneId;
+    }
+
+    public void setBelongSceneId(long belongSceneId) {
+        this.belongSceneId = belongSceneId;
+    }
+
+    public int getGroupAddr() {
+        return groupAddr;
+    }
+
+    public void setGroupAddr(int groupAddr) {
+        this.groupAddr = groupAddr;
+    }
+
+    public int getColorTemperature() {
+        return colorTemperature;
+    }
+
+    public void setColorTemperature(int colorTemperature) {
+        this.colorTemperature = colorTemperature;
+    }
+
+    public int getBrightness() {
+        return brightness;
+    }
+
+    public void setBrightness(int brightness) {
+        this.brightness = brightness;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
 }

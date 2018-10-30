@@ -22,6 +22,15 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/gray"
+        android:text="@string/long_click_select_color_tip"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/diy_color_recycler_list_view"
         android:layout_width="match_parent"

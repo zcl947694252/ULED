@@ -234,7 +234,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
                     opcode = (byte) Opcode.SET_LUM;
                     params = new byte[]{(byte) brightness};
                     light.setBrightness(brightness);
-                    light.setColor(String.valueOf(color));
+                    light.setColor(color);
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
                     DBUtils.INSTANCE.updateLight(light);
                 } catch (InterruptedException e) {
@@ -253,11 +253,11 @@ public final class RGBDeviceSettingFragment extends Fragment {
     BaseQuickAdapter.OnItemChildLongClickListener diyOnItemChildLongClickListener = new BaseQuickAdapter.OnItemChildLongClickListener() {
         @Override
         public boolean onItemChildLongClick(BaseQuickAdapter adapter, View view, int position) {
-            presetColors.get(position).setColor(Integer.parseInt(light.getColor()));
+            presetColors.get(position).setColor(light.getColor());
             presetColors.get(position).setBrightness(light.getBrightness());
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText(light.getBrightness() + "%");
-            textView.setBackgroundColor(light.getColor());
+            textView.setBackgroundColor(0xff000000|light.getColor());
             SharedPreferencesHelper.putObject(getActivity(), Constant.PRESET_COLOR, presetColors);
             return false;
         }
@@ -280,7 +280,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
 //                scrollView.setBackgroundColor(0xff000000|color);
                 if(argb[1]==0 && argb[2]==0 && argb[3]==0){
                 }else{
-                light.setColor(color);
+                    light.setColor(color);
                     new Thread(() -> changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3])).start();
                 }
             }
@@ -489,6 +489,5 @@ public final class RGBDeviceSettingFragment extends Fragment {
         intent.putExtra("light", light);
         intent.putExtra("gpAddress", gpAddress);
         startActivity(intent);
-        getActivity().finish();
     }
 }

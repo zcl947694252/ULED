@@ -109,10 +109,20 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:paddingStart="15dp"
-            android:paddingEnd="15dp">
+            android:paddingEnd="15dp"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/gray"
+                android:text="@string/long_click_select_color_tip"
+                android:gravity="center"
+                />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/diy_color_recycler_list_view"

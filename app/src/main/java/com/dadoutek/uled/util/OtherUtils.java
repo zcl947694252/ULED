@@ -1,5 +1,7 @@
 package com.dadoutek.uled.util;
 
+import android.graphics.Color;
+
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
@@ -63,5 +65,17 @@ public class OtherUtils {
             }
         }
         return true;
+    }
+
+    //初始颜色预设值
+    public static int getCreateInitColor(int type){
+        switch (type){
+            case 0:return Color.BLUE;
+            case 1:return Color.GREEN;
+            case 2:return Color.RED;
+            case 3:return Color.parseColor("#FF83FA");
+            case 4:return Color.parseColor("#9932CC");
+        }
+        return 0;
     }
 }
