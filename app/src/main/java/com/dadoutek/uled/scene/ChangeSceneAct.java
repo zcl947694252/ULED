@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
@@ -279,7 +280,6 @@ public class ChangeSceneAct extends TelinkBaseActivity {
 
         String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
         Log.d("RGBCOLOR", logStr);
-
         TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
     }
 
@@ -575,6 +575,16 @@ public class ChangeSceneAct extends TelinkBaseActivity {
             int green = (color & 0x00ff00) >> 8;
             int blue = (color & 0x0000ff);
 
+            byte minVal = (byte) 0x50;
+            if ((green & 0xff) <= minVal)
+                green = 0;
+            if ((red & 0xff) <= minVal)
+                red = 0;
+            if ((blue & 0xff) <= minVal)
+                blue = 0;
+
+            String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
+            Log.d("RGBCOLOR", logStr);
             params = new byte[]{0x01, (byte) id, light,
                     (byte) red, (byte) green, (byte) blue, temperature};
             TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
@@ -588,6 +598,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         try {
             Thread.sleep(100);
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
