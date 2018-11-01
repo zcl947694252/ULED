@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.View.FOCUSABLE
 import android.view.View.OnClickListener
@@ -78,6 +79,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
 
 
         this.colorPicker = findViewById<View>(R.id.color_picker) as ColorPicker
+
         btn_rename = findViewById<Button>(R.id.btn_rename)
         btn_remove_group = findViewById<Button>(R.id.btn_remove_group)
 

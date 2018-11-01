@@ -30,7 +30,7 @@ public class DbLight implements Serializable {
     private int productUUID;
     private Long belongGroupId;
 
-    public int color;//颜色
+    public int color=0xffffff;//颜色
 
     @Expose(serialize = false, deserialize = false)
     @Transient

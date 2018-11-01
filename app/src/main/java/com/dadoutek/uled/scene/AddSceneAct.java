@@ -134,7 +134,7 @@ public class AddSceneAct extends TelinkBaseActivity {
                 case R.id.btn_delete:
                     delete(adapter, position);
                     break;
-                case R.id.btn_rgb:
+                case R.id.rgb_view:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
                     currentPosition= position;
@@ -584,7 +584,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 
                 params = new byte[]{0x01, (byte) id, light,
                         (byte) red, (byte) green, (byte) blue, temperature};
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
             } while (count < 3);
         }
     }

@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -191,6 +192,10 @@ public final class RGBDeviceSettingFragment extends Fragment {
 
         this.colorPicker = (ColorPickerView) view.findViewById(R.id.color_picker);
         this.colorPicker.setColorListener(colorEnvelopeListener);
+        this.colorPicker.setOnTouchListener((v, event) -> {
+            v.getParent().requestDisallowInterceptTouchEvent(true);
+            return false;
+        });
 
         unbinder = ButterKnife.bind(this, view);
 

@@ -108,14 +108,14 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val group = DBUtils.getGroupByID(changeId)
-                            return GroupMdodel.add(token, group, group.belongRegionId, id, changeId)!!
+                            return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
 
                         }
                         Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                         Constant.DB_UPDATE -> {
                             val group = DBUtils.getGroupByID(changeId)
                             return GroupMdodel.update(token, changeId.toInt(),
-                                    group.name, group.brightness, group.colorTemperature, group.color,id)
+                                    group!!.name, group.brightness, group.colorTemperature, group.color,id)
                         }
                     }
                 }

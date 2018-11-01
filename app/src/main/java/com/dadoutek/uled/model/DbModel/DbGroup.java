@@ -27,7 +27,7 @@ public class DbGroup implements Serializable{
     private int colorTemperature;
     private int belongRegionId;
 
-    private int color;
+    private int color=0xffffff;//颜色;
 
     @Expose(serialize = false, deserialize = false)
     @Transient

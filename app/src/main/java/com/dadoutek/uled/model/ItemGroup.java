@@ -8,6 +8,6 @@ public class ItemGroup {
     public int groupAress = 0;
     public int brightness = 50;
     public int temperature = 50;
-    public int color = 0;
+    public int color = 0xffffff;
     public String gpName = "";
 }

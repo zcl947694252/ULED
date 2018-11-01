@@ -3,7 +3,6 @@ package com.dadoutek.uled.scene;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
@@ -35,7 +33,6 @@ import com.dadoutek.uled.model.ItemGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter;
-import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -86,7 +83,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
     private TelinkLightApplication telinkLightApplication;
     private ArrayList<DbGroup> groupArrayList = new ArrayList<>();
     private ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
-    private ArrayList<String> groupNameArrayList = new ArrayList<>();
+    private ArrayList<Integer> groupMeshAddrArrayList = new ArrayList<>();
     private List<DbGroup> groups = new ArrayList<>();
     /**
      * 输入法管理器
@@ -117,7 +114,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                 case R.id.btn_delete:
                     delete(adapter, position);
                     break;
-                case R.id.btn_rgb:
+                case R.id.rgb_view:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
                     currentPosition = position;
@@ -321,6 +318,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                     itemGroup.color =  actions.get(i).getColor() == 0?
                             getResources().getColor(R.color.primary) : actions.get(i).getColor();
                     itemGroupArrayList.add(itemGroup);
+                    groupMeshAddrArrayList.add(group.getMeshAddr());
 
                     if (group.getMeshAddr() != 0xffff) {
                         includeAll = false;
@@ -339,7 +337,6 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                 }
             }
             groupArrayList.add(group);
-            groupNameArrayList.add(group.getName());
         }
     }
 
@@ -523,17 +520,19 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         }
     }
 
-    private boolean isSave = false;
+    private boolean isChange = true;
 
     private void save() {
         showLoadingDialog(getString(R.string.saving));
         new Thread(() -> {
             String name = editName.getText().toString().trim();
             List<ItemGroup> itemGroups = itemGroupArrayList;
+            List<Integer> nameList = new ArrayList<>();
 
             scene.setName(name);
             DBUtils.INSTANCE.updateScene(scene);
             long idAction = scene.getId();
+
             DBUtils.INSTANCE.deleteSceneActionsList(DBUtils.INSTANCE.getActionsBySceneId(scene.getId()));
 
             for (int i = 0; i < itemGroups.size(); i++) {
@@ -543,8 +542,13 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                 sceneActions.setColorTemperature(itemGroups.get(i).temperature);
                 sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
                 sceneActions.setColor(itemGroups.get(i).color);
+
+                nameList.add(itemGroups.get(i).groupAress);
                 DBUtils.INSTANCE.saveSceneActions(sceneActions);
             }
+
+//            isChange=compareList(nameList,groupMeshAddrArrayList);
+
             try {
                 Thread.sleep(100);
                 updateScene(idAction);
@@ -555,6 +559,14 @@ public class ChangeSceneAct extends TelinkBaseActivity {
                 finish();
             }
         }).start();
+    }
+
+    private boolean compareList(List<Integer> actionsList, ArrayList<Integer> actionsList1) {
+        if(actionsList.size()==actionsList1.size()){
+            return !actionsList1.containsAll(actionsList);
+        }else{
+            return true;
+        }
     }
 
     private void updateScene(long id) throws InterruptedException {
@@ -587,20 +599,22 @@ public class ChangeSceneAct extends TelinkBaseActivity {
             Log.d("RGBCOLOR", logStr);
             params = new byte[]{0x01, (byte) id, light,
                     (byte) red, (byte) green, (byte) blue, temperature};
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
         }
     }
 
     private void deleteScene(long id) {
-        byte opcode = Opcode.SCENE_ADD_OR_DEL;
-        byte[] params;
-        params = new byte[]{0x00, (byte) id};
-        try {
-            Thread.sleep(100);
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(isChange){
+            byte opcode = Opcode.SCENE_ADD_OR_DEL;
+            byte[] params;
+            params = new byte[]{0x00, (byte) id};
+            try {
+                Thread.sleep(100);
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

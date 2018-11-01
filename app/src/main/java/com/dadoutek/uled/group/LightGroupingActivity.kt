@@ -20,7 +20,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBDeviceSettingActivity
-import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -60,7 +59,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     allocDeviceGroup(group)
                     Thread.sleep(100)
                     for (sceneId in sceneIds) {
-                        Commander.addScene(sceneId, light!!.meshAddr)
+                        Commander.addScene(sceneId, light!!.meshAddr,light!!.color)
                     }
                     DBUtils.updateLight(light!!)
                     runOnUiThread {
@@ -128,9 +127,9 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      */
     private fun deletePreGroup(lightMeshAddr: Int) {
         if(DBUtils.getGroupByID(light!!.belongGroupId!!)!=null){
-            val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!).meshAddr
+            val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!)?.meshAddr
             val opcode = Opcode.SET_GROUP
-            val params = byteArrayOf(0x00, (groupAddress and 0xFF).toByte(), //0x00表示删除组
+            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
                     (groupAddress shr 8 and 0xFF).toByte())
             TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
         }

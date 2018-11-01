@@ -102,6 +102,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         this.diyColorRecyclerListView = findViewById<View>(R.id.diy_color_recycler_list_view) as RecyclerView
 
         this.colorPicker = findViewById<View>(R.id.color_picker) as ColorPickerView
+        this.colorPicker!!.setOnTouchListener { v, _ ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            false
+        }
         btn_rename = findViewById<Button>(R.id.btn_rename)
         btn_remove_group = findViewById<Button>(R.id.btn_remove_group)
 

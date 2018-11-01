@@ -3,6 +3,7 @@ package com.dadoutek.uled.model.DbModel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import com.blankj.utilcode.util.LogUtils
 
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -170,8 +171,9 @@ object DBUtils {
     }
 
     
-    fun getGroupByID(id: Long): DbGroup {
-        return DaoSessionInstance.getInstance().dbGroupDao.load(id)
+    fun getGroupByID(id: Long): DbGroup? {
+        val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
+            return group
     }
 
     

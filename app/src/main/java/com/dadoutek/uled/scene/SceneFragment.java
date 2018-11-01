@@ -176,10 +176,9 @@ public class SceneFragment extends BaseFragment implements
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            initData();
-            initView();
+//            initData();
+//            initView();
         }
-
     }
 
     @Override

@@ -98,7 +98,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 app:palette="@drawable/palette"
-                app:selector="@drawable/wheel" />
+                app:selector="@drawable/wheel"
+                />
 
             <Button
                 android:id="@+id/btn_switch"
