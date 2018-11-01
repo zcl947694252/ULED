@@ -347,28 +347,33 @@ public class AddSceneAct extends TelinkBaseActivity {
 
         groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
 
-            DbGroup item = showList.get(position);
-            if (item.getMeshAddr() == 0xffff) {
-                ItemGroup itemGroup = new ItemGroup();
-                itemGroup.brightness = 50;
-                itemGroup.temperature = 50;
-                itemGroup.groupAress = showList.get(position).getMeshAddr();
-                itemGroup.gpName = showList.get(position).getName();
-                changeData(position, showList);
-                sceneGroupAdapter.addData(itemGroup);
-                dialog.dismiss();
-            } else {
-                btnSure.setVisibility(View.VISIBLE);
-                if (showList.get(position).checked) {
-                    showList.get(position).checked = false;
+            if(position!=-1){
+                DbGroup item = showList.get(position);
+                if (item.getMeshAddr() == 0xffff) {
+                    ItemGroup itemGroup = new ItemGroup();
+                    itemGroup.brightness = 50;
+                    itemGroup.temperature = 50;
+                    itemGroup.groupAress = showList.get(position).getMeshAddr();
+                    itemGroup.gpName = showList.get(position).getName();
+                    changeData(position, showList);
+                    sceneGroupAdapter.addData(itemGroup);
+                    dialog.dismiss();
                 } else {
-                    showList.get(position).checked = true;
-                }
+                    btnSure.setVisibility(View.VISIBLE);
+                    if (showList.get(position).checked) {
+                        showList.get(position).checked = false;
+                    } else {
+                        showList.get(position).checked = true;
+                    }
 
-                if (showList.get(0).getMeshAddr() == 0xffff) {
-                    adapter.remove(0);
+                    if (showList.get(0).getMeshAddr() == 0xffff) {
+                        adapter.remove(0);
+                    }
+
+                    view.setClickable(false);
+                    adapter.notifyItemChanged(position);
+                    view.setClickable(true);
                 }
-                adapter.notifyItemChanged(position);
             }
         });
 

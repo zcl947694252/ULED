@@ -172,7 +172,7 @@ object DBUtils {
 
     
     fun getGroupByID(id: Long): DbGroup? {
-        val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
+        val group:DbGroup? = DaoSessionInstance.getInstance().dbGroupDao.load(id)
             return group
     }
 
@@ -627,13 +627,15 @@ object DBUtils {
                     } else if (dataChangeList[i].changeType == Constant.DB_UPDATE && operating == Constant.DB_DELETE) {
                         dataChangeList[i].changeType = operating
                         updateDbchange(dataChangeList[i])
-                        break
+                        continue
                         //                        deleteDbDataChange(dataChangeList.get(i).getId());
                     } else if (dataChangeList[i].changeType == Constant.DB_ADD && operating == Constant.DB_UPDATE) {
                         break
                     } else if (dataChangeList[i].changeType == Constant.DB_DELETE && operating == Constant.DB_ADD) {
                         dataChangeList[i].changeType = operating
                         updateDbchange(dataChangeList[i])
+                        break
+                    }else if(dataChangeList[i].changeType == operating){
                         break
                     }
                 } else if (i == dataChangeList.size - 1) {

@@ -147,18 +147,21 @@ public class SceneFragment extends BaseFragment implements
         }
     }
 
+    synchronized
     private void deleteScene(int position) {
         byte opcode = Opcode.SCENE_ADD_OR_DEL;
         byte[] params;
-        long id = scenesListData.get(position).getId();
-        List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
-        params = new byte[]{0x00, (byte) id};
-        new Thread(() -> {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
-        }).start();
-        DBUtils.INSTANCE.deleteSceneActionsList(list);
-        DBUtils.INSTANCE.deleteScene(scenesListData.get(position));
-        scenesListData.remove(position);
+        if(scenesListData.size()>0){
+            long id = scenesListData.get(position).getId();
+            List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
+            params = new byte[]{0x00, (byte) id};
+            new Thread(() -> {
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+            }).start();
+            DBUtils.INSTANCE.deleteSceneActionsList(list);
+            DBUtils.INSTANCE.deleteScene(scenesListData.get(position));
+            scenesListData.remove(position);
+        }
     }
 
     private void setScene(long id) {

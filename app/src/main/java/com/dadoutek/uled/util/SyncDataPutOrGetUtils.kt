@@ -59,11 +59,11 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                    var observable: Observable<String> = this.sendDataToServer(dbDataChangeList[i].tableName,
+                    var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
                             dbDataChangeList[i].changeId,
                             dbDataChangeList[i].changeType,
-                            dbUser!!.token, dbDataChangeList[i].id!!)!!
-                    observableList.add(observable)
+                            dbUser!!.token, dbDataChangeList[i].id!!)
+                    observable?.let { observableList.add(it) }
 
                     if (i == dbDataChangeList.size - 1) {
 //                                observableNew = observableList.get(j).mergeWith(observableList.get(j-1))
@@ -71,29 +71,36 @@ class SyncDataPutOrGetUtils {
                         val observables = arrayOfNulls<Observable<String>>(observableList.size)
                         observableList.toArray(observables)
 
-                        Observable.mergeArrayDelayError<String>(*observables)
-                                .doFinally {
-                                }
-                                .subscribe(object : NetworkObserver<String?>() {
-                                    override fun onComplete() {
-                                        launch(UI) {
-                                            syncCallback.complete()
+                        if(observables.isNotEmpty()){
+                            Observable.mergeArrayDelayError<String>(*observables)
+                                    .doFinally {
+                                    }
+                                    .subscribe(object : NetworkObserver<String?>() {
+                                        override fun onComplete() {
+                                            launch(UI) {
+                                                syncCallback.complete()
 //                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
+                                            }
                                         }
-                                    }
-                                    override fun onSubscribe(d: Disposable) {
-                                    }
+                                        override fun onSubscribe(d: Disposable) {
+                                        }
 
-                                    override fun onNext(t: String) {
-                                    }
+                                        override fun onNext(t: String) {
+                                        }
 
-                                    override fun onError(e: Throwable) {
-                                        launch(UI) {
-                                            syncCallback.error(e.cause.toString())
+                                        override fun onError(e: Throwable) {
+                                            launch(UI) {
+                                                syncCallback.error(e.cause.toString())
 //                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
+                                            }
                                         }
-                                    }
-                                })
+                                    })
+                        }else{
+                            launch(UI) {
+                                syncCallback.complete()
+//                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
+                            }
+                        }
                     }
                 }
 
@@ -114,8 +121,10 @@ class SyncDataPutOrGetUtils {
                         Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                         Constant.DB_UPDATE -> {
                             val group = DBUtils.getGroupByID(changeId)
-                            return GroupMdodel.update(token, changeId.toInt(),
-                                    group!!.name, group.brightness, group.colorTemperature, group.color,id)
+                            if(group!=null){
+                                return GroupMdodel.update(token, changeId.toInt(),
+                                        group!!.name, group.brightness, group.colorTemperature, group.color,id)
+                            }
                         }
                     }
                 }
