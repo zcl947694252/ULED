@@ -399,6 +399,6 @@
     <string name="switch_mode">Switch mode</string>
     <string name="delay_unit">Delay mode</string>
     <string name="edit">Edit</string>
-    <string name="long_click_select_color_tip">点击小框选择颜色,长按可保存当前颜色</string>
+    <string name="long_click_select_color_tip">Click on the small box to select the color, long press to save the current color</string>
 
 </resources>

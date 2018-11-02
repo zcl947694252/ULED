@@ -85,8 +85,9 @@ dependencies {
     //    compile 'com.android.support:support-v4:26.1.0'
     implementation 'com.blankj:utilcode:1.20.3'
     implementation project(':BluetoothLightLib')
-    implementation 'com.google.zxing:core:3.2.1'
-    implementation 'com.google.zxing:android-core:3.2.1'
+    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'com.google.zxing:android-core:3.3.0'
+    //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     //compile project(':BluetoothStorageLib')
@@ -111,10 +112,10 @@ dependencies {
     implementation 'org.greenrobot:greendao:3.2.2'
     // add library
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.5.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
     implementation 'com.github.ittianyu:BottomNavigationViewEx:1.2.4'
     implementation 'com.hbb20:ccp:2.2.3'
     implementation 'me.zhanghai.android.materialprogressbar:library:1.4.2'

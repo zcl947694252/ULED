@@ -1,6 +1,7 @@
 package com.dadoutek.uled.light;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -65,6 +66,14 @@ public class LightsOfGroupRecyclerViewAdapter extends
                 holder.name.setTextColor(mContext.getResources().getColor(R.color.black));
             }
         }
+
+        GradientDrawable myGrad = (GradientDrawable)holder.tvRgbColor.getBackground();
+        if(light.getColor()==0||light.getColor()==0xffffff){
+            holder.tvRgbColor.setVisibility(View.GONE);
+        }else{
+            holder.tvRgbColor.setVisibility(View.VISIBLE);
+            myGrad.setColor(0Xff000000|light.getColor());
+        }
 //        holder.name.setTextColor(light.textColor);
         holder.ivSetting.setOnClickListener(this);
         holder.ivSetting.setTag(position);
@@ -95,6 +104,8 @@ public class LightsOfGroupRecyclerViewAdapter extends
         TextView name;
         @BindView(R.id.tv_setting)
         ImageView ivSetting;
+        @BindView(R.id.tv_rgb_color)
+        TextView tvRgbColor;
 
         ViewHolder(View view) {
             super(view);

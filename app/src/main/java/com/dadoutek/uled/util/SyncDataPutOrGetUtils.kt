@@ -143,7 +143,7 @@ class SyncDataPutOrGetUtils {
                             val light = DBUtils.getLightByID(changeId)
                             return LightModel.update(token,
                                     light.name, light.brightness,
-                                    light.colorTemperature, light.belongGroupId.toInt(),
+                                    light.colorTemperature, light.belongGroupId.toInt(),light.color,
                                     id, changeId.toInt())
                         }
                     }

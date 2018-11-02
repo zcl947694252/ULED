@@ -37,9 +37,10 @@ public class GroupListRecycleViewAdapter extends BaseItemDraggableAdapter<DbGrou
                     helper.setVisible(R.id.rgb_icon_circle,true);
                     TextView tvRgbIconCircle=helper.getView(R.id.rgb_icon_circle);
                     GradientDrawable myGrad = (GradientDrawable)tvRgbIconCircle.getBackground();
-                    if(group.getColor()==0){
+                    if(group.getColor()==0||group.getColor()==0xffffff){
                         tvRgbIconCircle.setVisibility(View.GONE);
                     }else{
+                        tvRgbIconCircle.setVisibility(View.VISIBLE);
                         myGrad.setColor(0Xff000000|group.getColor());
                     }
                 }

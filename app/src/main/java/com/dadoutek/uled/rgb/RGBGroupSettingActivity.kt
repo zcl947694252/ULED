@@ -159,6 +159,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 group?.color = color
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
                 DBUtils.updateGroup(group!!)
+                updateLights(color, "rgb_color", group!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
@@ -328,6 +329,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                     group?.color = color
                     changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
                     DBUtils.updateGroup(group!!)
+                    updateLights(color, "rgb_color", group!!)
                 }.start()
             }
         }
