@@ -28,8 +28,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 123
-        versionName "2.0.1"
+        versionCode 124
+        versionName "2.0.2"
 
         multiDexEnabled true
 
@@ -73,7 +73,7 @@ kotlin {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 7
+    schemaVersion 8
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
