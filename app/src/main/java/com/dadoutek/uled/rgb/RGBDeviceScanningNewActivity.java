@@ -3,6 +3,7 @@ package com.dadoutek.uled.rgb;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.le.ScanFilter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -92,6 +93,8 @@ import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
+
+import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 /**
  * Created by hejiajun on 2018/5/21.
@@ -367,7 +370,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void doFinish() {
-    if(updateList!=null&&updateList.size()>0){
+        if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
         TelinkLightService.Instance().idleMode(true);
@@ -854,12 +857,12 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         nowLightList = new ArrayList<>();
         if (groups == null) {
             groups = new ArrayList<>();
-            List<DbGroup> list=DBUtils.INSTANCE.getGroupList();
-           for(int i=0;i<list.size();i++){
-               if(OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff ||OtherUtils.groupIsEmpty(list.get(i))){
-                   groups.add(list.get(i));
-               }
-           }
+            List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
+            for (int i = 0; i < list.size(); i++) {
+                if (OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                    groups.add(list.get(i));
+                }
+            }
         }
 
         if (groups.size() > 1) {
@@ -1168,9 +1171,20 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             LogUtils.d("Empty Mesh");
                             return;
                         }
+                        List<ScanFilter> scanFilters = new ArrayList<>();
+                        byte[] manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_RGB};
+
+                        byte[] manuDataMask = new byte[]{0, 0, 0, 0, 0, 0, (byte) 0xFF};
+
+                        ScanFilter scanFilter = new ScanFilter.Builder()
+                                .setManufacturerData(VENDOR_ID, manuData, manuDataMask)
+                                .build();
+                        scanFilters.add(scanFilter);
+
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
+                        params.setScanFilters(scanFilters);
                         params.setMeshName(mesh.getFactoryName());
                         params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
@@ -1219,11 +1233,11 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));
-            if(adapter.getLights()!=null && adapter.getLights().size()>0){
+            if (adapter.getLights() != null && adapter.getLights().size() > 0) {
                 stopTimer();
                 onLeScanTimeout();
                 return;
-            }else{
+            } else {
                 doFinish();
             }
             return;
@@ -1234,8 +1248,8 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==Constant.RGB_UUID) {
-            mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS, Schedulers.io())
+        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID == DeviceType.LIGHT_RGB) {
+            mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(aLong -> {
                         //更新参数
                         deviceInfo.meshAddress = meshAddress;
@@ -1288,7 +1302,8 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> RGBDeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(RGBDeviceScanningNewActivity.this)).start();
 
-                if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==Constant.RGB_UUID) {
+                if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID ==
+                        DeviceType.LIGHT_RGB) {
                     int meshAddress = deviceInfo.meshAddress & 0xFF;
                     DbLight light = this.adapter.get(meshAddress);
 
@@ -1297,7 +1312,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         light = new DbLight();
                         light.setName(deviceInfo.meshName);
                         light.setMeshAddr(meshAddress);
-                        com.blankj.utilcode.util.LogUtils.d("light_mesh_3:"+light.getMeshAddr());
+                        com.blankj.utilcode.util.LogUtils.d("light_mesh_3:" + light.getMeshAddr());
                         light.textColor = this.getResources().getColor(
                                 R.color.black);
                         light.setBelongGroupId(-1L);

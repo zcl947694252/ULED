@@ -5,6 +5,7 @@
 package com.telink.bluetooth.light;
 
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -13,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.telink.TelinkApplication;
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.Peripheral;
@@ -25,9 +25,12 @@ import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.telink.bluetooth.light.Parameters.PARAM_SCAN_FILTER;
 
 public class LightAdapter {
 
@@ -597,8 +600,20 @@ public class LightAdapter {
     private Runnable startScanTask = new Runnable() {
         @Override
         public void run() {
-            if (!LeBluetooth.getInstance().startScan(null)) {
-                setMode(MODE_IDLE);
+//            if (!LeBluetooth.getInstance().startScan(null)) {
+//                setMode(MODE_IDLE);
+//            }
+            List<ScanFilter> filters = (List<ScanFilter>) mParams.get(PARAM_SCAN_FILTER);
+            if (mParams.get(PARAM_SCAN_FILTER) != null) {
+                if (!LeBluetooth.getInstance().startScan(null, filters)) {
+                    setMode(MODE_IDLE);
+                }
+
+
+            } else {
+                if (!LeBluetooth.getInstance().startScan(null)) {
+                    setMode(MODE_IDLE);
+                }
             }
         }
     };
@@ -744,7 +759,7 @@ public class LightAdapter {
             return false;
 
         byte[] outOfMeshName;
-        
+
         byte[] meshName = Strings.stringToBytes(params.getString(Parameters.PARAM_MESH_NAME), 16);
         byte[] meshName1 = light.getMeshName();
 
@@ -773,7 +788,7 @@ public class LightAdapter {
         int minLength = 20;
         int position = 7;
 
-        Log.d("LightAdapter:","light_mesh_2:  "+"data="+Arrays.bytesToHexString(data,"-"));
+        Log.d("LightAdapter:", "light_mesh_2:  " + "data=" + Arrays.bytesToHexString(data, "-"));
 
         if (length < minLength)
             return;
@@ -824,7 +839,7 @@ public class LightAdapter {
 
         if (!ignoreStatus) {
             if (this.status.get() == newStatus) {
-                Log.d("Saw", "return cause same status, status = "+ newStatus);
+                Log.d("Saw", "return cause same status, status = " + newStatus);
                 return;
             }
         }
@@ -1023,7 +1038,7 @@ public class LightAdapter {
 
                 LightPeripheral light = mLightCtrl.getCurrentLight();
                 login(light);
-                Log.d("sggs", "onConnected: "+light.getMacAddress());
+                Log.d("sggs", "onConnected: " + light.getMacAddress());
             } else {
                 mLightCtrl.requestFirmware();
             }
@@ -1279,12 +1294,12 @@ public class LightAdapter {
                 case LightController.LightEvent.DELETE_SUCCESS:
                     setStatus(STATUS_DELETE_COMPLETED);
                     setMode(MODE_IDLE);
-                    Log.d("kkkkkk", "performed: "+"11111");
+                    Log.d("kkkkkk", "performed: " + "11111");
                     break;
                 case LightController.LightEvent.DELETE_FAILURE:
                     setStatus(STATUS_DELETE_FAILURE);
                     setMode(MODE_IDLE);
-                    Log.d("kkkkkk", "performed: "+"222222");
+                    Log.d("kkkkkk", "performed: " + "222222");
                     break;
             }
         }

@@ -3,6 +3,7 @@ package com.dadoutek.uled.light;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.le.ScanFilter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -92,6 +93,8 @@ import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
+
+import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 /**
  * Created by hejiajun on 2018/5/21.
@@ -1168,9 +1171,21 @@ public class NormalDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             LogUtils.d("Empty Mesh");
                             return;
                         }
+
+                        List<ScanFilter> scanFilters = new ArrayList<>();
+                        byte[] manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_NORMAL};
+
+                        byte[] manuDataMask = new byte[]{0, 0, 0, 0, 0, 0, (byte) 0xFF};
+
+                        ScanFilter scanFilter = new ScanFilter.Builder()
+                                .setManufacturerData(VENDOR_ID, manuData, manuDataMask)
+                                .build();
+                        scanFilters.add(scanFilter);
+
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
+                        params.setScanFilters(scanFilters);
                         params.setMeshName(mesh.getFactoryName());
                         params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
@@ -1234,8 +1249,8 @@ public class NormalDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==Constant.NORMAL_UUID) {
-            mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS, Schedulers.io())
+        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==DeviceType.LIGHT_NORMAL) {
+            mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(aLong -> {
                         //更新参数
                         deviceInfo.meshAddress = meshAddress;
@@ -1288,7 +1303,7 @@ public class NormalDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> NormalDeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(NormalDeviceScanningNewActivity.this)).start();
 
-                if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==Constant.NORMAL_UUID) {
+                if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==DeviceType.LIGHT_NORMAL) {
                     int meshAddress = deviceInfo.meshAddress & 0xFF;
                     DbLight light = this.adapter.get(meshAddress);
 

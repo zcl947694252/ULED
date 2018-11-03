@@ -18,6 +18,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBDeviceSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
@@ -180,11 +181,11 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun filter(list: MutableList<DbGroup>) {
         groupsInit?.clear()
         for(i in list.indices){
-            if(light?.productUUID==Constant.NORMAL_UUID){
+            if(light?.productUUID==DeviceType.LIGHT_NORMAL){
                 if(OtherUtils.isNormalGroup(list[i])){
                     groupsInit?.add(list[i])
                 }
-            }else if(light?.productUUID==Constant.RGB_UUID){
+            }else if(light?.productUUID==DeviceType.LIGHT_RGB){
                 if(OtherUtils.isRGBGroup(list[i])){
                     groupsInit?.add(list[i])
                 }
