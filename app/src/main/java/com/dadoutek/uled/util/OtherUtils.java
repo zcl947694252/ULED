@@ -6,6 +6,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DeviceType;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==Constant.RGB_UUID){
+        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.RGB_UUID){
             return true;
         }else{
             return false;
@@ -40,7 +41,7 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==Constant.NORMAL_UUID){
+        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.NORMAL_UUID){
             return true;
         }else{
             return false;

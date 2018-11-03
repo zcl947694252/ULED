@@ -22,6 +22,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
@@ -96,7 +97,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
-                if(currentLight?.productUUID==Constant.RGB_UUID){
+                if(currentLight?.productUUID==DeviceType.RGB_UUID){
                     intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)

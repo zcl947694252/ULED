@@ -150,6 +150,4 @@ public class Constant implements Serializable {
     public static int TURN_ON_THE_LIGHT_AFTER_PASSING=0;
     public static int TURN_OFF_THE_LIGHT_AFTER_PASSING=1;
 
-    public static int RGB_UUID=6;
-    public static int NORMAL_UUID=4;
 }

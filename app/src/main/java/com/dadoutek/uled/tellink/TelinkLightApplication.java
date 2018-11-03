@@ -38,6 +38,7 @@ public final class TelinkLightApplication extends TelinkApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
         DaoSessionInstance.checkAndUpdateDatabase();
 
         Utils.init(this);
@@ -45,10 +46,7 @@ public final class TelinkLightApplication extends TelinkApplication {
             LogUtils.getConfig().setLogSwitch(false);
         }
 
-        LogUtils.d();
-
         MobSDK.init(this);
-        CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
 //        CrashReport.testJavaCrash();
 
         logInfo = new StringBuilder("log:");

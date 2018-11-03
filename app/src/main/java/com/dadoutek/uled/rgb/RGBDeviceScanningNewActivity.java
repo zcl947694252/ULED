@@ -1234,7 +1234,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==Constant.RGB_UUID) {
+        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==DeviceType.RGB_UUID) {
             mDisposable.add(Observable.timer(200, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(aLong -> {
                         //更新参数
@@ -1277,7 +1277,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 deviceInfo1.firmwareRevision = deviceInfo.firmwareRevision;
                 deviceInfo1.longTermKey = deviceInfo.longTermKey;
                 deviceInfo1.macAddress = deviceInfo.macAddress;
-                TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID);
+                TelinkLog.d("deviceInfo-Mac:" + deviceInfo.productUUID+"---"+deviceInfo.macAddress);
                 deviceInfo1.meshAddress = deviceInfo.meshAddress;
                 deviceInfo1.meshUUID = deviceInfo.meshUUID;
                 deviceInfo1.productUUID = deviceInfo.productUUID;
@@ -1288,7 +1288,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> RGBDeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(RGBDeviceScanningNewActivity.this)).start();
 
-                if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==Constant.RGB_UUID) {
+                if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==DeviceType.RGB_UUID) {
                     int meshAddress = deviceInfo.meshAddress & 0xFF;
                     DbLight light = this.adapter.get(meshAddress);
 
