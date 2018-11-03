@@ -142,6 +142,8 @@ public class Constant implements Serializable {
     public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT=1;
     //无频闪调光调色
     public static int CONTROLLER_TYPE_NO_STROBO_DIMMING=2;
+    //RGB控制器
+    public static int CONTROLLER_TYPE_RGB=3;
 
     public static int OTA_SUPPORT_LOWEST_VERSION=206;
 

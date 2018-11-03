@@ -54,6 +54,9 @@ public class OtaPrepareUtils {
                 case "CS":
                     getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
                     break;
+                case "CR":
+                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_RGB, localVersion, otaPrepareListner);
+                    break;
                 default:
                     ToastUtils.showLong(R.string.error_pack);
                     break;
@@ -223,7 +226,7 @@ public class OtaPrepareUtils {
         int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
         if ((localVersion.contains("L-") || localVersion.contains("LNS-")
                 || localVersion.contains("LN-") || localVersion.contains("C-") || localVersion.contains("CS-")
-                || localVersion.contains("RGB-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum!=-1) {
+                || localVersion.contains("CR-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum!=-1) {
             return true;
         } else {
             return false;
