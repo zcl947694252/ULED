@@ -2,7 +2,6 @@ package com.dadoutek.uled.util;
 
 import android.graphics.Color;
 
-import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -33,7 +32,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.RGB_UUID){
+        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.RGB_LIGHT){
             return true;
         }else{
             return false;
@@ -41,7 +40,7 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.NORMAL_UUID){
+        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.NORMAL_LIGHT){
             return true;
         }else{
             return false;

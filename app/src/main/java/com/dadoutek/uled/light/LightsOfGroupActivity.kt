@@ -97,7 +97,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
-                if(currentLight?.productUUID==DeviceType.RGB_UUID){
+                if(currentLight?.productUUID==DeviceType.RGB_LIGHT){
                     intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
