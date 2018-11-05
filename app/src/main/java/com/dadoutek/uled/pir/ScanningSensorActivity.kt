@@ -2,6 +2,7 @@ package com.dadoutek.uled.pir
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.le.ScanFilter
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -88,6 +89,17 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         }
     }
 
+    private fun getScanFilters(): MutableList<ScanFilter>{
+        val scanFilters = ArrayList<ScanFilter>()
+
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SENSOR.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        return scanFilters
+    }
+
 
     @SuppressLint("CheckResult")
     private fun startScan() {
@@ -104,10 +116,12 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
+                    params.setScanFilters(getScanFilters())
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                     params.setOutOfMeshName(mesh.name)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
+
 
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)

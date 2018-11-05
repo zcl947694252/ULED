@@ -382,7 +382,7 @@
     <string name="start_connect">连接中……</string>
     <string name="update_firmware_tip2">升级时请尽可能的靠近灯！</string>
     <string name="trigger_mode">触发方式</string>
-    <string name="rgb">RGB灯</string>
+    <string name="rgb">安装RGB灯</string>
     <string name="btn_get_verificationCode">获取</string>
     <string name="register">注册</string>
     <string name="set_password">设置密码</string>

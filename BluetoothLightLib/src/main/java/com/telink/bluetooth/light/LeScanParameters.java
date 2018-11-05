@@ -4,6 +4,10 @@
  */
 package com.telink.bluetooth.light;
 
+import android.bluetooth.le.ScanFilter;
+
+import java.util.List;
+
 /**
  * 扫描参数类
  * <p>{@link LeScanParameters}定义了{@link LightService#startScan(Parameters)}方法的必须要设置的几项参数.
@@ -29,6 +33,16 @@ public final class LeScanParameters extends Parameters {
      */
     public LeScanParameters setMeshName(String value) {
         this.set(Parameters.PARAM_MESH_NAME, value);
+        return this;
+    }
+    /**
+     * Scan Filter
+     *
+     * @param value
+     * @return
+     */
+    public LeScanParameters setScanFilters(List<ScanFilter> scanFilters) {
+        this.set(Parameters.PARAM_SCAN_FILTER, scanFilters);
         return this;
     }
 

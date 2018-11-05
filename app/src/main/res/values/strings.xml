@@ -390,7 +390,7 @@
     <string name="start_connect">Start connecting…</string>
     <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
     <string name="trigger_mode">Trigger mode</string>
-    <string name="rgb">RGB light</string>
+    <string name="rgb">Install RGB light</string>
     <string name="btn_get_verificationCode">Get</string>
     <string name="register">Register</string>
     <string name="set_password">Set password</string>

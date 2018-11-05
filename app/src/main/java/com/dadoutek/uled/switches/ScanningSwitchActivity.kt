@@ -2,6 +2,7 @@ package com.dadoutek.uled.switches
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.le.ScanFilter
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -10,6 +11,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.VENDOR_ID
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
@@ -89,7 +91,29 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             startScan()
         }
     }
+    private fun getScanFilters(): MutableList<ScanFilter>{
+        val scanFilters = ArrayList<ScanFilter>()
 
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        return scanFilters
+    }
+
+    @SuppressLint("CheckResult")
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
@@ -104,6 +128,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
+
+
+
+                    params.setScanFilters(getScanFilters())
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                     params.setOutOfMeshName(mesh.name)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)

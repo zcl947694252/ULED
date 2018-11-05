@@ -150,4 +150,5 @@ public class Constant implements Serializable {
     public static int TURN_ON_THE_LIGHT_AFTER_PASSING=0;
     public static int TURN_OFF_THE_LIGHT_AFTER_PASSING=1;
 
+    public static int VENDOR_ID = 0x0211;
 }

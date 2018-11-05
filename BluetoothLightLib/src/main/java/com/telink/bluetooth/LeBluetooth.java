@@ -9,7 +9,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -17,6 +19,7 @@ import android.support.annotation.NonNull;
 
 import com.telink.util.ContextUtil;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -50,7 +53,8 @@ public final class LeBluetooth {
     private LeScanCallback mCallback;
     private BluetoothAdapter mAdapter;
     private Context mContext;
-    private boolean mSupportLoScan = false;
+    private boolean mSupportLoScan = true;
+
     /********************************************************************************
      * Construct
      *******************************************************************************/
@@ -88,9 +92,10 @@ public final class LeBluetooth {
         }
     }
 
-    public void setSupportLoScan(boolean support){
+    public void setSupportLoScan(boolean support) {
         this.mSupportLoScan = support;
     }
+
     /**
      * 设置回调函数
      *
@@ -166,6 +171,74 @@ public final class LeBluetooth {
         }
 
         return true;
+    }
+
+
+    synchronized public boolean startScan(final UUID[] serviceUUIDs, final List<ScanFilter>
+            scanFilters) {
+
+        synchronized (this) {
+            if (this.mScanning || this.mStarted)
+                return true;
+        }
+
+        TelinkLog.w("LeBluetooth#StartScan");
+        if (!this.isEnabled())
+            return false;
+
+        synchronized (this) {
+            this.mStarted = true;
+            this.scan(serviceUUIDs, scanFilters);
+        }
+
+        return true;
+    }
+
+    private void scan(final UUID[] serviceUUIDs, List<ScanFilter> scanFilters) {
+        if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
+            mDelayHandler.removeCallbacks(mLocationCheckTask);
+            mDelayHandler.postDelayed(mLocationCheckTask, LOCATION_CHECK_PERIOD);
+            return;
+        }
+        if (isSupportLollipop()) {
+            mScanner = mAdapter.getBluetoothLeScanner();
+            if (mScanner == null) {
+                synchronized (this) {
+                    mScanning = false;
+                }
+                if (mCallback != null)
+                    mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
+            } else {
+                ScanSettings scanSettings = new ScanSettings.Builder()
+//                        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
+//                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+//                        .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
+//                                .setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT)
+//                                .setNumOfMatches()
+                        .build();
+//                mScanner.startScan(mScanCallback);
+                mScanner.startScan(scanFilters, scanSettings, mScanCallback);
+                synchronized (this) {
+                    mScanning = true;
+                }
+                mCallback.onStartedScan();
+            }
+
+        } else {
+            if (!mAdapter.startLeScan(serviceUUIDs,
+                    mLeScanCallback)) {
+                synchronized (this) {
+                    mScanning = false;
+                }
+                if (mCallback != null)
+                    mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
+            } else {
+                synchronized (this) {
+                    mScanning = true;
+                }
+                mCallback.onStartedScan();
+            }
+        }
     }
 
 
@@ -291,7 +364,7 @@ public final class LeBluetooth {
         return this.mAdapter;
     }
 
-    private class LocationCheckTask implements Runnable{
+    private class LocationCheckTask implements Runnable {
 
         @Override
         public void run() {

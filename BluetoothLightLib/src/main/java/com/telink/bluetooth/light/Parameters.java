@@ -28,6 +28,7 @@ public class Parameters {
     public static final String PARAM_AUTO_ENABLE_NOTIFICATION = "com.telink.bluetooth.light.PARAM_AUTO_ENABLE_NOTIFICATION";
     public static final String PARAM_AUTO_CONNECT_MAC = "com.telink.bluetooth.light.PARAM_AUTO_CONNECT_MAC";
     public static final String PARAM_SCAN_MAC = "com.telink.bluetooth.light.PARAM_SCAN_MAC";
+    public static final String PARAM_SCAN_FILTER = "com.telink.bluetooth.light.SCAN_FILTER";
 
     private final Map<String, Object> mParams = new HashMap<>();
 
