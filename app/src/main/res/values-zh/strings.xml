@@ -391,5 +391,5 @@
     <string name="switch_mode">开关方式</string>
     <string name="delay_unit">延时单位</string>
     <string name="edit">编辑</string>
-    <string name="long_click_select_color_tip">点击小框选择颜色,长按可保存当前颜色</string>
+    <string name="long_click_select_color_tip">～单击设置,长按保存</string>
 </resources>

@@ -55,7 +55,7 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
         sbBrightness.setOnSeekBarChangeListener(this);
         sBtemperature.setOnSeekBarChangeListener(this);
         helper.addOnClickListener(R.id.btn_delete);
-        helper.addOnClickListener(R.id.rgb_view);
+        helper.addOnClickListener(R.id.btn_rgb);
     }
 
 

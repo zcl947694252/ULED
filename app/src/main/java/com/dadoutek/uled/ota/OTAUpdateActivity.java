@@ -1,6 +1,7 @@
 package com.dadoutek.uled.ota;
 
 import android.app.AlertDialog;
+import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +25,8 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbUser;
+import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
@@ -65,6 +68,8 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 /**
  * 升级页面
@@ -672,9 +677,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      * action startScan
      */
     private synchronized void startScan() {
+        List<ScanFilter> scanFilters = new ArrayList<>();
+        ScanFilter scanFilter = new ScanFilter.Builder()
+                .setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount())
+                .build();
+        scanFilters.add(scanFilter);
         btnStartUpdate.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
+        params.setScanFilters(scanFilters);
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
         params.setScanMac(dbLight.getMacAddr());

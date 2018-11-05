@@ -134,7 +134,7 @@ public class AddSceneAct extends TelinkBaseActivity {
                 case R.id.btn_delete:
                     delete(adapter, position);
                     break;
-                case R.id.rgb_view:
+                case R.id.btn_rgb:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
                     currentPosition= position;
@@ -219,7 +219,7 @@ public class AddSceneAct extends TelinkBaseActivity {
 //                }
             }).start();
 
-            hideSelectDialog();
+//            hideSelectDialog();
             itemGroupArrayList.get(currentPosition).color=currentColor;
             sceneGroupAdapter.getViewByPosition(currentPosition,R.id.rgb_view).setBackgroundColor(currentColor);
             sceneGroupAdapter.notifyItemChanged(currentPosition);

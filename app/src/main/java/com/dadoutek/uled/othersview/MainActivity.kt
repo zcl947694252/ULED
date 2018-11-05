@@ -3,6 +3,7 @@ package com.dadoutek.uled.othersview
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.le.ScanFilter
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -41,7 +42,6 @@ import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.*
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.util.Arrays
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -50,7 +50,6 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
@@ -59,8 +58,8 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.experimental.and
 
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
@@ -307,37 +306,44 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun startScan() {
-            RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe {
-                        if (it) {
-                            TelinkLightService.Instance().idleMode(true)
-                            bestRSSIDevice = null   //扫描前置空信号最好设备。
-                            //扫描参数
-                            val account = DBUtils.lastUser?.account
-                            val params = LeScanParameters.create()
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN)
+                .subscribeOn(Schedulers.io())
+                .subscribe {
+                    if (it) {
+                        TelinkLightService.Instance().idleMode(true)
+                        bestRSSIDevice = null   //扫描前置空信号最好设备。
+                        //扫描参数
+                        val account = DBUtils.lastUser?.account
 
-                            params.setMeshName(account)
-                            params.setOutOfMeshName(account)
-                            params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                            params.setScanMode(false)
+                        val scanFilters = ArrayList<ScanFilter>()
+                        val scanFilter = ScanFilter.Builder()
+                                .setDeviceName(account)
+                                .build()
+                        scanFilters.add(scanFilter)
 
-                            addScanListeners()
-                            TelinkLightService.Instance().startScan(params)
-                            startCheckRSSITimer()
+                        val params = LeScanParameters.create()
+                        params.setScanFilters(scanFilters)
+                        params.setMeshName(account)
+                        params.setOutOfMeshName(account)
+                        params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                        params.setScanMode(false)
 
-                            if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
-                                mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                        addScanListeners()
+                        TelinkLightService.Instance().startScan(params)
+                        startCheckRSSITimer()
 
-                        } else {
-                            //没有授予权限
-                            DialogUtils.showNoBlePermissionDialog(this, {
-                                retryConnectCount = 0
-                                startScan()
-                            }, { finish() })
-                        }
+                        if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
+                            mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+
+                    } else {
+                        //没有授予权限
+                        DialogUtils.showNoBlePermissionDialog(this, {
+                            retryConnectCount = 0
+                            startScan()
+                        }, { finish() })
                     }
+                }
     }
 
 
@@ -491,64 +497,64 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     @Synchronized
     private fun onOnlineStatusNotify(event: NotificationEvent) {
 
-            val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
+        val notificationInfoList: List<OnlineStatusNotificationParser.DeviceNotificationInfo>?
 
-            notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
+        notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
 
-            if (notificationInfoList.isEmpty()) {
-                LogUtils.d("notificationInfoList is empty")
-                return
-            }
+        if (notificationInfoList.isEmpty()) {
+            LogUtils.d("notificationInfoList is empty")
+            return
+        }
 
-            for (notificationInfo: OnlineStatusNotificationParser.DeviceNotificationInfo in notificationInfoList) {
+        for (notificationInfo: OnlineStatusNotificationParser.DeviceNotificationInfo in notificationInfoList) {
 
-                val meshAddress = notificationInfo.meshAddress
-                val brightness = notificationInfo.brightness
-                val productUUID = notificationInfo.reserve
-                val connectionStatus = notificationInfo.connectionStatus
+            val meshAddress = notificationInfo.meshAddress
+            val brightness = notificationInfo.brightness
+            val productUUID = notificationInfo.reserve
+            val connectionStatus = notificationInfo.connectionStatus
 //            Log.d("Saw", "meshAddress = " + meshAddress + "  reserve = " + notificationInfo.reserve +
 //                    " status = " + notificationInfo.status + " connectionStatus = " + notificationInfo.connectionStatus.value)
-                if (checkIsLight(notificationInfo)) {
-                    val dbLight = DBUtils.getLightByMeshAddr(meshAddress)
-                    if (dbLight != null) {
-                        dbLight.connectionStatus = connectionStatus.value
-                        dbLight.updateIcon()
-                        if((productUUID and 0xff)==0xff && dbLight.productUUID==0xff){
-                            dbLight.productUUID=0x04
+            if (checkIsLight(notificationInfo)) {
+                val dbLight = DBUtils.getLightByMeshAddr(meshAddress)
+                if (dbLight != null) {
+                    dbLight.connectionStatus = connectionStatus.value
+                    dbLight.updateIcon()
+                    if ((productUUID and 0xff) == 0xff && dbLight.productUUID == 0xff) {
+                        dbLight.productUUID = 0x04
 //                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+data[3]+"-"+(data[3].toInt() and 0xff))
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+(productUUID and 0xff))
+                        com.blankj.utilcode.util.LogUtils.d("light_mesh_1:" + (productUUID and 0xff))
+                    }
+                    Thread {
+                        DBUtils.updateLightLocal(dbLight)
+                    }.start()
+                    runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                } else {
+                    if (connectionStatus != ConnectionStatus.OFFLINE) {
+                        val dbLightNew = DbLight()
+                        com.blankj.utilcode.util.LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
+                        if ((productUUID and 0xff) == 0xff || (productUUID and 0xff) == 0x04) {
+                            dbLightNew?.productUUID = 0x04
+                        } else if ((productUUID and 0xff) == 0x06) {
+                            dbLightNew?.productUUID = 0x06
                         }
-                        Thread{
-                            DBUtils.updateLightLocal(dbLight)
+                        dbLightNew.setConnectionStatus(connectionStatus.value)
+                        dbLightNew.updateIcon()
+                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
+                        dbLightNew.brightness = brightness
+                        dbLightNew.color = 0
+                        dbLightNew.colorTemperature = 0
+                        dbLightNew.meshAddr = meshAddress
+                        dbLightNew.name = getString(R.string.allLight)
+                        dbLightNew.macAddr = "0"
+                        Thread {
+                            DBUtils.saveLight(dbLightNew, false)
                         }.start()
-                        runOnUiThread { deviceFragment.notifyDataSetChanged() }
-                    } else {
-                        if (connectionStatus != ConnectionStatus.OFFLINE) {
-                            val dbLightNew = DbLight()
-                            com.blankj.utilcode.util.LogUtils.d("light_mesh_2:"+(productUUID and 0xff))
-                            if((productUUID and 0xff)==0xff||(productUUID and 0xff)==0x04){
-                                dbLightNew?.productUUID=0x04
-                            }else if((productUUID and 0xff)==0x06){
-                                dbLightNew?.productUUID=0x06
-                            }
-                            dbLightNew.setConnectionStatus(connectionStatus.value)
-                            dbLightNew.updateIcon()
-                            dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                            dbLightNew.brightness = brightness
-                            dbLightNew.color = 0
-                            dbLightNew.colorTemperature = 0
-                            dbLightNew.meshAddr = meshAddress
-                            dbLightNew.name = getString(R.string.allLight)
-                            dbLightNew.macAddr = "0"
-                            Thread{
-                                DBUtils.saveLight(dbLightNew, false)
-                            }.start()
-                            com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
-                        }
+                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
-
             }
+
+        }
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
