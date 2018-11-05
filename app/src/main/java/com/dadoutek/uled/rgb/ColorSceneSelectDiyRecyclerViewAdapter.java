@@ -1,6 +1,8 @@
 package com.dadoutek.uled.rgb;
 
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;

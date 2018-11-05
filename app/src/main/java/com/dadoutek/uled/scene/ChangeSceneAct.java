@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -161,9 +162,7 @@ public class ChangeSceneAct extends TelinkBaseActivity {
             }
         }
 
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
-        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        diyColorRecyclerListView.setLayoutManager(layoutmanager);
+        diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(this,5));
         colorSelectDiyRecyclerViewAdapter = new ColorSceneSelectDiyRecyclerViewAdapter(R.layout.dialog_color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);

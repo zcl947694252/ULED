@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -32,6 +33,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_group_setting.*
@@ -117,13 +119,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
             presetColors = java.util.ArrayList<ItemColorPreset>()
             for (i in 0..4) {
                 val itemColorPreset = ItemColorPreset()
+                itemColorPreset.color=OtherUtils.getCreateInitColor(i)
                 presetColors?.add(itemColorPreset)
             }
         }
 
-        val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.HORIZONTAL
-        diyColorRecyclerListView?.layoutManager = layoutmanager
+        diyColorRecyclerListView?.layoutManager = GridLayoutManager(this,5)
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener

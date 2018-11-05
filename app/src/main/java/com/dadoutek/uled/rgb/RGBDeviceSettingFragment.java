@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.OtherUtils;
 import com.skydoves.colorpickerview.ColorEnvelope;
 import com.skydoves.colorpickerview.ColorPickerView;
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
@@ -207,12 +209,12 @@ public final class RGBDeviceSettingFragment extends Fragment {
             presetColors = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 ItemColorPreset itemColorPreset = new ItemColorPreset();
+                itemColorPreset.setColor(OtherUtils.getCreateInitColor(i));
                 presetColors.add(itemColorPreset);
             }
         }
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(getActivity());
-        layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        diyColorRecyclerListView.setLayoutManager(layoutmanager);
+
+        diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(getActivity(),5));
         colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
