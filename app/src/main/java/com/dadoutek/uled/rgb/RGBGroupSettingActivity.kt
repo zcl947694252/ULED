@@ -3,6 +3,7 @@ package com.dadoutek.uled.rgb
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Point
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
@@ -156,7 +157,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 val addr = group?.meshAddr
                 val opcode: Byte = Opcode.SET_LUM
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
-                group?.brightness = brightness!!
+                group?.brightness = brightness
                 group?.color = color
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
                 DBUtils.updateGroup(group!!)

@@ -71,11 +71,11 @@ public class OtherUtils {
     //初始颜色预设值
     public static int getCreateInitColor(int type){
         switch (type){
-            case 0:return Color.BLUE;
-            case 1:return Color.GREEN;
-            case 2:return Color.RED;
-            case 3:return Color.parseColor("#FF83FA");
-            case 4:return Color.parseColor("#9932CC");
+            case 0:return Color.RED;
+            case 1:return Color.BLUE;
+            case 2:return Color.GREEN;
+            case 3:return Color.YELLOW;
+            case 4:return Color.parseColor("#800080");
         }
         return 0;
     }
