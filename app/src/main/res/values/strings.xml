@@ -399,7 +399,7 @@
     <string name="switch_mode">Switch mode</string>
     <string name="delay_unit">Delay mode</string>
     <string name="edit">Edit</string>
-    <string name="long_click_select_color_tip">～Click Settings, long press to save</string>
+    <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
     <string name="current_account_number">Current account number:</string>
 
 </resources>

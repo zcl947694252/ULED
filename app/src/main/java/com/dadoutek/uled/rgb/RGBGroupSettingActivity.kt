@@ -101,7 +101,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         this.colorR = findViewById<View>(R.id.color_r) as TextView
         this.colorG = findViewById<View>(R.id.color_g) as TextView
         this.colorB = findViewById<View>(R.id.color_b) as TextView
-        this.scrollView = findViewById<View>(R.id.scroll_view) as ScrollView
         this.diyColorRecyclerListView = findViewById<View>(R.id.diy_color_recycler_list_view) as RecyclerView
 
         this.colorPicker = findViewById<View>(R.id.color_picker) as ColorPickerView

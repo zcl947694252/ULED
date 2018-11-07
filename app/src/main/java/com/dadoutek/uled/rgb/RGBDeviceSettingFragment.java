@@ -82,8 +82,6 @@ public final class RGBDeviceSettingFragment extends Fragment {
     TextView colorB;
     @BindView(R.id.diy_color_recycler_list_view)
     RecyclerView diyColorRecyclerListView;
-    @BindView(R.id.scroll_view)
-    ScrollView scrollView;
     Unbinder unbinder1;
 
     private SeekBar brightnessBar;

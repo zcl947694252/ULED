@@ -391,6 +391,6 @@
     <string name="switch_mode">开关方式</string>
     <string name="delay_unit">延时单位</string>
     <string name="edit">编辑</string>
-    <string name="long_click_select_color_tip">～单击设置,长按保存</string>
+    <string name="long_click_select_color_tip">*单击设置,长按保存</string>
     <string name="current_account_number">当前账号:</string>
 </resources>

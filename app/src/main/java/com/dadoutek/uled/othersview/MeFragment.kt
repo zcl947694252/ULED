@@ -50,6 +50,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_me.*
+import kotlinx.android.synthetic.main.toolbar.*
 
 
 /**
@@ -174,19 +175,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     }
 
     private fun initView(view: View) {
-//         chearCache= view.findViewById<RelativeLayout>(R.id.chearCache)
-//         updateIte= view.findViewById<RelativeLayout>(R.id.updateIte)
-//         copyDataBase= view.findViewById<RelativeLayout>(R.id.copyDataBase)
-//         appVersion= view.findViewById<TextView>(R.id.appVersion)
-//         exitLogin= view.findViewById<Button>(R.id.exitLogin)
-//         oneClickBackup= view.findViewById<RelativeLayout>(R.id.oneClickBackup)
-//         oneClickReset= view.findViewById<RelativeLayout>(R.id.oneClickReset)
-//         constantQuestion= view.findViewById<RelativeLayout>(R.id.constantQuestion)
-//         userIcon= view.findViewById<ImageView>(R.id.userIcon)
-//         userName= view.findViewById<TextView>(R.id.userName)
-//         tvLightVersionText= view.findViewById<TextView>(R.id.tvLightVersionText)
-//         tvLightVersion= view.findViewById<TextView>(R.id.tvLightVersion)
-
+        toolbar.title=getString(R.string.fragment_name_me)
         val versionName = AppUtils.getVersionName(activity!!)
         appVersion!!.text = versionName
         //暂时屏蔽
