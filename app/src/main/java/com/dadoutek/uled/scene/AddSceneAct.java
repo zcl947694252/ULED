@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -125,8 +128,16 @@ public class AddSceneAct extends TelinkBaseActivity {
         sceneGroupListView.setLayoutManager(layoutmanager);
 
         this.sceneGroupAdapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
-//        sceneGroupListView.setAdapter(adapter);
+
+        DividerItemDecoration decoration = new DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL);
+        decoration.setDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)));
+        //添加分割线
+        sceneGroupListView.addItemDecoration(decoration);
         sceneGroupAdapter.bindToRecyclerView(sceneGroupListView);
+
 
         //删除时恢复可添加组标记
         sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {

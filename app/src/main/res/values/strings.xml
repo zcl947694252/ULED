@@ -353,7 +353,7 @@
     <string name="sync_error_exlogin">Failed to sync data, some data may be lost, still exit?</string>
     <string name="switch_version">version:</string>
     <string name="group_fail">Packet failed, Bluetooth is not connected, please check Bluetooth status</string>
-    <string name="delete">delete</string>
+    <string name="delete">Delete</string>
     <string name="select_all">select all</string>
     <string name="cancel">cancel</string>
     <string name="search_light">search for</string>

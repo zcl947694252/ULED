@@ -153,7 +153,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
 
                         LogUtils.d("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
-                        ToastUtils.showLong(R.string.login_success)
+//                        ToastUtils.showLong(R.string.login_success)
                         hideLoadingDialog()
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
                         showLoadingDialog(getString(R.string.sync_now))
