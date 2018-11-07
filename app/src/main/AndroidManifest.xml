@@ -128,7 +128,7 @@
             android:name=".light.LightsOfGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".scene.AddSceneAct"
+            android:name=".scene.SetSceneAct"
             android:screenOrientation="portrait" />
         <activity
             android:name=".switches.ConfigSceneSwitchActivity"
@@ -150,9 +150,9 @@
         <activity
             android:name=".light.NormalDeviceScanningNewActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".scene.ChangeSceneAct"
-            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".scene.ChangeSceneAct"-->
+            <!--android:screenOrientation="portrait" />-->
         <activity
             android:name=".light.EmptyAddActivity"
             android:screenOrientation="portrait" />

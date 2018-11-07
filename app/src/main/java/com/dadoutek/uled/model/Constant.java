@@ -26,6 +26,7 @@ public class Constant implements Serializable {
 
     public static final String GROUPS_KEY = "LastGroups";
     public static final String CURRENT_SELECT_SCENE = "CURRENT_SELECT_SCENE";
+    public static final String IS_CHANGE_SCENE = "IS_CHANGE_SCENE";
     public static final String SCENE_KEY = "SCENE_LAST";
     public static final String LIGHTS_KEY = "LastLights";
     public static final String DEFAULT_GROUP_ID = "DEFAULT_GROUP_ID";

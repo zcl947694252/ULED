@@ -2,7 +2,7 @@ package com.dadoutek.uled.scene;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -22,7 +22,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
@@ -38,7 +37,6 @@ import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.Scenes;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter;
-import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -61,7 +59,7 @@ import butterknife.OnClick;
  * Created by hejiajun on 2018/5/2.
  */
 
-public class AddSceneAct extends TelinkBaseActivity {
+public class SetSceneAct extends TelinkBaseActivity {
     @BindView(R.id.bt_save)
     Button btSave;
     @BindView(R.id.edit_name)
@@ -75,8 +73,10 @@ public class AddSceneAct extends TelinkBaseActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
+    private boolean isChangeData=false;
     private AlertDialog dialog;
     private Scenes scenes;
+    private DbScene scene;
     private int currentColor;
     private List<ItemColorPreset> presetColors;
     private int currentPosition;
@@ -89,6 +89,7 @@ public class AddSceneAct extends TelinkBaseActivity {
     private ArrayList<ItemGroup> itemGroupArrayList = new ArrayList<>();
     private ArrayList<String> groupNameArrayList = new ArrayList<>();
     private List<DbGroup> groups = new ArrayList<>();
+    private ArrayList<Integer> groupMeshAddrArrayList = new ArrayList<>();
     /**
      * 输入法管理器
      */
@@ -100,8 +101,120 @@ public class AddSceneAct extends TelinkBaseActivity {
         setContentView(R.layout.activity_scene_set);
         ButterKnife.bind(this);
         initToolbar();
-        initData();
-        initView();
+        initType();
+    }
+
+    private void initType() {
+        Intent intent = getIntent();
+        boolean isChangeScene= (boolean) intent.getExtras().get(Constant.IS_CHANGE_SCENE);
+        if(!isChangeScene){
+            isChangeData=false;
+            initData();
+            initView();
+        }else{
+            scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
+            isChangeData=true;
+            initChangeData();
+            initChangeView();
+            initClick();
+        }
+    }
+
+    private void initClick() {
+        //删除时恢复可添加组标记
+        sceneGroupAdapter.setOnItemChildClickListener((adapter, view, position) -> {
+            switch (view.getId()) {
+                case R.id.btn_delete:
+                    delete(adapter, position);
+                    break;
+                case R.id.btn_rgb:
+//                    Intent intent=new Intent(this,)
+//                    startActivityForResult();
+                    currentPosition = position;
+                    showPickColorDialog();
+                    break;
+            }
+        });
+    }
+
+    private void initChangeView() {
+
+        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+        sceneGroupListView.setLayoutManager(layoutmanager);
+
+        this.sceneGroupAdapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
+
+        DividerItemDecoration decoration = new DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL);
+        decoration.setDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)));
+        //添加分割线
+        sceneGroupListView.addItemDecoration(decoration);
+        sceneGroupAdapter.bindToRecyclerView(sceneGroupListView);
+
+        inflater = LayoutInflater.from(this);
+        mInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        editName.setFocusable(false);//设置输入框不可聚焦，即失去焦点和光标
+        editName.setText(scene.getName());
+        if (mInputMethodManager.isActive()) {
+            mInputMethodManager.hideSoftInputFromWindow(editName.getWindowToken(), 0);// 隐藏输入法
+        }
+        StringUtils.initEditTextFilter(editName);
+    }
+
+    private void initChangeData() {
+        telinkLightApplication = (TelinkLightApplication) this.getApplication();
+        dataManager = new DataManager(this, telinkLightApplication.getMesh().getName(), telinkLightApplication.getMesh().getPassword());
+        groups = DBUtils.INSTANCE.getGroupList();
+        itemGroupArrayList = new ArrayList<>();
+
+        Intent intent = getIntent();
+        scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
+//        scene.__setDaoSession(DaoSessionInstance.getInstance());
+
+        List<DbSceneActions> actions = DBUtils.INSTANCE.getActionsBySceneId(scene.getId());
+
+        boolean includeAll = false;
+
+        for (DbGroup group : groups) {
+            group.selected = false;
+
+            loop1:
+            for (int i = 0; i < actions.size(); i++) {
+                if (group.getMeshAddr() == actions.get(i).getGroupAddr()) {
+                    group.selected = true;
+
+                    ItemGroup itemGroup = new ItemGroup();
+                    itemGroup.brightness = actions.get(i).getBrightness();
+                    itemGroup.temperature = actions.get(i).getColorTemperature();
+                    itemGroup.groupAress = actions.get(i).getGroupAddr();
+                    itemGroup.gpName = group.getName();
+                    itemGroup.color =  actions.get(i).getColor() == 0?
+                            getResources().getColor(R.color.primary) : actions.get(i).getColor();
+                    itemGroupArrayList.add(itemGroup);
+                    groupMeshAddrArrayList.add(group.getMeshAddr());
+
+                    if (group.getMeshAddr() != 0xffff) {
+                        includeAll = false;
+                    } else {
+                        includeAll = true;
+                    }
+                    break loop1;
+                }
+            }
+
+            if (includeAll) {
+                group.selected = true;
+            } else {
+                if (group.getMeshAddr() == 0xffff) {
+                    group.selected = true;
+                }
+            }
+            groupArrayList.add(group);
+        }
     }
 
     private void initToolbar() {
@@ -245,7 +358,7 @@ public class AddSceneAct extends TelinkBaseActivity {
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText("");
             textView.setBackgroundColor(0xff000000|currentColor);
-            SharedPreferencesHelper.putObject(AddSceneAct.this, Constant.PRESET_COLOR, presetColors);
+            SharedPreferencesHelper.putObject(SetSceneAct.this, Constant.PRESET_COLOR, presetColors);
             return false;
         }
     };
@@ -330,7 +443,7 @@ public class AddSceneAct extends TelinkBaseActivity {
         AlertDialog dialog;
         List<DbGroup> showList = getShowList();
 
-        View bottomView = View.inflate(AddSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
+        View bottomView = View.inflate(SetSceneAct.this, R.layout.dialog_list, null);//填充ListView布局
         RecyclerView lvGp = bottomView.findViewById(R.id.listview_group);//初始化ListView控件
         Button btnSure = bottomView.findViewById(R.id.btn_sure);
         btnSure.setVisibility(View.GONE);
@@ -473,7 +586,11 @@ public class AddSceneAct extends TelinkBaseActivity {
                 break;
             case R.id.bt_save:
                 if (checked()) {
-                    save();
+                    if(isChangeData){
+                        changeDatasave();
+                    }else{
+                        save();
+                    }
                     setResult(Constant.RESULT_OK);
                 }
                 break;
@@ -602,6 +719,104 @@ public class AddSceneAct extends TelinkBaseActivity {
                         (byte) red, (byte) green, (byte) blue, temperature};
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
             } while (count < 3);
+        }
+    }
+
+    private boolean isChange = true;
+
+    private void changeDatasave() {
+        showLoadingDialog(getString(R.string.saving));
+        new Thread(() -> {
+            String name = editName.getText().toString().trim();
+            List<ItemGroup> itemGroups = itemGroupArrayList;
+            List<Integer> nameList = new ArrayList<>();
+
+            scene.setName(name);
+            DBUtils.INSTANCE.updateScene(scene);
+            long idAction = scene.getId();
+
+            DBUtils.INSTANCE.deleteSceneActionsList(DBUtils.INSTANCE.getActionsBySceneId(scene.getId()));
+
+            for (int i = 0; i < itemGroups.size(); i++) {
+                DbSceneActions sceneActions = new DbSceneActions();
+                sceneActions.setBelongSceneId(idAction);
+                sceneActions.setBrightness(itemGroups.get(i).brightness);
+                sceneActions.setColorTemperature(itemGroups.get(i).temperature);
+                sceneActions.setGroupAddr(itemGroups.get(i).groupAress);
+                sceneActions.setColor(itemGroups.get(i).color);
+
+                nameList.add(itemGroups.get(i).groupAress);
+                DBUtils.INSTANCE.saveSceneActions(sceneActions);
+            }
+
+//            isChange=compareList(nameList,groupMeshAddrArrayList);
+
+            try {
+                Thread.sleep(100);
+                updateScene(idAction);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                hideLoadingDialog();
+                finish();
+            }
+        }).start();
+    }
+
+    private boolean compareList(List<Integer> actionsList, ArrayList<Integer> actionsList1) {
+        if(actionsList.size()==actionsList1.size()){
+            return !actionsList1.containsAll(actionsList);
+        }else{
+            return true;
+        }
+    }
+
+    private void updateScene(long id) throws InterruptedException {
+        deleteScene(id);
+        byte opcode = (byte) Opcode.SCENE_ADD_OR_DEL;
+        List<DbSceneActions> list = DBUtils.INSTANCE.getActionsBySceneId(id);
+        byte[] params;
+        for (int i = 0; i < list.size(); i++) {
+            Thread.sleep(100);
+            byte temperature = (byte) list.get(i).getColorTemperature();
+            if (temperature > 99)
+                temperature = 99;
+            byte light = (byte) list.get(i).getBrightness();
+            if (light > 99)
+                light = 99;
+            int color = list.get(i).getColor();
+            int red = (color & 0xff0000) >> 16;
+            int green = (color & 0x00ff00) >> 8;
+            int blue = (color & 0x0000ff);
+
+            byte minVal = (byte) 0x50;
+            if ((green & 0xff) <= minVal)
+                green = 0;
+            if ((red & 0xff) <= minVal)
+                red = 0;
+            if ((blue & 0xff) <= minVal)
+                blue = 0;
+
+            String logStr = String.format("R = %x, G = %x, B = %x", red, green, blue);
+            Log.d("RGBCOLOR", logStr);
+            params = new byte[]{0x01, (byte) id, light,
+                    (byte) red, (byte) green, (byte) blue, temperature};
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+        }
+    }
+
+    private void deleteScene(long id) {
+        if(isChange){
+            byte opcode = Opcode.SCENE_ADD_OR_DEL;
+            byte[] params;
+            params = new byte[]{0x00, (byte) id};
+            try {
+                Thread.sleep(100);
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
