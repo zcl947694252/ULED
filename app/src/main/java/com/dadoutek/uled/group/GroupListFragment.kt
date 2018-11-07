@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
@@ -19,7 +20,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
-import com.dadoutek.uled.rgb.RGBDeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -29,6 +29,7 @@ import com.dadoutek.uled.othersview.AddMeshActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.rgb.RGBDeviceScanningNewActivity
 import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -83,7 +84,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             }
             R.id.btn_set -> {
                 intent = Intent(mContext, NormalGroupSettingActivity::class.java)
-                if (OtherUtils.isRGBGroup(group) && group.meshAddr!=0xffff) {
+                if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
                     intent = Intent(mContext, RGBGroupSettingActivity::class.java)
                 }
                 intent.putExtra("group", group)
@@ -127,10 +128,58 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        refreshData()
+
         if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
-            this.initData()
-            this.notifyDataSetChanged()
+//            this.initData()
+//            this.notifyDataSetChanged()
+//            refreshData()
         }
+    }
+
+    fun loadData(): List<DbGroup> {
+        var showList = mutableListOf<DbGroup>()
+
+        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
+
+        //如果有调整过顺序取本地数据，否则取数据库数据
+        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
+            showList = dbOldGroupList
+        } else {
+            showList = DBUtils.groupList
+        }
+        return showList
+    }
+
+    fun refreshData() {
+        val mOldDatas: List<DbGroup>? = showList
+        val mNewDatas: List<DbGroup>? = loadData()
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
+                (newItemPosition)?.id) ?: false;
+            }
+
+            override fun getOldListSize(): Int {
+                return mOldDatas?.size ?: 0
+            }
+
+            override fun getNewListSize(): Int {
+                return mNewDatas?.size ?: 0
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val beanOld = mOldDatas?.get(oldItemPosition)
+                val beanNew = mNewDatas?.get(newItemPosition)
+                return if (!beanOld?.name.equals(beanNew?.name)) {
+                    return false//如果有内容不同，就返回false
+                } else true
+
+            }
+        }, true);
+        diffResult.dispatchUpdatesTo(adapter);
+        showList = mNewDatas
+        adapter?.setNewData(showList)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -143,8 +192,8 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        this.initData()
-        this.notifyDataSetChanged()
+//        this.initData()
+//        this.notifyDataSetChanged()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -153,6 +202,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         this.initData()
         return view
     }
+
 
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
@@ -186,9 +236,10 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         super.onHiddenChanged(hidden)
 
         if (!hidden) {
-            this.initData()
+//            this.initData()
         }
     }
+
 
     private fun initData() {
         this.mApplication = activity!!.application as TelinkLightApplication

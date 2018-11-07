@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -365,6 +368,8 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         GroupListAdapter groupListAdapter;
         LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.VERTICAL);
+
+
         lvGp.setLayoutManager(layoutmanager);
         groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
         groupListAdapter.bindToRecyclerView(lvGp);
@@ -477,7 +482,14 @@ public class ChangeSceneAct extends TelinkBaseActivity {
         sceneGroupListView.setLayoutManager(layoutmanager);
 
         this.sceneGroupAdapter = new SceneGroupAdapter(R.layout.scene_group_item, itemGroupArrayList, groupArrayList);
-//        sceneGroupListView.setAdapter(adapter);
+
+        DividerItemDecoration decoration = new DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL);
+        decoration.setDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)));
+        //添加分割线
+        sceneGroupListView.addItemDecoration(decoration);
         sceneGroupAdapter.bindToRecyclerView(sceneGroupListView);
 
         inflater = LayoutInflater.from(this);

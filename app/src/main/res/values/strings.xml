@@ -266,7 +266,7 @@
     <string name="delete_group_confirm">Do you really want to delete the group?</string>
     <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
     <string name="reconnecting">Reconnecting</string>
-    <string name="app_version_name">App version:</string>
+    <string name="app_version_name">Current version:</string>
     <string name="group_not_change_tip">Grouping unchanged, determine exit?</string>
     <string name="save_now">saving</string>
     <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
@@ -353,7 +353,7 @@
     <string name="sync_error_exlogin">Failed to sync data, some data may be lost, still exit?</string>
     <string name="switch_version">version:</string>
     <string name="group_fail">Packet failed, Bluetooth is not connected, please check Bluetooth status</string>
-    <string name="delete">delete</string>
+    <string name="delete">Delete</string>
     <string name="select_all">select all</string>
     <string name="cancel">cancel</string>
     <string name="search_light">search for</string>
@@ -400,5 +400,6 @@
     <string name="delay_unit">Delay mode</string>
     <string name="edit">Edit</string>
     <string name="long_click_select_color_tip">～Click Settings, long press to save</string>
+    <string name="current_account_number">Current account number:</string>
 
 </resources>

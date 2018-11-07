@@ -33,17 +33,17 @@ public class GroupListRecycleViewAdapter extends BaseItemDraggableAdapter<DbGrou
                 helper.setText(R.id.txt_name, TelinkLightApplication.getInstance().getString(R.string.allLight));
             }else{
                 helper.setText(R.id.txt_name, group.getName());
-                if(OtherUtils.isRGBGroup(group)){
-                    helper.setVisible(R.id.rgb_icon_circle,true);
-                    TextView tvRgbIconCircle=helper.getView(R.id.rgb_icon_circle);
-                    GradientDrawable myGrad = (GradientDrawable)tvRgbIconCircle.getBackground();
-                    if(group.getColor()==0||group.getColor()==0xffffff){
-                        tvRgbIconCircle.setVisibility(View.GONE);
-                    }else{
-                        tvRgbIconCircle.setVisibility(View.VISIBLE);
-                        myGrad.setColor(0Xff000000|group.getColor());
-                    }
-                }
+//                if(OtherUtils.isRGBGroup(group)){
+//                    helper.setVisible(R.id.rgb_icon_circle,true);
+//                    TextView tvRgbIconCircle=helper.getView(R.id.rgb_icon_circle);
+//                    GradientDrawable myGrad = (GradientDrawable)tvRgbIconCircle.getBackground();
+//                    if(group.getColor()==0||group.getColor()==0xffffff){
+//                        tvRgbIconCircle.setVisibility(View.GONE);
+//                    }else{
+//                        tvRgbIconCircle.setVisibility(View.VISIBLE);
+//                        myGrad.setColor(0Xff000000|group.getColor());
+//                    }
+//                }
             }
             helper.setTextColor(R.id.txt_name, group.textColor)
                     .addOnClickListener(R.id.txt_name).

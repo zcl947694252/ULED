@@ -137,7 +137,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
                             DBUtils.deleteLocalData()
-                            ToastUtils.showLong(R.string.login_success)
+//                            ToastUtils.showLong(R.string.login_success)
                             SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
                             hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
@@ -180,7 +180,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun syncComplet() {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-        ToastUtils.showLong(getString(R.string.download_data_success))
+//        ToastUtils.showLong(getString(R.string.download_data_success))
         transformView()
         hideLoadingDialog()
     }

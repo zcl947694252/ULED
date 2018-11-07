@@ -261,7 +261,7 @@
     <string name="delete_group_confirm">确定要删除此组吗？</string>
     <string name="phone_or_password_can_not_be_empty">手机号或密码不能为空</string>
     <string name="reconnecting">重连中……</string>
-    <string name="app_version_name">App版本号:</string>
+    <string name="app_version_name">当前版本:</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
     <string name="save_now">正在保存</string>
     <string name="require_permission_reason">App使用蓝牙需要此权限</string>
@@ -392,4 +392,5 @@
     <string name="delay_unit">延时单位</string>
     <string name="edit">编辑</string>
     <string name="long_click_select_color_tip">～单击设置,长按保存</string>
+    <string name="current_account_number">当前账号:</string>
 </resources>
