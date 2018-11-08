@@ -111,7 +111,7 @@ public final class RGBDeviceSettingActivity extends TelinkBaseActivity {
                         txtTitle.setVisibility(View.VISIBLE);
                         txtTitle.setText(localVersion);
                         light.version=localVersion;
-                        tvOta.setVisibility(View.GONE);
+                        tvOta.setVisibility(View.VISIBLE);
                     }else{
                         txtTitle.setVisibility(View.GONE);
                         tvOta.setVisibility(View.GONE);

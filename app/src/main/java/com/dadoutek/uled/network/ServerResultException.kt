@@ -38,10 +38,8 @@ object ServerResultException {
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.server_exception))
             }
             else -> {
-                throw RuntimeException(TelinkLightApplication.getInstance().getString(R.string.unknown_network_error))
+                throw RuntimeException(response.message)
             }
-
-
         }
     }
 }

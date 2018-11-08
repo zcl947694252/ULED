@@ -44,7 +44,6 @@ object AccountModel {
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
-                    syncIsNewUser(it.token, it.account, it)
                     Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -214,32 +213,5 @@ object AccountModel {
         application.setupMesh(mesh)
 
 //        DBUtils.createAllLightControllerGroup()
-    }
-
-
-    private fun syncIsNewUser(token: String, account: String, user: DbUser) {
-//        setIsLogin(true)
-//        setupMesh(account)
-
-        NetworkFactory.getApi()
-                .getRegionList(token)
-                .compose(NetworkTransformer())
-                .observeOn(Schedulers.io())
-                .doOnNext {
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : NetworkObserver<List<DbRegion>>() {
-                    override fun onNext(t: List<DbRegion>) {
-                        //首次注册新用户在此手机登录加载数据，如果是老用户更换设备登录需在登录成功后拉取服务器数据
-                        if (t.size == 0) {
-//                            setIsLogin(true)
-//                            setupMesh(account)
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                    }
-                })
     }
 }
