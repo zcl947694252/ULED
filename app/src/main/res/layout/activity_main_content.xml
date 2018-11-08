@@ -35,7 +35,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#fbfbfb"
+        android:background="@color/background_color"
         app:itemIconTint="@color/selector_item_color"
         app:itemTextColor="@color/selector_item_color"
         app:layout_constraintBottom_toBottomOf="parent"

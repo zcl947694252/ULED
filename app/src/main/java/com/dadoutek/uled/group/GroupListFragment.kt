@@ -176,8 +176,8 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
                 } else true
 
             }
-        }, true);
-        diffResult.dispatchUpdatesTo(adapter);
+        }, true)
+        diffResult.dispatchUpdatesTo(adapter)
         showList = mNewDatas
         adapter?.setNewData(showList)
     }

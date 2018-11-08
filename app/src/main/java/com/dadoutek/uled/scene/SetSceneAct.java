@@ -100,7 +100,6 @@ public class SetSceneAct extends TelinkBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scene_set);
         ButterKnife.bind(this);
-        initToolbar();
         initType();
     }
 
@@ -109,11 +108,13 @@ public class SetSceneAct extends TelinkBaseActivity {
         boolean isChangeScene= (boolean) intent.getExtras().get(Constant.IS_CHANGE_SCENE);
         if(!isChangeScene){
             isChangeData=false;
+            initToolbar();
             initData();
             initView();
         }else{
             scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
             isChangeData=true;
+            initChangeToolbar();
             initChangeData();
             initChangeView();
             initClick();
@@ -219,6 +220,12 @@ public class SetSceneAct extends TelinkBaseActivity {
 
     private void initToolbar() {
         toolbar.setTitle(R.string.create_scene);
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white);
+        toolbar.setNavigationOnClickListener(v -> finish());
+    }
+
+    private void initChangeToolbar() {
+        toolbar.setTitle(R.string.edit_scene);
         toolbar.setNavigationIcon(R.drawable.navigation_back_white);
         toolbar.setNavigationOnClickListener(v -> finish());
     }
@@ -749,7 +756,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                 DBUtils.INSTANCE.saveSceneActions(sceneActions);
             }
 
-//            isChange=compareList(nameList,groupMeshAddrArrayList);
+            isChange=compareList(nameList,groupMeshAddrArrayList);
 
             try {
                 Thread.sleep(100);
