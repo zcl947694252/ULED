@@ -88,6 +88,8 @@
                     android:textColor="@color/black"
                     android:text="111111"
                     android:textSize="16sp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_gravity="center_vertical"
                     />
             </LinearLayout>
@@ -241,7 +243,7 @@
 
             </RelativeLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@drawable/btn_rectangle_all"
@@ -257,22 +259,23 @@
                     android:text="@string/app_version_name"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
                     android:layout_marginStart="10dp"
+
                     />
 
                 <TextView
                     android:id="@+id/appVersion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="1dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:text="1.0.0"
-                    android:layout_toEndOf="@+id/appVersionName"
+                    android:layout_gravity="center_vertical"
                     android:textColor="@color/primary"
-                    android:layout_centerVertical="true"
                     android:textSize="16sp" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
