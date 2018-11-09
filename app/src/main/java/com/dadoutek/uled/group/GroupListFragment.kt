@@ -93,7 +93,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             R.id.txt_name -> {
                 intent = Intent(mContext, LightsOfGroupActivity::class.java)
                 intent.putExtra("group", group)
-                startActivity(intent)
+                startActivityForResult(intent, 0)
             }
         }
     }
@@ -328,14 +328,14 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
             when (item.itemId) {
                 R.id.popup_install_light -> {
                     if (DBUtils.allLight.size < 254) {
-                        startActivity(Intent(mContext, NormalDeviceScanningNewActivity::class.java))
+                        startActivityForResult(Intent(mContext, NormalDeviceScanningNewActivity::class.java),0)
                     } else {
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                 }
                 R.id.popup_install_rgb_light -> {
                     if (DBUtils.allLight.size < 254) {
-                        startActivity(Intent(mContext, RGBDeviceScanningNewActivity::class.java))
+                        startActivityForResult(Intent(mContext, RGBDeviceScanningNewActivity::class.java),0)
                     } else {
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }

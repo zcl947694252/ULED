@@ -128,7 +128,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                 case R.id.btn_delete:
                     delete(adapter, position);
                     break;
-                case R.id.btn_rgb:
+                case R.id.rgb_view:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
                     currentPosition = position;
@@ -265,7 +265,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                 case R.id.btn_delete:
                     delete(adapter, position);
                     break;
-                case R.id.btn_rgb:
+                case R.id.rgb_view:
 //                    Intent intent=new Intent(this,)
 //                    startActivityForResult();
                     currentPosition= position;

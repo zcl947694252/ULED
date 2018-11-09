@@ -29,12 +29,11 @@
         app:layout_constraintStart_toEndOf="@+id/scene_delete"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <Button
         android:id="@+id/scene_edit"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/btn_radius_selector"
         android:gravity="center"
         android:text="@string/scene_edit"
         android:textColor="@color/white"

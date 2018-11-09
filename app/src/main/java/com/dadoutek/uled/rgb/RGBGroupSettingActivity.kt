@@ -133,7 +133,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         brightnessBar!!.progress = group!!.brightness
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
         temperatureBar!!.progress = group!!.colorTemperature
-        tv_temperature_rgb!!.text = getString(R.string.device_setting_temperature, group!!.colorTemperature.toString() + "")
 
 
         this.brightnessBar!!.setOnSeekBarChangeListener(this.barChangeListener)
@@ -275,7 +274,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 params = byteArrayOf(0x05, progress.toByte())
                 group!!.colorTemperature = progress
                 DBUtils.updateGroup(group!!)
-                tv_temperature_rgb!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {

@@ -19,7 +19,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.DeviceListFragment
@@ -181,9 +180,42 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
     }
 
+    var locationServiceDialog: AlertDialog? = null
+    fun showOpenLocationServiceDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(R.string.open_location_service)
+        builder.setNegativeButton(getString(R.string.btn_sure)) { dialog, which ->
+            BleUtils.jumpLocationSetting()
+        }
+        locationServiceDialog = builder.create()
+        locationServiceDialog?.setCancelable(false)
+        locationServiceDialog?.show()
+    }
+
+    fun hideLocationServiceDialog() {
+        locationServiceDialog?.hide()
+    }
+
+
+    fun addEventListeners() {
+        // 监听各种事件
+        addScanListeners()
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+//        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
+        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
+//        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
     override fun onPostResume() {
         super.onPostResume()
         addEventListeners()
+        autoConnect()
+    }
+
+    fun autoConnect() {
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
             Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
@@ -196,12 +228,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
-                    ToastUtils.showShort(R.string.open_location_service)
-
-                    indefiniteSnackbar(root, R.string.open_location_service, R.string.btn_ok) {
-                        BleUtils.jumpLocationSetting()
-                    }
+                    showOpenLocationServiceDialog()
                 } else {
+                    hideLocationServiceDialog()
                     mTelinkLightService = TelinkLightService.Instance()
                     if (mTelinkLightService?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
@@ -229,80 +258,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
             this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
                     ?: 0x00) and 0xFF
         }
-
     }
-
-    override fun onStop() {
-        super.onStop()
-        if (TelinkLightService.Instance() != null)
-            TelinkLightService.Instance().disableAutoRefreshNotify()
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(mReceiver)
-        this.mDelayHandler.removeCallbacksAndMessages(null)
-        Lights.getInstance().clear()
-        mDisposable.dispose()
-    }
-
-    private fun addScanListeners() {
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-    }
-
-    fun addEventListeners() {
-        // 监听各种事件
-        addScanListeners()
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-//        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
-        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
-        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-//        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-    }
-
-
-    private fun startConnectTimer() {
-        mConnectDisposal?.dispose()
-        mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    retryConnect()
-                }
-    }
-
-    private fun stopConnectTimer() {
-        mConnectDisposal?.dispose()
-    }
-
-    @SuppressLint("CheckResult")
-    private fun connect(mac: String) {
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe {
-                    if (it) {
-                        //授予了权限
-                        if (TelinkLightService.Instance() != null) {
-                            progressBar?.visibility = View.VISIBLE
-                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-                            startConnectTimer()
-
-                            if (mConnectSnackBar?.isShown != true)
-                                mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
-
-                        }
-                    } else {
-                        //没有授予权限
-                        DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
-                    }
-                }
-    }
-
 
     @SuppressLint("CheckResult")
     private fun startScan() {
@@ -346,6 +302,42 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                 }
     }
 
+    private fun startConnectTimer() {
+        mConnectDisposal?.dispose()
+        mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    retryConnect()
+                }
+    }
+
+    private fun stopConnectTimer() {
+        mConnectDisposal?.dispose()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun connect(mac: String) {
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN)
+                .subscribe {
+                    if (it) {
+                        //授予了权限
+                        if (TelinkLightService.Instance() != null) {
+                            progressBar?.visibility = View.VISIBLE
+                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                            startConnectTimer()
+
+                            if (mConnectSnackBar?.isShown != true)
+                                mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
+
+                        }
+                    } else {
+                        //没有授予权限
+                        DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
+                    }
+                }
+    }
 
     private fun startCheckRSSITimer() {
         mScanTimeoutDisposal?.dispose()
@@ -375,55 +367,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
 
                     }
                 })
-/*
-        mScanTimeoutDisposal = Observable.timer(SCAN_BEST_RSSI_DEVICE_SECOND.toLong(), TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (bestRSSIDevice != null) {
-                        LeBluetooth.getInstance().stopScan()
-                        connect(bestRSSIDevice?.macAddress)
-                    } else {
-                        startCheckRSSITimer()   //到时间后还没扫到设备就重新再检查。
-                    }
-                }
-*/
-    }
-
-    private fun onDeviceStatusChanged(event: DeviceEvent) {
-
-        val deviceInfo = event.args
-
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
-                launch(UI) {
-                    stopConnectTimer()
-                    if (progressBar?.visibility != View.GONE)
-                        progressBar?.visibility = View.GONE
-
-                    mScanSnackBar?.dismiss()
-                    mConnectSnackBar?.dismiss()
-                    delay(300)
-
-                    if (mConnectSuccessSnackBar?.isShown != true)
-                        mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
-                }
-
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
-                val connectDevice = this.mApplication?.connectDevice
-                if (connectDevice != null) {
-                    this.connectMeshAddress = connectDevice.meshAddress
-                }
-            }
-            LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
-                    login()
-            }
-            LightAdapter.STATUS_ERROR_N -> onNError(event)
-
-        }
     }
 
     private fun login() {
@@ -490,6 +433,62 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         return true
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (TelinkLightService.Instance() != null)
+            TelinkLightService.Instance().disableAutoRefreshNotify()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(mReceiver)
+        this.mDelayHandler.removeCallbacksAndMessages(null)
+        Lights.getInstance().clear()
+        mDisposable.dispose()
+    }
+
+    private fun addScanListeners() {
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+
+        val deviceInfo = event.args
+
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                TelinkLightService.Instance().enableNotification()
+                TelinkLightService.Instance().updateNotification()
+                launch(UI) {
+                    stopConnectTimer()
+                    if (progressBar?.visibility != View.GONE)
+                        progressBar?.visibility = View.GONE
+
+                    mScanSnackBar?.dismiss()
+                    mConnectSnackBar?.dismiss()
+                    delay(300)
+
+                    if (mConnectSuccessSnackBar?.isShown != true)
+                        mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
+                }
+
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+                val connectDevice = this.mApplication?.connectDevice
+                if (connectDevice != null) {
+                    this.connectMeshAddress = connectDevice.meshAddress
+                }
+            }
+            LightAdapter.STATUS_CONNECTED -> {
+                if (!TelinkLightService.Instance().isLogin)
+                    login()
+            }
+            LightAdapter.STATUS_ERROR_N -> onNError(event)
+
+        }
+    }
 
     /**
      * 处理[NotificationEvent.ONLINE_STATUS]事件

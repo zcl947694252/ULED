@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  * Created by hejiajun on 2018/4/17.
  */
@@ -48,6 +52,31 @@ public class AppUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isExynosSoc() {
+        String str1 = "/proc/cpuinfo";
+        String str2 = "";
+        String ret = "";
+        String[] cpuInfo = {"", ""};
+        String[] arrayOfString;
+        try {
+            FileReader fr = new FileReader(str1);
+            BufferedReader localBufferedReader = new BufferedReader(fr, 8192);
+
+            while (true) {
+                str2 = localBufferedReader.readLine();
+                if (str2 == null) {
+                    return false;
+                } else if (str2.contains("Exynos")) {
+                    localBufferedReader.close();
+                    return true;
+                }
+            }
+
+        } catch (IOException ignored) {
+            return false;
+        }
     }
 
 }

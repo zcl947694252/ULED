@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
@@ -348,13 +349,18 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
             return
         }
 
+        val MAX_RSSI = 81
         when (leScanEvent.args.productUUID) {
             DeviceType.SENSOR -> {
-                scanDisposable?.dispose()
-                LeBluetooth.getInstance().stopScan()
-                mDeviceInfo = leScanEvent.args
-                connect()
-                progressBtn.text = getString(R.string.connecting)
+                if(leScanEvent.args.rssi<MAX_RSSI){
+                    scanDisposable?.dispose()
+                    LeBluetooth.getInstance().stopScan()
+                    mDeviceInfo = leScanEvent.args
+                    connect()
+                    progressBtn.text = getString(R.string.connecting)
+                }else{
+                    ToastUtils.showLong(getString(R.string.rssi_low))
+                }
             }
         }
     }

@@ -53,6 +53,7 @@ import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
+import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
@@ -102,7 +103,7 @@ import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
-    private static final int MAX_RETRY_COUNT = 5;   //update mesh failed的重试次数设置为5次
+    private static final int MAX_RETRY_COUNT = 2;   //update mesh failed的重试次数设置为5次
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.recycler_view_groups)
@@ -1184,7 +1185,9 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
-                        params.setScanFilters(scanFilters);
+                        if(!AppUtils.isExynosSoc()){
+                            params.setScanFilters(scanFilters);
+                        }
                         params.setMeshName(mesh.getFactoryName());
                         params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
@@ -1248,7 +1251,9 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID == DeviceType.LIGHT_RGB) {
+        int MAX_RSSI =81;
+        if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
+                DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
             mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
                     .subscribe(aLong -> {
                         //更新参数

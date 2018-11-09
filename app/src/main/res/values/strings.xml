@@ -401,5 +401,6 @@
     <string name="edit">Edit</string>
     <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
     <string name="current_account_number">Current account number:</string>
+    <string name="rssi_low">Signal is too bad</string>
 
 </resources>

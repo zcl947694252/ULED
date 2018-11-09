@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
@@ -275,6 +276,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 onLogin()
+                LogUtils.d("connected22")
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
@@ -284,6 +286,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 connectDisposable?.dispose()
 
                 login()
+                LogUtils.d("connected11")
             }
         }
 
@@ -343,7 +346,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //            connectParams.autoEnableNotification(true)
 //            connectParams.setConnectMac(mDeviceInfo?.macAddress)
 //            connectParams.setTimeoutSeconds(CONNECT_TIMEOUT_SECONDS)
-
+            LogUtils.d("connected33")
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
@@ -402,12 +405,17 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         when (leScanEvent.args.productUUID) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
-                scanDisposable?.dispose()
-                LeBluetooth.getInstance().stopScan()
-                mDeviceInfo = leScanEvent.args
+                val MAX_RSSI = 81
+                if(leScanEvent.args.rssi<MAX_RSSI){
+                    scanDisposable?.dispose()
+                    LeBluetooth.getInstance().stopScan()
+                    mDeviceInfo = leScanEvent.args
 //                params.setUpdateDeviceList(mDeviceInfo)
-                connect()
-                progressBtn.text = getString(R.string.connecting)
+                    connect()
+                    progressBtn.text = getString(R.string.connecting)
+                }else{
+                    ToastUtils.showLong(getString(R.string.rssi_low))
+                }
             }
         }
     }
