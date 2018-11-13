@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SearchView
@@ -16,9 +17,14 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import butterknife.ButterKnife
+import com.app.hubert.guide.NewbieGuide
+import com.app.hubert.guide.model.GuidePage
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -156,6 +162,61 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         ButterKnife.bind(this)
         initToolbar()
         initParameter()
+        initOnLayoutListener()
+    }
+
+    private fun initOnLayoutListener() {
+        val view = getWindow().getDecorView()
+        val viewTreeObserver = view.getViewTreeObserver()
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                lazyLoad()
+            }
+        })
+    }
+
+    fun lazyLoad() {
+//        val guide2 = adapter.get
+//        NewbieGuide.with(this)
+//                .setLabel("add_device")
+//                .alwaysShow(true)
+//                .addGuidePage(GuidePage.newInstance()
+//                        .addHighLight(searchView)
+//                        .setLayoutRes(R.layout.view_guide_simple)
+//                        .setOnLayoutInflatedListener {
+//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+//                            tv_content.text = "点击这里可以搜索分组"
+//                        })
+//                .addGuidePage(GuidePage.newInstance()
+//                        .addHighLight(guide2)
+//                        .setLayoutRes(R.layout.view_guide_simple)
+//                        .setOnLayoutInflatedListener {
+//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+//                            tv_content.text = getString(R.string.group_list_guide2)
+//                        })
+//                .addGuidePage(GuidePage.newInstance()
+//                        .addHighLight(guide3)
+//                        .setLayoutRes(R.layout.view_guide_simple)
+//                        .setOnLayoutInflatedListener {
+//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+//                            tv_content.text = getString(R.string.group_list_guide3)
+//                        })
+//                .addGuidePage(GuidePage.newInstance()
+//                        .addHighLight(guide4)
+//                        .setLayoutRes(R.layout.view_guide_simple)
+//                        .setOnLayoutInflatedListener {
+//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+//                            tv_content.text = getString(R.string.group_list_guide4)
+//                        })
+//                .addGuidePage(GuidePage.newInstance()
+//                        .addHighLight(guide5)
+//                        .setLayoutRes(R.layout.view_guide_simple)
+//                        .setOnLayoutInflatedListener {
+//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+//                            tv_content.text = getString(R.string.group_list_guide5)
+//                        })
+//                .show()
     }
 
     private fun initToolbar() {
@@ -275,11 +336,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun initView() {
         if (group.meshAddr == 0xffff) {
             toolbar.title = getString(R.string.allLight)+" ("+lightList.size+")"
-//            if(searchView==null){
-//                toolbar.inflateMenu(R.menu.menu_search)
-//                searchView = MenuItemCompat.getActionView(toolbar.menu.findItem(R.id.action_search)) as SearchView
-//                searchView!!.setOnQueryTextListener(this)
-//            }
         } else {
             toolbar.title = (group.name ?: "")+" ("+lightList.size+")"
         }

@@ -47,7 +47,7 @@ public class EmptyAddActivity extends TelinkBaseActivity {
 //                developerMode();
                 break;
             case R.id.img_add:
-                Intent intent = new Intent(EmptyAddActivity.this, NormalDeviceScanningNewActivity.class);
+                Intent intent = new Intent(EmptyAddActivity.this, DeviceScanningNewActivity.class);
                 startActivity(intent);
                 finish();
                 break;

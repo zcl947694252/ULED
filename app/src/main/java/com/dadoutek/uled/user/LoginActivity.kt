@@ -9,10 +9,9 @@ import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
@@ -207,7 +206,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
      */
     private fun gotoDeviceScanning() {
         //首次进入APP才进入引导流程
-        val intent = Intent(this@LoginActivity, NormalDeviceScanningNewActivity::class.java)
+        val intent = Intent(this@LoginActivity, DeviceScanningNewActivity::class.java)
         intent.putExtra("isInit", true)
         startActivity(intent)
         finish()

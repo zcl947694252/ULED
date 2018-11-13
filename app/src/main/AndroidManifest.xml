@@ -148,7 +148,7 @@
             android:name=".user.ForgetPassWordActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.NormalDeviceScanningNewActivity"
+            android:name=".light.DeviceScanningNewActivity"
             android:screenOrientation="portrait" />
         <!--<activity-->
             <!--android:name=".scene.ChangeSceneAct"-->

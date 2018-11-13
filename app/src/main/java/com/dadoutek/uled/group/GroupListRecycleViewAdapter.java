@@ -2,7 +2,9 @@ package com.dadoutek.uled.group;
 
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseItemDraggableAdapter;
@@ -51,5 +53,7 @@ public class GroupListRecycleViewAdapter extends BaseItemDraggableAdapter<DbGrou
                     addOnClickListener(R.id.btn_off).
                     addOnClickListener(R.id.btn_set);
         }
+
     }
+
 }

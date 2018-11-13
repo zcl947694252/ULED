@@ -5,7 +5,8 @@
     android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout_editor_absoluteY="25dp">
+    tools:layout_editor_absoluteY="25dp"
+    >
 
     <include
         android:id="@+id/tb"
@@ -21,7 +22,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/ccp"
-        app:layout_constraintTop_toTopOf="@+id/ccp">
+        app:layout_constraintTop_toTopOf="@+id/ccp"
+        >
 
         <EditText
             android:layout_width="match_parent"
@@ -30,7 +32,10 @@
             android:inputType="phone"
             android:maxLength="16"
             android:maxLines="1"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
     </android.support.design.widget.TextInputLayout>
 
 
@@ -69,7 +74,10 @@
             android:inputType="textPassword"
             android:maxLength="16"
             android:maxLines="1"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
     </android.support.design.widget.TextInputLayout>
 
 
@@ -102,7 +110,10 @@
             android:inputType="number"
             android:maxLength="16"
             android:maxLines="1"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
     </android.support.design.widget.TextInputLayout>
 
     <Button

@@ -8,10 +8,11 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
+import com.app.hubert.guide.NewbieGuide
+import com.app.hubert.guide.model.GuidePage
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
@@ -19,23 +20,20 @@ import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.LightsOfGroupActivity
-import com.dadoutek.uled.light.NormalDeviceScanningNewActivity
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.othersview.AddMeshActivity
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.rgb.RGBDeviceScanningNewActivity
 import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtherUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -43,7 +41,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class GroupListFragment : BaseFragment(){
 
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
@@ -196,13 +194,70 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 //        this.notifyDataSetChanged()
     }
 
+    fun lazyLoad() {
+        val guide1= toolbar!!.findViewById<ImageView>(R.id.img_function1)
+        val guide2= adapter!!.getViewByPosition(0,R.id.txt_name)
+        val guide3= adapter!!.getViewByPosition(0,R.id.btn_on)
+        val guide4= adapter!!.getViewByPosition(0,R.id.btn_off)
+        val guide5= adapter!!.getViewByPosition(0,R.id.btn_set)
+        NewbieGuide.with(this@GroupListFragment)
+                .setLabel("add_device")
+                //.alwaysShow(true)
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(guide1)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.group_list_guide1)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(guide2)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.group_list_guide2)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(guide3)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.group_list_guide3)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(guide4)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.group_list_guide4)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(guide5)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.group_list_guide5)
+                        })
+                .show()
+    }
+
+    private fun initOnLayoutListener() {
+        val view = activity!!.getWindow().getDecorView()
+        val viewTreeObserver = view.getViewTreeObserver()
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                lazyLoad()
+            }
+        })
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
         return view
     }
-
 
     private fun getView(inflater: LayoutInflater): View {
         this.inflater = inflater
@@ -211,18 +266,22 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         toolbar = view.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_list_header)
-        toolbar!!.inflateMenu(R.menu.men_group)
-        toolbar!!.setOnMenuItemClickListener(this)
-        if (SharedPreferencesUtils.isDeveloperModel()) {
-            toolbar!!.menu.findItem(R.id.menu_setting).isVisible = false
-        } else {
-            toolbar!!.menu.findItem(R.id.menu_setting).isVisible = false
+
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility=View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility=View.GONE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+            showPopupMenu(it)
         }
 
         setHasOptionsMenu(true)
 
         recyclerView = view.findViewById(R.id.list_groups)
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initOnLayoutListener()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -272,6 +331,7 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
         adapter!!.setOnItemChildClickListener(onItemChildClickListener)
         adapter!!.bindToRecyclerView(recyclerView)
+
         setMove()
 
         application = activity!!.application as TelinkLightApplication
@@ -307,17 +367,17 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         this.adapter!!.notifyDataSetChanged()
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_setting -> {
-                val intent = Intent(mContext, AddMeshActivity::class.java)
-                startActivity(intent)
-            }
-
-            R.id.menu_install -> showPopupMenu(toolbar!!.findViewById(R.id.menu_install))
-        }
-        return false
-    }
+//    override fun onMenuItemClick(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            R.id.menu_setting -> {
+//                val intent = Intent(mContext, AddMeshActivity::class.java)
+//                startActivity(intent)
+//            }
+//
+//            R.id.menu_install -> showPopupMenu(toolbar!!.findViewById(R.id.menu_install))
+//        }
+//        return false
+//    }
 
     private fun showPopupMenu(view: View) {
         // 这里的view代表popupMenu需要依附的view
@@ -325,17 +385,22 @@ class GroupListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
         popupMenu.menuInflater.inflate(R.menu.menu_select_device_type, popupMenu.menu)
         popupMenu.show()
         popupMenu.setOnMenuItemClickListener { item ->
+            var intent:Intent? = null
             when (item.itemId) {
                 R.id.popup_install_light -> {
                     if (DBUtils.allLight.size < 254) {
-                        startActivityForResult(Intent(mContext, NormalDeviceScanningNewActivity::class.java),0)
+                        intent=Intent(mContext, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,false)
+                        startActivityForResult(intent,0)
                     } else {
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }
                 }
                 R.id.popup_install_rgb_light -> {
                     if (DBUtils.allLight.size < 254) {
-                        startActivityForResult(Intent(mContext, RGBDeviceScanningNewActivity::class.java),0)
+                        intent=Intent(mContext, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,true)
+                        startActivityForResult(intent,0)
                     } else {
                         ToastUtils.showLong(getString(R.string.much_lamp_tip))
                     }

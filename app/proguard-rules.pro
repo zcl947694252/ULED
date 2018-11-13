@@ -169,3 +169,5 @@ public static java.lang.String TABLENAME;
 -keep class cn.smssdk.**{*;}
 -dontwarn com.mob.**
 
+-keep class android.support.v7.widget.SearchView { *; }
+

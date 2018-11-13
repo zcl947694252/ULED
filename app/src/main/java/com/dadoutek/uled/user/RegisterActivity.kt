@@ -1,13 +1,18 @@
 package com.dadoutek.uled.user
 
+import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
+import com.app.hubert.guide.NewbieGuide
+import com.app.hubert.guide.model.GuidePage
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
@@ -21,9 +26,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
-import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.util.*
 import com.hbb20.CCPCountry.setDialogTitle
 import com.hbb20.CountryCodePicker
 import io.reactivex.Observable

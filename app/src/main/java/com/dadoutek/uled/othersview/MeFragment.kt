@@ -15,10 +15,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.app.hubert.guide.NewbieGuide
+import com.app.hubert.guide.model.GuidePage
 
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
@@ -65,19 +68,6 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     private var sleepTime: Long = 250
     internal var isClickExlogin = false
     private var compositeDisposable = CompositeDisposable()
-
-//    var chearCache:RelativeLayout?=null
-//    var updateIte:RelativeLayout?=null
-//    var copyDataBase:RelativeLayout?=null
-//    var appVersion:TextView?=null
-//    var exitLogin:Button?=null
-//    var oneClickBackup:RelativeLayout?=null
-//    var oneClickReset:RelativeLayout?=null
-//    var constantQuestion:RelativeLayout?=null
-//    var userIcon:ImageView?=null
-//    var userName:TextView?=null
-//    var tvLightVersionText:TextView?=null
-//    var tvLightVersion:TextView?=null
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
@@ -197,34 +187,70 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             this.mApplication = TelinkLightApplication.getApp()
             val mainAct = activity as MainActivity?
             //            getVersion();
+            initOnLayoutListener()
         } else {
             compositeDisposable.dispose()
         }
     }
 
-    private fun getVersion() {
-        var dstAdress = 0
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = TelinkApplication.getInstance().connectDevice.meshAddress
-            Commander.getDeviceVersion(dstAdress, { s ->
-                if (tvLightVersion != null && tvLightVersionText != null) {
-                    tvLightVersion!!.visibility = View.VISIBLE
-                    tvLightVersionText!!.visibility = View.VISIBLE
-                }
-                if (tvLightVersion != null && s != null) {
-                    tvLightVersion!!.text = s
-                }
-                null
-            }, {
-                if (tvLightVersion != null && tvLightVersionText != null) {
-                    tvLightVersion!!.visibility = View.GONE
-                    tvLightVersionText!!.visibility = View.GONE
-                }
-                null
-            })
-        } else {
-            dstAdress = 0
-        }
+    private fun initOnLayoutListener() {
+        val view = activity?.getWindow()?.getDecorView()
+        val viewTreeObserver = view?.getViewTreeObserver()
+        viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                lazyLoad()
+            }
+        })
+    }
+
+    fun lazyLoad() {
+        NewbieGuide.with(this@MeFragment)
+                .setLabel("me_show")
+                //.alwaysShow(true)
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(chearCache)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_1)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(oneClickBackup)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_2)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(constantQuestion)
+                        .setLayoutRes(R.layout.view_guide_simple)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_3)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(oneClickReset)
+                        .setLayoutRes(R.layout.view_guide_simple_bottom)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_4)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(appVersion)
+                        .setLayoutRes(R.layout.view_guide_simple_bottom)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_5)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(exitLogin)
+                        .setLayoutRes(R.layout.view_guide_simple_bottom)
+                        .setOnLayoutInflatedListener {
+                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_6)
+                        })
+                .show()
     }
 
     override fun onDestroyView() {
@@ -292,49 +318,6 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
             null
         })
-
-
-        /*
-        new Thread(() -> {
-
-
-            int lastIndex = lightList.size() - 1;
-            int connectDeviceIndex = 0;
-            for (int k = 0; k < lightList.size(); k++) {
-                if (lightList.get(k).getMeshAddr() == deviceInfo.meshAddress) {
-                    connectDeviceIndex = k;
-                    break;
-                }
-            }
-            Collections.swap(lightList, lastIndex, connectDeviceIndex);
-
-            for (int j = 0; j < lightList.size(); j++) {
-                try {
-                    if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
-                        ToastUtils.showLong(R.string.error_disconnect_tip);
-                        SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-                        break;
-                    }
-
-                    for (int k = 0; k < 5; k++) {
-                        byte opcode = (byte) Opcode.KICK_OUT;
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightList.get(j).getMeshAddr(), null);
-                        Thread.sleep(sleepTime);
-                    }
-                    Thread.sleep(sleepTime);
-                    DBUtils.INSTANCE.deleteLight(lightList.get(j));
-                } catch (InterruptedException e) {
-                    hideLoadingDialog();
-                    e.printStackTrace();
-                } finally {
-                    if (j == 0) {
-                        SharedPreferencesHelper.putBoolean(getActivity(), Constant.DELETEING, false);
-
-                    }
-                }
-            }
-        }).start();
-*/
     }
 
     private fun syncData() {

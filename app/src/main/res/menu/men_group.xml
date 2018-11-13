@@ -10,6 +10,6 @@
         android:id="@+id/menu_install"
         android:icon="@drawable/ic_add_circle_white_24dp"
         android:title="@string/add"
-        app:showAsAction="ifRoom" />
-
+        app:showAsAction="ifRoom"
+        />
 </menu>

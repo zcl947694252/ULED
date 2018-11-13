@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 public class KeyboardUtil {
 
@@ -24,19 +25,17 @@ public class KeyboardUtil {
         imm.showSoftInput(currentFocusedView, InputMethodManager.SHOW_FORCED);
     }
 
-    /**
-     * 隐藏输入法键盘
-     *
-     * @param activity
-     */
-    public static void closeInputKeyboard(Activity activity) {
-        if (activity == null) {
-            return;
+    public static void hintKeyBoard(Activity activity) {
+        //拿到InputMethodManager
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        //如果window上view获取焦点 && view不为空
+        if (imm.isActive() && activity.getCurrentFocus() != null) {
+            //拿到view的token 不为空
+            if (activity.getCurrentFocus().getWindowToken() != null) {
+                //表示软键盘窗口总是隐藏，除非开始时以SHOW_FORCED显示。
+                imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            }
         }
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken()
-                , InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private KeyboardUtil() {

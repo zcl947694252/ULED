@@ -566,7 +566,7 @@ public class RGBDeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         } else {
             new AlertDialog.Builder(this)
                     .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
-//                        startActivity(new Intent(NormalDeviceScanningNewActivity.this, MainActivity.class));
+//                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
 //                        finish();
                         doFinish();
                     })
