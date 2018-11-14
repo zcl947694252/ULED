@@ -19,6 +19,7 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.DeviceListFragment
@@ -44,6 +45,7 @@ import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
+import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -119,6 +121,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        detectUpdate()
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
@@ -131,6 +134,22 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
+    }
+
+    /**
+     * 检查App是否有新版本
+     */
+    private fun detectUpdate() {
+        mDisposable.add(
+                RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                    if (granted!!) {
+                        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true);
+                        XiaomiUpdateAgent.update(this);
+                    } else {
+                        ToastUtils.showLong(R.string.update_permission_tip)
+                    }
+                })
     }
 
     private fun initBottomNavigation() {

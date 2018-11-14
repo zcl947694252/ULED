@@ -3,7 +3,6 @@ package com.dadoutek.uled.ota;
 import android.app.AlertDialog;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,8 +24,6 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbUser;
-import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
@@ -68,8 +65,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 /**
  * 升级页面
@@ -151,7 +146,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_SCAN = 20;
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
-    private long TIME_OUT_SENDDATA=4;
+    private long TIME_OUT_SENDDATA = 4;
 
     private Handler delayHandler = new Handler();
     private Handler visibleHandler = new Handler() {
@@ -524,25 +519,19 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         } else {
             if (mCancelBuilder == null) {
                 mCancelBuilder = new AlertDialog.Builder(this);
-                mCancelBuilder.setTitle("Warning!");
-                mCancelBuilder.setMessage("OTA Not Complete, Quit?");
-                mCancelBuilder.setNeutralButton("Quit", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        sendStopMeshOTACommand();
-                        Mesh mesh = TelinkLightApplication.getApp().getMesh();
-                        mesh.setOtaDevice(null);
-                        mesh.saveOrUpdate(OTAUpdateActivity.this);
-                        dialog.dismiss();
-                        finish();
-                    }
+                mCancelBuilder.setTitle(getString(R.string.warning));
+                mCancelBuilder.setMessage(getString(R.string.is_exit_ota));
+                mCancelBuilder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
+                    sendStopMeshOTACommand();
+                    Mesh mesh = TelinkLightApplication.getApp().getMesh();
+                    mesh.setOtaDevice(null);
+                    mesh.saveOrUpdate(OTAUpdateActivity.this);
+                    dialog.dismiss();
+                    finish();
                 });
-                mCancelBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                mCancelBuilder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) ->
+                        dialog.dismiss()
+                );
             }
             mCancelBuilder.show();
         }
@@ -779,17 +768,18 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         mesh.saveOrUpdate(this);
         log("onScanComplet : " + successCount);
 
-        if(connectRetryCount==0 && TelinkLightApplication.getInstance().getConnectDevice()==null){
+        if (connectRetryCount == 0 && TelinkLightApplication.getInstance().getConnectDevice() == null) {
             showUpdateFailView();
         }
     }
 
-    private void showUpdateFailView(){
+    private void showUpdateFailView() {
         runOnUiThread(() -> {
             textInfo.setVisibility(View.VISIBLE);
             textInfo.setText(R.string.update_fail);
             btnStartUpdate.setVisibility(View.GONE);
             btnStartUpdate.setClickable(false);
+            mode = MODE_IDLE;
         });
     }
 
@@ -834,11 +824,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             if (otaState == NotificationEvent.OTA_STATE_IDLE) {
                 if (this.mode == MODE_OTA) {
                     startOTA();
-                    if(mSendataDisposal!=null){
+                    if (mSendataDisposal != null) {
                         mSendataDisposal.dispose();
                     }
-                    mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA,TimeUnit.SECONDS).subscribe(aLong -> {
-                        if(progressView.getProgress()<=0){
+                    mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS).subscribe(aLong -> {
+                        if (progressView.getProgress() <= 0) {
                             showUpdateFailView();
                         }
                     });
@@ -852,8 +842,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     Disposable mConnectDisposal;
+
     private void startConnectTimer() {
-        if(mConnectDisposal!=null){
+        if (mConnectDisposal != null) {
             mConnectDisposal.dispose();
         }
         mConnectDisposal = Observable.timer((long) TIME_OUT_CONNECT, TimeUnit.SECONDS)
@@ -869,7 +860,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void stopConnectTimer() {
-        if(mConnectDisposal!=null){
+        if (mConnectDisposal != null) {
             mConnectDisposal.dispose();
         }
     }
@@ -877,7 +868,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private int connectRetryCount = 0;
 
     //    private boolean loginStart=false;
-    private  void onDeviceEvent(DeviceEvent event) {
+    private void onDeviceEvent(DeviceEvent event) {
         int status = event.getArgs().status;
         switch (status) {
             case LightAdapter.STATUS_LOGOUT:

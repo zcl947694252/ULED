@@ -104,8 +104,8 @@ public class OtaPrepareUtils {
                 //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
                 File file = new File(localPath);
                 if (file.exists()) {
-                    otaPrepareListner.downLoadFileSuccess();
                     SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                    otaPrepareListner.downLoadFileSuccess();
                 } else {
                     download(serverVersionUrl, otaPrepareListner, context);
                 }
@@ -195,9 +195,9 @@ public class OtaPrepareUtils {
                     //完成下载
                     @Override
                     protected void completed(BaseDownloadTask task) {
-                        otaPrepareListner.downLoadFileSuccess();
                         mProgressBarDialog.dismiss();
                         SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                        otaPrepareListner.downLoadFileSuccess();
                     }
 
                     //暂停

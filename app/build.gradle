@@ -28,8 +28,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 130
-        versionName "2.0.4.3"
+        versionCode 131
+        versionName "2.0.5"
 
         multiDexEnabled true
 
@@ -124,4 +124,5 @@ dependencies {
     implementation 'com.github.maning0303:MNProgressHUD:V1.1.0'
     implementation "com.github.skydoves:colorpickerview:2.0.1"
     implementation 'com.github.huburt-Hu:NewbieGuide:v2.4.0'
+    implementation 'mi-appstore:xiaomi-update-sdk:4.0.3'
 }

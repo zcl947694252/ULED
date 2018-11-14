@@ -3,7 +3,6 @@ package com.dadoutek.uled.light;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -53,12 +52,12 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
         }
     };
 
-    private void checkPermission(){
+    private void checkPermission() {
         mDisposable.add(
                 mRxPermission.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe(granted -> {
                     if (granted) {
-                        OtaPrepareUtils.instance().gotoUpdateView(NormalDeviceSettingActivity.this,localVersion,otaPrepareListner);
+                        OtaPrepareUtils.instance().gotoUpdateView(NormalDeviceSettingActivity.this, localVersion, otaPrepareListner);
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip);
                     }
@@ -73,7 +72,7 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
 
         @Override
         public void getVersionSuccess(String s) {
-            ToastUtils.showLong(R.string.verification_version_success);
+//            ToastUtils.showLong(R.string.verification_version_success);
             hideLoadingDialog();
         }
 
@@ -86,9 +85,7 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
 
         @Override
         public void downLoadFileSuccess() {
-            new Handler().postDelayed(() -> {
-                transformView();
-            }, 200);
+            transformView();
         }
 
         @Override
@@ -110,12 +107,12 @@ public final class NormalDeviceSettingActivity extends TelinkBaseActivity {
             Commander.INSTANCE.getDeviceVersion(light.getMeshAddr(), (s) -> {
                 localVersion = s;
                 if (txtTitle != null) {
-                    if(OtaPrepareUtils.instance().checkSupportOta(localVersion)){
+                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)) {
                         txtTitle.setVisibility(View.VISIBLE);
                         txtTitle.setText(localVersion);
-                        light.version=localVersion;
+                        light.version = localVersion;
                         tvOta.setVisibility(View.VISIBLE);
-                    }else{
+                    } else {
                         txtTitle.setVisibility(View.GONE);
                         tvOta.setVisibility(View.GONE);
                     }

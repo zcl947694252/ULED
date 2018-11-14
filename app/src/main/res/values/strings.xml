@@ -428,5 +428,8 @@
     <string name="search_group">点击图标输入组名可以搜索分组</string>
     <string name="light_guide_1">点此处可以开关灯</string>
     <string name="light_guide_2">点此对灯进行设置</string>
+    <string name="warning">警告</string>
+    <string name="is_exit_ota">OTA中，确定要退出吗？</string>
+
 
 </resources>
