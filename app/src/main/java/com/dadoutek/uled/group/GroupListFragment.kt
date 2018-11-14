@@ -202,51 +202,12 @@ class GroupListFragment : BaseFragment(){
         val guide4= adapter!!.getViewByPosition(0,R.id.btn_off)
         val guide5= adapter!!.getViewByPosition(0,R.id.btn_set)
 
-//        AppUtils.checkShowGuideAgain(activity,Constant.TAG_GroupListFragment)
-
-//        val builder=NewbieGuide.with(this@GroupListFragment)
-//        builder.setLabel(Constant.TAG_GroupListFragment)
-//        builder.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.group_list_guide1)))
-//        builder.
-
-        val a=NewbieGuide.with(this@GroupListFragment)
-                .setLabel(Constant.TAG_GroupListFragment)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(guide1)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.group_list_guide1)
-                        }
-                )
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(guide2)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.group_list_guide2)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(guide3)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.group_list_guide3)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(guide4)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.group_list_guide4)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(guide5)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.group_list_guide5)
-                        })
+        GuideUtils.guideBuilder(this@GroupListFragment,Constant.TAG_GroupListFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.group_list_guide1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.group_list_guide2)))
+                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.group_list_guide3)))
+                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.group_list_guide4)))
+                .addGuidePage(GuideUtils.addGuidePage(guide5,R.layout.view_guide_simple,getString(R.string.group_list_guide5)))
                 .show()
     }
 

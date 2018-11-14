@@ -18,12 +18,23 @@ public class GuideUtils {
                         .addHighLight(guideTargetView)
                         .setLayoutRes(res)
                         .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(describeRes);
+                            TextView tvGuide = view.findViewById(R.id.show_guide_content);
+                            tvGuide.setText(describeRes);
+
+                            TextView tvJump = view.findViewById(R.id.jump_out);
+                            tvJump.setOnClickListener(v -> {
+                                controller.remove();
+                            });
                         });
     }
 
-//    public static Builder showGuide(AppCompatActivity activity){
-//
-//    }
+    public static Builder guideBuilder(Fragment fragment,String label){
+//        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label);
+        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label).alwaysShow(true);
+    }
+
+    public static Builder guideBuilder(AppCompatActivity activity,String label){
+//        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label);
+        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label).alwaysShow(true);
+    }
 }

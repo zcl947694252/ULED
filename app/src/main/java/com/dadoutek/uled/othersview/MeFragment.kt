@@ -40,11 +40,7 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.AppUtils
-import com.dadoutek.uled.util.DBManager
-import com.dadoutek.uled.util.NetWorkUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 
@@ -208,58 +204,21 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     }
 
     fun lazyLoad() {
-        NewbieGuide.with(this@MeFragment)
-                .setLabel(Constant.TAG_MeFragment)
-                //.alwaysShow(true)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(chearCache)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_1)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(oneClickBackup)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_2)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(constantQuestion)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_3)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(oneClickReset)
-                        .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_4)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(showGuideAgain)
-                        .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_reset)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(appVersion)
-                        .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_5)
-                        })
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(exitLogin)
-                        .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener { view, controller ->
-                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
-                            tv_content.text = getString(R.string.me_guide_6)
-                        })
+        val guide1 = chearCache
+        val guide2 = oneClickBackup
+        val guide3 = constantQuestion
+        val guide4 = oneClickReset
+        val guide5 = appVersion
+        val guide6 = exitLogin
+        val guide7 = showGuideAgain
+        GuideUtils.guideBuilder(this, Constant.TAG_MeFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple, getString(R.string.me_guide_1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple, getString(R.string.me_guide_2)))
+                .addGuidePage(GuideUtils.addGuidePage(guide3, R.layout.view_guide_simple, getString(R.string.me_guide_3)))
+                .addGuidePage(GuideUtils.addGuidePage(guide4, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_4)))
+                .addGuidePage(GuideUtils.addGuidePage(guide5, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_5)))
+                .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_6)))
+                .addGuidePage(GuideUtils.addGuidePage(guide7, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_7)))
                 .show()
     }
 

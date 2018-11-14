@@ -27,7 +27,11 @@ import com.app.hubert.guide.NewbieGuide
 import com.app.hubert.guide.model.GuidePage
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.NormalGroupSettingActivity
 import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -36,13 +40,11 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBDeviceSettingActivity
+import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.BleUtils
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -104,44 +106,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive=true
 
-    private var onCheckedChangeListener: SwitchButtonOnCheckedChangeListener = SwitchButtonOnCheckedChangeListener { v, position ->
-        currentLight = lightList[position]
-        positionCurrent = position
-        val opcode = Opcode.LIGHT_ON_OFF
-        if (v.id == R.id.img_light) {
-            canBeRefresh = true
-            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-                        byteArrayOf(0x01, 0x00, 0x00))
-                currentLight!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-                        byteArrayOf(0x00, 0x00, 0x00))
-                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
-            }
-
-            currentLight!!.updateIcon()
-            DBUtils.updateLight(currentLight!!)
-            runOnUiThread {
-                adapter?.notifyDataSetChanged()
-            }
-        } else if (v.id == R.id.tv_setting) {
-            if (scanPb.visibility != View.VISIBLE) {
-                //判断是否为rgb灯
-                var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
-                if(currentLight?.productUUID==DeviceType.LIGHT_RGB){
-                    intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
-                }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                startActivityForResult(intent, REQ_LIGHT_SETTING)
-            } else {
-                ToastUtils.showShort(R.string.reconnecting)
-            }
-        }
-    }
-
     override fun onStart() {
         super.onStart()
         // 监听各种事件
@@ -177,46 +141,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     fun lazyLoad() {
-//        val guide2 = adapter.get
-//        NewbieGuide.with(this)
-//                .setLabel("add_device")
-//                .alwaysShow(true)
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(searchView)
-//                        .setLayoutRes(R.layout.view_guide_simple)
-//                        .setOnLayoutInflatedListener {
-//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
-//                            tv_content.text = "点击这里可以搜索分组"
-//                        })
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(guide2)
-//                        .setLayoutRes(R.layout.view_guide_simple)
-//                        .setOnLayoutInflatedListener {
-//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
-//                            tv_content.text = getString(R.string.group_list_guide2)
-//                        })
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(guide3)
-//                        .setLayoutRes(R.layout.view_guide_simple)
-//                        .setOnLayoutInflatedListener {
-//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
-//                            tv_content.text = getString(R.string.group_list_guide3)
-//                        })
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(guide4)
-//                        .setLayoutRes(R.layout.view_guide_simple)
-//                        .setOnLayoutInflatedListener {
-//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
-//                            tv_content.text = getString(R.string.group_list_guide4)
-//                        })
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(guide5)
-//                        .setLayoutRes(R.layout.view_guide_simple)
-//                        .setOnLayoutInflatedListener {
-//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
-//                            tv_content.text = getString(R.string.group_list_guide5)
-//                        })
-//                .show()
+        val guide1= searchView
+        val guide2=adapter!!.getViewByPosition(0,R.id.img_light)
+        val guide3= adapter!!.getViewByPosition(0,R.id.tv_setting)
+
+        val builder=GuideUtils.guideBuilder(this@LightsOfGroupActivity,Constant.TAG_GroupListFragment)
+        if(group.meshAddr==0xffff){
+            builder.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.search_group)))
+        }
+        builder.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.light_guide_1)))
+        builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.light_guide_2)))
+        builder.show()
     }
 
     private fun initToolbar() {
@@ -340,10 +275,49 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             toolbar.title = (group.name ?: "")+" ("+lightList.size+")"
         }
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
-        adapter = LightsOfGroupRecyclerViewAdapter(this, lightList, onCheckedChangeListener)
-        recycler_view_lights.adapter = adapter
+        adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group,lightList)
+        adapter!!.onItemChildClickListener = onItemChildClickListener
+        adapter!!.bindToRecyclerView(recycler_view_lights)
         for (i in lightList.indices) {
             lightList[i].updateIcon()
+        }
+    }
+
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        currentLight = lightList[position]
+        positionCurrent = position
+        val opcode = Opcode.LIGHT_ON_OFF
+        if (view.id == R.id.img_light) {
+            canBeRefresh = true
+            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+                        byteArrayOf(0x01, 0x00, 0x00))
+                currentLight!!.connectionStatus = ConnectionStatus.ON.value
+            } else {
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+                        byteArrayOf(0x00, 0x00, 0x00))
+                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+            }
+
+            currentLight!!.updateIcon()
+            DBUtils.updateLight(currentLight!!)
+            runOnUiThread {
+                adapter?.notifyDataSetChanged()
+            }
+        } else if (view.id == R.id.tv_setting) {
+            if (scanPb.visibility != View.VISIBLE) {
+                //判断是否为rgb灯
+                var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
+                if(currentLight?.productUUID==DeviceType.LIGHT_RGB){
+                    intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
+                }
+                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
+                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                startActivityForResult(intent, REQ_LIGHT_SETTING)
+            } else {
+                ToastUtils.showShort(R.string.reconnecting)
+            }
         }
     }
 

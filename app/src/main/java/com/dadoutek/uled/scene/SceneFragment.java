@@ -35,6 +35,7 @@ import com.dadoutek.uled.othersview.BaseFragment;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.AppUtils;
+import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import java.util.List;
@@ -98,51 +99,20 @@ public class SceneFragment extends BaseFragment implements
     }
 
     public void lazyLoad() {
-
-//        AppUtils.checkShowGuideAgain(getActivity(),Constant.TAG_SceneFragment);
-
-        NewbieGuide.with(this)
-                //.alwaysShow(true)
-                .setLabel(Constant.TAG_SceneFragment)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight((ImageView) toolbar.findViewById(R.id.img_function1))
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scene_guide_1);
-                        })
-                )
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight((ImageView) toolbar.findViewById(R.id.img_function2))
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scene_guide_2);
-                        })
-                ).show();
+        ImageView guide1= (ImageView) toolbar.findViewById(R.id.img_function1);
+        ImageView guide2= (ImageView) toolbar.findViewById(R.id.img_function2);
+        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scene_guide_1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scene_guide_2)))
+                .show();
 
         if (adaper.getItemCount() != 0) {
-            TextView tvApply = (TextView) adaper.getViewByPosition(0, R.id.scene_name);
-            Button btnUpdate = (Button) adaper.getViewByPosition(0, R.id.scene_edit);
-            NewbieGuide.with(this)
-                    //.alwaysShow(true)
-                    .setLabel(Constant.TAG_SceneFragment)
-                    .addGuidePage(GuidePage.newInstance()
-                            .addHighLight(tvApply)
-                            .setLayoutRes(R.layout.view_guide_simple)
-                            .setOnLayoutInflatedListener((view, controller) -> {
-                                TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                                tv_Guide.setText(R.string.scene_guide_3);
-                            })
-                    )
-                    .addGuidePage(GuidePage.newInstance()
-                            .addHighLight(btnUpdate)
-                            .setLayoutRes(R.layout.view_guide_simple)
-                            .setOnLayoutInflatedListener((view, controller) -> {
-                                TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                                tv_Guide.setText(R.string.scene_guide_4);
-                            })
-                    ).show();
+            TextView guide3= (TextView) adaper.getViewByPosition(0, R.id.scene_name);
+            Button guide4= (Button) adaper.getViewByPosition(0, R.id.scene_edit);
+            GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                    .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.scene_guide_3)))
+                    .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scene_guide_4)))
+                    .show();
         }
     }
 

@@ -58,6 +58,7 @@ import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DialogUtils;
+import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
@@ -820,96 +821,43 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void guideStepAll() {
-        NewbieGuide.with(this)
-                .setLabel(Constant.TAG_DeviceScanningNewActivity)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(addGroupLayout)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                                    TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                                    tv_Guide.setText(R.string.scan_light_guide_1);
-                                })
-                )
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(recyclerViewGroups)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_2);
-                        })
-                )
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(listDevices.getChildAt(1))
-                        .setLayoutRes(R.layout.view_guide_simple_top)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_3);
-                        })
-                )
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(btnAddGroups)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_4);
-                        })
-                )
+        LinearLayout guide1= addGroupLayout;
+        RecyclerView guide2= recyclerViewGroups;
+        View guide3= listDevices.getChildAt(1);
+        Button guide4= btnAddGroups;
+        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
+                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
+                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
                 .show();
     }
 
     private void guideStep1() {
-        NewbieGuide.with(this)
-                .setLabel(Constant.TAG_DeviceScanningNewActivity)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(addGroupLayout)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_1);
-                        })
-                )
+        LinearLayout guide1= addGroupLayout;
+        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
                 .show();
     }
 
     private void guideStep2() {
-        NewbieGuide.with(this)
-                .setLabel(Constant.TAG_DeviceScanningNewActivity)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(recyclerViewGroups)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_2);
-                        })
-                )
+        RecyclerView guide2= recyclerViewGroups;
+        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
                 .show();
     }
 
     private void guideStep3() {
-        NewbieGuide.with(this)
-                .setLabel(Constant.TAG_DeviceScanningNewActivity)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(listDevices.getChildAt(1))
-                        .setLayoutRes(R.layout.view_guide_simple_top)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_3);
-                        })
-                )
+        View guide3= listDevices.getChildAt(1);
+        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
                 .show();
     }
 
     private void guideStep4() {
-        NewbieGuide.with(this)
-                .setLabel(Constant.TAG_DeviceScanningNewActivity)
-                .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(btnAddGroups)
-                        .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener((view, controller) -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_4);
-                        })
-                )
+        Button guide4= btnAddGroups;
+        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
                 .show();
     }
 

@@ -4,7 +4,11 @@ import android.text.InputFilter;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,5 +136,19 @@ public class StringUtils {
         if (str == null) return "";
         String chs1[] = str.split(sp);
         return chs1[i];
+    }
+
+    public static String getLightName(DbLight light) {
+
+        if(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId())==null){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }
+
+        //如果当前灯没分组  显示未分组
+        if(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getMeshAddr()==0xffff){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }else{
+            return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
+        }
     }
 }

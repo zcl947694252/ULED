@@ -423,6 +423,10 @@
     <string name="scan_light_guide_3">然后在此区域点击勾选一些打算分组的灯</string>
     <string name="scan_light_guide_4">最后点击这里确定你的选择,快来试试吧!</string>
     <string name="reset_boot_tutorial">Reset boot tutorial</string>
-    <string name="me_guide_reset">没学会？点击这里可以重新查看所有教程哦</string>
+    <string name="me_guide_7">没学会？点击这里可以重新查看所有教程哦</string>
+    <string name="btn_jump_over">跳过指引</string>
+    <string name="search_group">点击图标输入组名可以搜索分组</string>
+    <string name="light_guide_1">点此处可以开关灯</string>
+    <string name="light_guide_2">点此对灯进行设置</string>
 
 </resources>
