@@ -24,6 +24,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -41,6 +42,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        detectUpdate()
 
         //页面存在耗时操作 需要保持屏幕常亮
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -48,6 +50,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
         initData()
         initView()
+    }
+
+    /**
+     * 检查App是否有新版本
+     */
+    private fun detectUpdate() {
+        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true);
+        XiaomiUpdateAgent.update(this);
     }
 
     private fun initData() {

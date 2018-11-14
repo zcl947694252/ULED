@@ -19,7 +19,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.DeviceListFragment
@@ -140,16 +139,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
      * 检查App是否有新版本
      */
     private fun detectUpdate() {
-        mDisposable.add(
-                RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    if (granted!!) {
-                        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true);
-                        XiaomiUpdateAgent.update(this);
-                    } else {
-                        ToastUtils.showLong(R.string.update_permission_tip)
-                    }
-                })
+        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true);
+        XiaomiUpdateAgent.update(this);
     }
 
     private fun initBottomNavigation() {
