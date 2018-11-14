@@ -32,6 +32,7 @@ import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
+import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.dadoutek.uled.util.LogUtils
@@ -298,7 +299,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         scanFilters.add(scanFilter)
 
                         val params = LeScanParameters.create()
-                        params.setScanFilters(scanFilters)
+                        if(!AppUtils.isExynosSoc()){
+                            params.setScanFilters(scanFilters)
+                        }
                         params.setMeshName(account)
                         params.setOutOfMeshName(account)
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)

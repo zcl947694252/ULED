@@ -32,6 +32,7 @@ import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
+import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dinuscxj.progressbar.CircleProgressBar;
@@ -674,7 +675,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         btnStartUpdate.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
-        params.setScanFilters(scanFilters);
+        if(!AppUtils.isExynosSoc()){
+            params.setScanFilters(scanFilters);
+        }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
         params.setScanMac(dbLight.getMacAddr());

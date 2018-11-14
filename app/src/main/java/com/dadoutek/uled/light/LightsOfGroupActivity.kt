@@ -486,7 +486,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                             scanFilters.add(scanFilter)
 
                             val params = LeScanParameters.create()
-                            params.setScanFilters(scanFilters)
+                            if(!com.dadoutek.uled.util.AppUtils.isExynosSoc()){
+                                params.setScanFilters(scanFilters)
+                            }
                             params.setMeshName(account)
                             params.setOutOfMeshName(account)
                             params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
