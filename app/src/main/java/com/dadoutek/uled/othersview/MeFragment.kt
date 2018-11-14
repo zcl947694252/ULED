@@ -21,6 +21,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.app.hubert.guide.NewbieGuide
+import com.app.hubert.guide.core.Controller
 import com.app.hubert.guide.model.GuidePage
 
 import com.blankj.utilcode.util.ActivityUtils
@@ -36,6 +37,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
@@ -162,6 +164,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         oneClickBackup?.setOnClickListener(this)
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
+        showGuideAgain?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -206,48 +209,55 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
     fun lazyLoad() {
         NewbieGuide.with(this@MeFragment)
-                .setLabel("me_show")
+                .setLabel(Constant.TAG_MeFragment)
                 //.alwaysShow(true)
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(chearCache)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.me_guide_1)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(oneClickBackup)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.me_guide_2)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(constantQuestion)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.me_guide_3)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(oneClickReset)
                         .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.me_guide_4)
+                        })
+                .addGuidePage(GuidePage.newInstance()
+                        .addHighLight(showGuideAgain)
+                        .setLayoutRes(R.layout.view_guide_simple_bottom)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
+                            tv_content.text = getString(R.string.me_guide_reset)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(appVersion)
                         .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.me_guide_5)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(exitLogin)
                         .setLayoutRes(R.layout.view_guide_simple_bottom)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.me_guide_6)
                         })
                 .show()
@@ -267,7 +277,19 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             R.id.oneClickBackup -> checkNetworkAndSync(activity)
             R.id.oneClickReset -> showSureResetDialogByApp()
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
+            R.id.showGuideAgain -> showGuideAgainFun()
         }
+    }
+
+    private fun showGuideAgainFun() {
+        NewbieGuide.resetLabel(activity,Constant.TAG_MeFragment)
+//        SharedPreferencesHelper.putBoolean(activity,Constant.TAG_GroupListFragment,true)
+//        SharedPreferencesHelper.putBoolean(activity,Constant.TAG_SceneFragment,true)
+//        SharedPreferencesHelper.putBoolean(activity,Constant.TAG_DeviceScanningNewActivity,true)
+//        SharedPreferencesUtils.setShowGuideAgain(true)
+        NewbieGuide.resetLabel(activity,Constant.TAG_GroupListFragment)
+        NewbieGuide.resetLabel(activity,Constant.TAG_SceneFragment)
+        NewbieGuide.resetLabel(activity,Constant.TAG_DeviceScanningNewActivity)
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -378,6 +400,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         } else {
             checkNetworkAndSync(activity)
         }
+
     }
 
 

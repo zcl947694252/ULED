@@ -33,7 +33,6 @@ import android.widget.Toast;
 
 import com.app.hubert.guide.NewbieGuide;
 import com.app.hubert.guide.model.GuidePage;
-import com.app.hubert.guide.model.HighLight;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -175,10 +174,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private Disposable mConnectTimer;
     private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
     private boolean isSelectAll = false;
-    private boolean scanRGBLight=false;
+    private boolean scanRGBLight = false;
 
-    private boolean initHasGroup=false;
-    private String IS_JUMP_OVER="IS_JUMP_OVER";
+    private boolean initHasGroup = false;
+    private String IS_JUMP_OVER = "IS_JUMP_OVER";
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -381,7 +380,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void doFinish() {
-    if(updateList!=null&&updateList.size()>0){
+        if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
         TelinkLightService.Instance().idleMode(true);
@@ -401,7 +400,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-        SharedPreferencesHelper.putBoolean(this,IS_JUMP_OVER,true);
+        SharedPreferencesHelper.putBoolean(this, IS_JUMP_OVER, true);
 
         if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
             ActivityUtils.finishToActivity(MainActivity.class, false, true);
@@ -807,40 +806,42 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     public void lazyLoad() {
-        boolean isJumpOver=SharedPreferencesHelper.getBoolean(this,IS_JUMP_OVER,false);
-        if(!isJumpOver){
-            if(initHasGroup){
-                guideStepAll();
-            }else{
-                guideStep1();
-            }
+//        boolean isJumpOver=SharedPreferencesHelper.getBoolean(this,IS_JUMP_OVER,false);
+//        if(!isJumpOver){
+
+//        AppUtils.checkShowGuideAgain(this,Constant.TAG_DeviceScanningNewActivity);
+
+        if (initHasGroup) {
+            guideStepAll();
+        } else {
+            guideStep1();
         }
+//        }
     }
 
-    private void guideStepAll(){
+    private void guideStepAll() {
         NewbieGuide.with(this)
-                .alwaysShow(true)
-                .setLabel("scanLight")
+                .setLabel(Constant.TAG_DeviceScanningNewActivity)
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(addGroupLayout)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener(view -> {
-                            TextView tv_Guide = view.findViewById(R.id.show_guide_content);
-                            tv_Guide.setText(R.string.scan_light_guide_1);
-                        })
+                        .setOnLayoutInflatedListener((view, controller) -> {
+                                    TextView tv_Guide = view.findViewById(R.id.show_guide_content);
+                                    tv_Guide.setText(R.string.scan_light_guide_1);
+                                })
                 )
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(recyclerViewGroups)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_2);
                         })
                 )
                 .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(listDevices)
+                        .addHighLight(listDevices.getChildAt(1))
                         .setLayoutRes(R.layout.view_guide_simple_top)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_3);
                         })
@@ -848,7 +849,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(btnAddGroups)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_4);
                         })
@@ -856,14 +857,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .show();
     }
 
-    private void guideStep1(){
+    private void guideStep1() {
         NewbieGuide.with(this)
-                .alwaysShow(true)
-                .setLabel("scanLight")
+                .setLabel(Constant.TAG_DeviceScanningNewActivity)
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(addGroupLayout)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_1);
                         })
@@ -871,14 +871,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .show();
     }
 
-    private void guideStep2(){
+    private void guideStep2() {
         NewbieGuide.with(this)
-                .alwaysShow(true)
-                .setLabel("scanLight")
+                .setLabel(Constant.TAG_DeviceScanningNewActivity)
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(recyclerViewGroups)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_2);
                         })
@@ -886,14 +885,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .show();
     }
 
-    private void guideStep3(){
+    private void guideStep3() {
         NewbieGuide.with(this)
-                .alwaysShow(true)
-                .setLabel("scanLight")
+                .setLabel(Constant.TAG_DeviceScanningNewActivity)
                 .addGuidePage(GuidePage.newInstance()
-                        .addHighLight(listDevices)
+                        .addHighLight(listDevices.getChildAt(1))
                         .setLayoutRes(R.layout.view_guide_simple_top)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_3);
                         })
@@ -901,14 +899,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .show();
     }
 
-    private void guideStep4(){
+    private void guideStep4() {
         NewbieGuide.with(this)
-                .alwaysShow(true)
-                .setLabel("scanLight")
+                .setLabel(Constant.TAG_DeviceScanningNewActivity)
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(btnAddGroups)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener(view -> {
+                        .setOnLayoutInflatedListener((view, controller) -> {
                             TextView tv_Guide = view.findViewById(R.id.show_guide_content);
                             tv_Guide.setText(R.string.scan_light_guide_4);
                         })
@@ -992,24 +989,24 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void initData() {
-        Intent intent=getIntent();
-        scanRGBLight=intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT,false);
+        Intent intent = getIntent();
+        scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false);
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();
         if (groups == null) {
             groups = new ArrayList<>();
-            List<DbGroup> list=DBUtils.INSTANCE.getGroupList();
+            List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
 
-            if(scanRGBLight){
-                for(int i=0;i<list.size();i++){
-                    if(OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff || OtherUtils.groupIsEmpty(list.get(i))){
+            if (scanRGBLight) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
                         groups.add(list.get(i));
                     }
                 }
-            }else{
-                for(int i=0;i<list.size();i++){
-                    if(OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr()==0xffff || OtherUtils.groupIsEmpty(list.get(i))){
+            } else {
+                for (int i = 0; i < list.size(); i++) {
+                    if (OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
                         groups.add(list.get(i));
                     }
                 }
@@ -1027,9 +1024,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     groups.get(i).checked = false;
                 }
             }
-            initHasGroup=true;
+            initHasGroup = true;
         } else {
-            initHasGroup=false;
+            initHasGroup = false;
             currentGroupIndex = -1;
         }
     }
@@ -1326,10 +1323,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         }
 
                         List<ScanFilter> scanFilters = new ArrayList<>();
-                        byte[] manuData=null;
-                        if(scanRGBLight){
+                        byte[] manuData = null;
+                        if (scanRGBLight) {
                             manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_RGB};
-                        }else{
+                        } else {
                             manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_NORMAL};
                         }
 
@@ -1343,7 +1340,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
-                        if(!AppUtils.isExynosSoc()){
+                        if (!AppUtils.isExynosSoc()) {
                             params.setScanFilters(scanFilters);
                         }
                         params.setMeshName(mesh.getFactoryName());
@@ -1394,11 +1391,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));
-            if(adapter.getLights()!=null && adapter.getLights().size()>0){
+            if (adapter.getLights() != null && adapter.getLights().size() > 0) {
                 stopTimer();
                 onLeScanTimeout();
                 return;
-            }else{
+            } else {
                 doFinish();
             }
             return;
@@ -1409,9 +1406,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        int MAX_RSSI =81;
-        if(scanRGBLight){
-            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==
+        int MAX_RSSI = 81;
+        if (scanRGBLight) {
+            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
                 mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
                         .subscribe(aLong -> {
@@ -1429,8 +1426,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             TelinkLightService.Instance().updateMesh(params);
                         }));
             }
-        }else{
-            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID==
+        } else {
+            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_NORMAL && deviceInfo.rssi < MAX_RSSI) {
                 mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
                         .subscribe(aLong -> {
@@ -1486,8 +1483,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this)).start();
 
-                if(scanRGBLight){
-                    if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==DeviceType.LIGHT_RGB) {
+                if (scanRGBLight) {
+                    if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
                         int meshAddress = deviceInfo.meshAddress & 0xFF;
                         DbLight light = this.adapter.get(meshAddress);
 
@@ -1507,8 +1504,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             this.adapter.notifyDataSetChanged();
                         }
                     }
-                }else{
-                    if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID==DeviceType.LIGHT_NORMAL) {
+                } else {
+                    if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_NORMAL) {
                         int meshAddress = deviceInfo.meshAddress & 0xFF;
                         DbLight light = this.adapter.get(meshAddress);
 

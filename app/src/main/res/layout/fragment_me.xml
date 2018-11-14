@@ -226,7 +226,7 @@
                 android:id="@+id/oneClickReset"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:background="@drawable/btn_rectangle_bottom"
+                android:background="@drawable/btn_rectangle_center"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -235,6 +235,27 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/one_click_reset"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/showGuideAgain"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/btn_rectangle_bottom"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:foreground="?android:attr/selectableItemBackground"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reset_boot_tutorial"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:layout_centerVertical="true"

@@ -123,8 +123,5 @@ dependencies {
     implementation 'com.liulishuo.filedownloader:library:1.7.5'
     implementation 'com.github.maning0303:MNProgressHUD:V1.1.0'
     implementation "com.github.skydoves:colorpickerview:2.0.1"
-    implementation 'com.github.huburt-Hu:NewbieGuide:v2.0.1'
-    implementation ('com.github.huburt-Hu:NewbieGuide:v2.0.0') {
-        exclude group: 'com.android.support'
-    }
+    implementation 'com.github.huburt-Hu:NewbieGuide:v2.4.0'
 }

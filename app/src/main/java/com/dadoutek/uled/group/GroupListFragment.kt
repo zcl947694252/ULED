@@ -32,12 +32,13 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.*
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -200,51 +201,59 @@ class GroupListFragment : BaseFragment(){
         val guide3= adapter!!.getViewByPosition(0,R.id.btn_on)
         val guide4= adapter!!.getViewByPosition(0,R.id.btn_off)
         val guide5= adapter!!.getViewByPosition(0,R.id.btn_set)
-        NewbieGuide.with(this@GroupListFragment)
-                .setLabel("add_device")
-                //.alwaysShow(true)
+
+//        AppUtils.checkShowGuideAgain(activity,Constant.TAG_GroupListFragment)
+
+//        val builder=NewbieGuide.with(this@GroupListFragment)
+//        builder.setLabel(Constant.TAG_GroupListFragment)
+//        builder.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.group_list_guide1)))
+//        builder.
+
+        val a=NewbieGuide.with(this@GroupListFragment)
+                .setLabel(Constant.TAG_GroupListFragment)
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(guide1)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.group_list_guide1)
-                        })
+                        }
+                )
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(guide2)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.group_list_guide2)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(guide3)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.group_list_guide3)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(guide4)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.group_list_guide4)
                         })
                 .addGuidePage(GuidePage.newInstance()
                         .addHighLight(guide5)
                         .setLayoutRes(R.layout.view_guide_simple)
-                        .setOnLayoutInflatedListener {
-                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+                        .setOnLayoutInflatedListener { view, controller ->
+                            val tv_content: TextView = view.findViewById(R.id.show_guide_content)
                             tv_content.text = getString(R.string.group_list_guide5)
                         })
                 .show()
     }
 
     private fun initOnLayoutListener() {
-        val view = activity!!.getWindow().getDecorView()
-        val viewTreeObserver = view.getViewTreeObserver()
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        val view = activity?.getWindow()?.getDecorView()
+        val viewTreeObserver = view?.getViewTreeObserver()
+        viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
                 lazyLoad()
@@ -252,10 +261,16 @@ class GroupListFragment : BaseFragment(){
         })
     }
 
+    var firstShowGuide=true
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
+        if(firstShowGuide){
+            firstShowGuide=false
+            initOnLayoutListener()
+        }
+
         return view
     }
 
@@ -279,15 +294,15 @@ class GroupListFragment : BaseFragment(){
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initOnLayoutListener()
-    }
-
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
             act?.addEventListeners()
+//            Thread{
+//                Thread.sleep(300)
+//                lazyLoad()
+//            }.start()
+            initOnLayoutListener()
         }
     }
 

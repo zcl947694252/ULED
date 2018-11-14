@@ -80,6 +80,9 @@ public class Constant implements Serializable {
     //是否是开发者模式
     public static String IS_DEVELOPER_MODE = "IS_DEVELOPER_MODE";
 
+    //是否重置引导显示
+    public static String IS_SHOWGUIDE_AGAIN = "IS_DEVELOPER_MODE";
+
     //用户信息
     public static String USER_INFO = "USER_INFO";
 
@@ -153,4 +156,14 @@ public class Constant implements Serializable {
 
     public static int VENDOR_ID = 0x0211;
     public static String IS_SCAN_RGB_LIGHT="IS_SCAN_RGB_LIGHT";
+
+    //导航页标签
+    public static String TAG_GroupListFragment = "GroupListFragment";
+    public static String TAG_MeFragment = "MeFragment";
+    public static String TAG_SceneFragment = "SceneFragment";
+    public static String TAG_DeviceScanningNewActivity = "DeviceScanningNewActivity";
+//    public static String TAG_GroupListFragment = "GroupListFragment";
+//    public static String TAG_GroupListFragment = "GroupListFragment";
+//    public static String TAG_GroupListFragment = "GroupListFragment";
+
 }

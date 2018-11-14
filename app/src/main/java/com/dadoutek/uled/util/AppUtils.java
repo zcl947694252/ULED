@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.app.hubert.guide.NewbieGuide;
 import com.app.hubert.guide.model.GuidePage;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -82,6 +83,13 @@ public class AppUtils {
 
         } catch (IOException ignored) {
             return false;
+        }
+    }
+
+    public static void checkShowGuideAgain(Context context,String tag){
+        if(SharedPreferencesHelper.getBoolean(context,tag,false)){
+            NewbieGuide.resetLabel(context,tag);
+            SharedPreferencesHelper.putBoolean(context,tag,false);
         }
     }
 }

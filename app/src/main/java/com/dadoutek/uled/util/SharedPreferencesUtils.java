@@ -97,4 +97,14 @@ public class SharedPreferencesUtils {
         return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                 Constant.UPDATE_FILE_ADRESS,"");
     }
+
+    public static void setShowGuideAgain(boolean model){
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
+                Constant.IS_SHOWGUIDE_AGAIN,model);
+    }
+
+    public static boolean isShowGuideAgain(){
+        return SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),
+                Constant.IS_SHOWGUIDE_AGAIN,false);
+    }
 }
