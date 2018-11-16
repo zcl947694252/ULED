@@ -395,7 +395,9 @@ object Commander : EventListener<String> {
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
 //            light.version = version
 
-            mGetVersionSuccess = true
+            if(version != ""){
+                mGetVersionSuccess = true
+            }
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
@@ -406,7 +408,9 @@ object Commander : EventListener<String> {
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
 //            light.version = version
 
-            mGetVersionSuccess = true
+            if(version != ""){
+                mGetVersionSuccess = true
+            }
             SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }

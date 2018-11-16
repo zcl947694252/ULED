@@ -186,41 +186,40 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             this.mApplication = TelinkLightApplication.getApp()
             val mainAct = activity as MainActivity?
             //            getVersion();
-            initOnLayoutListener()
         } else {
             compositeDisposable.dispose()
         }
     }
 
-    private fun initOnLayoutListener() {
-        val view = activity?.getWindow()?.getDecorView()
-        val viewTreeObserver = view?.getViewTreeObserver()
-        viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
-                lazyLoad()
-            }
-        })
-    }
-
-    fun lazyLoad() {
-        val guide1 = chearCache
-        val guide2 = oneClickBackup
-        val guide3 = constantQuestion
-        val guide4 = oneClickReset
-        val guide5 = appVersion
-        val guide6 = exitLogin
-        val guide7 = showGuideAgain
-        GuideUtils.guideBuilder(this, Constant.TAG_MeFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple, getString(R.string.me_guide_1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple, getString(R.string.me_guide_2)))
-                .addGuidePage(GuideUtils.addGuidePage(guide3, R.layout.view_guide_simple, getString(R.string.me_guide_3)))
-                .addGuidePage(GuideUtils.addGuidePage(guide4, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_4)))
-                .addGuidePage(GuideUtils.addGuidePage(guide5, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_5)))
-                .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_6)))
-                .addGuidePage(GuideUtils.addGuidePage(guide7, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_7)))
-                .show()
-    }
+//    private fun initOnLayoutListener() {
+//        val view = activity?.getWindow()?.getDecorView()
+//        val viewTreeObserver = view?.getViewTreeObserver()
+//        viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+//            override fun onGlobalLayout() {
+//                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+//                lazyLoad()
+//            }
+//        })
+//    }
+//
+//    fun lazyLoad() {
+//        val guide1 = chearCache
+//        val guide2 = oneClickBackup
+//        val guide3 = constantQuestion
+//        val guide4 = oneClickReset
+//        val guide5 = appVersion
+//        val guide6 = exitLogin
+//        val guide7 = showGuideAgain
+//        GuideUtils.guideBuilder(this, Constant.TAG_MeFragment)
+//                .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple, getString(R.string.me_guide_1)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple, getString(R.string.me_guide_2)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide3, R.layout.view_guide_simple, getString(R.string.me_guide_3)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide4, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_4)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide5, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_5)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_6)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide7, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_7)))
+//                .show()
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -241,14 +240,25 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     }
 
     private fun showGuideAgainFun() {
-        NewbieGuide.resetLabel(activity,Constant.TAG_MeFragment)
+//        NewbieGuide.resetLabel(activity,Constant.TAG_MeFragment)
 //        SharedPreferencesHelper.putBoolean(activity,Constant.TAG_GroupListFragment,true)
 //        SharedPreferencesHelper.putBoolean(activity,Constant.TAG_SceneFragment,true)
 //        SharedPreferencesHelper.putBoolean(activity,Constant.TAG_DeviceScanningNewActivity,true)
 //        SharedPreferencesUtils.setShowGuideAgain(true)
-        NewbieGuide.resetLabel(activity,Constant.TAG_GroupListFragment)
-        NewbieGuide.resetLabel(activity,Constant.TAG_SceneFragment)
-        NewbieGuide.resetLabel(activity,Constant.TAG_DeviceScanningNewActivity)
+        val builder = AlertDialog.Builder(activity)
+        builder.setTitle(getString(R.string.show_guide_again_tip))
+        builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
+        builder.setPositiveButton(R.string.btn_sure) { dialog, which ->
+            NewbieGuide.resetLabel(activity,Constant.TAG_GroupListFragment)
+            NewbieGuide.resetLabel(activity,Constant.TAG_SceneFragment)
+            NewbieGuide.resetLabel(activity,Constant.TAG_SceneFragment2)
+            NewbieGuide.resetLabel(activity,Constant.TAG_DeviceScanningNewActivity)
+            NewbieGuide.resetLabel(activity,Constant.TAG_SetSceneAct)
+            NewbieGuide.resetLabel(activity,Constant.TAG_LightsOfGroupActivity)
+            NewbieGuide.resetLabel(activity,Constant.TAG_ConfigSensorAct)
+        }
+        val dialog = builder.create()
+        dialog.show()
     }
 
     // 如果没有网络，则弹出网络设置对话框

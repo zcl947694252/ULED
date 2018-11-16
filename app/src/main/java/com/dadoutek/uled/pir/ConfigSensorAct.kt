@@ -2,6 +2,7 @@ package com.dadoutek.uled.pir
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.blankj.utilcode.util.ActivityUtils
@@ -17,6 +18,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -28,6 +30,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
+    private var builder:com.app.hubert.guide.core.Builder?=null
+    private var mGroupsName: ArrayList<String>?=null
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
@@ -50,13 +54,48 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         fabConfirm.setOnClickListener(this)
         initToolbar()
         initData()
+        initView()
         getVersion()
+    }
+
+    private fun initView() {
+        val groupsAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupsName)
+        spSelectGroup.adapter = groupsAdapter
+        spSelectGroup.onItemSelectedListener = this
+        spSelectStartupMode.onItemSelectedListener = this
+        spDelayUnit.onItemSelectedListener=this
+        spSwitchMode.onItemSelectedListener=this
+    }
+
+    private fun initOnLayoutListener() {
+        val view = getWindow().getDecorView()
+        val viewTreeObserver = view.getViewTreeObserver()
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                lazyLoad()
+            }
+        })
+    }
+
+    fun lazyLoad() {
+        val guide1=tietDelay
+        val guide2=tietMinimumBrightness
+        val guide3= spTriggerLux
+        val guide4= spSelectGroup
+
+        builder= GuideUtils.guideBuilder(this@ConfigSensorAct,Constant.TAG_ConfigSensorAct)
+        builder?.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_1)))
+        builder?.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_2)))
+        builder?.addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_4)))
     }
 
     private fun getVersion() {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
             dstAdress = mDeviceInfo.meshAddress
+//            initOnLayoutListener()
+            lazyLoad()
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
                         val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
@@ -67,16 +106,24 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         if (isSupportModeSelect) {
                             tvSelectStartupMode.visibility = View.VISIBLE
                             spSelectStartupMode.visibility = View.VISIBLE
+
+                            builder?.addGuidePage(GuideUtils.addGuidePage(spSelectStartupMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_5)))
                             if(versionNum>=113){
                                 isSupportDelayUnitSelect=true
                                 tvSwitchMode.visibility =View.VISIBLE
                                 spSwitchMode.visibility=View.VISIBLE
                                 tvDelayUnit.visibility=View.VISIBLE
                                 spDelayUnit.visibility=View.VISIBLE
+                                builder?.addGuidePage(GuideUtils.addGuidePage(spSwitchMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_6)))
+                                builder?.addGuidePage(GuideUtils.addGuidePage(spDelayUnit,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_7)))
                             }
                         }
+                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
+                        builder?.show()
                     },
                     failedCallback = {
+                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
+                        builder?.show()
                         versionLayoutPS.visibility = View.GONE
                     })
         } else {
@@ -94,16 +141,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         mGroups = DBUtils.allGroups
-        val mGroupsName: ArrayList<String> = ArrayList()
+        mGroupsName = ArrayList()
         for (item in mGroups) {
-            mGroupsName.add(item.name)
+            mGroupsName!!.add(item.name)
         }
-        val groupsAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupsName)
-        spSelectGroup.adapter = groupsAdapter
-        spSelectGroup.onItemSelectedListener = this
-        spSelectStartupMode.onItemSelectedListener = this
-        spDelayUnit.onItemSelectedListener=this
-        spSwitchMode.onItemSelectedListener=this
     }
 
 

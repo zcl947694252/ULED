@@ -1,5 +1,6 @@
 package com.dadoutek.uled.ota;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
@@ -147,7 +148,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_SCAN = 20;
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
-    private long TIME_OUT_SENDDATA = 4;
+    private long TIME_OUT_SENDDATA = 10;
 
     private Handler delayHandler = new Handler();
     private Handler visibleHandler = new Handler() {
@@ -682,7 +683,25 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         params.setTimeoutSeconds(TIME_OUT_SCAN);
         params.setScanMac(dbLight.getMacAddr());
         TelinkLightService.Instance().startScan(params);
+        startScanTimer();
         log("startScan ");
+    }
+
+    Disposable mScanDisposal;
+    @SuppressLint("CheckResult")
+    private void startScanTimer(){
+        if (mScanDisposal != null) {
+            mScanDisposal.dispose();
+        }
+            mScanDisposal=Observable.timer(TIME_OUT_SCAN,TimeUnit.SECONDS).subscribe(aLong -> {
+                    onScanTimeout();
+            });
+    }
+
+    private void stopScanTimer() {
+        if(mScanDisposal!=null){
+            mScanDisposal.dispose();
+        }
     }
 
     private void startOTA() {
@@ -754,6 +773,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         } else if (this.mode == MODE_IDLE) {
             if (dbLight.getMeshAddr() == deviceInfo.meshAddress) {
                 log("onLeScan" + "connectDevice2");
+                stopScanTimer();
                 if (!connectStart) {
                     LeBluetooth.getInstance().stopScan();
 //                    connectDevice(deviceInfo.macAddress);
@@ -787,6 +807,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     public void onScanTimeout() {
+        stopScanTimer();
         this.mode = MODE_COMPLETE;
         Mesh mesh = TelinkLightApplication.getApp().getMesh();
         mesh.setOtaDevice(null);
@@ -824,17 +845,18 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             delayHandler.removeCallbacks(deviceOtaStateTimeoutTask);
             int otaState = data[1];
             log("OTA State response--" + otaState);
+
+            if (mSendataDisposal != null) {
+                mSendataDisposal.dispose();
+            }
+            mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS).subscribe(aLong -> {
+                if (progressView.getProgress() <= 0) {
+                    showUpdateFailView();
+                }
+            });
             if (otaState == NotificationEvent.OTA_STATE_IDLE) {
                 if (this.mode == MODE_OTA) {
                     startOTA();
-                    if (mSendataDisposal != null) {
-                        mSendataDisposal.dispose();
-                    }
-                    mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS).subscribe(aLong -> {
-                        if (progressView.getProgress() <= 0) {
-                            showUpdateFailView();
-                        }
-                    });
                 }
             } else {
                 log("OTA State response: Busy!!! Stopped!--" + otaState);

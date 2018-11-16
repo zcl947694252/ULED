@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import butterknife.ButterKnife
@@ -95,6 +96,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var retryConnectCount = 0
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var mConnectDisposal: Disposable? = null
+    private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
@@ -102,8 +104,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     override fun onStart() {
         super.onStart()
         // 监听各种事件
-        addListeners()
         LogUtils.d("____onStart")
+    }
+
+    override fun onPostResume() {
+        super.onPostResume()
+        addListeners()
     }
 
     fun addListeners() {
@@ -119,17 +125,30 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         ButterKnife.bind(this)
         initToolbar()
         initParameter()
-//        val guide2 = adapter.get
-//                        .setLayoutRes(R.layout.view_guide_simple)
-//                            val tv_content: TextView = it.findViewById(R.id.show_guide_content)
+        initOnLayoutListener()
+    }
 
-//                        })
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(guide2)
-//                        })
-//                .addGuidePage(GuidePage.newInstance()
-//                        .addHighLight(guide3)
-//                .show()
+    private fun initOnLayoutListener() {
+        val view = getWindow().getDecorView()
+        val viewTreeObserver = view.getViewTreeObserver()
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                lazyLoad()
+            }
+        })
+    }
+
+    fun lazyLoad() {
+        if(lightList.size!=0){
+            val guide2=adapter!!.getViewByPosition(0,R.id.img_light)
+            val guide3= adapter!!.getViewByPosition(0,R.id.tv_setting)
+
+            val builder=GuideUtils.guideBuilder(this@LightsOfGroupActivity,Constant.TAG_LightsOfGroupActivity)
+            builder.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.light_guide_1)))
+            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.light_guide_2)))
+            builder.show()
+        }
     }
 
     private fun initToolbar() {
@@ -219,6 +238,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         //        this.mApplication.removeEventListener(this);
         canBeRefresh = false
         acitivityIsAlive = false
+        mScanDisposal?.dispose()
+        if(TelinkLightApplication.getInstance().connectDevice==null){
+            TelinkLightService.Instance().idleMode(true)
+            LeBluetooth.getInstance().stopScan()
+        }
     }
 
     private fun initData() {
@@ -323,7 +347,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             Thread.sleep(2500)
-            addListeners()
             if (this@LightsOfGroupActivity == null ||
                     this@LightsOfGroupActivity.isDestroyed ||
                     this@LightsOfGroupActivity.isFinishing || !acitivityIsAlive) {
@@ -349,8 +372,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
 //            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
-                val info = (event as ErrorReportEvent).args
-                onErrorReport(info)
+                    val info = (event as ErrorReportEvent).args
+                    onErrorReport(info)
             }
         }
     }
@@ -469,43 +492,46 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
-            RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe {
-                        if (it) {
-                            TelinkLightService.Instance().idleMode(true)
-                            bestRSSIDevice = null   //扫描前置空信号最好设备。
-                            //扫描参数
-                            val account = DBUtils.lastUser?.account
+            if(acitivityIsAlive || !(mScanDisposal?.isDisposed?:false)){
+                LogUtils.d("startScanLight_LightOfGroup")
+                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                        Manifest.permission.BLUETOOTH_ADMIN)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe {
+                            if (it) {
+                                TelinkLightService.Instance().idleMode(true)
+                                bestRSSIDevice = null   //扫描前置空信号最好设备。
+                                //扫描参数
+                                val account = DBUtils.lastUser?.account
 
-                            val scanFilters = java.util.ArrayList<ScanFilter>()
-                            val scanFilter = ScanFilter.Builder()
-                                    .setDeviceName(account)
-                                    .build()
-                            scanFilters.add(scanFilter)
+                                val scanFilters = java.util.ArrayList<ScanFilter>()
+                                val scanFilter = ScanFilter.Builder()
+                                        .setDeviceName(account)
+                                        .build()
+                                scanFilters.add(scanFilter)
 
-                            val params = LeScanParameters.create()
-                            if(!com.dadoutek.uled.util.AppUtils.isExynosSoc()){
-                                params.setScanFilters(scanFilters)
+                                val params = LeScanParameters.create()
+                                if(!com.dadoutek.uled.util.AppUtils.isExynosSoc()){
+                                    params.setScanFilters(scanFilters)
+                                }
+                                params.setMeshName(account)
+                                params.setOutOfMeshName(account)
+                                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                                params.setScanMode(false)
+
+                                addScanListeners()
+                                TelinkLightService.Instance().startScan(params)
+                                startCheckRSSITimer()
+
+                            } else {
+                                //没有授予权限
+                                DialogUtils.showNoBlePermissionDialog(this, {
+                                    retryConnectCount = 0
+                                    startScan()
+                                }, { finish() })
                             }
-                            params.setMeshName(account)
-                            params.setOutOfMeshName(account)
-                            params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                            params.setScanMode(false)
-
-                            addScanListeners()
-                            TelinkLightService.Instance().startScan(params)
-                            startCheckRSSITimer()
-
-                        } else {
-                            //没有授予权限
-                            DialogUtils.showNoBlePermissionDialog(this, {
-                                retryConnectCount = 0
-                                startScan()
-                            }, { finish() })
                         }
-                    }
+            }
     }
 
     private fun startConnectTimer() {

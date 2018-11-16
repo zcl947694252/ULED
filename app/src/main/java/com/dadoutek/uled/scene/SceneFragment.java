@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -10,6 +11,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,9 +21,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.app.hubert.guide.NewbieGuide;
+import com.app.hubert.guide.core.Builder;
 import com.app.hubert.guide.core.Controller;
-import com.app.hubert.guide.model.GuidePage;
+import com.app.hubert.guide.listener.OnGuideChangedListener;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
@@ -34,7 +36,6 @@ import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.othersview.BaseFragment;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
@@ -65,6 +66,7 @@ public class SceneFragment extends BaseFragment implements
     //    private List<Scenes> scenesListData;
     private List<DbScene> scenesListData;
     private boolean isDelete = false;
+    Builder builder = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +85,11 @@ public class SceneFragment extends BaseFragment implements
         return view;
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     private void initToolBar(View view) {
         setHasOptionsMenu(true);
         toolbar = view.findViewById(R.id.toolbar);
@@ -98,34 +105,88 @@ public class SceneFragment extends BaseFragment implements
         btn_delete.setOnClickListener(this);
     }
 
-    public void lazyLoad() {
+//    public void initLoad(){
+//        ImageView guide1= (ImageView) toolbar.findViewById(R.id.img_function1);
+//        ImageView guide2= (ImageView) toolbar.findViewById(R.id.img_function2);
+//        Builder builder = GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+//                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scene_guide_1)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scene_guide_2)));
+//        builder.setOnGuideChangedListener(new OnGuideChangedListener() {
+//            @Override
+//            public void onShowed(Controller controller) {
+//
+//            }
+//
+//            @Override
+//            public void onRemoved(Controller controller) {
+//                initOnLayoutListener(1);
+////                lazyLoad(1);
+//            }
+//        });
+//        builder.show();
+//    }
+
+    public void lazyLoad(int showTypeView) {
         ImageView guide1= (ImageView) toolbar.findViewById(R.id.img_function1);
         ImageView guide2= (ImageView) toolbar.findViewById(R.id.img_function2);
-        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scene_guide_1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scene_guide_2)))
-                .show();
-
-        if (adaper.getItemCount() != 0) {
+                builder.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scene_guide_1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scene_guide_2)));
+        boolean isOldUser=SharedPreferencesHelper.getBoolean(getActivity(),"Older",false);
+        if (adaper.getItemCount() != 0 && showTypeView==1) {
             TextView guide3= (TextView) adaper.getViewByPosition(0, R.id.scene_name);
             Button guide4= (Button) adaper.getViewByPosition(0, R.id.scene_edit);
-            GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+
+            int size= adaper.getItemCount();
+            if(guide3==null){
+                for(int i=0;i<size;i++){
+                    if(adaper.getViewByPosition(i,R.id.txt_name)!=null){
+                        guide3= (TextView) adaper.getViewByPosition(i+1, R.id.scene_name);
+                        guide4= (Button) adaper.getViewByPosition(i+1, R.id.scene_edit);
+                        break;
+                    }
+                }
+            }
+
+            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.scene_guide_3)))
+                    .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scene_guide_4)));
+            SharedPreferencesHelper.putBoolean(getActivity(),"Older",true);
+            builder.show();
+        }else if(adaper.getItemCount()==1  && showTypeView==0 && !isOldUser){
+            TextView guide3= (TextView) adaper.getViewByPosition(0, R.id.scene_name);
+            Button guide4= (Button) adaper.getViewByPosition(0, R.id.scene_edit);
+            GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment1)
                     .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.scene_guide_3)))
                     .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scene_guide_4)))
                     .show();
         }
     }
 
-    private void initOnLayoutListener() {
-        final View view = getActivity().getWindow().getDecorView();
-        final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                lazyLoad();
-            }
-        });
+    long time1 = 0;
+    long time2 = 0;
+    private void initOnLayoutListener(int showTypeView) {
+        if(showTypeView==1){
+            time1 = System.currentTimeMillis();
+            Log.d("test22now", "initOnLayoutListener1: "+time1);
+        }else{
+            time2 = System.currentTimeMillis();
+            Log.d("test22now", "initOnLayoutListener2: "+time2);
+        }
+
+        Log.d("test22now", "initOnLayoutListener3: "+(time2-time1));
+//        if(time2-time1>=600){
+            Log.d("test22now", "initOnLayoutListener4: "+(time2-time1));
+            final View view = getActivity().getWindow().getDecorView();
+            final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    lazyLoad(showTypeView);
+                    time2=0;
+                    time1=0;
+                }
+            });
+//        }
     }
 
     private void initData() {
@@ -196,7 +257,7 @@ public class SceneFragment extends BaseFragment implements
         if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
             initData();
             initView();
-            initOnLayoutListener();
+            initOnLayoutListener(requestCode);
         }
     }
 
@@ -231,11 +292,18 @@ public class SceneFragment extends BaseFragment implements
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        builder = GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment);
         if (isVisibleToUser) {
 //            initData();
 //            initView();
-            initOnLayoutListener();
+//            showLoadingDialog("ss");
+            initOnLayoutListener(1);
+        }else{
+            if(getActivity()!=null){
+                initOnLayoutListener(2);
+            }
         }
+
     }
 
     @Override

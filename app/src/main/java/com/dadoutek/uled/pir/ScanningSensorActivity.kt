@@ -17,6 +17,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.AppUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
@@ -117,7 +118,9 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
-                    params.setScanFilters(getScanFilters())
+                    if(!AppUtils.isExynosSoc()){
+                        params.setScanFilters(getScanFilters())
+                    }
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                     params.setOutOfMeshName(mesh.name)
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)

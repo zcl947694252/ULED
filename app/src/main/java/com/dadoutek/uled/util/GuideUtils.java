@@ -29,12 +29,12 @@ public class GuideUtils {
     }
 
     public static Builder guideBuilder(Fragment fragment,String label){
-//        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label);
-        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label).alwaysShow(true);
+        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label);
+//        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label).alwaysShow(true);
     }
 
     public static Builder guideBuilder(AppCompatActivity activity,String label){
-//        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label);
-        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label).alwaysShow(true);
+        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label);
+//        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label).alwaysShow(true);
     }
 }

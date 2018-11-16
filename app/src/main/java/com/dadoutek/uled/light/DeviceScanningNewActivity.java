@@ -739,7 +739,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             groupsRecyclerViewAdapter.notifyDataSetChanged();
             SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-            guideStep3();
         }
     };
 
@@ -823,7 +822,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void guideStepAll() {
         LinearLayout guide1= addGroupLayout;
         RecyclerView guide2= recyclerViewGroups;
-        View guide3= listDevices.getChildAt(1);
+        View guide3= listDevices.getChildAt(0);
         Button guide4= btnAddGroups;
         GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
                 .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
@@ -842,14 +841,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void guideStep2() {
         RecyclerView guide2= recyclerViewGroups;
-        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
-                .show();
-    }
-
-    private void guideStep3() {
         View guide3= listDevices.getChildAt(1);
         GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
                 .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
                 .show();
     }
@@ -1221,7 +1215,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void onMeshEvent(MeshEvent event) {
-        new AlertDialog.Builder(this).setMessage(R.string.restart_bluetooth).show();
+//        new AlertDialog.Builder(this).setMessage(R.string.restart_bluetooth).show();
+        ToastUtils.showShort(R.string.restart_bluetooth);
     }
 
     private void onNError(final DeviceEvent event) {
@@ -1450,6 +1445,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.setSelected(false);
                             this.adapter.add(light);
                             this.adapter.notifyDataSetChanged();
+                            this.listDevices.smoothScrollToPosition(adapter.getCount()-1);
                         }
                     }
                 } else {
@@ -1471,6 +1467,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.setSelected(false);
                             this.adapter.add(light);
                             this.adapter.notifyDataSetChanged();
+                            this.listDevices.smoothScrollToPosition(adapter.getCount()-1);
                         }
                     }
                 }

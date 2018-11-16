@@ -159,11 +159,13 @@ public class Constant implements Serializable {
 
     //导航页标签
     public static String TAG_GroupListFragment = "GroupListFragment";
-    public static String TAG_MeFragment = "MeFragment";
     public static String TAG_SceneFragment = "SceneFragment";
+    public static String TAG_SceneFragment1 = "SceneFragment1";
+    public static String TAG_SceneFragment2 = "SceneFragment2";
     public static String TAG_DeviceScanningNewActivity = "DeviceScanningNewActivity";
-//    public static String TAG_GroupListFragment = "GroupListFragment";
-//    public static String TAG_GroupListFragment = "GroupListFragment";
+    public static String TAG_SetSceneAct = "TAG_SetSceneAct";
+    public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
+    public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
 //    public static String TAG_GroupListFragment = "GroupListFragment";
 
 }

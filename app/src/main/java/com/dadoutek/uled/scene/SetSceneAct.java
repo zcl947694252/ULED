@@ -16,12 +16,16 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.app.hubert.guide.core.Builder;
+import com.app.hubert.guide.core.Controller;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
@@ -41,6 +45,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
+import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.dadoutek.uled.util.StringUtils;
@@ -73,7 +78,7 @@ public class SetSceneAct extends TelinkBaseActivity {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private boolean isChangeData=false;
+    private boolean isShowChangeDataView =false;
     private AlertDialog dialog;
     private Scenes scenes;
     private DbScene scene;
@@ -101,19 +106,57 @@ public class SetSceneAct extends TelinkBaseActivity {
         setContentView(R.layout.activity_scene_set);
         ButterKnife.bind(this);
         initType();
+        if(!isShowChangeDataView){
+            initOnLayoutListener();
+        }
+    }
+
+    private void initOnLayoutListener() {
+        final View view = this.getWindow().getDecorView();
+        final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                lazyLoad();
+            }
+        });
+    }
+
+    public void lazyLoad() {
+        EditText guide1= (EditText)findViewById(R.id.edit_name);
+        Button guide2= (Button)findViewById(R.id.bt_add);
+        GuideUtils.guideBuilder(this,Constant.TAG_SetSceneAct)
+                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.add_scene_guide_1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.add_scene_guide_2)
+                ))
+                .show();
+
+        if (sceneGroupAdapter.getItemCount() != 0) {
+            TextView guide3= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.btn_delete);
+            TextView guide4= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.rgb_view);
+            Button guide5= (Button) findViewById(R.id.bt_save);
+            Builder builder=GuideUtils.guideBuilder(this,Constant.TAG_SetSceneAct);
+            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.add_scene_guide_3)));
+            if(guide4!=null && guide4.getVisibility()==View.VISIBLE){
+                builder.addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.add_scene_guide_4)));
+            }
+            builder.addGuidePage(GuideUtils.addGuidePage(guide5,R.layout.view_guide_simple,getString(R.string.add_scene_guide_5)))
+                    .show();
+        }
     }
 
     private void initType() {
         Intent intent = getIntent();
         boolean isChangeScene= (boolean) intent.getExtras().get(Constant.IS_CHANGE_SCENE);
         if(!isChangeScene){
-            isChangeData=false;
+            isShowChangeDataView =false;
             initToolbar();
             initData();
             initView();
         }else{
             scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
-            isChangeData=true;
+            isShowChangeDataView =true;
             initChangeToolbar();
             initChangeData();
             initChangeView();
@@ -311,6 +354,7 @@ public class SetSceneAct extends TelinkBaseActivity {
             itemGroupArrayList.get(currentPosition).color=currentColor;
             sceneGroupAdapter.getViewByPosition(currentPosition,R.id.rgb_view).setBackgroundColor(currentColor);
             sceneGroupAdapter.notifyItemChanged(currentPosition);
+            lazyLoad();
         });
 
         dialog= builder.create();
@@ -593,7 +637,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                 break;
             case R.id.bt_save:
                 if (checked()) {
-                    if(isChangeData){
+                    if(isShowChangeDataView){
                         changeDatasave();
                     }else{
                         save();

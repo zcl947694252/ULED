@@ -6,12 +6,12 @@
         <item>经过时候关灯</item>
     </string-array>
 
-    <string-array name="switch_mode" >
+    <string-array name="switch_mode">
         <item>瞬间</item>
         <item>渐变</item>
     </string-array>
 
-    <string-array name="delay_unit" >
+    <string-array name="delay_unit">
         <item>分钟</item>
         <item>秒</item>
     </string-array>
@@ -112,7 +112,7 @@
     <string name="selected_lamp_tip">请至少选择一个灯！</string>
     <string name="select_group_tip">请至少选择一个分组</string>
     <string name="much_lamp_tip">最高支持254个灯</string>
-    <string name="restart_bluetooth">重启蓝牙,更好地体验智能灯!</string>
+    <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机</string>
     <string name="chear_cache">清空数据</string>
     <string name="update_ite">同步ITE</string>
     <string name="clean_tip">缓存清空,App即将重启</string>
@@ -394,15 +394,15 @@
     <string name="long_click_select_color_tip">*单击设置,长按保存</string>
     <string name="current_account_number">当前账号:</string>
     <string name="rssi_low">信号太差</string>
-    <string name="group_list_guide1">首先你需要点击加号安装各种设备</string>
+    <string name="group_list_guide1">点击此处即可添加设备</string>
     <string name="group_list_guide2">点击此区域可查看组内的设备</string>
-    <string name="group_list_guide3">点击开能打开组内的所有灯</string>
-    <string name="group_list_guide4">点击关能关闭组内的所有灯</string>
-    <string name="group_list_guide5">点击能设置组相关信息</string>
-    <string name="scene_guide_1">点击加号可以添加场景</string>
+    <string name="group_list_guide3">开灯</string>
+    <string name="group_list_guide4">关灯</string>
+    <string name="group_list_guide5">点击此处即可对组进行设置</string>
+    <string name="scene_guide_1">点击此处即可添加场景</string>
     <string name="scene_guide_2">点击进入场景可删除模式</string>
-    <string name="scene_guide_3">点击此区域可以应用当前场景</string>
-    <string name="scene_guide_4">点击修改可以修改场景内容</string>
+    <string name="scene_guide_3">点击此处即可开启场景</string>
+    <string name="scene_guide_4">点击此处可设置编辑场景</string>
     <string name="me_guide_1">点击清空数据可以初始化APP,但请先将灯恢复出厂设置</string>
     <string name="me_guide_2">点击这里可以备份你的设备数据到服务器</string>
     <string name="me_guide_3">这里可以查看一些常见问题</string>
@@ -419,10 +419,23 @@
     <string name="btn_jump_over">跳过指引</string>
     <string name="search_group">点击图标输入组名可以搜索分组</string>
     <string name="light_guide_1">点此处可以开关灯</string>
-    <string name="light_guide_2">点此对灯进行设置</string>   
+    <string name="light_guide_2">点此对灯进行设置</string>
     <string name="warning">警告</string>
     <string name="is_exit_ota">It\'s in OTA progress, Do you really want to exit?</string>
-
+    <string name="add_scene_guide_1">点击此处即可输入场景名称</string>
+    <string name="add_scene_guide_2">点击此处即可选中需要的组。请注意：所有组与其他组不能同时选中</string>
+    <string name="add_scene_guide_3">点击此处即可删除场景里的组</string>
+    <string name="add_scene_guide_4">点击此处即可设置组的颜色</string>
+    <string name="add_scene_guide_5">点击此处即可保存场景</string>
+    <string name="config_pir_guide_1">这里输入触发后持续多久</string>
+    <string name="config_pir_guide_2">这里输入触发后的亮度</string>
+    <string name="config_pir_guide_4">这里选择一个组响应感应器</string>
+    <string name="config_pir_guide_5">这里可以选择触发后的操作</string>
+    <string name="config_pir_guide_6">这里可以选择触发形式</string>
+    <string name="config_pir_guide_7">这里可以选择触发时间单位</string>
+    <string name="config_pir_guide_8">点击此图标可以保存当前配置</string>
+    <string name="group_list_guide0">轻点屏幕即可查看下一个操作提示</string>
+    <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
 
 
 </resources>

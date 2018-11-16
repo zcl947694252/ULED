@@ -196,13 +196,28 @@ class GroupListFragment : BaseFragment(){
     }
 
     fun lazyLoad() {
+        val guide0= toolbar!!.findViewById<TextView>(R.id.toolbarTv)
         val guide1= toolbar!!.findViewById<ImageView>(R.id.img_function1)
-        val guide2= adapter!!.getViewByPosition(0,R.id.txt_name)
-        val guide3= adapter!!.getViewByPosition(0,R.id.btn_on)
-        val guide4= adapter!!.getViewByPosition(0,R.id.btn_off)
-        val guide5= adapter!!.getViewByPosition(0,R.id.btn_set)
+        var guide2= adapter!!.getViewByPosition(0,R.id.txt_name)
+        var guide3= adapter!!.getViewByPosition(0,R.id.btn_on)
+        var guide4= adapter!!.getViewByPosition(0,R.id.btn_off)
+        var guide5= adapter!!.getViewByPosition(0,R.id.btn_set)
+
+        val size= adapter!!.itemCount
+        if(guide2==null){
+            for(i in 0..size){
+                if(adapter!!.getViewByPosition(i,R.id.txt_name)!=null){
+                    guide2= adapter!!.getViewByPosition(i+1,R.id.txt_name)
+                    guide3= adapter!!.getViewByPosition(i+1,R.id.btn_on)
+                    guide4= adapter!!.getViewByPosition(i+1,R.id.btn_off)
+                    guide5= adapter!!.getViewByPosition(i+1,R.id.btn_set)
+                    break
+                }
+            }
+        }
 
         GuideUtils.guideBuilder(this@GroupListFragment,Constant.TAG_GroupListFragment)
+                .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_simple,getString(R.string.group_list_guide0)))
                 .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.group_list_guide1)))
                 .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.group_list_guide2)))
                 .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.group_list_guide3)))

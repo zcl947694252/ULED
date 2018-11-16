@@ -20,7 +20,7 @@
             android:contentDescription="@null" />
 
         <TextView
-            android:id="@+id/txt_header_title"
+            android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="false"
@@ -37,7 +37,7 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/tv_ota"
+            android:id="@+id/tvOta"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
@@ -48,21 +48,9 @@
             android:text="OTA"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:visibility="visible"
+            android:visibility="gone"
             android:contentDescription="@null" />
     </RelativeLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <fragment
-            android:id="@+id/device_setting_fragment"
-            android:name="com.dadoutek.uled.light.NormalDeviceSettingFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_device_setting" />
-    </FrameLayout>
-
+    <include layout="@layout/fragment_device_setting"/>
 </LinearLayout>
