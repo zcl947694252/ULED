@@ -80,7 +80,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
     RecyclerView diyColorRecyclerListView;
     Unbinder unbinder1;
     @BindView(R.id.dynamicRgb)
-    Button dynamicRgb;
+    TextView dynamicRgb;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
