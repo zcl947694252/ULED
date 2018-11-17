@@ -1,21 +1,19 @@
 package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.SeekBar
-import android.widget.TextView
+import com.blankj.utilcode.util.ActivityUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.ItemRgbGradient
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -43,7 +41,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        btnStopGradient.visibility=View.VISIBLE
+        btnStopGradient.visibility = View.VISIBLE
         btnStopGradient.setOnClickListener(this)
         normal_rgb.setOnClickListener(this)
     }
@@ -68,11 +66,11 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         this.sbSpeed!!.progress = speed
         tvSpeed.text = getString(R.string.speed_text, speed.toString())
         this.sbSpeed!!.setOnSeekBarChangeListener(this.barChangeListener)
-        btnStopGradient.visibility=View.VISIBLE
+        btnStopGradient.visibility = View.VISIBLE
         btnStopGradient.setOnClickListener(this)
     }
 
-    private fun applyPresetView(){
+    private fun applyPresetView() {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         builtInModeRecycleView!!.layoutManager = layoutmanager
@@ -103,40 +101,41 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
             speed = progress
             tvSpeed.text = getString(R.string.speed_text, speed.toString())
-            if(positionState!=0){
+            if (positionState != 0) {
                 Commander.applyGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
             }
         }
     }
 
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        positionState=position+1
+        positionState = position + 1
         Commander.applyGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
     }
 
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.diyButton->{
+        when (v?.id) {
+            R.id.diyButton -> {
                 diyButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
                 buildInButton.setBackgroundColor(resources.getColor(R.color.white))
             }
-            R.id.buildInButton->{
+            R.id.buildInButton -> {
                 diyButton.setBackgroundColor(resources.getColor(R.color.white))
                 buildInButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
             }
-            R.id.btnStopGradient->{
+            R.id.btnStopGradient -> {
                 positionState = 0
-               Commander.closeGradient(dstAddress,1, speed, successCallback = {}, failedCallback = {})
+                Commander.closeGradient(dstAddress, 1, speed, successCallback = {}, failedCallback = {})
             }
-            R.id.normal_rgb->{
-               finish()
+            R.id.normal_rgb -> {
+                finish()
             }
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> finish()
+            android.R.id.home -> ActivityUtils.finishToActivity(MainActivity::class.java, false,
+                    true)
         }
         return super.onOptionsItemSelected(item)
     }
