@@ -527,7 +527,7 @@ object DBUtils {
     
     fun addNewGroup(name: String, groups: MutableList<DbGroup>, context: Context) {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-        if (!checkReachedTheLimit(groups)) {
+        if (!checkReachedTheLimit(groups,name)) {
             val newMeshAdress: Int
             val group = DbGroup()
             newMeshAdress = groupAdress
@@ -548,11 +548,19 @@ object DBUtils {
 
     }
 
-    private fun checkReachedTheLimit(groups: List<DbGroup>): Boolean {
+    private fun checkReachedTheLimit(groups: List<DbGroup>,name:String): Boolean {
         if (groups.size >= MAX_GROUP_COUNT) {
             ToastUtils.showLong(R.string.group_limit)
             return true
         }
+
+        for(i in groups.indices){
+            if(groups[i].name==name){
+                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                return true
+            }
+        }
+
         return false
     }
 

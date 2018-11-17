@@ -473,6 +473,7 @@
     <string name="group_list_guide0"> Tap the screen to view the next action prompt </string>
 
     <string name="show_guide_again_tip">Want to see the APP tutorial again?</string>
+    <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
 
 
 </resources>
