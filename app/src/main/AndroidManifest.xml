@@ -188,6 +188,9 @@
         <activity
             android:name=".rgb.SelectColorActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".rgb.RGBGradientActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

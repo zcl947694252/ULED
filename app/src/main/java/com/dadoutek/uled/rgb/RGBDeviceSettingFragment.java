@@ -2,21 +2,17 @@ package com.dadoutek.uled.rgb;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -24,8 +20,8 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.light.RenameLightActivity;
 import com.dadoutek.uled.group.LightGroupingActivity;
+import com.dadoutek.uled.light.RenameLightActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -83,6 +79,8 @@ public final class RGBDeviceSettingFragment extends Fragment {
     @BindView(R.id.diy_color_recycler_list_view)
     RecyclerView diyColorRecyclerListView;
     Unbinder unbinder1;
+    @BindView(R.id.dynamicRgb)
+    Button dynamicRgb;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
@@ -212,7 +210,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             }
         }
 
-        diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(getActivity(),5));
+        diyColorRecyclerListView.setLayoutManager(new GridLayoutManager(getActivity(), 5));
         colorSelectDiyRecyclerViewAdapter = new ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildClickListener(diyOnItemChildClickListener);
         colorSelectDiyRecyclerViewAdapter.setOnItemChildLongClickListener(diyOnItemChildLongClickListener);
@@ -262,7 +260,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             presetColors.get(position).setBrightness(light.getBrightness());
             TextView textView = (TextView) adapter.getViewByPosition(position, R.id.btn_diy_preset);
             textView.setText(light.getBrightness() + "%");
-            textView.setBackgroundColor(0xff000000|light.getColor());
+            textView.setBackgroundColor(0xff000000 | light.getColor());
             SharedPreferencesHelper.putObject(getActivity(), Constant.PRESET_COLOR, presetColors);
             return false;
         }
@@ -279,12 +277,12 @@ public final class RGBDeviceSettingFragment extends Fragment {
             colorB.setText(argb[3] + "");
 
 //            int color = Color.rgb(argb[1], argb[2], argb[3]);
-            int color = (argb[1]<<16) | (argb[2]<<8) | (argb[3]);
-            Log.d(TAG, "onColorSelected: "+Integer.toHexString(color));
-            if(fromUser){
+            int color = (argb[1] << 16) | (argb[2] << 8) | (argb[3]);
+            Log.d(TAG, "onColorSelected: " + Integer.toHexString(color));
+            if (fromUser) {
 //                scrollView.setBackgroundColor(0xff000000|color);
-                if(argb[1]==0 && argb[2]==0 && argb[3]==0){
-                }else{
+                if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+                } else {
                     light.setColor(color);
                     new Thread(() -> changeColor((byte) argb[1], (byte) argb[2], (byte) argb[3])).start();
                 }
@@ -476,7 +474,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @OnClick({R.id.update_group, R.id.btn_remove})
+    @OnClick({R.id.update_group, R.id.btn_remove, R.id.dynamicRgb})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.update_group:
@@ -485,7 +483,17 @@ public final class RGBDeviceSettingFragment extends Fragment {
             case R.id.btn_remove:
                 remove();
                 break;
+            case R.id.dynamicRgb:
+                toRGBGradientView();
+                break;
         }
+    }
+
+    private void toRGBGradientView() {
+        Intent intent = new Intent(getActivity(), RGBGradientActivity.class);
+        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT);
+        intent.putExtra(Constant.TYPE_VIEW_ADDRESS, light.getMeshAddr());
+        startActivityForResult(intent, 0);
     }
 
     private void updateGroup() {

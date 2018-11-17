@@ -22,6 +22,16 @@
         <item>Second</item>
     </string-array>
 
+    <string-array name="preset_gradient">   
+        <item>Colorful Gradient</item>        
+        <item>red gradient</item>        
+        <item>green gradient</item>        
+        <item>blue gradient</item>        
+        <item> yellow gradient</item>        
+        <item> cyan gradient</item>        
+        <item> purple gradient</item>
+    </string-array>
+
     <!-- Activity Labels -->
     <string name="app_name">ULed</string>
     <string name="activity_device_setting_label">Device Setting</string>
@@ -411,7 +421,8 @@
     <string name="scene_guide_2">Click to enter the scene to delete the mode</string>  
     <string name="scene_guide_3">Click here to open the scene</string> 
     <string name="scene_guide_4">Click here to set the editing scene </string>    
-    <string name="me_guide_1">Click to clear the data to initialize the app, but please reset the lights to factory settings</string>    
+    <string name="me_guide_1">Click to clear the data to initialize the app, but please reset the lights to factory settings</string>
+        
     <string name="me_guide_2">Click here to back up your device data to the server</string>    
     <string name="me_guide_3"> Here are some common questions </string>   
     <string name="me_guide_4"> Here you can restore all the lights to the factory settings, remember to power the lights </string>
@@ -474,5 +485,9 @@
 
     <string name="show_guide_again_tip">Want to see the APP tutorial again?</string>
 
-
+    <string name="dynamic_rgb">dynamic RGB</string>
+       
+    <string name="speed_text">Speed: %1$s%%</string>
+        
+    <string name="dynamic_gradient">dynamic RGB</string>
 </resources>

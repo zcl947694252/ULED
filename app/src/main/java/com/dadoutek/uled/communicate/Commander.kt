@@ -334,8 +334,52 @@ object Commander : EventListener<String> {
         }
     }
 
+    fun closeGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
+                      failedCallback: () -> Unit){
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val gradientActionType= 0x03
+        val params: ByteArray
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+    }
 
-    fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit,
+    fun applyGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
+                      failedCallback: () -> Unit){
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val gradientActionType= 0x02
+        val params: ByteArray
+            params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+    }
+
+    fun deleteGradient(dstAddr: Int,id: Int,successCallback: (version: String?) -> Unit,
+                       failedCallback: () -> Unit){
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val gradientActionType= 0x01
+        val params: ByteArray
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+    }
+
+    /**
+     * id  渐变索引号
+     * node 渐变节点号。（填0: 从此颜色开始渐变，填1: 经过此颜色，填2: 以此颜色结束)
+     * mode 渐变模式 (填0: RGB渐变， 填1: 双色温渐变)
+     * (C没值就都先传FF)(W没值就都先传FF)
+     * 双色温渐变模式：[16]: 色温
+     */
+    fun addGradient(dstAddr: Int,id:Int,node: Int,mode: Int,brightness: Int,
+                    r:Int,g:Int,b:Int,c:Int=0xff,w:Int=0xff,successCallback: (version: String?) -> Unit,
+                    failedCallback: () -> Unit){
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val gradientActionType= 0x00
+        val params: ByteArray
+        params = byteArrayOf(gradientActionType.toByte(),id.toByte(),node.toByte(),
+                mode.toByte(),brightness.toByte(),r.toByte(),g.toByte(),b.toByte(),c.toByte(),w.toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+    }
+
+    fun getDeviceVersion(dstAddr: Int,successCallback: (version: String?) -> Unit,
                          failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 

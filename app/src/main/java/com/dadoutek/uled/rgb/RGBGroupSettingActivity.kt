@@ -2,6 +2,7 @@ package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Point
 import android.os.Bundle
@@ -55,16 +56,23 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     private var colorPicker: ColorPickerView? = null
     private var btn_remove_group: Button? = null
     private var btn_rename: Button? = null
+    private var dynamicRgb: Button? = null
     private var stopTracking = false
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
     private var group: DbGroup? = null
     private var editTitle: EditText? =null
+    private var dynamicRgbBt: TextView? =null
 
     private val clickListener = OnClickListener { v ->
         if (v === backView) {
             setResult(Constant.RESULT_OK)
             finish()
+        }else if(v === dynamicRgbBt){
+            val intent=Intent(this,RGBGradientActivity::class.java)
+            intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
+            intent.putExtra(Constant.TYPE_VIEW_ADDRESS,group?.meshAddr)
+            startActivityForResult(intent,0)
         }
     }
 
@@ -92,6 +100,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
             }
         }
 
+        dynamicRgbBt = this.findViewById<View>(R.id.dynamic_rgb) as TextView
+        dynamicRgbBt?.setOnClickListener(this.clickListener)
         this.backView = this
                 .findViewById<View>(R.id.img_header_menu_left) as ImageView
         this.backView!!.setOnClickListener(this.clickListener)
@@ -109,10 +119,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
             false
         }
         btn_rename = findViewById<Button>(R.id.btn_rename)
+        dynamicRgb = findViewById<Button>(R.id.dynamicRgb)
         btn_remove_group = findViewById<Button>(R.id.btn_remove_group)
 
         btn_remove_group?.setOnClickListener(this)
         btn_rename?.setOnClickListener(this)
+        dynamicRgb?.setOnClickListener(this)
 
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
@@ -203,7 +215,15 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
             R.id.btn_rename -> renameGp()
+            R.id.dynamicRgb -> toRGBGradientView()
         }
+    }
+
+    private fun toRGBGradientView() {
+        val intent=Intent(this,RGBGradientActivity::class.java)
+        intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
+        intent.putExtra(Constant.TYPE_VIEW_ADDRESS,group?.meshAddr)
+        startActivityForResult(intent,0)
     }
 
     override fun onDestroy() {

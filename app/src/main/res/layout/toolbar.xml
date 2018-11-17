@@ -47,6 +47,18 @@
             android:visibility="gone"
             android:foreground="?android:attr/selectableItemBackground"
             />
+
+        <ImageView
+            android:id="@+id/btnStopGradient"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:src="@drawable/outline_power_settings_new_white_36"
+            android:visibility="gone"
+            android:foreground="?android:attr/selectableItemBackground"
+            />
     </android.support.v7.widget.Toolbar>
 
 

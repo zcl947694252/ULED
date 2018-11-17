@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:scrollbars="none">
 
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:scrollbars="none">
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -16,8 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
-            >
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
             <TextView
                 android:layout_width="20dp"
@@ -65,8 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-            >
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
             <TextView
                 android:layout_width="20dp"
@@ -100,6 +103,15 @@
             app:palette="@drawable/palette"
             app:selector="@drawable/wheel" />
 
+        <Button
+            android:id="@+id/dynamicRgb"
+            android:text="@string/dynamic_rgb"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="5dp"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:id="@+id/tip"
@@ -199,12 +211,12 @@
         <!--android:background="@color/border_line" />-->
 
         <LinearLayout
+            android:id="@+id/func_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/brightness">
@@ -216,8 +228,8 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/click_btn"
-                android:textColor="@android:color/white"
-                android:text="@string/delete_group" />
+                android:text="@string/delete_group"
+                android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/btn_rename"
@@ -226,10 +238,45 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/click_btn"
-                android:textColor="@android:color/white"
-                android:text="@string/rename_the_group" />
+                android:text="@string/rename_the_group"
+                android:textColor="@android:color/white" />
         </LinearLayout>
-
     </android.support.constraint.ConstraintLayout>
-
 </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        >
+        <TextView
+            android:id="@+id/normal_rgb"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@color/primary"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:text="RGB"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:gravity="center"
+            />
+
+        <TextView
+            android:id="@+id/dynamic_rgb"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginStart="1dp"
+            android:background="@color/primary"
+            android:layout_height="match_parent"
+            android:text="动态RGB"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:gravity="center"
+            />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
