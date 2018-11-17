@@ -79,8 +79,8 @@ public final class RGBDeviceSettingFragment extends Fragment {
     @BindView(R.id.diy_color_recycler_list_view)
     RecyclerView diyColorRecyclerListView;
     Unbinder unbinder1;
-    @BindView(R.id.dynamicRgb)
-    Button dynamicRgb;
+    @BindView(R.id.dynamic_rgb)
+    TextView dynamicRgb;
 
     private SeekBar brightnessBar;
     private SeekBar temperatureBar;
@@ -474,7 +474,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @OnClick({R.id.update_group, R.id.btn_remove, R.id.dynamicRgb})
+    @OnClick({R.id.update_group, R.id.btn_remove, R.id.dynamic_rgb})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.update_group:
@@ -483,7 +483,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
             case R.id.btn_remove:
                 remove();
                 break;
-            case R.id.dynamicRgb:
+            case R.id.dynamic_rgb:
                 toRGBGradientView();
                 break;
         }
@@ -493,6 +493,7 @@ public final class RGBDeviceSettingFragment extends Fragment {
         Intent intent = new Intent(getActivity(), RGBGradientActivity.class);
         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT);
         intent.putExtra(Constant.TYPE_VIEW_ADDRESS, light.getMeshAddr());
+
         startActivityForResult(intent, 0);
     }
 

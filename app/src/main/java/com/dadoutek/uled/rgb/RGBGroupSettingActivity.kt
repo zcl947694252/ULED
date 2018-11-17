@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.Point
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -56,7 +57,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     private var colorPicker: ColorPickerView? = null
     private var btn_remove_group: Button? = null
     private var btn_rename: Button? = null
-    private var dynamicRgb: Button? = null
     private var stopTracking = false
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
@@ -119,12 +119,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
             false
         }
         btn_rename = findViewById<Button>(R.id.btn_rename)
-        dynamicRgb = findViewById<Button>(R.id.dynamicRgb)
+//        dynamicRgb = findViewById<Button>(R.id.dynamicRgb)
         btn_remove_group = findViewById<Button>(R.id.btn_remove_group)
 
         btn_remove_group?.setOnClickListener(this)
         btn_rename?.setOnClickListener(this)
-        dynamicRgb?.setOnClickListener(this)
+//        dynamicRgb?.setOnClickListener(this)
 
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
@@ -215,7 +215,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
             R.id.btn_rename -> renameGp()
-            R.id.dynamicRgb -> toRGBGradientView()
+//            R.id.dynamicRgb -> toRGBGradientView()
         }
     }
 
@@ -223,6 +223,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         val intent=Intent(this,RGBGradientActivity::class.java)
         intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
         intent.putExtra(Constant.TYPE_VIEW_ADDRESS,group?.meshAddr)
+        overridePendingTransition(0, 0)
         startActivityForResult(intent,0)
     }
 
@@ -364,14 +365,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         val opcode = 0xE2.toByte()
 
         val minVal = 0x50
-
-        if ((green.toInt() and 0xff) <= minVal)
-            green = 0
-        if ((red.toInt() and 0xff) <= minVal)
-            red = 0
-
-        if ((blue.toInt() and 0xff) <= minVal)
-            blue = 0
 
 
         val params = byteArrayOf(0x04, red, green, blue)
