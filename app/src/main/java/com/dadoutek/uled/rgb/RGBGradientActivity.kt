@@ -100,6 +100,9 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         @SuppressLint("StringFormatInvalid")
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
             speed = progress
+            if(speed==0){
+                speed=1
+            }
             tvSpeed.text = getString(R.string.speed_text, speed.toString())
             if (positionState != 0) {
                 Commander.applyGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
