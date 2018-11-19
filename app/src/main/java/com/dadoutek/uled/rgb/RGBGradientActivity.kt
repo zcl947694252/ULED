@@ -94,7 +94,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
-
+            tvSpeed.text = getString(R.string.speed_text, progress.toString())
         }
 
         @SuppressLint("StringFormatInvalid")
