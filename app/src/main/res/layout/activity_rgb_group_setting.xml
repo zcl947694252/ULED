@@ -67,4 +67,7 @@
         <include layout="@layout/fragment_rgb_group_setting"/>
     </FrameLayout>
 
+
+
+
 </LinearLayout>

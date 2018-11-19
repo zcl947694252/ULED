@@ -156,6 +156,10 @@ public class Constant implements Serializable {
 
     public static int VENDOR_ID = 0x0211;
     public static String IS_SCAN_RGB_LIGHT="IS_SCAN_RGB_LIGHT";
+    public static String TYPE_GROUP="TYPE_GROUP";
+    public static String TYPE_LIGHT="TYPE_LIGHT";
+    public static String TYPE_VIEW="TYPE_VIEW";
+    public static String TYPE_VIEW_ADDRESS="TYPE_VIEW_ADDRESS";
 
     //导航页标签
     public static String TAG_GroupListFragment = "GroupListFragment";

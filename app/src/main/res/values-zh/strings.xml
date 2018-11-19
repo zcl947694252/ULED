@@ -16,6 +16,16 @@
         <item>秒</item>
     </string-array>
 
+    <string-array name="preset_gradient">
+        <item>七彩渐变</item>
+        <item>红色渐变</item>
+        <item>绿色渐变</item>
+        <item>蓝色渐变</item>
+        <item>黄色渐变</item>
+        <item>青色渐变</item>
+        <item>紫色渐变</item>
+    </string-array>
+
     <!-- Activity Labels -->
     <string name="app_name">优乐迪</string>
     <string name="activity_device_setting_label">设备设置</string>
@@ -437,6 +447,10 @@
     <string name="group_list_guide0">轻点屏幕即可查看下一个操作提示</string>
     <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
+    <string name="dynamic_rgb">动态RGB</string>
+    <string name="speed_text">速度：%1$s%%</string>
+    <string name="dynamic_gradient">动态RGB</string>
+    <string name="stop">停止</string>
 
 
 </resources>
