@@ -110,7 +110,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
             }
             LightAdapter.STATUS_LOGOUT -> {
                 connectTimes++;
-                if(connectTimes>3){
+                if(connectTimes>6){
                     Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show()
                     hideLoadingDialog()
                 }else if(connectTimes<=1){
@@ -254,6 +254,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     override fun onDestroy() {
         super.onDestroy()
         mConnectTimer?.dispose()
+        this.mApplication?.removeEventListener(this)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

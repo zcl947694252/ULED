@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
@@ -33,18 +34,28 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.ItemColorPreset
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.Parameters
+import com.telink.util.Event
+import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_group_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
 
-class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.OnEditorActionListener {
+class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.OnEditorActionListener , EventListener<String> {
     private var backView: ImageView? = null
     private var mApplication: TelinkLightApplication? = null
     private var brightnessBar: SeekBar? = null
@@ -63,6 +74,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     private var group: DbGroup? = null
     private var editTitle: EditText? =null
     private var dynamicRgbBt: TextView? =null
+    private var mApp: TelinkLightApplication? = null
+    private var mConnectTimer: Disposable? = null
+    private var isLoginSuccess = false
+    private var connectTimes = 0
 
     private val clickListener = OnClickListener { v ->
         if (v === backView) {
@@ -83,6 +98,113 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
         initData()
         initView()
+
+        addEventListeners()
+        this.mApp = this.application as TelinkLightApplication?
+    }
+
+    fun addEventListeners() {
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+////        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
+//        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+//        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
+////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
+//        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    override fun performed(event: Event<String>?) {
+        when (event?.type) {
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+        }
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+
+        val deviceInfo = event.args
+
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                hideLoadingDialog()
+                isLoginSuccess=true
+                mConnectTimer?.dispose()
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                connectTimes++;
+                if(connectTimes>6){
+                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show()
+                    hideLoadingDialog()
+                }else if(connectTimes<=1){
+                    showLoadingDialog(getString(R.string.connecting))
+                    autoConnect()
+                }else{
+                    mConnectTimer= Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                            .subscribe { aLong ->
+                                com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
+                                showLoadingDialog(getString(R.string.connecting))
+                                autoConnect()
+                            }
+                }
+            }
+        }
+    }
+
+//    private fun showIsConnect
+
+    /**
+     * 自动重连
+     */
+    private fun autoConnect() {
+
+        if (TelinkLightService.Instance() != null) {
+
+            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+
+                ToastUtils.showLong(getString(R.string.connecting))
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
+                if (this.mApp!!.isEmptyMesh())
+                    return
+
+                //                Lights.getInstance().clear();
+                this.mApp?.refreshLights()
+
+                val mesh = this.mApp?.getMesh()
+
+                if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
+                    TelinkLightService.Instance().idleMode(true)
+                    return
+                }
+
+                val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.DB_NAME_KEY, "dadou")
+
+                //自动重连参数
+                val connectParams = Parameters.createAutoConnectParameters()
+                connectParams.setMeshName(mesh?.name)
+                if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+                    connectParams.setPassword(NetworkFactory.md5(
+                            NetworkFactory.md5(mesh?.password) + account))
+                } else {
+                    connectParams.setPassword(mesh?.password)
+                }
+                connectParams.autoEnableNotification(true)
+
+                // 之前是否有在做MeshOTA操作，是则继续
+                if (mesh!!.isOtaProcessing) {
+                    connectParams.setConnectMac(mesh?.otaDevice!!.mac)
+                }
+                //自动重连
+                TelinkLightService.Instance().autoConnect(connectParams)
+            }
+
+            //刷新Notify参数
+            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+            refreshNotifyParams.setRefreshRepeatCount(2)
+            refreshNotifyParams.setRefreshInterval(2000)
+            //开启自动刷新Notify
+            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+        }
     }
 
     private fun initData() {
@@ -229,6 +351,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
     override fun onDestroy() {
         super.onDestroy()
+        mConnectTimer?.dispose()
+        this.mApplication?.removeEventListener(this)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
