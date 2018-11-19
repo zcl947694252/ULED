@@ -146,6 +146,7 @@ public class Peripheral extends BluetoothGattCallback {
                     + this.getMacAddress());
             this.mConnState.set(CONN_STATE_CONNECTING);
             this.gatt = this.device.connectGatt(context, false, this);
+            gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
             if (this.gatt == null) {
                 this.disconnect();
                 this.mConnState.set(CONN_STATE_IDLE);
@@ -516,6 +517,7 @@ public class Peripheral extends BluetoothGattCallback {
                 if (!this.gatt.writeCharacteristic(characteristic)) {
                     success = false;
                     errorMsg = "write characteristic error";
+                    Log.d("myerror", "writeCharacteristic: ");
                    }
                 }
 
