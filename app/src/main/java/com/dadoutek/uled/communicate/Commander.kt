@@ -348,12 +348,12 @@ object Commander : EventListener<String> {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         val gradientActionType= 0x02
 
-//        var currentLightAddress =0
-//        if(TelinkLightApplication.getInstance().connectDevice!=null){
-//            currentLightAddress=TelinkLightApplication.getInstance().connectDevice.meshAddress
-//        }
+        var currentLightAddress =0
+        if(TelinkLightApplication.getInstance().connectDevice!=null){
+            currentLightAddress=TelinkLightApplication.getInstance().connectDevice.meshAddress
+        }
         val params: ByteArray
-            params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
+            params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), currentLightAddress.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
