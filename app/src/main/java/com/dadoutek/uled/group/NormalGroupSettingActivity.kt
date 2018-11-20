@@ -251,6 +251,17 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        addEventListeners()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mConnectTimer?.dispose()
+        this.mApplication?.removeEventListener(this)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         mConnectTimer?.dispose()
