@@ -451,6 +451,7 @@
     <string name="speed_text">速度：%1$s%%</string>
     <string name="dynamic_gradient">动态RGB</string>
     <string name="stop">停止</string>
+    <string name="rename">重命名</string>
 
 
 </resources>

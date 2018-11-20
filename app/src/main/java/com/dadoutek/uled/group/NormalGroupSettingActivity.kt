@@ -13,23 +13,22 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-
-import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.widget.ColorPicker
-import com.telink.bluetooth.event.*
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
@@ -37,15 +36,8 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.activity_group_setting.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_group_setting.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.design.snackbar
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -58,8 +50,8 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     private var btn_remove_group: Button? = null
     private var btn_rename: Button? = null
     private var group: DbGroup? = null
-    private var stopTracking = false
-    private var editTitle: EditText? =null
+    //    private var stopTracking = false
+    private var editTitle: EditText? = null
     private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
     private var isLoginSuccess = false
@@ -79,8 +71,58 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
 //        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 //        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
 ////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
-//        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
+
+    private fun onErrorReport(info: ErrorReportInfo) {
+//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+        when (info.stateCode) {
+            ErrorReportEvent.STATE_SCAN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                    }
+                }
+
+            }
+            ErrorReportEvent.STATE_CONNECT -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                    }
+                }
+
+                autoConnect()
+
+            }
+            ErrorReportEvent.STATE_LOGIN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                    }
+                }
+
+                autoConnect()
+
+            }
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -95,6 +137,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     override fun performed(event: Event<String>?) {
         when (event?.type) {
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+            ErrorReportEvent.ERROR_REPORT -> onErrorReport((event as ErrorReportEvent).args)
         }
     }
 
@@ -105,19 +148,19 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 hideLoadingDialog()
-                isLoginSuccess=true
+                isLoginSuccess = true
                 mConnectTimer?.dispose()
             }
             LightAdapter.STATUS_LOGOUT -> {
                 connectTimes++;
-                if(connectTimes>6){
+                if (connectTimes > 6) {
                     Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show()
                     hideLoadingDialog()
-                }else if(connectTimes<=1){
+                } else if (connectTimes <= 1) {
                     showLoadingDialog(getString(R.string.connecting))
                     autoConnect()
-                }else{
-                    mConnectTimer=Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                } else {
+                    mConnectTimer = Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                             .subscribe { aLong ->
                                 com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
                                 showLoadingDialog(getString(R.string.connecting))
@@ -184,6 +227,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
             TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
         }
     }
+
 
     private fun initView() {
         if (group != null) {
@@ -282,38 +326,35 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 20
+        private val delayTime = 30
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            stopTracking = true
-            this.onValueChange(seekBar, seekBar.progress, true)
-            LogUtils.d("seekBarstop" + seekBar.progress)
+//            stopTracking = true
+            this.onValueChange(seekBar, seekBar.progress, true, true)
+//            LogUtils.d("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
-            stopTracking = false
+//            stopTracking = false
             this.preTime = System.currentTimeMillis()
-            this.onValueChange(seekBar, seekBar.progress, true)
+            this.onValueChange(seekBar, seekBar.progress, true, true)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
 
-            //            if (progress % 5 != 0)
-            //                return;
-            //
             val currentTime = System.currentTimeMillis()
 
-            if (currentTime - this.preTime < this.delayTime) {
+            if (currentTime - this.preTime > this.delayTime) {
+                this.onValueChange(seekBar, progress, true, false)
                 this.preTime = currentTime
-                return
             }
 
-            LogUtils.d("seekBarChange" + seekBar.progress)
-            this.onValueChange(seekBar, progress, true)
+//            LogUtils.d("seekBarChange" + seekBar.progress)
         }
 
-        private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
+        private fun onValueChange(view: View, progress: Int, immediate: Boolean, isStopTracking:
+        Boolean) {
 
             val addr = group!!.meshAddr
             val opcode: Byte
@@ -323,11 +364,11 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
-                DBUtils.updateGroup(group!!)
                 tv_brightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
-                if (stopTracking) {
+                if (isStopTracking) {
+                    DBUtils.updateGroup(group!!)
                     updateLights(progress, "brightness", group!!)
                 }
             } else if (view === temperatureBar) {
@@ -335,12 +376,12 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, progress.toByte())
                 group!!.colorTemperature = progress
-                DBUtils.updateGroup(group!!)
                 tv_temperature!!.text = getString(R.string.device_setting_temperature, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
 
-                if (stopTracking) {
+                if (isStopTracking) {
+                    DBUtils.updateGroup(group!!)
                     updateLights(progress, "colorTemperature", group!!)
                 }
             }
@@ -348,7 +389,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     }
 
     private fun updateLights(progress: Int, type: String, group: DbGroup) {
-        Thread{
+        Thread {
             var lightList: MutableList<DbLight> = ArrayList()
 
             if (group.meshAddr == 0xffff) {
@@ -375,7 +416,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     private val colorChangedListener = object : ColorPicker.OnColorChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 20
+        private val delayTime = 30
 
         override fun onStartTrackingTouch(view: ColorPicker) {
             this.preTime = System.currentTimeMillis()
@@ -506,12 +547,12 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
-        btn_sure_edit_rename.visibility=View.VISIBLE
+        btn_sure_edit_rename.visibility = View.VISIBLE
         btn_sure_edit_rename.setOnClickListener {
-           saveName()
-            btn_sure_edit_rename.visibility=View.GONE
+            saveName()
+            btn_sure_edit_rename.visibility = View.GONE
         }
-         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
         editTitle?.setOnEditorActionListener(this)
     }
@@ -526,12 +567,12 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
             EditorInfo.IME_ACTION_DONE,
             EditorInfo.IME_ACTION_NONE -> {
                 saveName()
-                btn_sure_edit_rename.visibility=View.GONE
+                btn_sure_edit_rename.visibility = View.GONE
             }
         }
     }
 
-    private fun saveName(){
+    private fun saveName() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
         editTitle?.setFocusableInTouchMode(false)
@@ -539,12 +580,12 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         checkAndSaveName()
     }
 
-    private fun checkAndSaveName(){
-       val name = editTitle?.text.toString().trim()
+    private fun checkAndSaveName() {
+        val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-        }else{
-            group?.name=name
+        } else {
+            group?.name = name
             DBUtils.updateGroup(group!!)
         }
     }

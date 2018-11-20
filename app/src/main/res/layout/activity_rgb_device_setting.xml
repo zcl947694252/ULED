@@ -25,11 +25,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="false"
-            android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="30dp"
             android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
             android:gravity="center_vertical"
             android:singleLine="true"
             android:text="@string/device_setting_header"
@@ -44,24 +44,20 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="15dp"
+            android:contentDescription="@null"
             android:text="OTA"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:visibility="gone"
-            android:contentDescription="@null" />
+            android:visibility="gone" />
     </RelativeLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
 
-        <fragment
-            android:id="@+id/device_setting_rgb_fragment"
-            android:name="com.dadoutek.uled.rgb.RGBDeviceSettingFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_rgb_device_setting" />
-    </FrameLayout>
+    <fragment
+        android:id="@+id/device_setting_rgb_fragment"
+        android:name="com.dadoutek.uled.rgb.RGBDeviceSettingFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/fragment_rgb_device_setting" />
+
 
 </LinearLayout>

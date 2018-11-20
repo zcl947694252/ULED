@@ -494,6 +494,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
             }
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
             LightAdapter.STATUS_CONNECTED -> {
                 if (!TelinkLightService.Instance().isLogin)
                     login()
