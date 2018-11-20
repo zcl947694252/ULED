@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.util.StringUtils;
 
@@ -90,7 +91,9 @@ public class TelinkBaseActivity extends AppCompatActivity {
             loadDialog.setCancelable(false);
             loadDialog.setCanceledOnTouchOutside(false);
             loadDialog.setContentView(layout);
-            loadDialog.show();
+            if(!this.isDestroyed()){
+                loadDialog.show();
+            }
         }
     }
 

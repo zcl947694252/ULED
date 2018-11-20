@@ -152,24 +152,16 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
                 mConnectTimer?.dispose()
             }
             LightAdapter.STATUS_LOGOUT -> {
-                connectTimes++;
-                if (connectTimes > 6) {
-                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show()
-                    hideLoadingDialog()
-                } else if (connectTimes <= 1) {
-                    showLoadingDialog(getString(R.string.connecting))
                     autoConnect()
-                } else {
-                    mConnectTimer = Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                    mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                             .subscribe { aLong ->
                                 com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
-                                showLoadingDialog(getString(R.string.connecting))
-                                autoConnect()
+                                showLoadingDialog(getString(R.string.connect_failed))
+                                finish()
                             }
                 }
             }
         }
-    }
 
 
     /**
@@ -584,9 +576,22 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-        } else {
-            group?.name = name
-            DBUtils.updateGroup(group!!)
+        }
+        else {
+            var canSave=true
+            val groups=DBUtils.allGroups
+            for(i in groups.indices){
+                if(groups[i].name==name){
+                    ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                    canSave=false
+                    break
+                }
+            }
+
+            if(canSave){
+                group?.name = name
+                DBUtils.updateGroup(group!!)
+            }
         }
     }
 }

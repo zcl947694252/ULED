@@ -38,17 +38,26 @@ import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.widget.ColorPicker
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
+import com.telink.util.Event
+import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_device_setting.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 
-class NormalDeviceSettingActivity : TelinkBaseActivity() {
+class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> {
     private var localVersion: String? = null
 
     private var light: DbLight? = null
@@ -61,6 +70,9 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
+    private var mConnectTimer: Disposable? = null
+    private var isLoginSuccess = false
+    private var mApplication: TelinkLightApplication? = null
 
     private val clickListener = OnClickListener { v ->
         when(v.id){
@@ -85,6 +97,29 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
         }
     }
 
+    fun addEventListeners() {
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+////        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
+//        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+//        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
+////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mConnectTimer?.dispose()
+        this.mApplication?.removeEventListener(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mConnectTimer?.dispose()
+        mDisposable.dispose()
+        this.mApplication?.removeEventListener(this)
+    }
+
     private fun updateGroup() {
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
@@ -92,6 +127,13 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
         intent.putExtra("gpAddress", gpAddress)
         startActivity(intent)
        this!!.finish()
+    }
+
+    override fun performed(event: Event<String>?) {
+        when (event?.type) {
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+            ErrorReportEvent.ERROR_REPORT -> onErrorReport((event as ErrorReportEvent).args)
+        }
     }
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -167,17 +209,84 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
         }
     }
 
+    private fun onErrorReport(info: ErrorReportInfo) {
+//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+        when (info.stateCode) {
+            ErrorReportEvent.STATE_SCAN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                    }
+                }
+
+            }
+            ErrorReportEvent.STATE_CONNECT -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                    }
+                }
+
+                autoConnect()
+
+            }
+            ErrorReportEvent.STATE_LOGIN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                    }
+                }
+
+                autoConnect()
+
+            }
+        }
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+
+        val deviceInfo = event.args
+
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                hideLoadingDialog()
+                isLoginSuccess = true
+                mConnectTimer?.dispose()
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                autoConnect()
+                mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                        .subscribe { aLong ->
+                            com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
+                            showLoadingDialog(getString(R.string.connect_failed))
+                            finish()
+                        }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_device_setting)
         initView()
         getVersion()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mDisposable.dispose()
+        this.mApplication = this.application as TelinkLightApplication
     }
 
     private fun initView() {

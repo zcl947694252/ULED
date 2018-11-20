@@ -135,6 +135,7 @@
         android:text="@string/trigger_lux"
         android:textSize="18sp"
         app:autoSizeTextType = "uniform"
+        app:autoSizeMaxTextSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
         app:layout_constraintTop_toBottomOf="@+id/tilMinimumBrightness" />
 

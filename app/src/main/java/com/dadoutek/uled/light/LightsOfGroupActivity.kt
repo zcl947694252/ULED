@@ -145,8 +145,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             val guide3= adapter!!.getViewByPosition(0,R.id.tv_setting)
 
             val builder=GuideUtils.guideBuilder(this@LightsOfGroupActivity,Constant.TAG_LightsOfGroupActivity)
-            builder.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.light_guide_1)))
-            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.light_guide_2)))
+            builder.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_light_1,getString(R.string.light_guide_1)))
+            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_light_1,getString(R.string.light_guide_2)))
             builder.show()
         }
     }

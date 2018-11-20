@@ -35,13 +35,6 @@
                 android:progress="10" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
-            android:background="@color/border_line" />
-
         <!-- Color -->
 
         <LinearLayout

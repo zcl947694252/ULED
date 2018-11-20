@@ -42,6 +42,7 @@ import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
 import com.telink.bluetooth.light.LightAdapter;
 import com.telink.bluetooth.light.Parameters;
+import com.telink.util.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;

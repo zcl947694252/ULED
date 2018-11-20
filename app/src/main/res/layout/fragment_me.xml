@@ -346,7 +346,7 @@
 
             <Button
                 android:id="@+id/exitLogin"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="@string/exit_login"
                 android:layout_gravity="center"
                 android:textSize="18sp"

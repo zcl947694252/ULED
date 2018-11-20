@@ -129,8 +129,8 @@ public class SceneFragment extends BaseFragment implements
     public void lazyLoad(int showTypeView) {
         ImageView guide1= (ImageView) toolbar.findViewById(R.id.img_function1);
         ImageView guide2= (ImageView) toolbar.findViewById(R.id.img_function2);
-                builder.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scene_guide_1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scene_guide_2)));
+                builder.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_scene1,getString(R.string.scene_guide_1)))
+                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_scene1,getString(R.string.scene_guide_2)));
         boolean isOldUser=SharedPreferencesHelper.getBoolean(getActivity(),"Older",false);
         if (adaper.getItemCount() != 0 && showTypeView==1) {
             TextView guide3= (TextView) adaper.getViewByPosition(0, R.id.scene_name);
@@ -147,16 +147,16 @@ public class SceneFragment extends BaseFragment implements
                 }
             }
 
-            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.scene_guide_3)))
-                    .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scene_guide_4)));
+            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_scene2,getString(R.string.scene_guide_3)))
+                    .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_scene2,getString(R.string.scene_guide_4)));
             SharedPreferencesHelper.putBoolean(getActivity(),"Older",true);
             builder.show();
         }else if(adaper.getItemCount()==1  && showTypeView==0 && !isOldUser){
             TextView guide3= (TextView) adaper.getViewByPosition(0, R.id.scene_name);
             Button guide4= (Button) adaper.getViewByPosition(0, R.id.scene_edit);
             GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment1)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.scene_guide_3)))
-                    .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scene_guide_4)))
+                    .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_scene2,getString(R.string.scene_guide_3)))
+                    .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_scene2,getString(R.string.scene_guide_4)))
                     .show();
         }
     }
