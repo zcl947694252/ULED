@@ -375,7 +375,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 20
+        private val delayTime = 30
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
@@ -393,13 +393,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                                        fromUser: Boolean) {
             val currentTime = System.currentTimeMillis()
 
-            if (currentTime - this.preTime < this.delayTime) {
+            if (currentTime - this.preTime > this.delayTime) {
+                this.onValueChange(seekBar, progress, true)
                 this.preTime = currentTime
-                return
             }
-
-            LogUtils.d("seekBarChange" + seekBar.progress)
-            this.onValueChange(seekBar, progress, true)
         }
 
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
@@ -412,11 +409,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
-                DBUtils.updateGroup(group!!)
                 tv_brightness_rgb.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {
+                    DBUtils.updateGroup(group!!)
                     updateLights(progress, "brightness", group!!)
                 }
             } else if (view === temperatureBar) {
@@ -424,10 +421,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, progress.toByte())
                 group!!.colorTemperature = progress
-                DBUtils.updateGroup(group!!)
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {
+                    DBUtils.updateGroup(group!!)
                     updateLights(progress, "colorTemperature", group!!)
                 }
             }

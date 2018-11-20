@@ -216,33 +216,29 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 20
+        private val delayTime = 30
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            this.onValueChange(seekBar, seekBar.progress, true)
+            this.onValueChange(seekBar, seekBar.progress, true,true)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             this.preTime = System.currentTimeMillis()
-            this.onValueChange(seekBar, seekBar.progress, true)
+            this.onValueChange(seekBar, seekBar.progress, true,false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
+            val currentTime = System.currentTimeMillis()
 
-            //            if (progress % 5 != 0)
-            //                return;
-
-            //            long currentTime = System.currentTimeMillis();
-            //
-            //            if ((currentTime - this.preTime) >= this.delayTime) {
-            //                this.preTime = currentTime;
-            //            }
-
-            this.onValueChange(seekBar, progress, false)
+            if (currentTime - this.preTime > this.delayTime) {
+                this.onValueChange(seekBar, progress, true,false)
+                this.preTime = currentTime
+            }
         }
 
-        private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
+        private fun onValueChange(view: View, progress: Int, immediate: Boolean,isStopTracking:
+        Boolean) {
 
             val addr = light?.meshAddr
             val opcode: Byte
@@ -256,7 +252,9 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
 
                 light?.brightness = progress
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-                DBUtils.updateLight(light!!)
+                if(isStopTracking){
+                    DBUtils.updateLight(light!!)
+                }
             } else if (view === sbTemperature) {
 
                 opcode = Opcode.SET_TEMPERATURE
@@ -265,7 +263,9 @@ class NormalDeviceSettingActivity : TelinkBaseActivity() {
 
                 light?.colorTemperature = progress
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-                DBUtils.updateLight(light!!)
+                if(isStopTracking){
+                    DBUtils.updateLight(light!!)
+                }
             }
         }
     }

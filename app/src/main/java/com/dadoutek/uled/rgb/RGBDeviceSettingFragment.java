@@ -93,36 +93,31 @@ public final class RGBDeviceSettingFragment extends Fragment {
     private OnSeekBarChangeListener barChangeListener = new OnSeekBarChangeListener() {
 
         private long preTime;
-        private int delayTime = 20;
+        private int delayTime = 30;
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            this.onValueChange(seekBar, seekBar.getProgress(), true);
+            this.onValueChange(seekBar, seekBar.getProgress(), true,true);
         }
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             this.preTime = System.currentTimeMillis();
-            this.onValueChange(seekBar, seekBar.getProgress(), true);
+            this.onValueChange(seekBar, seekBar.getProgress(), true,false);
         }
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress,
                                       boolean fromUser) {
+            long currentTime = System.currentTimeMillis();
 
-//            if (progress % 5 != 0)
-//                return;
-
-//            long currentTime = System.currentTimeMillis();
-//
-//            if ((currentTime - this.preTime) >= this.delayTime) {
-//                this.preTime = currentTime;
-//            }
-
-            this.onValueChange(seekBar, progress, false);
+            if (currentTime - this.preTime > this.delayTime) {
+                this.onValueChange(seekBar, progress, true,false);
+                this.preTime = currentTime;
+            }
         }
 
-        private void onValueChange(View view, int progress, boolean immediate) {
+        private void onValueChange(View view, int progress, boolean immediate,boolean isStopTracking) {
 
             int addr = light.getMeshAddr();
             byte opcode;
@@ -136,7 +131,9 @@ public final class RGBDeviceSettingFragment extends Fragment {
 
                 light.setBrightness(progress);
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-                DBUtils.INSTANCE.updateLight(light);
+                if(isStopTracking){
+                    DBUtils.INSTANCE.updateLight(light);
+                }
             } else if (view == temperatureBar) {
 
                 opcode = (byte) Opcode.SET_TEMPERATURE;
@@ -145,7 +142,9 @@ public final class RGBDeviceSettingFragment extends Fragment {
 
                 light.setColorTemperature(progress);
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
-                DBUtils.INSTANCE.updateLight(light);
+                if(isStopTracking){
+                    DBUtils.INSTANCE.updateLight(light);
+                }
             }
         }
     };
