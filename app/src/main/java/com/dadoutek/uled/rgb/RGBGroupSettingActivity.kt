@@ -103,6 +103,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         this.mApp = this.application as TelinkLightApplication?
     }
 
+    override fun onPause() {
+        super.onPause()
+        DBUtils.updateGroup(group!!)
+        updateLights(group!!.color, "rgb_color", group!!)
+    }
+
     fun addEventListeners() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
@@ -472,8 +478,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
                 Thread{
                     group?.color = color
                     changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
-                    DBUtils.updateGroup(group!!)
-                    updateLights(color, "rgb_color", group!!)
+
                 }.start()
             }
         }
