@@ -159,6 +159,10 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         bnve.setupWithViewPager(viewPager)
     }
 
+    public fun transHome(){
+        bnve.currentItem=2
+    }
+
     override fun onPause() {
         super.onPause()
         mScanTimeoutDisposal?.dispose()
@@ -254,6 +258,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
                         }
 
                     } else {
+                        mNotFoundSnackBar?.dismiss()
                         progressBar?.visibility = View.GONE
                         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                     }

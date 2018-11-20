@@ -50,6 +50,7 @@ import java.util.concurrent.TimeUnit
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -303,6 +304,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
             syncData()
             hideLoadingDialog()
+            activity?.bnve?.currentItem=0
             null
         }, {
             ToastUtils.showLong(R.string.error_disconnect_tip)

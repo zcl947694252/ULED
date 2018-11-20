@@ -23,6 +23,7 @@
         android:layout_width="100dp"
         android:gravity="center"
         android:layout_height="30dp"
+        android:visibility="gone"
         android:background="@drawable/btn_rec_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

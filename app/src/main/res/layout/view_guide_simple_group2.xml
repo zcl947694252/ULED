@@ -23,6 +23,7 @@
         android:layout_width="100dp"
         android:gravity="center"
         android:layout_height="30dp"
+        android:visibility="gone"
         android:background="@drawable/btn_rec_blue"
         app:layout_constraintTop_toBottomOf="@+id/show_guide_content"
         app:layout_constraintEnd_toEndOf="parent"

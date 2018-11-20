@@ -384,7 +384,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance().idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -445,7 +445,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
 
-                TelinkLightService.Instance().idleMode(true);
+//                TelinkLightService.Instance().idleMode(true);
                 //目前测试调到主页
                 doFinish();
             } else {
