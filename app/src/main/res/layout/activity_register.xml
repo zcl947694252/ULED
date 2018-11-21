@@ -33,8 +33,6 @@
             android:maxLength="16"
             android:maxLines="1"
             android:padding="5dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
             />
     </android.support.design.widget.TextInputLayout>
 
@@ -75,8 +73,6 @@
             android:maxLength="16"
             android:maxLines="1"
             android:padding="5dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
             />
     </android.support.design.widget.TextInputLayout>
 
@@ -111,8 +107,6 @@
             android:maxLength="16"
             android:maxLines="1"
             android:padding="5dp"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
             />
     </android.support.design.widget.TextInputLayout>
 
