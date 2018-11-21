@@ -62,6 +62,59 @@
             android:textColor="@android:color/white"
             android:foreground="?android:attr/selectableItemBackground"
             />
+
+        <TextView
+            android:id="@+id/tvOta"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone"
+            android:text="@string/ota"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:foreground="?android:attr/selectableItemBackground"
+            />
+
+        <TextView
+            android:id="@+id/tvRename"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone"
+            android:text="@string/rename"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:foreground="?android:attr/selectableItemBackground"
+            />
+
+        <com.dadoutek.uled.widget.AutoTextSizeEditText
+            android:id="@+id/editTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignWithParentIfMissing="false"
+            android:singleLine="true"
+            android:maxLength="16"
+            android:textSize="18sp"
+            android:layout_gravity="center"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textCursorDrawable="@drawable/edit_cursor"
+            android:background="@null"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:imeOptions="actionDone"
+            android:visibility="gone"
+            app:aet_autoSizeTextType="uniform"
+            app:aet_autoSizeMaxTextSize="18sp"
+            app:aet_autoSizeMinTextSize="10sp"
+            />
     </android.support.v7.widget.Toolbar>
 
 

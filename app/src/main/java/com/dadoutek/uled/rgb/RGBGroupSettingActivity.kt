@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MenuItem
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.inputmethod.EditorInfo
@@ -39,6 +40,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.StringUtils
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.telink.bluetooth.event.DeviceEvent
@@ -51,12 +53,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_group_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
 
-class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.OnEditorActionListener , EventListener<String> {
-    private var backView: ImageView? = null
+class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
     private var brightnessBar: SeekBar? = null
     private var temperatureBar: SeekBar? = null
@@ -72,7 +74,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
     private var group: DbGroup? = null
-    private var editTitle: EditText? =null
     private var dynamicRgbBt: TextView? =null
     private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
@@ -80,10 +81,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     private var connectTimes = 0
 
     private val clickListener = OnClickListener { v ->
-        if (v === backView) {
-            setResult(Constant.RESULT_OK)
-            finish()
-        }else if(v === dynamicRgbBt){
+       if(v === dynamicRgbBt){
             val intent=Intent(this,RGBGradientActivity::class.java)
             intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
             intent.putExtra(Constant.TYPE_VIEW_ADDRESS,group?.meshAddr)
@@ -96,11 +94,26 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rgb_group_setting)
 
+        initToolbar()
         initData()
         initView()
 
         addEventListeners()
         this.mApp = this.application as TelinkLightApplication?
+    }
+
+    private fun initToolbar() {
+        toolbar.title = ""
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPause() {
@@ -212,19 +225,15 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
 
     private fun initView() {
         if (group != null) {
-            editTitle = this.findViewById<View>(R.id.edit_title) as EditText
             if (group!!.meshAddr == 0xffff) {
-                editTitle!!.setText(getString(R.string.allLight))
+                toolbar.title=getString(R.string.allLight)
             } else {
-                editTitle!!.setText(group!!.name)
+                toolbar.title=group?.name
             }
         }
 
         dynamicRgbBt = this.findViewById<View>(R.id.dynamic_rgb) as TextView
         dynamicRgbBt?.setOnClickListener(this.clickListener)
-        this.backView = this
-                .findViewById<View>(R.id.img_header_menu_left) as ImageView
-        this.backView!!.setOnClickListener(this.clickListener)
 
         this.brightnessBar = findViewById<View>(R.id.sb_brightness) as SeekBar
         this.temperatureBar = findViewById<View>(R.id.sb_temperature) as SeekBar
@@ -256,7 +265,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
             }
         }
 
-        diyColorRecyclerListView?.layoutManager = GridLayoutManager(this,5)
+        diyColorRecyclerListView?.layoutManager = GridLayoutManager(this,5) as RecyclerView.LayoutManager?
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
@@ -582,65 +591,37 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.
     }
 
     private fun renameGp() {
-//        val intent = Intent(this, RenameActivity::class.java)
-//        intent.putExtra("group", group)
-//        startActivity(intent)
-//        this?.finish()
-        editTitle?.isFocusableInTouchMode = true
-        editTitle?.isFocusable = true
-        editTitle?.requestFocus()
-        btn_sure_edit_rename.visibility=View.VISIBLE
-        btn_sure_edit_rename.setOnClickListener {
-            saveName()
-            btn_sure_edit_rename.visibility=View.GONE
-        }
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
-        editTitle?.setOnEditorActionListener(this)
-    }
+            val textGp = EditText(this)
+            StringUtils.initEditTextFilter(textGp)
+            android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
+                    .setTitle(R.string.rename)
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .setView(textGp)
 
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-        doWhichOperation(actionId)
-        return true
-    }
+                    .setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+                        // 获取输入框的内容
+                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                            ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        } else {
+                            var name=textGp.text.toString().trim { it <= ' ' }
+                            var canSave=true
+                            val groups=DBUtils.allGroups
+                            for(i in groups.indices){
+                                if(groups[i].name==name){
+                                    ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                    canSave=false
+                                    break
+                                }
+                            }
 
-    private fun doWhichOperation(actionId: Int) {
-        when (actionId) {
-            EditorInfo.IME_ACTION_DONE,
-            EditorInfo.IME_ACTION_NONE -> {
-                saveName()
-                btn_sure_edit_rename.visibility=View.GONE
-            }
-        }
-    }
-
-    private fun saveName(){
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
-        editTitle?.setFocusableInTouchMode(false)
-        editTitle?.setFocusable(false)
-        checkAndSaveName()
-    }
-
-    private fun checkAndSaveName(){
-        val name = editTitle?.text.toString().trim()
-        if (compileExChar(name)) {
-            Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-        }else{
-            var canSave=true
-            val groups=DBUtils.allGroups
-            for(i in groups.indices){
-                if(groups[i].name==name){
-                    ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
-                    canSave=false
-                    break
-                }
-            }
-
-            if(canSave){
-                group?.name = name
-                DBUtils.updateGroup(group!!)
-            }
-        }
+                            if(canSave){
+                                group?.name=textGp.text.toString().trim { it <= ' ' }
+                                DBUtils.updateGroup(group!!)
+                                toolbar.title=group?.name
+                                dialog.dismiss()
+                            }
+                        }
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 }

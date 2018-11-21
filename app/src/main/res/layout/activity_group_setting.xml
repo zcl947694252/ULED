@@ -22,7 +22,7 @@
 
         <com.dadoutek.uled.widget.AutoTextSizeEditText
             android:id="@+id/edit_title"
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="false"
             android:layout_centerHorizontal="true"

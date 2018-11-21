@@ -2,20 +2,18 @@ package com.dadoutek.uled.light
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
+import android.view.*
 import android.view.View.OnClickListener
-import android.view.ViewTreeObserver
-import android.view.Window
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.SeekBar
-import android.widget.TextView
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.*
 
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -52,12 +50,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_setting.*
+import kotlinx.android.synthetic.main.activity_group_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_device_setting.*
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> {
+class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>, TextView.OnEditorActionListener{
     private var localVersion: String? = null
 
     private var light: DbLight? = null
@@ -65,7 +65,6 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> 
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
     var fromWhere: String? = null
-    private var colorPicker: ColorPicker? = null
     private val dialog: AlertDialog? = null
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
@@ -73,29 +72,7 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> 
     private var mConnectTimer: Disposable? = null
     private var isLoginSuccess = false
     private var mApplication: TelinkLightApplication? = null
-
-    private val clickListener = OnClickListener { v ->
-        when(v.id){
-            R.id.img_header_menu_left ->{
-                finish()
-            }
-            R.id.tvOta ->{
-                checkPermission()
-            }
-            R.id.btn_rename ->{
-                val intent = Intent(this, RenameLightActivity::class.java)
-                intent.putExtra("light", light)
-                startActivity(intent)
-                this!!.finish()
-            }
-            R.id.updateGroup ->{
-                updateGroup()
-            }
-            R.id.btnRemove ->{
-                remove()
-            }
-        }
-    }
+    private var isRenameState=false
 
     fun addEventListeners() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -188,7 +165,7 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> 
                 if (txtTitle != null) {
                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                         txtTitle!!.visibility = View.VISIBLE
-                        txtTitle!!.text = localVersion
+                        txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
                         light!!.version = localVersion
                         tvOta!!.visibility = View.VISIBLE
                     } else {
@@ -284,9 +261,25 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> 
         super.onCreate(savedInstanceState)
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_device_setting)
+        initToolbar()
         initView()
         getVersion()
         this.mApplication = this.application as TelinkLightApplication
+    }
+
+    private fun initToolbar() {
+        toolbar.title = ""
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun initView() {
@@ -296,21 +289,20 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> 
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         txtTitle!!.text = ""
-        img_header_menu_left.setOnClickListener(this.clickListener)
+        editTitle!!.visibility=View.VISIBLE
+        editTitle!!.setText(light?.name)
 
         tvOta!!.setOnClickListener(this.clickListener)
         updateGroup.setOnClickListener(this.clickListener)
         btnRemove.setOnClickListener(this.clickListener)
+        btnRename.setOnClickListener(clickListener)
         mRxPermission = RxPermissions(this)
 
         this.sbBrightness?.max = 100
         this.sbTemperature?.max = 100
 
-        this.colorPicker = findViewById(R.id.color_picker)
 //        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
-
-        btnRename.visibility = View.GONE
         sbBrightness?.progress = light!!.brightness
         tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
         sbTemperature?.progress = light!!.colorTemperature
@@ -320,6 +312,81 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String> 
 
         this.sbBrightness?.setOnSeekBarChangeListener(this.barChangeListener)
         this.sbTemperature?.setOnSeekBarChangeListener(this.barChangeListener)
+    }
+
+    private val clickListener = OnClickListener { v ->
+        when(v.id){
+            R.id.tvOta ->{
+                if(isRenameState){
+                    saveName()
+                }else{
+                    checkPermission()
+                }
+            }
+            R.id.btnRename ->{
+                renameGp()
+            }
+            R.id.updateGroup ->{
+                updateGroup()
+            }
+            R.id.btnRemove ->{
+                remove()
+            }
+        }
+    }
+
+    private fun renameGp() {
+//        val intent = Intent(this, RenameActivity::class.java)
+//        intent.putExtra("group", group)
+//        startActivity(intent)
+//        this?.finish()
+        isRenameState=true
+        tvOta.setText(R.string.btn_sure)
+        editTitle?.setFocusableInTouchMode(true)
+        editTitle?.setFocusable(true)
+        editTitle?.requestFocus()
+//        btn_sure_edit_rename.visibility = View.VISIBLE
+//        btn_sure_edit_rename.setOnClickListener {
+//            saveName()
+//            btn_sure_edit_rename.visibility = View.GONE
+//        }
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(edit_title, InputMethodManager.SHOW_FORCED)
+        editTitle?.setOnEditorActionListener(this)
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        doWhichOperation(actionId)
+        return true
+    }
+
+    private fun doWhichOperation(actionId: Int) {
+        when (actionId) {
+            EditorInfo.IME_ACTION_DONE,
+            EditorInfo.IME_ACTION_NONE -> {
+                saveName()
+            }
+        }
+    }
+
+    private fun saveName() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
+        editTitle?.setFocusableInTouchMode(false)
+        editTitle?.setFocusable(false)
+        checkAndSaveName()
+        isRenameState=false
+        tvOta.setText(R.string.ota)
+    }
+
+    private fun checkAndSaveName() {
+        val name = editTitle?.text.toString().trim()
+        if (compileExChar(name)) {
+            Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
+        }else{
+            light?.name=name
+            DBUtils.updateLight(light!!)
+        }
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {

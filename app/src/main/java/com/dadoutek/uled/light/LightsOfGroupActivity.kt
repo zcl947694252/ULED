@@ -158,6 +158,14 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         actionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onQueryTextSubmit(query: String?): Boolean {
         searchView!!.clearFocus()
         return false
@@ -211,13 +219,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         this.group = this.intent.extras!!.get("group") as DbGroup
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {

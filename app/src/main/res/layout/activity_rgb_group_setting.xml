@@ -7,58 +7,59 @@
     android:orientation="vertical"
     tools:ignore="MissingDefaultResource">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/header_height"
-        android:background="@color/primary">
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/header_height"-->
+        <!--android:background="@color/primary">-->
 
-        <ImageView
-            android:id="@+id/img_header_menu_left"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/icon_top_tab_back"
-            android:contentDescription="@null" />
+        <!--<ImageView-->
+            <!--android:id="@+id/img_header_menu_left"-->
+            <!--android:layout_width="18dp"-->
+            <!--android:layout_height="18dp"-->
+            <!--android:layout_alignParentStart="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_marginStart="15dp"-->
+            <!--android:background="@drawable/icon_top_tab_back"-->
+            <!--android:contentDescription="@null" />-->
 
-        <com.dadoutek.uled.widget.AutoTextSizeEditText
-            android:id="@+id/edit_title"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_alignWithParentIfMissing="false"
-            android:layout_centerInParent="true"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@null"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:gravity="center_vertical"
-            android:imeOptions="actionDone"
-            android:maxLength="16"
-            android:singleLine="true"
-            android:text="@string/group_setting_header"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textCursorDrawable="@drawable/edit_cursor"
-            android:textSize="18sp"
-            app:aet_autoSizeMaxTextSize="18sp"
-            app:aet_autoSizeMinTextSize="10sp"
-            app:aet_autoSizeTextType="uniform" />
+        <!--<com.dadoutek.uled.widget.AutoTextSizeEditText-->
+            <!--android:id="@+id/edit_title"-->
+            <!--android:layout_width="200dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignWithParentIfMissing="false"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:background="@null"-->
+            <!--android:focusable="false"-->
+            <!--android:focusableInTouchMode="false"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:imeOptions="actionDone"-->
+            <!--android:maxLength="16"-->
+            <!--android:singleLine="true"-->
+            <!--android:text="@string/group_setting_header"-->
+            <!--android:textAlignment="center"-->
+            <!--android:textColor="@color/white"-->
+            <!--android:textCursorDrawable="@drawable/edit_cursor"-->
+            <!--android:textSize="18sp"-->
+            <!--app:aet_autoSizeMaxTextSize="18sp"-->
+            <!--app:aet_autoSizeMinTextSize="10sp"-->
+            <!--app:aet_autoSizeTextType="uniform" />-->
 
-        <TextView
-            android:id="@+id/btn_sure_edit_rename"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="5dp"
-            android:text="@string/btn_sure"
-            android:textSize="15sp"
-            android:visibility="gone" />
-    </RelativeLayout>
+        <!--<TextView-->
+            <!--android:id="@+id/btn_sure_edit_rename"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentEnd="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_marginEnd="5dp"-->
+            <!--android:text="@string/btn_sure"-->
+            <!--android:textSize="15sp"-->
+            <!--android:visibility="gone" />-->
+    <!--</RelativeLayout>-->
+
+    <include layout="@layout/toolbar"/>
 
     <include layout="@layout/fragment_rgb_group_setting" />
-
 
 </LinearLayout>

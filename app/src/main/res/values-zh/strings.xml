@@ -452,6 +452,9 @@
     <string name="dynamic_gradient">动态RGB</string>
     <string name="stop">停止</string>
     <string name="rename">重命名</string>
+    <string name="no_name">未命名</string>
+    <string name="firmware_version">固件版本：%1$s</string>
+    <string name="ota">OTA</string>
 
 
 </resources>
