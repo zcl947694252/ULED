@@ -824,34 +824,34 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         RecyclerView guide2= recyclerViewGroups;
         View guide3= listDevices.getChildAt(0);
         Button guide4= btnAddGroups;
-        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
-                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
-                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
+        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
                 .show();
     }
 
     private void guideStep1() {
         LinearLayout guide1= addGroupLayout;
-        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
+        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
                 .show();
     }
 
     private void guideStep2() {
         RecyclerView guide2= recyclerViewGroups;
         View guide3= listDevices.getChildAt(1);
-        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
-                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
+        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
                 .show();
     }
 
     private void guideStep4() {
         Button guide4= btnAddGroups;
-        GuideUtils.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
+        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
                 .show();
     }
 

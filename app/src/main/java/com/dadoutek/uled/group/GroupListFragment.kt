@@ -219,10 +219,10 @@ class GroupListFragment : BaseFragment(){
         GuideUtils.guideBuilder(this@GroupListFragment,Constant.TAG_GroupListFragment)
                 .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_simple,getString(R.string.group_list_guide0)))
                 .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_group1,getString(R.string.group_list_guide1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide2)))
-                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide3)))
-                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide4)))
-                .addGuidePage(GuideUtils.addGuidePage(guide5,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide5)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide2)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide3)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide4)))
+//                .addGuidePage(GuideUtils.addGuidePage(guide5,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide5)))
                 .show()
     }
 

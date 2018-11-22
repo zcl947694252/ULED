@@ -1,1 +1,1 @@
-include ':BluetoothLightLib', ':app'
+include ':BluetoothLightLib', ':app', ':guide'

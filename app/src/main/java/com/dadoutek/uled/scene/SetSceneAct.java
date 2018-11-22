@@ -126,9 +126,9 @@ public class SetSceneAct extends TelinkBaseActivity {
     public void lazyLoad() {
         EditText guide1= (EditText)findViewById(R.id.edit_name);
         Button guide2= (Button)findViewById(R.id.bt_add);
-        GuideUtils.guideBuilder(this,Constant.TAG_SetSceneAct)
-                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.add_scene_guide_1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.add_scene_guide_2)
+        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SetSceneAct)
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.add_scene_guide_1)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.add_scene_guide_2)
                 ))
                 .show();
 
@@ -136,12 +136,12 @@ public class SetSceneAct extends TelinkBaseActivity {
             TextView guide3= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.btn_delete);
             TextView guide4= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.rgb_view);
             Button guide5= (Button) findViewById(R.id.bt_save);
-            Builder builder=GuideUtils.guideBuilder(this,Constant.TAG_SetSceneAct);
-            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.add_scene_guide_3)));
+            Builder builder= GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SetSceneAct);
+            builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.add_scene_guide_3)));
             if(guide4!=null && guide4.getVisibility()==View.VISIBLE){
-                builder.addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.add_scene_guide_4)));
+                builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.add_scene_guide_4)));
             }
-            builder.addGuidePage(GuideUtils.addGuidePage(guide5,R.layout.view_guide_simple,getString(R.string.add_scene_guide_5)))
+            builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide5,R.layout.view_guide_simple,getString(R.string.add_scene_guide_5)))
                     .show();
         }
     }

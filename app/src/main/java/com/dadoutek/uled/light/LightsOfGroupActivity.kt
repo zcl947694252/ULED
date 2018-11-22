@@ -23,11 +23,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.NormalGroupSettingActivity
-import com.dadoutek.uled.intf.SwitchButtonOnCheckedChangeListener
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -36,8 +32,8 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBDeviceSettingActivity
-import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -140,14 +136,19 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     fun lazyLoad() {
-        if(lightList.size!=0){
-            val guide2=adapter!!.getViewByPosition(0,R.id.img_light)
-            val guide3= adapter!!.getViewByPosition(0,R.id.tv_setting)
+        if (lightList.size != 0) {
+            val guide2: View? = adapter!!.getViewByPosition(0, R.id.img_light)
+            val guide3 = adapter!!.getViewByPosition(0, R.id.tv_setting)
 
-            val builder=GuideUtils.guideBuilder(this@LightsOfGroupActivity,Constant.TAG_LightsOfGroupActivity)
-            builder.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_light_1,getString(R.string.light_guide_1)))
-            builder.addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_light_1,getString(R.string.light_guide_2)))
-            builder.show()
+            val builder = GuideUtils.guideBuilder(this@LightsOfGroupActivity, Constant.TAG_LightsOfGroupActivity)
+            builder.addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout
+                    .view_guide_simple_light_1, getString(R.string.light_guide_1), View
+                    .OnClickListener {
+                        ActivityUtils.startActivity(ScanningSensorActivity::class.java)
+                    }))
+            builder.addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_light_1, getString(R.string.light_guide_2)))
+            val guide = builder.show()
+
         }
     }
 
@@ -239,7 +240,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
-        if(TelinkLightApplication.getInstance().connectDevice==null){
+        if (TelinkLightApplication.getInstance().connectDevice == null) {
             TelinkLightService.Instance().idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
@@ -282,7 +283,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
-        adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group,lightList)
+        adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recycler_view_lights)
         for (i in lightList.indices) {
@@ -315,7 +316,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
-                if(currentLight?.productUUID==DeviceType.LIGHT_RGB){
+                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                     intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
@@ -372,8 +373,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
 //            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
-                    val info = (event as ErrorReportEvent).args
-                    onErrorReport(info)
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
             }
         }
     }
@@ -492,7 +493,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
-            if(acitivityIsAlive || !(mScanDisposal?.isDisposed?:false)){
+            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
                 LogUtils.d("startScanLight_LightOfGroup")
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
@@ -511,7 +512,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if(!com.dadoutek.uled.util.AppUtils.isExynosSoc()){
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setMeshName(account)
