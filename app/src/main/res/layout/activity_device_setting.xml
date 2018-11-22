@@ -1,56 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="280dp"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/header_height"
-        android:background="@color/primary">
-
-        <ImageView
-            android:id="@+id/img_header_menu_left"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:src="@drawable/navigation_back_white"
-            android:contentDescription="@null" />
-
-        <TextView
-            android:id="@+id/txtTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignWithParentIfMissing="false"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="30dp"
-            android:gravity="center_vertical"
-            android:singleLine="true"
-            android:text="@string/device_setting_header"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/tvOta"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:gravity="center"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:text="OTA"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:visibility="gone"
-            android:contentDescription="@null" />
-    </RelativeLayout>
+    <include layout="@layout/toolbar"/>
 
     <include layout="@layout/fragment_device_setting"/>
 </LinearLayout>

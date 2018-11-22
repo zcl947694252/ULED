@@ -129,6 +129,7 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
     @Override
     protected void convert(BaseViewHolder helper, DbLight item) {
         TextView tvName=helper.getView(R.id.name);
+        TextView tvLightName=helper.getView(R.id.light_name);
         TextView tvRgbColor=helper.getView(R.id.tv_rgb_color);
         tvName.setText(StringUtils.getLightName(item));
 
@@ -141,6 +142,8 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
                 tvName.setTextColor(mContext.getResources().getColor(R.color.black));
             }
         }
+
+        tvLightName.setText(item.getName());
 
         GradientDrawable myGrad = (GradientDrawable)tvRgbColor.getBackground();
         if(item.getColor()==0||item.getColor()==0xffffff){
