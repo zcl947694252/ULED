@@ -10,9 +10,7 @@ import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.*
 import android.widget.ImageView
-import android.widget.TextView
-import com.app.hubert.guide.NewbieGuide
-import com.app.hubert.guide.model.GuidePage
+import com.app.hubert.guide.model.HighlightOptions
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
@@ -37,8 +35,6 @@ import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -57,7 +53,7 @@ class GroupListFragment : BaseFragment(){
     private var recyclerView: RecyclerView? = null
     internal var showList: List<DbGroup>? = null
     private var updateLightDisposal: Disposable? = null
-
+    private var isGuideMode=false
 
 //     var onItemChildClickListener = { adapter, view, position ->
 //
@@ -196,33 +192,13 @@ class GroupListFragment : BaseFragment(){
     }
 
     fun lazyLoad() {
-        val guide0= toolbar!!.findViewById<TextView>(R.id.toolbarTv)
         val guide1= toolbar!!.findViewById<ImageView>(R.id.img_function1)
-        var guide2= adapter!!.getViewByPosition(0,R.id.txt_name)
-        var guide3= adapter!!.getViewByPosition(0,R.id.btn_on)
-        var guide4= adapter!!.getViewByPosition(0,R.id.btn_off)
-        var guide5= adapter!!.getViewByPosition(0,R.id.btn_set)
-
-        val size= adapter!!.itemCount
-        if(guide2==null){
-            for(i in 0..size){
-                if(adapter!!.getViewByPosition(i,R.id.txt_name)!=null){
-                    guide2= adapter!!.getViewByPosition(i+1,R.id.txt_name)
-                    guide3= adapter!!.getViewByPosition(i+1,R.id.btn_on)
-                    guide4= adapter!!.getViewByPosition(i+1,R.id.btn_off)
-                    guide5= adapter!!.getViewByPosition(i+1,R.id.btn_set)
-                    break
-                }
-            }
-        }
-
-        GuideUtils.guideBuilder(this@GroupListFragment,Constant.TAG_GroupListFragment)
-                .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_simple,getString(R.string.group_list_guide0)))
-                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_group1,getString(R.string.group_list_guide1)))
-                .addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide2)))
-                .addGuidePage(GuideUtils.addGuidePage(guide3,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide3)))
-                .addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide4)))
-                .addGuidePage(GuideUtils.addGuidePage(guide5,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide5)))
+        val options=HighlightOptions.Builder().setOnClickListener {
+            isGuideMode=true
+            showPopupMenu(guide1,isGuideMode)
+        }.build()
+        GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
+                .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.group_list_guide0),options))
                 .show()
     }
 
@@ -261,7 +237,8 @@ class GroupListFragment : BaseFragment(){
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility=View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility=View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-            showPopupMenu(it)
+            isGuideMode=false
+            showPopupMenu(it,isGuideMode)
         }
 
         setHasOptionsMenu(true)
@@ -358,22 +335,14 @@ class GroupListFragment : BaseFragment(){
         this.adapter!!.notifyDataSetChanged()
     }
 
-//    override fun onMenuItemClick(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            R.id.menu_setting -> {
-//                val intent = Intent(mContext, AddMeshActivity::class.java)
-//                startActivity(intent)
-//            }
-//
-//            R.id.menu_install -> showPopupMenu(toolbar!!.findViewById(R.id.menu_install))
-//        }
-//        return false
-//    }
-
-    private fun showPopupMenu(view: View) {
+    private fun showPopupMenu(view: View, guideMode: Boolean) {
         // 这里的view代表popupMenu需要依附的view
         val popupMenu = PopupMenu(activity!!, view)
         popupMenu.menuInflater.inflate(R.menu.menu_select_device_type, popupMenu.menu)
+        if(guideMode){
+            popupMenu.menu.removeItem(R.id.popup_install_switch)
+            popupMenu.menu.removeItem(R.id.popup_install_sensor)
+        }
         popupMenu.show()
         popupMenu.setOnMenuItemClickListener { item ->
             var intent:Intent? = null

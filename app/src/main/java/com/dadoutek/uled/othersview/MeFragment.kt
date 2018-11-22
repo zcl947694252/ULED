@@ -250,13 +250,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         builder.setTitle(getString(R.string.show_guide_again_tip))
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
         builder.setPositiveButton(R.string.btn_sure) { dialog, which ->
-            NewbieGuide.resetLabel(activity,Constant.TAG_GroupListFragment)
-            NewbieGuide.resetLabel(activity,Constant.TAG_SceneFragment)
-            NewbieGuide.resetLabel(activity,Constant.TAG_SceneFragment2)
-            NewbieGuide.resetLabel(activity,Constant.TAG_DeviceScanningNewActivity)
-            NewbieGuide.resetLabel(activity,Constant.TAG_SetSceneAct)
-            NewbieGuide.resetLabel(activity,Constant.TAG_LightsOfGroupActivity)
-            NewbieGuide.resetLabel(activity,Constant.TAG_ConfigSensorAct)
+
         }
         val dialog = builder.create()
         dialog.show()
