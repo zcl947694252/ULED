@@ -127,5 +127,5 @@ dependencies {
     implementation 'com.github.skydoves:colorpickerview:2.0.1'
 //    implementation 'com.github.huburt-Hu:NewbieGuide:v2.4.0'
     implementation 'mi-appstore:xiaomi-update-sdk:4.0.3'
-
+//    implementation 'com.github.wanglu1209:WPopup:lastReleases'
 }

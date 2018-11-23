@@ -57,4 +57,6 @@ public class BaseFragment extends Fragment {
             loadDialog.dismiss();
         }
     }
+
+    public void endCurrentGuide(){}
 }

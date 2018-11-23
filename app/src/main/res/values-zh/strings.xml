@@ -404,11 +404,9 @@
     <string name="long_click_select_color_tip">*单击设置,长按保存</string>
     <string name="current_account_number">当前账号:</string>
     <string name="rssi_low">信号太差</string>
-    <string name="group_list_guide1">点击此处即可添加设备</string>
-    <string name="group_list_guide2">点击此区域可查看组内的设备</string>
-    <string name="group_list_guide3">开灯</string>
-    <string name="group_list_guide4">关灯</string>
-    <string name="group_list_guide5">点击此处即可对组进行设置</string>
+    <string name="group_list_guide0">请先选择一种你当前购买要安装的灯</string>
+    <string name="group_list_guide1">请点击添加设备进入添加设备选项</string>
+    <string name="group_list_guide2">请点击选项开始安装设备</string>
     <string name="scene_guide_1">点击此处即可添加场景</string>
     <string name="scene_guide_2">点击进入场景可删除模式</string>
     <string name="scene_guide_3">点击此处即可开启场景</string>
@@ -444,7 +442,6 @@
     <string name="config_pir_guide_6">这里可以选择触发形式</string>
     <string name="config_pir_guide_7">这里可以选择触发时间单位</string>
     <string name="config_pir_guide_8">点击此图标可以保存当前配置</string>
-    <string name="group_list_guide0">轻点屏幕即可查看下一个操作提示</string>
     <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
     <string name="dynamic_rgb">动态RGB</string>

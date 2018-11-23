@@ -106,4 +106,6 @@ public class TelinkBaseActivity extends AppCompatActivity {
     public boolean compileExChar(String str) {
         return StringUtils.compileExChar(str);
     }
+
+    public void endCurrentGuide(){}
 }

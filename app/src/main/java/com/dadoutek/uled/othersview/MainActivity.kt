@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
@@ -67,7 +68,7 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
+class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
@@ -134,6 +135,16 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if(ev?.getAction()==MotionEvent.ACTION_DOWN){
+            if(!groupFragment.isHidden){
+                groupFragment.myPopViewClickPosition(ev.x,ev.y)
+            }
+            return super.dispatchTouchEvent(ev);
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     /**

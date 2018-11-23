@@ -412,11 +412,9 @@
     <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
     <string name="current_account_number">Current account number:</string>
     <string name="rssi_low">Signal is too bad</string>
-    <string name="group_list_guide1">Click here to add a device</string>
-    <string name="group_list_guide2">Click this area to view the devices in the group</string>
-    <string name="group_list_guide3">turn on the lights</string>    
-    <string name="group_list_guide4">turn off the lights</string>   
-    <string name="group_list_guide5">Click here to set the group</string>    
+    <string name="group_list_guide0">Click here to add a device</string>
+    <string name="group_list_guide1">Click this area to view the devices in the group</string>
+    <string name="group_list_guide2">turn on the lights</string>       
     <string name="scene_guide_1">Click here to add a scene</string>
     <string name="scene_guide_2">Click to enter the scene to delete the mode</string>  
     <string name="scene_guide_3">Click here to open the scene</string> 
@@ -480,8 +478,6 @@
     <string name="config_pir_guide_7"> Here you can choose the trigger time unit </string>
         
     <string name="config_pir_guide_8">Click this icon to save the current configuration</string>
-        
-    <string name="group_list_guide0"> Tap the screen to view the next action prompt </string>
 
     <string name="show_guide_again_tip">Want to see the APP tutorial again?</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>

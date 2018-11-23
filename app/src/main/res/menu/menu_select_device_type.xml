@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/popup_install_light"
-        android:title="@string/install_light" />
+        android:title="@string/install_light"
+        />
     <item
         android:id="@+id/popup_install_rgb_light"
-        android:title="@string/rgb" />
+        android:title="@string/rgb"
+        />
     <item
         android:id="@+id/popup_install_switch"
         android:title="@string/install_switch" />
