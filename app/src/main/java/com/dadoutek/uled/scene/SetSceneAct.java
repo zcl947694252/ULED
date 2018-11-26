@@ -21,10 +21,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.app.hubert.guide.core.Builder;
 import com.app.hubert.guide.core.Controller;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -99,6 +98,7 @@ public class SetSceneAct extends TelinkBaseActivity {
      * 输入法管理器
      */
     private InputMethodManager mInputMethodManager;
+    private boolean guideShowCurrentPage=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,8 +107,15 @@ public class SetSceneAct extends TelinkBaseActivity {
         ButterKnife.bind(this);
         initType();
         if(!isShowChangeDataView){
-            initOnLayoutListener();
+            editName.setText(DBUtils.INSTANCE.getDefaultNewSceneName());
+            lazyLoad();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        GuideUtils.INSTANCE.changeCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
     }
 
     private void initOnLayoutListener() {
@@ -118,31 +125,113 @@ public class SetSceneAct extends TelinkBaseActivity {
             @Override
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                lazyLoad();
+                step3Guide();
             }
         });
     }
 
     public void lazyLoad() {
-        EditText guide1= (EditText)findViewById(R.id.edit_name);
-        Button guide2= (Button)findViewById(R.id.bt_add);
-        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SetSceneAct)
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.add_scene_guide_1)))
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.add_scene_guide_2)
-                ))
-                .show();
+//        EditText guide1= (EditText)findViewById(R.id.edit_name);
+//        Button guide2= (Button)findViewById(R.id.bt_add);
+//        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SetSceneAct)
+//                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.add_scene_guide_1)))
+//                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.add_scene_guide_2)
+//                ))
+//                .show();
+//
+//        if (sceneGroupAdapter.getItemCount() != 0) {
+//            TextView guide3= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.btn_delete);
+//            TextView guide4= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.rgb_view);
+//            Button guide5= (Button) findViewById(R.id.bt_save);
+//            Builder builder= GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SetSceneAct);
+//            builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.add_scene_guide_3)));
+//            if(guide4!=null && guide4.getVisibility()==View.VISIBLE){
+//                builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.add_scene_guide_4)));
+//            }
+//            builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide5,R.layout.view_guide_simple,getString(R.string.add_scene_guide_5)))
+//                    .show();
+//        }
+        step1Guide();
+    }
 
-        if (sceneGroupAdapter.getItemCount() != 0) {
-            TextView guide3= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.btn_delete);
-            TextView guide4= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.rgb_view);
-            Button guide5= (Button) findViewById(R.id.bt_save);
-            Builder builder= GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SetSceneAct);
-            builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple,getString(R.string.add_scene_guide_3)));
-            if(guide4!=null && guide4.getVisibility()==View.VISIBLE){
-                builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.add_scene_guide_4)));
-            }
-            builder.addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide5,R.layout.view_guide_simple,getString(R.string.add_scene_guide_5)))
-                    .show();
+    Controller controllerGuide2=null;
+    private void step1Guide(){
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+        if(guideShowCurrentPage){
+            Button guide1= (Button)findViewById(R.id.bt_add);
+            GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP8_GUIDE_ADD_SCENE_ADD_GROUP())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple_scene_set1,getString(R.string.add_scene_guide_1),
+                            v -> {
+                                guide1.performClick();
+                                controllerGuide2=step2Guide();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+        }
+    }
+
+    private Controller step2Guide(){
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+        if(guideShowCurrentPage){
+            TextView guide2= findViewById(R.id.toolbarTv);
+            return GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP9_GUIDE_ADD_SCENE_SELECT_GROUP())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple_scene_set2,getString(R.string.add_scene_guide_2),
+                            v -> {},GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+        }
+        return null;
+    }
+
+    private void step3Guide(){
+        if(controllerGuide2!=null){
+            controllerGuide2.remove();
+        }
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+        if(guideShowCurrentPage){
+            SeekBar guide3= (SeekBar) sceneGroupAdapter.getViewByPosition(0, R.id.sb_brightness);
+             GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_3),
+                            v -> {
+                        DbGroup dbGroup=DBUtils.INSTANCE.getGroupByMesh(sceneGroupAdapter.getItem(0).groupAress);
+                        if(OtherUtils.isRGBGroup(dbGroup)){
+                            step5Guide();
+                        }else{
+                            step4Guide();
+                        }
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+        }
+    }
+
+    private void step4Guide(){
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+        if(guideShowCurrentPage){
+            SeekBar guide4= (SeekBar) sceneGroupAdapter.getViewByPosition(0, R.id.sb_temperature);
+            GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_4),
+                            v -> {
+                                stepEndGuide();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+        }
+    }
+
+    private void step5Guide(){
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+        if(guideShowCurrentPage){
+            TextView guide5= (TextView) sceneGroupAdapter.getViewByPosition(0, R.id.rgb_view);
+            GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP12_GUIDE_ADD_SCENE_CHANGE_COLOR())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide5,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_5),
+                            v -> {
+                            stepEndGuide();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+        }
+    }
+
+    private void stepEndGuide(){
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+        if(guideShowCurrentPage){
+            Button guide6= (Button) findViewById(R.id.bt_save);
+            GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP13_GUIDE_ADD_SCENE_SAVE())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide6,R.layout.view_guide_simple_scene_set1,getString(R.string.add_scene_guide_6),
+                            v -> {
+                             guide6.performClick();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
         }
     }
 
@@ -502,6 +591,7 @@ public class SetSceneAct extends TelinkBaseActivity {
         builder = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.group_select))
                 .setView(bottomView);
+        builder.setCancelable(false);
         dialog = builder.create();
 
 
@@ -533,6 +623,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                     changeData(position, showList);
                     sceneGroupAdapter.addData(itemGroup);
                     dialog.dismiss();
+                    initOnLayoutListener();
                 } else {
                     btnSure.setVisibility(View.VISIBLE);
                     if (showList.get(position).checked) {
@@ -566,6 +657,7 @@ public class SetSceneAct extends TelinkBaseActivity {
 
                 if (j == showList.size() - 1) {
                     dialog.dismiss();
+                    initOnLayoutListener();
                 }
             }
         });

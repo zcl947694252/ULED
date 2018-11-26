@@ -161,7 +161,6 @@ class GroupListFragment : BaseFragment(){
         showList = ArrayList()
 
         val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
 
         //如果有调整过顺序取本地数据，否则取数据库数据
         if (dbOldGroupList != null && dbOldGroupList.size > 0) {
@@ -339,10 +338,11 @@ class GroupListFragment : BaseFragment(){
 
 
     fun lazyLoad() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
         if(guideShowCurrentPage){
             val guide0= toolbar!!.findViewById<TextView>(R.id.toolbarTv)
             GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_0,getString(R.string.group_list_guide0), View.OnClickListener {})
+                    .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_0,getString(R.string.group_list_guide0), View.OnClickListener {},GuideUtils.END_GROUPLIST_KEY)
                             .setOnLayoutInflatedListener { view, controller ->
                                 val normal=view.findViewById<TextView>(R.id.normal_light)
                                 normal.setOnClickListener {
@@ -362,6 +362,7 @@ class GroupListFragment : BaseFragment(){
     }
 
     private fun guide1(){
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
         if(guideShowCurrentPage){
             val guide1= toolbar!!.findViewById<ImageView>(R.id.img_function1)
 
@@ -369,12 +370,13 @@ class GroupListFragment : BaseFragment(){
                     .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_group1,getString(R.string.group_list_guide1), View.OnClickListener {
                         isGuide=true
                         showPopupMenu()
-                    }))
+                    },GuideUtils.END_GROUPLIST_KEY))
                     .show()
         }
     }
 
     private fun guide2(): Controller? {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
         if(guideShowCurrentPage){
             var guide3:TextView?=null
             if(isRgbClick){
@@ -390,7 +392,7 @@ class GroupListFragment : BaseFragment(){
                         }else{
                             install_light?.performClick()
                         }
-                    }))
+                    },GuideUtils.END_GROUPLIST_KEY))
                     .show()
         }
         return null

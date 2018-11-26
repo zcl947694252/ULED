@@ -545,7 +545,46 @@ object DBUtils {
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
                     Constant.DB_ADD)
         }
+    }
 
+    fun getDefaultNewGroupName(): String {
+        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        val gpList=groupList
+        val gpNameList = ArrayList<String>()
+        for(i in gpList.indices){
+            gpNameList.add(gpList[i].name)
+        }
+
+        var count=0
+        while (true){
+            count++
+            val newName = "组" +count
+            for(i in gpList.indices){
+                if(!gpNameList.contains(newName)){
+                   return newName
+                }
+            }
+        }
+    }
+
+    fun getDefaultNewSceneName(): String {
+        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        val scList= sceneList
+        val scNameList = ArrayList<String>()
+        for(i in scList.indices){
+            scNameList.add(scList[i].name)
+        }
+
+        var count=0
+        while (true){
+            count++
+            val newName = "场景" +count
+            for(i in scList.indices){
+                if(!scNameList.contains(newName)){
+                    return newName
+                }
+            }
+        }
     }
 
     private fun checkReachedTheLimit(groups: List<DbGroup>,name:String): Boolean {

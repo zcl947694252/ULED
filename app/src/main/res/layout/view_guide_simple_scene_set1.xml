@@ -9,9 +9,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="60dp"
+        android:layout_marginBottom="120dp"
         />
 
     <TextView
@@ -50,5 +51,6 @@
          app:layout_constraintTop_toBottomOf="@+id/jump_out"
          app:layout_constraintStart_toStartOf="@+id/jump_out"
          app:layout_constraintEnd_toEndOf="@+id/jump_out"
+         android:layout_marginBottom="40dp"
          />
 </android.support.constraint.ConstraintLayout>

@@ -31,8 +31,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.app.hubert.guide.NewbieGuide;
-import com.app.hubert.guide.model.GuidePage;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -178,7 +176,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private boolean scanRGBLight = false;
 
     private boolean initHasGroup = false;
-    private String IS_JUMP_OVER = "IS_JUMP_OVER";
+    private boolean guideShowCurrentPage = false;
+    private boolean isGuide = false;
+    private LinearLayoutManager layoutmanager;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -206,8 +206,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 btnAddGroups.setText(R.string.complete);
             }
         }
-
-        guideStep4();
     }
 
     private void isSelectAll() {
@@ -401,7 +399,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-        SharedPreferencesHelper.putBoolean(this, IS_JUMP_OVER, true);
+        GuideUtils.INSTANCE.changeCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), true);
 
         if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
             ActivityUtils.finishToActivity(MainActivity.class, false, true);
@@ -643,7 +641,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         adapter.notifyDataSetChanged();
         btnAddGroups.setVisibility(View.VISIBLE);
         groupsBottom.setVisibility(View.VISIBLE);
-        LinearLayoutManager layoutmanager = new LinearLayoutManager(this);
+        layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
         groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener);
@@ -678,32 +676,37 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     @OnClick(R.id.add_group_layout)
     public void onViewClicked() {
+        isGuide = false;
         addNewGroup();
     }
 
     private void addNewGroup() {
         final EditText textGp = new EditText(this);
+        textGp.setText(DBUtils.INSTANCE.getDefaultNewGroupName());
         StringUtils.initEditTextFilter(textGp);
-        new AlertDialog.Builder(DeviceScanningNewActivity.this)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-
-                .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
-                        ToastUtils.showShort(getString(R.string.rename_tip_check));
-                    } else {
-                        //往DB里添加组数据
-                        DBUtils.INSTANCE.addNewGroup(textGp.getText().toString().trim(), groups, this);
-                        refreshView();
-                        dialog.dismiss();
-                        guideStep2();
-                    }
-                })
-                .setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
-                    dialog.dismiss();
-                }).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceScanningNewActivity.this);
+        builder.setTitle(R.string.create_new_group);
+        builder.setIcon(android.R.drawable.ic_dialog_info);
+        builder.setView(textGp);
+        builder.setCancelable(false);
+        builder.setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+            // 获取输入框的内容
+            if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
+                ToastUtils.showShort(getString(R.string.rename_tip_check));
+            } else {
+                //往DB里添加组数据
+                DBUtils.INSTANCE.addNewGroup(textGp.getText().toString().trim(), groups, this);
+                refreshView();
+                dialog.dismiss();
+                guideStep2();
+            }
+        });
+        if (!isGuide) {
+            builder.setNegativeButton(getString(R.string.btn_cancel), (dialog, which) -> {
+                dialog.dismiss();
+            });
+        }
+        builder.show();
     }
 
     private void refreshView() {
@@ -806,53 +809,73 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     public void lazyLoad() {
-//        boolean isJumpOver=SharedPreferencesHelper.getBoolean(this,IS_JUMP_OVER,false);
-//        if(!isJumpOver){
-
-//        AppUtils.checkShowGuideAgain(this,Constant.TAG_DeviceScanningNewActivity);
-
-        if (initHasGroup) {
-            guideStepAll();
-        } else {
-            guideStep1();
-        }
-//        }
+        guideStep1();
     }
 
     private void guideStepAll() {
-        LinearLayout guide1= addGroupLayout;
-        RecyclerView guide2= recyclerViewGroups;
-        View guide3= listDevices.getChildAt(0);
-        Button guide4= btnAddGroups;
-        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
+        LinearLayout guide1 = addGroupLayout;
+        RecyclerView guide2 = recyclerViewGroups;
+        View guide3 = listDevices.getChildAt(0);
+        Button guide4 = btnAddGroups;
+        GuideUtils.INSTANCE.guideBuilder(this, Constant.TAG_SceneFragment)
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_simple, getString(R.string.scan_light_guide_1)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2, R.layout.view_guide_simple, getString(R.string.scan_light_guide_2)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3, R.layout.view_guide_simple_top, getString(R.string.scan_light_guide_3)))
+                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4, R.layout.view_guide_simple, getString(R.string.scan_light_guide_4)))
                 .show();
     }
 
     private void guideStep1() {
-        LinearLayout guide1= addGroupLayout;
-        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple,getString(R.string.scan_light_guide_1)))
-                .show();
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
+        if (guideShowCurrentPage) {
+            LinearLayout guide1 = addGroupLayout;
+            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP3_GUIDE_CREATE_GROUP())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), v -> {
+                        isGuide = true;
+                        addNewGroup();
+                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                    .show();
+        }
     }
 
     private void guideStep2() {
-        RecyclerView guide2= recyclerViewGroups;
-        View guide3= listDevices.getChildAt(1);
-        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple,getString(R.string.scan_light_guide_2)))
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple_top,getString(R.string.scan_light_guide_3)))
-                .show();
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
+        if (guideShowCurrentPage) {
+            View guide2 = recyclerViewGroups;
+            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP4_GUIDE_SELECT_GROUP())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_2),
+                            v -> {
+                                guideStep3();
+                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                    .show();
+        }
+    }
+
+    private void guideStep3() {
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
+        if (guideShowCurrentPage) {
+            View guide3 = listDevices.getChildAt(0);
+            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP5_GUIDE_SELECT_SOME_LIGHT())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3, R.layout.view_guide_scan2, getString(R.string.scan_light_guide_3)
+                            , v -> {
+                                listDevices.performItemClick(guide3, 0, listDevices.getItemIdAtPosition(0));
+                                guideStep4();
+                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                    .show();
+        }
     }
 
     private void guideStep4() {
-        Button guide4= btnAddGroups;
-        GuideUtils.INSTANCE.guideBuilder(this,Constant.TAG_SceneFragment)
-                .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple,getString(R.string.scan_light_guide_4)))
-                .show();
+        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
+        if (guideShowCurrentPage) {
+            Button guide4 = btnAddGroups;
+            GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP6_GUIDE_SURE_GROUP())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4, R.layout.view_guide_scan3, getString(R.string.scan_light_guide_4), v -> {
+                        guide4.performClick();
+                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                    .show();
+        }
+//        sureGroups
     }
 
     private void initClick() {
@@ -1445,7 +1468,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.setSelected(false);
                             this.adapter.add(light);
                             this.adapter.notifyDataSetChanged();
-                            this.listDevices.smoothScrollToPosition(adapter.getCount()-1);
+                            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
                         }
                     }
                 } else {
@@ -1467,7 +1490,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.setSelected(false);
                             this.adapter.add(light);
                             this.adapter.notifyDataSetChanged();
-                            this.listDevices.smoothScrollToPosition(adapter.getCount()-1);
+                            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
                         }
                     }
                 }

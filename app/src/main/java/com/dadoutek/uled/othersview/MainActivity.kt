@@ -32,10 +32,7 @@ import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
-import com.dadoutek.uled.util.AppUtils
-import com.dadoutek.uled.util.BleUtils
-import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -91,7 +88,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     private var mConnectDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mTelinkLightService: TelinkLightService? = null
-
+    private var isCreate=false
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -135,6 +132,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
+
+        isCreate=true
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -170,8 +169,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         bnve.setupWithViewPager(viewPager)
     }
 
-    public fun transHome(){
-        bnve.currentItem=2
+    private fun transScene(){
+        bnve.currentItem=1
     }
 
     override fun onPause() {
@@ -203,7 +202,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
             mWakeLock?.acquire()
         }
 
-
+        if(GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_INSTALL_LIGHT_KEY,false) &&
+                !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
+            transScene()
+            isCreate=false
+        }
     }
 
     var locationServiceDialog: AlertDialog? = null
