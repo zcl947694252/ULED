@@ -162,6 +162,7 @@ public class SceneFragment extends BaseFragment implements
     private void step1Guide(){
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(getActivity(),GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
         if(guideShowCurrentPage){
+            GuideUtils.INSTANCE.resetSceneGuide(getActivity());
             ImageView guide1= (ImageView) toolbar.findViewById(R.id.img_function1);
             GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP7_GUIDE_ADD_SCENE())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple_scene_1,getString(R.string.scene_guide_1),
@@ -312,7 +313,7 @@ public class SceneFragment extends BaseFragment implements
             initOnLayoutListener(1);
         }else{
             if(getActivity()!=null){
-                initOnLayoutListener(2);
+//                initOnLayoutListener(2);
             }
         }
 
@@ -368,9 +369,13 @@ public class SceneFragment extends BaseFragment implements
                     if (scenesListData.size() >= SCENE_MAX_COUNT) {
                         ToastUtils.showLong(R.string.scene_16_tip);
                     } else {
-                        Intent intent = new Intent(getActivity(), SetSceneAct.class);
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false);
-                        startActivityForResult(intent, 0);
+                        if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+                            ToastUtils.showLong(R.string.device_not_connected);
+                        }else{
+                            Intent intent = new Intent(getActivity(), SetSceneAct.class);
+                            intent.putExtra(Constant.IS_CHANGE_SCENE, false);
+                            startActivityForResult(intent, 0);
+                        }
                     }
                 }
                 break;

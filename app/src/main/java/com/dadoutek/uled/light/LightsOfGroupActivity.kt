@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.SearchView
 import android.util.Log
@@ -121,6 +122,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         ButterKnife.bind(this)
         initToolbar()
         initParameter()
+        initData()
+        initView()
         initOnLayoutListener()
     }
 
@@ -224,8 +227,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     override fun onResume() {
         super.onResume()
-        initData()
-        initView()
+//        initData()
+//        initView()
     }
 
     override fun onStop() {
@@ -257,6 +260,55 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             lightList = DBUtils.getLightByGroupID(group.id)
         }
     }
+
+    private fun getNewData(): MutableList<DbLight> {
+        if (group.meshAddr == 0xffff) {
+            //            lightList = DBUtils.getAllLight();
+//            lightList=DBUtils.getAllLight()
+            filter("", false)
+        } else {
+            lightList = DBUtils.getLightByGroupID(group.id)
+        }
+
+        if (group.meshAddr == 0xffff) {
+            toolbar.title = getString(R.string.allLight) + " (" + lightList.size + ")"
+        } else {
+            toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
+        }
+        return lightList
+    }
+
+    fun notifyData() {
+        val mOldDatas: MutableList<DbLight>? = lightList
+        val mNewDatas: MutableList<DbLight>? = getNewData()
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
+                (newItemPosition)?.id) ?: false;
+            }
+
+            override fun getOldListSize(): Int {
+                return mOldDatas?.size ?: 0
+            }
+
+            override fun getNewListSize(): Int {
+                return mNewDatas?.size ?: 0
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val beanOld = mOldDatas?.get(oldItemPosition)
+                val beanNew = mNewDatas?.get(newItemPosition)
+                return if (!beanOld?.name.equals(beanNew?.name)) {
+                    return false//如果有内容不同，就返回false
+                } else true
+
+            }
+        }, true)
+        diffResult.dispatchUpdatesTo(adapter)
+        lightList = mNewDatas!!
+        adapter?.setNewData(lightList)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (group.meshAddr == 0xffff) {
@@ -332,18 +384,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQ_LIGHT_SETTING -> {
-                    initData()
-                    adapter?.notifyDataSetChanged()
-                    val isConnect = data?.getBooleanExtra("data", false) ?: false
-                    if (isConnect) {
-                        scanPb.visibility = View.VISIBLE
-                    }
-                }
-            }
-
+        notifyData()
+        val isConnect = data?.getBooleanExtra("data", false) ?: false
+        if (isConnect) {
+            scanPb.visibility = View.VISIBLE
         }
 
         Thread {

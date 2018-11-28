@@ -146,6 +146,32 @@ object GuideUtils {
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
     }
 
+    fun resetGroupListGuide(activity: Activity){
+        NewbieGuide.resetLabel(activity, STEP0_GUIDE_SELECT_DEVICE_KEY)
+        NewbieGuide.resetLabel(activity, STEP1_GUIDE_ADD_DEVICE_KEY)
+        NewbieGuide.resetLabel(activity, STEP2_GUIDE_START_INSTALL_DEVICE)
+        SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
+    }
+
+    fun resetDeviceScanningGuide(activity: Activity){
+        NewbieGuide.resetLabel(activity, STEP3_GUIDE_CREATE_GROUP)
+        NewbieGuide.resetLabel(activity, STEP4_GUIDE_SELECT_GROUP)
+        NewbieGuide.resetLabel(activity, STEP5_GUIDE_SELECT_SOME_LIGHT)
+        NewbieGuide.resetLabel(activity, STEP6_GUIDE_SURE_GROUP)
+        SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
+    }
+
+    fun resetSceneGuide(activity: Activity){
+        NewbieGuide.resetLabel(activity, STEP7_GUIDE_ADD_SCENE)
+        NewbieGuide.resetLabel(activity, STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
+        NewbieGuide.resetLabel(activity, STEP9_GUIDE_ADD_SCENE_SELECT_GROUP)
+        NewbieGuide.resetLabel(activity, STEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS)
+        NewbieGuide.resetLabel(activity, STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE)
+        NewbieGuide.resetLabel(activity, STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR)
+        NewbieGuide.resetLabel(activity, STEP13_GUIDE_ADD_SCENE_SAVE)
+        SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
+    }
+
     fun changeCurrentViewIsEnd(context: Context,key:String,isEnd:Boolean){
         SharedPreferencesHelper.putBoolean(context,key,isEnd)
     }

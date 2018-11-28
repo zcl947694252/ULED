@@ -115,7 +115,6 @@ public class SetSceneAct extends TelinkBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        GuideUtils.INSTANCE.changeCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
     }
 
     private void initOnLayoutListener() {
@@ -153,6 +152,18 @@ public class SetSceneAct extends TelinkBaseActivity {
 //        }
         step1Guide();
     }
+
+//    private void stepstartGuide(){
+//        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
+//        if(guideShowCurrentPage){
+//            EditText guide0= (EditText)findViewById(R.id.edit_name);
+//            GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP8_GUIDE_ADD_SCENE_ADD_GROUP())
+//                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide0,R.layout.view_guide_simple_scene_set1,getString(R.string.add_scene_guide_1),
+//                            v -> {
+//                                step1Guide();
+//                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+//        }
+//    }
 
     Controller controllerGuide2=null;
     private void step1Guide(){
@@ -231,6 +242,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide6,R.layout.view_guide_simple_scene_set1,getString(R.string.add_scene_guide_6),
                             v -> {
                              guide6.performClick();
+                                GuideUtils.INSTANCE.changeCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
                             },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
         }
     }
@@ -443,7 +455,7 @@ public class SetSceneAct extends TelinkBaseActivity {
             itemGroupArrayList.get(currentPosition).color=currentColor;
             sceneGroupAdapter.getViewByPosition(currentPosition,R.id.rgb_view).setBackgroundColor(currentColor);
             sceneGroupAdapter.notifyItemChanged(currentPosition);
-            lazyLoad();
+//            lazyLoad();
         });
 
         dialog= builder.create();
@@ -591,7 +603,9 @@ public class SetSceneAct extends TelinkBaseActivity {
         builder = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.group_select))
                 .setView(bottomView);
-        builder.setCancelable(false);
+        if(!GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false)){
+            builder.setCancelable(false);
+        }
         dialog = builder.create();
 
 

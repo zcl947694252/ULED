@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/gpLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background_color">
 
@@ -9,11 +10,12 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/list_groups"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             app:layout_constraintTop_toBottomOf="@id/toolbar_top"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <LinearLayout

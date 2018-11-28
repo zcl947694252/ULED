@@ -412,17 +412,26 @@
     <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
     <string name="current_account_number">Current account number:</string>
     <string name="rssi_low">Signal is too bad</string>
-    <string name="group_list_guide0">Click here to add a device</string>
-    <string name="group_list_guide1">Click this area to view the devices in the group</string>
-    <string name="group_list_guide2">turn on the lights</string>       
+    <string name="group_list_guide0">Please select a lamp you want to install now </string>
+        
+    <string name="group_list_guide1">Please click Add Device to enter the add device option </string>
+        
+    <string name="group_list_guide2">Please click on the option to start installing the device </string>
+        
     <string name="scene_guide_1">Click here to add a scene</string>
-    <string name="scene_guide_2">Click to enter the scene to delete the mode</string>  
-    <string name="scene_guide_3">Click here to open the scene</string> 
-    <string name="scene_guide_4">Click here to set the editing scene </string>    
+        
+    <string name="scene_guide_2">Click to select the group you want to add to the scene</string>
+        
+    <string name="scene_guide_3">Click here to save the current scene</string>
+        
+    <string name="scene_guide_4">Click here to set the editing scene </string>
+        
     <string name="me_guide_1">Click to clear the data to initialize the app, but please reset the lights to factory settings</string>
         
-    <string name="me_guide_2">Click here to back up your device data to the server</string>    
-    <string name="me_guide_3"> Here are some common questions </string>   
+    <string name="me_guide_2">Click here to back up your device data to the server</string>
+        
+    <string name="me_guide_3"> Here are some common questions </string>
+        
     <string name="me_guide_4"> Here you can restore all the lights to the factory settings, remember to power the lights </string>
         
     <string name="me_guide_5">The version of the current APP application is displayed here</string>
@@ -433,7 +442,7 @@
         
     <string name="scan_light_guide_1">First click here to create a group</string>
         
-    <string name="scan_light_guide_2"> Then select a group in this area</string>
+    <string name="scan_light_guide_2">Please click on this area to select a group, the current boot for you to select your newly created group </string>
         
     <string name="scan_light_guide_3"> Then in this area, click to select some lights that are intended to be grouped </string>
         
@@ -455,17 +464,17 @@
         
     <string name="is_exit_ota">It\'s in OTA progress, Do you really want to exit?</string>
         
-    <string name="add_scene_guide_1">Click here to enter the scene name </string>
+    <string name="add_scene_guide_1">Click Add to select some groups</string>
         
-    <string name="add_scene_guide_2">Click here to select the group you want. Please note: all groups and other groups cannot be selected at the same time </string>
+    <string name="add_scene_guide_2">Please select a group to add to this scene</string>
         
-    <string name="add_scene_guide_3">Click here to delete the group in the scene</string>
+    <string name="add_scene_guide_3"> Here you can set the group brightness </string>
         
-    <string name="add_scene_guide_4">Click here to set the color of the group</string>
+    <string name="add_scene_guide_4"> Here you can set the group color temperature </string>
         
-    <string name="add_scene_guide_5">Click here to save the scene</string>
-
-    <string name="add_scene_guide_6">点击保存保存场景</string>
+    <string name="add_scene_guide_5"> Here you can set the group color </string>
+        
+    <string name="add_scene_guide_6">Click Save to save the scene</string>
         
     <string name="config_pir_guide_1">How long does it take to enter the trigger here?</string>
         
@@ -480,19 +489,26 @@
     <string name="config_pir_guide_7"> Here you can choose the trigger time unit </string>
         
     <string name="config_pir_guide_8">Click this icon to save the current configuration</string>
-
-    <string name="show_guide_again_tip">Want to see the APP tutorial again?</string>
-    <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
-
+        
+    <string name="show_guide_again_tip"> Would you like to see the app tutorial again? </string>
+        
+    <string name="repeat_name">The group name already exists. Please re-enter the group name </string>
+        
     <string name="dynamic_rgb">dynamic RGB</string>
-       
+        
     <string name="speed_text">Speed: %1$s%%</string>
         
     <string name="dynamic_gradient">dynamic RGB</string>
-    <string name="stop">Stop</string>
-    <string name="rename">Rename</string>
-    <string name="no_name">未命名</string>
-    <string name="firmware_version">固件版本：%1$s</string>
+        
+    <string name="stop">stop</string>
+        
+    <string name="rename">rename </string>
+        
+    <string name="no_name">unnamed </string>
+        
+    <string name="firmware_version">firmware version: %1$s</string>
+        
     <string name="ota">OTA</string>
-    <string name="my_scene">我的场景</string>
+        
+    <string name="my_scene">Scenario 1 </string>
 </resources>

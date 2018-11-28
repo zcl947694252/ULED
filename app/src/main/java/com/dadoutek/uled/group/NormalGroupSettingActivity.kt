@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.view.KeyEvent
+import android.view.MenuItem
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.inputmethod.EditorInfo
@@ -38,11 +40,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_group_setting.*
 import kotlinx.android.synthetic.main.fragment_group_setting.*
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextView.OnEditorActionListener, EventListener<String> {
-    private var backView: ImageView? = null
     private var brightnessBar: SeekBar? = null
     private var temperatureBar: SeekBar? = null
     private var colorPicker: ColorPicker? = null
@@ -51,17 +53,13 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     private var btn_rename: Button? = null
     private var group: DbGroup? = null
     //    private var stopTracking = false
-    private var editTitle: EditText? = null
     private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
     private var isLoginSuccess = false
     private var connectTimes = 0
 
     private val clickListener = OnClickListener { v ->
-        if (v === backView) {
-            setResult(Constant.RESULT_OK)
-            finish()
-        }
+
     }
 
     fun addEventListeners() {
@@ -222,8 +220,8 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
 
 
     private fun initView() {
+        editTitle.visibility=View.VISIBLE
         if (group != null) {
-            editTitle = this.findViewById<View>(R.id.edit_title) as EditText
             if (group!!.meshAddr == 0xffff) {
                 editTitle!!.setText(getString(R.string.allLight))
             } else {
@@ -231,9 +229,9 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
             }
         }
 
-        this.backView = this
-                .findViewById<View>(R.id.img_header_menu_left) as ImageView
-        this.backView!!.setOnClickListener(this.clickListener)
+        toolbar.title=""
+        setSupportActionBar(toolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         this.brightnessBar = findViewById<View>(R.id.sb_brightness) as SeekBar
         this.temperatureBar = findViewById<View>(R.id.sb_temperature) as SeekBar
@@ -257,6 +255,13 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         this.brightnessBar!!.setOnSeekBarChangeListener(this.barChangeListener)
         this.temperatureBar!!.setOnSeekBarChangeListener(this.barChangeListener)
         this.colorPicker!!.setOnColorChangeListener(this.colorChangedListener)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun initData() {
@@ -539,10 +544,11 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
-        btn_sure_edit_rename.visibility = View.VISIBLE
-        btn_sure_edit_rename.setOnClickListener {
+        tvRename.visibility = View.VISIBLE
+        tvRename.setText(R.string.btn_sure)
+        tvRename.setOnClickListener {
             saveName()
-            btn_sure_edit_rename.visibility = View.GONE
+            tvRename.visibility = View.GONE
         }
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
@@ -559,7 +565,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
             EditorInfo.IME_ACTION_DONE,
             EditorInfo.IME_ACTION_NONE -> {
                 saveName()
-                btn_sure_edit_rename.visibility = View.GONE
+                tvRename.visibility = View.GONE
             }
         }
     }

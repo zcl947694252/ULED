@@ -1,26 +1,35 @@
 package com.dadoutek.uled.group
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.DisplayMetrics
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
+import com.app.hubert.guide.model.GuidePage
+import com.app.hubert.guide.model.HighLight
+import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -32,18 +41,19 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBGroupSettingActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.GuideUtils
+import com.dadoutek.uled.util.OtherUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_device_list.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class GroupListFragment : BaseFragment(){
+class GroupListFragment : BaseFragment() {
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
     private var mContext: Activity? = null
@@ -52,7 +62,7 @@ class GroupListFragment : BaseFragment(){
     private var gpList: List<DbGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
-    private var dialogPop:LinearLayout?=null
+    private var dialogPop: LinearLayout? = null
     private var recyclerView: RecyclerView? = null
     internal var showList: List<DbGroup>? = null
     private var updateLightDisposal: Disposable? = null
@@ -61,11 +71,11 @@ class GroupListFragment : BaseFragment(){
     private var install_switch: TextView? = null
     private var install_sensor: TextView? = null
     //新用户选择的初始安装选项是否是RGB灯
-    private var isRgbClick=false
+    private var isRgbClick = false
     //是否正在引导
-    private var isGuide=false
-    var firstShowGuide=true
-    private var guideShowCurrentPage=false
+    private var isGuide = false
+    var firstShowGuide = true
+    private var guideShowCurrentPage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,8 +88,8 @@ class GroupListFragment : BaseFragment(){
                               savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
-        if(firstShowGuide){
-            firstShowGuide=false
+        if (firstShowGuide) {
+            firstShowGuide = false
             initOnLayoutListener()
         }
 
@@ -116,7 +126,6 @@ class GroupListFragment : BaseFragment(){
 
     override fun onStop() {
         super.onStop()
-        GuideUtils.changeCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,true)
     }
 
     private fun getView(inflater: LayoutInflater): View {
@@ -127,13 +136,13 @@ class GroupListFragment : BaseFragment(){
         toolbar = view.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_list_header)
 
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility=View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility=View.GONE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-            isGuide=false
-            if(dialogPop?.visibility==View.GONE){
+            isGuide = false
+            if (dialogPop?.visibility == View.GONE) {
                 showPopupMenu()
-            }else{
+            } else {
                 hidePopupMenu()
             }
         }
@@ -227,28 +236,28 @@ class GroupListFragment : BaseFragment(){
         }
     }
 
-    private val onClick = View.OnClickListener{
-        var intent:Intent? = null
+    private val onClick = View.OnClickListener {
+        var intent: Intent? = null
         //点击任何一个选项跳转页面都隐藏引导
 //        val controller=guide2()
 //            controller?.remove()
-        isGuide=false
+        isGuide = false
         hidePopupMenu()
-        when(it.id){
+        when (it.id) {
             R.id.install_light -> {
                 if (DBUtils.allLight.size < 254) {
-                    intent=Intent(mContext, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,false)
-                    startActivityForResult(intent,0)
+                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                    startActivityForResult(intent, 0)
                 } else {
                     ToastUtils.showLong(getString(R.string.much_lamp_tip))
                 }
             }
             R.id.install_rgb_light -> {
                 if (DBUtils.allLight.size < 254) {
-                    intent=Intent(mContext, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,true)
-                    startActivityForResult(intent,0)
+                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    startActivityForResult(intent, 0)
                 } else {
                     ToastUtils.showLong(getString(R.string.much_lamp_tip))
                 }
@@ -330,16 +339,16 @@ class GroupListFragment : BaseFragment(){
 
             }
         }, true)
-        diffResult.dispatchUpdatesTo(adapter)
         showList = mNewDatas
         adapter?.setNewData(showList)
+        diffResult.dispatchUpdatesTo(adapter)
     }
-
 
 
     fun lazyLoad() {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
         if(guideShowCurrentPage){
+            GuideUtils.resetGroupListGuide(activity!!)
             val guide0= toolbar!!.findViewById<TextView>(R.id.toolbarTv)
             GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
                     .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_0,getString(R.string.group_list_guide0), View.OnClickListener {},GuideUtils.END_GROUPLIST_KEY)
@@ -356,43 +365,64 @@ class GroupListFragment : BaseFragment(){
                                     guide1()
                                     isRgbClick=true
                                 }
+                                val tvJump = view.findViewById<TextView>(R.id.jump_out)
+                                tvJump.setOnClickListener { v ->
+                                    controller.remove()
+                                    GuideUtils.changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), GuideUtils.END_GROUPLIST_KEY, true)
+                                }
                             })
                     .show()
         }
+//        testGUide()
     }
 
-    private fun guide1(){
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
-        if(guideShowCurrentPage){
-            val guide1= toolbar!!.findViewById<ImageView>(R.id.img_function1)
+    private fun testGUide() {
+        val height=ScreenUtils.getScreenHeight()
+        val top=(height - SizeUtils.dp2px(125f)).toFloat()
+        val bottom=(height- SizeUtils.dp2px(70f)).toFloat()
+        val right = SizeUtils.dp2px(230f).toFloat()
+        val left = SizeUtils.dp2px(130f).toFloat()
+        val rectf = RectF(left, top, right,bottom)
+//        val relativeGuide = RelativeGuide(R.layout.fragment_group_list,Gravity.BOTTOM,10)
+        val shape = HighLight.Shape.RECTANGLE
+        val round = 0
+        GuideUtils.guideBuilder(this, "aaaa").addGuidePage(GuidePage.newInstance().addHighLight(rectf)).alwaysShow(true)
+                .show()
+    }
 
-            GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_group1,getString(R.string.group_list_guide1), View.OnClickListener {
-                        isGuide=true
+    private fun guide1() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
+        if (guideShowCurrentPage) {
+            val guide1 = toolbar!!.findViewById<ImageView>(R.id.img_function1)
+
+            GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
+                    .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_group1, getString(R.string.group_list_guide1), View.OnClickListener {
+                        isGuide = true
                         showPopupMenu()
-                    },GuideUtils.END_GROUPLIST_KEY))
+                    }, GuideUtils.END_GROUPLIST_KEY))
                     .show()
         }
     }
 
     private fun guide2(): Controller? {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
-        if(guideShowCurrentPage){
-            var guide3:TextView?=null
-            if(isRgbClick){
-                guide3= install_rgb_light
-            }else{
-                guide3= install_light
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
+        if (guideShowCurrentPage) {
+            var guide3: TextView? = null
+            if (isRgbClick) {
+                guide3 = install_rgb_light
+            } else {
+                guide3 = install_light
             }
 
-            return GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3!!,R.layout.view_guide_simple_group2,getString(R.string.group_list_guide2), View.OnClickListener {
-                        if(isRgbClick){
+            return GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
+                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
+                        if (isRgbClick) {
                             install_rgb_light?.performClick()
-                        }else{
+                        } else {
                             install_light?.performClick()
                         }
-                    },GuideUtils.END_GROUPLIST_KEY))
+                        GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, true)
+                    }, GuideUtils.END_GROUPLIST_KEY))
                     .show()
         }
         return null
@@ -438,29 +468,29 @@ class GroupListFragment : BaseFragment(){
     }
 
     fun myPopViewClickPosition(x: Float, y: Float) {
-       if(x<dialogPop?.left?:0 || y<dialogPop?.top?:0 || y>dialogPop?.bottom?:0){
-           if(dialogPop?.visibility==View.VISIBLE){
-               Thread{
-                   //避免点击过快点击到下层View
-                   Thread.sleep(100)
-                   launch(UI){
-                      hidePopupMenu()
-                   }
-               }.start()
-           }
-       }
+        if (x < dialogPop?.left ?: 0 || y < dialogPop?.top ?: 0 || y > dialogPop?.bottom ?: 0) {
+            if (dialogPop?.visibility == View.VISIBLE) {
+                Thread {
+                    //避免点击过快点击到下层View
+                    Thread.sleep(100)
+                    launch(UI) {
+                        hidePopupMenu()
+                    }
+                }.start()
+            }
+        }
     }
 
     private fun showPopupMenu() {
-        dialogPop?.visibility=View.VISIBLE
-        if(isGuide){
+        dialogPop?.visibility = View.VISIBLE
+        if (isGuide) {
             guide2()
         }
     }
 
-    private fun hidePopupMenu(){
-        if(!isGuide){
-            dialogPop?.visibility=View.GONE
+    private fun hidePopupMenu() {
+        if (!isGuide || GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)) {
+            dialogPop?.visibility = View.GONE
         }
     }
 }

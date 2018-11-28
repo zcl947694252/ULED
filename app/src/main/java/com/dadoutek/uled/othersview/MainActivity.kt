@@ -173,6 +173,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         bnve.currentItem=1
     }
 
+    private fun tranHome(){
+        bnve.currentItem=0
+    }
+
+
     override fun onPause() {
         super.onPause()
         mScanTimeoutDisposal?.dispose()
@@ -206,6 +211,9 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                 !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
             transScene()
             isCreate=false
+        }else if(DBUtils.allLight.isEmpty()){
+            GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_GROUPLIST_KEY,false)
+            tranHome()
         }
     }
 
@@ -469,6 +477,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         super.onStop()
         if (TelinkLightService.Instance() != null)
             TelinkLightService.Instance().disableAutoRefreshNotify()
+        isCreate=false
     }
 
 
@@ -478,6 +487,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()
+        isCreate=true
     }
 
     private fun addScanListeners() {
@@ -553,14 +563,14 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    if ((productUUID and 0xff) == 0xff && dbLight.productUUID == 0xff) {
-                        dbLight.productUUID = 0x04
+//                    if ((productUUID and 0xff) == 0xff && dbLight.productUUID == 0xff) {
+//                        dbLight.productUUID = 0x04
 //                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+data[3]+"-"+(data[3].toInt() and 0xff))
-                        com.blankj.utilcode.util.LogUtils.d("light_mesh_1:" + (productUUID and 0xff))
-                    }
-                    Thread {
-                        DBUtils.updateLightLocal(dbLight)
-                    }.start()
+//                        com.blankj.utilcode.util.LogUtils.d("light_mesh_1:" + (productUUID and 0xff))
+//                    }
+//                    Thread {
+//                        DBUtils.updateLightLocal(dbLight)
+//                    }.start()
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
@@ -580,14 +590,26 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                         dbLightNew.meshAddr = meshAddress
                         dbLightNew.name = getString(R.string.allLight)
                         dbLightNew.macAddr = "0"
-                        Thread {
+//                        Thread {
                             DBUtils.saveLight(dbLightNew, false)
-                        }.start()
+//                            errorCheck(meshAddress)
+//                        }.start()
                         com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
 
+        }
+    }
+
+    private fun errorCheck(meshAddress: Int) {
+        val list=DBUtils.getLightListByMeshAddr(meshAddress)
+        if(list?.size?:0>1){
+            for(i in list!!.indices){
+                if(list[i].macAddr=="0"){
+                    DBUtils.deleteLight(list[i])
+                }
+            }
         }
     }
 
@@ -634,10 +656,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
-        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-            TelinkLightService.Instance().idleMode(true)
-            LeBluetooth.getInstance().stopScan()
-            startScan()
+        if (mNotFoundSnackBar?.isShown != true) {
+            mNotFoundSnackBar = indefiniteSnackbar(root,
+                    R.string.not_found_light, R.string.retry) {
+                retryConnectCount = 0
+                connectFailedDeviceMacList.clear()
+                startScan()
+            }
         }
 //        } else {
 //            retryConnect()

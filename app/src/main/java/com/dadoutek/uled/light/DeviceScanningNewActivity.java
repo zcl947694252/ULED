@@ -399,8 +399,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-        GuideUtils.INSTANCE.changeCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), true);
-
         if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
             ActivityUtils.finishToActivity(MainActivity.class, false, true);
         else {
@@ -774,7 +772,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
             //刷新Notify参数
             LeRefreshNotifyParameters refreshNotifyParams = Parameters.createRefreshNotifyParameters();
-            refreshNotifyParams.setRefreshRepeatCount(2);
+            refreshNotifyParams.setRefreshRepeatCount(1);
             refreshNotifyParams.setRefreshInterval(2000);
             //开启自动刷新Notify
             TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
@@ -828,6 +826,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void guideStep1() {
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
         if (guideShowCurrentPage) {
+            GuideUtils.INSTANCE.resetDeviceScanningGuide(this);
             LinearLayout guide1 = addGroupLayout;
             GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP3_GUIDE_CREATE_GROUP())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), v -> {
@@ -872,6 +871,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP6_GUIDE_SURE_GROUP())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4, R.layout.view_guide_scan3, getString(R.string.scan_light_guide_4), v -> {
                         guide4.performClick();
+                        GuideUtils.INSTANCE.changeCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), true);
                     }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
                     .show();
         }
@@ -1376,8 +1376,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
-                mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
-                        .subscribe(aLong -> {
                             //更新参数
                             deviceInfo.meshAddress = meshAddress;
                             String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -1390,13 +1388,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                                     NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
                             params.setUpdateDeviceList(deviceInfo);
                             TelinkLightService.Instance().updateMesh(params);
-                        }));
             }
         } else {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_NORMAL && deviceInfo.rssi < MAX_RSSI) {
-                mDisposable.add(Observable.timer(0, TimeUnit.MILLISECONDS, Schedulers.io())
-                        .subscribe(aLong -> {
                             //更新参数
                             deviceInfo.meshAddress = meshAddress;
                             String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
@@ -1409,7 +1404,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                                     NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
                             params.setUpdateDeviceList(deviceInfo);
                             TelinkLightService.Instance().updateMesh(params);
-                        }));
             }
         }
     }

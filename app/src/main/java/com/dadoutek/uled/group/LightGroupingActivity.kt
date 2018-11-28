@@ -279,6 +279,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun addNewGroup() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
+        textGp.setText(DBUtils.getDefaultNewGroupName())
         AlertDialog.Builder(this@LightGroupingActivity)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)

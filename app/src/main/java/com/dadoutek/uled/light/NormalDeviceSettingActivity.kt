@@ -351,7 +351,7 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>,
 //            btn_sure_edit_rename.visibility = View.GONE
 //        }
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(edit_title, InputMethodManager.SHOW_FORCED)
+        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
         editTitle?.setOnEditorActionListener(this)
     }
 

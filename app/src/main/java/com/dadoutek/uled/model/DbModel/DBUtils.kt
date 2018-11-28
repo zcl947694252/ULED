@@ -217,6 +217,11 @@ object DBUtils {
         } else null
     }
 
+    fun getLightListByMeshAddr(meshAddr: Int): MutableList<DbLight>? {
+        val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return dbLightList
+    }
+
     
     fun getGroupByMesh(mesh: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
@@ -559,11 +564,9 @@ object DBUtils {
         while (true){
             count++
             val newName = "组" +count
-            for(i in gpList.indices){
                 if(!gpNameList.contains(newName)){
                    return newName
                 }
-            }
         }
     }
 
@@ -579,11 +582,9 @@ object DBUtils {
         while (true){
             count++
             val newName = "场景" +count
-            for(i in scList.indices){
                 if(!scNameList.contains(newName)){
                     return newName
                 }
-            }
         }
     }
 

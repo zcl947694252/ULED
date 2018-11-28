@@ -429,7 +429,7 @@
     <string name="light_guide_1">点此处可以开关灯</string>
     <string name="light_guide_2">点此对灯进行设置</string>
     <string name="warning">警告</string>
-    <string name="is_exit_ota">It\'s in OTA progress, Do you really want to exit?</string>
+    <string name="is_exit_ota">OTA进行中，你真的想退出吗？</string>
     <string name="add_scene_guide_1">点击添加可选择一些分组</string>
     <string name="add_scene_guide_2">请选择组添加到这个场景</string>
     <string name="add_scene_guide_3">这里可以设置分组亮度</string>
