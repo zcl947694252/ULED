@@ -1,6 +1,7 @@
 package com.dadoutek.uled.util
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
@@ -8,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import com.app.hubert.guide.NewbieGuide
 import com.app.hubert.guide.core.Builder
+import com.app.hubert.guide.core.Controller
 import com.app.hubert.guide.model.GuidePage
 import com.app.hubert.guide.model.HighlightOptions
 import com.dadoutek.uled.R
@@ -32,18 +34,21 @@ object GuideUtils {
     var STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE = "STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE"
     var STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR = "STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR"
     var STEP13_GUIDE_ADD_SCENE_SAVE = "STEP13_GUIDE_ADD_SCENE_SAVE"
-    var STEP14_GUIDE_CONSTENT_QUESTION = "STEP14_GUIDE_CONSTENT_QUESTION"
+    var STEP14_GUIDE_APPLY_SCENE = "STEP14_GUIDE_APPLY_SCENE"
+    var STEP15_GUIDE_CONSTENT_QUESTION = "STEP15_GUIDE_CONSTENT_QUESTION"
+    var MAIN_STEP0_GUIDE_TO_SCENE = "MAIN_STEP0_GUIDE_TO_SCENE"
 
     /**
      * 每个页面引导结束标志
      * 本次取值为true则当前页不引导
      */
     var END_GROUPLIST_KEY = "END_GROUPLIST_KEY"
+    var END_MAIN_KEY = "END_MAIN_KEY"
     var END_INSTALL_LIGHT_KEY = "END_INSTALL_LIGHT_KEY"
     var END_ADD_SCENE_KEY = "END_ADD_SCENE_KEY"
 
     fun addGuidePage(guideTargetView: View,
-                     res: Int, describeRes: String, onClickListener: View.OnClickListener,jumpViewContent: String): GuidePage {
+                     res: Int, describeRes: String, onClickListener: View.OnClickListener,jumpViewContent: String,context: Context): GuidePage {
         val guide = GuidePage.newInstance()
                 .setLayoutRes(res)
                 .setEverywhereCancelable(false)
@@ -56,14 +61,7 @@ object GuideUtils {
 
                     val tvJump = view.findViewById<TextView>(R.id.jump_out)
                     tvJump.setOnClickListener { v ->
-                        controller.remove()
-                        if(jumpViewContent== END_GROUPLIST_KEY){
-                            changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_GROUPLIST_KEY,true)
-                        }else if(jumpViewContent== END_INSTALL_LIGHT_KEY){
-                            changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_INSTALL_LIGHT_KEY,true)
-                        }else if(jumpViewContent== END_ADD_SCENE_KEY){
-                            changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_KEY,true)
-                        }
+                        showExitGuideDialog(context,controller,jumpViewContent)
                     }
                 }
         val highlightOptions = HighlightOptions.Builder()
@@ -72,6 +70,31 @@ object GuideUtils {
         guide.addHighLightWithOptions(guideTargetView, highlightOptions)
 
         return guide
+    }
+
+    //显示退出引导弹窗
+    fun showExitGuideDialog(context: Context, controller: Controller, jumpViewContent: String){
+        val builder=AlertDialog.Builder(context)
+        var alertDialog:AlertDialog?=null
+        builder.setMessage("要跳过当前页面引导吗？")
+        builder.setNegativeButton(R.string.btn_cancel) { dialog, which ->
+            alertDialog?.dismiss()
+        }
+        builder.setPositiveButton(R.string.btn_sure) { dialog, which ->
+            controller.remove()
+            if(jumpViewContent== END_GROUPLIST_KEY){
+                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_GROUPLIST_KEY,true)
+            }else if(jumpViewContent== END_INSTALL_LIGHT_KEY){
+                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_INSTALL_LIGHT_KEY,true)
+            }else if(jumpViewContent== END_ADD_SCENE_KEY){
+                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_KEY,true)
+            }else if(jumpViewContent== END_MAIN_KEY){
+                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_MAIN_KEY,true)
+            }
+            alertDialog?.dismiss()
+        }
+        alertDialog=builder.create()
+        alertDialog.show()
     }
 
 
@@ -140,12 +163,18 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE)
         NewbieGuide.resetLabel(activity, STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR)
         NewbieGuide.resetLabel(activity, STEP13_GUIDE_ADD_SCENE_SAVE)
-        NewbieGuide.resetLabel(activity, STEP14_GUIDE_CONSTENT_QUESTION)
+        NewbieGuide.resetLabel(activity, STEP14_GUIDE_APPLY_SCENE)
+        NewbieGuide.resetLabel(activity, STEP15_GUIDE_CONSTENT_QUESTION)
+        NewbieGuide.resetLabel(activity, MAIN_STEP0_GUIDE_TO_SCENE)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
+        SharedPreferencesHelper.putBoolean(activity, END_MAIN_KEY,false)
     }
 
+    /**
+     * 重置组页面引导
+     */
     fun resetGroupListGuide(activity: Activity){
         NewbieGuide.resetLabel(activity, STEP0_GUIDE_SELECT_DEVICE_KEY)
         NewbieGuide.resetLabel(activity, STEP1_GUIDE_ADD_DEVICE_KEY)
@@ -153,6 +182,14 @@ object GuideUtils {
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
     }
 
+    fun resetMainGuide(activity: Activity){
+        NewbieGuide.resetLabel(activity, MAIN_STEP0_GUIDE_TO_SCENE)
+        SharedPreferencesHelper.putBoolean(activity, END_MAIN_KEY,false)
+    }
+
+    /**
+     * 重置扫灯页面引导
+     */
     fun resetDeviceScanningGuide(activity: Activity){
         NewbieGuide.resetLabel(activity, STEP3_GUIDE_CREATE_GROUP)
         NewbieGuide.resetLabel(activity, STEP4_GUIDE_SELECT_GROUP)
@@ -161,6 +198,9 @@ object GuideUtils {
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
     }
 
+    /**
+     * 重置场景引导
+     */
     fun resetSceneGuide(activity: Activity){
         NewbieGuide.resetLabel(activity, STEP7_GUIDE_ADD_SCENE)
         NewbieGuide.resetLabel(activity, STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
@@ -169,13 +209,16 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE)
         NewbieGuide.resetLabel(activity, STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR)
         NewbieGuide.resetLabel(activity, STEP13_GUIDE_ADD_SCENE_SAVE)
+        NewbieGuide.resetLabel(activity, STEP14_GUIDE_APPLY_SCENE)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
     }
 
+    //控制以页面为单位是否结束引导
     fun changeCurrentViewIsEnd(context: Context,key:String,isEnd:Boolean){
         SharedPreferencesHelper.putBoolean(context,key,isEnd)
     }
 
+    //获取页面是否引导已经结束
     fun getCurrentViewIsEnd(context: Context,key:String,isEnd:Boolean): Boolean {
         return SharedPreferencesHelper.getBoolean(context,key,isEnd)
     }

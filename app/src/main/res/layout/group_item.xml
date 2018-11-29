@@ -65,7 +65,7 @@
             android:layout_marginStart="8dp"
             android:background="@drawable/btn_radius_selector"
             android:gravity="center"
-            android:text="@string/set_str"
+            android:text="@string/setting"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

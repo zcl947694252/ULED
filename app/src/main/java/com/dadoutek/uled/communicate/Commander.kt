@@ -334,6 +334,7 @@ object Commander : EventListener<String> {
         }
     }
 
+    //关闭渐变
     fun closeGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
@@ -343,20 +344,17 @@ object Commander : EventListener<String> {
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
-    fun applyGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
+    //加载渐变
+    fun applyGradient(dstAddr: Int,id: Int,speed: Int,firstAddress: Int,successCallback: (version: String?) -> Unit,
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
         val gradientActionType= 0x02
-
-        var currentLightAddress =0
-        if(TelinkLightApplication.getInstance().connectDevice!=null){
-            currentLightAddress=TelinkLightApplication.getInstance().connectDevice.meshAddress
-        }
         val params: ByteArray
-            params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), currentLightAddress.toByte())
+            params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
+    //删除渐变
     fun deleteGradient(dstAddr: Int,id: Int,successCallback: (version: String?) -> Unit,
                        failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
@@ -367,6 +365,7 @@ object Commander : EventListener<String> {
     }
 
     /**
+     * 添加渐变
      * id  渐变索引号
      * node 渐变节点号。（填0: 从此颜色开始渐变，填1: 经过此颜色，填2: 以此颜色结束)
      * mode 渐变模式 (填0: RGB渐变， 填1: 双色温渐变)

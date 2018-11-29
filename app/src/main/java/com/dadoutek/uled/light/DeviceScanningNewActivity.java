@@ -823,6 +823,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 .show();
     }
 
+    //第一步添加组
     private void guideStep1() {
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
         if (guideShowCurrentPage) {
@@ -832,11 +833,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_1), v -> {
                         isGuide = true;
                         addNewGroup();
-                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(),this))
                     .show();
         }
     }
 
+    //第二部选择组
     private void guideStep2() {
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
         if (guideShowCurrentPage) {
@@ -845,11 +847,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2, R.layout.view_guide_scan1, getString(R.string.scan_light_guide_2),
                             v -> {
                                 guideStep3();
-                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(),this))
                     .show();
         }
     }
 
+    //第三部选择灯
     private void guideStep3() {
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
         if (guideShowCurrentPage) {
@@ -859,11 +862,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             , v -> {
                                 listDevices.performItemClick(guide3, 0, listDevices.getItemIdAtPosition(0));
                                 guideStep4();
-                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                            }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(),this))
                     .show();
         }
     }
 
+    //第四部确定分组
     private void guideStep4() {
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
         if (guideShowCurrentPage) {
@@ -872,7 +876,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4, R.layout.view_guide_scan3, getString(R.string.scan_light_guide_4), v -> {
                         guide4.performClick();
                         GuideUtils.INSTANCE.changeCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), true);
-                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY()))
+                    }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(),this))
                     .show();
         }
 //        sureGroups

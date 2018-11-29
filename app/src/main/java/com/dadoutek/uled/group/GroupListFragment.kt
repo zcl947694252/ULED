@@ -134,11 +134,11 @@ class GroupListFragment : BaseFragment() {
         val view = inflater.inflate(R.layout.fragment_group_list, null)
 
         toolbar = view.findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.group_list_header)
+        toolbar!!.setTitle(R.string.group)
 
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+        toolbar!!.findViewById<TextView>(R.id.tv_function1).setOnClickListener {
             isGuide = false
             if (dialogPop?.visibility == View.GONE) {
                 showPopupMenu()
@@ -351,7 +351,7 @@ class GroupListFragment : BaseFragment() {
             GuideUtils.resetGroupListGuide(activity!!)
             val guide0= toolbar!!.findViewById<TextView>(R.id.toolbarTv)
             GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_0,getString(R.string.group_list_guide0), View.OnClickListener {},GuideUtils.END_GROUPLIST_KEY)
+                    .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_0,getString(R.string.group_list_guide0), View.OnClickListener {},GuideUtils.END_GROUPLIST_KEY,activity!!)
                             .setOnLayoutInflatedListener { view, controller ->
                                 val normal=view.findViewById<TextView>(R.id.normal_light)
                                 normal.setOnClickListener {
@@ -367,39 +367,23 @@ class GroupListFragment : BaseFragment() {
                                 }
                                 val tvJump = view.findViewById<TextView>(R.id.jump_out)
                                 tvJump.setOnClickListener { v ->
-                                    controller.remove()
-                                    GuideUtils.changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), GuideUtils.END_GROUPLIST_KEY, true)
+                                    GuideUtils.showExitGuideDialog(activity!!,controller,GuideUtils.END_GROUPLIST_KEY)
                                 }
                             })
                     .show()
         }
-//        testGUide()
-    }
-
-    private fun testGUide() {
-        val height=ScreenUtils.getScreenHeight()
-        val top=(height - SizeUtils.dp2px(125f)).toFloat()
-        val bottom=(height- SizeUtils.dp2px(70f)).toFloat()
-        val right = SizeUtils.dp2px(230f).toFloat()
-        val left = SizeUtils.dp2px(130f).toFloat()
-        val rectf = RectF(left, top, right,bottom)
-//        val relativeGuide = RelativeGuide(R.layout.fragment_group_list,Gravity.BOTTOM,10)
-        val shape = HighLight.Shape.RECTANGLE
-        val round = 0
-        GuideUtils.guideBuilder(this, "aaaa").addGuidePage(GuidePage.newInstance().addHighLight(rectf)).alwaysShow(true)
-                .show()
     }
 
     private fun guide1() {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
         if (guideShowCurrentPage) {
-            val guide1 = toolbar!!.findViewById<ImageView>(R.id.img_function1)
+            val guide1 = toolbar!!.findViewById<TextView>(R.id.tv_function1)
 
             GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
                     .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_group1, getString(R.string.group_list_guide1), View.OnClickListener {
                         isGuide = true
                         showPopupMenu()
-                    }, GuideUtils.END_GROUPLIST_KEY))
+                    }, GuideUtils.END_GROUPLIST_KEY,activity!!))
                     .show()
         }
     }
@@ -422,7 +406,7 @@ class GroupListFragment : BaseFragment() {
                             install_light?.performClick()
                         }
                         GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, true)
-                    }, GuideUtils.END_GROUPLIST_KEY))
+                    }, GuideUtils.END_GROUPLIST_KEY,activity!!))
                     .show()
         }
         return null

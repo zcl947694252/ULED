@@ -36,7 +36,6 @@
 
     <!-- Bottom Nav -->
     <string name="header_devices">灯组</string>
-    <string name="header_groups">组</string>
     <string name="header_account">我的</string>
 
     <!-- DeviceSchema List -->
@@ -64,11 +63,6 @@
     <string name="device_scan_header">扫描网络</string>
     <string name="device_scan_scan">扫描设备</string>
     <string name="device_scan_add">添加设备</string>
-
-    <!-- GroupSchema List -->
-    <string name="group_list_header">组</string>
-    <string name="group_list_on">开</string>
-    <string name="group_list_off">关</string>
 
     <!-- GroupSchema Setting -->
     <string name="group_setting_header">分组设置</string>
@@ -105,8 +99,6 @@
     <string name="scan_end">扫描完成，没有发现设备！</string>
     <string name="connecting_tip">正在连接……</string>
     <string name="grouping_completed">分组完成</string>
-    <string name="allLight">所有灯</string>
-    <string name="group">组</string>
     <string name="openBluetooth">开启蓝牙，体验智能灯!</string>
     <string name="quite">退出</string>
     <string name="retry">重试</string>
@@ -132,7 +124,6 @@
     <string name="add_mesh_save_tip3">最大长度为16</string>
     <string name="add_mesh_save_tip4">输入不包含 \'.\'</string>
     <string name="add_mesh_save_tip5">账号或密码包含特殊字符！</string>
-    <string name="setting">设置</string>
     <string name="delete_group">删除分组</string>
     <string name="rename_the_group">重命名分组</string>
     <string name="input_rename_text_tip">请输入新的组名:</string>
@@ -152,7 +143,6 @@
     <string name="add_str_group">添加组</string>
     <string name="creat_group_fail_tip">创建失败,组名已存在！</string>
     <string name="create_new_group">创建一个新组</string>
-    <string name="set_str">设置</string>
     <string name="btn_rename_light">重命名</string>
     <string name="rename_light">单灯重命名</string>
     <string name="connect_success">连接成功！</string>
@@ -161,7 +151,6 @@
 
     <string name="smartSwitch">开关</string>
     <string name="select_install_device">选择安装设备</string>
-    <string name="install_switch">安装开关</string>
     <string name="search">搜索</string>
     <string name="complete">完成</string>
     <string name="not_found_switch">未找到开关</string>
@@ -250,7 +239,6 @@
     <string name="not_grouped">未分组</string>
     <string name="connect_failed_if_there_are_lights">连接失败，请确定附近有灯具存在!</string>
     <string name="scanning_devices">扫描设备中</string>
-    <string name="not_found_light">未找到灯具，请确定附近有灯具存在!</string>
     <string name="tip_add_group">请先添加一个分组</string>
     <string name="scanning">扫描中</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
@@ -298,7 +286,6 @@
     <string name="start_sync">即将开始数据同步……</string>
     <string name="download_data_success">下载数据成功</string>
     <string name="sync_now">正在同步服务器数据，请稍后……</string>
-    <string name="install_light">安装灯</string>
     <string name="install_device">安装设备</string>
     <string name="tip_start_sync">开始同步……</string>
     <string name="upload_data_success">上传数据成功</string>
@@ -392,7 +379,6 @@
     <string name="start_connect">连接中……</string>
     <string name="update_firmware_tip2">升级时请尽可能的靠近灯！</string>
     <string name="trigger_mode">触发方式</string>
-    <string name="rgb">安装RGB灯</string>
     <string name="btn_get_verificationCode">获取</string>
     <string name="register">注册</string>
     <string name="set_password">设置密码</string>
@@ -404,32 +390,15 @@
     <string name="long_click_select_color_tip">*单击设置,长按保存</string>
     <string name="current_account_number">当前账号:</string>
     <string name="rssi_low">信号太差</string>
+
     <string name="group_list_guide0">请先选择一种你当前购买要安装的灯</string>
     <string name="group_list_guide1">请点击添加设备进入添加设备选项</string>
     <string name="group_list_guide2">请点击选项开始安装设备</string>
     <string name="scene_guide_1">点击此处即可添加场景</string>
-    <string name="scene_guide_2">请点击选择需要添加到场景的分组</string>
-    <string name="scene_guide_3">点击此处保存当前场景</string>
-    <string name="scene_guide_4">点击此处可设置编辑场景</string>
-    <string name="me_guide_1">点击清空数据可以初始化APP,但请先将灯恢复出厂设置</string>
-    <string name="me_guide_2">点击这里可以备份你的设备数据到服务器</string>
-    <string name="me_guide_3">这里可以查看一些常见问题</string>
-    <string name="me_guide_4">这里可以对所有的灯进行恢复出厂设置,记得给灯通电</string>
-    <string name="me_guide_5">这里展示的事当前APP应用的版本号</string>
-    <string name="me_guide_6">点击退出登录可退出当前账号</string>
-    <string name="i_know_tip">我知道了!</string>
     <string name="scan_light_guide_1">首先点击这里创建一个组</string>
     <string name="scan_light_guide_2">请点击此区域可以选择一个组,当前引导为你选择你最新创建的组</string>
     <string name="scan_light_guide_3">然后在此区域点击勾选一些打算分组的灯</string>
     <string name="scan_light_guide_4">选择完成可以点击这里确定分组</string>
-    <string name="reset_boot_tutorial">重置引导教程</string>
-    <string name="me_guide_7">没学会？点击这里可以重新查看所有教程哦</string>
-    <string name="btn_jump_over">跳过指引</string>
-    <string name="search_group">点击图标输入组名可以搜索分组</string>
-    <string name="light_guide_1">点此处可以开关灯</string>
-    <string name="light_guide_2">点此对灯进行设置</string>
-    <string name="warning">警告</string>
-    <string name="is_exit_ota">OTA进行中，你真的想退出吗？</string>
     <string name="add_scene_guide_1">点击添加可选择一些分组</string>
     <string name="add_scene_guide_2">请选择组添加到这个场景</string>
     <string name="add_scene_guide_3">这里可以设置分组亮度</string>
@@ -443,6 +412,16 @@
     <string name="config_pir_guide_6">这里可以选择触发形式</string>
     <string name="config_pir_guide_7">这里可以选择触发时间单位</string>
     <string name="config_pir_guide_8">点击此图标可以保存当前配置</string>
+    <string name="change_to_scene">点击这里切换到场景页面试试吧</string>
+    <string name="btn_jump_over">跳过</string>
+    <string name="reset_boot_tutorial">重置引导教程</string>
+    <string name="select_device_tip">请点击选择你购买的产品</string>
+    <string name="normal_light">普通灯</string>
+    <string name="rgb_light">RGB灯</string>
+    <string name="i_know_tip">我知道了!</string>
+
+    <string name="warning">警告</string>
+    <string name="is_exit_ota">OTA进行中，你真的想退出吗？</string>
     <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
     <string name="dynamic_rgb">动态RGB</string>
@@ -455,5 +434,18 @@
     <string name="ota">OTA</string>
     <string name="my_scene">场景一</string>
 
+    <!--通用-->
+    <string name="not_found_light">未找到灯具，请确定附近有灯具存在!</string>
+    <string name="group">组</string>
+    <string name="setting">设置</string>
+
+    <!--组列表页面-->
+    <string name="allLight">所有灯</string>
+    <string name="group_list_on">开</string>
+    <string name="group_list_off">关</string>
+    <string name="install_light">安装灯</string>
+    <string name="rgb">安装RGB灯</string>
+    <string name="install_switch">安装开关</string>
+    <string name="apply_scene">点击白色区域可应用当前场景</string>
 
 </resources>

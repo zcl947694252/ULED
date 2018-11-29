@@ -241,6 +241,12 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
+    fun getLightByGroupMesh(mesh: Int): ArrayList<DbLight> {
+        val group= getGroupByMesh(mesh)
+        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
+        return ArrayList(query.list())
+    }
+
     /********************************************保存 */
 
     

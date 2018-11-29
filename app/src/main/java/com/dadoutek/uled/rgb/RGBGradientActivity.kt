@@ -12,6 +12,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
@@ -24,6 +25,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
     private var rgbGradientAdapter: RGBGradientAdapter? = null
     private var dstAddress: Int = 0
+    private var firstLightAddress: Int = 0
     var type = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
@@ -50,6 +52,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         val intent = intent
         type = intent.getStringExtra(Constant.TYPE_VIEW)
         dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
+        if(type==Constant.TYPE_GROUP){
+            val lightList = DBUtils.getLightByGroupMesh(dstAddress)
+            if(lightList.size>0){
+                firstLightAddress=lightList[0].meshAddr
+            }
+        }else{
+            firstLightAddress=dstAddress
+        }
         buildInModeList = ArrayList()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
         for (i in 0..6) {
@@ -105,14 +115,20 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             tvSpeed.text = getString(R.string.speed_text, speed.toString())
             if (positionState != 0) {
-                Commander.applyGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
+                stopGradient()
+                Thread.sleep(50)
+                Commander.applyGradient(dstAddress, positionState, speed,firstLightAddress ,successCallback = {}, failedCallback = {})
             }
         }
     }
 
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        positionState = position + 1
-        Commander.applyGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
+        Thread{
+            stopGradient()
+            Thread.sleep(50)
+            positionState = position + 1
+            Commander.applyGradient(dstAddress, positionState, speed ,firstLightAddress,successCallback = {}, failedCallback = {})
+        }.start()
     }
 
     override fun onClick(v: View?) {
@@ -126,13 +142,17 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                 buildInButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
             }
             R.id.btnStopGradient -> {
-                positionState = 0
-                Commander.closeGradient(dstAddress, 1, speed, successCallback = {}, failedCallback = {})
+                stopGradient()
             }
             R.id.normal_rgb -> {
                 finish()
             }
         }
+    }
+
+    fun stopGradient(){
+        positionState = 0
+        Commander.closeGradient(dstAddress, 1, speed, successCallback = {}, failedCallback = {})
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

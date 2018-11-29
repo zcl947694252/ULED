@@ -168,24 +168,31 @@ public class SceneFragment extends BaseFragment implements
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple_scene_1,getString(R.string.scene_guide_1),
                             v -> {
                               guide1.performClick();
-                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),getActivity())).show();
         }
     }
 
-    long time1 = 0;
-    long time2 = 0;
-    private void initOnLayoutListener(int showTypeView) {
-        if(showTypeView==1){
-            time1 = System.currentTimeMillis();
-            Log.d("test22now", "initOnLayoutListener1: "+time1);
-        }else{
-            time2 = System.currentTimeMillis();
-            Log.d("test22now", "initOnLayoutListener2: "+time2);
+    private void stepEndGuide(){
+        if(getActivity()!=null){
+            final View view = getActivity().getWindow().getDecorView();
+            final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    TextView guide2= (TextView) adaper.getViewByPosition(0, R.id.scene_name);
+                    GuideUtils.INSTANCE.guideBuilder(SceneFragment.this,GuideUtils.INSTANCE.getSTEP14_GUIDE_APPLY_SCENE())
+                            .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple_scene_2,getString(R.string.apply_scene),
+                                    v -> {
+                                        guide2.performClick();
+                                        GuideUtils.INSTANCE.changeCurrentViewIsEnd(getActivity(),GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
+                                    },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),getActivity())).show();
+                }
+            });
         }
+    }
 
-        Log.d("test22now", "initOnLayoutListener3: "+(time2-time1));
-//        if(time2-time1>=600){
-            Log.d("test22now", "initOnLayoutListener4: "+(time2-time1));
+    private void initOnLayoutListener(int showTypeView) {
             if(getActivity()!=null){
                 final View view = getActivity().getWindow().getDecorView();
                 final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
@@ -194,8 +201,6 @@ public class SceneFragment extends BaseFragment implements
                     public void onGlobalLayout() {
                         view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                         lazyLoad(showTypeView);
-                        time2=0;
-                        time1=0;
                     }
                 });
             }
@@ -270,7 +275,7 @@ public class SceneFragment extends BaseFragment implements
         if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
             initData();
             initView();
-            initOnLayoutListener(requestCode);
+            stepEndGuide();
         }
     }
 

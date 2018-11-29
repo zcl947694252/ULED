@@ -42,7 +42,6 @@
 
     <!-- Bottom Nav -->
     <string name="header_devices">Lights</string>
-    <string name="header_groups">Groups</string>
     <string name="header_account">Me</string>
 
 
@@ -71,11 +70,6 @@
     <string name="device_scan_header">Network Scanning</string>
     <string name="device_scan_scan">Scan Device</string>
     <string name="device_scan_add">Add Device</string>
-
-    <!-- GroupSchema List -->
-    <string name="group_list_header">Groups</string>
-    <string name="group_list_on">On</string>
-    <string name="group_list_off">Off</string>
 
     <!-- GroupSchema Setting -->
     <string name="group_setting_header">Group Setting</string>
@@ -112,8 +106,6 @@
     <string name="scan_end">The scan was completed and no equipment was found!</string>
     <string name="connecting_tip">Connecting…</string>
     <string name="grouping_completed">Grouping completed</string>
-    <string name="allLight">All Lights</string>
-    <string name="group">Group</string>
     <string name="openBluetooth">open Bluetooth, Play the smart light!</string>
     <string name="quite">Quite</string>
     <string name="retry">Retry</string>
@@ -139,12 +131,11 @@
     <string name="add_mesh_save_tip3">invalid! input max length: 16</string>
     <string name="add_mesh_save_tip4">invalid! input should not contains \'.\'</string>
     <string name="add_mesh_save_tip5">Account or password contains special characters!</string>
-    <string name="setting">Set</string>
     <string name="delete_group">Delete group</string>
     <string name="rename_the_group">Rename the group</string>
     <string name="input_rename_text_tip">Please enter a new group name:</string>
     <string name="hint_input">please enter. . .</string>
-    <string name="btn_sure">Sure</string>
+    <string name="btn_sure">OK</string>
     <string name="group_name_setting">Group name setting</string>
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="repeat_tip_name">Already have this group name, please modify!</string>
@@ -159,7 +150,6 @@
     <string name="add_str_group">Add group</string>
     <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
     <string name="create_new_group">Create a new group</string>
-    <string name="set_str">Set</string>
     <string name="btn_rename_light">Rename</string>
     <string name="rename_light">Single lamp rename</string>
     <string name="connect_state">Device connection, please wait. . .</string>
@@ -169,7 +159,6 @@
 
     <string name="smartSwitch">switch</string>
     <string name="select_install_device">Select device to install</string>
-    <string name="install_switch">install switch</string>
     <string name="install_switch_tips1">1.Plug micro USB to your Switch</string>
     <string name="install_switch_tips2">2.Press any button one time</string>
     <string name="install_switch_tips3">3.The indicator on the right of USB will stay on</string>
@@ -258,7 +247,6 @@
     <string name="connect_failed_if_there_are_lights">Connect failed, Please make sure there are lamps nearby!</string>
     <string name="not_grouped">Not grouped</string>
     <string name="scanning_devices">Scanning devices</string>
-    <string name="not_found_light">Not found light, Please make sure there are lamps nearby!</string>
     <string name="tip_add_group">Please add a group first</string>
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
@@ -302,7 +290,6 @@
     <string name="start_sync">Data synchronization is about to begin. . .</string>
     <string name="download_data_success">Download data success</string>
     <string name="sync_now">Syncing server data, please wait. . .</string>
-    <string name="install_light">Install lights</string>
     <string name="install_device">Install Device</string>
     <string name="tip_start_sync">Start synchronization. . .</string>
     <string name="upload_data_success">Upload data success</string>
@@ -400,7 +387,6 @@
     <string name="start_connect">Start connecting…</string>
     <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
     <string name="trigger_mode">Trigger mode</string>
-    <string name="rgb">Install RGB light</string>
     <string name="btn_get_verificationCode">Get</string>
     <string name="register">Register</string>
     <string name="set_password">Set password</string>
@@ -412,6 +398,7 @@
     <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
     <string name="current_account_number">Current account number:</string>
     <string name="rssi_low">Signal is too bad</string>
+
     <string name="group_list_guide0">Please select a lamp you want to install now </string>
         
     <string name="group_list_guide1">Please click Add Device to enter the add device option </string>
@@ -420,26 +407,6 @@
         
     <string name="scene_guide_1">Click here to add a scene</string>
         
-    <string name="scene_guide_2">Click to select the group you want to add to the scene</string>
-        
-    <string name="scene_guide_3">Click here to save the current scene</string>
-        
-    <string name="scene_guide_4">Click here to set the editing scene </string>
-        
-    <string name="me_guide_1">Click to clear the data to initialize the app, but please reset the lights to factory settings</string>
-        
-    <string name="me_guide_2">Click here to back up your device data to the server</string>
-        
-    <string name="me_guide_3"> Here are some common questions </string>
-        
-    <string name="me_guide_4"> Here you can restore all the lights to the factory settings, remember to power the lights </string>
-        
-    <string name="me_guide_5">The version of the current APP application is displayed here</string>
-        
-    <string name="me_guide_6">Click to log out to quit the current account </string>
-        
-    <string name="i_know_tip">I know! </string>
-        
     <string name="scan_light_guide_1">First click here to create a group</string>
         
     <string name="scan_light_guide_2">Please click on this area to select a group, the current boot for you to select your newly created group </string>
@@ -447,22 +414,6 @@
     <string name="scan_light_guide_3"> Then in this area, click to select some lights that are intended to be grouped </string>
         
     <string name="scan_light_guide_4">Select to complete, click here to determine the group </string>
-        
-    <string name="reset_boot_tutorial"> reset boot tutorial </string>
-        
-    <string name="me_guide_7"> Didn\'t learn? Click here to revisit all tutorials </string>
-        
-    <string name="btn_jump_over">skip guidelines</string>
-        
-    <string name="search_group">Click the icon to enter the group name to search for the group </string>
-        
-    <string name="light_guide_1">Click here to turn the light on and off </string>
-        
-    <string name="light_guide_2">Click here to set the lights</string>
-        
-    <string name="warning">warning </string>
-        
-    <string name="is_exit_ota">It\'s in OTA progress, Do you really want to exit?</string>
         
     <string name="add_scene_guide_1">Click Add to select some groups</string>
         
@@ -490,6 +441,25 @@
         
     <string name="config_pir_guide_8">Click this icon to save the current configuration</string>
         
+    <string name="change_to_scene">Click here to switch to the scene page to try it</string>
+        
+    <string name="btn_jump_over">skip </string>
+        
+    <string name="reset_boot_tutorial"> reset boot tutorial </string>
+        
+    <string name="select_device_tip">Please click to select the product you purchased </string>
+        
+    <string name="normal_light">Normal light </string>
+        
+    <string name="rgb_light">RGB lights</string>
+        
+    <string name="i_know_tip">I know! </string>
+        
+        
+    <string name="warning">warning </string>
+        
+    <string name="is_exit_ota">OTA is in progress, do you really want to quit? </string>
+        
     <string name="show_guide_again_tip"> Would you like to see the app tutorial again? </string>
         
     <string name="repeat_name">The group name already exists. Please re-enter the group name </string>
@@ -511,4 +481,27 @@
     <string name="ota">OTA</string>
         
     <string name="my_scene">Scenario 1 </string>
+
+    <!--通用-->
+        
+    <string name="not_found_light">The luminaire was not found, please make sure there are lamps nearby!</string>
+        
+    <string name="group">group </string>
+        
+    <string name="setting">Settings </string>
+
+        <!--组列表页面-->
+        
+    <string name="allLight">all lights </string>
+        
+    <string name="group_list_on"> open </string>
+        
+    <string name="group_list_off">off</string>
+        
+    <string name="install_light">installation lights</string>
+        
+    <string name="rgb">Install RGB lights</string>
+        
+    <string name="install_switch">installation switch</string>
+    <string name="apply_scene">点击应用当前场景</string>
 </resources>

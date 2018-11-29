@@ -71,7 +71,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbar.title = getString(R.string.user_register)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
-
     }
 
     override fun onClick(v: View?) {

@@ -175,7 +175,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                             v -> {
                                 guide1.performClick();
                                 controllerGuide2=step2Guide();
-                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
     }
 
@@ -185,7 +185,7 @@ public class SetSceneAct extends TelinkBaseActivity {
             TextView guide2= findViewById(R.id.toolbarTv);
             return GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP9_GUIDE_ADD_SCENE_SELECT_GROUP())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple_scene_set2,getString(R.string.add_scene_guide_2),
-                            v -> {},GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            v -> {},GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
         return null;
     }
@@ -206,7 +206,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                         }else{
                             step4Guide();
                         }
-                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
     }
 
@@ -218,7 +218,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_4),
                             v -> {
                                 stepEndGuide();
-                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
     }
 
@@ -230,7 +230,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide5,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_5),
                             v -> {
                             stepEndGuide();
-                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
     }
 
@@ -242,8 +242,7 @@ public class SetSceneAct extends TelinkBaseActivity {
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide6,R.layout.view_guide_simple_scene_set1,getString(R.string.add_scene_guide_6),
                             v -> {
                              guide6.performClick();
-                                GuideUtils.INSTANCE.changeCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
-                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY())).show();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
     }
 
@@ -605,11 +604,12 @@ public class SetSceneAct extends TelinkBaseActivity {
                 .setView(bottomView);
         if(!GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false)){
             builder.setCancelable(false);
+            showList = getShowListForGuide();
         }
         dialog = builder.create();
 
-
-        GroupListAdapter groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
+        List<DbGroup> showListFinal = showList;
+        GroupListAdapter groupListAdapter = new GroupListAdapter(R.layout.item_group, showListFinal);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         lvGp.setLayoutManager(layoutManager);
         lvGp.setAdapter(groupListAdapter);
@@ -627,26 +627,26 @@ public class SetSceneAct extends TelinkBaseActivity {
         groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
 
             if(position!=-1){
-                DbGroup item = showList.get(position);
+                DbGroup item = showListFinal.get(position);
                 if (item.getMeshAddr() == 0xffff) {
                     ItemGroup itemGroup = new ItemGroup();
                     itemGroup.brightness = 50;
                     itemGroup.temperature = 50;
-                    itemGroup.groupAress = showList.get(position).getMeshAddr();
-                    itemGroup.gpName = showList.get(position).getName();
-                    changeData(position, showList);
+                    itemGroup.groupAress = showListFinal.get(position).getMeshAddr();
+                    itemGroup.gpName = showListFinal.get(position).getName();
+                    changeData(position, showListFinal);
                     sceneGroupAdapter.addData(itemGroup);
                     dialog.dismiss();
                     initOnLayoutListener();
                 } else {
                     btnSure.setVisibility(View.VISIBLE);
-                    if (showList.get(position).checked) {
-                        showList.get(position).checked = false;
+                    if (showListFinal.get(position).checked) {
+                        showListFinal.get(position).checked = false;
                     } else {
-                        showList.get(position).checked = true;
+                        showListFinal.get(position).checked = true;
                     }
 
-                    if (showList.get(0).getMeshAddr() == 0xffff) {
+                    if (showListFinal.get(0).getMeshAddr() == 0xffff) {
                         adapter.remove(0);
                     }
 
@@ -658,18 +658,18 @@ public class SetSceneAct extends TelinkBaseActivity {
         });
 
         btnSure.setOnClickListener(v -> {
-            for (int j = 0; j < showList.size(); j++) {
-                if (showList.get(j).checked) {
+            for (int j = 0; j < showListFinal.size(); j++) {
+                if (showListFinal.get(j).checked) {
                     ItemGroup itemGroup = new ItemGroup();
                     itemGroup.brightness = 50;
                     itemGroup.temperature = 50;
-                    itemGroup.groupAress = showList.get(j).getMeshAddr();
-                    itemGroup.gpName = showList.get(j).getName();
-                    changeDataList(showList.get(j));
+                    itemGroup.groupAress = showListFinal.get(j).getMeshAddr();
+                    itemGroup.gpName = showListFinal.get(j).getName();
+                    changeDataList(showListFinal.get(j));
                     sceneGroupAdapter.addData(itemGroup);
                 }
 
-                if (j == showList.size() - 1) {
+                if (j == showListFinal.size() - 1) {
                     dialog.dismiss();
                     initOnLayoutListener();
                 }
@@ -679,12 +679,12 @@ public class SetSceneAct extends TelinkBaseActivity {
 
     }
 
-    private void changeData(int position, List<DbGroup> showList) {
+    private void changeData(int position, List<DbGroup> showListFinal) {
         for (int k = 0; k < groupArrayList.size(); k++) {
-            if (showList.get(position).getMeshAddr() == 0xffff) {
+            if (showListFinal.get(position).getMeshAddr() == 0xffff) {
                 groupArrayList.get(k).selected = true;
             } else {
-                if (groupArrayList.get(k).getMeshAddr() == showList.get(position).getMeshAddr()) {
+                if (groupArrayList.get(k).getMeshAddr() == showListFinal.get(position).getMeshAddr()) {
 //                    showList.add(groupArrayList.get(k));
                     groupArrayList.get(k).selected = true;
                     for (int i = 0; i < groupArrayList.size(); i++) {
@@ -714,6 +714,23 @@ public class SetSceneAct extends TelinkBaseActivity {
     private List<DbGroup> getShowList() {
         List<DbGroup> showList = new ArrayList<>();
         for (int k = 0; k < groupArrayList.size(); k++) {
+            if (!groupArrayList.get(k).selected) {
+                groupArrayList.get(k).checked = false;
+                showList.add(groupArrayList.get(k));
+            } else {
+                groupArrayList.get(k).checked = false;
+            }
+        }
+        return showList;
+    }
+
+    private List<DbGroup> getShowListForGuide() {
+        List<DbGroup> showList = new ArrayList<>();
+        int gpId=1;
+        if(groupArrayList.size()>1){
+            gpId=2;
+        }
+        for (int k = gpId-1; k < gpId; k++) {
             if (!groupArrayList.get(k).selected) {
                 groupArrayList.get(k).checked = false;
                 showList.add(groupArrayList.get(k));

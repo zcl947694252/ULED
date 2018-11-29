@@ -414,6 +414,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
                 CleanUtils.cleanInternalFiles()
                 CleanUtils.cleanInternalCache()
                 ToastUtils.showShort(R.string.clean_tip)
+                GuideUtils.resetAllGuide(activity!!)
                 hideLoadingDialog()
 
                 try {

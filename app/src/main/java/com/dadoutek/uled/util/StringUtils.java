@@ -53,7 +53,7 @@ public class StringUtils {
             String regexStr = "[`~\\\\!()+=|{}':;',\\[\\].<>/?~！￥……（）——+|{}【】‘；：”“’。，、？\\s+]";
             Pattern pattern = Pattern.compile(regexStr);
             Matcher matcher = pattern.matcher(source.toString());
-            if (matcher.matches()) {
+            if (matcher.matches()||compileExChar(source.toString())) {
                 return "";
             } else {
                 return null;

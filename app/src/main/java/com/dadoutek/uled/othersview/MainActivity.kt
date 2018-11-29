@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
 import android.os.PowerManager
@@ -18,8 +19,13 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
+import com.app.hubert.guide.model.GuidePage
+import com.app.hubert.guide.model.HighLight
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.SizeUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.DeviceListFragment
@@ -89,6 +95,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     private var mScanTimeoutDisposal: Disposable? = null
     private var mTelinkLightService: TelinkLightService? = null
     private var isCreate=false
+    private var guideShowCurrentPage = false
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -169,6 +176,25 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         bnve.setupWithViewPager(viewPager)
     }
 
+    private fun testGUide() {
+        GuideUtils.guideBuilder(this, "aaaa").addGuidePage(GuidePage.newInstance().addHighLight(bnve.getBottomNavigationItemView(1))).alwaysShow(true)
+                .show()
+    }
+
+    private fun guide1() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_MAIN_KEY, false)
+        if (guideShowCurrentPage) {
+            val guide1 = bnve.getBottomNavigationItemView(1)
+
+            GuideUtils.guideBuilder(this, GuideUtils.MAIN_STEP0_GUIDE_TO_SCENE)
+                    .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_main_1, getString(R.string.change_to_scene), View.OnClickListener {
+                        transScene()
+                        GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_MAIN_KEY,true)
+                    }, GuideUtils.END_MAIN_KEY,this))
+                    .show()
+        }
+    }
+
     private fun transScene(){
         bnve.currentItem=1
     }
@@ -207,21 +233,23 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
             mWakeLock?.acquire()
         }
 
+        //判断装灯页面引导完成且场景页面引导还没开始,进行场景页面强制引导
         if(GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_INSTALL_LIGHT_KEY,false) &&
                 !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
-            transScene()
+            guide1()
             isCreate=false
-        }else if(DBUtils.allLight.isEmpty()){
-            GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_GROUPLIST_KEY,false)
-            tranHome()
         }
+//        else if(DBUtils.allLight.isEmpty()){
+//            GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_GROUPLIST_KEY,false)
+//            tranHome()
+//        }
     }
 
     var locationServiceDialog: AlertDialog? = null
     fun showOpenLocationServiceDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(R.string.btn_sure)) { dialog, which ->
+        builder.setNegativeButton( getString(R.string.btn_sure)) { dialog, which ->
             BleUtils.jumpLocationSetting()
         }
         locationServiceDialog = builder.create()
