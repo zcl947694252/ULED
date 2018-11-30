@@ -2,6 +2,7 @@ package com.dadoutek.uled.scene;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
@@ -17,10 +18,12 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -174,18 +177,40 @@ public class SetSceneAct extends TelinkBaseActivity {
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide1,R.layout.view_guide_simple_scene_set1,getString(R.string.add_scene_guide_1),
                             v -> {
                                 guide1.performClick();
-                                controllerGuide2=step2Guide();
+//                                controllerGuide2=step2Guide(lvGp, showList);
                             },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
     }
 
-    private Controller step2Guide(){
+    private Controller step2Guide(RecyclerView lvGp, List<DbGroup> showList, AlertDialog dialog, GroupListAdapter groupListAdapter){
+        ListView listView =dialog.getListView();
+        dialog.getLayoutInflater();
+//        GuideUtils.INSTANCE.guideBuilder(SetSceneAct.this, lvGp, GuideUtils.INSTANCE
+//                .getSTEP7_GUIDE_ADD_SCENE())
+//                .addGuidePage(
+//                        GuideUtils.INSTANCE.addGuidePage(
+//                                lvGp.getChildAt(showList.size() - 1), R.layout.view_guide_simple_scene_1, getString(R.string.scene_guide_1),
+//                                v -> {
+//
+//                                }, GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(), SetSceneAct.this))
+//                .alwaysShow(true)
+//                .show();
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
         if(guideShowCurrentPage){
             TextView guide2= findViewById(R.id.toolbarTv);
-            return GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP9_GUIDE_ADD_SCENE_SELECT_GROUP())
-                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple_scene_set2,getString(R.string.add_scene_guide_2),
-                            v -> {},GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
+            return GuideUtils.INSTANCE.guideBuilder(SetSceneAct.this,lvGp,GuideUtils.INSTANCE.getSTEP9_GUIDE_ADD_SCENE_SELECT_GROUP())
+                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(lvGp.getChildAt(0),R.layout.view_guide_simple_scene_set2,getString(R.string.add_scene_guide_2),
+                            v -> {
+                                ItemGroup itemGroup = new ItemGroup();
+                                itemGroup.brightness = 50;
+                                itemGroup.temperature = 50;
+                                itemGroup.groupAress = showList.get(0).getMeshAddr();
+                                itemGroup.gpName = showList.get(0).getName();
+                                changeDataList(showList.get(0));
+                                sceneGroupAdapter.addData(itemGroup);
+                                dialog.dismiss();
+                                initOnLayoutListener();
+                            },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),this)).show();
         }
         return null;
     }
@@ -600,12 +625,13 @@ public class SetSceneAct extends TelinkBaseActivity {
         btnSure.setVisibility(View.GONE);
 
         builder = new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.group_select))
                 .setView(bottomView);
         if(!GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false)){
             builder.setCancelable(false);
         }
         dialog = builder.create();
+
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 //        List<DbGroup> showList = showList;
         GroupListAdapter groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
@@ -613,6 +639,13 @@ public class SetSceneAct extends TelinkBaseActivity {
         lvGp.setLayoutManager(layoutManager);
         lvGp.setAdapter(groupListAdapter);
         groupListAdapter.bindToRecyclerView(lvGp);
+
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+               step2Guide(lvGp,showList,dialog,groupListAdapter);
+            }
+        });
 
         dialog.show();
 
@@ -636,7 +669,6 @@ public class SetSceneAct extends TelinkBaseActivity {
                     changeData(position, showList);
                     sceneGroupAdapter.addData(itemGroup);
                     dialog.dismiss();
-                    initOnLayoutListener();
                 } else {
                     btnSure.setVisibility(View.VISIBLE);
                     if (showList.get(position).checked) {
@@ -670,7 +702,6 @@ public class SetSceneAct extends TelinkBaseActivity {
 
                 if (j == showList.size() - 1) {
                     dialog.dismiss();
-                    initOnLayoutListener();
                 }
             }
         });

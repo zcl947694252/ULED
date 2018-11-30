@@ -138,7 +138,8 @@
             android:label="@string/title_activity_switch_group" />
         <activity
             android:name=".light.LightsOfGroupActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".scene.SetSceneAct"
             android:screenOrientation="portrait" />

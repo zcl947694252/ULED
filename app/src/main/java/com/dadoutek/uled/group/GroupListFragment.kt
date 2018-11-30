@@ -48,6 +48,7 @@ import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.util.*
@@ -62,7 +63,6 @@ class GroupListFragment : BaseFragment() {
     private var gpList: List<DbGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
-    private var dialogPop: LinearLayout? = null
     private var recyclerView: RecyclerView? = null
     internal var showList: List<DbGroup>? = null
     private var updateLightDisposal: Disposable? = null
@@ -140,7 +140,7 @@ class GroupListFragment : BaseFragment() {
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<TextView>(R.id.tv_function1).setOnClickListener {
             isGuide = false
-            if (dialogPop?.visibility == View.GONE) {
+            if (dialog_pop?.visibility == View.GONE) {
                 showPopupMenu()
             } else {
                 hidePopupMenu()
@@ -150,7 +150,6 @@ class GroupListFragment : BaseFragment() {
         setHasOptionsMenu(true)
 
         recyclerView = view.findViewById(R.id.list_groups)
-        dialogPop = view.findViewById(R.id.dialog_pop)
 
         install_light = view.findViewById(R.id.install_light)
         install_rgb_light = view.findViewById(R.id.install_rgb_light)
@@ -452,8 +451,8 @@ class GroupListFragment : BaseFragment() {
     }
 
     fun myPopViewClickPosition(x: Float, y: Float) {
-        if (x < dialogPop?.left ?: 0 || y < dialogPop?.top ?: 0 || y > dialogPop?.bottom ?: 0) {
-            if (dialogPop?.visibility == View.VISIBLE) {
+        if (x < dialog_pop?.left ?: 0 || y < dialog_pop?.top ?: 0 || y > dialog_pop?.bottom ?: 0) {
+            if (dialog_pop?.visibility == View.VISIBLE) {
                 Thread {
                     //避免点击过快点击到下层View
                     Thread.sleep(100)
@@ -466,7 +465,7 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun showPopupMenu() {
-        dialogPop?.visibility = View.VISIBLE
+        dialog_pop?.visibility = View.VISIBLE
         if (isGuide) {
             guide2()
         }
@@ -474,7 +473,7 @@ class GroupListFragment : BaseFragment() {
 
     private fun hidePopupMenu() {
         if (!isGuide || GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)) {
-            dialogPop?.visibility = View.GONE
+            dialog_pop?.visibility = View.GONE
         }
     }
 }

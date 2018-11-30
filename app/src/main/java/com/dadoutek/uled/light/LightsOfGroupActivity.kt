@@ -327,7 +327,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             searchView!!.backgroundColor = resources.getColor(R.color.blue)
             searchView!!.alpha = 0.3f
             val icon = searchView!!.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_button)
-            icon.setColorFilter(Color.WHITE)
             return super.onCreateOptionsMenu(menu)
         }
         return true
