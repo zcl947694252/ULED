@@ -29,7 +29,6 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
 import io.reactivex.Observable
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -81,7 +80,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private fun initView() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.install_sensor)
+        supportActionBar?.title = getString(R.string.sensor_title)
     }
 
     private fun initListener() {

@@ -341,7 +341,7 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>,
 //        startActivity(intent)
 //        this?.finish()
         isRenameState=true
-        tvOta.setText(R.string.btn_sure)
+        tvOta.setText(android.R.string.ok)
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
@@ -471,7 +471,7 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>,
 
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
-                .setPositiveButton(R.string.btn_ok) { dialog, which ->
+                .setPositiveButton(android.R.string.ok) { dialog, which ->
 
                     if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT

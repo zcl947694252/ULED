@@ -84,7 +84,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun initView() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.install_switch)
+        supportActionBar?.title = getString(R.string.switch_title)
     }
 
     private fun initListener() {

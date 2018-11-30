@@ -450,7 +450,7 @@ public class SetSceneAct extends TelinkBaseActivity {
         builder.setNegativeButton(R.string.cancel, (dialog, which) -> {
 
         });
-        builder.setPositiveButton(R.string.btn_sure, (dialog, which) -> {
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
             itemGroupArrayList.get(currentPosition).color=currentColor;
             sceneGroupAdapter.getViewByPosition(currentPosition,R.id.rgb_view).setBackgroundColor(currentColor);
             sceneGroupAdapter.notifyItemChanged(currentPosition);
@@ -604,12 +604,11 @@ public class SetSceneAct extends TelinkBaseActivity {
                 .setView(bottomView);
         if(!GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false)){
             builder.setCancelable(false);
-            showList = getShowListForGuide();
         }
         dialog = builder.create();
 
-        List<DbGroup> showListFinal = showList;
-        GroupListAdapter groupListAdapter = new GroupListAdapter(R.layout.item_group, showListFinal);
+//        List<DbGroup> showList = showList;
+        GroupListAdapter groupListAdapter = new GroupListAdapter(R.layout.item_group, showList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         lvGp.setLayoutManager(layoutManager);
         lvGp.setAdapter(groupListAdapter);
@@ -627,26 +626,26 @@ public class SetSceneAct extends TelinkBaseActivity {
         groupListAdapter.setOnItemClickListener((adapter, view, position) -> {
 
             if(position!=-1){
-                DbGroup item = showListFinal.get(position);
+                DbGroup item = showList.get(position);
                 if (item.getMeshAddr() == 0xffff) {
                     ItemGroup itemGroup = new ItemGroup();
                     itemGroup.brightness = 50;
                     itemGroup.temperature = 50;
-                    itemGroup.groupAress = showListFinal.get(position).getMeshAddr();
-                    itemGroup.gpName = showListFinal.get(position).getName();
-                    changeData(position, showListFinal);
+                    itemGroup.groupAress = showList.get(position).getMeshAddr();
+                    itemGroup.gpName = showList.get(position).getName();
+                    changeData(position, showList);
                     sceneGroupAdapter.addData(itemGroup);
                     dialog.dismiss();
                     initOnLayoutListener();
                 } else {
                     btnSure.setVisibility(View.VISIBLE);
-                    if (showListFinal.get(position).checked) {
-                        showListFinal.get(position).checked = false;
+                    if (showList.get(position).checked) {
+                        showList.get(position).checked = false;
                     } else {
-                        showListFinal.get(position).checked = true;
+                        showList.get(position).checked = true;
                     }
 
-                    if (showListFinal.get(0).getMeshAddr() == 0xffff) {
+                    if (showList.get(0).getMeshAddr() == 0xffff) {
                         adapter.remove(0);
                     }
 
@@ -658,18 +657,18 @@ public class SetSceneAct extends TelinkBaseActivity {
         });
 
         btnSure.setOnClickListener(v -> {
-            for (int j = 0; j < showListFinal.size(); j++) {
-                if (showListFinal.get(j).checked) {
+            for (int j = 0; j < showList.size(); j++) {
+                if (showList.get(j).checked) {
                     ItemGroup itemGroup = new ItemGroup();
                     itemGroup.brightness = 50;
                     itemGroup.temperature = 50;
-                    itemGroup.groupAress = showListFinal.get(j).getMeshAddr();
-                    itemGroup.gpName = showListFinal.get(j).getName();
-                    changeDataList(showListFinal.get(j));
+                    itemGroup.groupAress = showList.get(j).getMeshAddr();
+                    itemGroup.gpName = showList.get(j).getName();
+                    changeDataList(showList.get(j));
                     sceneGroupAdapter.addData(itemGroup);
                 }
 
-                if (j == showListFinal.size() - 1) {
+                if (j == showList.size() - 1) {
                     dialog.dismiss();
                     initOnLayoutListener();
                 }
@@ -679,12 +678,12 @@ public class SetSceneAct extends TelinkBaseActivity {
 
     }
 
-    private void changeData(int position, List<DbGroup> showListFinal) {
+    private void changeData(int position, List<DbGroup> showList) {
         for (int k = 0; k < groupArrayList.size(); k++) {
-            if (showListFinal.get(position).getMeshAddr() == 0xffff) {
+            if (showList.get(position).getMeshAddr() == 0xffff) {
                 groupArrayList.get(k).selected = true;
             } else {
-                if (groupArrayList.get(k).getMeshAddr() == showListFinal.get(position).getMeshAddr()) {
+                if (groupArrayList.get(k).getMeshAddr() == showList.get(position).getMeshAddr()) {
 //                    showList.add(groupArrayList.get(k));
                     groupArrayList.get(k).selected = true;
                     for (int i = 0; i < groupArrayList.size(); i++) {

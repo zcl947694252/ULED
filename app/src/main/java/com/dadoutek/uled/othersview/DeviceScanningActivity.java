@@ -265,7 +265,7 @@
 //                .setIcon(android.R.drawable.ic_dialog_info)
 //                .setView(textGp)
 //
-//                .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+//                .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
 //                    // 获取输入框的内容
 //                    if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
 //                        ToastUtils.showShort(getString(R.string.rename_tip_check));
@@ -775,7 +775,7 @@
 //                    } else {
 //                        AlertDialog.Builder dialog = new AlertDialog.Builder(DeviceScanningActivity.this);
 //                        dialog.setMessage(getResources().getString(R.string.scan_tip));
-//                        dialog.setPositiveButton(R.string.btn_ok, (dialog1, which) -> startScan(0));
+//                        dialog.setPositiveButton(android.R.string.ok, (dialog1, which) -> startScan(0));
 //                        dialog.setNegativeButton(R.string.btn_cancel, (dialog12, which) -> System.exit(0));
 //                    }
 //                }));

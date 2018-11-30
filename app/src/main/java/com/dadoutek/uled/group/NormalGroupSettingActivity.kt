@@ -272,7 +272,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
-                    .setPositiveButton(R.string.btn_ok) { _, _ ->
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
                         (this as NormalGroupSettingActivity).showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
@@ -545,7 +545,7 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
         tvRename.visibility = View.VISIBLE
-        tvRename.setText(R.string.btn_sure)
+        tvRename.setText(android.R.string.ok)
         tvRename.setOnClickListener {
             saveName()
             tvRename.visibility = View.GONE

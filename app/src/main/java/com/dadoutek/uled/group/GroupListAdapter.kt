@@ -16,6 +16,10 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseQuickAdapte
 
         helper.setText(R.id.tv_group_name, item.name)
 
+        if(item.meshAddr==0xffff){
+            helper.setText(R.id.tv_group_name, R.string.allLight)
+        }
+
         if (item.checked) {
             helper.itemView.setBackgroundColor(TelinkLightApplication.getInstance().resources.getColor(R.color.primary))
         } else {

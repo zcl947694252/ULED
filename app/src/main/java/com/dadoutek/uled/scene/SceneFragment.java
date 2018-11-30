@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -40,6 +41,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static android.content.Context.POWER_SERVICE;
 
 /**
  * Created by hejiajun on 2018/5/2.

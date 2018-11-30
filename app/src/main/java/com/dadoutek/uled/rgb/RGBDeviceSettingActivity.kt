@@ -92,7 +92,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
 
-                .setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
@@ -453,7 +453,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
 
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
-                .setPositiveButton(R.string.btn_ok) { dialog, which ->
+                .setPositiveButton(android.R.string.ok) { dialog, which ->
 
                     if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT

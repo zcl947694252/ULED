@@ -1,14 +1,14 @@
 package com.dadoutek.uled.othersview
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
+import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
-import android.os.SystemClock
+import android.os.*
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.util.Log
@@ -67,6 +67,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     private var sleepTime: Long = 250
     internal var isClickExlogin = false
     private var compositeDisposable = CompositeDisposable()
+    private var mWakeLock: PowerManager.WakeLock? = null
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
@@ -92,7 +93,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
                 AlertDialog.Builder(activity)
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
-                        .setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+                        .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                             SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                             TelinkLightService.Instance().idleMode(true)
                             dialog.dismiss()
@@ -146,10 +147,27 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         return view
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
         initClick()
+        val pm = activity!!.getSystemService(POWER_SERVICE) as PowerManager
+        mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, "DPA")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mWakeLock != null) {
+            mWakeLock?.acquire()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (mWakeLock != null) {
+            mWakeLock?.release()
+        }
     }
 
     fun initClick(){
@@ -244,7 +262,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(getString(R.string.show_guide_again_tip))
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
-        builder.setPositiveButton(R.string.btn_sure) { dialog, which ->
+        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
            GuideUtils.resetAllGuide(activity!!)
             activity?.bnve?.currentItem=0
         }
@@ -258,7 +276,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
                     .setMessage(R.string.net_disconnect_tip_message)
-                    .setPositiveButton(R.string.btn_sure
+                    .setPositiveButton(android.R.string.ok
                     ) { dialog, whichButton ->
                         // 跳转到设置界面
                         activity.startActivityForResult(Intent(
@@ -274,7 +292,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(R.string.tip_reset_sure)
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
-        builder.setPositiveButton(R.string.btn_sure) { dialog, which ->
+        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
             if (TelinkLightApplication.getInstance().connectDevice != null)
                 resetAllLight()
             else {
@@ -388,7 +406,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
                 .setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
                 .setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }
-                .setPositiveButton(activity!!.getString(R.string.btn_sure)) { dialog, which ->
+                .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
                     TelinkLightService.Instance().idleMode(true)
                     clearData()
                 }

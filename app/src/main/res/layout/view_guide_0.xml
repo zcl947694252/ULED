@@ -12,8 +12,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         app:layout_constraintTop_toBottomOf="@+id/bt_layout"
         android:layout_marginTop="15dp"
+        android:gravity="center"
         android:textColor="@color/white"
         />
 
@@ -31,14 +34,11 @@
             android:id="@+id/normal_light"
             android:text="@string/normal_light"
             android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="140dp"
+            android:gravity="center"
+            android:layout_height="70dp"
             android:textColor="@color/white"
             android:background="@drawable/btn_guide_bg"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
-            android:paddingStart="50dp"
-            android:paddingEnd="50dp"
             android:layout_marginEnd="5dp"
             />
 
@@ -46,14 +46,11 @@
             android:id="@+id/rgb_light"
             android:text="@string/rgb_light"
             android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="140dp"
+            android:layout_height="70dp"
+            android:gravity="center"
             android:textColor="@color/white"
             android:background="@drawable/btn_guide_bg"
-            android:paddingTop="15dp"
-            android:paddingBottom="15dp"
-            android:paddingStart="50dp"
-            android:paddingEnd="50dp"
             android:layout_marginStart="5dp"
             />
     </LinearLayout>

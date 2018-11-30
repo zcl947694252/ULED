@@ -134,7 +134,7 @@ class GroupListFragment : BaseFragment() {
         val view = inflater.inflate(R.layout.fragment_group_list, null)
 
         toolbar = view.findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.group)
+        toolbar!!.setTitle(R.string.group_title)
 
         toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE

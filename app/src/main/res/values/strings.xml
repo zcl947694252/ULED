@@ -111,7 +111,7 @@
     <string name="retry">Retry</string>
     <string name="light">Lights</string>
     <string name="me">Me</string>
-    <string name="fragment_name_me">me</string>
+    <string name="fragment_name_me">Me</string>
     <string name="grouping_wait_tip">There are currently %1$s lights grouping, please wait!</string>
     <string name="rescan">Rescan</string>
     <string name="start_group_bt">Start grouping</string>
@@ -163,7 +163,6 @@
     <string name="install_switch_tips2">2.Press any button one time</string>
     <string name="install_switch_tips3">3.The indicator on the right of USB will stay on</string>
     <string name="install_sensor_tips1">Please power on your Sensor first</string>
-    <string name="install_sensor">Install sensor</string>
 
     <string name="search">Search</string>
     <string name="complete">complete</string>
@@ -264,7 +263,7 @@
     <string name="delete_group_confirm">Do you really want to delete the group?</string>
     <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
     <string name="reconnecting">Reconnecting</string>
-    <string name="app_version_name">Current version:</string>
+    <string name="app_version_name">version:</string>
     <string name="group_not_change_tip">Grouping unchanged, determine exit?</string>
     <string name="save_now">saving</string>
     <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
@@ -396,7 +395,7 @@
     <string name="delay_unit">Delay mode</string>
     <string name="edit">Edit</string>
     <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
-    <string name="current_account_number">Current account number:</string>
+    <string name="account">Account:</string>
     <string name="rssi_low">Signal is too bad</string>
 
     <string name="group_list_guide0">Please select a lamp you want to install now </string>
@@ -445,7 +444,7 @@
         
     <string name="btn_jump_over">skip </string>
         
-    <string name="reset_boot_tutorial"> reset boot tutorial </string>
+    <string name="reset_boot_tutorial"> Reset boot tutorial </string>
         
     <string name="select_device_tip">Please click to select the product you purchased </string>
         
@@ -487,21 +486,28 @@
     <string name="not_found_light">The luminaire was not found, please make sure there are lamps nearby!</string>
         
     <string name="group">group </string>
+
+    <string name="group_title">Group </string>
         
-    <string name="setting">Settings </string>
+    <string name="setting">SET </string>
 
         <!--组列表页面-->
         
-    <string name="allLight">all lights </string>
+    <string name="allLight">All lights </string>
         
-    <string name="group_list_on"> open </string>
+    <string name="group_list_on"> ON </string>
         
-    <string name="group_list_off">off</string>
+    <string name="group_list_off">OFF</string>
         
-    <string name="install_light">installation lights</string>
+    <string name="normal_light_title">Normal light</string>
         
-    <string name="rgb">Install RGB lights</string>
+    <string name="rgb_title">RGB light</string>
         
-    <string name="install_switch">installation switch</string>
-    <string name="apply_scene">点击应用当前场景</string>
+    <string name="switch_title">Switch</string>
+
+    <string name="sensor_title">Sensor</string>
+
+    <string name="apply_scene">Click to apply the current scene </string>
+        
+    <string name="jump_out_guide_tip"> Do you want to skip the current page guide? </string>
 </resources>

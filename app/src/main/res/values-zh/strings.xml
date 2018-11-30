@@ -259,7 +259,7 @@
     <string name="delete_group_confirm">确定要删除此组吗？</string>
     <string name="phone_or_password_can_not_be_empty">手机号或密码不能为空</string>
     <string name="reconnecting">重连中……</string>
-    <string name="app_version_name">当前版本:</string>
+    <string name="app_version_name">版本:</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
     <string name="save_now">正在保存</string>
     <string name="require_permission_reason">App使用蓝牙需要此权限</string>
@@ -328,7 +328,7 @@
     <string name="minimum_brightness_percentage">最终亮度(百分比)</string>
     <string name="trigger_lux">触发照度(lux)</string>
     <string name="params_cannot_be_empty">参数不可为空</string>
-    <string name="install_sensor">安装传感器</string>
+    <string name="sensor_title">传感器</string>
     <string name="button1">按键1</string>
     <string name="button2">按键2</string>
     <string name="button3">按键3</string>
@@ -388,7 +388,7 @@
     <string name="delay_unit">延时单位</string>
     <string name="edit">编辑</string>
     <string name="long_click_select_color_tip">*单击设置,长按保存</string>
-    <string name="current_account_number">当前账号:</string>
+    <string name="account">账号:</string>
     <string name="rssi_low">信号太差</string>
 
     <string name="group_list_guide0">请先选择一种你当前购买要安装的灯</string>
@@ -443,9 +443,11 @@
     <string name="allLight">所有灯</string>
     <string name="group_list_on">开</string>
     <string name="group_list_off">关</string>
-    <string name="install_light">安装灯</string>
-    <string name="rgb">安装RGB灯</string>
-    <string name="install_switch">安装开关</string>
+    <string name="normal_light_title">普通灯</string>
+    <string name="rgb_title">RGB灯</string>
+    <string name="switch_title">开关</string>
     <string name="apply_scene">点击白色区域可应用当前场景</string>
 
+    <string name="group_title">组 </string>
+    <string name="jump_out_guide_tip">要跳过当前页面引导吗？</string>
 </resources>

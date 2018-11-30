@@ -4,17 +4,17 @@
 
     <item
         android:id="@+id/popup_install_light"
-        android:title="@string/install_light"
+        android:title="@string/normal_light_title"
         />
     <item
         android:id="@+id/popup_install_rgb_light"
-        android:title="@string/rgb"
+        android:title="@string/rgb_title"
         />
     <item
         android:id="@+id/popup_install_switch"
-        android:title="@string/install_switch" />
+        android:title="@string/switch_title" />
     <item
         android:id="@+id/popup_install_sensor"
-        android:title="@string/install_sensor" />
+        android:title="@string/sensor_title" />
 
 </menu>

@@ -285,7 +285,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
 
-                .setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
@@ -312,7 +312,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onBackPressed() {
         val builder = AlertDialog.Builder(this@LightGroupingActivity)
         builder.setTitle(R.string.group_not_change_tip)
-        builder.setPositiveButton(R.string.btn_sure) { dialog, which -> finish() }
+        builder.setPositiveButton(android.R.string.ok) { dialog, which -> finish() }
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
         val dialog = builder.create()
         dialog.show()

@@ -327,7 +327,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
-                    .setPositiveButton(R.string.btn_ok) { _, _ ->
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
@@ -598,7 +598,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .setView(textGp)
 
-                    .setPositiveButton(getString(R.string.btn_sure)) { dialog, which ->
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                         // 获取输入框的内容
                         if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                             ToastUtils.showShort(getString(R.string.rename_tip_check))

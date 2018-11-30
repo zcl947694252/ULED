@@ -120,16 +120,11 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     //记录用户首次点击返回键的时间
     private var firstTime: Long = 0
 
-    private var mWakeLock: PowerManager.WakeLock? = null
-
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         detectUpdate()
-
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
 
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
@@ -216,10 +211,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         //移除事件
         this.mApplication?.removeEventListener(this)
         stopConnectTimer()
-
-        if (mWakeLock != null) {
-            mWakeLock?.acquire()
-        }
     }
 
     override fun onResume() {
@@ -227,10 +218,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null) {
             mApplication?.startLightService(TelinkLightService::class.java)
-        }
-
-        if (mWakeLock != null) {
-            mWakeLock?.acquire()
         }
 
         //判断装灯页面引导完成且场景页面引导还没开始,进行场景页面强制引导
@@ -249,7 +236,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     fun showOpenLocationServiceDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton( getString(R.string.btn_sure)) { dialog, which ->
+        builder.setNegativeButton( getString(android.R.string.ok)) { dialog, which ->
             BleUtils.jumpLocationSetting()
         }
         locationServiceDialog = builder.create()
@@ -287,7 +274,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-                indefiniteSnackbar(root, R.string.openBluetooth, R.string.btn_ok) {
+                indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
                     LeBluetooth.getInstance().enable(applicationContext)
                 }
             } else {

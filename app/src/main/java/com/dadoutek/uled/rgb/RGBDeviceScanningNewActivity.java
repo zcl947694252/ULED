@@ -565,7 +565,7 @@
 //            doFinish();
 //        } else {
 //            new AlertDialog.Builder(this)
-//                    .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+//                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
 ////                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
 ////                        finish();
 //                        doFinish();
@@ -675,7 +675,7 @@
 //                .setIcon(android.R.drawable.ic_dialog_info)
 //                .setView(textGp)
 //
-//                .setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+//                .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
 //                    // 获取输入框的内容
 //                    if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
 //                        ToastUtils.showShort(getString(R.string.rename_tip_check));

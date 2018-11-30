@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
@@ -573,7 +576,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             doFinish();
         } else {
             new AlertDialog.Builder(this)
-                    .setPositiveButton(R.string.btn_ok, (dialog, which) -> {
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
 //                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
 //                        finish();
                         doFinish();
@@ -687,7 +690,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         builder.setIcon(android.R.drawable.ic_dialog_info);
         builder.setView(textGp);
         builder.setCancelable(false);
-        builder.setPositiveButton(getString(R.string.btn_sure), (dialog, which) -> {
+        builder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
             // 获取输入框的内容
             if (StringUtils.compileExChar(textGp.getText().toString().trim())) {
                 ToastUtils.showShort(getString(R.string.rename_tip_check));

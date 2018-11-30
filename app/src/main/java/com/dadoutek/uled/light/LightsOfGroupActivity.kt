@@ -5,6 +5,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.le.ScanFilter
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -18,6 +22,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
@@ -62,6 +67,7 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
+import org.jetbrains.anko.imageBitmap
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -320,8 +326,32 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             searchView!!.setSubmitButtonEnabled(true)
             searchView!!.backgroundColor = resources.getColor(R.color.blue)
             searchView!!.alpha = 0.3f
+            val icon = searchView!!.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_button)
+            icon.setColorFilter(Color.WHITE)
+            return super.onCreateOptionsMenu(menu)
         }
         return true
+    }
+
+    fun getAlphaBitmap(mBitmap: Bitmap, mColor: Int): Bitmap {
+        //	    	BitmapDrawable mBitmapDrawable = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.enemy_infantry_ninja);
+        //	    	Bitmap mBitmap = mBitmapDrawable.getBitmap();
+
+        //BitmapDrawable的getIntrinsicWidth（）方法，Bitmap的getWidth（）方法
+        //注意这两个方法的区别
+        //Bitmap mAlphaBitmap = Bitmap.createBitmap(mBitmapDrawable.getIntrinsicWidth(), mBitmapDrawable.getIntrinsicHeight(), Config.ARGB_8888);
+        val mAlphaBitmap = Bitmap.createBitmap(mBitmap.width, mBitmap.height, Bitmap.Config.ARGB_8888)
+
+        val mCanvas = Canvas(mAlphaBitmap)
+        val mPaint = Paint()
+
+        mPaint.color = mColor
+        //从原位图中提取只包含alpha的位图
+        val alphaBitmap = mBitmap.extractAlpha()
+        //在画布上（mAlphaBitmap）绘制alpha位图
+        mCanvas.drawBitmap(alphaBitmap, 0f, 0f, mPaint)
+
+        return mAlphaBitmap
     }
 
     private fun initView() {
@@ -474,7 +504,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-                indefiniteSnackbar(root, R.string.openBluetooth, R.string.btn_ok) {
+                indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
                     LeBluetooth.getInstance().enable(applicationContext)
                 }
             } else {
@@ -522,7 +552,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     fun showOpenLocationServiceDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
-        builder.setNegativeButton(getString(R.string.btn_sure)) { dialog, which ->
+        builder.setNegativeButton(getString(android.R.string.ok)) { dialog, which ->
             BleUtils.jumpLocationSetting()
         }
         locationServiceDialog = builder.create()

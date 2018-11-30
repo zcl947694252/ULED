@@ -76,11 +76,11 @@ object GuideUtils {
     fun showExitGuideDialog(context: Context, controller: Controller, jumpViewContent: String){
         val builder=AlertDialog.Builder(context)
         var alertDialog:AlertDialog?=null
-        builder.setMessage("要跳过当前页面引导吗？")
+        builder.setMessage(context.getString(R.string.jump_out_guide_tip))
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which ->
             alertDialog?.dismiss()
         }
-        builder.setPositiveButton(R.string.btn_sure) { dialog, which ->
+        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
             controller.remove()
             if(jumpViewContent== END_GROUPLIST_KEY){
                 changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_GROUPLIST_KEY,true)

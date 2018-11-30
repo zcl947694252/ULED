@@ -189,7 +189,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (mSceneList.isEmpty()) {
 //            ToastUtils.showLong(getString(R.string.tip_switch))
             fab.visibility = View.GONE
-            indefiniteSnackbar(configGroupRoot, R.string.tip_switch, R.string.btn_ok) {
+            indefiniteSnackbar(configGroupRoot, R.string.tip_switch, android.R.string.ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }
             return
