@@ -3,7 +3,6 @@ package com.dadoutek.uled.scene;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -12,7 +11,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,8 +39,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-
-import static android.content.Context.POWER_SERVICE;
 
 /**
  * Created by hejiajun on 2018/5/2.
@@ -93,7 +89,7 @@ public class SceneFragment extends BaseFragment implements
     private void initToolBar(View view) {
         setHasOptionsMenu(true);
         toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.SceneSetting);
+        toolbar.setTitle(R.string.SceneTitle);
 
         ImageView btn_add = toolbar.findViewById(R.id.img_function1);
         ImageView btn_delete = toolbar.findViewById(R.id.img_function2);

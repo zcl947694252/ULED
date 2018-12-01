@@ -127,7 +127,8 @@ public class SetSceneAct extends TelinkBaseActivity {
             @Override
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                step3Guide();
+//                step3Guide();
+                stepEndGuide();
             }
         });
     }

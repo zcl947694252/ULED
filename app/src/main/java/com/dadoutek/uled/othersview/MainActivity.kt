@@ -11,6 +11,7 @@ import android.content.IntentFilter
 import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
+import android.os.PersistableBundle
 import android.os.PowerManager
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -136,6 +137,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         initBottomNavigation()
 
         isCreate=true
+    }
+
+    //防止viewpager嵌套fragment,fragment放置后台时间过长,fragment被系统回收了
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+
+        super.onSaveInstanceState(outState)
+        outState.putParcelable("android:support:fragments", null)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
