@@ -116,18 +116,24 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             tvSpeed.text = getString(R.string.speed_text, speed.toString())
             if (positionState != 0) {
                 stopGradient()
-                Thread.sleep(50)
+                Thread.sleep(200)
                 Commander.applyGradient(dstAddress, positionState, speed,firstLightAddress ,successCallback = {}, failedCallback = {})
             }
         }
     }
 
+    var end=true
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         Thread{
-            stopGradient()
-            Thread.sleep(50)
-            positionState = position + 1
-            Commander.applyGradient(dstAddress, positionState, speed ,firstLightAddress,successCallback = {}, failedCallback = {})
+            if(end){
+                end=false
+                stopGradient()
+                Thread.sleep(50)
+                positionState = position + 1
+                Commander.applyGradient(dstAddress, positionState, speed ,firstLightAddress,successCallback = {}, failedCallback = {})
+                Thread.sleep(200)
+                end=true
+            }
         }.start()
     }
 
@@ -151,8 +157,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     fun stopGradient(){
-        positionState = 0
-        Commander.closeGradient(dstAddress, 1, speed, successCallback = {}, failedCallback = {})
+        Commander.closeGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

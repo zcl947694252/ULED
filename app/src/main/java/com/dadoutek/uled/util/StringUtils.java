@@ -61,7 +61,7 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(32)});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(50)});
     }
 
     public static void initEditTextFilterForRegister(EditText editText) {
@@ -89,7 +89,7 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(32)});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(50)});
     }
 
     /**
