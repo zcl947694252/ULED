@@ -569,7 +569,7 @@ object DBUtils {
         var count=0
         while (true){
             count++
-            val newName = "组" +count
+            val newName = TelinkLightApplication.getInstance().getString(R.string.group) +count
                 if(!gpNameList.contains(newName)){
                    return newName
                 }
@@ -587,7 +587,7 @@ object DBUtils {
         var count=0
         while (true){
             count++
-            val newName = "场景" +count
+            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) +count
                 if(!scNameList.contains(newName)){
                     return newName
                 }

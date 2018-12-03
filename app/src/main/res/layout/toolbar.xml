@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="false"
             android:singleLine="true"
-            android:maxLength="32"
+            android:maxLength="50"
             android:textSize="18sp"
             android:layout_gravity="center"
             android:text=""

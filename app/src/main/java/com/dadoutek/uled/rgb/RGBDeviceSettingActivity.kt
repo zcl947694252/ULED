@@ -37,7 +37,6 @@ import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -45,7 +44,6 @@ import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_rgb_device_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
@@ -169,7 +167,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         val green = color and 0x00ff00 shr 8
         val blue = color and 0x0000ff
         Thread {
-            changeColor(red.toByte(), green.toByte(), blue.toByte())
+            changeColor(red.toByte(), green.toByte(), blue.toByte(),true)
 
             try {
                 Thread.sleep(100)
@@ -228,7 +226,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
             if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
             } else {
                 light!!.setColor(color)
-                Thread { changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte()) }.start()
+                Thread { changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false) }.start()
             }
         }
     }
@@ -408,7 +406,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         this.sb_temperature!!.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
-    private fun changeColor(R: Byte, G: Byte, B: Byte) {
+    private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
 
         DBUtils.updateLight(light!!)
 
@@ -432,9 +430,12 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         val params = byteArrayOf(0x04, red, green, blue)
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-        Log.d("RGBCOLOR", logStr)
-        for(i in 0..3){
-            Thread.sleep(50)
+        if(isOnceSet){
+            for(i in 0..3){
+                Thread.sleep(50)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+            }
+        }else{
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
         }
     }
