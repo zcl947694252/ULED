@@ -7,20 +7,41 @@
     <include layout="@layout/toolbar" android:id="@+id/top_title"/>
 
     <LinearLayout
-        android:id="@+id/show_data_view"
+        android:id="@+id/data_view_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/top_title"
+        app:layout_constraintBottom_toTopOf="@id/confirm"
         >
 
+        <TextView
+            android:id="@+id/tv_scene_name"
+            android:text="@string/scene_name_show"
+            android:textColor="@color/primary"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:textSize="16sp"
+            android:layout_height="40dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView_group_list_view"
+            android:layout_width="match_parent"
+            android:background="@drawable/btn_rectangle_all"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/edit_data_view"
+        android:id="@+id/edit_data_view_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/top_title"
+        app:layout_constraintBottom_toTopOf="@id/confirm"
+        android:visibility="gone"
         >
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -70,20 +91,35 @@
         </android.support.constraint.ConstraintLayout>
 
         <TextView
-            android:text="@string/add_scene_tip"
-            android:textSize="12sp"
+            android:text="请选择分组:"
+            android:textSize="16sp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:background="@color/primary"
+            android:paddingStart="10dp"
+            android:layout_height="40dp" />
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/scene_group_list_view"
+                android:id="@+id/recyclerView_select_group_list_view"
                 android:layout_width="match_parent"
                 android:background="@drawable/btn_rectangle_all"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_margin="8dp"
-                android:layout_above="@+id/bt_add" />
+                 />
     </LinearLayout>
 
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/btn_rec_blue_bt"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:text="@string/mesh_add_button_save" />
 </android.support.constraint.ConstraintLayout>

@@ -501,4 +501,5 @@
     <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
     <string name="question_3">3. Can not control, not connect</string>
     <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
+    <string name="scene_name_show">场景: %1$s</string>
 </resources>

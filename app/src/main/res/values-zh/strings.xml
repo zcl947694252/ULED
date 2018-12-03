@@ -459,5 +459,6 @@
     <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
     <string name="question_3">3.无法控制，连接不上</string>
     <string name="question3_answer">一些手机使用过久可能手机蓝牙会出现无法使用的情况，可以试试把手机蓝牙关掉，再打开，甚至一些低端机型需要重启手机才可以使用蓝牙</string>
+    <string name="scene_name_show">场景: %1$s</string>
 
 </resources>
