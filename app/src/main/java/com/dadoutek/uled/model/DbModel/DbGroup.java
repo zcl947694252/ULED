@@ -34,6 +34,9 @@ public class DbGroup implements Serializable{
     public boolean checked=false;
     @Expose(serialize = false, deserialize = false)
     @Transient
+    public boolean enableCheck=true;
+    @Expose(serialize = false, deserialize = false)
+    @Transient
     public boolean selected;
     @Expose(serialize = false, deserialize = false)
     @Transient

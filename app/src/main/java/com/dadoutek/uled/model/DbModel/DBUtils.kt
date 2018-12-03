@@ -116,7 +116,7 @@ object DBUtils {
             return false
         }
 
-    val allGroups: List<DbGroup>
+    val allGroups: MutableList<DbGroup>
          get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
 
     val deleteGroups: List<DbDeleteGroup>
@@ -159,7 +159,7 @@ object DBUtils {
     /********************************************查询 */
 
     
-    fun getActionsBySceneId(id: Long): List<DbSceneActions> {
+    fun getActionsBySceneId(id: Long): ArrayList<DbSceneActions> {
         val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
         return ArrayList(query.list())
     }

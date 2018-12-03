@@ -346,7 +346,7 @@
     <string name="select_color_title">颜色选择</string>
     <string name="switch_mode">开关方式</string>
     <string name="delay_unit">延时单位</string>
-    <string name="edit">编辑</string>
+    <string name="edit">修改</string>
     <string name="rssi_low">信号太差</string>
 
     <string name="group_list_guide0">请先选择一种你当前购买要安装的灯</string>
@@ -460,5 +460,6 @@
     <string name="question_3">3.无法控制，连接不上</string>
     <string name="question3_answer">一些手机使用过久可能手机蓝牙会出现无法使用的情况，可以试试把手机蓝牙关掉，再打开，甚至一些低端机型需要重启手机才可以使用蓝牙</string>
     <string name="scene_name_show">场景: %1$s</string>
+    <string name="confirm">确认</string>
 
 </resources>

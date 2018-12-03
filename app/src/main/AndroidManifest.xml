@@ -194,6 +194,9 @@
         <activity
             android:name=".rgb.RGBGradientActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".scene.NewSceneSetAct"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

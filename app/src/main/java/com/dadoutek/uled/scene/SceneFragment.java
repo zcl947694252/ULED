@@ -245,7 +245,7 @@ public class SceneFragment extends BaseFragment implements
         } else if (view.getId() == R.id.scene_edit) {
 //                setScene(scenesListData.get(position).getId());
             DbScene scene = scenesListData.get(position);
-            Intent intent = new Intent(getActivity(), SetSceneAct.class);
+            Intent intent = new Intent(getActivity(), NewSceneSetAct.class);
             intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene);
             intent.putExtra(Constant.IS_CHANGE_SCENE, true);
             startActivityForResult(intent, 0);
@@ -343,7 +343,7 @@ public class SceneFragment extends BaseFragment implements
                     if (scenesListData.size() >= SCENE_MAX_COUNT) {
                         ToastUtils.showLong(R.string.scene_16_tip);
                     } else {
-                        Intent intent = new Intent(getActivity(), SetSceneAct.class);
+                        Intent intent = new Intent(getActivity(), NewSceneSetAct.class);
                         intent.putExtra(Constant.IS_CHANGE_SCENE, false);
                         startActivityForResult(intent, 0);
                     }
@@ -376,7 +376,7 @@ public class SceneFragment extends BaseFragment implements
                         if(TelinkLightApplication.getInstance().getConnectDevice()==null){
                             ToastUtils.showLong(R.string.device_not_connected);
                         }else{
-                            Intent intent = new Intent(getActivity(), SetSceneAct.class);
+                            Intent intent = new Intent(getActivity(), NewSceneSetAct.class);
                             intent.putExtra(Constant.IS_CHANGE_SCENE, false);
                             startActivityForResult(intent, 0);
                         }
