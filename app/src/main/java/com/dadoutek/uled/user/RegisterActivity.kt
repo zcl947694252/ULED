@@ -63,8 +63,8 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
-        StringUtils.initEditTextFilter(edit_user_phone!!.editText)
-        StringUtils.initEditTextFilter(edit_user_password!!.editText)
+        StringUtils.initEditTextFilterForRegister(edit_user_phone!!.editText)
+        StringUtils.initEditTextFilterForRegister(edit_user_password!!.editText)
     }
 
     private fun initToolbar() {

@@ -172,7 +172,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
             changeColor(red.toByte(), green.toByte(), blue.toByte())
 
             try {
-                Thread.sleep(200)
+                Thread.sleep(100)
                 val addr = light!!.meshAddr
                 val opcode: Byte
                 val params: ByteArray
@@ -180,18 +180,27 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
                 params = byteArrayOf(brightness.toByte())
                 light!!.brightness = brightness
                 light!!.setColor(color)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
-                DBUtils.updateLight(light!!)
+                for(i in 0..3){
+                    Thread.sleep(50)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+                }
+//                DBUtils.updateLight(light!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
         }.start()
 
         sb_brightness!!.progress = brightness
+        tv_brightness.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
         //            scrollView.setBackgroundColor(color);
         color_r!!.text = red.toString() + ""
         color_g!!.text = green.toString() + ""
         color_b!!.text = blue.toString() + ""
+    }
+
+    override fun onPause() {
+        super.onPause()
+        DBUtils.updateLight(light!!)
     }
 
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
@@ -408,7 +417,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         var blue = B
 
         val addr = light!!.meshAddr
-        val opcode = 0xE2.toByte()
+        val opcode = Opcode.SET_TEMPERATURE
 
         val minVal = 0x50
 
@@ -424,8 +433,10 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
         Log.d("RGBCOLOR", logStr)
-
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+        for(i in 0..3){
+            Thread.sleep(50)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        }
     }
 
     private fun sendInitCmd(brightness: Int, colorTemperature: Int) {

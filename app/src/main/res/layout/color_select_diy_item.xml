@@ -5,6 +5,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:layout_gravity="center"
+    android:foreground="?android:attr/selectableItemBackground"
     >
 
     <LinearLayout
@@ -22,6 +23,7 @@
             android:background="@color/primary"
             android:textColor="@color/white"
             android:gravity="center|bottom"
+            android:foreground="?android:attr/selectableItemBackground"
             android:text="diy" />
     </LinearLayout>
 

@@ -153,7 +153,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
                             com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
-                            showLoadingDialog(getString(R.string.connect_failed))
+//                            showLoadingDialog()
+                            ToastUtils.showLong(getString(R.string.connect_failed))
                             finish()
                         }
             }
@@ -284,6 +285,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
+
+//        LogUtils.d("changedff$color")
         val brightness = presetColors?.get(position)?.brightness
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
@@ -292,21 +295,27 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             changeColor(red.toByte(), green.toByte(), blue.toByte())
 
             try {
-                Thread.sleep(200)
+                Thread.sleep(100)
                 val addr = group?.meshAddr
                 val opcode: Byte = Opcode.SET_LUM
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
                 group?.brightness = brightness
                 group?.color = color
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-                DBUtils.updateGroup(group!!)
-                updateLights(color, "rgb_color", group!!)
+
+                LogUtils.d("changedff2"+opcode+"--"+addr+"--"+brightness)
+                for(i in 0..3){
+                    Thread.sleep(50)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+                }
+//                DBUtils.updateGroup(group!!)
+//                updateLights(color, "rgb_color", group!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
         }.start()
 
         brightnessBar?.progress = brightness!!
+        tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
 //        scrollView?.setBackgroundColor(color)
         colorR?.text = red.toString()
         colorG?.text = green.toString()
@@ -489,17 +498,27 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         var blue = B
 
         val addr = group?.meshAddr
-        val opcode = 0xE2.toByte()
+        val opcode = Opcode.SET_TEMPERATURE
 
         val minVal = 0x50
 
+        if (green.toInt() and 0xff <= minVal)
+            green = 0
+        if (red.toInt() and 0xff <= minVal)
+            red = 0
+        if (blue.toInt() and 0xff <= minVal)
+            blue = 0
 
         val params = byteArrayOf(0x04, red, green, blue)
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
         Log.d("RGBCOLOR", logStr)
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        LogUtils.d("changedff1"+opcode+"--"+addr+"--"+logStr)
+        for(i in 0..3){
+            Thread.sleep(50)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        }
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
