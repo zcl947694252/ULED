@@ -45,8 +45,8 @@ import java.util.concurrent.TimeUnit
 
 class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     private val SCAN_TIMEOUT_SECOND: Int = 8
-    private val CONNECT_TIMEOUT_SECONDS: Int = 5
-    private val MAX_RETRY_CONNECT_TIME = 3
+    private val CONNECT_TIMEOUT_SECONDS: Int = 10
+    private val MAX_RETRY_CONNECT_TIME = 1
 
     private var mRetryConnectCount: Int = 0
 
