@@ -456,4 +456,7 @@
 
     <string name="group_title">组 </string>
     <string name="jump_out_guide_tip">是否确定跳过引导教程？</string>
+    <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
+    <string name="device_disconnected">设备已断开</string>
+    <string name="reconnect">重连</string>
 </resources>

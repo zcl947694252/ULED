@@ -24,7 +24,6 @@ import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
@@ -40,24 +39,22 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
+private const val SCAN_TIMEOUT_SECOND: Int = 10
+private const val MAX_RETRY_CONNECT_TIME = 1
+
 
 class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
-    private val SCAN_TIMEOUT_SECOND: Int = 10
-    private val MAX_RETRY_CONNECT_TIME = 0
-
     private var connectDisposable: Disposable? = null
 
     private lateinit var mApplication: TelinkLightApplication
@@ -107,7 +104,8 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             startScan()
         }
     }
-    private fun getScanFilters(): MutableList<ScanFilter>{
+
+    private fun getScanFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
 
         scanFilters.add(ScanFilter.Builder()
@@ -134,35 +132,35 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
-                Thread {
-                    bestRSSIDevice = null   //扫描前置空信号最好设备。
-                    TelinkLightService.Instance().idleMode(true)
-                    val mesh = mApplication.mesh
-                    //扫描参数
-                    val params = LeScanParameters.create()
-                    if (BuildConfig.DEBUG) {
-                        params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
-                    } else {
-                        params.setMeshName(mesh.factoryName)
-                    }
 
-                    if(!AppUtils.isExynosSoc()){
-                        params.setScanFilters(getScanFilters())
-                    }
-                    //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                    params.setOutOfMeshName(mesh.name)
-                    params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                    params.setScanMode(false)
+                bestRSSIDevice = null   //扫描前置空信号最好设备。
+                TelinkLightService.Instance().idleMode(true)
+                val mesh = mApplication.mesh
+                //扫描参数
+                val params = LeScanParameters.create()
+                if (BuildConfig.DEBUG) {
+                    params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                } else {
+                    params.setMeshName(mesh.factoryName)
+                }
 
-                    this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
-                    this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+                if (!AppUtils.isExynosSoc()) {
+                    params.setScanFilters(getScanFilters())
+                }
+                //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
+                params.setOutOfMeshName(mesh.name)
+                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                params.setScanMode(false)
 
-                    TelinkLightService.Instance()?.startScan(params)
-                    startCheckRSSITimer()
-                }.start()
+                this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
+                this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
 
-                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+
+                startCheckRSSITimer()
+                TelinkLightService.Instance()?.startScan(params)
+
+                progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
 
 //                scanDisposable?.dispose()
 //                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
@@ -287,7 +285,6 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
                     }
                 }
-                LogUtils.d("onError retry")
                 retryConnect()
 
             }
@@ -312,13 +309,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onLeScanTimeout() {
         LogUtils.d("onLeScanTimeout")
-        launch(UI){
+        launch(UI) {
             retryConnectCount = 0
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_found_switch)
         }
     }
-
 
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -350,7 +346,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
             pwd = mesh.factoryPassword.toString()
-        }else{
+        } else {
             pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName)
                     .substring(0, 16)
         }
@@ -454,7 +450,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             else
                 login()
         } else {
-            retryConnectCount=0
+            retryConnectCount = 0
             TelinkLightService.Instance().idleMode(true)
             showConnectFailed()
         }
@@ -485,7 +481,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         when (leScanEvent.args.productUUID) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
                 val MAX_RSSI = 81
-                if(leScanEvent.args.rssi<MAX_RSSI){
+                if (leScanEvent.args.rssi < MAX_RSSI) {
 
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
@@ -504,7 +500,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 ////                params.setUpdateDeviceList(bestRSSIDevice)
 //                    connect()
 //                    progressBtn.text = getString(R.string.connecting)
-                }else{
+                } else {
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }
             }

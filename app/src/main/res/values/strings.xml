@@ -507,4 +507,9 @@
     <string name="apply_scene">Click here to apply the scene </string>
         
     <string name="jump_out_guide_tip"> Confirm to skip the guide page? </string>
+
+    <string name="do_you_really_want_to_cancel">Do you really want to cancel the
+        installation</string>
+    <string name="device_disconnected">The device is connected</string>
+    <string name="reconnect">Reconnect</string>
 </resources>
