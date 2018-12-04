@@ -89,7 +89,7 @@ public class SceneFragment extends BaseFragment implements
     private void initToolBar(View view) {
         setHasOptionsMenu(true);
         toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.SceneTitle);
+        toolbar.setTitle(R.string.scene_name);
 
         ImageView btn_add = toolbar.findViewById(R.id.img_function1);
         ImageView btn_delete = toolbar.findViewById(R.id.img_function2);

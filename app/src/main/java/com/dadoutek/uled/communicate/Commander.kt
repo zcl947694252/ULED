@@ -56,9 +56,10 @@ object Commander : EventListener<String> {
         val params: ByteArray
 
         if (isOpen) {
-            params = byteArrayOf(0x01, 0x00, 0x00)
+            //0x64代表延时100ms保证开关同步
+            params = byteArrayOf(0x01, 0x64, 0x00)
         } else {
-            params = byteArrayOf(0x00, 0x00, 0x00)
+            params = byteArrayOf(0x00, 0x64, 0x00)
         }
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
