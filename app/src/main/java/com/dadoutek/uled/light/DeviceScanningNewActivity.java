@@ -109,7 +109,6 @@ import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
-    private static final int MAX_RETRY_COUNT = 2;   //update mesh failed的重试次数设置为5次
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.recycler_view_groups)
@@ -137,6 +136,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     @BindView(R.id.scanPb)
     MaterialProgressBar scanPb;
 
+    private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
+    private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
     private RxPermissions mRxPermission;
     private static final String TAG = DeviceScanningNewActivity.class.getSimpleName();
@@ -1380,7 +1381,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
-        int MAX_RSSI = 81;
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
