@@ -12,6 +12,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -20,7 +21,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var currentPageIsEdit=false
     private var scene: DbScene? = null
     private var isChangeScene = false
-    private var showGroupList: MutableList<DbGroup>? = null
+    private var showGroupList: MutableList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var sceneEditListAdapter: SceneEditListAdapter? = null
@@ -41,14 +42,15 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
-                val itemGroup = DbGroup()
-                itemGroup.name=item.name
+                val itemGroup = ItemGroup()
+                itemGroup.gpName=item.name
                 itemGroup.enableCheck = false
+                itemGroup.groupAress=actions[i].groupAddr
                 itemGroup.brightness =actions[i].brightness
-                itemGroup.colorTemperature = actions[i].colorTemperature
+                itemGroup.temperature = actions[i].colorTemperature
                 itemGroup.color=actions[i].color
                 item.checked = true
-                showGroupList!!.add(item)
+                showGroupList!!.add(itemGroup)
             }
         }
     }
@@ -144,10 +146,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         showCheckListData = DBUtils.allGroups
         for(i in showCheckListData!!.indices){
             for(j in showGroupList!!.indices){
-                if(showCheckListData!![i].meshAddr == showGroupList!![j].meshAddr){
+                if(showCheckListData!![i].meshAddr == showGroupList!![j].groupAress){
                     showCheckListData!![i].checked= true
                     break
-                }else if(j==showGroupList!!.size-1 && showCheckListData!![i].meshAddr != showGroupList!![j].meshAddr){
+                }else if(j==showGroupList!!.size-1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress){
                     showCheckListData!![i].checked= false
                 }
             }
@@ -210,7 +212,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveCurrenEditResult() {
+        val checkedItemList= ArrayList<Int>()
+        val resultItemList= ArrayList<ItemGroup>()
 
+       for(i in showCheckListData!!.indices){
+          if(showCheckListData!![i].checked){
+              for(i in showGroupList!!.indices){
+                  checkedItemList.add(showGroupList!![i].groupAress)
+              }
+          }
+       }
     }
 
     private fun saveScene(){
