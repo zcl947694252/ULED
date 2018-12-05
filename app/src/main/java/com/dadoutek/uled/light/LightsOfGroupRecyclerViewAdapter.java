@@ -140,8 +140,8 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
                 tvName.setTextColor(mContext.getResources().getColor(R.color.primary));
                 tvLightName.setTextColor(mContext.getResources().getColor(R.color.primary));
             }else{
-                tvName.setTextColor(mContext.getResources().getColor(R.color.black));
-                tvLightName.setTextColor(mContext.getResources().getColor(R.color.gray));
+                tvName.setTextColor(mContext.getResources().getColor(R.color.gray));
+                tvLightName.setTextColor(mContext.getResources().getColor(R.color.black));
             }
         }
 

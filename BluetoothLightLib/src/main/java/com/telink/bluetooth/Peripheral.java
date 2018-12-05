@@ -153,7 +153,7 @@ public class Peripheral extends BluetoothGattCallback {
                         + this.getMacAddress());
                 this.onDisconnect();
             }else{
-                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
+//                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
             }
         }
 
