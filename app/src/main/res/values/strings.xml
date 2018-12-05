@@ -512,4 +512,5 @@
         installation</string>
     <string name="device_disconnected">The device is connected</string>
     <string name="reconnect">Reconnect</string>
+    <string name="unnamed">Unnamed</string>
 </resources>

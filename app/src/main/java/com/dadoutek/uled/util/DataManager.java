@@ -264,7 +264,7 @@ public class DataManager {
     }
 
     public boolean getConnectState(Context context) {
-        if (!SharedPreferencesHelper.getBoolean(context, Constant.CONNECT_STATE_SUCCESS_KEY, false)) {
+        if (TelinkLightApplication.getInstance().getConnectDevice()==null) {
             ToastUtils.showLong(context.getString(R.string.device_not_connected));
             return false;
         }

@@ -14,6 +14,7 @@ import android.view.View.OnClickListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import com.blankj.utilcode.util.SizeUtils
 
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -289,8 +290,10 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>,
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         txtTitle!!.text = ""
-        editTitle!!.visibility=View.VISIBLE
         editTitle!!.setText(light?.name)
+        editTitle!!.visibility=View.GONE
+        titleCenterName.visibility=View.VISIBLE
+        titleCenterName.setText(light?.name)
 
         tvOta!!.setOnClickListener(this.clickListener)
         updateGroup.setOnClickListener(this.clickListener)
@@ -340,11 +343,14 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>,
 //        intent.putExtra("group", group)
 //        startActivity(intent)
 //        this?.finish()
+        editTitle.visibility=View.VISIBLE
+        titleCenterName.visibility=View.GONE
         isRenameState=true
         tvOta.setText(android.R.string.ok)
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
+        editTitle.setSelection(editTitle.getText().toString().length)
 //        btn_sure_edit_rename.visibility = View.VISIBLE
 //        btn_sure_edit_rename.setOnClickListener {
 //            saveName()
@@ -384,6 +390,9 @@ class NormalDeviceSettingActivity : TelinkBaseActivity(), EventListener<String>,
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
         }else{
+            editTitle.visibility=View.GONE
+            titleCenterName.visibility=View.VISIBLE
+            titleCenterName.text = name
             light?.name=name
             DBUtils.updateLight(light!!)
         }
