@@ -173,6 +173,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private Disposable mGroupingDisposable;
 
+    private TextView tvStopScan;
+
     //灯的mesh地址
     private int dstAddress;
     private Disposable mConnectTimer;
@@ -345,6 +347,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     //处理扫描成功后
     private void scanSuccess() {
         //更新Title
+        tvStopScan.setVisibility(View.GONE);
         toolbar.setTitle(getString(R.string.title_scanned_lights_num, adapter.getCount()));
 
         //存储当前添加的灯。
@@ -935,7 +938,15 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         groupingCompleted.setVisibility(View.GONE);
 
         lightNumLayout.setVisibility(View.GONE);
+        tvStopScan=toolbar.findViewById(R.id.tv_function1);
+        tvStopScan.setText(R.string.stop_scan);
+        tvStopScan.setOnClickListener(onClick);
+        tvStopScan.setVisibility(View.GONE);
     }
+
+    private View.OnClickListener onClick= v -> {
+        onLeScanTimeout();
+    };
 
     private void initToolbar() {
         toolbar.setTitle(R.string.scanning);
@@ -1502,6 +1513,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     SharedPreferencesHelper.putBoolean(DeviceScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
                 toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
+                tvStopScan.setVisibility(View.VISIBLE);
 
                 Log.d("ScanningTest", "update mesh success");
                 mRetryCount = 0;
