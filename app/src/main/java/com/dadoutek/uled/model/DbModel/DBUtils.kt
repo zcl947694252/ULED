@@ -566,7 +566,7 @@ object DBUtils {
             gpNameList.add(gpList[i].name)
         }
 
-        var count=0
+        var count=gpList.size
         while (true){
             count++
             val newName = TelinkLightApplication.getInstance().getString(R.string.group) +count
@@ -584,7 +584,7 @@ object DBUtils {
             scNameList.add(scList[i].name)
         }
 
-        var count=0
+        var count=scList.size
         while (true){
             count++
             val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) +count

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.util.StringUtils;
 
@@ -53,13 +54,7 @@ public class TelinkBaseActivity extends AppCompatActivity {
     }
 
     public void showToast(CharSequence s) {
-
-        if (this.toast != null) {
-            this.toast.setView(this.toast.getView());
-            this.toast.setDuration(Toast.LENGTH_LONG);
-            this.toast.setText(s);
-            this.toast.show();
-        }
+        ToastUtils.showLong(s);
     }
 
     protected void saveLog(String log) {

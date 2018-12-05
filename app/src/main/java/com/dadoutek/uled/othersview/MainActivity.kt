@@ -229,11 +229,12 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         }
 
         //判断装灯页面引导完成且场景页面引导还没开始,进行场景页面强制引导
-        if(GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_INSTALL_LIGHT_KEY,false) &&
-                !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
-            guide1()
-            isCreate=false
-        }
+        //依需求暂时屏蔽强制引导到场景
+//        if(GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_INSTALL_LIGHT_KEY,false) &&
+//                !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
+//            guide1()
+//            isCreate=false
+//        }
 //        else if(DBUtils.allLight.isEmpty()){
 //            GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_GROUPLIST_KEY,false)
 //            tranHome()
@@ -538,6 +539,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
 
                     if (mConnectSuccessSnackBar?.isShown != true)
                         mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
+                        mConnectSnackBar?.dismiss()
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
@@ -611,7 +613,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                         dbLightNew.color = 0
                         dbLightNew.colorTemperature = 0
                         dbLightNew.meshAddr = meshAddress
-                        dbLightNew.name = getString(R.string.allLight)
+                        dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
 //                        Thread {
                             DBUtils.saveLight(dbLightNew, false)
