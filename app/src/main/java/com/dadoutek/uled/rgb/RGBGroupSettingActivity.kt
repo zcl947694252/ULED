@@ -604,10 +604,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     private fun renameGp() {
             val textGp = EditText(this)
+            textGp.setText(group?.name)
             StringUtils.initEditTextFilter(textGp)
             android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
                     .setTitle(R.string.rename)
-                    .setIcon(android.R.drawable.ic_dialog_info)
                     .setView(textGp)
 
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->

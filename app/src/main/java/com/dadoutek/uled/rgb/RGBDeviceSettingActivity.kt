@@ -85,9 +85,9 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
     private fun renameLight() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
+        textGp.setText(light?.name)
         android.app.AlertDialog.Builder(this@RGBDeviceSettingActivity)
                 .setTitle(R.string.rename)
-                .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
 
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->

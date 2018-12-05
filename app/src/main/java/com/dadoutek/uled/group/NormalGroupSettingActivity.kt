@@ -220,12 +220,15 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
 
 
     private fun initView() {
-        editTitle.visibility=View.VISIBLE
+        editTitle.visibility=View.GONE
+        titleCenterName.visibility=View.VISIBLE
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
                 editTitle!!.setText(getString(R.string.allLight))
+                titleCenterName!!.text = getString(R.string.allLight)
             } else {
                 editTitle!!.setText(group!!.name)
+                titleCenterName!!.text = group!!.name
             }
         }
 
@@ -541,9 +544,12 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
 //        intent.putExtra("group", group)
 //        startActivity(intent)
 //        this?.finish()
+        editTitle.visibility=View.VISIBLE
+        titleCenterName.visibility=View.GONE
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
+        editTitle.setSelection(editTitle.getText().toString().length)
         tvRename.visibility = View.VISIBLE
         tvRename.setText(android.R.string.ok)
         tvRename.setOnClickListener {
@@ -595,6 +601,9 @@ class NormalGroupSettingActivity : TelinkBaseActivity(), OnClickListener, TextVi
             }
 
             if(canSave){
+                editTitle.visibility=View.GONE
+                titleCenterName.visibility=View.VISIBLE
+                titleCenterName.text = name
                 group?.name = name
                 DBUtils.updateGroup(group!!)
             }

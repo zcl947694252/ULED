@@ -8,8 +8,8 @@
     </string-array>
 
     <string-array name="startup_mode">
-        <item>Turn on the lights</item>
-        <item>Turn off the lights</item>
+        <item>Turn on</item>
+        <item>Turn off</item>
     </string-array>
 
     <string-array name="switch_mode">
@@ -23,13 +23,13 @@
     </string-array>
 
     <string-array name="preset_gradient">   
-        <item>Colorful Gradient</item>        
-        <item>Red gradient</item>        
-        <item>Green gradient</item>        
-        <item>Blue gradient</item>        
-        <item> Yellow gradient</item>        
-        <item> Cyan gradient</item>        
-        <item> Purple gradient</item>
+        <item>GRB Color Gradient</item>        
+        <item>Red Color Gradient</item>        
+        <item>Green Color Gradient</item>        
+        <item>Blue Color Gradient</item>        
+        <item> Yellow Color Gradient</item>        
+        <item> Cyan Color Gradient</item>        
+        <item> Purple Color Gradient</item>
     </string-array>
 
     <!-- Activity Labels -->
@@ -56,7 +56,9 @@
 
     <!-- DeviceSchema Setting -->
     <string name="device_setting_header">Light Setting</string>
+    <string name="device_setting_brightness">Brightness:%1$s</string>
     <string name="device_setting_color">Color</string>
+    <string name="device_setting_temperature">Color Temperature:%1$s</string>
     <string name="device_setting_music">Music</string>
     <string name="device_setting_sound">Playing by heart</string>
     <string name="device_setting_remove_device">Remove Device</string>
@@ -76,6 +78,7 @@
     <string name="mesh_add_header">Add Mesh</string>
     <string name="mesh_add_label_mesh_setting">Mesh Setting</string>
     <string name="install_setting">Install Setting</string>
+    <string name="mesh_add_button_save">Save</string>
     <string name="mesh_add_button_share">Share</string>
     <string name="mesh_add_button_clear">Clear Mesh</string>
     <string name="mesh_add_default_factory_name">Telink_mesh1</string>
@@ -95,14 +98,16 @@
     <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
     <string name="target_version">Target Version : %s</string>
     <string name="scan_tip">Scanning lights need related permissions, otherwise it can not proceed to the next step</string>
-    <string name="add_groups">Add a group</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="add_groups">Add Group</string>
     <string name="set_group">Set Group</string>
     <string name="loading">Loading</string>
-    <string name="scan_end">The scan was completed and no equipment was found!</string>
+    <string name="scan_end">No device found!</string>
     <string name="connecting_tip">Connecting…</string>
     <string name="grouping_completed">Grouping completed</string>
     <string name="openBluetooth">Open Bluetooth, Play the smart light!</string>
-    <string name="quite">Quite</string>
+    <string name="quite">Quit</string>
     <string name="retry">Retry</string>
     <string name="light">Lights</string>
     <string name="me">Me</string>
@@ -112,11 +117,12 @@
     <string name="start_group_bt">Start grouping</string>
     <string name="group_completed">Grouping is complete!</string>
     <string name="have_lamp_no_group_tip">There are no lights grouping, please complete the grouping operation</string>
-    <string name="sure_group">Determine the group</string>
-    <string name="selected_lamp_tip">Please select at least one light!</string>
-    <string name="select_group_tip">Please select at least one group</string>
+    <string name="sure_group">Confirm Grouping</string>
+    <string name="selected_lamp_tip">Please Select at Least ONE Light to Group</string>
+    <string name="select_group_tip">Please Select at Least ONE group</string>
     <string name="much_lamp_tip">Supports up to 254 lights</string>
     <string name="restart_bluetooth">System Bluetooth is abnormal, please restart your phone</string>
+    <string name="chear_cache">Clear Data</string>
     <string name="update_ite">Sync ITE</string>
     <string name="clean_tip">Cache empty, App Reboot soon</string>
     <string name="wait_develop">To be developed</string>
@@ -125,8 +131,11 @@
     <string name="add_mesh_save_tip3">Invalid! input max length: 16</string>
     <string name="add_mesh_save_tip4">Invalid! input should not contains \'.\'</string>
     <string name="add_mesh_save_tip5">Account or password contains special characters!</string>
+    <string name="delete_group">Delete group</string>
+    <string name="rename_the_group">Rename the group</string>
     <string name="input_rename_text_tip">Please enter a new group name:</string>
     <string name="hint_input">Please enter. . .</string>
+    <string name="btn_sure">OK</string>
     <string name="group_name_setting">Group name setting</string>
     <string name="rename_tip_check">Input contains special characters, please modify</string>
     <string name="repeat_tip_name">Already have this group name, please modify!</string>
@@ -135,6 +144,8 @@
     <string name="title_scanning_lights_num">Scanning(scanned %1$d lights)</string>
     <string name="title_scanned_lights_num">%1$d</string>
     <string name="click_double_exit">Press again to exit the program</string>
+    <string name="empty_cache_title">Data clearing</string>
+    <string name="empty_cache_tip">Need to physically recover the lamp before clearing the data and start clearing the data?</string>
     <string name="factory_reset">Factory reset</string>
     <string name="add_str_group">Add group</string>
     <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
@@ -147,17 +158,17 @@
     <string name="device_not_connected">The device is not connected!</string>
 
     <string name="smartSwitch">switch</string>
-    <string name="select_install_device">Select device to install</string>
-    <string name="install_switch_tips1">1.Plug micro USB to your Switch</string>
-    <string name="install_switch_tips2">2.Press any button one time</string>
-    <string name="install_switch_tips3">3.The indicator on the right of USB will stay on</string>
-    <string name="install_sensor_tips1">Please power on your Sensor first</string>
+    <string name="select_install_device">Choose your devices</string>
+    <string name="install_switch_tips1">1. Plug USB into switch</string>
+    <string name="install_switch_tips2">2. Press any button</string>
+    <string name="install_switch_tips3">3. The right indicator light will On</string>
+    <string name="install_sensor_tips1">Please connect the sensor to the power supply</string>
 
     <string name="search">Search</string>
-    <string name="complete">Complete</string>
-    <string name="not_found_switch">Not found switch</string>
-    <string name="searching">Searching</string>
-    <string name="install_failed">Install failed</string>
+    <string name="complete">Done</string>
+    <string name="not_found_switch">No switch found</string>
+    <string name="searching">Searching…</string>
+    <string name="install_failed">Install Failed, Please try again</string>
     <string name="installing">Installing</string>
     <string name="title_activity_switch_group">SwitchGroupActivity</string>
     <string name="select_group">Select group</string>
@@ -166,12 +177,18 @@
     <string name="connect_failed">Connect failed</string>
     <string name="group_failed">Group failed</string>
     <string name="connected">Connected</string>
+    <string name="SceneSetting">Scene</string>
     <string name="scene_apply">Apply</string>
-    <string name="edit_scene">Edit Scene</string>
+    <string name="scene_edit">Edit</string>
+    <string name="create_scene">Add Scene</string>
+    <string name="edit_scene">Modify scene</string>
+    <string name="tv_scene_name">Scene name:</string>
     <string name="plaese_input_scene_name">Please enter the scene name</string>
-    <string name="scene_tip">Please select at least one group!</string>
+    <string name="scene_tip">Please add at least one group</string>
     <string name="scene_name">Scenes</string>
-    <string name="group_select">Please select group:</string>
+    <string name="add_scene_tip">Please click to Add the group to apply to this scene:</string>
+    <string name="bt_add">Add</string>
+    <string name="group_select">Please Choose a Group:</string>
     <string name="scene1">Scene 1</string>
     <string name="scene2">Scene 2</string>
     <string name="scene3">Scene 3</string>
@@ -180,7 +197,7 @@
     <string name="setting_switch">Configuring switch…</string>
     <string name="configuring_switch">Configuring sensor…</string>
     <string name="pace_fail">Configuration failed</string>
-    <string name="tip_switch">Please add scene first! Reconfiguration switch</string>
+    <string name="tip_switch">Please add Scene first</string>
     <string name="tip_add_scene">All existing groups have been added!</string>
     <string name="tip_save_dialog_all">The current selection contains all the groups. Only the settings of all groups will take effect and still be saved?</string>
     <string name="copy_data_base">Database copy</string>
@@ -197,17 +214,18 @@
     <string name="register_success">Registration success</string>
     <string name="phone_input_error">Malformed phone number</string>
     <string name="tip_register_input_error">Username or password cannot contain special characters</string>
-    <string name="register_title_name">User registration</string>
-    <string name="login_bt_name">Log in</string>
-    <string name="user_login_title">User login</string>
+    <string name="register_title_name">Register</string>
+    <string name="login_bt_name">Login</string>
+    <string name="user_login_title">Login</string>
     <string name="logging_tip">Logging in</string>
-    <string name="login_success">Login successful</string>
+    <string name="login_success">Login success</string>
     <string name="user_register">User register</string>
     <string name="login_fail">Login failed</string>
     <string name="name_or_password_error">Wrong user name or password!</string>
     <string name="phone_current">Current phone number: %1$s</string>
     <string name="select_country">Choose a country</string>
     <string name="verification">Verification</string>
+    <string name="add">Add</string>
     <string name="open_location_service">Please open "Location service"</string>
     <string name="send_verification">Send the verification code</string>
     <string name="VerificationCode">Verification code</string>
@@ -215,86 +233,104 @@
     <string name="send_message_fail">Failed to send</string>
     <string name="verification_code_error">Verification code error</string>
     <string name="successful_verification">Successful verification</string>
-    <string name="forget_password">Forget password?</string>
+    <string name="exit_login">Logout</string>
+    <string name="forget_password">Forget PW?</string>
     <string name="verification_phone">Verify your phone</string>
     <string name="update_password">Change Password</string>
     <string name="password_input_error">Password cannot contain special characters</string>
     <string name="different_input">Inconsistent input twice, please check</string>
-    <string name="get_account_fail">Failed to get user</string>
-    <string name="tip_update_password_success">Change was successful</string>
+    <string name="get_account_fail">Get user failed</string>
+    <string name="tip_update_password_success">Change success</string>
     <string name="tip_update_password_fail">Change failed</string>
     <string name="updating_password">Changing</string>
-    <string name="connect_failed_if_there_are_lights">Connect failed, Please make sure there are lamps nearby!</string>
-    <string name="not_grouped">Not grouped</string>
+    <string name="connect_failed_if_there_are_lights">Connect failed, Please make sure there are lights nearby!</string>
+    <string name="not_grouped">No Groups</string>
     <string name="scanning_devices">Scanning devices</string>
     <string name="tip_add_group">Please add a group first</string>
     <string name="scanning">Scanning</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">The current name is already used</string>
-    <string name="exit_tips_in_scanning">Do you really want to exit when scanning?</string>
+    <string name="upload_data">Upload data</string>
+    <string name="exit_tips_in_scanning">Do you really want to quit scanning?</string>
     <string name="login_timeout">Login timeout</string>
-    <string name="account_not_exist">Account does not exist</string>
-    <string name="account_exist">Account does exist</string>
+    <string name="account_not_exist">Account not exist</string>
+    <string name="account_exist">Account already exists</string>
     <string name="unknown_network_error">Unknown network error</string>
     <string name="network_error">Network Error</string>
     <string name="network_unavailable">Network unavailable.Check your network settings.</string>
     <string name="network_time_out">Network connection timed out, please try again.</string>
-    <string name="delete_light_confirm">Do you really want to delete the light?</string>
-    <string name="phone_or_password_can_not_be_empty">Phone number or password can\'t be empty!</string>
-    <string name="reconnecting">Reconnecting</string>
-    <string name="group_not_change_tip">Grouping unchanged, determine exit?</string>
-    <string name="save_now">Saving</string>
+    <string name="delete_light_confirm">Confirm the light reset?</string>
+    <string name="delete_group_confirm">Confirm delete this group?</string>
+    <string name="phone_or_password_can_not_be_empty">Phone number or password cannot be empty!</string>
+    <string name="reconnecting">Reconnecting…</string>
+    <string name="app_version_name">Version:</string>
+    <string name="group_not_change_tip">Group unchanged, determine to exit?</string>
+    <string name="save_now">Saving…</string>
     <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
     <string name="i_know">OK</string>
     <string name="exit">Exit</string>
-    <string name="saving">Saving</string>
+    <string name="saving">Saving…</string>
+    <string name="delete_name">delete</string>
     <string name="open_blutooth">Bluetooth on</string>
     <string name="close_bluetooth">Bluetooth off</string>
-    <string name="empty_tip">There are currently no lights, click to add</string>
-    <string name="grouping_fail">Failed to group</string>
-    <string name="add_scene_gp_tip">Please add a group that needs to be applied to this scene!</string>
-    <string name="group_fail_tip">There are currently lights failing to group, please check or try again!</string>
+    <string name="empty_tip">No lights, click to add</string>
+    <string name="grouping_fail">Group failed</string>
+    <string name="add_scene_gp_tip">Please Choose a Group</string>
+    <string name="group_fail_tip">There is a light grouped failed, please check and try again!</string>
+    <string name="one_click_reset">Reset all lights</string>
     <string name="disconected">Not connected</string>
     <string name="reset_all_now">Restoring factory settings</string>
-    <string name="reset_fail_tip1">There are no lights at the moment, please check if the lights are installed</string>
-    <string name="delete_lamp_tip">There is a lamp deletion failure. Please try again after linking. . .</string>
-    <string name="error_disconnect_tip">Disconnect, please link and try again</string>
-    <string name="scene_16_tip">The maximum number of scenes is 16!</string>
+    <string name="reset_fail_tip1">There are no lights, please check if the lights are installed</string>
+    <string name="tip_reset_sure">Confirm all lights reset？</string>
+    <string name="delete_lamp_tip">There is a light reset failed, please retry after connecting</string>
+    <string name="error_disconnect_tip">Disconnected, please retry after connecting</string>
+    <string name="scene_16_tip">Up to 16 Scenes!</string>
     <string name="server_exception">Server exception</string>
-    <string name="start_sync">Data synchronization is about to begin. . .</string>
+    <string name="start_sync">Start to download data…</string>
     <string name="download_data_success">Download data success</string>
-    <string name="sync_now">Syncing server data, please wait. . .</string>
-    <string name="tip_start_sync">Start synchronization. . .</string>
+    <string name="sync_now">Download data…</string>
+    <string name="install_device">Add Device</string>
+    <string name="tip_start_sync">Start syncing. . .</string>
     <string name="upload_data_success">Upload data success</string>
     <string name="network_tip_title">Network status prompt</string>
-    <string name="net_disconnect_tip_message">There is no network available at the moment. Please set up a network!</string>
-    <string name="devoloping">In development. . . Stay tuned!</string>
+    <string name="net_disconnect_tip_message">Network Unavailable. Please check your network!</string>
+    <string name="devoloping">In development - Stay tuned!</string>
     <string name="regetCount">Resend(%1$d) </string>
     <string name="reget">Resend</string>
     <string name="manager_verification">Administrator authority verification</string>
     <string name="manager_phone_error">Admin mobile phone number is wrong</string>
-    <string name="answer_app">Questions and answers</string>
+    <string name="answer_app">Questions and Answers</string>
     <string name="click_reset_title">One-click recovery</string>
     <string name="select_type_str">Please select the way to restore factory settings</string>
     <string name="by_app_reset">Through software</string>
     <string name="by_light_reset">Through lamps</string>
     <string name="by_info_reset">Learn more</string>
-    <string name="by_light_reset_title">Physical recovery</string>
+    <string name="by_light_reset_title">Physical reset</string>
     <string name="by_light_reset_mesage">I have already physically restored the lamp to factory settings and started initializing APP data?</string>
+    <string name="question_1">1. How to reset my lights?</string>
+    <string name="question_1_anser1">(1) uled app reset: This method will directly reset the lights to the factory settings through the App. Please ensure that the lights are connected.</string>
+    <string name="qustion_2_anser2">(2)Light: Connect to power supply for 1 second, disconnect to power supply for 6s, repeat about 5-6 times until the light flashes.
+        Switch: Connect to power supply and simultaneously press the upper left button and the lower right button of the 4 buttons. The blue light will always be on during the period.
+        Sensor: Connect to power supply for 1 second, disconnect to power supply for 1 second, repeat about 5-6 times until the sensor flashes.</string>
+    <string name="common_question">Q&amp;A</string>
+    <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
+    <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
+    <string name="question_3">3. Can not control, not connect</string>
+    <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
     <string name="group_limit">Add up to 255 groups up to the current limit</string>
     <string name="data_empty">Data is empty</string>
-    <string name="clear_data_now">Clearing user data. . .</string>
+    <string name="clear_data_now">Clearing data. . .</string>
     <string name="clear_fail">Clear failed</string>
     <string name="backup_failed">Backup data failed</string>
-    <string name="uploading_data">Uploading data</string>
-    <string name="upload_data_failed">Upload data failed</string>
+    <string name="uploading_data">Uploading data…</string>
+    <string name="upload_data_failed">Upload failed</string>
     <string name="phone_cannot_be_empty">Phone cannot be empty</string>
-    <string name="delete_group_failed">Deleting a group failed</string>
-    <string name="deleting">Deleting</string>
+    <string name="delete_group_failed">Delete failed</string>
+    <string name="deleting">Deleting…</string>
     <string name="move_out_some_lights_in_group_failed">Lights in some groups failed to move out of the group</string>
-    <string name="delay_minute">Delay (minutes)</string>
-    <string name="delay_seconds">Delay (seconds)</string>
-    <string name="minimum_brightness_percentage">Final brightness (percentage)</string>
+    <string name="delay_minute">Delay(min)</string>
+    <string name="delay_seconds">Delay(s)</string>
+    <string name="minimum_brightness_percentage">Final brightness(%)</string>
     <string name="trigger_lux">Trigger illumination(lux)</string>
     <string name="params_cannot_be_empty">Params cannot be empty</string>
     <string name="button1">Button 1</string>
@@ -302,71 +338,78 @@
     <string name="button3">Button 3</string>
     <string name="button4">Button 4</string>
     <string name="update_group_tip">A packet change is detected. If the scene is required for the light, go to the scene page to update the scene!</string>
-    <string name="light_version">Light version:</string>
+    <string name="light_version">Version:</string>
     <string name="error_tip">Some data synchronization failed</string>
     <string name="sync_error_contant">Sync error</string>
     <string name="change_account">Switch account</string>
-    <string name="grouping">Grouping</string>
-    <string name="sync_error_exlogin">Failed to sync data, some data may be lost, still exit?</string>
+    <string name="grouping">Grouping…</string>
+    <string name="sync_error_exlogin">Sync failed, some data may be lost, still exit?</string>
     <string name="switch_version">Version:</string>
-    <string name="group_fail">Packet failed, Bluetooth is not connected, please check Bluetooth status</string>
-    <string name="select_all">select all</string>
-    <string name="search_light">Search for</string>
+    <string name="group_fail">Group failed, Bluetooth is not connected, please check Bluetooth status</string>
+    <string name="delete">Delete</string>
+    <string name="select_all">Choose all</string>
+    <string name="cancel">Cancel</string>
+    <string name="search_light">Search</string>
     <string name="input_groupAdress">Please enter a group name</string>
     <string name="not_find_pir">Sensor not found</string>
-    <string name="max_tip_brightness">The maximum brightness cannot exceed 99</string>
-    <string name="time_max_tip">The maximum time cannot exceed 30</string>
+    <string name="max_tip_brightness">Final brightness cannot exceed 99%</string>
+    <string name="time_max_tip">delay-time cannot exceed 30 minutes</string>
     <string name="ota_str">OTA</string>
+    <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
+    <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
+    <string name="question0">Where can I update my app?</string>
     <string name="update_group">Modify group</string>
-    <string name="the_last_version">This light is currently the latest version!</string>
-    <string name="updateSuccess">update successed!</string>
-    <string name="update_fail">Upgrade failed!</string>
-    <string name="start_update">Start upgrading</string>
-    <string name="tip_select_file">Please select an upgrade file first!</string>
-    <string name="updating">upgrading……</string>
-    <string name="update_tip_user">Please don\'t quit the upgrade during the upgrade process, wait patiently!</string>
-    <string name="exit_update">Exit the upgrade page after 2s</string>
-    <string name="scan_and_connect">Scan connection…</string>
-    <string name="network_disconect">Network not connected</string>
-    <string name="getVsersionFail">Failed to get the version number</string>
-    <string name="get_server_version_fail">Failed to get the server version!</string>
-    <string name="download_pack_fail">Upgrade package download failed</string>
-    <string name="error_pack">Upgrade package error!</string>
-    <string name="verification_version">Start verifying version information!</string>
-    <string name="verification_version_success">Version verification is successful!</string>
-    <string name="verification_version_fail">Version verification failed!</string>
+    <string name="the_last_version">It is the latest version!</string>
+    <string name="updateSuccess">Update succeed!</string>
+    <string name="update_fail">Update failed!</string>
+    <string name="start_update">Start update</string>
+    <string name="tip_select_file">Please select an update file first!</string>
+    <string name="updating">Updating…</string>
+    <string name="update_tip_user">Do not quit or disconnect during the update process</string>
+    <string name="exit_update">Exit the update page after 2s</string>
+    <string name="scan_and_connect">Scan and Connect…</string>
+    <string name="network_disconect">Network Unavailable</string>
+    <string name="getVsersionFail">Get version failed</string>
+    <string name="get_server_version_fail">Get version on service failed!</string>
+    <string name="download_pack_fail">Update package download failed</string>
+    <string name="error_pack">Update package error!</string>
+    <string name="verification_version">Verifying version…</string>
+    <string name="verification_version_success">Verify succeed!</string>
+    <string name="verification_version_fail">Verify failed!</string>
     <string name="downloading">Downloading:</string>
-    <string name="local_version">Pre-upgrade version: %1$s</string>
-    <string name="server_version">Upgraded version: %1$s</string>
-    <string name="start_scan">Start scanning…</string>
-    <string name="start_connect">Start connecting…</string>
-    <string name="update_firmware_tip2">Please be as close as possible to the lights when upgrading!</string>
+    <string name="local_version">Current firmware version: %1$s</string>
+    <string name="server_version">New firmware version: %1$s</string>
+    <string name="start_scan">Scanning…</string>
+    <string name="start_connect">Connecting…</string>
+    <string name="update_firmware_tip2">Please be close to the lights when updating!</string>
     <string name="trigger_mode">Trigger mode</string>
     <string name="btn_get_verificationCode">Get</string>
     <string name="register">Register</string>
     <string name="set_password">Set password</string>
     <string name="update_permission_tip">Please allow some permissions</string>
     <string name="select_color_title">Select color</string>
-    <string name="switch_mode">Switch mode</string>
-    <string name="delay_unit">Delay mode</string>
+    <string name="switch_mode">Light-open mode</string>
+    <string name="delay_unit">Delay-time unit</string>
     <string name="edit">Edit</string>
-    <string name="rssi_low">Signal is too bad</string>
+    <string name="long_click_select_color_tip">*Long press to save, tap to apply</string>
+    <string name="account">Account:</string>
+    <string name="rssi_low">Weak signal</string>
 
-    <string name="group_list_guide0">Please select a lamp you want to install now </string>
+    <string name="group_list_guide0">Choose your devices</string>
         
-    <string name="group_list_guide1">Please click Add Device to enter the add device option </string>
+    <string name="group_list_guide1">Click here to add device</string>
         
-    <string name="group_list_guide2">Please click on the option to start installing the device </string>
+    <string name="group_list_guide2">Click here to start Scanning</string>
         
     <string name="scene_guide_1">Click here to add a scene</string>
         
-    <string name="scan_light_guide_1">First click here to create a group</string>
+    <string name="scan_light_guide_1">Click here to add a group</string>
         
-    <string name="scan_light_guide_2">Please click on this area to select a group, the current boot for you to select your newly created group </string>
+    <string name="scan_light_guide_2">Choose a group in this area</string>
         
-    <string name="scan_light_guide_3"> Then in this area, click to select some lights that are intended to be grouped </string>
+    <string name="scan_light_guide_3">Select some lights intended to be grouped</string>
         
-    <string name="scan_light_guide_4">Select to complete, click here to determine the group </string>
+    <string name="scan_light_guide_4">Click here to confirm grouping</string>
         
     <string name="add_scene_guide_1">Click Add to select some groups</string>
         
@@ -380,25 +423,27 @@
         
     <string name="add_scene_guide_6">Click Save to save the scene</string>
         
-    <string name="config_pir_guide_1">How long does it take to enter the trigger here?</string>
+    <string name="config_pir_guide_1">How long does it take to enter the trigger here</string>
         
-    <string name="config_pir_guide_2">Enter the brightness after the trigger</string>
+    <string name="config_pir_guide_2">Enter the final brightness after the delay</string>
         
     <string name="config_pir_guide_4">Select a group response sensor here</string>
         
-    <string name="config_pir_guide_5"> Here you can choose the action after the trigger </string>
+    <string name="config_pir_guide_5"> Choose the light-open mode </string>
         
-    <string name="config_pir_guide_6"> Here you can choose the trigger form </string>
+    <string name="config_pir_guide_6"> Choose the trigger mode </string>
         
-    <string name="config_pir_guide_7"> Here you can choose the trigger time unit </string>
+    <string name="config_pir_guide_7"> choose the delay-time unit </string>
         
-    <string name="config_pir_guide_8">Click this icon to save the current configuration</string>
+    <string name="config_pir_guide_8">Done</string>
         
     <string name="change_to_scene">Click here to switch to the scene page to try it</string>
         
     <string name="btn_jump_over">Skip </string>
         
-    <string name="select_device_tip">Please click to select the product you purchased </string>
+    <string name="reset_boot_tutorial">Review the guide pages</string>
+        
+    <string name="select_device_tip">Choose your devices </string>
         
     <string name="normal_light">Normal light </string>
         
@@ -411,7 +456,17 @@
         
     <string name="is_exit_ota">OTA is in progress, do you really want to quit? </string>
         
-    <string name="repeat_name">The group name already exists. Please re-enter the group name </string>    
+    <string name="show_guide_again_tip"> Would you like to see the guide pages again? </string>
+        
+    <string name="repeat_name">The group name already exists. Please re-enter the group name </string>
+        
+    <string name="dynamic_rgb">Dynamic RGB</string>
+        
+    <string name="speed_text">Speed: %1$s%%</string>
+        
+    <string name="dynamic_gradient">Gradient</string>
+        
+    <string name="stop">Stop</string>
         
     <string name="rename">Rename </string>
         
@@ -421,86 +476,42 @@
         
     <string name="ota">OTA</string>
         
-    <string name="my_scene">Scenario 1 </string>
+    <string name="my_scene">Scene 1 </string>
 
     <!--通用-->
-    <string name="not_found_light">The luminaire was not found, please make sure there are lamps nearby!</string>    
-    <string name="group">group </string>    
-    <string name="setting">SET </string>
-    <string name="jump_out_guide_tip"> Do you want to skip the current page guide? </string>
-    <string name="device_setting_brightness">Brightness:%1$s</string>
-    <string name="device_setting_temperature">Color Temperature:%1$s</string>
-    <string name="dynamic_rgb">Dynamic RGB</string>
-    <string name="dynamic_gradient">Dynamic RGB</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_sure">OK</string>
-    <string name="btn_cancel">Cancel</string>
-    <string name="cancel">Cancel</string>
-    <string name="add">Add</string>
-    <string name="mesh_add_button_save">Save</string>
-    <string name="delete_name">delete</string>
-    <string name="delete">Delete</string>
+        
+    <string name="not_found_light">Lights not found, please make sure there are lights nearby!</string>
+        
+    <string name="group">group </string>
 
-    <!--组列表页面-->
-    <string name="allLight">All lights </string>
-    <string name="group_list_on"> ON </string>
-    <string name="group_list_off">OFF</string> 
-    <string name="normal_light_title">Normal light</string>    
-    <string name="rgb_title">RGB light</string>   
-    <string name="switch_title">Switch</string>
-    <string name="sensor_title">Sensor</string>
     <string name="group_title">Group </string>
-    <string name="install_device">Install Device</string>
+        
+    <string name="setting">SET </string>
 
-    <!--场景列表页面-->
-    <string name="SceneTitle">Scene</string>
-    <string name="apply_scene">Click to apply the current scene </string>
-    <string name="scene_edit">Edit</string>
+        <!--组列表页面-->
+        
+    <string name="allLight">All lights </string>
+        
+    <string name="group_list_on"> ON </string>
+        
+    <string name="group_list_off">OFF</string>
+        
+    <string name="normal_light_title">Normal light</string>
+        
+    <string name="rgb_title">RGB light</string>
+        
+    <string name="switch_title">Switch</string>
 
-    <!--我-->
-    <string name="account">Account:</string>
-    <string name="chear_cache">Clear data</string>
-    <string name="upload_data">Upload data</string>
-    <string name="common_question">Q&amp;A</string>
-    <string name="one_click_reset">Factory reset</string>
-    <string name="reset_boot_tutorial">Re-enable guide</string>
-    <string name="app_version_name">Version:</string>
-    <string name="exit_login">LOG OUT</string>
-    <string name="empty_cache_title">Data clearing</string>
-    <string name="empty_cache_tip">Need to physically recover the lamp before clearing the data and start clearing the data?</string>
-    <string name="tip_reset_sure">Are you sure all lights are reset to factory settings?</string>
-    <string name="show_guide_again_tip"> Would you like to see the app tutorial again? </string>
+    <string name="sensor_title">Sensor</string>
 
-    <!--组设置-->
-    <string name="delete_group">Delete group</string>
-    <string name="rename_the_group">Rename the group</string>
-    <string name="long_click_select_color_tip">*Click Settings, long press to save</string>
-    <string name="delete_group_confirm">Do you really want to delete the group?</string>
-    <string name="stop">Stop</string>
-    <string name="speed_text">Speed: %1$s%%</string>
+    <string name="apply_scene">Click here to apply the scene </string>
+        
+    <string name="jump_out_guide_tip"> Confirm to skip the guide page? </string>
 
-    <!--场景设置-->
-    <string name="tv_scene_name">Scene name:</string>
-    <string name="add_scene_tip">Please click to Add the group to apply to this scene:</string>
-    <string name="create_scene">Create a scene</string>
-    <string name="bt_add">Add</string>
-
-    <!--常见问题-->
-    <string name="question0">Where can I update my app?</string>
-    <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
-    <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
-    <string name="question_1">1. Restore factory mode: One-click recovery</string>
-    <string name="question_1_anser1">(1) Software Recovery: This mode will restore the factory settings of the lamp directly through the App. In this method, please ensure that the lamp is in a controllable state. If you can also control some lamps after recovery, please use the physical recovery method.</string>
-    <string name="qustion_2_anser2">(2) physical recovery: Please use the power off for 6 seconds,
-        and then turn on the power for 1 to 2 seconds, repeat this operation
-        until it succeeds (at least about five times) to force the hardware to restore the factory
-        settings, and finally on the App side select Clear Data, and if other mobile phones are using
-        this account, you need to log out or re-install the APP to use it normally. This
-        method will clear all user data and use it with caution!</string>
-    <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
-    <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
-    <string name="question_3">3. Can not control, not connect</string>
-    <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
-    <string name="scene_name_show">场景: %1$s</string>
-    <string name="confirm">确认</string>
+    <string name="do_you_really_want_to_cancel">Do you really want to cancel the
+        installation</string>
+    <string name="device_disconnected">The device is connected</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="unnamed">Unnamed</string>
+    <string name="stop_scan">停止扫描</string>
 </resources>
