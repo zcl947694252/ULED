@@ -75,9 +75,27 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
         this.mApplication = this.application as TelinkLightApplication
-        TelinkLightService.Instance()?.idleMode(true)
         initView()
         initListener()
+        readyConnection()
+    }
+
+    private var mIntervalCheckConnection: Disposable? = null
+
+    @SuppressLint("CheckResult")
+    private fun readyConnection() {
+        mIntervalCheckConnection = Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    //如果已经断连或者检测超过10次，直接完成。
+                    if (!TelinkLightService.Instance().isLogin || it > 10) {
+                        onInited()
+                    }
+                }
+
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
+
     }
 
 
@@ -92,13 +110,18 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
 
+    private var mIsInited: Boolean = false
+
     private fun initView() {
+        mIsInited = false;
+        content.visibility = View.INVISIBLE
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.switch_title)
     }
 
     private fun initListener() {
+        mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
         progressBtn.onClick {
             retryConnectCount = 0
             startScan()
@@ -328,6 +351,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
+
+                launch(UI) {
+                    if (!mIsInited){
+                        onInited()
+                    }
+                }
             }
 
             LightAdapter.STATUS_CONNECTED -> {
@@ -337,6 +366,14 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 LogUtils.d("connected11")
             }
         }
+
+    }
+
+    private fun onInited() {
+        mIntervalCheckConnection?.dispose()
+        mIsInited = true
+        content.visibility = View.VISIBLE
+        pb.visibility = View.GONE
 
     }
 
