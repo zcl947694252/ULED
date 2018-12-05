@@ -1033,16 +1033,6 @@
 //            return false;
 //        }
 //
-////        List<ItemGroup> itemGroups = adapter.getData();
-//
-////        for (int i = 0; i < itemGroups.size(); i++) {
-////            if (itemGroups.get(i).groupAress == 0xFFFF) {
-////                showSaveDialog();
-////                return false;
-////            }
-////        }
-////        ToastUtils.showLong(R.string.scene_tip);
-//
 //        if (itemGroupArrayList.size() == 0) {
 //            ToastUtils.showLong(R.string.add_scene_gp_tip);
 //            return false;

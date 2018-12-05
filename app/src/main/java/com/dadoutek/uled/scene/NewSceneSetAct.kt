@@ -1,19 +1,27 @@
 package com.dadoutek.uled.scene
 
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.View
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.DbModel.DbSceneActions
 import com.dadoutek.uled.model.ItemGroup
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -21,19 +29,21 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var currentPageIsEdit=false
     private var scene: DbScene? = null
     private var isChangeScene = false
+    private var isChange = true
     private var showGroupList: MutableList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var sceneEditListAdapter: SceneEditListAdapter? = null
+    private var editSceneName:String?=null
+    private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
-        initData()
-        initView()
+        init()
     }
 
-    private fun initData() {
+    private fun init() {
         val intent = intent
         isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
         showGroupList = ArrayList()
@@ -51,31 +61,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 itemGroup.color=actions[i].color
                 item.checked = true
                 showGroupList!!.add(itemGroup)
+                groupMeshAddrArrayList.add(item.getMeshAddr())
             }
         }
+        initScene()
     }
 
-    private fun initView() {
+    private fun initScene() {
         if (isChangeScene) {
-            initChangeData()
             initChangeView()
             showDataListView()
         } else {
-            initCreateData()
             initCreateView()
             showEditListVew()
         }
 
+        confirm.setOnClickListener(this)
+        StringUtils.initEditTextFilter(edit_name)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
-    }
-
-    private fun initCreateData() {
-
-    }
-
-    private fun initChangeData() {
-
     }
 
     private fun initCreateView() {
@@ -90,11 +94,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         when (view.id) {
             R.id.btn_delete -> delete(adapter, position)
-            R.id.rgb_view -> {
-//                currentPosition = position
-//                showPickColorDialog()
-            }
+            R.id.rgb_view -> changeToColorSelect()
         }
+    }
+
+    private fun changeToColorSelect() {
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     internal var onItemChildClickListenerCheck: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -138,23 +147,33 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     //显示配置数据页面
     private fun showEditListVew() {
+        if(scene!=null){
+            edit_name.setText(scene!!.name)
+        }
         currentPageIsEdit=true
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
         tv_function1.visibility = View.GONE
 
         showCheckListData = DBUtils.allGroups
-        for(i in showCheckListData!!.indices){
-            for(j in showGroupList!!.indices){
-                if(showCheckListData!![i].meshAddr == showGroupList!![j].groupAress){
-                    showCheckListData!![i].checked= true
-                    break
-                }else if(j==showGroupList!!.size-1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress){
-                    showCheckListData!![i].checked= false
+        if(showGroupList!!.size!=0){
+            for(i in showCheckListData!!.indices){
+                for(j in showGroupList!!.indices){
+                    if(showCheckListData!![i].meshAddr == showGroupList!![j].groupAress){
+                        showCheckListData!![i].checked= true
+                        break
+                    }else if(j==showGroupList!!.size-1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress){
+                        showCheckListData!![i].checked= false
+                    }
                 }
             }
+            changeCheckedViewData()
+        }else{
+            for(i in showCheckListData!!.indices){
+                showCheckListData!![i].enableCheck=true
+                showCheckListData!![i].checked=false
+            }
         }
-        changeCheckedViewData()
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -204,7 +223,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun save() {
-        if(currentPageIsEdit){
+        if(!currentPageIsEdit){
             saveScene()
         }else{
             saveCurrenEditResult()
@@ -212,19 +231,278 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveCurrenEditResult() {
-        val checkedItemList= ArrayList<Int>()
-        val resultItemList= ArrayList<ItemGroup>()
+        if(checkName()){
+            editSceneName=edit_name.text.toString()
+            tv_scene_name.text = resources.getString(R.string.scene_name_show,editSceneName)
+            val oldResultItemList= ArrayList<ItemGroup>()
+            val newResultItemList= ArrayList<ItemGroup>()
 
-       for(i in showCheckListData!!.indices){
-          if(showCheckListData!![i].checked){
-              for(i in showGroupList!!.indices){
-                  checkedItemList.add(showGroupList!![i].groupAress)
-              }
-          }
-       }
+            for(i in showCheckListData!!.indices){
+                if(showCheckListData!![i].checked){
+                    if(showGroupList!!.size==0){
+                        val newItemGroup=ItemGroup()
+                        newItemGroup.brightness=50
+                        newItemGroup.temperature=50
+                        newItemGroup.color=R.color.white
+                        newItemGroup.checked=true
+                        newItemGroup.enableCheck=true
+                        newItemGroup.gpName=showCheckListData!![i].name
+                        newItemGroup.groupAress=showCheckListData!![i].meshAddr
+                        newResultItemList.add(newItemGroup)
+                    }else{
+                        for(j in showGroupList!!.indices){
+                            if(showCheckListData!![i].meshAddr==showGroupList!![j].groupAress){
+                                oldResultItemList.add(showGroupList!![j])
+                                break
+                            }else if(j == showGroupList!!.size-1){
+                                val newItemGroup=ItemGroup()
+                                newItemGroup.brightness=50
+                                newItemGroup.temperature=50
+                                newItemGroup.color=R.color.white
+                                newItemGroup.checked=true
+                                newItemGroup.enableCheck=true
+                                newItemGroup.gpName=showCheckListData!![i].name
+                                newItemGroup.groupAress=showCheckListData!![i].meshAddr
+                                newResultItemList.add(newItemGroup)
+                            }
+                        }
+                    }
+                }
+            }
+            showGroupList?.clear()
+            showGroupList?.addAll(oldResultItemList)
+            showGroupList?.addAll(newResultItemList)
+            showDataListView()
+        }
+    }
+
+    private fun checkName(): Boolean {
+        if(edit_name.text.toString().isEmpty()){
+            ToastUtils.showLong(getString(R.string.name_can_not_null))
+            return false
+        }
+        return true
     }
 
     private fun saveScene(){
+        if (checked()) {
+            if (isChangeScene) {
+                updateOldScene()
+            } else {
+                saveNewScene()
+            }
+            setResult(Constant.RESULT_OK)
+        }
+    }
 
+    private fun saveNewScene() {
+        showLoadingDialog(getString(R.string.saving))
+        Thread {
+            val name = editSceneName
+            //        List<ItemGroup> itemGroups = adapter.getData();
+            val itemGroups = showGroupList
+
+            val dbScene = DbScene()
+            dbScene.id = getSceneId()
+            dbScene.name = name
+            dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion()
+            DBUtils.saveScene(dbScene, false)
+
+            val idAction = dbScene.id!!
+
+            for (i in itemGroups!!.indices) {
+                val sceneActions = DbSceneActions()
+                sceneActions.belongSceneId = idAction
+                sceneActions.brightness = itemGroups.get(i).brightness
+                sceneActions.setColor(itemGroups.get(i).color)
+                sceneActions.colorTemperature = itemGroups.get(i).temperature
+                //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
+                //                sceneActions.setGroupAddr(0xFFFF);
+                //                DBUtils.saveSceneActions(sceneActions);
+                //                break;
+                //            } else {
+                sceneActions.groupAddr = itemGroups.get(i).groupAress
+                DBUtils.saveSceneActions(sceneActions)
+                //            }
+            }
+
+            try {
+                Thread.sleep(100)
+                addScene(idAction)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            } finally {
+                hideLoadingDialog()
+                finish()
+            }
+        }.start()
+    }
+
+    @Throws(InterruptedException::class)
+    private fun addScene(id: Long) {
+        val opcode = Opcode.SCENE_ADD_OR_DEL
+        val list = DBUtils.getActionsBySceneId(id)
+        var params: ByteArray
+
+        for (i in list.indices) {
+            var count = 0
+            do {
+                count++
+                Thread.sleep(300)
+                var temperature = list[i].colorTemperature.toByte()
+                if (temperature > 99)
+                    temperature = 99
+                var light = list[i].brightness.toByte()
+                if (light > 99)
+                    light = 99
+                val color = list[i].getColor()
+                var red = color and 0xff0000 shr 16
+                var green = color and 0x00ff00 shr 8
+                var blue = color and 0x0000ff
+
+                val minVal = 0x50.toByte()
+                if (green and 0xff <= minVal)
+                    green = 0
+                if (red and 0xff <= minVal)
+                    red = 0
+                if (blue and 0xff <= minVal)
+                    blue = 0
+
+
+                params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+            } while (count < 3)
+        }
+    }
+
+    private fun getSceneId(): Long {
+        val list = DBUtils.sceneList
+        val idList = java.util.ArrayList<Int>()
+        for (i in list.indices) {
+            idList.add(list[i].id!!.toInt())
+        }
+
+        var id = 0
+        for (i in 1..16) {
+            if (idList.contains(i)) {
+                Log.d("sceneID", "getSceneId: " + "aaaaa")
+                continue
+            } else {
+                id = i
+                Log.d("sceneID", "getSceneId: bbbbb$id")
+                break
+            }
+        }
+
+        if (list.size == 0) {
+            id = 1
+        }
+
+        return java.lang.Long.valueOf(id.toLong())
+    }
+
+    private fun updateOldScene() {
+        showLoadingDialog(getString(R.string.saving))
+        Thread {
+            val name = editSceneName
+            val itemGroups = showGroupList
+            val nameList = java.util.ArrayList<Int>()
+
+            scene?.setName(name)
+            DBUtils.updateScene(scene!!)
+            val idAction = scene?.getId()!!
+
+            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.getId()!!))
+
+            for (i in itemGroups!!.indices) {
+                val sceneActions = DbSceneActions()
+                sceneActions.belongSceneId = idAction
+                sceneActions.brightness = itemGroups.get(i).brightness
+                sceneActions.colorTemperature = itemGroups.get(i).temperature
+                sceneActions.groupAddr = itemGroups.get(i).groupAress
+                sceneActions.setColor(itemGroups.get(i).color)
+
+                nameList.add(itemGroups.get(i).groupAress)
+                DBUtils.saveSceneActions(sceneActions)
+            }
+
+            isChange = compareList(nameList, groupMeshAddrArrayList)
+
+            try {
+                Thread.sleep(100)
+                updateScene(idAction)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            } finally {
+                hideLoadingDialog()
+                finish()
+            }
+        }.start()
+    }
+
+    @Throws(InterruptedException::class)
+    private fun updateScene(id: Long) {
+        deleteScene(id)
+        val opcode = Opcode.SCENE_ADD_OR_DEL
+        val list = DBUtils.getActionsBySceneId(id)
+        var params: ByteArray
+        for (i in list.indices) {
+            Thread.sleep(100)
+            var temperature = list[i].colorTemperature.toByte()
+            if (temperature > 99)
+                temperature = 99
+            var light = list[i].brightness.toByte()
+            if (light > 99)
+                light = 99
+            val color = list[i].getColor()
+            var red = color and 0xff0000 shr 16
+            var green = color and 0x00ff00 shr 8
+            var blue = color and 0x0000ff
+
+            val minVal = 0x50.toByte()
+            if (green and 0xff <= minVal)
+                green = 0
+            if (red and 0xff <= minVal)
+                red = 0
+            if (blue and 0xff <= minVal)
+                blue = 0
+
+            val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
+            Log.d("RGBCOLOR", logStr)
+            params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+        }
+    }
+
+    private fun deleteScene(id: Long) {
+        if (isChange) {
+            val opcode = Opcode.SCENE_ADD_OR_DEL
+            val params: ByteArray
+            params = byteArrayOf(0x00, id.toByte())
+            try {
+                Thread.sleep(100)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params)
+                Thread.sleep(300)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+
+        }
+    }
+
+    private fun compareList(actionsList: List<Int>, actionsList1: java.util.ArrayList<Int>): Boolean {
+        return if (actionsList.size == actionsList1.size) {
+            !actionsList1.containsAll(actionsList)
+        } else {
+            true
+        }
+    }
+
+    private fun checked(): Boolean {
+        if (showGroupList!!.size == 0) {
+            ToastUtils.showLong(R.string.add_scene_gp_tip)
+            return false
+        }
+        return true
     }
 }

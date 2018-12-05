@@ -388,7 +388,7 @@
     <string name="select_color_title">颜色选择</string>
     <string name="switch_mode">开关灯方式</string>
     <string name="delay_unit">延时时间单位</string>
-    <string name="edit">编辑</string>
+    <string name="edit">修改</string>
     <string name="long_click_select_color_tip">*长按保存,单击应用</string>
     <string name="account">账号:</string>
     <string name="rssi_low">信号太差</string>
@@ -461,4 +461,6 @@
     <string name="reconnect">重连</string>
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
+    <string name="scene_name_show">场景:%1$s</string>
+    <string name="name_can_not_null">名字不能为空</string>
 </resources>

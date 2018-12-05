@@ -514,4 +514,6 @@
     <string name="reconnect">Reconnect</string>
     <string name="unnamed">Unnamed</string>
     <string name="stop_scan">停止扫描</string>
+    <string name="scene_name_show">场景:%1$s</string>
+    <string name="name_can_not_null">名字不能为空</string>
 </resources>

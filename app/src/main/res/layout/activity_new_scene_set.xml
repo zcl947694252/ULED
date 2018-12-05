@@ -126,5 +126,5 @@
         android:layout_marginBottom="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:foreground="?android:attr/selectableItemBackground"
-        android:text="@string/confirm" />
+        android:text="@string/btn_sure" />
 </android.support.constraint.ConstraintLayout>
