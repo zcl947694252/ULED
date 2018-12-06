@@ -207,7 +207,9 @@ class GroupListFragment : BaseFragment() {
             val dstAddr = group.meshAddr
             var intent: Intent
 
-            if (dataManager!!.getConnectState(activity)) {
+            if (TelinkLightApplication.getInstance().connectDevice == null) {
+                ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+            }else{
                 when (view.getId()) {
                     R.id.btn_on -> {
                         Commander.openOrCloseLights(dstAddr, true)

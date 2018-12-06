@@ -1,7 +1,6 @@
 package com.dadoutek.uled.switches
 
 import android.os.Bundle
-import android.support.annotation.NonNull
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -32,7 +31,6 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -88,8 +86,13 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
-                    progressBar.visibility = View.VISIBLE
-                    disconnect(false)
+                    if (TelinkLightService.Instance().isLogin) {
+                        progressBar.visibility = View.VISIBLE
+                        mIsDisconnecting = true
+                        disconnect()
+                    } else {
+                        finish()
+                    }
                 }
                 .setTitle(R.string.do_you_really_want_to_cancel)
                 .show()
@@ -110,28 +113,16 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private var mIsDisconnecting: Boolean = false
 
-    private fun disconnect(isConfigured: Boolean) {
+    private fun disconnect() {
         TelinkLightService.Instance().idleMode(true)
         TelinkLightService.Instance().disconnect()
-        if (isConfigured) {
-            mIsConfigured = true
-        } else {
-            mIsDisconnecting = true
-        }
-    }
-
-    private fun configureComplete() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
-//        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-        mIsDisconnecting = true
     }
 
     override fun onBackPressed() {
         showCancelDialog();
     }
 
-    private var mIsConfigured: Boolean = false
+    private var mIsConfiguring: Boolean = false
 
     private fun initListener() {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -140,10 +131,10 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         fab.setOnClickListener { view ->
             if (mAdapter.selectedPos != -1) {
                 progressBar.visibility = View.VISIBLE
+                mIsConfiguring = true
                 setGroupForSwitch()
-//                updateNameForSwitch()
                 Commander.updateMeshName(successCallback = {
-                    disconnect(true)
+                    disconnect()
                 },
                         failedCallback = {
                             snackbar(configGroupRoot, getString(R.string.group_failed))
@@ -241,7 +232,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
     }
 
-    private fun showDisconnectSnackBar(){
+    private fun showDisconnectSnackBar() {
         TelinkLightService.Instance().idleMode(true)
         mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
                 .string.device_disconnected), getString(R.string.reconnect)) {
@@ -251,7 +242,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private var mDisconnectSnackBar: Snackbar? = null
 
-    private var mConnectedSnackBar:  Snackbar? = null
+    private var mConnectedSnackBar: Snackbar? = null
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
@@ -273,12 +264,11 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                         progressBar.visibility = View.GONE
                         finish()
                     }
-                } else if (mIsConfigured) {
+                } else if (mIsConfiguring) {
                     this.mApplication.removeEventListener(this)
                     launch(UI) {
-                        delay(200, TimeUnit.MILLISECONDS)
                         progressBar.visibility = View.GONE
-                        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                        showConfigSuccessDialog()
                     }
                 } else {
                     showDisconnectSnackBar()
@@ -287,6 +277,19 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                 }
             }
         }
+
+    }
+
+    private fun showConfigSuccessDialog() {
+
+        AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle(R.string.install_success)
+                .setMessage(R.string.tip_config_switch_success)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                }
+                .show()
 
     }
 

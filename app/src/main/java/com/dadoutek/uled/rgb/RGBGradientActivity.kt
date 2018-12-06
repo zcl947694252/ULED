@@ -135,7 +135,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         applyDisposable?.dispose()
         applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io()).subscribe {
-            for(i in 0..1){
+            for(i in 0..2){
                 stopGradient()
                 Thread.sleep(50)
             }

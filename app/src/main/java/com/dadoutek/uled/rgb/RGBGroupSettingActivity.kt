@@ -606,6 +606,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             val textGp = EditText(this)
             textGp.setText(group?.name)
             StringUtils.initEditTextFilter(textGp)
+            textGp.setSelection(textGp.getText().toString().length)
             android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
                     .setTitle(R.string.rename)
                     .setView(textGp)

@@ -177,7 +177,7 @@ object DBUtils {
     }
 
     
-    fun getLightByID(id: Long): DbLight {
+    fun getLightByID(id: Long): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
     }
 
