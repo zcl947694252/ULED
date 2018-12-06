@@ -338,7 +338,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private Disposable createConnectTimeout() {
         return Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();
                     mConnectTimer = null;
                 });
@@ -412,6 +412,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             ActivityUtils.startActivity(MainActivity.class);
             finish();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mConnectTimer != null)
+            mConnectTimer.dispose();
     }
 
     /**

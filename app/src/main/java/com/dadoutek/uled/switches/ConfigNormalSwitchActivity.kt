@@ -131,15 +131,16 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         fab.setOnClickListener { view ->
             if (mAdapter.selectedPos != -1) {
                 progressBar.visibility = View.VISIBLE
-                mIsConfiguring = true
                 setGroupForSwitch()
                 Commander.updateMeshName(successCallback = {
+                    mIsConfiguring = true
                     disconnect()
                 },
                         failedCallback = {
                             snackbar(configGroupRoot, getString(R.string.group_failed))
                             launch(UI) {
                                 progressBar.visibility = View.GONE
+                                mIsConfiguring = false
                             }
                         })
             } else {

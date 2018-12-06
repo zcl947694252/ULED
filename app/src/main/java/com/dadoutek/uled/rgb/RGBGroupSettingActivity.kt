@@ -281,7 +281,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
-        Thread {
+//        Thread {
             changeColor(red.toByte(), green.toByte(), blue.toByte(),true)
 
             try {
@@ -293,16 +293,16 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                 group?.color = color
 
                 LogUtils.d("changedff2"+opcode+"--"+addr+"--"+brightness)
-                for(i in 0..3){
+//                for(i in 0..3){
                     Thread.sleep(50)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-                }
+//                }
 //                DBUtils.updateGroup(group!!)
 //                updateLights(color, "rgb_color", group!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+//        }.start()
 
         brightnessBar?.progress = brightness!!
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
@@ -505,10 +505,10 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         Log.d("RGBCOLOR", logStr)
 
         if(isOnceSet){
-            for(i in 0..3){
+//            for(i in 0..3){
                 Thread.sleep(50)
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-            }
+//            }
         }else{
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
         }

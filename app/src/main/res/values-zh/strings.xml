@@ -463,4 +463,5 @@
     <string name="install_success">安装成功</string>
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
+    <string name="sure_delete">确定要删除此场景吗？</string>
 </resources>
