@@ -152,9 +152,10 @@ public class Peripheral extends BluetoothGattCallback {
                 TelinkLog.d("Peripheral# gatt NULL onDisconnect:" + this.getDeviceName() + " -- "
                         + this.getMacAddress());
                 this.onDisconnect();
-            }else{
-//                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
             }
+//            else{
+//                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
+//            }
         }
 
     }

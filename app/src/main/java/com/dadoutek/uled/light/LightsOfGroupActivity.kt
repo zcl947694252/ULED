@@ -101,6 +101,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
+    private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
 
@@ -625,7 +626,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+        mCheckRssiDisposal?.dispose()
+        mCheckRssiDisposal=RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
                 .subscribe {
                     if (it) {
@@ -685,7 +687,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
                     override fun onError(e: Throwable) {
                         Log.d("SawTest", "error = $e")
-
                     }
                 })
     }
@@ -748,6 +749,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         //移除事件
         this.mApplication?.removeEventListener(this)
         stopConnectTimer()
+        mCheckRssiDisposal?.dispose()
     }
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {

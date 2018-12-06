@@ -37,6 +37,7 @@ public class StringUtils {
     }
 
     public static void initEditTextFilter(EditText editText) {
+        editText.setSelection(editText.getText().toString().length());
         //表情过滤器
         InputFilter emojiFilter = (source, start, end, dest, dstart, dend) -> {
             Pattern emoji = Pattern.compile(

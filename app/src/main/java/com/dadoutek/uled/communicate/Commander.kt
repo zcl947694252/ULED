@@ -352,7 +352,7 @@ object Commander : EventListener<String> {
         val gradientActionType= 0x02
         val params: ByteArray
             params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
-        for(i in 0..1){
+        for(i in 0..2){
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
         }

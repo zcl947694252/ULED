@@ -945,6 +945,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private View.OnClickListener onClick= v -> {
+        stopTimer();
         onLeScanTimeout();
     };
 

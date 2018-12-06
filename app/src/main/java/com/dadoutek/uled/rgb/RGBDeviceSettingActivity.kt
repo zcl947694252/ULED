@@ -86,6 +86,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)
+        textGp.setSelection(textGp.getText().toString().length)
         android.app.AlertDialog.Builder(this@RGBDeviceSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
