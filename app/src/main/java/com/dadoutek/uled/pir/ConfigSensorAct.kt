@@ -30,11 +30,13 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
-    private var builder:com.app.hubert.guide.core.Builder?=null
+//    private var builder:com.app.hubert.guide.core.Builder?=null
     private var mGroupsName: ArrayList<String>?=null
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
+    private var getVersionRetryMaxCount=2
+    private var getVersionRetryCount=0
 
     private var modeStartUpMode=0
     private var modeDelayUnit=0
@@ -84,10 +86,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         val guide3= spTriggerLux
         val guide4= spSelectGroup
 
-        builder= GuideUtils.guideBuilder(this@ConfigSensorAct,Constant.TAG_ConfigSensorAct)
-        builder?.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_1)))
-        builder?.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_2)))
-        builder?.addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_4)))
+//        builder= GuideUtils.guideBuilder(this@ConfigSensorAct,Constant.TAG_ConfigSensorAct)
+//        builder?.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_1)))
+//        builder?.addGuidePage(GuideUtils.addGuidePage(guide2,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_2)))
+//        builder?.addGuidePage(GuideUtils.addGuidePage(guide4,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_4)))
     }
 
     private fun getVersion() {
@@ -99,6 +101,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
                         val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
+                        LogUtils.d("kkkk"+versionNum)
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
                         isSupportModeSelect = (it ?: "").contains("PS")
@@ -107,26 +110,31 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             tvSelectStartupMode.visibility = View.VISIBLE
                             spSelectStartupMode.visibility = View.VISIBLE
 
-                            builder?.addGuidePage(GuideUtils.addGuidePage(spSelectStartupMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_5)))
+//                            builder?.addGuidePage(GuideUtils.addGuidePage(spSelectStartupMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_5)))
                             if(versionNum>=113){
                                 isSupportDelayUnitSelect=true
                                 tvSwitchMode.visibility =View.VISIBLE
                                 spSwitchMode.visibility=View.VISIBLE
                                 tvDelayUnit.visibility=View.VISIBLE
                                 spDelayUnit.visibility=View.VISIBLE
-                                builder?.addGuidePage(GuideUtils.addGuidePage(spSwitchMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_6)))
-                                builder?.addGuidePage(GuideUtils.addGuidePage(spDelayUnit,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_7)))
+//                                builder?.addGuidePage(GuideUtils.addGuidePage(spSwitchMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_6)))
+//                                builder?.addGuidePage(GuideUtils.addGuidePage(spDelayUnit,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_7)))
                             }
                         }
-                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
-                        builder?.show()
+//                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
+//                        builder?.show()
                     },
                     failedCallback = {
-                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
-                        builder?.show()
+//                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
+//                        builder?.show()
                         versionLayoutPS.visibility = View.GONE
+                        getVersionRetryCount++
+                        if(getVersionRetryCount<=getVersionRetryMaxCount){
+                            getVersion()
+                        }
                     })
         } else {
+            ToastUtils.showLong(R.string.device_not_connected)
             dstAdress = 0
         }
     }

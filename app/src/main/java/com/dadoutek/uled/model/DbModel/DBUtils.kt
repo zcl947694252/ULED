@@ -177,7 +177,7 @@ object DBUtils {
     }
 
     
-    fun getLightByID(id: Long): DbLight {
+    fun getLightByID(id: Long): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
     }
 
@@ -566,10 +566,10 @@ object DBUtils {
             gpNameList.add(gpList[i].name)
         }
 
-        var count=0
+        var count=gpList.size
         while (true){
             count++
-            val newName = "组" +count
+            val newName = TelinkLightApplication.getInstance().getString(R.string.group) +count
                 if(!gpNameList.contains(newName)){
                    return newName
                 }
@@ -584,10 +584,10 @@ object DBUtils {
             scNameList.add(scList[i].name)
         }
 
-        var count=0
+        var count=scList.size
         while (true){
             count++
-            val newName = "场景" +count
+            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) +count
                 if(!scNameList.contains(newName)){
                     return newName
                 }

@@ -56,9 +56,10 @@ object Commander : EventListener<String> {
         val params: ByteArray
 
         if (isOpen) {
-            params = byteArrayOf(0x01, 0x00, 0x00)
+            //0x64代表延时100ms保证开关同步
+            params = byteArrayOf(0x01, 0x64, 0x00)
         } else {
-            params = byteArrayOf(0x00, 0x00, 0x00)
+            params = byteArrayOf(0x00, 0x64, 0x00)
         }
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
@@ -351,7 +352,10 @@ object Commander : EventListener<String> {
         val gradientActionType= 0x02
         val params: ByteArray
             params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        for(i in 0..2){
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            Thread.sleep(50)
+        }
     }
 
     //删除渐变
@@ -392,11 +396,11 @@ object Commander : EventListener<String> {
         var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
 
         val params: ByteArray
-        if (TelinkApplication.getInstance().getConnectDevice().meshAddress == dstAddr) {
+        if (TelinkApplication.getInstance().connectDevice.meshAddress == dstAddr) {
             params = byteArrayOf(0x00, 0x00)
         } else {
             opcode = Opcode.SEND_MESSAGE_BY_MESH
-            params = byteArrayOf(0x3c, TelinkApplication.getInstance().getConnectDevice().meshAddress.toByte())
+            params = byteArrayOf(0x3c, TelinkApplication.getInstance().connectDevice.meshAddress.toByte())
         }
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
@@ -415,7 +419,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        if (t >= 30) {   //30次 * 200 = 6000, 也就是超过了2s就超时
+                        if (t >= 10) {   //30次 * 200 = 6000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
                         } else if (mGetVersionSuccess) {

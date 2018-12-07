@@ -65,8 +65,8 @@ public class ForgetPassWordActivity extends TelinkBaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.update_password);
 
-        StringUtils.initEditTextFilter(editNewPassword.getEditText());
-        StringUtils.initEditTextFilter(editNewPasswordSure.getEditText());
+        StringUtils.initEditTextFilterForRegister(editNewPassword.getEditText());
+        StringUtils.initEditTextFilterForRegister(editNewPasswordSure.getEditText());
     }
 
     @Override

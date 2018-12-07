@@ -37,7 +37,6 @@ import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -45,7 +44,6 @@ import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_rgb_device_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
@@ -87,9 +85,10 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
     private fun renameLight() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
+        textGp.setText(light?.name)
+        textGp.setSelection(textGp.getText().toString().length)
         android.app.AlertDialog.Builder(this@RGBDeviceSettingActivity)
                 .setTitle(R.string.rename)
-                .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
 
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
@@ -168,11 +167,11 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         val red = color and 0xff0000 shr 16
         val green = color and 0x00ff00 shr 8
         val blue = color and 0x0000ff
-        Thread {
-            changeColor(red.toByte(), green.toByte(), blue.toByte())
+//        Thread {
+            changeColor(red.toByte(), green.toByte(), blue.toByte(),true)
 
             try {
-                Thread.sleep(200)
+                Thread.sleep(100)
                 val addr = light!!.meshAddr
                 val opcode: Byte
                 val params: ByteArray
@@ -180,18 +179,27 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
                 params = byteArrayOf(brightness.toByte())
                 light!!.brightness = brightness
                 light!!.setColor(color)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
-                DBUtils.updateLight(light!!)
+//                for(i in 0..3){
+                    Thread.sleep(50)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+//                }
+//                DBUtils.updateLight(light!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+//        }.start()
 
         sb_brightness!!.progress = brightness
+        tv_brightness.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
         //            scrollView.setBackgroundColor(color);
         color_r!!.text = red.toString() + ""
         color_g!!.text = green.toString() + ""
         color_b!!.text = blue.toString() + ""
+    }
+
+    override fun onPause() {
+        super.onPause()
+        DBUtils.updateLight(light!!)
     }
 
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
@@ -219,7 +227,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
             if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
             } else {
                 light!!.setColor(color)
-                Thread { changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte()) }.start()
+                Thread { changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false) }.start()
             }
         }
     }
@@ -399,7 +407,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         this.sb_temperature!!.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
-    private fun changeColor(R: Byte, G: Byte, B: Byte) {
+    private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
 
         DBUtils.updateLight(light!!)
 
@@ -408,7 +416,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         var blue = B
 
         val addr = light!!.meshAddr
-        val opcode = 0xE2.toByte()
+        val opcode = Opcode.SET_TEMPERATURE
 
         val minVal = 0x50
 
@@ -423,9 +431,14 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         val params = byteArrayOf(0x04, red, green, blue)
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-        Log.d("RGBCOLOR", logStr)
-
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+        if(isOnceSet){
+//            for(i in 0..3){
+                Thread.sleep(50)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+//            }
+        }else{
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        }
     }
 
     private fun sendInitCmd(brightness: Int, colorTemperature: Int) {

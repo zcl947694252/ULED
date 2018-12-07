@@ -39,6 +39,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/img_light"
+        android:singleLine="true"
         />
 
     <TextView
@@ -63,7 +64,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/light_name" />
+        app:layout_constraintTop_toBottomOf="@id/light_name"
+        android:singleLine="true"
+        />
 
 
 </android.support.constraint.ConstraintLayout>

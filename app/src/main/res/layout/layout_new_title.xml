@@ -31,7 +31,7 @@
             android:layout_marginStart="30dp"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:text="@string/SceneSetting"
+            android:text="@string/scene_name"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />

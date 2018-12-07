@@ -138,8 +138,10 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
         }else{
             if(TelinkLightApplication.getInstance().getConnectDevice().meshAddress==item.getMeshAddr()){
                 tvName.setTextColor(mContext.getResources().getColor(R.color.primary));
+                tvLightName.setTextColor(mContext.getResources().getColor(R.color.primary));
             }else{
-                tvName.setTextColor(mContext.getResources().getColor(R.color.black));
+                tvName.setTextColor(mContext.getResources().getColor(R.color.gray));
+                tvLightName.setTextColor(mContext.getResources().getColor(R.color.black));
             }
         }
 

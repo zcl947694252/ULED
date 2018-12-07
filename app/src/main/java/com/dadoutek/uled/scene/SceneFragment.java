@@ -1,9 +1,10 @@
 package com.dadoutek.uled.scene;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -12,7 +13,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,8 +41,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-
-import static android.content.Context.POWER_SERVICE;
 
 /**
  * Created by hejiajun on 2018/5/2.
@@ -93,7 +91,7 @@ public class SceneFragment extends BaseFragment implements
     private void initToolBar(View view) {
         setHasOptionsMenu(true);
         toolbar = view.findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.SceneSetting);
+        toolbar.setTitle(R.string.scene_name);
 
         ImageView btn_add = toolbar.findViewById(R.id.img_function1);
         ImageView btn_delete = toolbar.findViewById(R.id.img_function2);
@@ -236,15 +234,19 @@ public class SceneFragment extends BaseFragment implements
     }
 
     BaseQuickAdapter.OnItemClickListener onItemClickListener = (adapter, view, position) -> {
-        setScene(scenesListData.get(position).getId());
+        try {
+            if(position<adapter.getData().size()){
+                setScene(scenesListData.get(position).getId());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     };
 
     BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener = (adapter, view, position) -> {
         if (view.getId() == R.id.scene_delete) {
 //                dataManager.deleteScene(scenesListData.get(position));
-            deleteScene(position);
-            adapter.notifyItemRemoved(position);
-
+            showDeleteDialog(adapter,position);
 //            refreshData();
         } else if (view.getId() == R.id.scene_edit) {
 //                setScene(scenesListData.get(position).getId());
@@ -255,6 +257,19 @@ public class SceneFragment extends BaseFragment implements
             startActivityForResult(intent, 0);
         }
     };
+
+    private void showDeleteDialog(BaseQuickAdapter adapter, int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.sure_delete);
+        builder.setPositiveButton(getActivity().getString(android.R.string.ok), (dialog, which) -> {
+            deleteScene(position);
+            adapter.notifyItemRemoved(position);
+        });
+        builder.setNegativeButton(getActivity().getString(R.string.cancel), (dialog, which) -> {
+        });
+        AlertDialog dialog=builder.show();
+        dialog.show();
+    }
 
     private void refreshData() {
         adaper.notifyDataSetChanged();

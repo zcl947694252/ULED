@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:max="100"
                 android:padding="5dp"
-                android:progress="10" />
+                android:progress="100" />
         </LinearLayout>
 
         <View
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:max="100"
                 android:padding="5dp"
-                android:progress="10" />
+                android:progress="100" />
         </LinearLayout>
 
         <!-- Music -->

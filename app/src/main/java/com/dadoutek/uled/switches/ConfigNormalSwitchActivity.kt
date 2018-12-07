@@ -1,12 +1,15 @@
 package com.dadoutek.uled.switches
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -21,21 +24,25 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
-import com.telink.bluetooth.light.LightAdapter.MODE_UPDATE_MESH
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.Strings
-import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.util.concurrent.TimeUnit
 
+
+private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
@@ -75,52 +82,65 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
     }
 
+    private fun showCancelDialog() {
+        AlertDialog.Builder(this)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok) { dialog, which ->
+                    if (TelinkLightService.Instance().isLogin) {
+                        progressBar.visibility = View.VISIBLE
+                        mIsDisconnecting = true
+                        disconnect()
+                    } else {
+                        finish()
+                    }
+                }
+                .setTitle(R.string.do_you_really_want_to_cancel)
+                .show()
+
+    }
+
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
-                doFinish()
+                showCancelDialog()
+
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun doFinish() {
-        this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
-        finish()
-    }
+    private var mIsDisconnecting: Boolean = false
 
-    private fun configureComplete() {
-        this.mApplication.removeEventListener(this)
+    private fun disconnect() {
         TelinkLightService.Instance().idleMode(true)
         TelinkLightService.Instance().disconnect()
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
     override fun onBackPressed() {
-        doFinish();
+        showCancelDialog();
     }
 
+    private var mIsConfiguring: Boolean = false
+
     private fun initListener() {
-//        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
         fab.setOnClickListener { view ->
             if (mAdapter.selectedPos != -1) {
                 progressBar.visibility = View.VISIBLE
                 setGroupForSwitch()
-//                updateNameForSwitch()
                 Commander.updateMeshName(successCallback = {
-                    launch(UI) {
-                        progressBar.visibility = View.GONE
-                    }
-                    configureComplete()
+                    mIsConfiguring = true
+                    disconnect()
                 },
                         failedCallback = {
                             snackbar(configGroupRoot, getString(R.string.group_failed))
                             launch(UI) {
                                 progressBar.visibility = View.GONE
+                                mIsConfiguring = false
                             }
                         })
             } else {
@@ -151,14 +171,155 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun performed(event: Event<String>?) {
         when (event?.type) {
 
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
+            }
+
+
         }
+    }
+
+    private fun onErrorReport(info: ErrorReportInfo) {
+        when (info.stateCode) {
+            ErrorReportEvent.STATE_SCAN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                    }
+                }
+                showDisconnectSnackBar()
+
+            }
+            ErrorReportEvent.STATE_CONNECT -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+
+                    }
+                }
+                showDisconnectSnackBar()
+
+            }
+            ErrorReportEvent.STATE_LOGIN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                    }
+                }
+                LogUtils.d("onError login")
+                showDisconnectSnackBar()
+
+            }
+        }
+    }
+
+    private fun showDisconnectSnackBar() {
+        TelinkLightService.Instance().idleMode(true)
+        mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
+                .string.device_disconnected), getString(R.string.reconnect)) {
+            reconnect()
+        }
+    }
+
+    private var mDisconnectSnackBar: Snackbar? = null
+
+    private var mConnectedSnackBar: Snackbar? = null
+
+    private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
+        val deviceInfo = deviceEvent.args
+//        mDeviceMeshName = deviceInfo.meshName
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                mConnectingSnackBar?.dismiss()
+                mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
+            }
+
+
+            LightAdapter.STATUS_LOGOUT -> {
+//                onLoginFailed()
+                if (mIsDisconnecting) {
+                    this.mApplication.removeEventListener(this)
+
+                    launch(UI) {
+                        delay(200, TimeUnit.MILLISECONDS)
+                        progressBar.visibility = View.GONE
+                        finish()
+                    }
+                } else if (mIsConfiguring) {
+                    this.mApplication.removeEventListener(this)
+                    launch(UI) {
+                        progressBar.visibility = View.GONE
+                        showConfigSuccessDialog()
+                    }
+                } else {
+                    showDisconnectSnackBar()
+
+                    LogUtils.d("Disconnected")
+                }
+            }
+        }
+
+    }
+
+    private fun showConfigSuccessDialog() {
+
+        AlertDialog.Builder(this)
+                .setCancelable(false)
+                .setTitle(R.string.install_success)
+                .setMessage(R.string.tip_config_switch_success)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                }
+                .show()
+
+    }
+
+    private var mConnectingSnackBar: Snackbar? = null
+
+    private fun reconnect() {
+
+        //自动重连参数
+        val connectParams = Parameters.createAutoConnectParameters()
+        connectParams.setMeshName(mDeviceInfo.meshName)
+
+        val mesh = TelinkLightApplication.getApp().mesh
+        val pwd: String
+        if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+            pwd = mesh.factoryPassword.toString()
+        } else {
+            pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
+                    .substring(0, 16)
+        }
+        connectParams.setPassword(pwd)
+        connectParams.autoEnableNotification(true)
+        connectParams.setTimeoutSeconds(CONNECT_TIMEOUT)
+        connectParams.setConnectMac(mDeviceInfo.macAddress)
+
+        mDisconnectSnackBar?.dismiss()
+        mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
+                .string.connecting))
+
+        TelinkLightService.Instance().autoConnect(connectParams)
 
     }
 

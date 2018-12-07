@@ -1,5 +1,6 @@
 package com.dadoutek.uled.group
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -38,6 +39,7 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
         return null
     }
 
+    @SuppressLint("ViewHolder")
     @Deprecated("")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var convertView: View? = convertView

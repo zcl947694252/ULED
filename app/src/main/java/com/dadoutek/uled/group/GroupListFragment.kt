@@ -202,35 +202,37 @@ class GroupListFragment : BaseFragment() {
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        val group = showList!![position]
-        val dstAddr = group.meshAddr
-        var intent: Intent
+        if(dialog_pop.visibility==View.GONE || dialog_pop==null){
+            val group = showList!![position]
+            val dstAddr = group.meshAddr
+            var intent: Intent
 
-        if (!dataManager!!.getConnectState(activity)) {
-            return@OnItemChildClickListener
-        }
-
-        when (view.getId()) {
-            R.id.btn_on -> {
-                Commander.openOrCloseLights(dstAddr, true)
-                updateLights(true, group)
-            }
-            R.id.btn_off -> {
-                Commander.openOrCloseLights(dstAddr, false)
-                updateLights(false, group)
-            }
-            R.id.btn_set -> {
-                intent = Intent(mContext, NormalGroupSettingActivity::class.java)
-                if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
-                    intent = Intent(mContext, RGBGroupSettingActivity::class.java)
+            if (TelinkLightApplication.getInstance().connectDevice == null) {
+                ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+            }else{
+                when (view.getId()) {
+                    R.id.btn_on -> {
+                        Commander.openOrCloseLights(dstAddr, true)
+                        updateLights(true, group)
+                    }
+                    R.id.btn_off -> {
+                        Commander.openOrCloseLights(dstAddr, false)
+                        updateLights(false, group)
+                    }
+                    R.id.btn_set -> {
+                        intent = Intent(mContext, NormalGroupSettingActivity::class.java)
+                        if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
+                            intent = Intent(mContext, RGBGroupSettingActivity::class.java)
+                        }
+                        intent.putExtra("group", group)
+                        startActivityForResult(intent, 0)
+                    }
+                    R.id.txt_name -> {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                        intent.putExtra("group", group)
+                        startActivityForResult(intent, 0)
+                    }
                 }
-                intent.putExtra("group", group)
-                startActivityForResult(intent, 0)
-            }
-            R.id.txt_name -> {
-                intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                intent.putExtra("group", group)
-                startActivityForResult(intent, 0)
             }
         }
     }
@@ -295,7 +297,6 @@ class GroupListFragment : BaseFragment() {
                         DBUtils.updateLightLocal(dbLight)
                     }
                 }
-
     }
 
     fun loadData(): List<DbGroup> {
@@ -460,6 +461,8 @@ class GroupListFragment : BaseFragment() {
                         hidePopupMenu()
                     }
                 }.start()
+            }else if(dialog_pop==null){
+                hidePopupMenu()
             }
         }
     }

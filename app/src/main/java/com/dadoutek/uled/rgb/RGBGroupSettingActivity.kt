@@ -1,16 +1,11 @@
 package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Point
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
@@ -18,8 +13,6 @@ import android.view.KeyEvent
 import android.view.MenuItem
 import android.view.View
 import android.view.View.OnClickListener
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -27,7 +20,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.NormalGroupSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -51,12 +43,10 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_group_setting.*
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.experimental.and
 
 class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
@@ -153,7 +143,8 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
                             com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
-                            showLoadingDialog(getString(R.string.connect_failed))
+//                            showLoadingDialog()
+                            ToastUtils.showLong(getString(R.string.connect_failed))
                             finish()
                         }
             }
@@ -284,29 +275,37 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
+
+//        LogUtils.d("changedff$color")
         val brightness = presetColors?.get(position)?.brightness
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
-        Thread {
-            changeColor(red.toByte(), green.toByte(), blue.toByte())
+//        Thread {
+            changeColor(red.toByte(), green.toByte(), blue.toByte(),true)
 
             try {
-                Thread.sleep(200)
+                Thread.sleep(100)
                 val addr = group?.meshAddr
                 val opcode: Byte = Opcode.SET_LUM
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
                 group?.brightness = brightness
                 group?.color = color
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-                DBUtils.updateGroup(group!!)
-                updateLights(color, "rgb_color", group!!)
+
+                LogUtils.d("changedff2"+opcode+"--"+addr+"--"+brightness)
+//                for(i in 0..3){
+                    Thread.sleep(50)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+//                }
+//                DBUtils.updateGroup(group!!)
+//                updateLights(color, "rgb_color", group!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+//        }.start()
 
         brightnessBar?.progress = brightness!!
+        tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
 //        scrollView?.setBackgroundColor(color)
         colorR?.text = red.toString()
         colorG?.text = green.toString()
@@ -475,31 +474,44 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             }else{
                 Thread{
                     group?.color = color
-                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte())
+                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
 
                 }.start()
             }
         }
     }
 
-    private fun changeColor(R: Byte, G: Byte, B: Byte) {
+    private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
 
         var red  = R
         var green = G
         var blue = B
 
         val addr = group?.meshAddr
-        val opcode = 0xE2.toByte()
+        val opcode = Opcode.SET_TEMPERATURE
 
         val minVal = 0x50
 
+        if (green.toInt() and 0xff <= minVal)
+            green = 0
+        if (red.toInt() and 0xff <= minVal)
+            red = 0
+        if (blue.toInt() and 0xff <= minVal)
+            blue = 0
 
         val params = byteArrayOf(0x04, red, green, blue)
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
         Log.d("RGBCOLOR", logStr)
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        if(isOnceSet){
+//            for(i in 0..3){
+                Thread.sleep(50)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+//            }
+        }else{
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        }
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
@@ -592,10 +604,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     private fun renameGp() {
             val textGp = EditText(this)
+            textGp.setText(group?.name)
             StringUtils.initEditTextFilter(textGp)
+            textGp.setSelection(textGp.getText().toString().length)
             android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
                     .setTitle(R.string.rename)
-                    .setIcon(android.R.drawable.ic_dialog_info)
                     .setView(textGp)
 
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->

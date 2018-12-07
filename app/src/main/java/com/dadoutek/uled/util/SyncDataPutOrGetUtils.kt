@@ -133,7 +133,7 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val light = DBUtils.getLightByID(changeId)
-                            return LightModel.add(token, light, id, changeId)
+                            return LightModel.add(token, light!!, id, changeId)
                         }
                         Constant.DB_DELETE -> {
                             return LightModel.delete(token,
@@ -141,10 +141,12 @@ class SyncDataPutOrGetUtils {
                         }
                         Constant.DB_UPDATE -> {
                             val light = DBUtils.getLightByID(changeId)
-                            return LightModel.update(token,
-                                    light.name, light.brightness,
-                                    light.colorTemperature, light.belongGroupId.toInt(),light.color,
-                                    id, changeId.toInt())
+                            if(light!=null){
+                                return LightModel.update(token,
+                                        light.name, light.brightness,
+                                        light.colorTemperature, light.belongGroupId.toInt(),light.color,
+                                        id, changeId.toInt())
+                            }
                         }
                     }
                 }

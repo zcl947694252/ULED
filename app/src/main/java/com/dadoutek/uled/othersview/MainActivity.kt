@@ -11,6 +11,7 @@ import android.content.IntentFilter
 import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
+import android.os.PersistableBundle
 import android.os.PowerManager
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
@@ -138,6 +139,13 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         isCreate=true
     }
 
+    //防止viewpager嵌套fragment,fragment放置后台时间过长,fragment被系统回收了
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+
+        super.onSaveInstanceState(outState)
+        outState.putParcelable("android:support:fragments", null)
+    }
+
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if(ev?.getAction()==MotionEvent.ACTION_DOWN){
             if(!groupFragment.isHidden){
@@ -221,11 +229,12 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         }
 
         //判断装灯页面引导完成且场景页面引导还没开始,进行场景页面强制引导
-        if(GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_INSTALL_LIGHT_KEY,false) &&
-                !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
-            guide1()
-            isCreate=false
-        }
+        //依需求暂时屏蔽强制引导到场景
+//        if(GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_INSTALL_LIGHT_KEY,false) &&
+//                !GuideUtils.getCurrentViewIsEnd(this,GuideUtils.END_ADD_SCENE_KEY,false)&&!isCreate){
+//            guide1()
+//            isCreate=false
+//        }
 //        else if(DBUtils.allLight.isEmpty()){
 //            GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_GROUPLIST_KEY,false)
 //            tranHome()
@@ -530,6 +539,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
 
                     if (mConnectSuccessSnackBar?.isShown != true)
                         mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
+                        mConnectSnackBar?.dismiss()
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
@@ -603,7 +613,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                         dbLightNew.color = 0
                         dbLightNew.colorTemperature = 0
                         dbLightNew.meshAddr = meshAddress
-                        dbLightNew.name = getString(R.string.allLight)
+                        dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
 //                        Thread {
                             DBUtils.saveLight(dbLightNew, false)

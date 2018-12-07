@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="false"
             android:singleLine="true"
-            android:maxLength="16"
+            android:maxLength="50"
             android:textSize="18sp"
             android:layout_gravity="center"
             android:text=""
@@ -128,6 +128,17 @@
             app:aet_autoSizeTextType="uniform"
             app:aet_autoSizeMaxTextSize="18sp"
             app:aet_autoSizeMinTextSize="10sp"
+            />
+
+        <TextView
+            android:id="@+id/titleCenterName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:singleLine="true"
+            android:visibility="gone"
             />
     </android.support.v7.widget.Toolbar>
 

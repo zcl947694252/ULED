@@ -465,6 +465,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         if (mWakeLock != null) {
             mWakeLock.acquire();
         }
+
+        stopConnectTimer();
+        stopScanTimer();
     }
 
     private void updateSuccess() {
@@ -489,7 +492,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             startScan();
         }
     }
-
 
     AlertDialog.Builder mScanTimeoutDialog;
 

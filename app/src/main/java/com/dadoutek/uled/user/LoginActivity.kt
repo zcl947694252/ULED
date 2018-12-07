@@ -98,8 +98,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         btn_register.setOnClickListener(this)
         forget_password.setOnClickListener(this)
 
-        com.dadoutek.uled.util.StringUtils.initEditTextFilter(edit_user_phone_or_email!!.editText)
-        com.dadoutek.uled.util.StringUtils.initEditTextFilter(edit_user_password!!.editText)
+        com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email!!.editText)
+        com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password!!.editText)
 
         val info = SharedPreferencesUtils.getLastUser()
         if (info != null && !info.isEmpty()) {
