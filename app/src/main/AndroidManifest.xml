@@ -201,6 +201,12 @@
         <activity
             android:name=".rgb.RGBGradientActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".light.ScanningLightlightActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".light.ConfigLightlightActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

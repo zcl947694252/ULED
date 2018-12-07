@@ -464,4 +464,8 @@
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
+    <string name="light_light">小夜灯</string>
+    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
+    <string name="light_light_title">小夜灯</string>
+    <string name="delay_time">延时时间</string>
 </resources>
