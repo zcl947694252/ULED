@@ -35,6 +35,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
+    private var getVersionRetryMaxCount=2
+    private var getVersionRetryCount=0
 
     private var modeStartUpMode=0
     private var modeDelayUnit=0
@@ -99,6 +101,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
                         val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
+                        LogUtils.d("kkkk"+versionNum)
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
                         isSupportModeSelect = (it ?: "").contains("PS")
@@ -125,8 +128,13 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 //                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
 //                        builder?.show()
                         versionLayoutPS.visibility = View.GONE
+                        getVersionRetryCount++
+                        if(getVersionRetryCount<=getVersionRetryMaxCount){
+                            getVersion()
+                        }
                     })
         } else {
+            ToastUtils.showLong(R.string.device_not_connected)
             dstAdress = 0
         }
     }

@@ -396,11 +396,11 @@ object Commander : EventListener<String> {
         var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
 
         val params: ByteArray
-        if (TelinkApplication.getInstance().getConnectDevice().meshAddress == dstAddr) {
+        if (TelinkApplication.getInstance().connectDevice.meshAddress == dstAddr) {
             params = byteArrayOf(0x00, 0x00)
         } else {
             opcode = Opcode.SEND_MESSAGE_BY_MESH
-            params = byteArrayOf(0x3c, TelinkApplication.getInstance().getConnectDevice().meshAddress.toByte())
+            params = byteArrayOf(0x3c, TelinkApplication.getInstance().connectDevice.meshAddress.toByte())
         }
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
@@ -419,7 +419,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        if (t >= 30) {   //30次 * 200 = 6000, 也就是超过了2s就超时
+                        if (t >= 10) {   //30次 * 200 = 6000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
                         } else if (mGetVersionSuccess) {

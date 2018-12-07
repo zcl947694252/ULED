@@ -188,7 +188,9 @@
         <activity
             android:name=".othersview.AboutSomeQuestionsActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".pir.ScanningSensorActivity" />
+        <activity android:name=".pir.ScanningSensorActivity"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".rgb.RGBDeviceSettingActivity"
             android:screenOrientation="portrait" />
