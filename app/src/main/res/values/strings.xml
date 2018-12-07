@@ -423,7 +423,7 @@
         
     <string name="add_scene_guide_6">Click Save to save the scene</string>
         
-    <string name="config_pir_guide_1">How long does it take to enter the trigger here</string>
+    <string name="config_pir_guide_1">Delay-time to final brightness</string>
         
     <string name="config_pir_guide_2">Enter the final brightness after the delay</string>
         
@@ -519,5 +519,6 @@
     <string name="install_success">Successful installation</string>
     <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
+    <string name="sure_delete">确定要删除此场景吗？</string>
 
 </resources>

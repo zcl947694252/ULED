@@ -167,7 +167,7 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
         val red = color and 0xff0000 shr 16
         val green = color and 0x00ff00 shr 8
         val blue = color and 0x0000ff
-        Thread {
+//        Thread {
             changeColor(red.toByte(), green.toByte(), blue.toByte(),true)
 
             try {
@@ -179,15 +179,15 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
                 params = byteArrayOf(brightness.toByte())
                 light!!.brightness = brightness
                 light!!.setColor(color)
-                for(i in 0..3){
+//                for(i in 0..3){
                     Thread.sleep(50)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-                }
+//                }
 //                DBUtils.updateLight(light!!)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+//        }.start()
 
         sb_brightness!!.progress = brightness
         tv_brightness.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
@@ -432,10 +432,10 @@ class RGBDeviceSettingActivity : TelinkBaseActivity() {
 
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
         if(isOnceSet){
-            for(i in 0..3){
+//            for(i in 0..3){
                 Thread.sleep(50)
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-            }
+//            }
         }else{
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
         }

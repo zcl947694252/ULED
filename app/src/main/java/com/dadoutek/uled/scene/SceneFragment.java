@@ -1,5 +1,7 @@
 package com.dadoutek.uled.scene;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -232,15 +234,19 @@ public class SceneFragment extends BaseFragment implements
     }
 
     BaseQuickAdapter.OnItemClickListener onItemClickListener = (adapter, view, position) -> {
-        setScene(scenesListData.get(position).getId());
+        try {
+            if(position<adapter.getData().size()){
+                setScene(scenesListData.get(position).getId());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     };
 
     BaseQuickAdapter.OnItemChildClickListener onItemChildClickListener = (adapter, view, position) -> {
         if (view.getId() == R.id.scene_delete) {
 //                dataManager.deleteScene(scenesListData.get(position));
-            deleteScene(position);
-            adapter.notifyItemRemoved(position);
-
+            showDeleteDialog(adapter,position);
 //            refreshData();
         } else if (view.getId() == R.id.scene_edit) {
 //                setScene(scenesListData.get(position).getId());
@@ -251,6 +257,19 @@ public class SceneFragment extends BaseFragment implements
             startActivityForResult(intent, 0);
         }
     };
+
+    private void showDeleteDialog(BaseQuickAdapter adapter, int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.sure_delete);
+        builder.setPositiveButton(getActivity().getString(android.R.string.ok), (dialog, which) -> {
+            deleteScene(position);
+            adapter.notifyItemRemoved(position);
+        });
+        builder.setNegativeButton(getActivity().getString(R.string.cancel), (dialog, which) -> {
+        });
+        AlertDialog dialog=builder.show();
+        dialog.show();
+    }
 
     private void refreshData() {
         adaper.notifyDataSetChanged();
