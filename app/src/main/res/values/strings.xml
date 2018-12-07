@@ -101,7 +101,7 @@
     <string name="btn_ok">OK</string>
     <string name="btn_cancel">Cancel</string>
     <string name="add_groups">Add Group</string>
-    <string name="set_group">Set Group</string>
+    <string name="set_group">CONFIRM GROUPING</string>
     <string name="loading">Loading</string>
     <string name="scan_end">No device found!</string>
     <string name="connecting_tip">Connecting…</string>
@@ -145,7 +145,7 @@
     <string name="title_scanned_lights_num">%1$d</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
-    <string name="empty_cache_tip">Need to physically recover the lamp before clearing the data and start clearing the data?</string>
+    <string name="empty_cache_tip">Need to physically reset the light before clearing the data and start clearing the data?</string>
     <string name="factory_reset">Factory reset</string>
     <string name="add_str_group">Add group</string>
     <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
@@ -244,7 +244,7 @@
     <string name="tip_update_password_fail">Change failed</string>
     <string name="updating_password">Changing</string>
     <string name="connect_failed_if_there_are_lights">Connect failed, Please make sure there are lights nearby!</string>
-    <string name="not_grouped">No Groups</string>
+    <string name="not_grouped">No Group</string>
     <string name="scanning_devices">Scanning devices</string>
     <string name="tip_add_group">Please add a group first</string>
     <string name="scanning">Scanning</string>
@@ -411,7 +411,7 @@
         
     <string name="scan_light_guide_4">Click here to confirm grouping</string>
         
-    <string name="add_scene_guide_1">Click Add to select some groups</string>
+    <string name="add_scene_guide_1">Click to select some groups</string>
         
     <string name="add_scene_guide_2">Please select a group to add to this scene</string>
         
@@ -421,7 +421,7 @@
         
     <string name="add_scene_guide_5"> Here you can set the group color </string>
         
-    <string name="add_scene_guide_6">Click Save to save the scene</string>
+    <string name="add_scene_guide_6">Save the scene</string>
         
     <string name="config_pir_guide_1">Delay-time to final brightness</string>
         
@@ -517,6 +517,6 @@
     <string name="install_success">Successful installation</string>
     <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
-    <string name="sure_delete">确定要删除此场景吗？</string>
+    <string name="sure_delete">Confirm deleting this scene？</string>
 
 </resources>
