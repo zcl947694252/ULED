@@ -186,6 +186,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private boolean guideShowCurrentPage = false;
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
+    private long allLightId=0;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -516,7 +517,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }, new Function0<Unit>() {
             @Override
             public Unit invoke() {
-                dbLight.setBelongGroupId(-1L);
+                dbLight.setBelongGroupId(allLightId);
                 ToastUtils.showLong(R.string.group_fail_tip);
                 updateGroupResult(dbLight, dbGroup);
                 if (index + 1 > selectLights.size() - 1)
@@ -564,7 +565,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void updateGroupResult(DbLight light, DbGroup group) {
         for (int i = 0; i < nowLightList.size(); i++) {
             if (light.getMeshAddr() == nowLightList.get(i).getMeshAddr()) {
-                if (light.getBelongGroupId()!=-1L) {
+                if (light.getBelongGroupId()!=allLightId) {
                     nowLightList.get(i).hasGroup = true;
                     nowLightList.get(i).setBelongGroupId(group.getId());
                     nowLightList.get(i).setName(getString(R.string.unnamed));
@@ -636,7 +637,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      */
     private boolean isAllLightsGrouped() {
         for (int j = 0; j < nowLightList.size(); j++) {
-            if (nowLightList.get(j).getBelongGroupId()==-1) {
+            if (nowLightList.get(j).getBelongGroupId()==allLightId) {
                 return false;
             }
         }
@@ -983,6 +984,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false);
+        allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();
@@ -1168,7 +1170,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private String getDeviceName(DbLight light) {
-        if (light.getBelongGroupId()!=-1L) {
+        if (light.getBelongGroupId()!=allLightId) {
             return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
         } else {
             return getString(R.string.not_grouped);
@@ -1481,7 +1483,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.setMeshAddr(meshAddress);
                             light.textColor = this.getResources().getColor(
                                     R.color.black);
-                            light.setBelongGroupId(-1L);
+                            light.setBelongGroupId(allLightId);
                             light.setMacAddr(deviceInfo.macAddress);
                             light.setMeshUUID(deviceInfo.meshUUID);
                             light.setProductUUID(deviceInfo.productUUID);
@@ -1503,7 +1505,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             light.setMeshAddr(meshAddress);
                             light.textColor = this.getResources().getColor(
                                     R.color.black);
-                            light.setBelongGroupId(-1L);
+                            light.setBelongGroupId(allLightId);
                             light.setMacAddr(deviceInfo.macAddress);
                             light.setMeshUUID(deviceInfo.meshUUID);
                             light.setProductUUID(deviceInfo.productUUID);
