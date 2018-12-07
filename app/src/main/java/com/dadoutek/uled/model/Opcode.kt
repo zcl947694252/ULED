@@ -12,6 +12,7 @@ object Opcode {
     const val SCENE_ADD_OR_DEL: Byte = 0xEE.toByte()
     const val SCENE_LOAD: Byte = 0xEF.toByte()
     const val SET_LUM: Byte = 0xD2.toByte()
+    const val SET_W_LUM: Byte = 0xFA.toByte()
     const val SET_TEMPERATURE: Byte = 0xE2.toByte()
     const val KICK_OUT: Byte = 0xE3.toByte()
     const val APPLY_RGB_GRADIENT: Byte = 0xFE.toByte()

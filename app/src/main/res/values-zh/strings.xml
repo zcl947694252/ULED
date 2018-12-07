@@ -464,4 +464,5 @@
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
+    <string name="w_bright">白光亮度:%1$s</string>
 </resources>
