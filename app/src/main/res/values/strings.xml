@@ -141,7 +141,7 @@
     <string name="repeat_tip_name">Already have this group name, please modify!</string>
     <string name="successfully_modified">Successfully modified!</string>
     <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
-    <string name="title_scanning_lights_num">%1$d</string>
+    <string name="title_scanning_lights_num">Scanning:%1$d</string>
     <string name="title_scanned_lights_num">%1$d</string>
     <string name="click_double_exit">Press again to exit the program</string>
     <string name="empty_cache_title">Data clearing</string>
