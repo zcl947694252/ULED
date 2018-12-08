@@ -1,20 +1,32 @@
 package com.dadoutek.uled.light
 
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.graphics.Point
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.GroupListAdapter
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -27,6 +39,13 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
     private lateinit var mGroups: List<DbGroup>
     private var mGroupsName: ArrayList<String>?=null
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
+    private val CMD_OPEN_LIGHT=0X01
+    private val CMD_CLOSE_LIGHT=0X00
+    private val CMD_CONTROL_GROUP=0X02
+    private var switchMode=0X00
+    lateinit var secondsList:Array<String>
+    lateinit var minuteList:Array<String>
+    private var selectTime=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +63,11 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
         spSelectGroup.onItemSelectedListener = this
         spDelayUnit.onItemSelectedListener=this
         spDelay.onItemSelectedListener=this
+        spSwitchMode.onItemSelectedListener=this
+        secondsList=resources.getStringArray(R.array.light_light_seconds_list)
+        minuteList=resources.getStringArray(R.array.light_light_minute_list)
+        val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, minuteList)
+        spDelay.adapter = adapter
     }
 
     private fun getVersion() {
@@ -80,24 +104,31 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
     }
 
 
-    private fun configLightlight(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
-        LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
-                "   triggerValue = $triggerValue")
+    private fun configLightlight() {
 //        val spGroup = groupConvertSpecialValue(groupAddr)
-        val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
-        val groupL: Byte = (groupAddr and 0xff).toByte()
+        val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
+        val groupL: Byte = (mSelectGroupAddr and 0xff).toByte()
+        val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
+        val timeL: Byte = (selectTime and 0xff).toByte()
         val paramBytes = byteArrayOf(
-                0x01,
-                groupH, groupL,
-
-                delayTime.toByte(),
-                minBrightness.toByte(),
-                triggerValue.toByte(),
-                mode.toByte()
+                DeviceType.LIGHT_LIGHT.toByte(),
+                switchMode.toByte(),timeL,timeH
         )
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_PIR,
+        val paramBytesGroup = byteArrayOf(
+                DeviceType.LIGHT_LIGHT.toByte(),CMD_CONTROL_GROUP.toByte(),groupL
+        )
+
+        LogUtils.d("groupL="+groupL+"")
+
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
+
+        Thread.sleep(300)
+
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                mDeviceInfo.meshAddress,
+                paramBytesGroup)
 
         Thread.sleep(300)
     }
@@ -109,13 +140,121 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
             }
             R.id.spDelayUnit ->{
                 if(position==0){
-
+                    val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, minuteList)
+                    spDelay.adapter = adapter
                 }else{
-
+                    val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, secondsList)
+                    spDelay.adapter = adapter
+                }
+            }
+            R.id.spDelay ->{
+                val time=(spDelay.selectedItem as String).toInt()
+                if(position==0){
+                    selectTime=time*60
+                }else{
+                    selectTime=time
+                }
+            }
+            R.id.spSwitchMode->{
+                if(position==0){
+                    switchMode=CMD_OPEN_LIGHT
+                }else{
+                    switchMode=CMD_CLOSE_LIGHT
                 }
             }
         }
     }
+
+//    private fun inflatView() {
+//        val builder: AlertDialog.Builder
+//        val dialog: AlertDialog
+//        val showList = mGroups
+//
+//        val bottomView = View.inflate(this@SetSceneAct, R.layout.dialog_list, null)//填充ListView布局
+//        val lvGp = bottomView.findViewById<RecyclerView>(R.id.listview_group)//初始化ListView控件
+//        val btnSure = bottomView.findViewById<Button>(R.id.btn_sure)
+//        btnSure.visibility = View.GONE
+//
+//        builder = AlertDialog.Builder(this)
+//                .setView(bottomView)
+//        if (!GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)) {
+//            builder.setCancelable(false)
+//        }
+//        dialog = builder.create()
+//
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+//
+//        //        List<DbGroup> showList = showList;
+//        val groupListAdapter = GroupListAdapter(R.layout.item_group, showList)
+//        val layoutManager = LinearLayoutManager(this)
+//        lvGp.layoutManager = layoutManager
+//        lvGp.adapter = groupListAdapter
+//        groupListAdapter.bindToRecyclerView(lvGp)
+//
+//        dialog.setOnShowListener { step2Guide(lvGp, showList, dialog, groupListAdapter) }
+//
+//        dialog.show()
+//
+//
+//        val display = windowManager.defaultDisplay
+//        val size = Point()
+//        display.getSize(size)
+//        dialog.window!!.setLayout((size.x * 0.9).toInt(), WindowManager.LayoutParams.WRAP_CONTENT)
+//
+//
+//        groupListAdapter.setOnItemClickListener { adapter, view, position ->
+//
+//            if (position != -1) {
+//                val item = showList.get(position)
+//                if (item.getMeshAddr() == 0xffff) {
+//                    val itemGroup = ItemGroup()
+//                    itemGroup.brightness = 50
+//                    itemGroup.temperature = 50
+//                    itemGroup.groupAress = showList.get(position).getMeshAddr()
+//                    itemGroup.gpName = showList.get(position).getName()
+//                    changeData(position, showList)
+//                    sceneGroupAdapter.addData(itemGroup)
+//                    dialog.dismiss()
+//                } else {
+//                    btnSure.visibility = View.VISIBLE
+//                    if (showList.get(position).checked) {
+//                        showList.get(position).checked = false
+//                    } else {
+//                        showList.get(position).checked = true
+//                    }
+//
+//                    if (showList.get(0).getMeshAddr() == 0xffff) {
+//                        adapter.remove(0)
+//                    }
+//
+//                    view.isClickable = false
+//                    adapter.notifyItemChanged(position)
+//                    view.isClickable = true
+//                }
+//            }
+//        }
+//
+//        btnSure.setOnClickListener { v ->
+//            for (j in showList.indices) {
+//                if (showList.get(j).checked) {
+//                    val itemGroup = ItemGroup()
+//                    itemGroup.brightness = 50
+//                    itemGroup.temperature = 50
+//                    itemGroup.groupAress = showList.get(j).getMeshAddr()
+//                    itemGroup.gpName = showList.get(j).getName()
+//                    changeDataList(showList.get(j))
+//                    sceneGroupAdapter.addData(itemGroup)
+//                }
+//
+//                if (j == showList.size - 1) {
+//                    dialog.dismiss()
+//                }
+//            }
+//        }
+//
+//
+//    }
+
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         mSelectGroupAddr = 0xFF

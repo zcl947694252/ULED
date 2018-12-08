@@ -71,6 +71,7 @@ class GroupListFragment : BaseFragment() {
     private var install_rgb_light: TextView? = null
     private var install_switch: TextView? = null
     private var install_sensor: TextView? = null
+    private var install_light_light: TextView? = null
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
     //是否正在引导
@@ -156,10 +157,12 @@ class GroupListFragment : BaseFragment() {
         install_rgb_light = view.findViewById(R.id.install_rgb_light)
         install_switch = view.findViewById(R.id.install_switch)
         install_sensor = view.findViewById(R.id.install_sensor)
+        install_light_light = view.findViewById(R.id.install_light_light)
         install_light?.setOnClickListener(onClick)
         install_rgb_light?.setOnClickListener(onClick)
         install_switch?.setOnClickListener(onClick)
         install_sensor?.setOnClickListener(onClick)
+        install_light_light?.setOnClickListener(onClick)
         return view
     }
 
