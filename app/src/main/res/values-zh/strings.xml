@@ -134,7 +134,7 @@
     <string name="repeat_tip_name">已经有这个组名了,请修改！</string>
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
-    <string name="title_scanning_lights_num">扫描中(已扫到%1$d个灯)</string>
+    <string name="title_scanning_lights_num">扫描中:%1$d</string>
     <string name="title_scanned_lights_num">扫描完毕(已扫到%1$d个灯)</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
@@ -464,6 +464,7 @@
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
+    <string name="w_bright">白光亮度:%1$s</string>
     <string name="light_light">小夜灯</string>
     <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
     <string name="light_light_title">小夜灯</string>

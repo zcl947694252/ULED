@@ -19,7 +19,6 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-
                 android:id="@+id/ll_r"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -160,8 +159,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:max="100"
-                    android:padding="5dp"
+                    android:padding="6dp"
                     android:progress="100" />
+
+                <TextView
+                    android:id="@+id/tv_brightness_w"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:padding="5dp"
+                    android:text="@string/w_bright" />
+
+                <SeekBar
+                    android:id="@+id/sb_w_bright"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100"
+                    android:padding="6dp" />
+
             </LinearLayout>
 
             <!-- Color -->

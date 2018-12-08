@@ -17,7 +17,6 @@ import android.widget.*
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
-
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
@@ -50,11 +49,6 @@ import java.util.concurrent.TimeUnit
 
 class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
-    private var brightnessBar: SeekBar? = null
-    private var temperatureBar: SeekBar? = null
-    private var colorR: TextView? = null
-    private var colorG: TextView? = null
-    private var colorB: TextView? = null
     private var scrollView: ScrollView? = null
     private var diyColorRecyclerListView: RecyclerView? = null
     private var colorPicker: ColorPickerView? = null
@@ -64,18 +58,18 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
     private var group: DbGroup? = null
-    private var dynamicRgbBt: TextView? =null
+    private var dynamicRgbBt: TextView? = null
     private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
     private var isLoginSuccess = false
     private var connectTimes = 0
 
     private val clickListener = OnClickListener { v ->
-       if(v === dynamicRgbBt){
-            val intent=Intent(this,RGBGradientActivity::class.java)
-            intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
-            intent.putExtra(Constant.TYPE_VIEW_ADDRESS,group?.meshAddr)
-            startActivityForResult(intent,0)
+        if (v === dynamicRgbBt) {
+            val intent = Intent(this, RGBGradientActivity::class.java)
+            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+            intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group?.meshAddr)
+            startActivityForResult(intent, 0)
         }
     }
 
@@ -135,7 +129,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 hideLoadingDialog()
-                isLoginSuccess=true
+                isLoginSuccess = true
                 mConnectTimer?.dispose()
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -217,20 +211,15 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
     private fun initView() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
-                toolbar.title=getString(R.string.allLight)
+                toolbar.title = getString(R.string.allLight)
             } else {
-                toolbar.title=group?.name
+                toolbar.title = group?.name
             }
         }
 
         dynamicRgbBt = this.findViewById<View>(R.id.dynamic_rgb) as TextView
         dynamicRgbBt?.setOnClickListener(this.clickListener)
 
-        this.brightnessBar = findViewById<View>(R.id.sb_brightness) as SeekBar
-        this.temperatureBar = findViewById<View>(R.id.sb_temperature) as SeekBar
-        this.colorR = findViewById<View>(R.id.color_r) as TextView
-        this.colorG = findViewById<View>(R.id.color_g) as TextView
-        this.colorB = findViewById<View>(R.id.color_b) as TextView
         this.diyColorRecyclerListView = findViewById<View>(R.id.diy_color_recycler_list_view) as RecyclerView
 
         this.colorPicker = findViewById<View>(R.id.color_picker) as ColorPickerView
@@ -251,24 +240,29 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             presetColors = java.util.ArrayList<ItemColorPreset>()
             for (i in 0..4) {
                 val itemColorPreset = ItemColorPreset()
-                itemColorPreset.color=OtherUtils.getCreateInitColor(i)
+                itemColorPreset.color = OtherUtils.getCreateInitColor(i)
                 presetColors?.add(itemColorPreset)
             }
         }
 
-        diyColorRecyclerListView?.layoutManager = GridLayoutManager(this,5) as RecyclerView.LayoutManager?
+        diyColorRecyclerListView?.layoutManager = GridLayoutManager(this, 5) as RecyclerView.LayoutManager?
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter?.bindToRecyclerView(diyColorRecyclerListView)
 
-        brightnessBar!!.progress = group!!.brightness
+        sb_brightness!!.progress = group!!.brightness
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
-        temperatureBar!!.progress = group!!.colorTemperature
+        sb_temperature!!.progress = group!!.colorTemperature
+
+        val w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
+        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
+        sb_w_bright.progress = w
 
 
-        this.brightnessBar!!.setOnSeekBarChangeListener(this.barChangeListener)
-        this.temperatureBar!!.setOnSeekBarChangeListener(this.barChangeListener)
+        this.sb_brightness!!.setOnSeekBarChangeListener(this.barChangeListener)
+        this.sb_temperature!!.setOnSeekBarChangeListener(this.barChangeListener)
+        sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
         this.colorPicker?.setColorListener(colorEnvelopeListener)
         checkGroupIsSystemGroup()
     }
@@ -278,38 +272,40 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
 //        LogUtils.d("changedff$color")
         val brightness = presetColors?.get(position)?.brightness
+        val w = (color!! and 0xff000000.toInt()) shr 24
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
 //        Thread {
-            changeColor(red.toByte(), green.toByte(), blue.toByte(),true)
+        changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
 
-            try {
-                Thread.sleep(100)
-                val addr = group?.meshAddr
-                val opcode: Byte = Opcode.SET_LUM
-                val params: ByteArray = byteArrayOf(brightness!!.toByte())
-                group?.brightness = brightness
-                group?.color = color
+        try {
+            Thread.sleep(100)
+            val addr = group?.meshAddr
+            val opcode: Byte = Opcode.SET_LUM
+            val params: ByteArray = byteArrayOf(brightness!!.toByte())
+            group?.brightness = brightness
+            group?.color = color
 
-                LogUtils.d("changedff2"+opcode+"--"+addr+"--"+brightness)
+            LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
 //                for(i in 0..3){
-                    Thread.sleep(50)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+            Thread.sleep(50)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
 //                }
 //                DBUtils.updateGroup(group!!)
 //                updateLights(color, "rgb_color", group!!)
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            }
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
 //        }.start()
 
-        brightnessBar?.progress = brightness!!
+        sb_brightness?.progress = brightness!!
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
+        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
 //        scrollView?.setBackgroundColor(color)
-        colorR?.text = red.toString()
-        colorG?.text = green.toString()
-        colorB?.text = blue.toString()
+        color_r?.text = red.toString()
+        color_g?.text = green.toString()
+        color_b?.text = blue.toString()
     }
 
     @SuppressLint("SetTextI18n")
@@ -348,11 +344,11 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
     }
 
     private fun toRGBGradientView() {
-        val intent=Intent(this,RGBGradientActivity::class.java)
-        intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
-        intent.putExtra(Constant.TYPE_VIEW_ADDRESS,group?.meshAddr)
+        val intent = Intent(this, RGBGradientActivity::class.java)
+        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+        intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group?.meshAddr)
         overridePendingTransition(0, 0)
-        startActivityForResult(intent,0)
+        startActivityForResult(intent, 0)
     }
 
     override fun onDestroy() {
@@ -405,7 +401,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             val opcode: Byte
             val params: ByteArray
 
-            if (view === brightnessBar) {
+            if (view === sb_brightness) {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
@@ -416,7 +412,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                     DBUtils.updateGroup(group!!)
                     updateLights(progress, "brightness", group!!)
                 }
-            } else if (view === temperatureBar) {
+            } else if (view === sb_temperature) {
 
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, progress.toByte())
@@ -427,6 +423,24 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                     DBUtils.updateGroup(group!!)
                     updateLights(progress, "colorTemperature", group!!)
                 }
+            } else if (view == sb_w_bright) {
+                opcode = Opcode.SET_W_LUM
+                params = byteArrayOf(progress.toByte())
+                val color = group?.color
+                val red = (color!! and 0xff0000) shr 16
+                val green = (color and 0x00ff00) shr 8
+                val blue = color and 0x0000ff
+                val w = progress
+
+                group?.color = (w shl 24) or red or green or blue
+                tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+
+                if (stopTracking) {
+                    DBUtils.updateGroup(group!!)
+                    updateLights(progress, "colorTemperature", group!!)
+                }
+
             }
         }
     }
@@ -450,7 +464,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                     dbLight.brightness = progress
                 } else if (type == "colorTemperature") {
                     dbLight.colorTemperature = progress
-                } else if(type == "rgb_color"){
+                } else if (type == "rgb_color") {
                     dbLight.color = progress
                 }
                 DBUtils.updateLight(dbLight)
@@ -461,18 +475,20 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
     private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
         val argb = envelope.argb
 
-        colorR?.text = argb[1].toString()
-        colorG?.text = argb[2].toString()
-        colorB?.text = argb[3].toString()
 
-        val color:Int = argb[1] shl 16 or (argb[2] shl 8) or argb[3]
+        color_r?.text = argb[1].toString()
+        color_g?.text = argb[2].toString()
+        color_b?.text = argb[3].toString()
+        val w = sb_w_bright.progress
+
+        val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
-            if(argb[1]==0 && argb[2]==0 && argb[3]==0){
-            }else{
-                Thread{
+            if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+            } else {
+                Thread {
                     group?.color = color
                     changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
 
@@ -483,7 +499,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
 
-        var red  = R
+        var red = R
         var green = G
         var blue = B
 
@@ -504,12 +520,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
         Log.d("RGBCOLOR", logStr)
 
-        if(isOnceSet){
+        if (isOnceSet) {
 //            for(i in 0..3){
-                Thread.sleep(50)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+            Thread.sleep(50)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
 //            }
-        }else{
+        } else {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
         }
     }
@@ -603,38 +619,38 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
     }
 
     private fun renameGp() {
-            val textGp = EditText(this)
-            textGp.setText(group?.name)
-            StringUtils.initEditTextFilter(textGp)
-            textGp.setSelection(textGp.getText().toString().length)
-            android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
-                    .setTitle(R.string.rename)
-                    .setView(textGp)
+        val textGp = EditText(this)
+        textGp.setText(group?.name)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.setSelection(textGp.getText().toString().length)
+        android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
+                .setTitle(R.string.rename)
+                .setView(textGp)
 
-                    .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                        // 获取输入框的内容
-                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                            ToastUtils.showShort(getString(R.string.rename_tip_check))
-                        } else {
-                            var name=textGp.text.toString().trim { it <= ' ' }
-                            var canSave=true
-                            val groups=DBUtils.allGroups
-                            for(i in groups.indices){
-                                if(groups[i].name==name){
-                                    ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
-                                    canSave=false
-                                    break
-                                }
-                            }
-
-                            if(canSave){
-                                group?.name=textGp.text.toString().trim { it <= ' ' }
-                                DBUtils.updateGroup(group!!)
-                                toolbar.title=group?.name
-                                dialog.dismiss()
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                    } else {
+                        var name = textGp.text.toString().trim { it <= ' ' }
+                        var canSave = true
+                        val groups = DBUtils.allGroups
+                        for (i in groups.indices) {
+                            if (groups[i].name == name) {
+                                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                canSave = false
+                                break
                             }
                         }
+
+                        if (canSave) {
+                            group?.name = textGp.text.toString().trim { it <= ' ' }
+                            DBUtils.updateGroup(group!!)
+                            toolbar.title = group?.name
+                            dialog.dismiss()
+                        }
                     }
-                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 }
