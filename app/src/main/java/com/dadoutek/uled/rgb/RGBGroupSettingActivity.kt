@@ -49,11 +49,6 @@ import java.util.concurrent.TimeUnit
 
 class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
-    private var brightnessBar: SeekBar? = null
-    private var temperatureBar: SeekBar? = null
-    private var colorR: TextView? = null
-    private var colorG: TextView? = null
-    private var colorB: TextView? = null
     private var scrollView: ScrollView? = null
     private var diyColorRecyclerListView: RecyclerView? = null
     private var colorPicker: ColorPickerView? = null
@@ -225,11 +220,6 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         dynamicRgbBt = this.findViewById<View>(R.id.dynamic_rgb) as TextView
         dynamicRgbBt?.setOnClickListener(this.clickListener)
 
-        this.brightnessBar = findViewById<View>(R.id.sb_brightness) as SeekBar
-        this.temperatureBar = findViewById<View>(R.id.sb_temperature) as SeekBar
-        this.colorR = findViewById<View>(R.id.color_r) as TextView
-        this.colorG = findViewById<View>(R.id.color_g) as TextView
-        this.colorB = findViewById<View>(R.id.color_b) as TextView
         this.diyColorRecyclerListView = findViewById<View>(R.id.diy_color_recycler_list_view) as RecyclerView
 
         this.colorPicker = findViewById<View>(R.id.color_picker) as ColorPickerView
@@ -261,17 +251,17 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter?.bindToRecyclerView(diyColorRecyclerListView)
 
-        brightnessBar!!.progress = group!!.brightness
+        sb_brightness!!.progress = group!!.brightness
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
-        temperatureBar!!.progress = group!!.colorTemperature
+        sb_temperature!!.progress = group!!.colorTemperature
 
         val w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
 
-        this.brightnessBar!!.setOnSeekBarChangeListener(this.barChangeListener)
-        this.temperatureBar!!.setOnSeekBarChangeListener(this.barChangeListener)
+        this.sb_brightness!!.setOnSeekBarChangeListener(this.barChangeListener)
+        this.sb_temperature!!.setOnSeekBarChangeListener(this.barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
         this.colorPicker?.setColorListener(colorEnvelopeListener)
         checkGroupIsSystemGroup()
@@ -309,13 +299,13 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         }
 //        }.start()
 
-        brightnessBar?.progress = brightness!!
+        sb_brightness?.progress = brightness!!
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
 //        scrollView?.setBackgroundColor(color)
-        colorR?.text = red.toString()
-        colorG?.text = green.toString()
-        colorB?.text = blue.toString()
+        color_r?.text = red.toString()
+        color_g?.text = green.toString()
+        color_b?.text = blue.toString()
     }
 
     @SuppressLint("SetTextI18n")
@@ -411,7 +401,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             val opcode: Byte
             val params: ByteArray
 
-            if (view === brightnessBar) {
+            if (view === sb_brightness) {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
                 group!!.brightness = progress
@@ -422,7 +412,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                     DBUtils.updateGroup(group!!)
                     updateLights(progress, "brightness", group!!)
                 }
-            } else if (view === temperatureBar) {
+            } else if (view === sb_temperature) {
 
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, progress.toByte())
@@ -486,9 +476,9 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         val argb = envelope.argb
 
 
-        colorR?.text = argb[1].toString()
-        colorG?.text = argb[2].toString()
-        colorB?.text = argb[3].toString()
+        color_r?.text = argb[1].toString()
+        color_g?.text = argb[2].toString()
+        color_b?.text = argb[3].toString()
         val w = sb_w_bright.progress
 
         val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
