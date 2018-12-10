@@ -7,20 +7,17 @@
         <item>50</item>
     </string-array>
 
-    <string-array name="light_light_minute_list" translatable="false">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-    </string-array>
-
-    <string-array name="light_light_seconds_list" translatable="false">
-        <item>10</item>
-        <item>20</item>
-        <item>30</item>
-        <item>40</item>
-        <item>50</item>
+    <string-array name="light_light_time_list">
+        <item>10s</item>
+        <item>20s</item>
+        <item>30s</item>
+        <item>40s</item>
+        <item>50s</item>
+        <item>1min</item>
+        <item>2min</item>
+        <item>3min</item>
+        <item>4min</item>
+        <item>5min</item>
     </string-array>
 
     <string-array name="startup_mode">
@@ -539,5 +536,6 @@
     <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
     <string name="light_light_title">小夜灯</string>
     <string name="delay_time">延时时间</string>
+    <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
 
 </resources>

@@ -116,7 +116,7 @@ object DBUtils {
             return false
         }
 
-    val allGroups: List<DbGroup>
+    val allGroups: MutableList<DbGroup>
          get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
 
     val deleteGroups: List<DbDeleteGroup>

@@ -15,6 +15,19 @@
         <item>秒</item>
     </string-array>
 
+    <string-array name="light_light_time_list">
+        <item>10秒</item>
+        <item>20秒</item>
+        <item>30秒</item>
+        <item>40秒</item>
+        <item>50秒</item>
+        <item>1分钟</item>
+        <item>2分钟</item>
+        <item>3分钟</item>
+        <item>4分钟</item>
+        <item>5分钟</item>
+    </string-array>
+
     <string-array name="preset_gradient">
         <item>七彩渐变</item>
         <item>红色渐变</item>
@@ -468,4 +481,5 @@
     <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
     <string name="light_light_title">小夜灯</string>
     <string name="delay_time">延时时间</string>
+    <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
 </resources>

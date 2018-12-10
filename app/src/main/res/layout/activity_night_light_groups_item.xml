@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:gravity="center_vertical">
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tvGroupName"
+            android:text="组1"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
+        <!--<ImageView-->
+            <!--android:id="@+id/imgDelete"-->
+            <!--app:layout_constraintEnd_toEndOf="@id/tvGroupName"-->
+            <!--app:layout_constraintTop_toTopOf="parent"-->
+            <!--android:layout_width="12dp"-->
+            <!--android:layout_height="12dp"-->
+            <!--android:src="@drawable/delete"-->
+            <!--/>-->
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>

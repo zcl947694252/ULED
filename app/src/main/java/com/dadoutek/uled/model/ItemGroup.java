@@ -10,4 +10,6 @@ public class ItemGroup {
     public int temperature = 50;
     public int color = 0xffffff;
     public String gpName = "";
+    public boolean checked = false;
+    public boolean enableCheck = false;
 }
