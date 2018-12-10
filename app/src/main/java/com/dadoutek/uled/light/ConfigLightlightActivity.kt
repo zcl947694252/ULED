@@ -126,9 +126,11 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
 
         Thread.sleep(300)
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                mDeviceInfo.meshAddress,
-                paramBytesGroup)
+        if(groupL!=(0xff).toByte()){
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                    mDeviceInfo.meshAddress,
+                    paramBytesGroup)
+        }
 
         Thread.sleep(300)
     }
@@ -164,97 +166,6 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
             }
         }
     }
-
-//    private fun inflatView() {
-//        val builder: AlertDialog.Builder
-//        val dialog: AlertDialog
-//        val showList = mGroups
-//
-//        val bottomView = View.inflate(this@SetSceneAct, R.layout.dialog_list, null)//填充ListView布局
-//        val lvGp = bottomView.findViewById<RecyclerView>(R.id.listview_group)//初始化ListView控件
-//        val btnSure = bottomView.findViewById<Button>(R.id.btn_sure)
-//        btnSure.visibility = View.GONE
-//
-//        builder = AlertDialog.Builder(this)
-//                .setView(bottomView)
-//        if (!GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)) {
-//            builder.setCancelable(false)
-//        }
-//        dialog = builder.create()
-//
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//
-//        //        List<DbGroup> showList = showList;
-//        val groupListAdapter = GroupListAdapter(R.layout.item_group, showList)
-//        val layoutManager = LinearLayoutManager(this)
-//        lvGp.layoutManager = layoutManager
-//        lvGp.adapter = groupListAdapter
-//        groupListAdapter.bindToRecyclerView(lvGp)
-//
-//        dialog.setOnShowListener { step2Guide(lvGp, showList, dialog, groupListAdapter) }
-//
-//        dialog.show()
-//
-//
-//        val display = windowManager.defaultDisplay
-//        val size = Point()
-//        display.getSize(size)
-//        dialog.window!!.setLayout((size.x * 0.9).toInt(), WindowManager.LayoutParams.WRAP_CONTENT)
-//
-//
-//        groupListAdapter.setOnItemClickListener { adapter, view, position ->
-//
-//            if (position != -1) {
-//                val item = showList.get(position)
-//                if (item.getMeshAddr() == 0xffff) {
-//                    val itemGroup = ItemGroup()
-//                    itemGroup.brightness = 50
-//                    itemGroup.temperature = 50
-//                    itemGroup.groupAress = showList.get(position).getMeshAddr()
-//                    itemGroup.gpName = showList.get(position).getName()
-//                    changeData(position, showList)
-//                    sceneGroupAdapter.addData(itemGroup)
-//                    dialog.dismiss()
-//                } else {
-//                    btnSure.visibility = View.VISIBLE
-//                    if (showList.get(position).checked) {
-//                        showList.get(position).checked = false
-//                    } else {
-//                        showList.get(position).checked = true
-//                    }
-//
-//                    if (showList.get(0).getMeshAddr() == 0xffff) {
-//                        adapter.remove(0)
-//                    }
-//
-//                    view.isClickable = false
-//                    adapter.notifyItemChanged(position)
-//                    view.isClickable = true
-//                }
-//            }
-//        }
-//
-//        btnSure.setOnClickListener { v ->
-//            for (j in showList.indices) {
-//                if (showList.get(j).checked) {
-//                    val itemGroup = ItemGroup()
-//                    itemGroup.brightness = 50
-//                    itemGroup.temperature = 50
-//                    itemGroup.groupAress = showList.get(j).getMeshAddr()
-//                    itemGroup.gpName = showList.get(j).getName()
-//                    changeDataList(showList.get(j))
-//                    sceneGroupAdapter.addData(itemGroup)
-//                }
-//
-//                if (j == showList.size - 1) {
-//                    dialog.dismiss()
-//                }
-//            }
-//        }
-//
-//
-//    }
-
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         mSelectGroupAddr = 0xFF
