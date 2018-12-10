@@ -68,6 +68,7 @@ import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.imageBitmap
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -626,22 +627,26 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
-        mCheckRssiDisposal?.dispose()
-        mCheckRssiDisposal=RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe {
-                    if (it) {
-                        //授予了权限
-                        if (TelinkLightService.Instance() != null) {
-                            progressBar?.visibility = View.VISIBLE
-                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-                            startConnectTimer()
+        try {
+            mCheckRssiDisposal?.dispose()
+            mCheckRssiDisposal=RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_ADMIN)
+                    .subscribe {
+                        if (it) {
+                            //授予了权限
+                            if (TelinkLightService.Instance() != null) {
+                                progressBar?.visibility = View.VISIBLE
+                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                startConnectTimer()
+                            }
+                        } else {
+                            //没有授予权限
+                            DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
-                    } else {
-                        //没有授予权限
-                        DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                     }
-                }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 
     /**
