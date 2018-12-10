@@ -66,7 +66,6 @@
         <activity
             android:name=".light.NormalDeviceSettingActivity"
             android:theme="@style/FullHeightDialogNew"
-            android:screenOrientation="portrait"
             />
         <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
@@ -88,7 +87,6 @@
         <activity
             android:name=".group.NormalGroupSettingActivity"
             android:theme="@style/FullHeightDialogNew"
-            android:screenOrientation="portrait"
             />
         <activity
             android:name=".group.AddGroupActivity"
