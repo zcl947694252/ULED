@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string-array name="startup_mode">
         <item>触发时开灯</item>
         <item>触发时关灯</item>
@@ -465,4 +464,8 @@
     <string name="stop_scan">停止扫描</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
     <string name="w_bright">白光亮度:%1$s</string>
+    <string name="light_light">小夜灯</string>
+    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
+    <string name="light_light_title">小夜灯</string>
+    <string name="delay_time">延时时间</string>
 </resources>
