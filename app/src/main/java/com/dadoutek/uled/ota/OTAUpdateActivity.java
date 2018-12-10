@@ -778,8 +778,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 stopScanTimer();
                 if (!connectStart) {
                     LeBluetooth.getInstance().stopScan();
-//                    connectDevice(deviceInfo.macAddress);
-                    startConnectTimer();
+                    connectDevice(deviceInfo.macAddress);
+//                    startConnectTimer();
                 }
                 connectStart = true;
             }
