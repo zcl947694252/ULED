@@ -326,40 +326,43 @@ public class Peripheral extends BluetoothGattCallback {
 
     synchronized private void processCommand(CommandContext commandContext) {
 
-        Command command = commandContext.command;
-        Command.CommandType commandType = command.type;
+        if(commandContext!=null){
+            Command command = commandContext.command;
+            Command.CommandType commandType = command.type;
 
-        TelinkLog.d("processCommand : " + command.toString());
+            TelinkLog.d("processCommand : " + command.toString());
 
-        switch (commandType) {
-            case READ:
-                this.postCommandTimeoutTask();
-                this.readCharacteristic(commandContext, command.serviceUUID,
-                        command.characteristicUUID);
-                break;
-            case WRITE:
-                this.postCommandTimeoutTask();
-                this.writeCharacteristic(commandContext, command.serviceUUID,
-                        command.characteristicUUID,
-                        BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT,
-                        command.data);
-                break;
-            case WRITE_NO_RESPONSE:
-                this.postCommandTimeoutTask();
-                 this.writeCharacteristic(commandContext, command.serviceUUID,
-                        command.characteristicUUID,
-                        BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE,
-                        command.data);
-                break;
-            case ENABLE_NOTIFY:
-                this.enableNotification(commandContext, command.serviceUUID,
-                        command.characteristicUUID);
-                break;
-            case DISABLE_NOTIFY:
-                this.disableNotification(commandContext, command.serviceUUID,
-                        command.characteristicUUID);
-                break;
+            switch (commandType) {
+                case READ:
+                    this.postCommandTimeoutTask();
+                    this.readCharacteristic(commandContext, command.serviceUUID,
+                            command.characteristicUUID);
+                    break;
+                case WRITE:
+                    this.postCommandTimeoutTask();
+                    this.writeCharacteristic(commandContext, command.serviceUUID,
+                            command.characteristicUUID,
+                            BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT,
+                            command.data);
+                    break;
+                case WRITE_NO_RESPONSE:
+                    this.postCommandTimeoutTask();
+                    this.writeCharacteristic(commandContext, command.serviceUUID,
+                            command.characteristicUUID,
+                            BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE,
+                            command.data);
+                    break;
+                case ENABLE_NOTIFY:
+                    this.enableNotification(commandContext, command.serviceUUID,
+                            command.characteristicUUID);
+                    break;
+                case DISABLE_NOTIFY:
+                    this.disableNotification(commandContext, command.serviceUUID,
+                            command.characteristicUUID);
+                    break;
+            }
         }
+
     }
 
     private void commandCompleted() {

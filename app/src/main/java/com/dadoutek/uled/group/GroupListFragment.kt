@@ -270,8 +270,8 @@ class GroupListFragment : BaseFragment() {
             }
             R.id.install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
             R.id.install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
-            R.id.install_light_light -> startActivity(Intent(mContext, ConfigLightlightActivity::class.java))
-//            R.id.install_light_light -> startActivity(Intent(mContext, ScanningLightlightActivity::class.java))
+//            R.id.install_light_light -> startActivity(Intent(mContext, ConfigLightlightActivity::class.java))
+            R.id.install_light_light -> startActivity(Intent(mContext, ScanningLightlightActivity::class.java))
         }
     }
 
