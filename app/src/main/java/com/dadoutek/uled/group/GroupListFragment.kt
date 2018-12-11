@@ -1,27 +1,17 @@
 package com.dadoutek.uled.group
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.graphics.RectF
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.util.DisplayMetrics
 import android.view.*
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
-import com.app.hubert.guide.model.GuidePage
-import com.app.hubert.guide.model.HighLight
-import com.blankj.utilcode.util.ScreenUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
@@ -30,6 +20,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
+import com.dadoutek.uled.light.NormalSettingActivity
+import com.dadoutek.uled.light.ScanningLightlightActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -38,7 +30,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.rgb.RGBGroupSettingActivity
+import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
@@ -70,6 +62,7 @@ class GroupListFragment : BaseFragment() {
     private var install_rgb_light: TextView? = null
     private var install_switch: TextView? = null
     private var install_sensor: TextView? = null
+    private var install_light_light: TextView? = null
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
     //是否正在引导
@@ -155,10 +148,12 @@ class GroupListFragment : BaseFragment() {
         install_rgb_light = view.findViewById(R.id.install_rgb_light)
         install_switch = view.findViewById(R.id.install_switch)
         install_sensor = view.findViewById(R.id.install_sensor)
+        install_light_light = view.findViewById(R.id.install_light_light)
         install_light?.setOnClickListener(onClick)
         install_rgb_light?.setOnClickListener(onClick)
         install_switch?.setOnClickListener(onClick)
         install_sensor?.setOnClickListener(onClick)
+        install_light_light?.setOnClickListener(onClick)
         return view
     }
 
@@ -220,10 +215,11 @@ class GroupListFragment : BaseFragment() {
                         updateLights(false, group)
                     }
                     R.id.btn_set -> {
-                        intent = Intent(mContext, NormalGroupSettingActivity::class.java)
+                        intent = Intent(mContext, NormalSettingActivity::class.java)
                         if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
-                            intent = Intent(mContext, RGBGroupSettingActivity::class.java)
+                            intent = Intent(mContext, RGBSettingActivity::class.java)
                         }
+                        intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
                         intent.putExtra("group", group)
                         startActivityForResult(intent, 0)
                     }
@@ -265,6 +261,8 @@ class GroupListFragment : BaseFragment() {
             }
             R.id.install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
             R.id.install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
+//            R.id.install_light_light -> startActivity(Intent(mContext, ConfigLightlightActivity::class.java))
+            R.id.install_light_light -> startActivity(Intent(mContext, ScanningLightlightActivity::class.java))
         }
     }
 

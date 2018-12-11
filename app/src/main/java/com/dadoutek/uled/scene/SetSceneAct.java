@@ -222,7 +222,7 @@ public class SetSceneAct extends TelinkBaseActivity {
         }
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
         if(guideShowCurrentPage){
-            SeekBar guide3= (SeekBar) sceneGroupAdapter.getViewByPosition(0, R.id.sb_brightness);
+            SeekBar guide3= (SeekBar) sceneGroupAdapter.getViewByPosition(0, R.id.sbBrightness);
              GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_3),
                             v -> {
@@ -239,7 +239,7 @@ public class SetSceneAct extends TelinkBaseActivity {
     private void step4Guide(){
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
         if(guideShowCurrentPage){
-            SeekBar guide4= (SeekBar) sceneGroupAdapter.getViewByPosition(0, R.id.sb_temperature);
+            SeekBar guide4= (SeekBar) sceneGroupAdapter.getViewByPosition(0, R.id.sbTemperature);
             GuideUtils.INSTANCE.guideBuilder(this,GuideUtils.INSTANCE.getSTEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide4,R.layout.view_guide_simple_scene_set3,getString(R.string.add_scene_guide_4),
                             v -> {

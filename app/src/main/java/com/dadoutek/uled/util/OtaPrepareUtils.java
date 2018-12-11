@@ -57,6 +57,9 @@ public class OtaPrepareUtils {
                 case "CR":
                     getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_RGB, localVersion, otaPrepareListner);
                     break;
+                case "LC":
+                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN, localVersion, otaPrepareListner);
+                    break;
                 default:
                     ToastUtils.showLong(R.string.error_pack);
                     break;

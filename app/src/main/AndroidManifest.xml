@@ -64,9 +64,8 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.NormalDeviceSettingActivity"
+            android:name=".light.NormalSettingActivity"
             android:theme="@style/FullHeightDialogNew"
-            android:screenOrientation="portrait"
             />
         <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
@@ -85,11 +84,6 @@
             android:name=".group.LightGroupingActivity"
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".group.NormalGroupSettingActivity"
-            android:theme="@style/FullHeightDialogNew"
-            android:screenOrientation="portrait"
-            />
         <activity
             android:name=".group.AddGroupActivity"
             android:screenOrientation="portrait" />
@@ -192,13 +186,16 @@
             android:screenOrientation="portrait"
             />
         <activity
-            android:name=".rgb.RGBDeviceSettingActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".rgb.RGBGroupSettingActivity"
+            android:name=".rgb.RGBSettingActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.SelectColorActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".rgb.RGBGradientActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".light.ScanningLightlightActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.RGBGradientActivity"
@@ -208,6 +205,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.SelectColorAct"
+            android:screenOrientation="portrait" />
+            android:name=".light.ConfigLightlightActivity"
             android:screenOrientation="portrait" />
     </application>
 

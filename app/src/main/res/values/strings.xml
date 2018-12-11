@@ -7,6 +7,19 @@
         <item>50</item>
     </string-array>
 
+    <string-array name="light_light_time_list">
+        <item>10s</item>
+        <item>20s</item>
+        <item>30s</item>
+        <item>40s</item>
+        <item>50s</item>
+        <item>1min</item>
+        <item>2min</item>
+        <item>3min</item>
+        <item>4min</item>
+        <item>5min</item>
+    </string-array>
+
     <string-array name="startup_mode">
         <item>Turn on</item>
         <item>Turn off</item>
@@ -521,5 +534,14 @@
     <string name="stop_scan">Stop scan</string>
     <string name="sure_delete">Confirm deleting this scene？</string>
     <string name="w_bright">White Brightness:%1$s</string>
+    <string name="light_light">Light light</string>
+    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
+    <string name="light_light_title">小夜灯</string>
+    <string name="delay_time">延时时间</string>
+    <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
+    <string name="night_light_title">小夜灯</string>
+    <string name="current_select_group">当前选择的分组:</string>
+    <string name="selected">选中</string>
+    <string name="unSelect">未选中</string>
 
 </resources>

@@ -34,14 +34,13 @@ public class DbGroup implements Serializable{
     public boolean checked=false;
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public boolean enableCheck=true;
+    public boolean enableCheck=false;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int textColor;//文字颜色
-
 
     @Generated(hash = 1966413977)
     public DbGroup() {

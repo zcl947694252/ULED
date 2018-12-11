@@ -200,10 +200,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         userName = edit_user_phone!!.editText!!.text.toString().trim { it <= ' ' }
         userPassWord = edit_user_password!!.editText!!.text.toString().trim { it <= ' ' }
 
-        if (compileExChar(userName)) {
+        if (compileExChar(userName!!)) {
             ToastUtils.showLong(R.string.phone_input_error)
             return false
-        } else if (compileExChar(userName) || compileExChar(userPassWord)) {
+        } else if (compileExChar(userName!!) || compileExChar(userPassWord!!)) {
             ToastUtils.showLong(R.string.tip_register_input_error)
             return false
         } else {

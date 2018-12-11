@@ -141,6 +141,8 @@ public class Constant implements Serializable {
     public static int LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT=2;
     //无频闪调光调色
     public static int LIGHT_TYPE_NO_STROBO_DIMMING=3;
+    //无频闪costdown
+    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN=4;
 
     //无频闪单调光
     public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT=1;

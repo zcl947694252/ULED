@@ -14,13 +14,12 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.rgb.RGBDeviceSettingActivity
+import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -65,7 +64,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     DBUtils.updateLight(light!!)
                     runOnUiThread {
                         hideLoadingDialog()
-                        ActivityUtils.finishActivity(RGBDeviceSettingActivity::class.java)
+                        ActivityUtils.finishActivity(RGBSettingActivity::class.java)
                         finish()
                     }
                 }) {

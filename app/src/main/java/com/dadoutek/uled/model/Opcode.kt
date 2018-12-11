@@ -16,4 +16,5 @@ object Opcode {
     const val SET_TEMPERATURE: Byte = 0xE2.toByte()
     const val KICK_OUT: Byte = 0xE3.toByte()
     const val APPLY_RGB_GRADIENT: Byte = 0xFE.toByte()
+    const val CONFIG_LIGHT_LIGHT: Byte = 0xF1.toByte()
 }
