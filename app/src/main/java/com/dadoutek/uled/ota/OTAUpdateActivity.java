@@ -64,11 +64,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import kotlin.jvm.Synchronized;
 
 /**
  * 升级页面
@@ -777,28 +775,17 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         } else if (this.mode == MODE_IDLE) {
             if (dbLight.getMeshAddr() == deviceInfo.meshAddress) {
                 log("onLeScan" + "connectDevice2");
-                connectDeviceTimer(deviceInfo);
+                stopScanTimer();
+                if (!connectStart) {
+                    TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
+                    LeBluetooth.getInstance().stopScan();
+                    connectDevice(deviceInfo.macAddress);
+                    connectRetryCount=1;
+//                    startConnectTimer();
+                }
+                connectStart = true;
             }
         }
-    }
-
-    private Disposable disposable=null;
-    @Synchronized
-    private void connectDeviceTimer(DeviceInfo deviceInfo){
-        if(disposable!=null){
-            disposable.dispose();
-        }
-         disposable=Observable.timer(500,TimeUnit.MILLISECONDS,AndroidSchedulers.mainThread()).subscribe(aLong -> {
-             stopScanTimer();
-             if (!connectStart) {
-                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
-                 LeBluetooth.getInstance().stopScan();
-                 connectDevice(deviceInfo.macAddress);
-                 connectRetryCount=1;
-//                    startConnectTimer();
-             }
-             connectStart = true;
-        });
     }
 
     public void onScanComplet() {

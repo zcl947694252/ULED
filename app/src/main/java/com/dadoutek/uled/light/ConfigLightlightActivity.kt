@@ -217,20 +217,20 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
     }
 
     private fun getVersion() {
-        var dstAdress = 0
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = mDeviceInfo.meshAddress
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-                        versionLayoutPS.visibility = View.VISIBLE
-                        tvPSVersion.text = it
-                    },
-                    failedCallback = {
-                        versionLayoutPS.visibility = View.GONE
-                    })
-        } else {
-            dstAdress = 0
-        }
+//        var dstAdress = 0
+//        if (TelinkApplication.getInstance().connectDevice != null) {
+//            dstAdress = mDeviceInfo.meshAddress
+//            Commander.getDeviceVersion(dstAdress,
+//                    successCallback = {
+//                        versionLayoutPS.visibility = View.VISIBLE
+//                        tvPSVersion.text = it
+//                    },
+//                    failedCallback = {
+//                        versionLayoutPS.visibility = View.GONE
+//                    })
+//        } else {
+//            dstAdress = 0
+//        }
     }
 
     private fun initToolbar() {
@@ -241,7 +241,7 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
     }
 
     private fun initData() {
-//        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         showCheckListData = DBUtils.allGroups
         for(i in showCheckListData!!.indices){
             showCheckListData!![i].checked=false
@@ -262,7 +262,7 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
         )
         val paramBytesGroup:ByteArray
         paramBytesGroup = byteArrayOf(
-                DeviceType.LIGHT_LIGHT.toByte(),CMD_CONTROL_GROUP.toByte(),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                DeviceType.LIGHT_LIGHT.toByte(),CMD_CONTROL_GROUP.toByte(),0,0,0,0,0,0,0,0
         )
 
         var canSendGroup=true

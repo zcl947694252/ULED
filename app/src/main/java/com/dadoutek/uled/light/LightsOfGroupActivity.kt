@@ -838,7 +838,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR -> {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.LIGHT_LIGHT -> {
                 LogUtils.d("This is switch")
                 true
             }
