@@ -103,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:text="选择分组"
+                android:text="@string/select_group"
                 android:textSize="18sp"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="@id/tvSwitchMode"
@@ -114,7 +114,7 @@
                 android:id="@+id/btnSelectGroup"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="选择分组"
+                android:text="@string/select_group"
                 android:entries="@array/startup_mode"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/tvSelectGroup"
@@ -125,7 +125,7 @@
 
             <TextView
                 android:id="@+id/tip"
-                android:text="当前选择的分组:"
+                android:text="@string/current_select_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"

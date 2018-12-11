@@ -538,5 +538,8 @@
     <string name="delay_time">延时时间</string>
     <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
     <string name="night_light_title">小夜灯</string>
+    <string name="current_select_group">当前选择的分组:</string>
+    <string name="selected">选中</string>
+    <string name="unSelect">未选中</string>
 
 </resources>

@@ -2,12 +2,10 @@ package com.dadoutek.uled.light
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.bluetooth.le.ScanFilter
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -38,8 +36,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.rgb.RGBDeviceSettingActivity
+import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -67,7 +64,6 @@ import kotlinx.coroutines.experimental.delay
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
-import org.jetbrains.anko.imageBitmap
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -399,9 +395,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else if (view.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
-                var intent = Intent(this@LightsOfGroupActivity, NormalDeviceSettingActivity::class.java)
+                var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
                 if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                    intent = Intent(this@LightsOfGroupActivity, RGBDeviceSettingActivity::class.java)
+                    intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
+                    intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)

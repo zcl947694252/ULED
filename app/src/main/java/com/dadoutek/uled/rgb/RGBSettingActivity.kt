@@ -1,6 +1,8 @@
 package com.dadoutek.uled.rgb
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
@@ -19,6 +21,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.LightGroupingActivity
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -27,66 +31,317 @@ import com.dadoutek.uled.model.ItemColorPreset
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
+import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventListener<String> {
+class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
-    private var scrollView: ScrollView? = null
-    private var diyColorRecyclerListView: RecyclerView? = null
-    private var colorPicker: ColorPickerView? = null
-    private var btn_remove_group: Button? = null
-    private var btn_rename: Button? = null
     private var stopTracking = false
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSelectDiyRecyclerViewAdapter? = null
     private var group: DbGroup? = null
-    private var dynamicRgbBt: TextView? = null
     private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
     private var isLoginSuccess = false
     private var connectTimes = 0
+    private var localVersion: String? = null
+    private var light: DbLight? = null
+    private var gpAddress: Int = 0
+    private var fromWhere: String? = null
+    private var dataManager: DataManager? = null
+    private val mDisposable = CompositeDisposable()
+    private var mRxPermission: RxPermissions? = null
+    private val remove: Button? = null
+    private val dialog: AlertDialog? = null
+    private var manager: DataManager? = null
+    private var mConnectDevice: DeviceInfo? = null
+    private var currentShowGroupSetPage=true
 
     private val clickListener = OnClickListener { v ->
-        if (v === dynamicRgbBt) {
-            val intent = Intent(this, RGBGradientActivity::class.java)
-            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-            intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group?.meshAddr)
-            startActivityForResult(intent, 0)
+        when(v.id){
+            R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        this.showLoadingDialog(getString(R.string.deleting))
+
+                        deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
+                                successCallback = {
+                                    this.hideLoadingDialog()
+                                    this.setResult(Constant.RESULT_OK)
+                                    this.finish()
+                                },
+                                failedCallback = {
+                                    this.hideLoadingDialog()
+                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                })
+                    }
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show()
+            R.id.btn_rename -> {
+                if(currentShowGroupSetPage){
+                    renameGp()
+                }else{
+                    renameLight()
+                }
+            }
+            R.id.img_header_menu_left->finish()
+            R.id.tvOta->checkPermission()
+            R.id.update_group -> updateGroup()
+            R.id.btn_remove -> remove()
+            R.id.dynamic_rgb -> toRGBGradientView()
+            R.id.tvRename -> renameLight()
         }
+    }
+
+    fun remove() {
+        AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
+                .setPositiveButton(android.R.string.ok) { dialog, which ->
+
+                    if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                        val opcode = Opcode.KICK_OUT
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.meshAddr, null)
+                        DBUtils.deleteLight(light!!)
+                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
+                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
+                        }
+                        if (mConnectDevice != null) {
+                            Log.d(this!!.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
+                            Log.d(this!!.javaClass.simpleName, "light.getMeshAddr() = " + light!!.meshAddr)
+                            if (light!!.meshAddr == mConnectDevice!!.meshAddress) {
+                                this!!.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
+                            }
+                        }
+                        this!!.finish()
+
+
+                    } else {
+                        ToastUtils.showLong("当前处于未连接状态，重连中。。。")
+                        this!!.finish()
+                    }
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
+    }
+
+    private fun updateGroup() {
+        val intent = Intent(this,
+                LightGroupingActivity::class.java)
+        intent.putExtra("light", light)
+        intent.putExtra("gpAddress", gpAddress)
+        startActivity(intent)
+    }
+
+    private fun checkPermission() {
+        mDisposable.add(
+                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                    if (granted!!) {
+                        OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                    } else {
+                        ToastUtils.showLong(R.string.update_permission_tip)
+                    }
+                })
+    }
+
+    private fun renameLight() {
+        val textGp = EditText(this)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.setText(light?.name)
+        textGp.setSelection(textGp.getText().toString().length)
+        android.app.AlertDialog.Builder(this@RGBSettingActivity)
+                .setTitle(R.string.rename)
+                .setView(textGp)
+
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                    } else {
+                        light?.name=textGp.text.toString().trim { it <= ' ' }
+                        DBUtils.updateLight(light!!)
+                        toolbar.title=light?.name
+                        dialog.dismiss()
+                    }
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+        override fun startGetVersion() {
+            showLoadingDialog(getString(R.string.verification_version))
+        }
+
+        override fun getVersionSuccess(s: String) {
+            ToastUtils.showLong(R.string.verification_version_success)
+            hideLoadingDialog()
+        }
+
+        override fun getVersionFail() {
+            ToastUtils.showLong(R.string.verification_version_fail)
+            hideLoadingDialog()
+        }
+
+
+        override fun downLoadFileSuccess() {
+            transformView()
+        }
+
+        override fun downLoadFileFail(message: String) {
+            ToastUtils.showLong(R.string.download_pack_fail)
+        }
+    }
+
+    private fun transformView() {
+        val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        startActivity(intent)
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rgb_group_setting)
+        initType()
+    }
 
-        initToolbar()
-        initData()
-        initView()
+    private fun initType() {
+        val type=intent.getStringExtra(Constant.TYPE_VIEW)
+        if(type==Constant.TYPE_GROUP){
+            currentShowGroupSetPage=true
+            group_view_func_btn.visibility=View.VISIBLE
+            light_view_bt_layout.visibility=View.GONE
+            initToolbarGroup()
+            initDataGroup()
+            initViewGroup()
+            addEventListeners()
+            this.mApp = this.application as TelinkLightApplication?
+        }else{
+            currentShowGroupSetPage=false
+            group_view_func_btn.visibility=View.GONE
+            light_view_bt_layout.visibility=View.VISIBLE
+            initToolbar()
+            initView()
+            getVersion()
+        }
+    }
 
-        addEventListeners()
-        this.mApp = this.application as TelinkLightApplication?
+    private fun getVersion() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            Commander.getDeviceVersion(light!!.meshAddr, { s ->
+                localVersion = s
+                if (toolbar.title != null) {
+                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+//                        toolbar.title!!.visibility = View.VISIBLE
+                        lightVersion.text = localVersion
+                        light!!.version = localVersion
+                        tvOta!!.visibility = View.VISIBLE
+                    } else {
+//                        toolbar.title!!.visibility = View.GONE
+                        tvOta!!.visibility = View.GONE
+                    }
+                }
+                null
+            }, {
+                if (toolbar.title != null) {
+//                    toolbar.title!!.visibility = View.GONE
+                    tvOta!!.visibility = View.GONE
+                }
+                null
+            })
+        } else {
+            dstAdress = 0
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initView() {
+        this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
+        this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
+        this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
+        mApplication = this.application as TelinkLightApplication
+        dataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
+        tvRename.visibility=View.VISIBLE
+        toolbar.title=light?.name
+
+        tvRename!!.setOnClickListener(this.clickListener)
+        tvOta!!.setOnClickListener(this.clickListener)
+        btn_rename!!.setOnClickListener(this.clickListener)
+        update_group!!.setOnClickListener(this.clickListener)
+        btn_remove!!.setOnClickListener(this.clickListener)
+        dynamic_rgb!!.setOnClickListener(this.clickListener)
+
+        mRxPermission = RxPermissions(this)
+
+        sbBrightness!!.max = 100
+
+        color_picker!!.setColorListener(colorEnvelopeListener)
+        color_picker!!.setOnTouchListener { v, event ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            false
+        }
+
+        mConnectDevice = TelinkLightApplication.getInstance().connectDevice
+
+        presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
+        if (presetColors == null) {
+            presetColors = ArrayList()
+            for (i in 0..4) {
+                val itemColorPreset = ItemColorPreset()
+                itemColorPreset.color = OtherUtils.getCreateInitColor(i)
+                presetColors!!.add(itemColorPreset)
+            }
+        }
+
+        diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 5)
+        colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
+        colorSelectDiyRecyclerViewAdapter!!.setOnItemChildClickListener(diyOnItemChildClickListener)
+        colorSelectDiyRecyclerViewAdapter!!.setOnItemChildLongClickListener(diyOnItemChildLongClickListener)
+        colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
+
+        btn_rename!!.visibility = View.GONE
+        sbBrightness!!.progress = light!!.brightness
+        tv_brightness_rgb!!.text = getString(R.string.device_setting_brightness, light!!.brightness.toString() + "")
+
+        val w = ((light?.color ?: 0) and 0xff000000.toInt()) shr 24
+        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
+        sb_w_bright.progress = w
+
+        this.sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
+        sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
     private fun initToolbar() {
+        toolbar.title = ""
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    private fun initToolbarGroup() {
         toolbar.title = ""
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
@@ -102,8 +357,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     override fun onPause() {
         super.onPause()
-        DBUtils.updateGroup(group!!)
-        updateLights(group!!.color, "rgb_color", group!!)
+        if(currentShowGroupSetPage){
+            DBUtils.updateGroup(group!!)
+            updateLights(group!!.color, "rgb_color", group!!)
+        }else{
+            DBUtils.updateLight(light!!)
+        }
     }
 
     fun addEventListeners() {
@@ -203,12 +462,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         }
     }
 
-    private fun initData() {
+    private fun initDataGroup() {
         this.mApplication = this.application as TelinkLightApplication
         this.group = this.intent.extras!!.get("group") as DbGroup
     }
 
-    private fun initView() {
+    private fun initViewGroup() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
                 toolbar.title = getString(R.string.allLight)
@@ -216,23 +475,16 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
                 toolbar.title = group?.name
             }
         }
+        
+        dynamic_rgb.setOnClickListener(this.clickListener)
 
-        dynamicRgbBt = this.findViewById<View>(R.id.dynamic_rgb) as TextView
-        dynamicRgbBt?.setOnClickListener(this.clickListener)
-
-        this.diyColorRecyclerListView = findViewById<View>(R.id.diy_color_recycler_list_view) as RecyclerView
-
-        this.colorPicker = findViewById<View>(R.id.color_picker) as ColorPickerView
-        this.colorPicker!!.setOnTouchListener { v, _ ->
+        this.color_picker!!.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
-        btn_rename = findViewById<Button>(R.id.btn_rename)
-//        dynamicRgb = findViewById<Button>(R.id.dynamicRgb)
-        btn_remove_group = findViewById<Button>(R.id.btn_remove_group)
 
-        btn_remove_group?.setOnClickListener(this)
-        btn_rename?.setOnClickListener(this)
+        btn_remove_group?.setOnClickListener(clickListener)
+        btn_rename?.setOnClickListener(clickListener)
 //        dynamicRgb?.setOnClickListener(this)
 
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
@@ -245,32 +497,28 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             }
         }
 
-        diyColorRecyclerListView?.layoutManager = GridLayoutManager(this, 5) as RecyclerView.LayoutManager?
+        diy_color_recycler_list_view?.layoutManager = GridLayoutManager(this, 5) as RecyclerView.LayoutManager?
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
-        colorSelectDiyRecyclerViewAdapter?.bindToRecyclerView(diyColorRecyclerListView)
+        colorSelectDiyRecyclerViewAdapter?.bindToRecyclerView(diy_color_recycler_list_view)
 
-        sb_brightness!!.progress = group!!.brightness
+        sbBrightness!!.progress = group!!.brightness
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
-        sb_temperature!!.progress = group!!.colorTemperature
 
         val w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
 
-        this.sb_brightness!!.setOnSeekBarChangeListener(this.barChangeListener)
-        this.sb_temperature!!.setOnSeekBarChangeListener(this.barChangeListener)
+        this.sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
-        this.colorPicker?.setColorListener(colorEnvelopeListener)
+        this.color_picker?.setColorListener(colorEnvelopeListener)
         checkGroupIsSystemGroup()
     }
 
     internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
-
-//        LogUtils.d("changedff$color")
         val brightness = presetColors?.get(position)?.brightness
         val w = (color!! and 0xff000000.toInt()) shr 24
         val red = (color!! and 0xff0000) shr 16
@@ -281,11 +529,22 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
         try {
             Thread.sleep(100)
-            val addr = group?.meshAddr
+            var addr = 0
+            if(currentShowGroupSetPage){
+                addr = group?.meshAddr!!
+            }else{
+                addr = light?.meshAddr!!
+            }
+
             val opcode: Byte = Opcode.SET_LUM
             val params: ByteArray = byteArrayOf(brightness!!.toByte())
-            group?.brightness = brightness
-            group?.color = color
+            if(currentShowGroupSetPage){
+                group?.brightness = brightness
+                group?.color = color
+            }else{
+                light?.brightness = brightness
+                light?.color = color
+            }
 
             LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
 //                for(i in 0..3){
@@ -299,7 +558,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         }
 //        }.start()
 
-        sb_brightness?.progress = brightness!!
+        sbBrightness?.progress = brightness!!
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
 //        scrollView?.setBackgroundColor(color)
@@ -310,8 +569,13 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
     @SuppressLint("SetTextI18n")
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
-        presetColors?.get(position)!!.color = group!!.color
-        presetColors?.get(position)!!.brightness = group!!.brightness
+        if(currentShowGroupSetPage){
+            presetColors?.get(position)!!.color = group!!.color
+            presetColors?.get(position)!!.brightness = group!!.brightness
+        }else{
+            presetColors?.get(position)!!.color = light!!.color
+            presetColors?.get(position)!!.brightness = light!!.brightness
+        }
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as TextView?
         textView!!.text = group!!.brightness.toString() + "%"
         textView.setBackgroundColor(0xff000000.toInt() or group!!.color)
@@ -319,42 +583,26 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         false
     }
 
-    override fun onClick(v: View?) {
-        when (v?.id) {
-            R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        this.showLoadingDialog(getString(R.string.deleting))
-
-                        deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
-                                successCallback = {
-                                    this.hideLoadingDialog()
-                                    this.setResult(Constant.RESULT_OK)
-                                    this.finish()
-                                },
-                                failedCallback = {
-                                    this.hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
-                                })
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
-            R.id.btn_rename -> renameGp()
-//            R.id.dynamicRgb -> toRGBGradientView()
-        }
-    }
-
     private fun toRGBGradientView() {
-        val intent = Intent(this, RGBGradientActivity::class.java)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-        intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group?.meshAddr)
-        overridePendingTransition(0, 0)
-        startActivityForResult(intent, 0)
+        if(currentShowGroupSetPage){
+            val intent = Intent(this, RGBGradientActivity::class.java)
+            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+            intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group?.meshAddr)
+            overridePendingTransition(0, 0)
+            startActivityForResult(intent, 0)
+        }else{
+            val intent = Intent(this, RGBGradientActivity::class.java)
+            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+            intent.putExtra(Constant.TYPE_VIEW_ADDRESS, light!!.meshAddr)
+            startActivityForResult(intent, 0)
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mConnectTimer?.dispose()
         this.mApplication?.removeEventListener(this)
+        mDisposable.dispose()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -397,48 +645,67 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
 
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
 
-            val addr = group!!.meshAddr
+            var addr = 0
+            if(currentShowGroupSetPage){
+                addr = group!!.meshAddr
+            }else{
+                addr = light!!.meshAddr
+            }
+
             val opcode: Byte
             val params: ByteArray
 
-            if (view === sb_brightness) {
+            if (view === sbBrightness) {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
-                group!!.brightness = progress
+                if(currentShowGroupSetPage){
+                    group!!.brightness = progress
+                }else{
+                    light!!.brightness = progress
+                }
+
                 tv_brightness_rgb.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {
-                    DBUtils.updateGroup(group!!)
-                    updateLights(progress, "brightness", group!!)
-                }
-            } else if (view === sb_temperature) {
-
-                opcode = Opcode.SET_TEMPERATURE
-                params = byteArrayOf(0x05, progress.toByte())
-                group!!.colorTemperature = progress
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
-
-                if (stopTracking) {
-                    DBUtils.updateGroup(group!!)
-                    updateLights(progress, "colorTemperature", group!!)
+                    if(currentShowGroupSetPage){
+                        DBUtils.updateGroup(group!!)
+                        updateLights(progress, "brightness", group!!)
+                    }else{
+                        DBUtils.updateLight(light!!)
+                    }
                 }
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(progress.toByte())
-                val color = group?.color
+                var color = 0
+                if(currentShowGroupSetPage){
+                    color = group?.color!!
+                }else{
+                    color = light?.color!!
+                }
+
                 val red = (color!! and 0xff0000) shr 16
                 val green = (color and 0x00ff00) shr 8
                 val blue = color and 0x0000ff
                 val w = progress
 
-                group?.color = (w shl 24) or red or green or blue
+                if(currentShowGroupSetPage){
+                    group?.color = (w shl 24) or red or green or blue
+                }else{
+                    light?.color = (w shl 24) or red or green or blue
+                }
+
                 tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {
-                    DBUtils.updateGroup(group!!)
-                    updateLights(progress, "colorTemperature", group!!)
+                    if(currentShowGroupSetPage){
+                        DBUtils.updateGroup(group!!)
+                        updateLights(progress, "colorTemperature", group!!)
+                    }else{
+                        DBUtils.updateLight(light!!)
+                    }
                 }
 
             }
@@ -489,7 +756,12 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
             if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
             } else {
                 Thread {
-                    group?.color = color
+                    if(currentShowGroupSetPage){
+                        group?.color = color
+                    }else{
+                        light?.color=color
+                    }
+
                     changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
 
                 }.start()
@@ -503,7 +775,13 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         var green = G
         var blue = B
 
-        val addr = group?.meshAddr
+        var addr = 0
+        if(currentShowGroupSetPage){
+            addr = group?.meshAddr!!
+        }else{
+            addr = light?.meshAddr!!
+        }
+
         val opcode = Opcode.SET_TEMPERATURE
 
         val minVal = 0x50
@@ -623,7 +901,7 @@ class RGBGroupSettingActivity : TelinkBaseActivity(), OnClickListener, EventList
         textGp.setText(group?.name)
         StringUtils.initEditTextFilter(textGp)
         textGp.setSelection(textGp.getText().toString().length)
-        android.app.AlertDialog.Builder(this@RGBGroupSettingActivity)
+        android.app.AlertDialog.Builder(this@RGBSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
 

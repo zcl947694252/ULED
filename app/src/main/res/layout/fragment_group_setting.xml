@@ -19,14 +19,14 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_brightness"
+                android:id="@+id/tvBrightness"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:text="@string/device_setting_brightness" />
 
             <SeekBar
-                android:id="@+id/sb_brightness"
+                android:id="@+id/sbBrightness"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
@@ -104,14 +104,14 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_temperature"
+                android:id="@+id/tvTemperature"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:text="@string/device_setting_temperature" />
 
             <SeekBar
-                android:id="@+id/sb_temperature"
+                android:id="@+id/sbTemperature"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:max="100"

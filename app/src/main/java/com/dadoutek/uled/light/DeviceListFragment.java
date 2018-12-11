@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -235,7 +234,7 @@ public final class DeviceListFragment extends Fragment {
                                        int position, long id) {
 
             Intent intent = new Intent(getActivity(),
-                    NormalDeviceSettingActivity.class);
+                    NormalSettingActivity.class);
             Light light = adapter.getItem(position);
             intent.putExtra(Constant.LIGHT_ARESS_KEY, light.meshAddress);
             startActivity(intent);

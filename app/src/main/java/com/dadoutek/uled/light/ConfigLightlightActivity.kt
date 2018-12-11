@@ -72,7 +72,7 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
         edit_data_view_layout.visibility = View.GONE
 
         val layoutmanager = GridLayoutManager(this,2)
-        recyclerViewNightLightGroups.layoutManager = layoutmanager
+        recyclerViewNightLightGroups.layoutManager = layoutmanager as RecyclerView.LayoutManager?
         this.nightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(
                 R.layout.activity_night_light_groups_item, showGroupList)
 //        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)

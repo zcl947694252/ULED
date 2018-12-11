@@ -67,18 +67,18 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <SeekBar
-            android:id="@+id/sb_brightness"
+            android:id="@+id/sbBrightness"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:max="100"
             android:progress="50"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_brightness"
+            app:layout_constraintEnd_toStartOf="@+id/tvBrightness"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_brightness"
+            android:id="@+id/tvBrightness"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="50%"
@@ -112,16 +112,16 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <SeekBar
-            android:id="@+id/sb_temperature"
+            android:id="@+id/sbTemperature"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:max="100"
             android:progress="50"
-            app:layout_constraintEnd_toStartOf="@+id/tv_temperature"
+            app:layout_constraintEnd_toStartOf="@+id/tvTemperature"
             app:layout_constraintStart_toEndOf="@+id/imageView5" />
 
         <TextView
-            android:id="@+id/tv_temperature"
+            android:id="@+id/tvTemperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="50%"

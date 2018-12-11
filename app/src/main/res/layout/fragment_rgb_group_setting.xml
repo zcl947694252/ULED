@@ -155,7 +155,7 @@
                     android:text="@string/device_setting_brightness" />
 
                 <SeekBar
-                    android:id="@+id/sb_brightness"
+                    android:id="@+id/sbBrightness"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:max="100"
@@ -190,29 +190,6 @@
 
             <!-- Temperature -->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/tv_temperature"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="@string/device_setting_temperature" />
-
-                <SeekBar
-                    android:id="@+id/sb_temperature"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:padding="5dp"
-                    android:progress="10" />
-            </LinearLayout>
-
-
             <!--<View-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="1dp"-->
@@ -221,7 +198,7 @@
             <!--android:background="@color/border_line" />-->
 
             <LinearLayout
-                android:id="@+id/func_btn"
+                android:id="@+id/group_view_func_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -251,6 +228,51 @@
                     android:text="@string/rename_the_group"
                     android:textColor="@android:color/white" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/light_view_bt_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/brightness">
+
+                <Button
+                    android:id="@+id/update_group"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/click_btn"
+                    android:text="@string/update_group"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_remove"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/click_btn"
+                    android:text="@string/factory_reset"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/lightVersion"
+                android:text="1.0.0"
+                android:textColor="@color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/light_view_bt_layout"
+                app:layout_constraintStart_toStartOf="@id/tip"
+                android:paddingStart="8dp"
+                android:visibility="gone"
+                />
+
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 
