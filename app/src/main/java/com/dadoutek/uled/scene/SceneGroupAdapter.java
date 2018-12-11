@@ -32,16 +32,16 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
     @Override
     protected void convert(BaseViewHolder helper, ItemGroup item) {
         int position = helper.getLayoutPosition();
-        SeekBar sbBrightness = helper.getView(R.id.sb_brightness);
-        SeekBar sBtemperature = helper.getView(R.id.sb_temperature);
+        SeekBar sbBrightness = helper.getView(R.id.sbBrightness);
+        SeekBar sBtemperature = helper.getView(R.id.sbTemperature);
 
         helper.setText(R.id.name_gp, item.gpName);
         helper.setBackgroundColor(R.id.rgb_view, item.color==0?TelinkLightApplication.
                 getInstance().getResources().getColor(R.color.primary):(0xff000000|item.color));
-        helper.setProgress(R.id.sb_brightness, item.brightness);
-        helper.setProgress(R.id.sb_temperature, item.temperature);
-        helper.setText(R.id.tv_brightness, sbBrightness.getProgress() + "%");
-        helper.setText(R.id.tv_temperature, sBtemperature.getProgress() + "%");
+        helper.setProgress(R.id.sbBrightness, item.brightness);
+        helper.setProgress(R.id.sbTemperature, item.temperature);
+        helper.setText(R.id.tvBrightness, sbBrightness.getProgress() + "%");
+        helper.setText(R.id.tvTemperature, sBtemperature.getProgress() + "%");
         if(OtherUtils.isRGBGroup(DBUtils.INSTANCE.getGroupByMesh(item.groupAress))){
             helper.setGone(R.id.scene_rgb_layout, true);
             helper.setGone(R.id.sb_temperature_layout, false);
@@ -66,8 +66,8 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
             int address = getData().get(position).groupAress;
             byte opcode;
             byte[] params;
-            if (seekBar.getId() == R.id.sb_brightness) {
-                TextView tvBrightness = (TextView) getViewByPosition(position, R.id.tv_brightness);
+            if (seekBar.getId() == R.id.sbBrightness) {
+                TextView tvBrightness = (TextView) getViewByPosition(position, R.id.tvBrightness);
                 if (tvBrightness != null) {
                     tvBrightness.setText(progress + "%");
                     opcode = (byte) 0xD2;
@@ -76,8 +76,8 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
                             () ->
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)).start();
                 }
-            } else if (seekBar.getId() == R.id.sb_temperature) {
-                TextView tvTemperature = (TextView) getViewByPosition(position, R.id.tv_temperature);
+            } else if (seekBar.getId() == R.id.sbTemperature) {
+                TextView tvTemperature = (TextView) getViewByPosition(position, R.id.tvTemperature);
                 if (tvTemperature != null) {
                     tvTemperature.setText(progress + "%");
                     opcode = (byte) 0xE2;
@@ -97,11 +97,11 @@ public class SceneGroupAdapter extends BaseQuickAdapter<ItemGroup, BaseViewHolde
     public void onStopTrackingTouch(SeekBar seekBar) {
         int pos = (Integer) seekBar.getTag();
         ItemGroup itemGroup = getData().get(pos);
-        if (seekBar.getId() == R.id.sb_brightness) {
-            ((TextView) Objects.requireNonNull(getViewByPosition(pos, R.id.tv_brightness))).setText(seekBar.getProgress() + "%");
+        if (seekBar.getId() == R.id.sbBrightness) {
+            ((TextView) Objects.requireNonNull(getViewByPosition(pos, R.id.tvBrightness))).setText(seekBar.getProgress() + "%");
             itemGroup.brightness=seekBar.getProgress();
-        } else if (seekBar.getId() == R.id.sb_temperature) {
-            ((TextView) Objects.requireNonNull(getViewByPosition(pos, R.id.tv_temperature))).setText(seekBar.getProgress() + "%");
+        } else if (seekBar.getId() == R.id.sbTemperature) {
+            ((TextView) Objects.requireNonNull(getViewByPosition(pos, R.id.tvTemperature))).setText(seekBar.getProgress() + "%");
             itemGroup.temperature=seekBar.getProgress();
         }
         notifyItemChanged((Integer) seekBar.getTag());
