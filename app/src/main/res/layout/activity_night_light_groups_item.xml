@@ -16,14 +16,16 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:singleLine="true"
+            android:paddingEnd="8dp"
             />
-        <!--<ImageView-->
-            <!--android:id="@+id/imgDelete"-->
-            <!--app:layout_constraintEnd_toEndOf="@id/tvGroupName"-->
-            <!--app:layout_constraintTop_toTopOf="parent"-->
-            <!--android:layout_width="12dp"-->
-            <!--android:layout_height="12dp"-->
-            <!--android:src="@drawable/delete"-->
-            <!--/>-->
+        <ImageView
+            android:id="@+id/imgDelete"
+            app:layout_constraintEnd_toEndOf="@id/tvGroupName"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:src="@drawable/delete"
+            />
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>

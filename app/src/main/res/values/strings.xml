@@ -537,5 +537,6 @@
     <string name="light_light_title">小夜灯</string>
     <string name="delay_time">延时时间</string>
     <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
+    <string name="night_light_title">小夜灯</string>
 
 </resources>

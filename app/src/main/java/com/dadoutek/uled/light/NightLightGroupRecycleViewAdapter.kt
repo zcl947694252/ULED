@@ -12,5 +12,6 @@ class NightLightGroupRecycleViewAdapter(layoutResId: Int, data: List<ItemGroup>?
 
     override fun convert(helper: BaseViewHolder, group: ItemGroup?) {
           helper.setText(R.id.tvGroupName,group?.gpName)
+        helper.addOnClickListener(R.id.imgDelete)
     }
 }

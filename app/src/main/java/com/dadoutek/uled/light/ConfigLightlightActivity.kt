@@ -1,24 +1,18 @@
 package com.dadoutek.uled.light
 
-import android.app.AlertDialog
-import android.content.DialogInterface
-import android.graphics.Point
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.*
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.GroupListAdapter
-import com.dadoutek.uled.group.GroupListRecycleViewAdapter
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
@@ -28,8 +22,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_light_light.*
@@ -88,6 +80,17 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
 //        //添加分割线
 //        recyclerViewNightLightGroups.addItemDecoration(decoration)
         nightLightGroupRecycleViewAdapter?.bindToRecyclerView(recyclerViewNightLightGroups)
+        nightLightGroupRecycleViewAdapter?.onItemChildClickListener=onItemChildClickListener
+    }
+
+    internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        when (view.id) {
+            R.id.imgDelete -> delete(adapter, position)
+        }
+    }
+
+    private fun delete(adapter: BaseQuickAdapter<Any, BaseViewHolder>, position: Int) {
+        adapter.remove(position)
     }
 
     //显示配置数据页面
@@ -231,7 +234,7 @@ class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
     }
 
     private fun initToolbar() {
-        toolbar.title = getString(R.string.sensor_title)
+        toolbar.title = getString(R.string.night_light_title)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
 
