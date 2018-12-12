@@ -178,6 +178,7 @@ public class TelinkApplication extends Application {
         filter.addAction(LightService.ACTION_OFFLINE);
         filter.addAction(LightService.ACTION_ERROR);
         filter.addAction(LightService.ACTION_ERROR_REPORT);
+        TelinkLog.d("onLeScanResult"+"register_action");
         return filter;
     }
 
@@ -289,6 +290,7 @@ public class TelinkApplication extends Application {
     protected void onLeScan(Intent intent) {
         DeviceInfo deviceInfo = intent.getParcelableExtra(LightService.EXTRA_DEVICE);
         this.dispatchEvent(LeScanEvent.newInstance(this, LeScanEvent.LE_SCAN, deviceInfo));
+        TelinkLog.d("dispatchEvent_device"+deviceInfo.macAddress);
     }
 
     protected void onLeScanCompleted(Intent intent) {

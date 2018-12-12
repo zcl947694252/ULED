@@ -8,8 +8,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.telink.bluetooth.Command;
+import com.telink.bluetooth.TelinkLog;
 
 /**
  * LightService是一个抽象类,封装了扫描加灯,自动重连,设备控制等方法.
@@ -423,6 +425,7 @@ public abstract class LightService extends Service implements
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);
 
+        TelinkLog.d("onLeScanResult"+deviceInfo.macAddress);
         return true;
     }
 
@@ -451,6 +454,7 @@ public abstract class LightService extends Service implements
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
+            TelinkLog.d("onLeScanResult1："+deviceInfo.macAddress);
         } else {
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.macAddress = light.getMacAddress();
@@ -464,7 +468,9 @@ public abstract class LightService extends Service implements
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
+            TelinkLog.d("onLeScanResult2："+deviceInfo.macAddress);
         }
+
 
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);

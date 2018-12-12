@@ -275,7 +275,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN, this);
 //        TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this);
         TelinkLightApplication.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
-//        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
+        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
         TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
     }
 
@@ -468,6 +468,13 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
         stopConnectTimer();
         stopScanTimer();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LeBluetooth.getInstance().stopScan();
+        TelinkLightApplication.getApp().removeEventListener(this);
     }
 
     private void updateSuccess() {
@@ -777,7 +784,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 log("onLeScan" + "connectDevice2");
                 stopScanTimer();
                 if (!connectStart) {
-                    TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
                     LeBluetooth.getInstance().stopScan();
                     connectDevice(deviceInfo.macAddress);
                     connectRetryCount=1;
@@ -812,6 +818,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     public void onScanTimeout() {
         stopScanTimer();
+        LeBluetooth.getInstance().stopScan();
         this.mode = MODE_COMPLETE;
         Mesh mesh = TelinkLightApplication.getApp().getMesh();
         mesh.setOtaDevice(null);
