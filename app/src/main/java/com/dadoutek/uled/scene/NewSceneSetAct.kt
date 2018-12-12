@@ -1,5 +1,6 @@
 package com.dadoutek.uled.scene
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -18,6 +19,7 @@ import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
@@ -94,16 +96,23 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         when (view.id) {
             R.id.btn_delete -> delete(adapter, position)
-            R.id.rgb_view -> changeToColorSelect()
+            R.id.rgb_view -> changeToColorSelect(position)
         }
     }
 
-    private fun changeToColorSelect() {
-
+    private fun changeToColorSelect(position: Int) {
+       val intent=Intent(this,SelectColorAct::class.java)
+        intent.putExtra(Constant.GROUPS_KEY, showGroupList!![position])
+        startActivityForResult(intent, position)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK){
+            val color=data?.getIntExtra("color",0)
+            showGroupList!![requestCode].color= color!!
+            sceneGroupAdapter?.notifyItemChanged(requestCode)
+        }
     }
 
     internal var onItemChildClickListenerCheck: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
