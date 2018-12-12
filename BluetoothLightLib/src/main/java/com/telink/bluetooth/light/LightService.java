@@ -454,6 +454,7 @@ public abstract class LightService extends Service implements
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
+            TelinkLog.d("onLeScanResult1："+deviceInfo.macAddress);
         } else {
             DeviceInfo deviceInfo = new DeviceInfo();
             deviceInfo.macAddress = light.getMacAddress();
@@ -467,7 +468,9 @@ public abstract class LightService extends Service implements
             intent.setAction(ACTION_STATUS_CHANGED);
             intent.putExtra(EXTRA_MODE, mode);
             intent.putExtra(EXTRA_DEVICE, deviceInfo);
+            TelinkLog.d("onLeScanResult2："+deviceInfo.macAddress);
         }
+
 
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);

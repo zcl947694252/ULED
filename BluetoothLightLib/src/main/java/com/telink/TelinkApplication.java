@@ -178,6 +178,7 @@ public class TelinkApplication extends Application {
         filter.addAction(LightService.ACTION_OFFLINE);
         filter.addAction(LightService.ACTION_ERROR);
         filter.addAction(LightService.ACTION_ERROR_REPORT);
+        TelinkLog.d("onLeScanResult"+"register_action");
         return filter;
     }
 

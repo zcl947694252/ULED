@@ -17,7 +17,7 @@ public class TelinkLog {
 
     public final static String TAG = "TelinkBluetoothSDK";
 
-    public static boolean ENABLE = true;
+    public static boolean ENABLE = false;
     public static boolean LOG2FILE_ENABLE = false;
     public static String FILE_PREFIX = "TelinkBluetoothSDKLogger";
     private static BufferedWriter mWriter;
