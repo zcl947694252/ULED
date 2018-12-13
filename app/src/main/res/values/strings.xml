@@ -533,13 +533,13 @@
     <string name="sure_delete">Confirm deleting this scene？</string>
     <string name="w_bright">White Brightness:%1$s</string>
     <string name="light_light">Light light</string>
-    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
-    <string name="light_light_title">小夜灯</string>
-    <string name="delay_time">延时时间</string>
-    <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
-    <string name="night_light_title">小夜灯</string>
-    <string name="current_select_group">当前选择的分组:</string>
-    <string name="selected">选中</string>
-    <string name="unSelect">未选中</string>
+    <string name="light_light_tip">Please switch the night light to the configuration mode first.</string>
+    <string name="light_light_title">Night light</string>
+    <string name="delay_time">delay-time</string>
+    <string name="tip_night_light_group_limite_tip">Up to 8 groups can be choice</string>
+    <string name="night_light_title">Night Light</string>
+    <string name="current_select_group">Selected Group:</string>
+    <string name="selected">YES</string>
+    <string name="unSelect">NO</string>
 
 </resources>
