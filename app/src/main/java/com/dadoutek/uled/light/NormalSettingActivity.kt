@@ -605,7 +605,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 30
+        private val delayTime = 100
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             this.onValueChange(seekBar, seekBar.progress, true,true)

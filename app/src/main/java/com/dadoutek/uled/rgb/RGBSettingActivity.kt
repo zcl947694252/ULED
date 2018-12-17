@@ -631,7 +631,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 30
+        private val delayTime = 100
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
