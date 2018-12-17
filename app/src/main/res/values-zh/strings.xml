@@ -419,8 +419,8 @@
     <string name="scan_light_guide_4">选择完成可以点击这里确定分组</string>
 
     <!--改好场景页面后再改-->
-    <string name="add_scene_guide_1">点击添加可选择一些分组</string>
-    <string name="add_scene_guide_2">请选择组添加到这个场景</string>
+    <string name="add_scene_guide_1">请选择组添加到这个场景</string>
+    <string name="add_scene_guide_2">点击这里确定选择分组</string>
     <string name="add_scene_guide_3">这里可以设置分组亮度</string>
     <string name="add_scene_guide_4">这里可以设置分组色温</string>
     <string name="add_scene_guide_5">这里可以设置分组颜色</string>
@@ -493,4 +493,6 @@
     <string name="selected">选中</string>
     <string name="unSelect">未选中</string>
     <string name="rgb_gradient">动态RGB</string>
+    <string name="add_scene_guide_0">这里可以输入场景名</string>
+    <string name="click_update_scene">点击可修改场景</string>
 </resources>

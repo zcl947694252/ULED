@@ -173,7 +173,26 @@ public class SceneFragment extends BaseFragment implements
         }
     }
 
-    private void stepEndGuide(){
+    private void stepEndGuide2(){
+        if(getActivity()!=null){
+            final View view = getActivity().getWindow().getDecorView();
+            final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    TextView guide2= (TextView) adaper.getViewByPosition(0, R.id.scene_edit);
+                    GuideUtils.INSTANCE.guideBuilder(SceneFragment.this,GuideUtils.INSTANCE.getADDITIONAL_GUIDE_SET_SCENE())
+                            .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple_scene_2,getString(R.string.click_update_scene),
+                                    v -> {
+                                        GuideUtils.INSTANCE.changeCurrentViewIsEnd(getActivity(),GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
+                                    },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),getActivity())).show();
+                }
+            });
+        }
+    }
+
+    private void stepEndGuide1(){
         if(getActivity()!=null){
             final View view = getActivity().getWindow().getDecorView();
             final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
@@ -185,8 +204,7 @@ public class SceneFragment extends BaseFragment implements
                     GuideUtils.INSTANCE.guideBuilder(SceneFragment.this,GuideUtils.INSTANCE.getSTEP14_GUIDE_APPLY_SCENE())
                             .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide2,R.layout.view_guide_simple_scene_2,getString(R.string.apply_scene),
                                     v -> {
-                                        guide2.performClick();
-                                        GuideUtils.INSTANCE.changeCurrentViewIsEnd(getActivity(),GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),true);
+                                     stepEndGuide2();
                                     },GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),getActivity())).show();
                 }
             });
@@ -293,7 +311,7 @@ public class SceneFragment extends BaseFragment implements
         if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
             initData();
             initView();
-            stepEndGuide();
+            stepEndGuide1();
         }
     }
 

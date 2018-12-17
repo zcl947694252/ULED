@@ -29,15 +29,18 @@ object GuideUtils {
     var STEP6_GUIDE_SURE_GROUP = "STEP6_GUIDE_SURE_GROUP"
     var STEP7_GUIDE_ADD_SCENE = "STEP7_GUIDE_ADD_SCENE"
     var STEP8_GUIDE_ADD_SCENE_ADD_GROUP = "STEP8_GUIDE_ADD_SCENE_ADD_GROUP"
-    var STEP9_GUIDE_ADD_SCENE_SELECT_GROUP = "STEP9_GUIDE_ADD_SCENE_SELECT_GROUP"
+    var STEP9_GUIDE_ADD_SCENE_SURE = "STEP9_GUIDE_ADD_SCENE_SURE"
     var STEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS = "STEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS"
     var STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE = "STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE"
     var STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR = "STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR"
     var STEP13_GUIDE_ADD_SCENE_SAVE = "STEP13_GUIDE_ADD_SCENE_SAVE"
+
     var STEP14_GUIDE_APPLY_SCENE = "STEP14_GUIDE_APPLY_SCENE"
     var STEP15_GUIDE_CONSTENT_QUESTION = "STEP15_GUIDE_CONSTENT_QUESTION"
     var MAIN_STEP0_GUIDE_TO_SCENE = "MAIN_STEP0_GUIDE_TO_SCENE"
 
+    var ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME="ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME"
+    var ADDITIONAL_GUIDE_SET_SCENE="ADDITIONAL_GUIDE_SET_SCENE"
     /**
      * 每个页面引导结束标志
      * 本次取值为true则当前页不引导
@@ -158,7 +161,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, STEP6_GUIDE_SURE_GROUP)
         NewbieGuide.resetLabel(activity, STEP7_GUIDE_ADD_SCENE)
         NewbieGuide.resetLabel(activity, STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
-        NewbieGuide.resetLabel(activity, STEP9_GUIDE_ADD_SCENE_SELECT_GROUP)
+        NewbieGuide.resetLabel(activity, STEP9_GUIDE_ADD_SCENE_SURE)
         NewbieGuide.resetLabel(activity, STEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS)
         NewbieGuide.resetLabel(activity, STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE)
         NewbieGuide.resetLabel(activity, STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR)
@@ -166,6 +169,8 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, STEP14_GUIDE_APPLY_SCENE)
         NewbieGuide.resetLabel(activity, STEP15_GUIDE_CONSTENT_QUESTION)
         NewbieGuide.resetLabel(activity, MAIN_STEP0_GUIDE_TO_SCENE)
+        NewbieGuide.resetLabel(activity, ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
+        NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
@@ -204,12 +209,14 @@ object GuideUtils {
     fun resetSceneGuide(activity: Activity){
         NewbieGuide.resetLabel(activity, STEP7_GUIDE_ADD_SCENE)
         NewbieGuide.resetLabel(activity, STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
-        NewbieGuide.resetLabel(activity, STEP9_GUIDE_ADD_SCENE_SELECT_GROUP)
+        NewbieGuide.resetLabel(activity, STEP9_GUIDE_ADD_SCENE_SURE)
         NewbieGuide.resetLabel(activity, STEP10_GUIDE_ADD_SCENE_CHANGE_BRIGHTNESS)
         NewbieGuide.resetLabel(activity, STEP11_GUIDE_ADD_SCENE_CHANGE_TEMPERATURE)
         NewbieGuide.resetLabel(activity, STEP12_GUIDE_ADD_SCENE_CHANGE_COLOR)
         NewbieGuide.resetLabel(activity, STEP13_GUIDE_ADD_SCENE_SAVE)
         NewbieGuide.resetLabel(activity, STEP14_GUIDE_APPLY_SCENE)
+        NewbieGuide.resetLabel(activity, ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
+        NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
     }
 

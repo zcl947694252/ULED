@@ -199,7 +199,7 @@
 //        guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this,GuideUtils.INSTANCE.getEND_ADD_SCENE_KEY(),false);
 //        if(guideShowCurrentPage){
 //            TextView guide2= findViewById(R.id.toolbarTv);
-//            return GuideUtils.INSTANCE.guideBuilder(SetSceneAct.this,lvGp,GuideUtils.INSTANCE.getSTEP9_GUIDE_ADD_SCENE_SELECT_GROUP())
+//            return GuideUtils.INSTANCE.guideBuilder(SetSceneAct.this,lvGp,GuideUtils.INSTANCE.getSTEP9_GUIDE_ADD_SCENE_SURE())
 //                    .addGuidePage(GuideUtils.INSTANCE.addGuidePage(lvGp.getChildAt(0),R.layout.view_guide_simple_scene_set2,getString(R.string.add_scene_guide_2),
 //                            v -> {
 //                                ItemGroup itemGroup = new ItemGroup();

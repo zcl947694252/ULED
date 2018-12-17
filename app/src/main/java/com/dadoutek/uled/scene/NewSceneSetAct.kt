@@ -9,6 +9,8 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
+import android.widget.Button
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -22,9 +24,11 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
+import kotlinx.android.synthetic.main.activity_online_status.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
@@ -38,11 +42,70 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName:String?=null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
+    private var guideShowCurrentPage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
         init()
+        if (!isChangeScene) {
+            edit_name.setText(DBUtils.getDefaultNewSceneName())
+            initOnLayoutListener()
+        }
+    }
+
+    private fun initOnLayoutListener() {
+        val view = this.window.decorView
+        val viewTreeObserver = view.viewTreeObserver
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                lazyLoad()
+            }
+        })
+    }
+
+    private fun lazyLoad() {
+        step0Guide()
+    }
+
+    private fun step0Guide() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
+        if (guideShowCurrentPage) {
+            GuideUtils.guideBuilder(this, GuideUtils.ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
+                    .addGuidePage(GuideUtils.addGuidePage(edit_name, R.layout.view_guide_simple_scene_set0, getString(R.string.add_scene_guide_0),
+                            View.OnClickListener {  step1Guide() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+        }
+    }
+
+    private fun step1Guide() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
+        if (guideShowCurrentPage) {
+            val guide1=sceneEditListAdapter!!.getViewByPosition(0,R.id.group_check_state)
+            GuideUtils.guideBuilder(this, GuideUtils.STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
+                    .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_1),
+                             View.OnClickListener {guide1.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+        }
+    }
+
+    private fun step2Guide() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
+        if (guideShowCurrentPage) {
+            val guide1=confirm
+            GuideUtils.guideBuilder(this, GuideUtils.STEP9_GUIDE_ADD_SCENE_SURE)
+                    .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_2),
+                            View.OnClickListener {guide1.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+        }
+    }
+
+    private fun stepEndGuide() {
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
+        if (guideShowCurrentPage) {
+            val guide6 = confirm
+            GuideUtils.guideBuilder(this, GuideUtils.STEP13_GUIDE_ADD_SCENE_SAVE)
+                    .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_scene_set1, getString(R.string.add_scene_guide_6),
+                            View.OnClickListener {guide6.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+        }
     }
 
     private fun init() {
@@ -124,6 +187,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     changeCheckedViewData()
                     sceneEditListAdapter?.notifyDataSetChanged()
                 }
+                step2Guide()
             }
         }
     }
@@ -236,6 +300,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             saveScene()
         }else{
             saveCurrenEditResult()
+            stepEndGuide()
         }
     }
 

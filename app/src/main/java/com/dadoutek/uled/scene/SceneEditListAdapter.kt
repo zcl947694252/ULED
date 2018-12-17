@@ -25,11 +25,11 @@ class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAda
         helper.addOnClickListener(R.id.group_check_state)
         val tvState = helper.getView<TextView>(R.id.group_check_state)
         if (item.isChecked) {
-            tvState.text = "选中"
+            tvState.text = mContext.getString(R.string.selected)
             tvState.setTextColor(mContext.resources.getColor(R.color.white))
             tvState.setBackgroundColor(mContext.resources.getColor(R.color.primary))
         } else {
-            tvState.text = "未选中"
+            tvState.text = mContext.getString(R.string.unSelect)
             tvState.setBackgroundColor(mContext.resources.getColor(R.color.white))
             if(item.enableCheck){
                 tvState.setTextColor(mContext.resources.getColor(R.color.primary))

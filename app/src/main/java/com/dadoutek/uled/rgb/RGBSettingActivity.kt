@@ -318,8 +318,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 5)
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
-        colorSelectDiyRecyclerViewAdapter!!.setOnItemChildClickListener(diyOnItemChildClickListener)
-        colorSelectDiyRecyclerViewAdapter!!.setOnItemChildLongClickListener(diyOnItemChildLongClickListener)
+        colorSelectDiyRecyclerViewAdapter!!.onItemChildClickListener = diyOnItemChildClickListener
+        colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
         btn_rename!!.visibility = View.GONE
@@ -333,8 +333,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
-        this.sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
-        sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
+        sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
+        sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
     }
 
     private fun initToolbar() {
@@ -517,8 +517,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         sb_w_bright.progress = w
 
 
-        this.sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
-        sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
+        sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
+        sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
         this.color_picker?.setColorListener(colorEnvelopeListener)
         checkGroupIsSystemGroup()
     }
@@ -667,7 +667,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             val opcode: Byte
             val params: ByteArray
 
-            if (view === sbBrightness) {
+            if (view == sbBrightness) {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
                 if(currentShowGroupSetPage){

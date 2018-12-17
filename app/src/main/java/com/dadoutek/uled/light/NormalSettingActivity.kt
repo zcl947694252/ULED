@@ -508,7 +508,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         this.sbBrightness?.setOnSeekBarChangeListener(this.barChangeListener)
         this.sbTemperature?.setOnSeekBarChangeListener(this.barChangeListener)
     }
-    
+
     private fun renameGp() {
 //        val intent = Intent(this, RenameActivity::class.java)
 //        intent.putExtra("group", group)
@@ -608,16 +608,19 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         private val delayTime = 100
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
+//            LogUtils.d("progress:_3__"+seekBar.progress)
             this.onValueChange(seekBar, seekBar.progress, true,true)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
+//            LogUtils.d("progress:_1__"+seekBar.progress)
             this.preTime = System.currentTimeMillis()
             this.onValueChange(seekBar, seekBar.progress, true,false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
+//            LogUtils.d("progress:_2__"+progress)
             val currentTime = System.currentTimeMillis()
 
             if (currentTime - this.preTime > this.delayTime) {
@@ -634,7 +637,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             }else{
                 addr = light?.meshAddr!!
             }
-            
+
             val opcode: Byte
             val params: ByteArray
             if (view === sbBrightness) {
@@ -650,7 +653,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     light?.brightness = progress
                 }
                 
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
                 if(isStopTracking){
                     if(currentShowPageGroup){
                         DBUtils.updateGroup(group!!)
