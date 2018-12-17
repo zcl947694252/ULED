@@ -605,7 +605,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 30
+        private val delayTime = 100
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             this.onValueChange(seekBar, seekBar.progress, true,true)
@@ -774,7 +774,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 ToastUtils.showLong(getString(R.string.connecting))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                if (this.mApp!!.isEmptyMesh())
+                if (this.mApp?.isEmptyMesh != false)
                     return
 
                 //                Lights.getInstance().clear();

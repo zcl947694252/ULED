@@ -195,7 +195,7 @@
             android:name=".rgb.RGBGradientActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.ScanningLightlightActivity"
+            android:name=".light.ScanningNightlightActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.RGBGradientActivity"
@@ -207,6 +207,7 @@
             android:name=".othersview.SelectColorAct"
             android:screenOrientation="portrait" />
             android:name=".light.ConfigLightlightActivity"
+            android:name=".light.ConfigNightlightActivity"
             android:screenOrientation="portrait" />
     </application>
 

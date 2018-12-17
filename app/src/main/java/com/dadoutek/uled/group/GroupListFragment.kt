@@ -21,7 +21,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
-import com.dadoutek.uled.light.ScanningLightlightActivity
+import com.dadoutek.uled.light.ScanningNightlightActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -261,8 +261,8 @@ class GroupListFragment : BaseFragment() {
             }
             R.id.install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
             R.id.install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
-//            R.id.install_light_light -> startActivity(Intent(mContext, ConfigLightlightActivity::class.java))
-            R.id.install_light_light -> startActivity(Intent(mContext, ScanningLightlightActivity::class.java))
+//            R.id.install_light_light -> startActivity(Intent(mContext, ConfigNightlightActivity::class.java))
+            R.id.install_light_light -> startActivity(Intent(mContext, ScanningNightlightActivity::class.java))
         }
     }
 

@@ -14,7 +14,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -44,7 +43,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
-class ScanningLightlightActivity :TelinkBaseActivity(), EventListener<String> {
+class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
     private val SCAN_TIMEOUT_SECOND: Int = 8
     private val CONNECT_TIMEOUT_SECONDS: Int = 5
     private val MAX_RETRY_CONNECT_TIME = 3
@@ -296,7 +295,7 @@ class ScanningLightlightActivity :TelinkBaseActivity(), EventListener<String> {
         scanDisposable?.dispose()
         progressBtn.progress = 100  //进度控件显示成完成状态
         if (mDeviceInfo?.productUUID == DeviceType.LIGHT_LIGHT) {
-            startActivity<ConfigLightlightActivity>("deviceInfo" to mDeviceInfo!!)
+            startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!)
         }
     }
 
@@ -314,8 +313,8 @@ class ScanningLightlightActivity :TelinkBaseActivity(), EventListener<String> {
     private fun connect() {
         Thread {
 
-            mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningLightlightActivity)
-            mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningLightlightActivity)
+            mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningNightlightActivity)
+            mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningNightlightActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
             LogUtils.d("开始连接")
         }.start()

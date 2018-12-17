@@ -43,6 +43,10 @@
         <item> Yellow Color Gradient</item>        
         <item> Cyan Color Gradient</item>        
         <item> Purple Color Gradient</item>
+        <item>white breath </item>
+        <item> red and green gradient</item>
+        <item> red and blue gradient</item>
+        <item> green blue gradient</item>
     </string-array>
 
     <!-- Activity Labels -->
@@ -529,19 +533,24 @@
     <string name="name_can_not_null">名字不能为空</string>
     <string name="tip_config_switch_success">Please unplug the USB cable in Switch then use it
         .</string>
+    <string name="device_disconnected">device disconnected</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="tip_config_switch_success">
+        Please unplug the USB cable before use switch.</string>
     <string name="install_success">Successful installation</string>
     <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
     <string name="sure_delete">Confirm deleting this scene？</string>
     <string name="w_bright">White Brightness:%1$s</string>
     <string name="light_light">Light light</string>
-    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
-    <string name="light_light_title">小夜灯</string>
-    <string name="delay_time">延时时间</string>
-    <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
-    <string name="night_light_title">小夜灯</string>
-    <string name="current_select_group">当前选择的分组:</string>
-    <string name="selected">选中</string>
-    <string name="unSelect">未选中</string>
+    <string name="light_light_tip">Please switch the night light to the configuration mode first.</string>
+    <string name="light_light_title">Night light</string>
+    <string name="delay_time">delay-time</string>
+    <string name="tip_night_light_group_limite_tip">Up to 8 groups can be choice</string>
+    <string name="night_light_title">Night Light</string>
+    <string name="current_select_group">Selected Group:</string>
+    <string name="selected">YES</string>
+    <string name="unSelect">NO</string>
+    <string name="rgb_gradient">Gradient</string>
 
 </resources>

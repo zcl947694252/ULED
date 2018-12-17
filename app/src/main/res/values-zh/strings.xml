@@ -36,6 +36,10 @@
         <item>黄色渐变</item>
         <item>青色渐变</item>
         <item>紫色渐变</item>
+        <item>白色呼吸</item>
+        <item>红绿渐变</item>
+        <item>红蓝渐变</item>
+        <item>绿蓝渐变</item>
     </string-array>
 
     <!-- Activity Labels -->
@@ -471,7 +475,7 @@
     <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
     <string name="device_disconnected">设备已断开</string>
     <string name="reconnect">重连</string>
-    <string name="tip_config_switch_success">请拔出开关上的USB线后再使用开关。</string>
+    <string name="tip_config_switch_success">安装成功后开关底部蓝灯会闪烁并断开连接,请拔出开关上的USB线后再使用开关。</string>
     <string name="install_success">安装成功</string>
     <string name="unnamed">未命名</string>
     <string name="stop_scan">停止扫描</string>
@@ -488,4 +492,5 @@
     <string name="current_select_group">当前选择的分组:</string>
     <string name="selected">选中</string>
     <string name="unSelect">未选中</string>
+    <string name="rgb_gradient">动态RGB</string>
 </resources>

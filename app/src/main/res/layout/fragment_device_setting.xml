@@ -30,7 +30,7 @@
                 android:id="@+id/sbBrightness"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="95"
+                android:max="100"
                 android:padding="5dp"
                 android:progress="10" />
         </LinearLayout>
