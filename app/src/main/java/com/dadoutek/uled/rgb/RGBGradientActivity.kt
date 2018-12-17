@@ -72,7 +72,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         }
         buildInModeList = ArrayList()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
-        for (i in 0..6) {
+        for (i in 0..10) {
             var item = ItemRgbGradient()
             item.name = presetGradientList[i]
             buildInModeList?.add(item)

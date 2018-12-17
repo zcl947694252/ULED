@@ -774,7 +774,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 ToastUtils.showLong(getString(R.string.connecting))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                if (this.mApp!!.isEmptyMesh())
+                if (this.mApp?.isEmptyMesh != false)
                     return
 
                 //                Lights.getInstance().clear();

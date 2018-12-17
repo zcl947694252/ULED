@@ -114,8 +114,16 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private var mIsDisconnecting: Boolean = false
 
     private fun disconnect() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        if(mIsConfiguring){
+            this.mApplication.removeEventListener(this)
+            launch(UI) {
+                progressBar.visibility = View.GONE
+                showConfigSuccessDialog()
+            }
+        }else{
+            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance().disconnect()
+        }
     }
 
     override fun onBackPressed() {
@@ -252,6 +260,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
                 mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
+                progressBar.visibility=View.GONE
             }
 
 
@@ -282,16 +291,18 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     }
 
     private fun showConfigSuccessDialog() {
-
-        AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(R.string.install_success)
-                .setMessage(R.string.tip_config_switch_success)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                }
-                .show()
-
+        try{
+            AlertDialog.Builder(this)
+                    .setCancelable(false)
+                    .setTitle(R.string.install_success)
+                    .setMessage(R.string.tip_config_switch_success)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                    }
+                    .show()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 
     private var mConnectingSnackBar: Snackbar? = null

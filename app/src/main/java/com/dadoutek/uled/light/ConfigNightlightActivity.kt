@@ -29,7 +29,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 import java.util.regex.Pattern
 
-class ConfigLightlightActivity :TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener{
+class ConfigNightlightActivity :TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener{
     private lateinit var mDeviceInfo: DeviceInfo
     private var nightLightGroupRecycleViewAdapter: NightLightGroupRecycleViewAdapter? = null
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter? = null

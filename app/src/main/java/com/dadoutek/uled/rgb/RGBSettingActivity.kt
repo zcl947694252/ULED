@@ -326,7 +326,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         sbBrightness!!.progress = light!!.brightness
         tv_brightness_rgb!!.text = getString(R.string.device_setting_brightness, light!!.brightness.toString() + "")
 
-        val w = ((light?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var w = ((light?.color ?: 0) and 0xff000000.toInt()) shr 24
+        if(w==-1){
+            w=0
+        }
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
@@ -506,7 +509,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         sbBrightness!!.progress = group!!.brightness
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
 
-        val w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
+        if(w==-1){
+            w=0
+        }
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
@@ -560,7 +566,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         sbBrightness?.progress = brightness!!
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
-        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
+        if(w!=-1){
+            tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
+            sb_w_bright.progress=w
+        }else{
+            tv_brightness_w.text = getString(R.string.w_bright, "0")
+            sb_w_bright.progress=0
+        }
 //        scrollView?.setBackgroundColor(color)
         color_r?.text = red.toString()
         color_g?.text = green.toString()
@@ -685,21 +697,20 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                     color = light?.color!!
                 }
 
-                val red = (color!! and 0xff0000) shr 16
-                val green = (color and 0x00ff00) shr 8
-                val blue = color and 0x0000ff
-                val w = progress
-
-                if(currentShowGroupSetPage){
-                    group?.color = (w shl 24) or red or green or blue
-                }else{
-                    light?.color = (w shl 24) or red or green or blue
-                }
 
                 tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {
+                    val red = (color and 0xff0000) shr 16
+                    val green = (color and 0x00ff00) shr 8
+                    val blue = color and 0x0000ff
+                    val w = progress
+                    if(currentShowGroupSetPage){
+                        group?.color = (w shl 24) or (red shl 16) or (green shl 8) or blue
+                    }else{
+                        light?.color = (w shl 24) or (red shl 16) or (green shl 8) or blue
+                    }
                     if(currentShowGroupSetPage){
                         DBUtils.updateGroup(group!!)
                         updateLights(progress, "colorTemperature", group!!)

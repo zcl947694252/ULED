@@ -43,6 +43,10 @@
         <item> Yellow Color Gradient</item>        
         <item> Cyan Color Gradient</item>        
         <item> Purple Color Gradient</item>
+        <item>white breath </item>
+        <item> red and green gradient</item>
+        <item> red and blue gradient</item>
+        <item> green blue gradient</item>
     </string-array>
 
     <!-- Activity Labels -->
@@ -523,10 +527,10 @@
 
     <string name="do_you_really_want_to_cancel">Do you really want to cancel the
         installation</string>
-    <string name="device_disconnected">The device is connected</string>
+    <string name="device_disconnected">device disconnected</string>
     <string name="reconnect">Reconnect</string>
-    <string name="tip_config_switch_success">Please unplug the USB cable in Switch then use it
-        .</string>
+    <string name="tip_config_switch_success">
+        Please unplug the USB cable before use switch.</string>
     <string name="install_success">Successful installation</string>
     <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
@@ -541,5 +545,6 @@
     <string name="current_select_group">Selected Group:</string>
     <string name="selected">YES</string>
     <string name="unSelect">NO</string>
+    <string name="rgb_gradient">Gradient</string>
 
 </resources>
