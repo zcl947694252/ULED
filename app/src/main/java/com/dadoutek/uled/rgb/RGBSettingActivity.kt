@@ -9,9 +9,11 @@ import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.View.OnClickListener
@@ -80,39 +82,24 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     private var mConnectDevice: DeviceInfo? = null
     private var currentShowGroupSetPage=true
 
-    private val clickListener = OnClickListener { v ->
-        when(v.id){
-            R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        this.showLoadingDialog(getString(R.string.deleting))
+    fun removeGroup(){
+        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    this.showLoadingDialog(getString(R.string.deleting))
 
-                        deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
-                                successCallback = {
-                                    this.hideLoadingDialog()
-                                    this.setResult(Constant.RESULT_OK)
-                                    this.finish()
-                                },
-                                failedCallback = {
-                                    this.hideLoadingDialog()
-                                    ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
-                                })
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
-            R.id.btn_rename -> {
-                if(currentShowGroupSetPage){
-                    renameGp()
-                }else{
-                    renameLight()
+                    deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
+                            successCallback = {
+                                this.hideLoadingDialog()
+                                this.setResult(Constant.RESULT_OK)
+                                this.finish()
+                            },
+                            failedCallback = {
+                                this.hideLoadingDialog()
+                                ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                            })
                 }
-            }
-            R.id.img_header_menu_left->finish()
-            R.id.tvOta->checkPermission()
-            R.id.update_group -> updateGroup()
-            R.id.btn_remove -> remove()
-            R.id.dynamic_rgb -> toRGBGradientView()
-            R.id.tvRename -> renameLight()
-        }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
     }
 
     fun remove() {
@@ -231,7 +218,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val type=intent.getStringExtra(Constant.TYPE_VIEW)
         if(type==Constant.TYPE_GROUP){
             currentShowGroupSetPage=true
-            group_view_func_btn.visibility=View.VISIBLE
+            group_view_func_btn.visibility=View.GONE
             light_view_bt_layout.visibility=View.GONE
             initToolbarGroup()
             initDataGroup()
@@ -241,7 +228,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }else{
             currentShowGroupSetPage=false
             group_view_func_btn.visibility=View.GONE
-            light_view_bt_layout.visibility=View.VISIBLE
+            light_view_bt_layout.visibility=View.GONE
             initToolbar()
             initView()
             getVersion()
@@ -284,7 +271,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         mApplication = this.application as TelinkLightApplication
         dataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
-        tvRename.visibility=View.VISIBLE
+        tvRename.visibility=View.GONE
         toolbar.title=light?.name
 
         tvRename!!.setOnClickListener(this.clickListener)
@@ -339,16 +326,55 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initToolbar() {
         toolbar.title = ""
+        toolbar.inflateMenu(R.menu.menu_rgb_light_setting)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 
     private fun initToolbarGroup() {
         toolbar.title = ""
+        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if(currentShowGroupSetPage){
+            getMenuInflater().inflate(R.menu.menu_rgb_group_setting, menu)
+        }else{
+            getMenuInflater().inflate(R.menu.menu_rgb_light_setting, menu)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private val clickListener = OnClickListener { v ->
+        when(v.id){
+            R.id.btn_remove_group -> removeGroup()
+            R.id.btn_rename -> {
+                renameGp()
+            }
+            R.id.img_header_menu_left->finish()
+            R.id.tvOta->checkPermission()
+            R.id.update_group -> updateGroup()
+            R.id.btn_remove -> remove()
+            R.id.dynamic_rgb -> toRGBGradientView()
+            R.id.tvRename -> renameLight()
+        }
+    }
+
+    private val menuItemClickListener= Toolbar.OnMenuItemClickListener { item ->
+        when(item?.itemId){
+            R.id.toolbar_delete_group->{removeGroup()}
+            R.id.toolbar_rename_group->{renameGp()}
+            R.id.toolbar_rename_light->{renameLight()}
+            R.id.toolbar_reset->{remove()}
+            R.id.toolbar_update_group->{updateGroup()}
+        }
+        true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

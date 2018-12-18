@@ -208,7 +208,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_group_list_view.layoutManager = layoutmanager
-        this.sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_group_item, showGroupList)
+        this.sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_group_item, showGroupList!!)
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线

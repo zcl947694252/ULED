@@ -270,8 +270,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
-//                          transformView()
+//                        OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
+                          transformView()
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
@@ -608,19 +608,19 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         private val delayTime = 100
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-//            LogUtils.d("progress:_3__"+seekBar.progress)
+            LogUtils.d("progress:_3__"+seekBar.progress)
             this.onValueChange(seekBar, seekBar.progress, true,true)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
-//            LogUtils.d("progress:_1__"+seekBar.progress)
+            LogUtils.d("progress:_1__"+seekBar.progress)
             this.preTime = System.currentTimeMillis()
             this.onValueChange(seekBar, seekBar.progress, true,false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
-//            LogUtils.d("progress:_2__"+progress)
+            LogUtils.d("progress:_2__"+progress)
             val currentTime = System.currentTimeMillis()
 
             if (currentTime - this.preTime > this.delayTime) {
@@ -674,7 +674,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     light?.colorTemperature = progress
                 }
                
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
                 if(isStopTracking){
                     if(currentShowPageGroup){
                         DBUtils.updateGroup(group!!)
