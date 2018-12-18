@@ -495,4 +495,7 @@
     <string name="rgb_gradient">动态RGB</string>
     <string name="add_scene_guide_0">这里可以输入场景名</string>
     <string name="click_update_scene">点击可修改场景</string>
+    <string name="save_scene_tip">是否保存场景?</string>
+    <string name="not_null_scene">场景名不能为空</string>
+    <string name="get_update_file">获取升级包...</string>
 </resources>

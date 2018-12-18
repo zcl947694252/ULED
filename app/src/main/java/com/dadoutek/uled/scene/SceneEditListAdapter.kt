@@ -22,7 +22,6 @@ class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAda
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
         helper.setText(R.id.group_name,item.name)
-        helper.addOnClickListener(R.id.group_check_state)
         val tvState = helper.getView<TextView>(R.id.group_check_state)
         if (item.isChecked) {
             tvState.text = mContext.getString(R.string.selected)

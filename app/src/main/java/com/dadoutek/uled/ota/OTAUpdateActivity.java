@@ -257,16 +257,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        TelinkLog.i("OTAUpdate#onStop#removeEventListener");
-        TelinkLightApplication.getApp().removeEventListener(this);
-        if (this.delayHandler != null) {
-            this.delayHandler.removeCallbacksAndMessages(null);
-        }
-    }
-
-    @Override
     protected void onLocationEnable() {
         startScan();
     }
@@ -474,6 +464,16 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     protected void onStop() {
         super.onStop();
         LeBluetooth.getInstance().stopScan();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        TelinkLog.i("OTAUpdate#onStop#removeEventListener");
+        TelinkLightApplication.getApp().removeEventListener(this);
+        if (this.delayHandler != null) {
+            this.delayHandler.removeCallbacksAndMessages(null);
+        }
         TelinkLightApplication.getApp().removeEventListener(this);
     }
 
@@ -686,7 +686,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
         if(!AppUtils.isExynosSoc()){
-            params.setScanFilters(scanFilters);
+//            params.setScanFilters(scanFilters);
         }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);

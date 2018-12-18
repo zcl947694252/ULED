@@ -1437,14 +1437,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private boolean checkIsLight(int productUUID) {
-        if (productUUID == DeviceType.NORMAL_SWITCH ||
-                productUUID == DeviceType.NORMAL_SWITCH2 ||
-                productUUID == DeviceType.SCENE_SWITCH ||
-                productUUID == DeviceType.SENSOR
+        if (productUUID == DeviceType.LIGHT_RGB ||
+                productUUID == DeviceType.LIGHT_NORMAL ||
+                productUUID == DeviceType.LIGHT_NORMAL_OLD
                 ) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 

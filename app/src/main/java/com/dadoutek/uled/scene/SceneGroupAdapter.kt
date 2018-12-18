@@ -1,22 +1,17 @@
 package com.dadoutek.uled.scene
 
-import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
-
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.util.OtherUtils
-
-import java.util.ArrayList
-import java.util.Objects
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/5.
@@ -59,29 +54,25 @@ class SceneGroupAdapter
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         val currentTime = System.currentTimeMillis()
+        val position = seekBar.tag as Int
+
+        if(fromUser){
+            changeTextView(seekBar, progress, position)
+        }
 
         if (currentTime - this.preTime > this.delayTime) {
             if (fromUser) {
-                val position = seekBar.tag as Int
                 val address = data[position].groupAress
                 val opcode: Byte
                 val params: ByteArray
                 if (seekBar.id == R.id.sbBrightness) {
-                    val tvBrightness = getViewByPosition(position, R.id.tvBrightness) as TextView?
-                    if (tvBrightness != null) {
-                        tvBrightness.text = progress.toString() + "%"
-                        opcode = 0xD2.toByte()
-                        params = byteArrayOf(progress.toByte())
-                        Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
-                    }
+                    opcode = 0xD2.toByte()
+                    params = byteArrayOf(progress.toByte())
+                    Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
                 } else if (seekBar.id == R.id.sbTemperature) {
-                    val tvTemperature = getViewByPosition(position, R.id.tvTemperature) as TextView?
-                    if (tvTemperature != null) {
-                        tvTemperature.text = progress.toString() + "%"
-                        opcode = 0xE2.toByte()
-                        params = byteArrayOf(0x05, progress.toByte())
-                        Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
-                    }
+                    opcode = 0xE2.toByte()
+                    params = byteArrayOf(0x05, progress.toByte())
+                    Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
                 }
             }
             this.preTime = currentTime
@@ -94,16 +85,37 @@ class SceneGroupAdapter
 
     override fun onStopTrackingTouch(seekBar: SeekBar) {
         val pos = seekBar.tag as Int
+        val address = data[pos].groupAress
+        val opcode: Byte
+        val params: ByteArray
         val itemGroup = data[pos]
         if (seekBar.id == R.id.sbBrightness) {
             (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.tvBrightness)) as TextView).text = seekBar.progress.toString() + "%"
             itemGroup.brightness = seekBar.progress
+            opcode = 0xD2.toByte()
+            params = byteArrayOf(seekBar.progress.toByte())
+            Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
         } else if (seekBar.id == R.id.sbTemperature) {
             (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.tvTemperature)) as TextView).text = seekBar.progress.toString() + "%"
             itemGroup.temperature = seekBar.progress
+            opcode = 0xE2.toByte()
+            params = byteArrayOf(0x05, seekBar.progress.toByte())
+            Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
         }
         notifyItemChanged(seekBar.tag as Int)
     }
 
-
+    fun changeTextView(seekBar: SeekBar, progress: Int, position: Int) {
+        if (seekBar.id == R.id.sbBrightness) {
+            val tvBrightness = getViewByPosition(position, R.id.tvBrightness) as TextView?
+            if (tvBrightness != null) {
+                tvBrightness?.text = progress.toString() + "%"
+            }
+        } else if (seekBar.id == R.id.sbTemperature) {
+            val tvTemperature = getViewByPosition(position, R.id.tvTemperature) as TextView?
+            if (tvTemperature != null) {
+                tvTemperature?.text = progress.toString() + "%"
+            }
+        }
+    }
 }

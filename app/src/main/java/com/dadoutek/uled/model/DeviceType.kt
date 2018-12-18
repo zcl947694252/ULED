@@ -1,6 +1,8 @@
 package com.dadoutek.uled.model
 
 object DeviceType {
+    const val OLD_NORMAL_SWITCH: Byte = 0x18
+    const val OLD_NORMAL_SWITCH2: Byte = 0x19
     const val NORMAL_SWITCH: Int = 0x20
     const val SCENE_SWITCH: Int = 0x21
     const val NORMAL_SWITCH2: Int = 0x22

@@ -487,11 +487,8 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
     private fun checkIsLight(info: OnlineStatusNotificationParser.DeviceNotificationInfo?): Boolean {
         if (info != null) {
             when (info.reserve) {
-                UpdateStatusDeviceType.OLD_NORMAL_SWITCH.toInt() -> return false
-                UpdateStatusDeviceType.OLD_NORMAL_SWITCH2.toInt() -> return false
-                UpdateStatusDeviceType.OLD_NORMAL_SWITCH3.toInt() -> return false
-                UpdateStatusDeviceType.OLD_NORMAL_PIR.toInt() -> return false
-                else -> return true
+                DeviceType.LIGHT_NORMAL,DeviceType.LIGHT_NORMAL_OLD,DeviceType.LIGHT_RGB -> return true
+                else -> return false
             }
         }
         return true

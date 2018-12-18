@@ -176,6 +176,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
@@ -675,9 +676,18 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                                        fromUser: Boolean) {
             val currentTime = System.currentTimeMillis()
 
+            onValueChangeView(seekBar, progress, true)
             if (currentTime - this.preTime > this.delayTime) {
                 this.onValueChange(seekBar, progress, true)
                 this.preTime = currentTime
+            }
+        }
+
+        private fun onValueChangeView(view: View, progress: Int, immediate: Boolean){
+            if (view === sbBrightness) {
+                tv_brightness_rgb.text = getString(R.string.device_setting_brightness, progress.toString() + "")
+            } else if (view === sb_w_bright) {
+                tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
             }
         }
 
@@ -702,7 +712,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                     light!!.brightness = progress
                 }
 
-                tv_brightness_rgb.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {
@@ -723,8 +732,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                     color = light?.color!!
                 }
 
-
-                tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
 
                 if (stopTracking) {

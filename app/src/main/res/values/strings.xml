@@ -550,5 +550,7 @@
     <string name="rgb_gradient">Gradient</string>
     <string name="add_scene_guide_0">Here you can enter the scene name</string>
     <string name="click_update_scene">Click to modify the scene</string>
-
+    <string name="save_scene_tip">Do you want to save the scene?</string>
+    <string name="not_null_scene">Scene name cannot be empty</string>
+    <string name="get_update_file">Get the upgrade package...</string>
 </resources>

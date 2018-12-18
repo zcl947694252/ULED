@@ -1,6 +1,7 @@
 package com.dadoutek.uled.scene
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -10,7 +11,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
-import android.widget.Button
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -28,7 +28,6 @@ import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
-import kotlinx.android.synthetic.main.activity_online_status.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
@@ -144,7 +143,26 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         confirm.setOnClickListener(this)
         StringUtils.initEditTextFilter(edit_name)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            if(currentPageIsEdit){
+                finish()
+            }else{
+                showExitSaveDialog()
+            }
+        }
+    }
+
+    private fun showExitSaveDialog() {
+        val exitDialogBuilder=AlertDialog.Builder(this)
+        exitDialogBuilder.setMessage(getString(R.string.save_scene_tip))
+        exitDialogBuilder.setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+            save()
+        }
+        exitDialogBuilder.setNegativeButton(getString(R.string.cancel)) { dialog, which ->
+            finish()
+        }
+
+        exitDialogBuilder.create().show()
     }
 
     private fun initCreateView() {
@@ -154,6 +172,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private fun initChangeView() {
         toolbar.setTitle(R.string.edit_scene)
         tv_scene_name.text = resources.getString(R.string.scene_name_show,scene!!.name)
+        editSceneName = scene!!.name
     }
 
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -178,9 +197,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    internal var onItemChildClickListenerCheck: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        when (view.id) {
-            R.id.group_check_state -> {
+    internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
                 val item = showCheckListData!!.get(position)
                 if(item.enableCheck){
                     showCheckListData!!.get(position).checked = !item.checked
@@ -188,8 +205,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneEditListAdapter?.notifyDataSetChanged()
                 }
                 step2Guide()
-            }
-        }
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
@@ -257,7 +272,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         //添加分割线
         recyclerView_select_group_list_view.addItemDecoration(decoration)
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
-        sceneEditListAdapter?.onItemChildClickListener=onItemChildClickListenerCheck
+        sceneEditListAdapter?.onItemClickListener=onItemClickListenerCheck
     }
 
     private fun changeCheckedViewData(){

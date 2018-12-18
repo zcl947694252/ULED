@@ -241,6 +241,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
@@ -270,8 +271,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-//                        OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
-                          transformView()
+                            OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
+//                          transformView()
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
@@ -623,9 +624,20 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             LogUtils.d("progress:_2__"+progress)
             val currentTime = System.currentTimeMillis()
 
+            onValueChangeView(seekBar, progress, true,false)
             if (currentTime - this.preTime > this.delayTime) {
                 this.onValueChange(seekBar, progress, true,false)
                 this.preTime = currentTime
+            }
+
+        }
+
+        private fun onValueChangeView(view: View, progress: Int, immediate: Boolean,isStopTracking:
+        Boolean){
+            if (view === sbBrightness) {
+                tvBrightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
+            } else if (view === sbTemperature) {
+                tvTemperature.text = getString(R.string.device_setting_temperature, progress.toString() + "")
             }
         }
 
@@ -643,7 +655,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             if (view === sbBrightness) {
                 //                progress += 5;
                 //                Log.d(TAG, "onValueChange: "+progress);
-                tvBrightness.text = getString(R.string.device_setting_brightness, progress.toString() + "")
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
 
@@ -666,7 +677,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, progress.toByte())
-                tvTemperature.text = getString(R.string.device_setting_temperature, progress.toString() + "")
 
                 if(currentShowPageGroup){
                     group?.colorTemperature = progress
