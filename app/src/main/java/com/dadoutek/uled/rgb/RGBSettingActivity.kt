@@ -193,6 +193,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
         override fun downLoadFileSuccess() {
+            hideLoadingDialog()
             transformView()
         }
 

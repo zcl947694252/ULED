@@ -258,6 +258,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
 
         override fun downLoadFileSuccess() {
+            hideLoadingDialog()
             transformView()
         }
 
