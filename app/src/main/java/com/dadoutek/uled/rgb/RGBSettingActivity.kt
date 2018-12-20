@@ -177,6 +177,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
@@ -193,10 +197,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
         override fun downLoadFileSuccess() {
+            hideLoadingDialog()
             transformView()
         }
 
         override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }

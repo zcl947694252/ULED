@@ -242,12 +242,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
 
         override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(R.string.verification_version_success);
+            //            ToastUtils.showLong(.string.verification_version_success);
             hideLoadingDialog()
         }
 
@@ -258,10 +262,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
 
         override fun downLoadFileSuccess() {
+            hideLoadingDialog()
             transformView()
         }
 
         override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }

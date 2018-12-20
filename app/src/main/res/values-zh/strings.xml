@@ -498,4 +498,15 @@
     <string name="save_scene_tip">是否保存场景?</string>
     <string name="not_null_scene">场景名不能为空</string>
     <string name="get_update_file">获取升级包...</string>
+    <string name="mode_preset">内置模式</string>
+    <string name="mode_diy">自定义</string>
+    <string name="please_check_group">请选择分组:</string>
+    <string name="tv_speed">速度:%1$s</string>
+    <string name="str_gradient">渐变</string>
+    <string name="str_jump">跳变</string>
+    <string name="str_strobe">频闪</string>
+    <string name="save">保存</string>
+    <string name="diy_action_tip">*点击按钮修改颜色,长按删除颜色</string>
+    <string name="color_check">颜色选择</string>
+    <string name="name_not_null_tip">名称不可以为空</string>
 </resources>

@@ -1,18 +1,12 @@
 package com.dadoutek.uled.user
 
-import android.app.Activity
-import android.app.Dialog
-import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
-import com.app.hubert.guide.NewbieGuide
-import com.app.hubert.guide.model.GuidePage
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
@@ -20,6 +14,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkFactory.md5
 import com.dadoutek.uled.network.NetworkObserver
@@ -27,15 +22,15 @@ import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.*
-import com.hbb20.CCPCountry.setDialogTitle
-import com.hbb20.CountryCodePicker
 import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_ota_update.view.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
 /**
@@ -49,6 +44,8 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private var countryCode: String? = null
     private val mCompositeDisposable = CompositeDisposable()
     private val TIME_INTERVAL: Long = 60
+    private var isChangePwd=false
+    private var dbUser: DbUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +55,8 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
+        val changeKey=intent.getStringExtra("fromLogin")
+        isChangePwd = changeKey != "register"
         initToolbar()
         countryCode = ccp.selectedCountryCode
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
@@ -65,10 +64,19 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         btn_send_verification.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone!!.editText)
         StringUtils.initEditTextFilterForRegister(edit_user_password!!.editText)
+
+        if(isChangePwd){
+            dbUser=DbUser()
+            register_completed.setText(R.string.btn_ok)
+        }
     }
 
     private fun initToolbar() {
-        toolbar.title = getString(R.string.user_register)
+        if(isChangePwd){
+            toolbar.title = getString(R.string.update_password)
+        }else{
+            toolbar.title = getString(R.string.user_register)
+        }
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
     }
@@ -77,19 +85,27 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         when (v!!.id) {
             R.id.register_completed -> {
                 if (checkIsOK()) {
-                    if (Constant.TEST_REGISTER) {
-                        showLoadingDialog(getString(R.string.registing))
-                        register()
-                    } else {
-                        showLoadingDialog(getString(R.string.registing))
-                        submitCode(countryCode
-                                ?: "", userName!!, edit_verification.editText!!.text.toString().trim { it <= ' ' })
-                    }
+                        if (Constant.TEST_REGISTER) {
+                            showLoadingDialog(getString(R.string.registing))
+                            register()
+                        } else {
+                            if(isChangePwd){
+                                showLoadingDialog(getString(R.string.updating_password))
+                            }else{
+                                showLoadingDialog(getString(R.string.registing))
+                            }
+                            submitCode(countryCode
+                                    ?: "", userName!!, edit_verification.editText!!.text.toString().trim { it <= ' ' })
+                        }
                 }
             }
             R.id.btn_send_verification ->
                 send_verification()
         }
+    }
+
+    private fun startChange() {
+        getAccount()
     }
 
     private fun send_verification() {
@@ -218,7 +234,11 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
             override fun afterEvent(event: Int, result: Int, data: Any?) {
                 if (result == SMSSDK.RESULT_COMPLETE) {
                     // TODO 处理验证成功的结果
-                    register()
+                    if(isChangePwd){
+                        startChange()
+                    }else{
+                        register()
+                    }
                 } else {
                     // TODO 处理错误的结果
                     ToastUtils.showLong(R.string.verification_code_error)
@@ -230,5 +250,68 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         // 触发操作
         SMSSDK.submitVerificationCode(country, phone, code)
         return false
+    }
+
+    private fun getAccount() {
+        val map = HashMap<String, String>()
+        map["phone"] = userName!!
+        map["channel"] = dbUser!!.channel
+        NetworkFactory.getApi()
+                .getAccount(userName, dbUser!!.channel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observerAccount)
+    }
+
+    internal var observerAccount: Observer<Response<String>> = object : Observer<Response<String>> {
+        override fun onSubscribe(d: Disposable) {}
+
+        override fun onNext(stringResponse: Response<String>) {
+            if (stringResponse.errorCode == 0) {
+                LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                dbUser!!.account = stringResponse.t
+                updatePassword()
+            } else {
+                ToastUtils.showLong(R.string.get_account_fail)
+            }
+        }
+
+        override fun onError(e: Throwable) {
+            hideLoadingDialog()
+            Toast.makeText(this@RegisterActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onComplete() {}
+    }
+
+    internal var observerUpdatePassword: Observer<Response<DbUser>> = object : Observer<Response<DbUser>> {
+        override fun onSubscribe(d: Disposable) {}
+
+        override fun onNext(stringResponse: Response<DbUser>) {
+            hideLoadingDialog()
+            if (stringResponse.errorCode == 0) {
+                LogUtils.d("logging" + stringResponse.errorCode + "更改成功")
+                ToastUtils.showLong(R.string.tip_update_password_success)
+                finish()
+            } else {
+                ToastUtils.showLong(R.string.tip_update_password_fail)
+            }
+        }
+
+        override fun onError(e: Throwable) {
+            hideLoadingDialog()
+            Toast.makeText(this@RegisterActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
+        }
+
+        override fun onComplete() {}
+    }
+
+    private fun updatePassword() {
+        MD5PassWord = md5(userPassWord)
+        NetworkFactory.getApi()
+                .putPassword(dbUser!!.account,MD5PassWord)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observerUpdatePassword)
     }
 }

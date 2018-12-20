@@ -7,13 +7,8 @@ import com.blankj.utilcode.util.LogUtils
 
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.dao.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.dao.DbGroupDao
-import com.dadoutek.uled.dao.DbLightDao
-import com.dadoutek.uled.dao.DbRegionDao
-import com.dadoutek.uled.dao.DbSceneActionsDao
-import com.dadoutek.uled.dao.DbSceneDao
-import com.dadoutek.uled.dao.DbUserDao
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -77,6 +72,13 @@ object DBUtils {
             return qb.where(
                     DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
                     .list()
+        }
+
+    val diyGradientList: List<DbDiyGradient>
+        get() {
+            val allGIndex = -1
+            val qb = DaoSessionInstance.getInstance().dbDiyGradientDao.queryBuilder()
+            return qb.list()
         }
 
     //未分组
@@ -164,7 +166,11 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    
+    fun getColorNodeListByIndex(id: Long): ArrayList<DbColorNode> {
+        val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().build()
+        return ArrayList(query.list())
+    }
+
     fun getGroupNameByID(id: Long?): String {
         val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
         return group.name
@@ -191,6 +197,9 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbSceneDao.load(id)
     }
 
+    fun getGradientByID(id: Long): DbDiyGradient? {
+        return DaoSessionInstance.getInstance().dbDiyGradientDao.load(id)
+    }
     
     fun getSceneActionsByID(id: Long): DbSceneActions {
         return DaoSessionInstance.getInstance().dbSceneActionsDao.load(id)
@@ -382,7 +391,25 @@ object DBUtils {
         //                Constant.DB_ADD);
     }
 
-    
+    fun saveGradient(dbDiyGradient: DbDiyGradient, isFromServer: Boolean) {
+        if (isFromServer) {
+            DaoSessionInstance.getInstance().dbDiyGradientDao.insert(dbDiyGradient)
+        } else {
+            DaoSessionInstance.getInstance().dbDiyGradientDao.insertOrReplace(dbDiyGradient)
+            recordingChange(dbDiyGradient.id,
+                    DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
+                    Constant.DB_ADD)
+        }
+    }
+
+
+    fun saveColorNode(colorNode: DbColorNode) {
+        DaoSessionInstance.getInstance().dbColorNodeDao.insertOrReplace(colorNode)
+        //        recordingChange(sceneActions.getId(),
+        //                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+        //                Constant.DB_ADD);
+    }
+
     fun saveSceneActions(sceneActions: DbSceneActions, id: Long?,
                          sceneId: Long) {
         val actions = DbSceneActions()
@@ -394,6 +421,19 @@ object DBUtils {
         actions.color=sceneActions.color
 
         DaoSessionInstance.getInstance().dbSceneActionsDao.save(actions)
+    }
+
+    fun saveColorNodes(colorNode: DbColorNode, id: Long?,
+                         gradientId: Long) {
+        val colorNodeNew = DbColorNode()
+        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
+
+        colorNodeNew.index=gradientId
+        colorNodeNew.brightness=colorNode.brightness
+        colorNodeNew.colorTemperature=colorNode.colorTemperature
+        colorNodeNew.rgbw=colorNode.rgbw
+
+        DaoSessionInstance.getInstance().dbColorNodeDao.save(colorNodeNew)
     }
 
     /********************************************更改 */
@@ -452,7 +492,21 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
-    
+    fun updateGradient(dbDiyGradient: DbDiyGradient) {
+        DaoSessionInstance.getInstance().dbDiyGradientDao.update(dbDiyGradient)
+        recordingChange(dbDiyGradient.id,
+                DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
+                Constant.DB_UPDATE)
+    }
+
+
+    fun updateColorNode(colorNode: DbColorNode) {
+        DaoSessionInstance.getInstance().dbColorNodeDao.update(colorNode)
+        recordingChange(colorNode.id,
+                DaoSessionInstance.getInstance().dbColorNodeDao.tablename,
+                Constant.DB_UPDATE)
+    }
+
     fun updateDbchange(change: DbDataChange) {
         DaoSessionInstance.getInstance().dbDataChangeDao.update(change)
     }
@@ -505,7 +559,18 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteInTx(sceneActionslist)
     }
 
-    
+    fun deleteGradient(dbDiyGradient: DbDiyGradient) {
+        DaoSessionInstance.getInstance().dbDiyGradientDao.delete(dbDiyGradient)
+        recordingChange(dbDiyGradient.id,
+                DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
+                Constant.DB_DELETE)
+    }
+
+
+    fun deleteColorNodeList(colorNodelist: List<DbColorNode>) {
+        DaoSessionInstance.getInstance().dbColorNodeDao.deleteInTx(colorNodelist)
+    }
+
     fun deleteAllData() {
         DaoSessionInstance.getInstance().dbUserDao.deleteAll()
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
@@ -514,6 +579,8 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbGroupDao.deleteAll()
         DaoSessionInstance.getInstance().dbLightDao.deleteAll()
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteAll()
+        DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
+        DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
     }
 
     
@@ -525,6 +592,8 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbGroupDao.deleteAll()
         DaoSessionInstance.getInstance().dbLightDao.deleteAll()
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteAll()
+        DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
+        DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
         SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, null)
     }
 
@@ -591,6 +660,24 @@ object DBUtils {
                 if(!scNameList.contains(newName)){
                     return newName
                 }
+        }
+    }
+
+    fun getDefaultModeName(): String {
+        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        val dyList= diyGradientList
+        val scNameList = ArrayList<String>()
+        for(i in dyList.indices){
+            scNameList.add(dyList[i].name)
+        }
+
+        var count=dyList.size
+        while (true){
+            count++
+            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) +count
+            if(!scNameList.contains(newName)){
+                return newName
+            }
         }
     }
 

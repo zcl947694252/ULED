@@ -207,6 +207,12 @@
         <activity
             android:name=".light.ConfigNightlightActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".rgb.SetDiyColorAct"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".rgb.SelectColorGradientAct"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

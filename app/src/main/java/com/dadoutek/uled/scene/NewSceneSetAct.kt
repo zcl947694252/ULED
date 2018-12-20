@@ -83,7 +83,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val guide1=sceneEditListAdapter!!.getViewByPosition(0,R.id.group_check_state)
             GuideUtils.guideBuilder(this, GuideUtils.STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
                     .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_1),
-                             View.OnClickListener {guide1.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                             View.OnClickListener {
+                                changeCheck(0)
+                             }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -198,13 +200,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-                val item = showCheckListData!!.get(position)
-                if(item.enableCheck){
-                    showCheckListData!!.get(position).checked = !item.checked
-                    changeCheckedViewData()
-                    sceneEditListAdapter?.notifyDataSetChanged()
-                }
-                step2Guide()
+        changeCheck(position)
+    }
+
+    fun changeCheck(position: Int) {
+        val item = showCheckListData!!.get(position)
+        if(item.enableCheck){
+            showCheckListData!!.get(position).checked = !item.checked
+            changeCheckedViewData()
+            sceneEditListAdapter?.notifyDataSetChanged()
+        }
+        step2Guide()
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {

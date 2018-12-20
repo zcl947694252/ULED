@@ -110,7 +110,8 @@ public class OtaPrepareUtils {
                     SharedPreferencesUtils.saveUpdateFilePath(localPath);
                     otaPrepareListner.downLoadFileSuccess();
                 } else {
-                    download(serverVersionUrl, otaPrepareListner, context);
+                      otaPrepareListner.downLoadFileStart();
+//                    download(serverVersionUrl, otaPrepareListner, context);
                 }
 //                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
             }else{
@@ -122,7 +123,8 @@ public class OtaPrepareUtils {
                         otaPrepareListner.downLoadFileSuccess();
                         SharedPreferencesUtils.saveUpdateFilePath(localPath);
                     } else {
-                        download(serverVersionUrl, otaPrepareListner, context);
+                        otaPrepareListner.downLoadFileStart();
+//                        download(serverVersionUrl, otaPrepareListner, context);
                     }
 //                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
                     return true;

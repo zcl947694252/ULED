@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/diy_show_color_recyclerView"
+        android:layout_width="100dp"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/modeName"
+        android:text="模式1"
+        app:layout_constraintTop_toTopOf="@id/diy_show_color_recyclerView"
+        app:layout_constraintStart_toEndOf="@id/diy_show_color_recyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        />
+
+    <TextView
+        android:id="@+id/modeType"
+        android:text="渐变"
+        app:layout_constraintTop_toTopOf="@id/diy_show_color_recyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/diy_show_color_recyclerView"
+        app:layout_constraintStart_toEndOf="@id/diy_show_color_recyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        />
+
+    <TextView
+        android:id="@+id/modeSpeed"
+        android:text="@string/tv_speed"
+        app:layout_constraintBottom_toBottomOf="@id/diy_show_color_recyclerView"
+        app:layout_constraintStart_toEndOf="@id/diy_show_color_recyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        />
+</android.support.constraint.ConstraintLayout>

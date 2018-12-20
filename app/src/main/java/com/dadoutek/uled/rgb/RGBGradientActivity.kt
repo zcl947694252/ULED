@@ -1,6 +1,8 @@
 package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -13,6 +15,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbColorNode
+import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
@@ -27,7 +31,9 @@ import java.util.concurrent.TimeUnit
 class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
+    private var diyModeList: ArrayList<DbDiyGradient>? = null
     private var rgbGradientAdapter: RGBGradientAdapter? = null
+    private var rgbDiyGradientAdapter: RGBDiyGradientAdapter? = null
     private var applyDisposable: Disposable? = null
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
@@ -81,16 +87,17 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initView() {
         applyPresetView()
+        applyDiyView()
         diyButton.setOnClickListener(this)
         buildInButton.setOnClickListener(this)
-        this.sbSpeed!!.progress = speed
-        tvSpeed.text = getString(R.string.speed_text, speed.toString())
-        this.sbSpeed!!.setOnSeekBarChangeListener(this.barChangeListener)
         btnStopGradient.visibility = View.VISIBLE
         btnStopGradient.setOnClickListener(this)
     }
 
     private fun applyPresetView() {
+        this.sbSpeed!!.progress = speed
+        tvSpeed.text = getString(R.string.speed_text, speed.toString())
+        this.sbSpeed!!.setOnSeekBarChangeListener(this.barChangeListener)
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         builtInModeRecycleView!!.layoutManager = layoutmanager
@@ -99,6 +106,16 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
         rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
         rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
+    }
+
+    private fun applyDiyView() {
+        btnAdd.setOnClickListener(this)
+        val layoutmanager = LinearLayoutManager(this)
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        builtInModeRecycleView!!.layoutManager = layoutmanager
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyModeList)
+        builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
+        rgbDiyGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
@@ -147,12 +164,10 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.diyButton -> {
-                diyButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
-                buildInButton.setBackgroundColor(resources.getColor(R.color.white))
+                changeToDiyPage()
             }
             R.id.buildInButton -> {
-                diyButton.setBackgroundColor(resources.getColor(R.color.white))
-                buildInButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
+                changeToBuildInPage()
             }
             R.id.btnStopGradient -> {
                 stopGradient()
@@ -160,7 +175,32 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.normal_rgb -> {
                 finish()
             }
+            R.id.btnAdd -> {
+                transAddAct()
+            }
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun transAddAct() {
+
+    }
+
+    private fun changeToDiyPage() {
+        diyButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
+        buildInButton.setBackgroundColor(resources.getColor(R.color.white))
+        layoutModeDiy.visibility=View.VISIBLE
+        layoutModePreset.visibility=View.GONE
+    }
+
+    private fun changeToBuildInPage(){
+        diyButton.setBackgroundColor(resources.getColor(R.color.white))
+        buildInButton.setBackgroundColor(resources.getColor(R.color.mode_check_color))
+        layoutModeDiy.visibility=View.GONE
+        layoutModePreset.visibility=View.VISIBLE
     }
 
     fun stopGradient() {

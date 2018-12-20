@@ -9,8 +9,10 @@ import org.greenrobot.greendao.identityscope.IdentityScopeType;
 import org.greenrobot.greendao.internal.DaoConfig;
 
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbDiyGradient;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbColorNode;
 import com.dadoutek.uled.model.DbModel.DbSceneActions;
 import com.dadoutek.uled.model.DbModel.DbDeleteGroup;
 import com.dadoutek.uled.model.DbModel.DbDataChange;
@@ -18,8 +20,10 @@ import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.DbModel.DbScene;
 
 import com.dadoutek.uled.dao.DbLightDao;
+import com.dadoutek.uled.dao.DbDiyGradientDao;
 import com.dadoutek.uled.dao.DbUserDao;
 import com.dadoutek.uled.dao.DbGroupDao;
+import com.dadoutek.uled.dao.DbColorNodeDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.dao.DbDeleteGroupDao;
 import com.dadoutek.uled.dao.DbDataChangeDao;
@@ -36,8 +40,10 @@ import com.dadoutek.uled.dao.DbSceneDao;
 public class DaoSession extends AbstractDaoSession {
 
     private final DaoConfig dbLightDaoConfig;
+    private final DaoConfig dbDiyGradientDaoConfig;
     private final DaoConfig dbUserDaoConfig;
     private final DaoConfig dbGroupDaoConfig;
+    private final DaoConfig dbColorNodeDaoConfig;
     private final DaoConfig dbSceneActionsDaoConfig;
     private final DaoConfig dbDeleteGroupDaoConfig;
     private final DaoConfig dbDataChangeDaoConfig;
@@ -45,8 +51,10 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig dbSceneDaoConfig;
 
     private final DbLightDao dbLightDao;
+    private final DbDiyGradientDao dbDiyGradientDao;
     private final DbUserDao dbUserDao;
     private final DbGroupDao dbGroupDao;
+    private final DbColorNodeDao dbColorNodeDao;
     private final DbSceneActionsDao dbSceneActionsDao;
     private final DbDeleteGroupDao dbDeleteGroupDao;
     private final DbDataChangeDao dbDataChangeDao;
@@ -60,11 +68,17 @@ public class DaoSession extends AbstractDaoSession {
         dbLightDaoConfig = daoConfigMap.get(DbLightDao.class).clone();
         dbLightDaoConfig.initIdentityScope(type);
 
+        dbDiyGradientDaoConfig = daoConfigMap.get(DbDiyGradientDao.class).clone();
+        dbDiyGradientDaoConfig.initIdentityScope(type);
+
         dbUserDaoConfig = daoConfigMap.get(DbUserDao.class).clone();
         dbUserDaoConfig.initIdentityScope(type);
 
         dbGroupDaoConfig = daoConfigMap.get(DbGroupDao.class).clone();
         dbGroupDaoConfig.initIdentityScope(type);
+
+        dbColorNodeDaoConfig = daoConfigMap.get(DbColorNodeDao.class).clone();
+        dbColorNodeDaoConfig.initIdentityScope(type);
 
         dbSceneActionsDaoConfig = daoConfigMap.get(DbSceneActionsDao.class).clone();
         dbSceneActionsDaoConfig.initIdentityScope(type);
@@ -82,8 +96,10 @@ public class DaoSession extends AbstractDaoSession {
         dbSceneDaoConfig.initIdentityScope(type);
 
         dbLightDao = new DbLightDao(dbLightDaoConfig, this);
+        dbDiyGradientDao = new DbDiyGradientDao(dbDiyGradientDaoConfig, this);
         dbUserDao = new DbUserDao(dbUserDaoConfig, this);
         dbGroupDao = new DbGroupDao(dbGroupDaoConfig, this);
+        dbColorNodeDao = new DbColorNodeDao(dbColorNodeDaoConfig, this);
         dbSceneActionsDao = new DbSceneActionsDao(dbSceneActionsDaoConfig, this);
         dbDeleteGroupDao = new DbDeleteGroupDao(dbDeleteGroupDaoConfig, this);
         dbDataChangeDao = new DbDataChangeDao(dbDataChangeDaoConfig, this);
@@ -91,8 +107,10 @@ public class DaoSession extends AbstractDaoSession {
         dbSceneDao = new DbSceneDao(dbSceneDaoConfig, this);
 
         registerDao(DbLight.class, dbLightDao);
+        registerDao(DbDiyGradient.class, dbDiyGradientDao);
         registerDao(DbUser.class, dbUserDao);
         registerDao(DbGroup.class, dbGroupDao);
+        registerDao(DbColorNode.class, dbColorNodeDao);
         registerDao(DbSceneActions.class, dbSceneActionsDao);
         registerDao(DbDeleteGroup.class, dbDeleteGroupDao);
         registerDao(DbDataChange.class, dbDataChangeDao);
@@ -102,8 +120,10 @@ public class DaoSession extends AbstractDaoSession {
     
     public void clear() {
         dbLightDaoConfig.clearIdentityScope();
+        dbDiyGradientDaoConfig.clearIdentityScope();
         dbUserDaoConfig.clearIdentityScope();
         dbGroupDaoConfig.clearIdentityScope();
+        dbColorNodeDaoConfig.clearIdentityScope();
         dbSceneActionsDaoConfig.clearIdentityScope();
         dbDeleteGroupDaoConfig.clearIdentityScope();
         dbDataChangeDaoConfig.clearIdentityScope();
@@ -115,12 +135,20 @@ public class DaoSession extends AbstractDaoSession {
         return dbLightDao;
     }
 
+    public DbDiyGradientDao getDbDiyGradientDao() {
+        return dbDiyGradientDao;
+    }
+
     public DbUserDao getDbUserDao() {
         return dbUserDao;
     }
 
     public DbGroupDao getDbGroupDao() {
         return dbGroupDao;
+    }
+
+    public DbColorNodeDao getDbColorNodeDao() {
+        return dbColorNodeDao;
     }
 
     public DbSceneActionsDao getDbSceneActionsDao() {

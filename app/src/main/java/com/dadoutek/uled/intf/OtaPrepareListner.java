@@ -6,5 +6,6 @@ public interface OtaPrepareListner {
     void getVersionFail();
     void downLoadFileSuccess();
     void downLoadFileFail(String message);
+    void downLoadFileStart();
 //    void downLoadProgress(int progress);
 }
