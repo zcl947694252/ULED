@@ -391,9 +391,11 @@ public class ActionSheetDialog extends AlertDialog {
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT);
                     params.setMargins(0, mCancelTopMargin, 0, 0);
+//                    params.gravity=Gravity.CENTER;
                     mCancelView.setLayoutParams(params);
                     if (null != mNegativeText) {
                         mCancelView.setText(mNegativeText);
+                        mCancelView.setGravity(Gravity.CENTER);
                     }
                     mCancelView.setOnClickListener(new View.OnClickListener() {
                         @Override

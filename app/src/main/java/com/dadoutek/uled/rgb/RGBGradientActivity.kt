@@ -1,7 +1,6 @@
 package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -156,7 +155,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         //应用自定义渐变
-    }
+        Thread{
+            stopGradient()
+            Thread.sleep(200)
+            Commander.applyGradient(dstAddress, diyGradientList!![position].id.toInt(),
+                    diyGradientList!![position].speed, firstLightAddress, successCallback = {}, failedCallback = {})
+
+        }.start()
+       }
 
     private var onItemChildDiyClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         when(view.id){
@@ -172,18 +178,31 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     override fun onClick(dialog: DialogInterface, which: Int) {
                        when(which){
                            0->{
-                               DBUtils.deleteGradient(diyGradientList!![position])
-                               adapter.remove(position)
+                               deleteGradient(position,adapter,dialog)
                            }
                            1->{
                                transChangeAct(diyGradientList!![position])
+                               dialog.dismiss()
                            }
                        }
                     }
                 })
+                .setNegativeButton(getString(R.string.cancel),{ dialog, which ->  })
                 .setCancelable(true)
                 .create()
         dialog.show()
+    }
+
+    fun deleteGradient(position: Int, adapter: BaseQuickAdapter<Any, BaseViewHolder>, dialog: DialogInterface) {
+        startDeleteGradientCmd(diyGradientList!![position].id)
+        DBUtils.deleteGradient(diyGradientList!![position])
+        DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(diyGradientList!![position].id!!))
+        adapter.remove(position)
+        dialog.dismiss()
+    }
+
+    private fun startDeleteGradientCmd(id: Long) {
+        Commander.deleteGradient(dstAddress,id.toInt(),{},{})
     }
 
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -223,14 +242,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         diyGradientList=DBUtils.diyGradientList
-        rgbDiyGradientAdapter?.notifyDataSetChanged()
+        changeToDiyPage()
     }
 
     private fun transAddAct() {
         val intent=Intent(this,SetDiyColorAct::class.java)
         intent.putExtra(Constant.IS_CHANGE_COLOR,false)
         intent.putExtra(Constant.TYPE_VIEW_ADDRESS,dstAddress)
-        startActivityForResult(intent,Activity.RESULT_OK)
+        startActivityForResult(intent,0)
     }
 
     private fun transChangeAct(dbDiyGradient: DbDiyGradient) {
@@ -238,7 +257,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         intent.putExtra(Constant.IS_CHANGE_COLOR,true)
         intent.putExtra(Constant.GRADIENT_KEY,dbDiyGradient)
         intent.putExtra(Constant.TYPE_VIEW_ADDRESS,dstAddress)
-        startActivityForResult(intent,Activity.RESULT_OK)
+        startActivityForResult(intent,0)
     }
 
     private fun changeToDiyPage() {

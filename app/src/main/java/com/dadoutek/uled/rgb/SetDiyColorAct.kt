@@ -26,7 +26,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var rgbDiyColorListAdapter: RGBDiyColorCheckAdapter? = null
     private var isChange = false
     private var diyGradient: DbDiyGradient? = null
-    private var speed=0
+    private var speed=50
     private var dstAddress: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +63,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         if (isChange) {
             editName.setText(diyGradient?.name)
             sbSpeed.progress= diyGradient?.speed!!
+            tvSpeed.text = getString(R.string.speed_text, diyGradient?.speed!!)
         } else {
             editName.setText(DBUtils.getDefaultModeName())
             sbSpeed.progress= 50
@@ -108,11 +109,13 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }else{
                 saveNode()
             }
+            setResult(Activity.RESULT_OK)
             finish()
         }
     }
 
     private fun updateNode() {
+        showLoadingDialog(getString(R.string.save_gradient_dialog_tip))
         diyGradient?.name=editName.text.toString().trim()
         diyGradient?.type=0
         diyGradient?.speed=speed
@@ -125,9 +128,14 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             item.index=index
             DBUtils.saveColorNode(item)
         }
+
+        Thread.sleep(100)
+        startSendCmdToAddDiyGradient(diyGradient!!)
+        hideLoadingDialog()
     }
 
     private fun saveNode(){
+        showLoadingDialog(getString(R.string.save_gradient_dialog_tip))
         Thread{
             diyGradient = DbDiyGradient()
 
@@ -146,13 +154,60 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             Thread.sleep(100)
             startSendCmdToAddDiyGradient(diyGradient!!)
+            hideLoadingDialog()
         }.start()
     }
 
     private fun startSendCmdToAddDiyGradient(diyGradient: DbDiyGradient) {
-//        var addNodeList=ArrayList<>
-//        Commander.addGradient(dstAddress,diyGradient.id,)
+        var addNodeList:ArrayList<DbColorNode> = ArrayList()
+        for(item in colorNodeList!!){
+            if(item.rgbw!=-1){
+                addNodeList.add(item)
+            }
+        }
 
+        val address=dstAddress
+        val id=diyGradient.id.toInt()
+        var nodeId=1
+        var nodeMode=diyGradient.type
+        var brightness = 100
+        var r=0xff
+        var g=0xff
+        var b=0xff
+        var c=0xff
+        var w=0xff
+
+        var temperature=0
+        if(nodeMode<3){
+            //rgb模式
+            for(j in addNodeList.indices){
+                nodeId = j+1
+                var item=addNodeList[j]
+                brightness = item.brightness
+                r = (item.rgbw and 0xff0000) shr 16
+                g = (item.rgbw and 0x00ff00) shr 8
+                b = (item.rgbw and 0x0000ff)
+                w = item.rgbw shr 18
+
+                Thread.sleep(200)
+                Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
+            }
+        }else{
+            //双色温模式
+            for(j in addNodeList.indices){
+                nodeId = j+1
+                var item=addNodeList[j]
+                brightness = item.brightness
+                temperature = item.colorTemperature
+
+                Thread.sleep(200)
+                Commander.addGradient(address,id,nodeId,nodeMode,brightness,temperature,0,0,0,0,{},{})
+            }
+        }
+//        val red = (color!! and 0xff0000) shr 16
+//        val green = (color and 0x00ff00) shr 8
+//        val blue = color and 0x0000ff
+//        val w = progress
     }
 
     private fun getGradientId(): Long {

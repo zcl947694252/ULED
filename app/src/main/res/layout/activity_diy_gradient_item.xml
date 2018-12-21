@@ -47,12 +47,11 @@
 
     <TextView
         android:id="@+id/more"
-        android:text="···"
-        android:textSize="28sp"
+        android:background="@drawable/menu"
         android:textColor="@color/primary"
         app:layout_constraintBottom_toTopOf="@id/modeSpeed"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="30dp"
+        android:layout_height="30dp" />
 </android.support.constraint.ConstraintLayout>

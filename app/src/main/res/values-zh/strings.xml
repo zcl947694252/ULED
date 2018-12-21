@@ -511,4 +511,5 @@
     <string name="color_check">颜色选择</string>
     <string name="name_not_null_tip">名称不可以为空</string>
     <string name="mode_str">模式</string>
+    <string name="save_gradient_dialog_tip">保存渐变中...</string>
 </resources>

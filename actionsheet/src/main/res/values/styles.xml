@@ -14,7 +14,7 @@
         <item name="messageDivider">@drawable/divider_bg</item>
         <item name="messageDividerInset">18dp</item>
         <item name="messageDividerHeight">1px</item>
-        <item name="itemTextColor">#00beb4</item>
+        <item name="itemTextColor">#d4000000</item>
         <item name="itemTextSize">15sp</item>
         <item name="itemDivider">@drawable/divider_bg</item>
         <item name="itemDividerInset">18dp</item>
@@ -23,7 +23,7 @@
         <item name="positiveTextColor">#de2b2b</item>
         <item name="positiveTextSize">15sp</item>
         <item name="positiveHeight">48dp</item>
-        <item name="cancelTextColor">#00beb4</item>
+        <item name="cancelTextColor">#de2b2b</item>
         <item name="cancelTextSize">15sp</item>
         <item name="cancelHeight">48dp</item>
         <item name="cancelTopMargins">8dp</item>
