@@ -60,6 +60,12 @@ public class OtaPrepareUtils {
                 case "LC":
                     getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN, localVersion, otaPrepareListner);
                     break;
+                case "LCS":
+                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING, localVersion, otaPrepareListner);
+                    break;
+                case "L36":
+                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V, localVersion, otaPrepareListner);
+                    break;
                 default:
                     ToastUtils.showLong(R.string.error_pack);
                     break;

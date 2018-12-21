@@ -143,6 +143,10 @@ public class Constant implements Serializable {
     public static int LIGHT_TYPE_NO_STROBO_DIMMING=3;
     //无频闪costdown
     public static int LIGHT_TYPE_NO_STROBO_COSTDOWN=4;
+    //无频闪costdown双调光
+    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING=5;
+    //无频闪costdown48转36V
+    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V=6;
 
     //无频闪单调光
     public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT=1;
