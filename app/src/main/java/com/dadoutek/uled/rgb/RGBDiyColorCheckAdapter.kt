@@ -5,11 +5,15 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbColorNode
 
-class RGBDiyColorListAdapter(layoutResId: Int, data: List<DbColorNode>?) : BaseQuickAdapter<DbColorNode, BaseViewHolder>(layoutResId, data) {
+class RGBDiyColorCheckAdapter(layoutResId: Int, data: List<DbColorNode>?) : BaseQuickAdapter<DbColorNode, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder?, item: DbColorNode?) {
         helper?.setBackgroundColor(R.id.colorRec,getColor(item!!.rgbw))
-        helper?.setText(R.id.colorRec,"")
+        if(item!!.rgbw!=-1){
+            helper?.setText(R.id.colorRec,item?.brightness.toString()+"%")
+        }else{
+            helper?.setText(R.id.colorRec,"")
+        }
     }
 
     fun getColor(rgbw: Int) : Int{

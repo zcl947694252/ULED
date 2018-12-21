@@ -132,7 +132,7 @@
                     android:layout_height="wrap_content"
                     android:max="100"
                     android:padding="6dp"
-                    android:progress="100" />
+                    android:progress="50" />
 
                 <TextView
                     android:id="@+id/tv_brightness_w"
@@ -147,7 +147,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:max="100"
-                    android:padding="6dp" />
+                    android:padding="6dp"
+                    android:progress="50"
+                    />
 
                 <Button
                     android:id="@+id/btn_save"

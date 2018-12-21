@@ -245,7 +245,7 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
                 val blue = color and 0x0000ff
                 val w = progress
                 
-                itemGroup?.color = (w shl 24) or red or green or blue
+                itemGroup?.color = (w shl 24) or (red shl 16) or (green shl 8) or blue
 
                 tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)

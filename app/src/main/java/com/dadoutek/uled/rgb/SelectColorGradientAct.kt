@@ -42,7 +42,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         colorNode = intent.getSerializableExtra(Constant.COLOR_NODE_KEY) as? DbColorNode
     }
     
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "StringFormatMatches")
     private fun initView() {
         toolbar.title = getString(R.string.color_check)
         setSupportActionBar(toolbar)
@@ -57,6 +57,10 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
         sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+        sbBrightness.progress=50
+        sb_w_bright.progress=50
+        tv_brightness_rgb.text = getString(R.string.device_setting_brightness,50)
+        tv_brightness_w.text = getString(R.string.w_bright,50)
         btn_save.setOnClickListener(this)
     }
 
@@ -199,7 +203,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 val blue = color and 0x0000ff
                 val w = progress
                 
-                colorNode?.rgbw = (w shl 24) or red or green or blue
+                colorNode?.rgbw = (w shl 24) or (red shl 16) or (green shl 8) or blue
 //                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
             }
         }

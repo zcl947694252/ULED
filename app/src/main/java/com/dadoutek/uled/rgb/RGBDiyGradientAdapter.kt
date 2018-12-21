@@ -19,9 +19,9 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?) : Base
         val colorListRecyclerView=helper.getView<RecyclerView>(R.id.diy_show_color_recyclerView)
 
         helper.setText(R.id.modeName, item.name)
-                .setText(R.id.modeSpeed, item.speed)
+                .setText(R.id.modeSpeed, mContext.getString(R.string.tv_speed,item.speed.toString()))
                 .setText(R.id.modeType, getTypeString(item.type))
-
+                .addOnClickListener(R.id.more)
         val layoutmanager = GridLayoutManager(mContext,4)
         colorListRecyclerView.layoutManager = layoutmanager as RecyclerView.LayoutManager?
         rgbDiyColorListAdapter = RGBDiyColorListAdapter(

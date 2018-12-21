@@ -509,4 +509,5 @@
     <string name="diy_action_tip">*点击按钮修改颜色,长按删除颜色</string>
     <string name="color_check">颜色选择</string>
     <string name="name_not_null_tip">名称不可以为空</string>
+    <string name="mode_str">模式</string>
 </resources>

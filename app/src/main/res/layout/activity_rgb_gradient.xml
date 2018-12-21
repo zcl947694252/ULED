@@ -26,8 +26,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:text="@string/mode_preset"
+                    android:textColor="@color/white"
                     android:gravity="center"
-                    android:background="@color/mode_check_color"
+                    android:background="@color/primary"
                     android:layout_marginEnd="1dp"
                     />
                 <TextView
@@ -69,7 +70,7 @@
             app:layout_constraintStart_toStartOf="@id/builtDiyModeRecycleView"
             app:layout_constraintEnd_toEndOf="@id/builtDiyModeRecycleView"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             />
@@ -79,7 +80,7 @@
         android:id="@+id/layoutModePreset"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottom_view"
         app:layout_constraintStart_toStartOf="@id/btn_mode_top"
         app:layout_constraintEnd_toEndOf="@id/btn_mode_top"

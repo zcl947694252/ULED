@@ -24,10 +24,11 @@ import kotlinx.android.synthetic.main.activity_set_diy_color.*
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     var colorNodeList: ArrayList<DbColorNode>? = null
-    private var rgbDiyColorListAdapter: RGBDiyColorListAdapter? = null
+    private var rgbDiyColorListAdapter: RGBDiyColorCheckAdapter? = null
     private var isChange = false
     private var diyGradient: DbDiyGradient? = null
     private var speed=0
+    private var dstAddress: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +39,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         isChange = intent.getBooleanExtra(Constant.IS_CHANGE_COLOR, false)
+        dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
         if (isChange) {
             diyGradient = intent.getParcelableExtra(Constant.GRADIENT_KEY) as? DbDiyGradient
             colorNodeList = DBUtils.getColorNodeListByIndex(diyGradient!!.id)
@@ -46,13 +48,14 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("StringFormatMatches")
     private fun initView() {
         saveNode.setOnClickListener(this)
         val layoutmanager = GridLayoutManager(this, 4)
         StringUtils.initEditTextFilter(editName)
         selectColorRecyclerView.layoutManager = layoutmanager as RecyclerView.LayoutManager?
-        rgbDiyColorListAdapter = RGBDiyColorListAdapter(
-                R.layout.item_color, colorNodeList)
+        rgbDiyColorListAdapter = RGBDiyColorCheckAdapter(
+                R.layout.item_color1, colorNodeList)
         rgbDiyColorListAdapter?.bindToRecyclerView(selectColorRecyclerView)
         rgbDiyColorListAdapter?.onItemClickListener=onItemClickListener
         rgbDiyColorListAdapter?.onItemLongClickListener=onItemLongClickListener
@@ -64,6 +67,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         } else {
             editName.setText(DBUtils.getDefaultModeName())
             sbSpeed.progress= 50
+            tvSpeed.text = getString(R.string.speed_text, 50)
         }
     }
 
@@ -105,6 +109,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }else{
                 saveNode()
             }
+            finish()
         }
     }
 
@@ -124,20 +129,25 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveNode(){
-        diyGradient = DbDiyGradient()
+        Thread{
+            diyGradient = DbDiyGradient()
 
-        diyGradient?.id = getGradientId()
-        diyGradient?.name = editName.text.toString().trim()
-        diyGradient?.type=0
-        diyGradient?.speed=speed
+            diyGradient?.id = getGradientId()
+            diyGradient?.name = editName.text.toString().trim()
+            diyGradient?.type=0
+            diyGradient?.speed=speed
 
-        DBUtils.saveGradient(diyGradient, false)
+            DBUtils.saveGradient(diyGradient!!, false)
 
-        val index = diyGradient!!.id
-        for(item in colorNodeList!!){
-            item.index=index
-            DBUtils.saveColorNode(item)
-        }
+            val index = diyGradient!!.id
+            for(item in colorNodeList!!){
+                item.index=index
+                DBUtils.saveColorNode(item)
+            }
+
+            Thread.sleep(100)
+//            Commander.addGradient(dstAddress,diyGradient.id,)
+        }.start()
     }
 
     private fun getGradientId(): Long {

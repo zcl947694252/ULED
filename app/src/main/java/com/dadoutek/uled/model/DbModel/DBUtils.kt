@@ -74,7 +74,7 @@ object DBUtils {
                     .list()
         }
 
-    val diyGradientList: List<DbDiyGradient>
+    val diyGradientList: MutableList<DbDiyGradient>
         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbDiyGradientDao.queryBuilder()
@@ -167,7 +167,7 @@ object DBUtils {
     }
 
     fun getColorNodeListByIndex(id: Long): ArrayList<DbColorNode> {
-        val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().build()
+        val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.Index.eq(id)).build()
         return ArrayList(query.list())
     }
 
@@ -674,7 +674,7 @@ object DBUtils {
         var count=dyList.size
         while (true){
             count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) +count
+            val newName = TelinkLightApplication.getInstance().getString(R.string.mode_str) +count
             if(!scNameList.contains(newName)){
                 return newName
             }
