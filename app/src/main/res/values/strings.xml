@@ -553,6 +553,7 @@
     <string name="save_scene_tip">Do you want to save the scene?</string>
     <string name="not_null_scene">Scene name cannot be empty</string>
     <string name="get_update_file">Get the upgrade package...</string>
+    <string name="firware_version">Firmware version: %1$s</string>
     <string name="mode_preset">内置模式</string>
     <string name="mode_diy">自定义</string>
     <string name="please_check_group">请选择分组:</string>

@@ -498,6 +498,7 @@
     <string name="save_scene_tip">是否保存场景?</string>
     <string name="not_null_scene">场景名不能为空</string>
     <string name="get_update_file">获取升级包...</string>
+    <string name="firware_version">固件版本号:%1$s</string>
     <string name="mode_preset">内置模式</string>
     <string name="mode_diy">自定义</string>
     <string name="please_check_group">请选择分组:</string>
