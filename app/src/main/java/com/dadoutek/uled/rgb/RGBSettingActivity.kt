@@ -705,10 +705,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
             val opcode: Byte
             val params: ByteArray
-
+            var brightness=0
             if (view == sbBrightness) {
+                if(progress>98){
+                    brightness=98
+                }else{
+                    brightness=progress
+                }
                 opcode = Opcode.SET_LUM
-                params = byteArrayOf(progress.toByte())
+                params = byteArrayOf(brightness.toByte())
                 if(currentShowGroupSetPage){
                     group!!.brightness = progress
                 }else{
