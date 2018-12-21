@@ -245,7 +245,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                 if (toolbar.title != null) {
                     if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
 //                        toolbar.title!!.visibility = View.VISIBLE
-                        lightVersion.text = localVersion
+                        lightVersion.visibility=View.VISIBLE
+                        lightVersion.text = getString(R.string.firware_version,localVersion)
                         light!!.version = localVersion
                         tvOta!!.visibility = View.VISIBLE
                     } else {
@@ -257,6 +258,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             }, {
                 if (toolbar.title != null) {
 //                    toolbar.title!!.visibility = View.GONE
+                    lightVersion.visibility=View.GONE
                     tvOta!!.visibility = View.GONE
                 }
                 null
