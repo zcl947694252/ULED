@@ -5,10 +5,14 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
+    <include layout="@layout/toolbar"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/header_height"
-        android:background="@color/primary">
+        android:background="@color/primary"
+        android:visibility="gone"
+        >
 
         <ImageView
             android:id="@+id/back"
@@ -48,7 +52,7 @@
         android:padding="@dimen/activity_horizontal_margin">
 
         <TextView
-            android:id="@+id/file"
+            android:id="@+id/tvFile"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

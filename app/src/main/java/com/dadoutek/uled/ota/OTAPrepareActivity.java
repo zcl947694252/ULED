@@ -51,7 +51,7 @@ public class OTAPrepareActivity extends TelinkBaseActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_prepare);
-        tv_file = (TextView) findViewById(R.id.file);
+        tv_file = (TextView) findViewById(R.id.tvFile);
         btn_next = (Button) findViewById(R.id.btn_next);
         tv_version = (TextView) findViewById(R.id.tv_version);
         ListView lv_device = (ListView) findViewById(R.id.lv_device);
