@@ -148,9 +148,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                             DBUtils.deleteLocalData()
 //                            ToastUtils.showLong(R.string.login_success)
                             SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
-                            hideLoadingDialog()
+//                            hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            showLoadingDialog(getString(R.string.sync_now))
+//                            showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                         }
 
@@ -169,7 +169,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
         override fun start() {
-            showLoadingDialog(getString(R.string.tip_start_sync))
+//            showLoadingDialog(getString(R.string.tip_start_sync))
         }
 
         override fun complete() {

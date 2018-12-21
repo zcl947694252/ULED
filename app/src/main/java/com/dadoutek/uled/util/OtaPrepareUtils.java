@@ -79,7 +79,7 @@ public class OtaPrepareUtils {
         DownLoadFileModel.INSTANCE.getUrl(type, detailType).subscribe(new NetworkObserver<String>() {
             @Override
             public void onNext(String s) {
-                otaPrepareListner.getVersionSuccess(s);
+//                otaPrepareListner.getVersionSuccess(s);
                /* localPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
                         + "/" + StringUtils.versionResolutionURL(s, 2);*/
                 localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(s, 2);
@@ -110,8 +110,8 @@ public class OtaPrepareUtils {
                     SharedPreferencesUtils.saveUpdateFilePath(localPath);
                     otaPrepareListner.downLoadFileSuccess();
                 } else {
-                      otaPrepareListner.downLoadFileStart();
-//                    download(serverVersionUrl, otaPrepareListner, context);
+//                    otaPrepareListner.getVersionSuccess("");
+                    download(serverVersionUrl, otaPrepareListner, context);
                 }
 //                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
             }else{
@@ -123,14 +123,15 @@ public class OtaPrepareUtils {
                         otaPrepareListner.downLoadFileSuccess();
                         SharedPreferencesUtils.saveUpdateFilePath(localPath);
                     } else {
-                        otaPrepareListner.downLoadFileStart();
-//                        download(serverVersionUrl, otaPrepareListner, context);
+//                        otaPrepareListner.getVersionSuccess("");
+                        download(serverVersionUrl, otaPrepareListner, context);
                     }
 //                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
                     return true;
                 } else {
                     //4.本地已经是最新直接跳转升级页面
 //                transformView();
+                    otaPrepareListner.getVersionSuccess("");
                     ToastUtils.showLong(R.string.the_last_version);
                     return false;
                 }
