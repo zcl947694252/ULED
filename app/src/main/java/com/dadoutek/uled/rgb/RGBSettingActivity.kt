@@ -555,8 +555,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
     internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
-        val brightness = presetColors?.get(position)?.brightness
-        val w = (color!! and 0xff000000.toInt()) shr 24
+        var brightness = presetColors?.get(position)?.brightness
+        var w = (color!! and 0xff000000.toInt()) shr 24
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
@@ -573,7 +573,20 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             }
 
             val opcode: Byte = Opcode.SET_LUM
+            val opcodeW: Byte = Opcode.SET_W_LUM
+
+            if(brightness!! > 98){
+                brightness=98
+            }
+            if(w>98){
+                w=98
+            }
+            if(w==-1){
+                w=0
+            }
+
             val params: ByteArray = byteArrayOf(brightness!!.toByte())
+            val paramsW: ByteArray = byteArrayOf(w.toByte())
             if(currentShowGroupSetPage){
                 group?.brightness = brightness
                 group?.color = color
@@ -586,6 +599,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 //                for(i in 0..3){
             Thread.sleep(50)
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+
+            Thread.sleep(100)
+            TelinkLightService.Instance().sendCommandNoResponse(opcodeW, addr!!, paramsW)
 //                }
 //                DBUtils.updateGroup(group!!)
 //                updateLights(color, "rgb_color", group!!)
