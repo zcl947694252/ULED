@@ -30,7 +30,7 @@ class SceneGroupAdapter
         helper.setBackgroundColor(R.id.rgb_view, if (item.color == 0)
             TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
         else
-            -0x1000000 or item.color)
+            (0xff0000 shl 8) or (item.color and 0xffffff))
         helper.setProgress(R.id.sbBrightness, item.brightness)
         helper.setProgress(R.id.sbTemperature, item.temperature)
         helper.setText(R.id.tvBrightness, sbBrightness.progress.toString() + "%")

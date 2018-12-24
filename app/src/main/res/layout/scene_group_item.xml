@@ -153,17 +153,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/rgb_view"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="28dp"
-            android:layout_marginEnd="36dp"
-            android:layout_marginStart="16dp"
-            android:background="@color/primary"
+            android:background="@drawable/rec_wide_1dp"
             app:layout_constraintEnd_toEndOf="@+id/scene_rgb_layout"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="36dp"
+            android:layout_marginStart="16dp"
+            android:padding="1dp"
+            >
+            <TextView
+                android:id="@+id/rgb_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/primary"
+                />
+        </LinearLayout>
 
         <!--<TextView-->
             <!--android:id="@+id/btn_rgb"-->
