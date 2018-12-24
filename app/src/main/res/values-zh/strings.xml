@@ -512,4 +512,5 @@
     <string name="name_not_null_tip">名称不可以为空</string>
     <string name="mode_str">模式</string>
     <string name="save_gradient_dialog_tip">保存渐变中...</string>
+    <string name="add_gradient_limit">最大只能添加6个渐变!</string>
 </resources>

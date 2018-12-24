@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.SeekBar
 import com.android.actionsheetdialog.ActionSheetDialog
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -246,10 +247,14 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun transAddAct() {
-        val intent=Intent(this,SetDiyColorAct::class.java)
-        intent.putExtra(Constant.IS_CHANGE_COLOR,false)
-        intent.putExtra(Constant.TYPE_VIEW_ADDRESS,dstAddress)
-        startActivityForResult(intent,0)
+        if(DBUtils.diyGradientList.size<6){
+            val intent=Intent(this,SetDiyColorAct::class.java)
+            intent.putExtra(Constant.IS_CHANGE_COLOR,false)
+            intent.putExtra(Constant.TYPE_VIEW_ADDRESS,dstAddress)
+            startActivityForResult(intent,0)
+        }else{
+            ToastUtils.showLong(getString(R.string.add_gradient_limit))
+        }
     }
 
     private fun transChangeAct(dbDiyGradient: DbDiyGradient) {

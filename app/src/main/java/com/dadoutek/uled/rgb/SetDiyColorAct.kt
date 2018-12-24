@@ -20,6 +20,8 @@ import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     var colorNodeList: ArrayList<DbColorNode>? = null
@@ -109,8 +111,6 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }else{
                 saveNode()
             }
-            setResult(Activity.RESULT_OK)
-            finish()
         }
     }
 
@@ -132,6 +132,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         Thread.sleep(100)
         startSendCmdToAddDiyGradient(diyGradient!!)
         hideLoadingDialog()
+
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     private fun saveNode(){
@@ -155,6 +158,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             Thread.sleep(100)
             startSendCmdToAddDiyGradient(diyGradient!!)
             hideLoadingDialog()
+
+            setResult(Activity.RESULT_OK)
+            finish()
         }.start()
     }
 
