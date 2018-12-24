@@ -45,7 +45,7 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
     
     @SuppressLint("ClickableViewAccessibility")
     private fun initView() {
-        toolbar.title = "颜色选择"
+        toolbar.title = getString(R.string.color_checked_set)
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
@@ -72,7 +72,10 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
-        val w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
+        if(w==-1){
+            w=0
+        }
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
@@ -184,7 +187,7 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
             e.printStackTrace()
         }
         
-        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
+//        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
 //        scrollView?.setBackgroundColor(color)
         color_r?.text = red.toString()
         color_g?.text = green.toString()
@@ -245,7 +248,7 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
                 val blue = color and 0x0000ff
                 val w = progress
                 
-                itemGroup?.color = (w shl 24) or red or green or blue
+                itemGroup?.color = (w shl 24) or (red shl 16) or (green shl 8) or blue
 
                 tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)

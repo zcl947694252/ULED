@@ -25,6 +25,7 @@ import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
+import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
@@ -35,18 +36,21 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var scene: DbScene? = null
     private var isChangeScene = false
     private var isChange = true
-    private var showGroupList: MutableList<ItemGroup>? = null
+    private var isResult = false
+    private var showGroupList: ArrayList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName:String?=null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
     private var guideShowCurrentPage = false
+    private val DATA_LIST_KEY="DATA_LIST_KEY"
+    private val SCENE_KEY="SCENE_KEY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
-        init()
+        init(savedInstanceState)
         if (!isChangeScene) {
             edit_name.setText(DBUtils.getDefaultNewSceneName())
             initOnLayoutListener()
@@ -107,11 +111,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    private fun init() {
+    private fun init(savedInstanceState: Bundle?) {
         val intent = intent
         isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
-        showGroupList = ArrayList()
-        if (isChangeScene) {
+        if(savedInstanceState!=null && savedInstanceState.containsKey(DATA_LIST_KEY)){
+            isResult=true
+            showGroupList = savedInstanceState.getSerializable(DATA_LIST_KEY) as? ArrayList<ItemGroup>
+        }else{
+            isResult=false
+            showGroupList = ArrayList()
+        }
+        if (isChangeScene && !isResult) {
             scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
             for (i in actions.indices) {
@@ -128,17 +138,28 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 groupMeshAddrArrayList.add(item.getMeshAddr())
             }
         }
+
         initScene()
     }
 
     private fun initScene() {
-        if (isChangeScene) {
-            initChangeView()
+        if(isResult){
+            if (isChangeScene) {
+                initChangeView()
+            }else{
+                initCreateView()
+            }
             showDataListView()
-        } else {
-            initCreateView()
-            showEditListVew()
+        }else{
+            if (isChangeScene) {
+                initChangeView()
+                showDataListView()
+            } else {
+                initCreateView()
+                showEditListVew()
+            }
         }
+
 
         confirm.setOnClickListener(this)
         StringUtils.initEditTextFilter(edit_name)
@@ -188,12 +209,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         startActivityForResult(intent, position)
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putSerializable(DATA_LIST_KEY,showGroupList!!)
+        if(isChangeScene){
+            outState?.putParcelable(SCENE_KEY,scene!!)
+        }
+        super.onSaveInstanceState(outState)
+        LogUtils.d("onSaveInstanceState")
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK){
-            val color=data?.getIntExtra("color",0)
-            showGroupList!![requestCode].color= color!!
-            sceneGroupAdapter?.notifyItemChanged(requestCode)
+            try{
+                val color=data?.getIntExtra("color",0)
+                showGroupList!![requestCode].color= color!!
+                sceneGroupAdapter?.notifyItemChanged(requestCode)
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
         }
     }
 
@@ -332,7 +366,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         val newItemGroup=ItemGroup()
                         newItemGroup.brightness=50
                         newItemGroup.temperature=50
-                        newItemGroup.color=R.color.white
+                        newItemGroup.color=0xffffff
                         newItemGroup.checked=true
                         newItemGroup.enableCheck=true
                         newItemGroup.gpName=showCheckListData!![i].name
@@ -347,7 +381,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                                 val newItemGroup=ItemGroup()
                                 newItemGroup.brightness=50
                                 newItemGroup.temperature=50
-                                newItemGroup.color=R.color.white
+                                newItemGroup.color=0xffffff
                                 newItemGroup.checked=true
                                 newItemGroup.enableCheck=true
                                 newItemGroup.gpName=showCheckListData!![i].name

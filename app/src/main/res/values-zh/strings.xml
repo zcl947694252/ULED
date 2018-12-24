@@ -499,4 +499,5 @@
     <string name="not_null_scene">场景名不能为空</string>
     <string name="get_update_file">获取升级包...</string>
     <string name="firware_version">固件版本号:%1$s</string>
+    <string name="color_checked_set">颜色选择</string>
 </resources>
