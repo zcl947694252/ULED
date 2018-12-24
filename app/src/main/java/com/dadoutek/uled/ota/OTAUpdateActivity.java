@@ -692,6 +692,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      * ****************************************泰凌微升级逻辑********************************************
      */
 
+
     /**
      * action startScan
      */
@@ -705,7 +706,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
         if(!AppUtils.isExynosSoc()){
-//            params.setScanFilters(scanFilters);
+            params.setScanFilters(scanFilters);
         }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
@@ -832,6 +833,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             btn_start_update.setVisibility(View.GONE);
             btn_start_update.setClickable(false);
             mode = MODE_IDLE;
+            TelinkLightApplication.getApp().removeEventListener(this);
+            addEventListener();
         });
     }
 
