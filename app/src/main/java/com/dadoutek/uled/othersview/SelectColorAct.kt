@@ -31,7 +31,8 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSceneSelectDiyRecyclerViewAdapter? = null
     private var stopTracking = false
-    
+    private var wValue=0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_color)
@@ -76,6 +77,8 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
         if(w==-1){
             w=0
         }
+
+        wValue=w
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
@@ -166,7 +169,6 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
     internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
         val brightness = presetColors?.get(position)?.brightness
-        val w = (color!! and 0xff000000.toInt()) shr 24
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
@@ -178,10 +180,10 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
 
             val opcode: Byte = Opcode.SET_LUM
             val params: ByteArray = byteArrayOf(brightness!!.toByte())
-            itemGroup!!.color=color
+            itemGroup!!.color=(wValue shl 24) or (red shl 16) or (green shl 8) or blue
             
             Thread.sleep(50)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+//            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
 
         } catch (e: InterruptedException) {
             e.printStackTrace()
@@ -247,7 +249,8 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
                 val green = (color and 0x00ff00) shr 8
                 val blue = color and 0x0000ff
                 val w = progress
-                
+                wValue=w
+
                 itemGroup?.color = (w shl 24) or (red shl 16) or (green shl 8) or blue
 
                 tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")

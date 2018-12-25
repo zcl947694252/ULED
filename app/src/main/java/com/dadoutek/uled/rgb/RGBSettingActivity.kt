@@ -56,6 +56,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -560,6 +561,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
+
+        val showBrightness=brightness
+        val showW=w
 //        Thread {
         changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
 
@@ -610,11 +614,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }
 //        }.start()
 
-        sbBrightness?.progress = brightness!!
-        tv_brightness_rgb.text = getString(R.string.device_setting_brightness, brightness.toString() + "")
+        sbBrightness?.progress = showBrightness!!
+        tv_brightness_rgb.text = getString(R.string.device_setting_brightness, showBrightness.toString() + "")
         if(w!=-1){
-            tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
-            sb_w_bright.progress=w
+            tv_brightness_w.text = getString(R.string.w_bright, showW.toString() + "")
+            sb_w_bright.progress=showW
         }else{
             tv_brightness_w.text = getString(R.string.w_bright, "0")
             sb_w_bright.progress=0
@@ -635,9 +639,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             presetColors?.get(position)!!.brightness = light!!.brightness
         }
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as TextView?
-        textView!!.text = group!!.brightness.toString() + "%"
-        textView.setBackgroundColor(0xff000000.toInt() or group!!.color)
-        SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+        try {
+            textView!!.text = group!!.brightness.toString() + "%"
+            textView.setBackgroundColor(0xff000000.toInt() or group!!.color)
+            SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
         false
     }
 
@@ -722,6 +730,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             val opcode: Byte
             val params: ByteArray
             var brightness=0
+            var w=0
             if (view == sbBrightness) {
                 if(progress>98){
                     brightness=98
@@ -748,7 +757,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                 }
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
-                params = byteArrayOf(progress.toByte())
+                if(progress>98){
+                    w=98
+                }else{
+                    w=progress
+                }
+                params = byteArrayOf(w.toByte())
                 var color = 0
                 if(currentShowGroupSetPage){
                     color = group?.color!!
