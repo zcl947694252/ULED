@@ -117,6 +117,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         if(savedInstanceState!=null && savedInstanceState.containsKey(DATA_LIST_KEY)){
             isResult=true
             showGroupList = savedInstanceState.getSerializable(DATA_LIST_KEY) as? ArrayList<ItemGroup>
+            scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
         }else{
             isResult=false
             showGroupList = ArrayList()
