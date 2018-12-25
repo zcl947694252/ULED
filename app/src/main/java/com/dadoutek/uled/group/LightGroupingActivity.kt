@@ -59,7 +59,10 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     allocDeviceGroup(group)
                     Thread.sleep(100)
                     for (sceneId in sceneIds) {
-                        Commander.addScene(sceneId, light!!.meshAddr,light!!.color)
+                        val action=DBUtils.getActionBySceneId(sceneId,group.meshAddr)
+                        if(action!=null){
+                            Commander.addScene(sceneId, light!!.meshAddr, action.color)
+                        }
                     }
                     DBUtils.updateLight(light!!)
                     runOnUiThread {

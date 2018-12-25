@@ -166,6 +166,17 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
+    fun getActionBySceneId(id: Long,address: Int): DbSceneActions? {
+        val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
+        val list=ArrayList(query.list())
+        for(i in list.indices){
+            if(list[i].groupAddr == address){
+                return list[i]
+            }
+        }
+        return null
+    }
+    
     fun getColorNodeListByIndex(id: Long): ArrayList<DbColorNode> {
         val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.Index.eq(id)).build()
         return ArrayList(query.list())
