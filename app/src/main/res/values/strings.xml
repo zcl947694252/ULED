@@ -568,7 +568,5 @@
     <string name="mode_str">Mode</string>
     <string name="save_gradient_dialog_tip">Save gradient…</string>
     <string name="add_gradient_limit">最大只能添加6个渐变!</string>
-    <string name="get_update_file">Get the upgrade package...</string>
-    <string name="firware_version">Firmware version: %1$s</string>
     <string name="color_checked_set">Select color</string>
 </resources>
