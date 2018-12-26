@@ -568,7 +568,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val blue = color and 0x0000ff
 
         val showBrightness=brightness
-        val showW=w
+        var showW=w
 //        Thread {
         changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
 
@@ -592,6 +592,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             }
             if(w==-1){
                 w=0
+                showW=0
             }
 
             val params: ByteArray = byteArrayOf(brightness!!.toByte())
@@ -651,7 +652,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }catch (e:Exception){
             e.printStackTrace()
         }
-        false
+        true
     }
 
     private fun toRGBGradientView() {
