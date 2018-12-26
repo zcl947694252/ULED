@@ -57,10 +57,19 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
         sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
-        sbBrightness.progress=50
-        sb_w_bright.progress=50
-        tv_brightness_rgb.text = getString(R.string.device_setting_brightness,50)
-        tv_brightness_w.text = getString(R.string.w_bright,50)
+        if(colorNode!!.rgbw==-1){
+            sbBrightness.progress=50
+            sb_w_bright.progress=50
+            tv_brightness_rgb.text = getString(R.string.device_setting_brightness,50)
+            tv_brightness_w.text = getString(R.string.w_bright,50)
+        }else{
+            var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
+            sbBrightness.progress=colorNode!!.brightness
+            sb_w_bright.progress=w
+            tv_brightness_rgb.text = getString(R.string.device_setting_brightness,colorNode!!.brightness)
+            tv_brightness_w.text = getString(R.string.w_bright,w)
+        }
+
         btn_save.setOnClickListener(this)
     }
 

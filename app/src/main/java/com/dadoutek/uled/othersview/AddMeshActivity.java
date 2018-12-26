@@ -3,6 +3,8 @@ package com.dadoutek.uled.othersview;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -75,6 +77,8 @@ public final class AddMeshActivity extends TelinkBaseActivity {
             } else {
                 setResult(RESULT_CANCELED);
             }
+
+
             finish();
         }
     }

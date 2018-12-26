@@ -2,8 +2,6 @@ package com.dadoutek.uled.util
 
 import android.content.Context
 import android.util.Log
-import com.blankj.utilcode.util.ToastUtils
-import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
@@ -16,7 +14,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.google.gson.Gson
 import com.mob.tools.utils.DeviceHelper
 import io.reactivex.Observable
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -24,7 +21,6 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import java.util.concurrent.TimeUnit
 
 
 class SyncDataPutOrGetUtils {
@@ -206,6 +202,51 @@ class SyncDataPutOrGetUtils {
                     }
                 }
 
+                "DB_DIY_GRADIENT" -> {
+                    val gradient = DBUtils.getGradientByID(changeId)
+
+                    lateinit var postInfoStr: String
+                    var bodyGradient: RequestBody? = null
+                    if (gradient != null && type != Constant.DB_DELETE) {
+                        val body: DbGradientBody = DbGradientBody()
+                        val gson: Gson = Gson()
+                        body.name = gradient.name
+                        body.type = gradient.type
+                        body.speed = gradient.speed
+                        body.colorNodes = DBUtils.getColorNodeListByIndex(changeId)
+
+                        postInfoStr = gson.toJson(body)
+
+                        bodyGradient = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                    }
+
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val node = DBUtils.getColorNodeListByIndex(changeId)
+                            LogUtils.d("scene_add--id=="+changeId)
+                            if(bodyGradient!=null){
+                                return GradientModel.add(token, bodyGradient
+                                        , id, changeId)
+                            }
+                        }
+                        Constant.DB_DELETE -> {
+                            LogUtils.d("scene_delete--id=="+changeId)
+                           val body=DbDeleteGradientBody()
+                            body.idList=ArrayList()
+                            body.idList.add(changeId.toInt())
+                            return GradientModel.delete(token,
+                                    body, id)
+                        }
+                        Constant.DB_UPDATE -> {
+                            LogUtils.d("scene_update--id=="+changeId)
+                            if(bodyGradient!=null){
+                                return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
+                            }
+                        }
+
+                    }
+                }
+
                 "DB_USER" -> {
                     val user = DBUtils.getUserByID(changeId)
 
@@ -262,6 +303,18 @@ class SyncDataPutOrGetUtils {
                     .flatMap {
                         for (item in it) {
                             DBUtils.saveLight(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getGradientList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveGradient(item, true)
+                            for (i in item.colorNodes.indices) {
+                                val k = i + 1
+                                DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
+                            }
                         }
                         NetworkFactory.getApi()
                                 .getGroupList(token)

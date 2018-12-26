@@ -1,5 +1,7 @@
 package com.dadoutek.uled.network;
 
+import com.dadoutek.uled.model.DbModel.DbDeleteGradientBody;
+import com.dadoutek.uled.model.DbModel.DbDiyGradient;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbRegion;
@@ -16,6 +18,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -178,6 +181,28 @@ public interface RequestInterface {
     @DELETE("api/ext/soybean/scene/remove/{rid}")
     Observable<Response<String>> deleteScene(@Header("token") String token,
                                              @Path("rid") int rid);
+
+    //添加渐变
+    @POST("api/ext/soybean/dynamic-change/{did}")
+    Observable<Response<String>> addGradient(@Header("token") String token,
+                                          @Body RequestBody body,
+                                          @Path("did") int did);
+
+    //获取渐变列表
+    @GET("api/ext/soybean/dynamic-change/list")
+    Observable<Response<List<DbDiyGradient>>> getGradientList(@Header("token") String token);
+
+    //更新渐变
+    @PUT("api/ext/soybean/dynamic-change/update/{did}")
+    Observable<Response<String>> updateGradient(@Header("token") String token,
+                                             @Path("rid") int rid,
+                                             @Body RequestBody body);
+
+    //删除渐变
+    @HTTP(method = "DELETE",path = "api/ext/soybean/dynamic-change/remove",hasBody = true)
+//    @DELETE("api/ext/soybean/dynamic-change/remove")
+    Observable<Response<String>> deleteGradients(@Header("token") String token,
+                                                 @Body DbDeleteGradientBody body);
 
     //获取用户信息
     @GET("api/user/info/mine")

@@ -17,16 +17,16 @@ public class DbColorNode  implements Serializable{
     @NotNull
     private long index=0;
     private int brightness=100;
-    private int rgbw=-1;
     private int colorTemperature=0;
-    @Generated(hash = 1439200622)
-    public DbColorNode(Long id, long index, int brightness, int rgbw,
-            int colorTemperature) {
+    private int rgbw=-1;
+    @Generated(hash = 1603503987)
+    public DbColorNode(Long id, long index, int brightness, int colorTemperature,
+            int rgbw) {
         this.id = id;
         this.index = index;
         this.brightness = brightness;
-        this.rgbw = rgbw;
         this.colorTemperature = colorTemperature;
+        this.rgbw = rgbw;
     }
     @Generated(hash = 1783393701)
     public DbColorNode() {
@@ -49,17 +49,17 @@ public class DbColorNode  implements Serializable{
     public void setBrightness(int brightness) {
         this.brightness = brightness;
     }
-    public int getRgbw() {
-        return this.rgbw;
-    }
-    public void setRgbw(int rgbw) {
-        this.rgbw = rgbw;
-    }
     public int getColorTemperature() {
         return this.colorTemperature;
     }
     public void setColorTemperature(int colorTemperature) {
         this.colorTemperature = colorTemperature;
+    }
+    public int getRgbw() {
+        return this.rgbw;
+    }
+    public void setRgbw(int rgbw) {
+        this.rgbw = rgbw;
     }
 
 }

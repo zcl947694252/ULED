@@ -30,11 +30,11 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Index = new Property(1, long.class, "index", false, "INDEX");
         public final static Property Brightness = new Property(2, int.class, "brightness", false, "BRIGHTNESS");
-        public final static Property Rgbw = new Property(3, int.class, "rgbw", false, "RGBW");
-        public final static Property ColorTemperature = new Property(4, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
+        public final static Property ColorTemperature = new Property(3, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
+        public final static Property Rgbw = new Property(4, int.class, "rgbw", false, "RGBW");
     }
 
-    private Query<DbColorNode> dbDiyGradient_ColorNodeListQuery;
+    private Query<DbColorNode> dbDiyGradient_ColorNodesQuery;
 
     public DbColorNodeDao(DaoConfig config) {
         super(config);
@@ -51,8 +51,8 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"INDEX\" INTEGER NOT NULL ," + // 1: index
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 2: brightness
-                "\"RGBW\" INTEGER NOT NULL ," + // 3: rgbw
-                "\"COLOR_TEMPERATURE\" INTEGER NOT NULL );"); // 4: colorTemperature
+                "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 3: colorTemperature
+                "\"RGBW\" INTEGER NOT NULL );"); // 4: rgbw
     }
 
     /** Drops the underlying database table. */
@@ -71,8 +71,8 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         }
         stmt.bindLong(2, entity.getIndex());
         stmt.bindLong(3, entity.getBrightness());
-        stmt.bindLong(4, entity.getRgbw());
-        stmt.bindLong(5, entity.getColorTemperature());
+        stmt.bindLong(4, entity.getColorTemperature());
+        stmt.bindLong(5, entity.getRgbw());
     }
 
     @Override
@@ -85,8 +85,8 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         }
         stmt.bindLong(2, entity.getIndex());
         stmt.bindLong(3, entity.getBrightness());
-        stmt.bindLong(4, entity.getRgbw());
-        stmt.bindLong(5, entity.getColorTemperature());
+        stmt.bindLong(4, entity.getColorTemperature());
+        stmt.bindLong(5, entity.getRgbw());
     }
 
     @Override
@@ -100,8 +100,8 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getLong(offset + 1), // index
             cursor.getInt(offset + 2), // brightness
-            cursor.getInt(offset + 3), // rgbw
-            cursor.getInt(offset + 4) // colorTemperature
+            cursor.getInt(offset + 3), // colorTemperature
+            cursor.getInt(offset + 4) // rgbw
         );
         return entity;
     }
@@ -111,8 +111,8 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setIndex(cursor.getLong(offset + 1));
         entity.setBrightness(cursor.getInt(offset + 2));
-        entity.setRgbw(cursor.getInt(offset + 3));
-        entity.setColorTemperature(cursor.getInt(offset + 4));
+        entity.setColorTemperature(cursor.getInt(offset + 3));
+        entity.setRgbw(cursor.getInt(offset + 4));
      }
     
     @Override
@@ -140,16 +140,16 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "colorNodeList" to-many relationship of DbDiyGradient. */
-    public List<DbColorNode> _queryDbDiyGradient_ColorNodeList(long index) {
+    /** Internal query to resolve the "colorNodes" to-many relationship of DbDiyGradient. */
+    public List<DbColorNode> _queryDbDiyGradient_ColorNodes(long index) {
         synchronized (this) {
-            if (dbDiyGradient_ColorNodeListQuery == null) {
+            if (dbDiyGradient_ColorNodesQuery == null) {
                 QueryBuilder<DbColorNode> queryBuilder = queryBuilder();
                 queryBuilder.where(Properties.Index.eq(null));
-                dbDiyGradient_ColorNodeListQuery = queryBuilder.build();
+                dbDiyGradient_ColorNodesQuery = queryBuilder.build();
             }
         }
-        Query<DbColorNode> query = dbDiyGradient_ColorNodeListQuery.forCurrentThread();
+        Query<DbColorNode> query = dbDiyGradient_ColorNodesQuery.forCurrentThread();
         query.setParameter(0, index);
         return query.list();
     }

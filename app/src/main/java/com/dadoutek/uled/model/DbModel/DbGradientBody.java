@@ -10,7 +10,7 @@ public class DbGradientBody {
 
     private int speed;
 
-    private List<DbColorNode> colorNode;
+    private List<DbColorNode> colorNodes;
 
     public String getName() {
         return name;
@@ -36,12 +36,12 @@ public class DbGradientBody {
         this.speed = speed;
     }
 
-    public List<DbColorNode> getColorNode() {
-        return colorNode;
+    public List<DbColorNode> getColorNodes() {
+        return colorNodes;
     }
 
-    public void setColorNode(List<DbColorNode> colorNode) {
-        this.colorNode = colorNode;
+    public void setColorNodes(List<DbColorNode> colorNodes) {
+        this.colorNodes = colorNodes;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DbGradientBody {
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", speed=" + speed +
-                ", colorNode=" + colorNode +
+                ", colorNode=" + colorNodes +
                 '}';
     }
 }

@@ -25,7 +25,7 @@ public class DbDiyGradient implements Parcelable {
     private int speed=50;
 
     @ToMany(referencedJoinProperty = "index")
-    private List<DbColorNode> colorNodeList;
+    private List<DbColorNode> colorNodes;
 
     protected DbDiyGradient(Parcel in) {
         if (in.readByte() == 0) {
@@ -119,35 +119,6 @@ public class DbDiyGradient implements Parcelable {
     }
 
     /**
-     * To-many relationship, resolved on first access (and after reset).
-     * Changes to to-many relations are not persisted, make changes to the target entity.
-     */
-    @Generated(hash = 54589380)
-    public List<DbColorNode> getColorNodeList() {
-        if (colorNodeList == null) {
-            final DaoSession daoSession = this.daoSession;
-            if (daoSession == null) {
-                throw new DaoException("Entity is detached from DAO context");
-            }
-            DbColorNodeDao targetDao = daoSession.getDbColorNodeDao();
-            List<DbColorNode> colorNodeListNew = targetDao
-                    ._queryDbDiyGradient_ColorNodeList(id);
-            synchronized (this) {
-                if (colorNodeList == null) {
-                    colorNodeList = colorNodeListNew;
-                }
-            }
-        }
-        return colorNodeList;
-    }
-
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    @Generated(hash = 255026754)
-    public synchronized void resetColorNodeList() {
-        colorNodeList = null;
-    }
-
-    /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
      * Entity must attached to an entity context.
      */
@@ -188,5 +159,33 @@ public class DbDiyGradient implements Parcelable {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getDbDiyGradientDao() : null;
+    }
+
+    /**
+     * To-many relationship, resolved on first access (and after reset).
+     * Changes to to-many relations are not persisted, make changes to the target entity.
+     */
+    @Generated(hash = 360862439)
+    public List<DbColorNode> getColorNodes() {
+        if (colorNodes == null) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            DbColorNodeDao targetDao = daoSession.getDbColorNodeDao();
+            List<DbColorNode> colorNodesNew = targetDao._queryDbDiyGradient_ColorNodes(id);
+            synchronized (this) {
+                if (colorNodes == null) {
+                    colorNodes = colorNodesNew;
+                }
+            }
+        }
+        return colorNodes;
+    }
+
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
+    @Generated(hash = 596063868)
+    public synchronized void resetColorNodes() {
+        colorNodes = null;
     }
 }
