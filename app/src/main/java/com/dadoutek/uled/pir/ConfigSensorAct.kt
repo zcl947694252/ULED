@@ -10,7 +10,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
@@ -18,7 +17,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -26,29 +24,29 @@ import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
-class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener{
+class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroups: List<DbGroup>
-//    private var builder:com.app.hubert.guide.core.Builder?=null
-    private var mGroupsName: ArrayList<String>?=null
+    //    private var builder:com.app.hubert.guide.core.Builder?=null
+    private var mGroupsName: ArrayList<String>? = null
     private var mSelectGroupAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
-    private var getVersionRetryMaxCount=2
-    private var getVersionRetryCount=0
+    private var getVersionRetryMaxCount = 2
+    private var getVersionRetryCount = 0
 
-    private var modeStartUpMode=0
-    private var modeDelayUnit=0
-    private var modeSwitchMode=0
+    private var modeStartUpMode = 0
+    private var modeDelayUnit = 0
+    private var modeSwitchMode = 0
 
-    private val MODE_START_UP_MODE_OPEN=0
-    private val MODE_DELAY_UNIT_SECONDS=0
-    private val MODE_SWITCH_MODE_MOMENT=0
+    private val MODE_START_UP_MODE_OPEN = 0
+    private val MODE_DELAY_UNIT_SECONDS = 0
+    private val MODE_SWITCH_MODE_MOMENT = 0
 
-    private val MODE_START_UP_MODE_CLOSE=1
-    private val MODE_DELAY_UNIT_MINUTE=2
-    private val MODE_SWITCH_MODE_GRADIENT=4
+    private val MODE_START_UP_MODE_CLOSE = 1
+    private val MODE_DELAY_UNIT_MINUTE = 2
+    private val MODE_SWITCH_MODE_GRADIENT = 4
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,8 +63,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         spSelectGroup.adapter = groupsAdapter
         spSelectGroup.onItemSelectedListener = this
         spSelectStartupMode.onItemSelectedListener = this
-        spDelayUnit.onItemSelectedListener=this
-        spSwitchMode.onItemSelectedListener=this
+        spDelayUnit.onItemSelectedListener = this
+        spSwitchMode.onItemSelectedListener = this
     }
 
     private fun initOnLayoutListener() {
@@ -81,10 +79,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     fun lazyLoad() {
-        val guide1=tietDelay
-        val guide2=tietMinimumBrightness
-        val guide3= spTriggerLux
-        val guide4= spSelectGroup
+        val guide1 = tietDelay
+        val guide2 = tietMinimumBrightness
+        val guide3 = spTriggerLux
+        val guide4 = spSelectGroup
 
 //        builder= GuideUtils.guideBuilder(this@ConfigSensorAct,Constant.TAG_ConfigSensorAct)
 //        builder?.addGuidePage(GuideUtils.addGuidePage(guide1,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_1)))
@@ -101,7 +99,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
                         val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
-                        LogUtils.d("kkkk"+versionNum)
+                        LogUtils.d("kkkk" + versionNum)
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
                         isSupportModeSelect = (it ?: "").contains("PS")
@@ -111,12 +109,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             spSelectStartupMode.visibility = View.VISIBLE
 
 //                            builder?.addGuidePage(GuideUtils.addGuidePage(spSelectStartupMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_5)))
-                            if(versionNum>=113){
-                                isSupportDelayUnitSelect=true
-                                tvSwitchMode.visibility =View.VISIBLE
-                                spSwitchMode.visibility=View.VISIBLE
-                                tvDelayUnit.visibility=View.VISIBLE
-                                spDelayUnit.visibility=View.VISIBLE
+                            if (versionNum >= 113) {
+                                isSupportDelayUnitSelect = true
+                                tvSwitchMode.visibility = View.VISIBLE
+                                spSwitchMode.visibility = View.VISIBLE
+                                tvDelayUnit.visibility = View.VISIBLE
+                                spDelayUnit.visibility = View.VISIBLE
 //                                builder?.addGuidePage(GuideUtils.addGuidePage(spSwitchMode,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_6)))
 //                                builder?.addGuidePage(GuideUtils.addGuidePage(spDelayUnit,R.layout.view_guide_simple_bottom,getString(R.string.config_pir_guide_7)))
                             }
@@ -125,11 +123,11 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 //                        builder?.show()
                     },
                     failedCallback = {
-//                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
+                        //                        builder?.addGuidePage(GuideUtils.addGuidePage(fabConfirm,R.layout.view_guide_simple_jump_left_tobottom,getString(R.string.config_pir_guide_8)))
 //                        builder?.show()
                         versionLayoutPS.visibility = View.GONE
                         getVersionRetryCount++
-                        if(getVersionRetryCount<=getVersionRetryMaxCount){
+                        if (getVersionRetryCount <= getVersionRetryMaxCount) {
                             getVersion()
                         }
                     })
@@ -197,33 +195,33 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 //        if (position == 0)
 //            mSelectGroupAddr = 0xDF
 //        else
-        when(parent?.id){
-            R.id.spSelectGroup ->{
+        when (parent?.id) {
+            R.id.spSelectGroup -> {
                 mSelectGroupAddr = mGroups[position].meshAddr
             }
-            R.id.spSelectStartupMode ->{
-                if(position == 0){//开灯
+            R.id.spSelectStartupMode -> {
+                if (position == 0) {//开灯
                     tietMinimumBrightness?.setText("0")
-                    modeStartUpMode=MODE_START_UP_MODE_OPEN
-                }else if(position == 1){//关灯
+                    modeStartUpMode = MODE_START_UP_MODE_OPEN
+                } else if (position == 1) {//关灯
                     tietMinimumBrightness?.setText("99")
-                    modeStartUpMode=MODE_START_UP_MODE_CLOSE
+                    modeStartUpMode = MODE_START_UP_MODE_CLOSE
                 }
             }
-            R.id.spSwitchMode ->{
-                 if(position==0){
-                     modeSwitchMode=MODE_SWITCH_MODE_MOMENT
-                 }else{
-                     modeSwitchMode=MODE_SWITCH_MODE_GRADIENT
-                 }
+            R.id.spSwitchMode -> {
+                if (position == 0) {
+                    modeSwitchMode = MODE_SWITCH_MODE_MOMENT
+                } else {
+                    modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
+                }
             }
-            R.id.spDelayUnit ->{
-                if(position==0){
+            R.id.spDelayUnit -> {
+                if (position == 0) {
                     tilDelay.hint = getString(R.string.delay_minute)
-                    modeDelayUnit=MODE_DELAY_UNIT_MINUTE
-                }else{
+                    modeDelayUnit = MODE_DELAY_UNIT_MINUTE
+                } else {
                     tilDelay.hint = getString(R.string.delay_seconds)
-                    modeDelayUnit=MODE_DELAY_UNIT_SECONDS
+                    modeDelayUnit = MODE_DELAY_UNIT_SECONDS
                 }
             }
         }
@@ -252,7 +250,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.fabConfirm -> {
-                if (tietDelay.text.isEmpty() || tietMinimumBrightness.text.isEmpty()) {
+                if (tietDelay.text?.isEmpty() != false || tietMinimumBrightness.text?.isEmpty() !=
+                        false) {
                     snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
                 } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
                     ToastUtils.showLong(getString(R.string.max_tip_brightness))
@@ -265,7 +264,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         val mApplication = this.application as TelinkLightApplication
                         val mesh = mApplication.getMesh()
 
-                        val mode=getModeValue()
+                        val mode = getModeValue()
 
                         configPir(mSelectGroupAddr,
                                 tietDelay.text.toString().toInt(),
@@ -296,7 +295,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun getModeValue(): Int {
         LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
-        LogUtils.d("FINAL_VALUE"+(modeStartUpMode or modeDelayUnit or modeSwitchMode))
+        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 }

@@ -14,8 +14,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.util.StringUtils
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -85,7 +84,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
-                launch(UI){
+                GlobalScope.launch(Dispatchers.Main){
                     loadDialog!!.show()
                 }
             }
@@ -93,7 +92,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     fun hideLoadingDialog() {
-        launch(UI){
+        GlobalScope.launch(Dispatchers.Main){
             if (loadDialog != null) {
                 loadDialog!!.dismiss()
             }

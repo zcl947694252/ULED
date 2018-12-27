@@ -20,18 +20,16 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.TelinkApplication
-import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.Strings
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
@@ -83,18 +81,18 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         fab.setOnClickListener { _ ->
             showLoadingDialog(getString(R.string.setting_switch))
             Thread {
-//                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
+                //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
                 setSceneForSwitch()
 //                updateNameForSwitch()
                 Commander.updateMeshName(successCallback = {
-                    launch(UI) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         hideLoadingDialog()
                     }
                     configureComplete()
                 },
                         failedCallback = {
                             snackbar(configGroupRoot, getString(R.string.pace_fail))
-                            launch(UI) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 hideLoadingDialog()
                             }
                         })
@@ -119,7 +117,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         finish()
     }
 
-    private fun configureComplete(){
+    private fun configureComplete() {
         this.mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
         TelinkLightService.Instance().disconnect()

@@ -203,7 +203,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         //退出MeshSetting后进入DeviceScanning
         if (requestCode == REQ_MESH_SETTING) {

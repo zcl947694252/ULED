@@ -37,9 +37,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import kotlinx.coroutines.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
@@ -245,7 +244,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
     private fun onLeScanTimeout() {
         LogUtils.d("onLeScanTimeout")
-        launch(UI){
+        GlobalScope.launch(Dispatchers.Main){
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
         }
@@ -319,7 +318,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
             LogUtils.d("开始连接")
         }.start()
 
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             connectDisposable?.dispose()    //取消掉上一个超时计时器
             connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit
                     .SECONDS)

@@ -17,8 +17,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
@@ -40,7 +39,7 @@ class SyncDataPutOrGetUtils {
                 val dbUser = DBUtils.lastUser
 
                 if (dbDataChangeList.size == 0) {
-                    launch(UI) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
                     }
                     return@Thread
@@ -51,7 +50,7 @@ class SyncDataPutOrGetUtils {
 
                 for (i in dbDataChangeList.indices) {
                     if (i == 0) {
-                        launch(UI) {
+                        GlobalScope.launch(Dispatchers.Main) {
                             syncCallback.start()
                         }
                     }
@@ -73,7 +72,7 @@ class SyncDataPutOrGetUtils {
                                     }
                                     .subscribe(object : NetworkObserver<String?>() {
                                         override fun onComplete() {
-                                            launch(UI) {
+                                            GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.complete()
 //                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                                             }
@@ -85,14 +84,14 @@ class SyncDataPutOrGetUtils {
                                         }
 
                                         override fun onError(e: Throwable) {
-                                            launch(UI) {
+                                            GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.error(e.cause.toString())
 //                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                                             }
                                         }
                                     })
                         }else{
-                            launch(UI) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 syncCallback.complete()
 //                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                             }
@@ -345,14 +344,14 @@ class SyncDataPutOrGetUtils {
                             syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
                             SharedPreferencesUtils.saveCurrentUserList(accountNow)
 //                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                            launch(UI) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 syncCallBack.complete()
                             }
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            launch(UI) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 syncCallBack.error(e.message)
                             }
                         }

@@ -8,7 +8,7 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 
 class SelectDeviceTypeActivity : AppCompatActivity() {
