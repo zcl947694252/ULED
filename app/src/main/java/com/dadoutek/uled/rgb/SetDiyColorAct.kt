@@ -20,8 +20,6 @@ import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     var colorNodeList: ArrayList<DbColorNode>? = null
