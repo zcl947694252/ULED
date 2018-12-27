@@ -8,7 +8,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
@@ -41,8 +44,9 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -197,14 +201,14 @@ class GroupListFragment : BaseFragment() {
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        if(dialog_pop.visibility==View.GONE || dialog_pop==null){
+        if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
             val group = showList!![position]
             val dstAddr = group.meshAddr
             var intent: Intent
 
             if (TelinkLightApplication.getInstance().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-            }else{
+            } else {
                 when (view.getId()) {
                     R.id.btn_on -> {
                         Commander.openOrCloseLights(dstAddr, true)
@@ -219,7 +223,7 @@ class GroupListFragment : BaseFragment() {
                         if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
                             intent = Intent(mContext, RGBSettingActivity::class.java)
                         }
-                        intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_GROUP)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", group)
                         startActivityForResult(intent, 0)
                     }
@@ -261,7 +265,6 @@ class GroupListFragment : BaseFragment() {
             }
             R.id.install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
             R.id.install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
-//            R.id.install_light_light -> startActivity(Intent(mContext, ConfigNightlightActivity::class.java))
             R.id.install_light_light -> startActivity(Intent(mContext, ScanningNightlightActivity::class.java))
         }
     }
@@ -339,33 +342,33 @@ class GroupListFragment : BaseFragment() {
         }, true)
         showList = mNewDatas
         adapter?.setNewData(showList)
-        diffResult.dispatchUpdatesTo(adapter)
+        adapter?.let { diffResult.dispatchUpdatesTo(it) }
     }
 
 
     fun lazyLoad() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!,GuideUtils.END_GROUPLIST_KEY,false)
-        if(guideShowCurrentPage){
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
+        if (guideShowCurrentPage) {
             GuideUtils.resetGroupListGuide(activity!!)
-            val guide0= toolbar!!.findViewById<TextView>(R.id.toolbarTv)
-            GuideUtils.guideBuilder(this@GroupListFragment,GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide0,R.layout.view_guide_0,getString(R.string.group_list_guide0), View.OnClickListener {},GuideUtils.END_GROUPLIST_KEY,activity!!)
+            val guide0 = toolbar!!.findViewById<TextView>(R.id.toolbarTv)
+            GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
+                    .addGuidePage(GuideUtils.addGuidePage(guide0, R.layout.view_guide_0, getString(R.string.group_list_guide0), View.OnClickListener {}, GuideUtils.END_GROUPLIST_KEY, activity!!)
                             .setOnLayoutInflatedListener { view, controller ->
-                                val normal=view.findViewById<TextView>(R.id.normal_light)
+                                val normal = view.findViewById<TextView>(R.id.normal_light)
                                 normal.setOnClickListener {
                                     controller.remove()
                                     guide1()
-                                    isRgbClick=false
+                                    isRgbClick = false
                                 }
-                                val rgb=view.findViewById<TextView>(R.id.rgb_light)
+                                val rgb = view.findViewById<TextView>(R.id.rgb_light)
                                 rgb.setOnClickListener {
                                     controller.remove()
                                     guide1()
-                                    isRgbClick=true
+                                    isRgbClick = true
                                 }
                                 val tvJump = view.findViewById<TextView>(R.id.jump_out)
                                 tvJump.setOnClickListener { v ->
-                                    GuideUtils.showExitGuideDialog(activity!!,controller,GuideUtils.END_GROUPLIST_KEY)
+                                    GuideUtils.showExitGuideDialog(activity!!, controller, GuideUtils.END_GROUPLIST_KEY)
                                 }
                             })
                     .show()
@@ -381,7 +384,7 @@ class GroupListFragment : BaseFragment() {
                     .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_group1, getString(R.string.group_list_guide1), View.OnClickListener {
                         isGuide = true
                         showPopupMenu()
-                    }, GuideUtils.END_GROUPLIST_KEY,activity!!))
+                    }, GuideUtils.END_GROUPLIST_KEY, activity!!))
                     .show()
         }
     }
@@ -404,7 +407,7 @@ class GroupListFragment : BaseFragment() {
                             install_light?.performClick()
                         }
                         GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, true)
-                    }, GuideUtils.END_GROUPLIST_KEY,activity!!))
+                    }, GuideUtils.END_GROUPLIST_KEY, activity!!))
                     .show()
         }
         return null
@@ -455,11 +458,11 @@ class GroupListFragment : BaseFragment() {
                 Thread {
                     //避免点击过快点击到下层View
                     Thread.sleep(100)
-                    launch(UI) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         hidePopupMenu()
                     }
                 }.start()
-            }else if(dialog_pop==null){
+            } else if (dialog_pop == null) {
                 hidePopupMenu()
             }
         }

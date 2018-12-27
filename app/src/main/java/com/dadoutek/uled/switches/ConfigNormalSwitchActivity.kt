@@ -34,9 +34,11 @@ import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 import java.util.concurrent.TimeUnit
@@ -116,7 +118,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private fun disconnect() {
         if(mIsConfiguring){
             this.mApplication.removeEventListener(this)
-            launch(UI) {
+            GlobalScope.launch(Dispatchers.Main) {
                 progressBar.visibility = View.GONE
                 showConfigSuccessDialog()
             }
@@ -146,7 +148,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                 },
                         failedCallback = {
                             snackbar(configGroupRoot, getString(R.string.group_failed))
-                            launch(UI) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 progressBar.visibility = View.GONE
                                 mIsConfiguring = false
                             }
@@ -269,14 +271,14 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                 if (mIsDisconnecting) {
                     this.mApplication.removeEventListener(this)
 
-                    launch(UI) {
-                        delay(200, TimeUnit.MILLISECONDS)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        delay(200)
                         progressBar.visibility = View.GONE
                         finish()
                     }
                 } else if (mIsConfiguring) {
                     this.mApplication.removeEventListener(this)
-                    launch(UI) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         progressBar.visibility = View.GONE
                         showConfigSuccessDialog()
                     }

@@ -59,9 +59,11 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.design.indefiniteSnackbar
 import java.lang.Exception
@@ -308,7 +310,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
             }
         }, true)
-        diffResult.dispatchUpdatesTo(adapter)
+        adapter?.let { diffResult.dispatchUpdatesTo(it) }
         lightList = mNewDatas!!
         adapter?.setNewData(lightList)
     }
@@ -508,17 +510,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
-                    launch(UI) {
+                     GlobalScope.launch(Dispatchers.Main) {
                         showOpenLocationServiceDialog()
                     }
                 } else {
-                    launch(UI) {
+                     GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
                     mTelinkLightService = TelinkLightService.Instance()
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                            launch(UI) {
+                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
                                 startScan()
@@ -527,7 +529,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                         }
 
                     } else {
-                        launch(UI) {
+                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
@@ -763,7 +765,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
                 TelinkLightService.Instance().enableNotification()
                 TelinkLightService.Instance().updateNotification()
-                launch(UI) {
+                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE

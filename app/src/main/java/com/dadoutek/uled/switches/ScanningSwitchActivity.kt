@@ -42,9 +42,8 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
@@ -332,7 +331,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun onLeScanTimeout() {
         LogUtils.d("onLeScanTimeout")
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_found_switch)
@@ -352,7 +351,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
 
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
                     if (!mIsInited){
                         onInited()
                     }
@@ -426,7 +425,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 //            TelinkLightService.Instance().connect(bestRSSIDevice?.macAddress, CONNECT_TIMEOUT_SECONDS)
 //        }.start()
 //
-//        launch(UI) {
+//        GlobalScope.launch(Dispatchers.Main) {
 //            connectDisposable?.dispose()    //取消掉上一个超时计时器
 //            connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit
 //                    .SECONDS, AndroidSchedulers.mainThread())
