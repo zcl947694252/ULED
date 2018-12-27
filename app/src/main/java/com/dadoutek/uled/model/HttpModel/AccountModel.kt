@@ -1,21 +1,18 @@
 package com.dadoutek.uled.model.HttpModel
 
 import android.text.TextUtils
-import android.util.Config
-import com.dadoutek.uled.BuildConfig
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
@@ -61,7 +58,7 @@ object AccountModel {
 
 
     private fun oldDataConvertToNewData(name: String, pwd: String) {
-        launch(CommonPool) {
+        GlobalScope.launch {
             delay(500L)
             oldDataConvertToNewDataGroup(name, pwd)
             delay(500L)
@@ -93,7 +90,7 @@ object AccountModel {
                 light.meshAddr = item.meshAddress
                 light.name = item.name
                 light.macAddr = item.macAddress
-                light.color =item.color
+                light.color = item.color
                 if (item.raw != null) {
                     light.meshUUID = item.raw.meshUUID
                     light.productUUID = item.raw.productUUID
@@ -123,7 +120,7 @@ object AccountModel {
                 dbGroup.colorTemperature = item.temperature
                 dbGroup.meshAddr = item.meshAddress
                 dbGroup.name = item.name
-                dbGroup.color =item.color
+                dbGroup.color = item.color
                 DBUtils.saveGroup(dbGroup, false)
             }
         }

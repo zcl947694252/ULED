@@ -1,5 +1,6 @@
 package com.dadoutek.uled.communicate
 
+import android.provider.Contacts
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -23,8 +24,9 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
@@ -95,7 +97,7 @@ object Commander : EventListener<String> {
                     Thread.sleep(sleepTime);
                     DBUtils.deleteLight(light);
                 }
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
                     successCallback.invoke()
                 }
             }.start()

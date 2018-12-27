@@ -8,11 +8,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.RectF
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
-import android.os.PowerManager
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -20,13 +18,9 @@ import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 import android.widget.Toast
 import com.app.hubert.guide.model.GuidePage
-import com.app.hubert.guide.model.HighLight
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.ScreenUtils
-import com.blankj.utilcode.util.SizeUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.DeviceListFragment
@@ -59,9 +53,11 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 import java.util.*
@@ -179,11 +175,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
         bnve.setupWithViewPager(viewPager)
     }
 
-    private fun testGUide() {
-        GuideUtils.guideBuilder(this, "aaaa").addGuidePage(GuidePage.newInstance().addHighLight(bnve.getBottomNavigationItemView(1))).alwaysShow(true)
-                .show()
-    }
-
     private fun guide1() {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_MAIN_KEY, false)
         if (guideShowCurrentPage) {
@@ -295,7 +286,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                     mTelinkLightService = TelinkLightService.Instance()
                     if (mTelinkLightService?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                            launch(UI) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
                                 startScan()
@@ -525,7 +516,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
             LightAdapter.STATUS_LOGIN -> {
                 TelinkLightService.Instance().enableNotification()
                 TelinkLightService.Instance().updateNotification()
-                launch(UI) {
+                GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE
