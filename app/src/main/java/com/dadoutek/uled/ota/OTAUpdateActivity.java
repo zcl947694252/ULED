@@ -934,13 +934,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 connectRetryCount = 0;
                 if (this.mode == MODE_COMPLETE) return;
                 TelinkLightService.Instance().enableNotification();
-                if (this.mode == MODE_OTA) {
-                    sendGetDeviceOtaStateCommand();
-                } else if (this.mode == MODE_IDLE) {
-                    if (this.mFirmwareData != null) {
-                        sendGetVersionCommand();
-                    }
-                }
+//                if (this.mode == MODE_OTA) {
+//                    sendGetDeviceOtaStateCommand();
+//                } else if (this.mode == MODE_IDLE) {
+//                    if (this.mFirmwareData != null) {
+//                        sendGetVersionCommand();
+//                    }
+//                }
+                startOTA();
                 break;
 
             case LightAdapter.STATUS_CONNECTED:
