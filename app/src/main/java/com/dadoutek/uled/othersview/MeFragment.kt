@@ -31,6 +31,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.light.DeviceResetGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -180,6 +181,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
         showGuideAgain?.setOnClickListener(this)
+        resetAllGroup?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -191,9 +193,11 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         if (SharedPreferencesUtils.isDeveloperModel()) {
             copyDataBase!!.visibility = View.VISIBLE
             chearCache!!.visibility = View.VISIBLE
+            resetAllGroup.visibility=View.VISIBLE
         } else {
             copyDataBase!!.visibility = View.GONE
             chearCache!!.visibility = View.VISIBLE
+            resetAllGroup.visibility=View.GONE
         }
 
         userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
@@ -255,7 +259,30 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             R.id.oneClickReset -> showSureResetDialogByApp()
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
             R.id.showGuideAgain -> showGuideAgainFun()
+            R.id.resetAllGroup -> gotoResetAllGroup()
         }
+    }
+
+    private fun gotoResetAllGroup() {
+        showResetSelectTypeDialog()
+    }
+
+    private fun showResetSelectTypeDialog() {
+        val intent = Intent(activity,DeviceResetGroupActivity::class.java)
+        val builder:AlertDialog.Builder=AlertDialog.Builder(activity)
+        builder.setMessage(getString(R.string.please_select_light_type))
+        builder.setPositiveButton(R.string.rgb_light) { dialog, which ->
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,true)
+            startActivityForResult(intent,Activity.RESULT_OK)
+        }
+        builder.setNeutralButton(R.string.cancel) { dialog, which ->
+
+        }
+        builder.setNegativeButton(R.string.normal_light) { dialog, which ->
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,false)
+            startActivityForResult(intent,Activity.RESULT_OK)
+        }
+        builder.create().show()
     }
 
     private fun showGuideAgainFun() {
@@ -392,6 +419,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             ToastUtils.showLong(R.string.developer_mode)
             copyDataBase!!.visibility = View.VISIBLE
             chearCache!!.visibility = View.VISIBLE
+            resetAllGroup.visibility=View.VISIBLE
             //开发者模式启动时启动LOG日志
             LogUtils.getConfig().setLog2FileSwitch(true)
             LogUtils.getConfig().setDir(LOG_PATH_DIR)

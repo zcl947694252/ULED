@@ -514,4 +514,6 @@
     <string name="save_gradient_dialog_tip">保存渐变中...</string>
     <string name="add_gradient_limit">最大只能添加6个渐变!</string>
     <string name="color_checked_set">颜色选择</string>
+    <string name="one_click_group">一键分组</string>
+    <string name="please_select_light_type">请选灯类型</string>
 </resources>

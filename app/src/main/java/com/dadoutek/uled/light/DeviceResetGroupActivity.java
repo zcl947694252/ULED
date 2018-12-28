@@ -5,11 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -107,7 +103,7 @@ import static com.dadoutek.uled.model.Constant.VENDOR_ID;
  * Created by hejiajun on 2018/5/21.
  */
 
-public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
+public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -140,7 +136,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
     private RxPermissions mRxPermission;
-    private static final String TAG = DeviceScanningNewActivity.class.getSimpleName();
+    private static final String TAG = DeviceResetGroupActivity.class.getSimpleName();
     private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
@@ -174,6 +170,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private Disposable mGroupingDisposable;
 
     private TextView tvStopScan;
+
+    List<DbLight> lightsData= null;
 
     //灯的mesh地址
     private int dstAddress;
@@ -662,7 +660,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         disableEventListenerInGrouping();
 
-//        initOnLayoutListener();
+        initOnLayoutListener();
     }
 
     @Override
@@ -697,7 +695,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         final EditText textGp = new EditText(this);
         textGp.setText(DBUtils.INSTANCE.getDefaultNewGroupName());
         StringUtils.initEditTextFilter(textGp);
-        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceScanningNewActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceResetGroupActivity.this);
         builder.setTitle(R.string.create_new_group);
         builder.setIcon(android.R.drawable.ic_dialog_info);
         builder.setView(textGp);
@@ -806,7 +804,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         initData();
         initView();
         initClick();
-        startScan(0);
+//        startScan(0);
     }
 
     private void initOnLayoutListener() {
@@ -910,7 +908,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 doFinish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
-                startActivity(new Intent(DeviceScanningNewActivity.this, LogInfoActivity.class));
+                startActivity(new Intent(DeviceResetGroupActivity.this, LogInfoActivity.class));
             }
         }
     };
@@ -944,12 +942,17 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         btnLog.setVisibility(View.GONE);
         btnAddGroups.setVisibility(View.GONE);
         groupingCompleted.setVisibility(View.GONE);
+        scanPb.setVisibility(View.GONE);
 
         lightNumLayout.setVisibility(View.GONE);
         tvStopScan=toolbar.findViewById(R.id.tv_function1);
         tvStopScan.setText(R.string.stop_scan);
         tvStopScan.setOnClickListener(onClick);
         tvStopScan.setVisibility(View.GONE);
+
+        adapter.setLights(lightsData);
+        adapter.notifyDataSetChanged();
+        startGrouping();
     }
 
     private View.OnClickListener onClick= v -> {
@@ -958,7 +961,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.scanning);
+        toolbar.setTitle(R.string.one_click_group);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -1023,6 +1026,15 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             initHasGroup = false;
             currentGroupIndex = -1;
         }
+
+
+        if(scanRGBLight){
+            lightsData = DBUtils.INSTANCE.getAllRGBLight();
+        }else{
+            lightsData = DBUtils.INSTANCE.getAllNormalLight();
+        }
+
+        nowLightList.addAll(lightsData);
     }
 
     @Override
@@ -1101,7 +1113,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            DeviceScanningNewActivity.DeviceItemHolder holder;
+            DeviceResetGroupActivity.DeviceItemHolder holder;
 
             convertView = inflater.inflate(R.layout.device_item, null);
             ImageView icon = (ImageView) convertView
@@ -1121,7 +1133,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
             DbLight light = this.getItem(position);
 
-            holder.txtName.setText(R.string.not_grouped);
+            if(light.getBelongGroupId()!=1){
+                holder.txtName.setText(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName());
+            }else{
+                holder.txtName.setText(R.string.not_grouped);
+            }
+
             holder.icon.setImageResource(R.drawable.icon_light_on);
             holder.selected.setChecked(light.selected);
 
@@ -1166,6 +1183,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         public List<DbLight> getLights() {
             return lights;
+        }
+
+        public void setLights(List<DbLight> lights) {
+            this.lights=lights;
         }
     }
 
@@ -1468,7 +1489,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
 
-                new Thread(() -> DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this)).start();
+                new Thread(() -> DeviceResetGroupActivity.this.mApplication.getMesh().saveOrUpdate(DeviceResetGroupActivity.this)).start();
 
                 if (scanRGBLight) {
                     if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
@@ -1519,7 +1540,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 //扫描出灯就设置为非首次进入
                 if (isFirtst) {
                     isFirtst = false;
-                    SharedPreferencesHelper.putBoolean(DeviceScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
+                    SharedPreferencesHelper.putBoolean(DeviceResetGroupActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
                 toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);
