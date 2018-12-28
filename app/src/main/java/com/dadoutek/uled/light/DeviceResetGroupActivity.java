@@ -961,7 +961,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.scanning);
+        toolbar.setTitle(R.string.one_click_group);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

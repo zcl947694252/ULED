@@ -193,19 +193,15 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         if (SharedPreferencesUtils.isDeveloperModel()) {
             copyDataBase!!.visibility = View.VISIBLE
             chearCache!!.visibility = View.VISIBLE
+            resetAllGroup.visibility=View.VISIBLE
         } else {
             copyDataBase!!.visibility = View.GONE
             chearCache!!.visibility = View.VISIBLE
+            resetAllGroup.visibility=View.GONE
         }
 
         userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
         userName!!.text = DBUtils.lastUser!!.phone
-
-        if(SharedPreferencesUtils.isDeveloperModel()){
-            resetAllGroup.visibility=View.VISIBLE
-        }else{
-            resetAllGroup.visibility=View.GONE
-        }
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -423,6 +419,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             ToastUtils.showLong(R.string.developer_mode)
             copyDataBase!!.visibility = View.VISIBLE
             chearCache!!.visibility = View.VISIBLE
+            resetAllGroup.visibility=View.VISIBLE
             //开发者模式启动时启动LOG日志
             LogUtils.getConfig().setLog2FileSwitch(true)
             LogUtils.getConfig().setDir(LOG_PATH_DIR)

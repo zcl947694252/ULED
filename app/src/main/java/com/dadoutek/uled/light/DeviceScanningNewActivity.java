@@ -662,7 +662,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         disableEventListenerInGrouping();
 
-        initOnLayoutListener();
+//        initOnLayoutListener();
     }
 
     @Override
