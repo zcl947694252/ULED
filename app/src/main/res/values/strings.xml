@@ -552,7 +552,9 @@
     <string name="click_update_scene">Click to modify the scene</string>
     <string name="save_scene_tip">Do you want to save the scene?</string>
     <string name="not_null_scene">Scene name cannot be empty</string>
-    <string name="get_update_file">Get the upgrade package...</string>
+    <string name="get_update_file">Get the upgrade package…</string>
     <string name="firware_version">Firmware version: %1$s</string>
     <string name="color_checked_set">Select color</string>
+    <string name="one_click_group">One-click grouping</string>
+    <string name="please_select_light_type">请选灯类型</string>
 </resources>

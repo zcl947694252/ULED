@@ -25,6 +25,7 @@ import org.greenrobot.greendao.query.QueryBuilder
 import java.util.ArrayList
 
 import com.dadoutek.uled.model.Constant.MAX_GROUP_COUNT
+import com.dadoutek.uled.model.DeviceType
 
 /**
  * Created by hejiajun on 2018/5/18.
@@ -158,6 +159,17 @@ object DBUtils {
 
     /********************************************查询 */
 
+    fun getAllRGBLight(): ArrayList<DbLight> {
+        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_RGB)).build()
+        return ArrayList(query.list())
+    }
+
+    fun getAllNormalLight(): ArrayList<DbLight> {
+        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL))
+                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD)).build()
+        return ArrayList(query.list())
+    }
     
     fun getActionsBySceneId(id: Long): ArrayList<DbSceneActions> {
         val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()

@@ -207,6 +207,9 @@
         <activity
             android:name=".light.ConfigNightlightActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".light.DeviceResetGroupActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

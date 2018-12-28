@@ -500,4 +500,6 @@
     <string name="get_update_file">获取升级包...</string>
     <string name="firware_version">固件版本号:%1$s</string>
     <string name="color_checked_set">颜色选择</string>
+    <string name="one_click_group">一键分组</string>
+    <string name="please_select_light_type">请选灯类型</string>
 </resources>
