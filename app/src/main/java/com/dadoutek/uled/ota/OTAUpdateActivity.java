@@ -151,6 +151,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private long TIME_OUT_SENDDATA = 10;
 
     private Handler delayHandler = new Handler();
+    @SuppressLint("HandlerLeak")
     private Handler visibleHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -158,6 +159,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             ((View) msg.obj).setVisibility(msg.what);
         }
     };
+    @SuppressLint("HandlerLeak")
     private Handler msgHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -227,8 +229,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     }
 
+    @SuppressLint({"InvalidWakeLockTag", "SimpleDateFormat"})
     private void initView() {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        assert powerManager != null;
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         addEventListener();
         TelinkLightService.Instance().enableNotification();
