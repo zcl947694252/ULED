@@ -98,7 +98,6 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                 }
                 .setTitle(R.string.do_you_really_want_to_cancel)
                 .show()
-
     }
 
 
