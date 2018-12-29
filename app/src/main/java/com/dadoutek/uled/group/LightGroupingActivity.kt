@@ -59,8 +59,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     allocDeviceGroup(group)
                     Thread.sleep(100)
                     for (sceneId in sceneIds) {
-                        val action=DBUtils.getActionBySceneId(sceneId,group.meshAddr)
-                        if(action!=null){
+                        val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
+                        if (action != null) {
                             Commander.addScene(sceneId, light!!.meshAddr, action.color)
                         }
                     }
@@ -129,7 +129,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      * @param lightMeshAddr 灯的mesh地址
      */
     private fun deletePreGroup(lightMeshAddr: Int) {
-        if(DBUtils.getGroupByID(light!!.belongGroupId!!)!=null){
+        if (DBUtils.getGroupByID(light!!.belongGroupId!!) != null) {
             val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!)?.meshAddr
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
@@ -173,7 +173,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initData() {
         this.light = this.intent.extras!!.get("light") as DbLight
         this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
-        groupsInit= ArrayList()
+        groupsInit = ArrayList()
 
         val list = DBUtils.groupList
         filter(list)
@@ -182,18 +182,20 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun filter(list: MutableList<DbGroup>) {
         groupsInit?.clear()
-        for(i in list.indices){
-            if(light?.productUUID==DeviceType.LIGHT_NORMAL){
-                if(OtherUtils.isNormalGroup(list[i])){
+        for (i in list.indices) {
+            if (light?.productUUID == DeviceType.LIGHT_NORMAL ||
+                    light?.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
+                    light?.productUUID == 0x00) {
+                if (OtherUtils.isNormalGroup(list[i])) {
                     groupsInit?.add(list[i])
                 }
-            }else if(light?.productUUID==DeviceType.LIGHT_RGB){
-                if(OtherUtils.isRGBGroup(list[i])){
+            } else if (light?.productUUID == DeviceType.LIGHT_RGB) {
+                if (OtherUtils.isRGBGroup(list[i])) {
                     groupsInit?.add(list[i])
                 }
             }
 
-            if(OtherUtils.groupIsEmpty(list[i])){
+            if (OtherUtils.groupIsEmpty(list[i])) {
                 groupsInit?.add(list[i])
             }
         }
