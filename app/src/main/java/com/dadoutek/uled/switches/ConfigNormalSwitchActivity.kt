@@ -53,6 +53,12 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
 
+    private var mDisconnectSnackBar: Snackbar? = null
+
+    private var mConnectedSnackBar: Snackbar? = null
+
+    private var mConfigFailSnackbar: Snackbar? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_group)
@@ -138,22 +144,29 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
         fab.setOnClickListener { view ->
-            if (mAdapter.selectedPos != -1) {
-                progressBar.visibility = View.VISIBLE
-                setGroupForSwitch()
-                Commander.updateMeshName(successCallback = {
-                    mIsConfiguring = true
-                    disconnect()
-                },
-                        failedCallback = {
-                            snackbar(configGroupRoot, getString(R.string.group_failed))
-                            GlobalScope.launch(Dispatchers.Main) {
-                                progressBar.visibility = View.GONE
-                                mIsConfiguring = false
-                            }
-                        })
-            } else {
-                snackbar(view, getString(R.string.please_select_group))
+            if(TelinkLightApplication.getInstance().connectDevice==null){
+                if(mConnectingSnackBar?.isShown != true){
+                    mConfigFailSnackbar?.dismiss()
+                    showDisconnectSnackBar()
+                }
+            }else{
+                if (mAdapter.selectedPos != -1) {
+                    progressBar.visibility = View.VISIBLE
+                    setGroupForSwitch()
+                    Commander.updateMeshName(successCallback = {
+                        mIsConfiguring = true
+                        disconnect()
+                    },
+                            failedCallback = {
+                                mConfigFailSnackbar=snackbar(configGroupRoot, getString(R.string.group_failed))
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    progressBar.visibility = View.GONE
+                                    mIsConfiguring = false
+                                }
+                            })
+                } else {
+                    snackbar(view, getString(R.string.please_select_group))
+                }
             }
         }
 
@@ -250,10 +263,6 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
     }
 
-    private var mDisconnectSnackBar: Snackbar? = null
-
-    private var mConnectedSnackBar: Snackbar? = null
-
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
 //        mDeviceMeshName = deviceInfo.meshName
@@ -298,6 +307,8 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                     }
                     .show()

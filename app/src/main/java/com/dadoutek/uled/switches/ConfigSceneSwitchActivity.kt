@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -50,6 +51,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private lateinit var mSwitchList: ArrayList<String>
     private lateinit var mSceneList: List<DbScene>
     private var loadDialog: Dialog? = null
+    private var mConfigFailSnackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,23 +94,30 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         fab.setOnClickListener { _ ->
 //            showLoadingDialog(getString(R.string.setting_switch))
-            progressBar.visibility = View.VISIBLE
-            Thread {
-                //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
-                setSceneForSwitch()
+            if(TelinkLightApplication.getInstance().connectDevice==null){
+                if(mConnectingSnackBar?.isShown != true){
+                    mConfigFailSnackbar?.dismiss()
+                    showDisconnectSnackBar()
+                }
+            }else{
+                progressBar.visibility = View.VISIBLE
+                Thread {
+                    //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
+                    setSceneForSwitch()
 //                updateNameForSwitch()
-                Commander.updateMeshName(successCallback = {
-                    mIsConfiguring = true
-                    disconnect()
-                },
-                        failedCallback = {
-                            snackbar(configGroupRoot, getString(R.string.pace_fail))
-                            GlobalScope.launch(Dispatchers.Main) {
-                                progressBar.visibility = View.GONE
-                                mIsConfiguring = false
-                            }
-                        })
-            }.start()
+                    Commander.updateMeshName(successCallback = {
+                        mIsConfiguring = true
+                        disconnect()
+                    },
+                            failedCallback = {
+                                mConfigFailSnackbar=snackbar(configGroupRoot, getString(R.string.pace_fail))
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    progressBar.visibility = View.GONE
+                                    mIsConfiguring = false
+                                }
+                            })
+                }.start()
+            }
         }
     }
 
@@ -149,6 +158,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                     }
                     .show()
@@ -352,7 +363,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         params.setUpdateDeviceList(mDeviceInfo)
 
         var keyNum: Int = 0
-        val map: Map<Int, DbScene> = mAdapter.getSceneMap()
+        val map: Map<Int, DbScene> = mAdapter.sceneMap
         for (key in map.keys) {
             when (key) {
                 0 -> keyNum = 0x05          //左上按键
@@ -373,6 +384,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
+    @SuppressLint("RestrictedApi")
     private fun initView() {
         if (mSceneList.isEmpty()) {
 //            ToastUtils.showLong(getString(R.string.tip_switch))
