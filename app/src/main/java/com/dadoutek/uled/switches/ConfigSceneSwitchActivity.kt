@@ -50,6 +50,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private lateinit var mSwitchList: ArrayList<String>
     private lateinit var mSceneList: List<DbScene>
     private var loadDialog: Dialog? = null
+    private var mConfigFailSnackbar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,23 +93,30 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         fab.setOnClickListener { _ ->
 //            showLoadingDialog(getString(R.string.setting_switch))
-            progressBar.visibility = View.VISIBLE
-            Thread {
-                //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
-                setSceneForSwitch()
+            if(TelinkLightApplication.getInstance().connectDevice==null){
+                if(mConnectingSnackBar?.isShown != true){
+                    mConfigFailSnackbar?.dismiss()
+                    showDisconnectSnackBar()
+                }
+            }else{
+                progressBar.visibility = View.VISIBLE
+                Thread {
+                    //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
+                    setSceneForSwitch()
 //                updateNameForSwitch()
-                Commander.updateMeshName(successCallback = {
-                    mIsConfiguring = true
-                    disconnect()
-                },
-                        failedCallback = {
-                            snackbar(configGroupRoot, getString(R.string.pace_fail))
-                            GlobalScope.launch(Dispatchers.Main) {
-                                progressBar.visibility = View.GONE
-                                mIsConfiguring = false
-                            }
-                        })
-            }.start()
+                    Commander.updateMeshName(successCallback = {
+                        mIsConfiguring = true
+                        disconnect()
+                    },
+                            failedCallback = {
+                                mConfigFailSnackbar=snackbar(configGroupRoot, getString(R.string.pace_fail))
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    progressBar.visibility = View.GONE
+                                    mIsConfiguring = false
+                                }
+                            })
+                }.start()
+            }
         }
     }
 
