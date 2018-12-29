@@ -307,6 +307,8 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                     }
                     .show()

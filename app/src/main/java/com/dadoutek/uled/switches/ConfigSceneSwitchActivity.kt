@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -157,6 +158,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                     }
                     .show()
@@ -360,7 +363,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         params.setUpdateDeviceList(mDeviceInfo)
 
         var keyNum: Int = 0
-        val map: Map<Int, DbScene> = mAdapter.getSceneMap()
+        val map: Map<Int, DbScene> = mAdapter.sceneMap
         for (key in map.keys) {
             when (key) {
                 0 -> keyNum = 0x05          //左上按键
@@ -381,6 +384,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
+    @SuppressLint("RestrictedApi")
     private fun initView() {
         if (mSceneList.isEmpty()) {
 //            ToastUtils.showLong(getString(R.string.tip_switch))
