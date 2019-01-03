@@ -1,8 +1,10 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.os.PowerManager
 import android.view.MenuItem
 import android.view.View
@@ -38,7 +40,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private var editPassWord: String? = null
     private var isFirstLauch: Boolean = false
     private var mWakeLock: PowerManager.WakeLock? = null
+    private var SAVE_USER_NAME_KEY="SAVE_USER_NAME_KEY"
+    private var SAVE_USER_PW_KEY="SAVE_USER_PW_KEY"
 
+    @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -48,8 +53,21 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
 
+        if(savedInstanceState!=null && (savedInstanceState.containsKey(SAVE_USER_NAME_KEY) || savedInstanceState.containsKey(SAVE_USER_PW_KEY))){
+            phone=savedInstanceState.getString(SAVE_USER_NAME_KEY)
+            editPassWord=savedInstanceState.getString(SAVE_USER_PW_KEY)
+            edit_user_phone_or_email!!.editText?.setText(phone)
+            edit_user_password!!.editText?.setText(editPassWord)
+        }
+
         initData()
         initView()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        outState?.putString(SAVE_USER_NAME_KEY,phone)
+        outState?.putString(SAVE_USER_PW_KEY,editPassWord)
+        super.onSaveInstanceState(outState, outPersistentState)
     }
 
     /**

@@ -26,9 +26,8 @@
 
     <Spinner
         android:id="@+id/spSelectStartupMode"
-        android:layout_width="168dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:entries="@array/startup_mode"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tvSelectStartupMode"
@@ -50,9 +49,8 @@
 
     <Spinner
         android:id="@+id/spSwitchMode"
-        android:layout_width="128dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:entries="@array/switch_mode"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/tvSwitchMode"
@@ -74,7 +72,7 @@
 
     <Spinner
         android:id="@+id/spDelayUnit"
-        android:layout_width="128dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:entries="@array/delay_unit"
@@ -87,10 +85,10 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tilDelay"
-        android:layout_width="280dp"
+        android:layout_width="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -109,7 +107,7 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/tilMinimumBrightness"
-        android:layout_width="280dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="@+id/tilDelay"
@@ -141,9 +139,8 @@
 
     <Spinner
         android:id="@+id/spTriggerLux"
-        android:layout_width="128dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:entries="@array/trigger_lux_array"
         app:layout_constraintBottom_toBottomOf="@+id/tvTriggerLux"
         app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
@@ -164,9 +161,8 @@
 
     <Spinner
         android:id="@+id/spSelectGroup"
-        android:layout_width="128dp"
+        android:layout_width="148dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/tvSelectGroup"
         app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
         app:layout_constraintHorizontal_bias="1.0"

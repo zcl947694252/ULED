@@ -211,7 +211,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rgb_group_setting)
         initType()
@@ -554,7 +553,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         checkGroupIsSystemGroup()
     }
 
-    internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+    private var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
         var brightness = presetColors?.get(position)?.brightness
         var w = (color!! and 0xff000000.toInt()) shr 24
@@ -564,20 +563,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         val showBrightness=brightness
         var showW=w
-//        Thread {
-        changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+        Thread {
 
         try {
-            Thread.sleep(100)
-            var addr = 0
-            if(currentShowGroupSetPage){
-                addr = group?.meshAddr!!
-            }else{
-                addr = light?.meshAddr!!
-            }
-
-            val opcode: Byte = Opcode.SET_LUM
-            val opcodeW: Byte = Opcode.SET_W_LUM
 
             if(brightness!! > 98){
                 brightness=98
@@ -590,30 +578,39 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                 showW=0
             }
 
-            val params: ByteArray = byteArrayOf(brightness!!.toByte())
-            val paramsW: ByteArray = byteArrayOf(w.toByte())
+            var addr = 0
             if(currentShowGroupSetPage){
-                group?.brightness = brightness
+                addr = group?.meshAddr!!
+            }else{
+                addr = light?.meshAddr!!
+            }
+
+            val opcode: Byte = Opcode.SET_LUM
+            val opcodeW: Byte = Opcode.SET_W_LUM
+
+            val paramsW: ByteArray = byteArrayOf(w.toByte())
+            val params: ByteArray = byteArrayOf(brightness!!.toByte())
+            TelinkLightService.Instance().sendCommandNoResponse(opcodeW, addr!!, paramsW)
+
+            Thread.sleep(80)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+
+            Thread.sleep(80)
+            changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+
+            if(currentShowGroupSetPage){
+                group?.brightness = showBrightness!!
                 group?.color = color
             }else{
-                light?.brightness = brightness
+                light?.brightness = showBrightness!!
                 light?.color = color
             }
 
             LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
-//                for(i in 0..3){
-            Thread.sleep(50)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
-
-            Thread.sleep(100)
-            TelinkLightService.Instance().sendCommandNoResponse(opcodeW, addr!!, paramsW)
-//                }
-//                DBUtils.updateGroup(group!!)
-//                updateLights(color, "rgb_color", group!!)
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
-//        }.start()
+        }.start()
 
         sbBrightness?.progress = showBrightness!!
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, showBrightness.toString() + "")

@@ -37,6 +37,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var isChangeScene = false
     private var isChange = true
     private var isResult = false
+    private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private var showGroupList: ArrayList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
@@ -360,6 +361,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             tv_scene_name.text = resources.getString(R.string.scene_name_show,editSceneName)
             val oldResultItemList= ArrayList<ItemGroup>()
             val newResultItemList= ArrayList<ItemGroup>()
+            notCheckedGroupList= ArrayList()
 
             for(i in showCheckListData!!.indices){
                 if(showCheckListData!![i].checked){
@@ -391,6 +393,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                             }
                         }
                     }
+                }else{
+                    val newItemGroup=ItemGroup()
+                    newItemGroup.brightness=0
+                    newItemGroup.temperature=0
+                    newItemGroup.color=0xffffff
+                    newItemGroup.checked=true
+                    newItemGroup.enableCheck=true
+                    newItemGroup.gpName=showCheckListData!![i].name
+                    newItemGroup.groupAress=showCheckListData!![i].meshAddr
+                    notCheckedGroupList!!.add(newItemGroup)
                 }
             }
             showGroupList?.clear()

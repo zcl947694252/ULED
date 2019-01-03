@@ -18,7 +18,7 @@ MobSDK {
                 "android.permission.READ_CONTACTS",
                 "android.permission.RECEIVE_SMS"
     }
-    SMSSDK {}
+    SMSSDK {             version "3.2.1"                 }
 }
 
 android {
@@ -28,8 +28,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 174
-        versionName "2.2.8"
+        versionCode 178
+        versionName "2.2.9"
 
         multiDexEnabled true
 
