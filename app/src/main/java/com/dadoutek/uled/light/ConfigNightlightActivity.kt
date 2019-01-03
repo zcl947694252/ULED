@@ -268,12 +268,14 @@ class ConfigNightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
         var canSendGroup=true
         for(i in showGroupList!!.indices){
             if(showGroupList!![i].groupAress==0xffff){
-                canSendGroup=false
+//                canSendGroup=false
+                paramBytesGroup[i + 2] = 0xFF.toByte()
                 break
+            } else {
+                val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
+                paramBytesGroup[i + 2] = groupL
+                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
-            val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
-            paramBytesGroup[i+2]=groupL
-            LogUtils.d("groupL="+groupL+""+"-----"+showGroupList!![i].groupAress)
         }
 
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
