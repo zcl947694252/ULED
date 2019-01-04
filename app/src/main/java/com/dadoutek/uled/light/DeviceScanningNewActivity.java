@@ -1032,6 +1032,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance() == null) {
             mApplication.startLightService(TelinkLightService.class);
         }
+//
+//        if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+//            autoConnect();
+//            mConnectTimer = createConnectTimeout();
+//        }
     }
 
     // 如果没有网络，则弹出网络设置对话框

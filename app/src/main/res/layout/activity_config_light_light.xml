@@ -20,12 +20,14 @@
         android:visibility="visible"
         >
         <android.support.constraint.ConstraintLayout
-            android:layout_width="280dp"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginTop="32dp"
             >
 
@@ -65,7 +67,7 @@
 
             <Spinner
                 android:id="@+id/spDelay"
-                android:layout_width="128dp"
+                android:layout_width="148dp"
                 android:layout_height="wrap_content"
                 android:entries="@array/delay_unit"
                 android:visibility="visible"
@@ -88,7 +90,7 @@
 
             <Spinner
                 android:id="@+id/spSwitchMode"
-                android:layout_width="128dp"
+                android:layout_width="148dp"
                 android:layout_height="wrap_content"
                 android:entries="@array/startup_mode"
                 android:visibility="visible"

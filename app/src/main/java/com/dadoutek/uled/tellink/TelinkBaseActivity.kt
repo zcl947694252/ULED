@@ -14,7 +14,9 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.util.StringUtils
-import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -93,7 +95,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         GlobalScope.launch(Dispatchers.Main){
-            if (loadDialog != null) {
+            if (loadDialog != null && this.isActive) {
                 loadDialog!!.dismiss()
             }
         }
