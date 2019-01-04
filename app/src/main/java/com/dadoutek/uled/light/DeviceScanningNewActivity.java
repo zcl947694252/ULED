@@ -1400,7 +1400,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         DeviceInfo deviceInfo = event.getArgs();
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
-//                "------" + deviceInfo.macAddress);
+//                "--" + deviceInfo.macAddress+"--productUUID:"+deviceInfo.productUUID);
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
@@ -1432,6 +1432,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                                     NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
                             params.setUpdateDeviceList(deviceInfo);
                             TelinkLightService.Instance().updateMesh(params);
+
+                Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
+                        "--" + deviceInfo.macAddress+"--productUUID:"+deviceInfo.productUUID);
             }
         }
     }
