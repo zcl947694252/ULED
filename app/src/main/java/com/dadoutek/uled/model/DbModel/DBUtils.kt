@@ -166,8 +166,7 @@ object DBUtils {
 
     fun getAllNormalLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
-                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL))
-                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD)).build()
+                .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD),DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
         return ArrayList(query.list())
     }
     

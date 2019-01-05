@@ -34,6 +34,7 @@ import com.dadoutek.uled.othersview.BaseFragment;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.GuideUtils;
+import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
 import java.util.List;
@@ -296,6 +297,12 @@ public class SceneFragment extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LogUtils.d("ss");
     }
 
     @Override

@@ -94,8 +94,8 @@ object Commander : EventListener<String> {
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, light.meshAddr, null)
                         Thread.sleep(sleepTime)
                     }
-                    Thread.sleep(sleepTime);
-                    DBUtils.deleteLight(light);
+                    Thread.sleep(sleepTime)
+                    DBUtils.deleteLight(light)
                 }
                 GlobalScope.launch(Dispatchers.Main) {
                     successCallback.invoke()
@@ -104,8 +104,6 @@ object Commander : EventListener<String> {
         } else {
             failedCallback.invoke()
         }
-
-
     }
 
     fun addScene(sceneId: Long, meshAddr: Int, color: Int) {
@@ -331,8 +329,8 @@ object Commander : EventListener<String> {
             }
 
             if (mGroupingAddr == groupAddress) {
-                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x",
-                        groupAddress, mLightAddr))
+//                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x",
+//                        groupAddress, mLightAddr))
                 mGroupSuccess = true
             }
         }
