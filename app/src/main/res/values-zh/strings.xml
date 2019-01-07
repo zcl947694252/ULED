@@ -502,4 +502,6 @@
     <string name="color_checked_set">颜色选择</string>
     <string name="one_click_group">一键分组</string>
     <string name="please_select_light_type">请选灯类型</string>
+    <string name="tip_change_gp_reset_scene">检测到分组改变,建议重新绑定场景</string>
+    <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
 </resources>

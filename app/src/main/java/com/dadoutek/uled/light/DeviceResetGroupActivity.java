@@ -180,6 +180,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
     private boolean isSelectAll = false;
     private boolean scanRGBLight = false;
 
+    private boolean groupIsChange = false;
     private boolean initHasGroup = false;
     private boolean guideShowCurrentPage = false;
     private boolean isGuide = false;
@@ -385,6 +386,13 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private void doFinish() {
+
+        if(groupIsChange){
+            if(DBUtils.INSTANCE.getSceneAll().size()>0){
+                ToastUtils.showLong(R.string.tip_change_gp_reset_scene);
+            }
+        }
+
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
@@ -499,6 +507,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
 
     private void setGroupOneByOne(DbGroup dbGroup, List<DbLight> selectLights, int index) {
+        groupIsChange=true;
         DbLight dbLight = selectLights.get(index);
         int lightMeshAddr = dbLight.getMeshAddr();
         Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), new Function0<Unit>() {
