@@ -144,12 +144,12 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         Log.d("RGBCOLOR", logStr)
 
         if (isOnceSet) {
-//            for(i in 0..3){
+            for(i in 0..3){
             Thread.sleep(50)
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
-//            }
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+            }
         } else {
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
         }
     }
 
@@ -191,7 +191,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
 
-//            var addr = itemGroup!!.groupAress
+            var addr = colorNode!!.dstAddress
 
             val opcode: Byte
             val params: ByteArray
@@ -201,7 +201,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 params = byteArrayOf(progress.toByte())
 
                 colorNode!!.brightness = progress
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(progress.toByte())
@@ -213,7 +213,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 val w = progress
                 
                 colorNode?.rgbw = (w shl 24) or (red shl 16) or (green shl 8) or blue
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
             }
         }
     }

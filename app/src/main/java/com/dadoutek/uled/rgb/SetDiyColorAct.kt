@@ -193,6 +193,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             for(j in addNodeList.indices){
                 nodeId = j
                 if(addNodeList[j].rgbw==-1){
+                    nodeId = 0xff
                     brightness = 0
                     r = 0
                     g = 0
@@ -239,7 +240,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         var id = 0
-        for (i in 1..6) {
+        for (i in 12..17) {
             if (idList.contains(i)) {
                 Log.d("sceneID", "getSceneId: " + "aaaaa")
                 continue
@@ -251,7 +252,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         if (list.size == 0) {
-            id = 1
+            id = 12
         }
 
         return java.lang.Long.valueOf(id.toLong())
@@ -282,6 +283,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     val onItemClickListener = BaseQuickAdapter.OnItemClickListener {
         adapter, view, position ->
         val intent= Intent(this,SelectColorGradientAct::class.java)
+        colorNodeList!![position].dstAddress=dstAddress
         intent.putExtra(Constant.COLOR_NODE_KEY, colorNodeList!![position])
         startActivityForResult(intent, position)
     }

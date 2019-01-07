@@ -1,11 +1,14 @@
 package com.dadoutek.uled.model.DbModel;
 
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.Serializable;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class DbColorNode  implements Serializable{
@@ -19,6 +22,11 @@ public class DbColorNode  implements Serializable{
     private int brightness=100;
     private int colorTemperature=0;
     private int rgbw=-1;
+
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public int dstAddress=0;
+
     @Generated(hash = 1603503987)
     public DbColorNode(Long id, long index, int brightness, int colorTemperature,
             int rgbw) {
