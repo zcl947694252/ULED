@@ -168,8 +168,7 @@ object DBUtils {
 
     fun getAllNormalLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
-                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL))
-                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD)).build()
+                .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD),DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
         return ArrayList(query.list())
     }
     
@@ -638,7 +637,7 @@ object DBUtils {
             group.name = name
             group.brightness = 100
             group.colorTemperature = 100
-            group.color = context.resources.getColor(R.color.white)
+            group.color = 0xffffff
             group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
             groups.add(group)
             //新增数据库保存

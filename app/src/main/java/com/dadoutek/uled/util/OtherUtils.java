@@ -41,7 +41,9 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL||getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL_OLD){
+        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL
+                ||getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL_OLD
+                ||getFirstLightOfGroupUUID(dbGroup)==0x00){
             return true;
         }else{
             return false;

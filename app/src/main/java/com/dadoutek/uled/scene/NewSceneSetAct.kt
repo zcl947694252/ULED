@@ -37,6 +37,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var isChangeScene = false
     private var isChange = true
     private var isResult = false
+    private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private var showGroupList: ArrayList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
@@ -142,7 +143,30 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
+        initChangeState()
         initScene()
+    }
+
+    fun initChangeState(){
+        showCheckListData = DBUtils.allGroups
+        if(showGroupList!!.size!=0){
+            for(i in showCheckListData!!.indices){
+                for(j in showGroupList!!.indices){
+                    if(showCheckListData!![i].meshAddr == showGroupList!![j].groupAress){
+                        showCheckListData!![i].checked= true
+                        break
+                    }else if(j==showGroupList!!.size-1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress){
+                        showCheckListData!![i].checked= false
+                    }
+                }
+            }
+            changeCheckedViewData()
+        }else{
+            for(i in showCheckListData!!.indices){
+                showCheckListData!![i].enableCheck=true
+                showCheckListData!![i].checked=false
+            }
+        }
     }
 
     private fun initScene() {
@@ -284,25 +308,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         edit_data_view_layout.visibility = View.VISIBLE
         tv_function1.visibility = View.GONE
 
-        showCheckListData = DBUtils.allGroups
-        if(showGroupList!!.size!=0){
-            for(i in showCheckListData!!.indices){
-                for(j in showGroupList!!.indices){
-                    if(showCheckListData!![i].meshAddr == showGroupList!![j].groupAress){
-                        showCheckListData!![i].checked= true
-                        break
-                    }else if(j==showGroupList!!.size-1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress){
-                        showCheckListData!![i].checked= false
-                    }
-                }
-            }
-            changeCheckedViewData()
-        }else{
-            for(i in showCheckListData!!.indices){
-                showCheckListData!![i].enableCheck=true
-                showCheckListData!![i].checked=false
-            }
-        }
+        initChangeState()
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -398,6 +404,19 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
+//                else{
+//                    if(showCheckListData!![i].meshAddr!=0xffff){
+//                        val newItemGroup=ItemGroup()
+//                        newItemGroup.brightness=0
+//                        newItemGroup.temperature=0
+//                        newItemGroup.color=0xffffff
+//                        newItemGroup.checked=true
+//                        newItemGroup.enableCheck=true
+//                        newItemGroup.gpName=showCheckListData!![i].name
+//                        newItemGroup.groupAress=showCheckListData!![i].meshAddr
+//                        notCheckedGroupList!!.add(newItemGroup)
+//                    }
+//                }
             }
             showGroupList?.clear()
             showGroupList?.addAll(oldResultItemList)
@@ -416,13 +435,36 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun saveScene(){
         if (checked()) {
-            if (isChangeScene) {
-                updateOldScene()
-            } else {
-                saveNewScene()
+            if(notCheckedGroupList?.size?:0>0){
+                showChangeOtherGroupCloseDialog()
+            }else{
+                saveAndFinish()
             }
-            setResult(Constant.RESULT_OK)
         }
+    }
+
+    private fun saveAndFinish(){
+        if (isChangeScene) {
+            updateOldScene()
+        } else {
+            saveNewScene()
+        }
+        setResult(Constant.RESULT_OK)
+    }
+
+    private fun showChangeOtherGroupCloseDialog() {
+        val tipSaveDailogBuilder = AlertDialog.Builder(this)
+        tipSaveDailogBuilder.setMessage(getString(R.string.tip_save_scene_all_group))
+        tipSaveDailogBuilder.setNegativeButton(R.string.cancel) { dialog, which ->
+            saveAndFinish()
+        }
+
+        tipSaveDailogBuilder.setPositiveButton(android.R.string.ok) { dialog, which ->
+            showGroupList?.addAll(notCheckedGroupList!!)
+            saveAndFinish()
+        }
+
+        tipSaveDailogBuilder.create().show()
     }
 
     private fun saveNewScene() {
@@ -630,10 +672,30 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun checked(): Boolean {
+
+        notCheckedGroupList= ArrayList()
+        initChangeState()
+
         if (showGroupList!!.size == 0) {
             ToastUtils.showLong(R.string.add_scene_gp_tip)
             return false
         }
+
+        for(i in showCheckListData!!.indices){
+            if(!showCheckListData!![i].checked){
+                if(showCheckListData!![i].meshAddr!=0xffff){
+                        val newItemGroup=ItemGroup()
+                        newItemGroup.brightness=0
+                        newItemGroup.temperature=0
+                        newItemGroup.color=0xffffff
+                        newItemGroup.checked=true
+                        newItemGroup.enableCheck=true
+                        newItemGroup.gpName=showCheckListData!![i].name
+                        newItemGroup.groupAress=showCheckListData!![i].meshAddr
+                        notCheckedGroupList!!.add(newItemGroup)
+                    }
+                }
+            }
         return true
     }
 }

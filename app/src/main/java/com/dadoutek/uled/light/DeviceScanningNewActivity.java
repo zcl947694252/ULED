@@ -662,7 +662,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         disableEventListenerInGrouping();
 
-//        initOnLayoutListener();
+        initOnLayoutListener();
     }
 
     @Override
@@ -1032,6 +1032,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance() == null) {
             mApplication.startLightService(TelinkLightService.class);
         }
+//
+//        if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+//            autoConnect();
+//            mConnectTimer = createConnectTimeout();
+//        }
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -1400,7 +1405,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         DeviceInfo deviceInfo = event.getArgs();
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
-//                "------" + deviceInfo.macAddress);
+//                "--" + deviceInfo.macAddress+"--productUUID:"+deviceInfo.productUUID);
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
@@ -1432,6 +1437,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                                     NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
                             params.setUpdateDeviceList(deviceInfo);
                             TelinkLightService.Instance().updateMesh(params);
+
+                Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
+                        "--" + deviceInfo.macAddress+"--productUUID:"+deviceInfo.productUUID);
             }
         }
     }
