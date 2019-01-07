@@ -51,7 +51,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
                 "\"NAME\" TEXT," + // 1: name
                 "\"TYPE\" INTEGER NOT NULL ," + // 2: type
                 "\"SPEED\" INTEGER NOT NULL ," + // 3: speed
-                "\"BELONG_REGION_ID\" INTEGER NOT NULL );"); // 4: belongRegionId
+                "\"BELONG_REGION_ID\" INTEGER);"); // 4: belongRegionId
     }
 
     /** Drops the underlying database table. */
@@ -75,7 +75,11 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         }
         stmt.bindLong(3, entity.getType());
         stmt.bindLong(4, entity.getSpeed());
-        stmt.bindLong(5, entity.getBelongRegionId());
+ 
+        Long belongRegionId = entity.getBelongRegionId();
+        if (belongRegionId != null) {
+            stmt.bindLong(5, belongRegionId);
+        }
     }
 
     @Override
@@ -93,7 +97,11 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         }
         stmt.bindLong(3, entity.getType());
         stmt.bindLong(4, entity.getSpeed());
-        stmt.bindLong(5, entity.getBelongRegionId());
+ 
+        Long belongRegionId = entity.getBelongRegionId();
+        if (belongRegionId != null) {
+            stmt.bindLong(5, belongRegionId);
+        }
     }
 
     @Override
@@ -114,7 +122,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.getInt(offset + 2), // type
             cursor.getInt(offset + 3), // speed
-            cursor.getLong(offset + 4) // belongRegionId
+            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // belongRegionId
         );
         return entity;
     }
@@ -125,7 +133,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setType(cursor.getInt(offset + 2));
         entity.setSpeed(cursor.getInt(offset + 3));
-        entity.setBelongRegionId(cursor.getLong(offset + 4));
+        entity.setBelongRegionId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
      }
     
     @Override

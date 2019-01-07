@@ -116,25 +116,28 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateNode() {
         showLoadingDialog(getString(R.string.save_gradient_dialog_tip))
-        diyGradient?.name=editName.text.toString().trim()
-        diyGradient?.type=NODE_MODE_RGB_GRADIENT
-        diyGradient?.speed=speed
 
-        DBUtils.updateGradient(diyGradient!!)
-        val index = diyGradient?.getId()!!
-        DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(index))
+        Thread{
+            diyGradient?.name=editName.text.toString().trim()
+            diyGradient?.type=NODE_MODE_RGB_GRADIENT
+            diyGradient?.speed=speed
 
-        for(item in colorNodeList!!){
-            item.index=index
-            DBUtils.saveColorNode(item)
-        }
+            DBUtils.updateGradient(diyGradient!!)
+            val index = diyGradient?.getId()!!
+            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(index))
 
-        Thread.sleep(100)
-        startSendCmdToAddDiyGradient(diyGradient!!)
-        hideLoadingDialog()
+            for(item in colorNodeList!!){
+                item.index=index
+                DBUtils.saveColorNode(item)
+            }
 
-        setResult(Activity.RESULT_OK)
-        finish()
+            Thread.sleep(100)
+            startSendCmdToAddDiyGradient(diyGradient!!)
+            hideLoadingDialog()
+
+            setResult(Activity.RESULT_OK)
+            finish()
+        }.start()
     }
 
     private fun saveNode(){

@@ -57,10 +57,10 @@ public class Constant implements Serializable {
     public static final String IS_LOGIN = "IS_LOGIN";
 
     //网络请求服务器测试地址
-//    public static final String BASE_URL = "http://tmp.ibeelink.com/";
+    public static final String BASE_URL = "http://tmp.ibeelink.com/";
 
     //网络请求服务器正式地址
-    public static final String BASE_URL = "https://mqtt.beesmartnet.com/";
+//    public static final String BASE_URL = "https://mqtt.beesmartnet.com/";
 
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY = "DB_NAME_KEY";
