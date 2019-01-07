@@ -28,6 +28,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Type = new Property(2, int.class, "type", false, "TYPE");
         public final static Property Speed = new Property(3, int.class, "speed", false, "SPEED");
+        public final static Property BelongRegionId = new Property(4, Long.class, "belongRegionId", false, "BELONG_REGION_ID");
     }
 
     private DaoSession daoSession;
@@ -49,7 +50,8 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
                 "\"TYPE\" INTEGER NOT NULL ," + // 2: type
-                "\"SPEED\" INTEGER NOT NULL );"); // 3: speed
+                "\"SPEED\" INTEGER NOT NULL ," + // 3: speed
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL );"); // 4: belongRegionId
     }
 
     /** Drops the underlying database table. */
@@ -73,6 +75,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         }
         stmt.bindLong(3, entity.getType());
         stmt.bindLong(4, entity.getSpeed());
+        stmt.bindLong(5, entity.getBelongRegionId());
     }
 
     @Override
@@ -90,6 +93,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         }
         stmt.bindLong(3, entity.getType());
         stmt.bindLong(4, entity.getSpeed());
+        stmt.bindLong(5, entity.getBelongRegionId());
     }
 
     @Override
@@ -109,7 +113,8 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.getInt(offset + 2), // type
-            cursor.getInt(offset + 3) // speed
+            cursor.getInt(offset + 3), // speed
+            cursor.getLong(offset + 4) // belongRegionId
         );
         return entity;
     }
@@ -120,6 +125,7 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setType(cursor.getInt(offset + 2));
         entity.setSpeed(cursor.getInt(offset + 3));
+        entity.setBelongRegionId(cursor.getLong(offset + 4));
      }
     
     @Override

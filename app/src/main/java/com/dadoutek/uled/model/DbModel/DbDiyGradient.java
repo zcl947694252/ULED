@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
 import java.io.Serializable;
@@ -24,6 +25,9 @@ public class DbDiyGradient implements Parcelable {
     private int type=0;
     private int speed=50;
 
+    @NotNull
+    private Long belongRegionId;
+
     @ToMany(referencedJoinProperty = "index")
     private List<DbColorNode> colorNodes;
 
@@ -38,12 +42,13 @@ public class DbDiyGradient implements Parcelable {
         speed = in.readInt();
     }
 
-    @Generated(hash = 973390080)
-    public DbDiyGradient(Long id, String name, int type, int speed) {
+    @Generated(hash = 1870404240)
+    public DbDiyGradient(Long id, String name, int type, int speed, @NotNull Long belongRegionId) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.speed = speed;
+        this.belongRegionId = belongRegionId;
     }
 
     @Generated(hash = 176034366)
@@ -116,6 +121,14 @@ public class DbDiyGradient implements Parcelable {
 
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public Long getBelongRegionId() {
+        return belongRegionId;
+    }
+
+    public void setBelongRegionId(Long belongRegionId) {
+        this.belongRegionId = belongRegionId;
     }
 
     /**

@@ -10,6 +10,8 @@ public class DbGradientBody {
 
     private int speed;
 
+    private Long belongRegionId;
+
     private List<DbColorNode> colorNodes;
 
     public String getName() {
@@ -36,6 +38,14 @@ public class DbGradientBody {
         this.speed = speed;
     }
 
+    public Long getBelongRegionId() {
+        return belongRegionId;
+    }
+
+    public void setBelongRegionId(Long belongRegionId) {
+        this.belongRegionId = belongRegionId;
+    }
+
     public List<DbColorNode> getColorNodes() {
         return colorNodes;
     }
@@ -50,7 +60,8 @@ public class DbGradientBody {
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", speed=" + speed +
-                ", colorNode=" + colorNodes +
+                ", belongRegionId=" + belongRegionId +
+                ", colorNodes=" + colorNodes +
                 '}';
     }
 }

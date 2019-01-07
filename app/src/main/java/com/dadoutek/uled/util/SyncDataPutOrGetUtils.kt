@@ -212,6 +212,7 @@ class SyncDataPutOrGetUtils {
                         body.name = gradient.name
                         body.type = gradient.type
                         body.speed = gradient.speed
+                        body.belongRegionId = gradient.belongRegionId
                         body.colorNodes = DBUtils.getColorNodeListByIndex(changeId)
 
                         postInfoStr = gson.toJson(body)
