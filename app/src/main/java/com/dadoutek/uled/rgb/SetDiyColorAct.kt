@@ -29,6 +29,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var diyGradient: DbDiyGradient? = null
     private var speed=50
     private var dstAddress: Int = 0
+    private val NODE_MODE_RGB_GRADIENT=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,7 +117,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private fun updateNode() {
         showLoadingDialog(getString(R.string.save_gradient_dialog_tip))
         diyGradient?.name=editName.text.toString().trim()
-        diyGradient?.type=0
+        diyGradient?.type=NODE_MODE_RGB_GRADIENT
         diyGradient?.speed=speed
 
         DBUtils.updateGradient(diyGradient!!)
@@ -143,7 +144,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             diyGradient?.id = getGradientId()
             diyGradient?.name = editName.text.toString().trim()
-            diyGradient?.type=0
+            diyGradient?.type=NODE_MODE_RGB_GRADIENT
             diyGradient?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion()
             diyGradient?.speed=speed
 
@@ -167,36 +168,47 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private fun startSendCmdToAddDiyGradient(diyGradient: DbDiyGradient) {
         var addNodeList:ArrayList<DbColorNode> = ArrayList()
         for(item in colorNodeList!!){
-            if(item.rgbw!=-1){
+//            if(item.rgbw!=-1){
                 addNodeList.add(item)
-            }
+//            }
         }
 
         val address=dstAddress
         val id=diyGradient.id.toInt()
-        var nodeId=1
+        var nodeId=0
         var nodeMode=diyGradient.type
-        var brightness = 100
-        var r=0xff
-        var g=0xff
-        var b=0xff
-        var c=0xff
-        var w=0xff
+        var brightness = 0
+        var r=0
+        var g=0
+        var b=0
+        var c=0
+        var w=0
 
         var temperature=0
         if(nodeMode<3){
             //rgb模式
             for(j in addNodeList.indices){
-                nodeId = j+1
-                var item=addNodeList[j]
-                brightness = item.brightness
-                r = (item.rgbw and 0xff0000) shr 16
-                g = (item.rgbw and 0x00ff00) shr 8
-                b = (item.rgbw and 0x0000ff)
-                w = item.rgbw shr 18
+                nodeId = j
+                if(addNodeList[j].rgbw==-1){
+                    brightness = 0
+                    r = 0
+                    g = 0
+                    b = 0
+                    w = 0
 
-                Thread.sleep(200)
-                Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
+                    Thread.sleep(200)
+                    Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
+                }else{
+                    var item=addNodeList[j]
+                    brightness = item.brightness
+                    r = (item.rgbw and 0xff0000) shr 16
+                    g = (item.rgbw and 0x00ff00) shr 8
+                    b = (item.rgbw and 0x0000ff)
+                    w = item.rgbw shr 18
+
+                    Thread.sleep(200)
+                    Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
+                }
             }
         }else{
             //双色温模式
