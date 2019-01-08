@@ -17,7 +17,9 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
@@ -131,13 +133,18 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 DBUtils.saveColorNode(item)
             }
 
-            Thread.sleep(100)
+            deleteGradient(index)
+            Thread.sleep(200)
             startSendCmdToAddDiyGradient(diyGradient!!)
             hideLoadingDialog()
 
             setResult(Activity.RESULT_OK)
             finish()
         }.start()
+    }
+
+    private fun deleteGradient(id: Long) {
+            Commander.deleteGradient(dstAddress,id.toInt(),{},{})
     }
 
     private fun saveNode(){
@@ -193,15 +200,15 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             for(j in addNodeList.indices){
                 nodeId = j
                 if(addNodeList[j].rgbw==-1){
-                    nodeId = 0xff
-                    brightness = 0
-                    r = 0
-                    g = 0
-                    b = 0
-                    w = 0
-
-                    Thread.sleep(200)
-                    Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
+//                    nodeId = 0xff
+//                    brightness = 0
+//                    r = 0
+//                    g = 0
+//                    b = 0
+//                    w = 0
+//
+//                    Thread.sleep(1000)
+//                    Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
                 }else{
                     var item=addNodeList[j]
                     brightness = item.brightness
@@ -210,7 +217,13 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     b = (item.rgbw and 0x0000ff)
                     w = item.rgbw shr 18
 
-                    Thread.sleep(200)
+                    Thread.sleep(1000)
+                    if(brightness > 99){
+                        brightness = 99
+                    }
+                    if(w>99){
+                        w = 99
+                    }
                     Commander.addGradient(address,id,nodeId,nodeMode,brightness,r,g,b,c,w,{},{})
                 }
             }
