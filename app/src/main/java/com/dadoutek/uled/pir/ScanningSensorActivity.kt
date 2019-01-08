@@ -136,6 +136,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                     }
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                     if(isSupportInstallOldDevice){
+                        params.setMeshName(mesh.name)
                         params.setOutOfMeshName(mesh.name)
                     }
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
