@@ -19,7 +19,6 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
-import com.app.hubert.guide.model.GuidePage
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
@@ -685,7 +684,7 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
 
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.LIGHT_LIGHT -> {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
                 LogUtils.d("This is switch")
                 true
             }

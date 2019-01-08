@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.light.ConfigNightlightActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
@@ -32,7 +33,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_scanning_switch.*
+import kotlinx.android.synthetic.main.activity_scanning_sensor.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -54,6 +55,8 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
     private var scanDisposable: Disposable? = null
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
+
+    private var isSupportInstallOldDevice=false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +88,13 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private fun initListener() {
         progressBtn.onClick {
             mRetryConnectCount = 0
+            isSupportInstallOldDevice=false
+            startScan()
+        }
+
+        installOldDevice.onClick {
+            mRetryConnectCount = 0
+            isSupportInstallOldDevice=true
             startScan()
         }
     }
@@ -97,6 +107,11 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                         byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SENSOR.toByte()),
                         byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
                 .build())
+        scanFilters.add(ScanFilter.Builder()
+                        .setManufacturerData(Constant.VENDOR_ID,
+                                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NIGHT_LIGHT.toByte()),
+                                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                        .build())
         return scanFilters
     }
 
@@ -120,7 +135,9 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                         params.setScanFilters(getScanFilters())
                     }
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                    params.setOutOfMeshName(mesh.name)
+                    if(isSupportInstallOldDevice){
+                        params.setOutOfMeshName(mesh.name)
+                    }
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
 
@@ -292,6 +309,8 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.progress = 100  //进度控件显示成完成状态
         if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
             startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
+        }else if(mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT){
+            startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!)
         }
     }
 
@@ -352,7 +371,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
         val MAX_RSSI = 81
         when (leScanEvent.args.productUUID) {
-            DeviceType.SENSOR -> {
+            DeviceType.SENSOR,DeviceType.NIGHT_LIGHT -> {
                 if(leScanEvent.args.rssi<MAX_RSSI){
                     scanDisposable?.dispose()
                     LeBluetooth.getInstance().stopScan()

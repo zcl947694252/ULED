@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".pir.ScanningSwitchActivity">
+    tools:context=".pir.ScanningSensorActivity">
 
     <include
         android:id="@+id/include"
@@ -56,6 +56,24 @@
         app:pb_textError="@string/not_found_switch"
         app:pb_textProgress="@string/searching" />
 
+    <TextView
+        android:id="@+id/installOldDevice"
+        android:text="@string/install_old_device_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/progressBtn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="15dp"
+        />
 
-
+    <TextView
+        android:id="@+id/line"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        app:layout_constraintTop_toBottomOf="@id/installOldDevice"
+        android:background="@color/black"
+        app:layout_constraintStart_toStartOf="@id/installOldDevice"
+        app:layout_constraintEnd_toEndOf="@id/installOldDevice"
+        />
 </android.support.constraint.ConstraintLayout>

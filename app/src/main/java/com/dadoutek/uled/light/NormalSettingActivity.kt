@@ -299,7 +299,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         light!!.version = localVersion
                         tvOta!!.visibility = View.VISIBLE
                     } else {
-                        txtTitle!!.visibility = View.GONE
+                        txtTitle!!.visibility = View.VISIBLE
+                        txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
+                        light!!.version = localVersion
                         tvOta!!.visibility = View.GONE
                     }
                 }

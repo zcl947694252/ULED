@@ -559,4 +559,5 @@
     <string name="please_select_light_type">Please select the type of light</string>
     <string name="tip_change_gp_reset_scene">Packet change detected, it is recommended to re-bind the scene</string>
     <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
+    <string name="install_old_device_tip">重新安装已安装设备</string>
 </resources>
