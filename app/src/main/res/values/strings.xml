@@ -572,5 +572,7 @@
     <string name="one_click_group">One-click grouping</string>
     <string name="please_select_light_type">Please select the type of light</string>
     <string name="tip_change_gp_reset_scene">Packet change detected, it is recommended to re-bind the scene</string>
-    <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
+    <string name="tip_save_scene_all_group">Is the unselected group brightness white light set to 0?</string>
+    <string name="install_old_device_tip">Search for installed devices</string>
+    <string name="search_new_device">Search for new devices</string>
 </resources>

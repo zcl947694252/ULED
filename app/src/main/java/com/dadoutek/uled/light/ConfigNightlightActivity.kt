@@ -22,7 +22,6 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_light_light.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -257,12 +256,12 @@ class ConfigNightlightActivity :TelinkBaseActivity(), View.OnClickListener, Adap
         val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
         val timeL: Byte = (selectTime and 0xff).toByte()
         val paramBytes = byteArrayOf(
-                DeviceType.LIGHT_LIGHT.toByte(),
+                DeviceType.NIGHT_LIGHT.toByte(),
                 switchMode.toByte(),timeL,timeH
         )
         val paramBytesGroup:ByteArray
         paramBytesGroup = byteArrayOf(
-                DeviceType.LIGHT_LIGHT.toByte(),CMD_CONTROL_GROUP.toByte(),0,0,0,0,0,0,0,0
+                DeviceType.NIGHT_LIGHT.toByte(),CMD_CONTROL_GROUP.toByte(),0,0,0,0,0,0,0,0
         )
 
         var canSendGroup=true

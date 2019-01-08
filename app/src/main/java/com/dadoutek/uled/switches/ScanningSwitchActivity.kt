@@ -70,6 +70,8 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private var retryConnectCount = 0
 
+    private var isSupportInstallOldDevice=false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
@@ -123,6 +125,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
         progressBtn.onClick {
             retryConnectCount = 0
+            isSupportInstallOldDevice=false
+            startScan()
+        }
+
+        installOldDevice.onClick {
+            retryConnectCount = 0
+            isSupportInstallOldDevice=true
             startScan()
         }
     }
@@ -170,7 +179,10 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     params.setScanFilters(getScanFilters())
                 }
                 //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                params.setOutOfMeshName(mesh.name)
+                if(isSupportInstallOldDevice){
+                    params.setMeshName(mesh.name)
+                    params.setOutOfMeshName(mesh.name)
+                }
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)
 

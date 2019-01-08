@@ -518,4 +518,6 @@
     <string name="please_select_light_type">请选灯类型</string>
     <string name="tip_change_gp_reset_scene">检测到分组改变,建议重新绑定场景</string>
     <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
+    <string name="install_old_device_tip">搜索已安装设备</string>
+    <string name="search_new_device">搜索新设备</string>
 </resources>

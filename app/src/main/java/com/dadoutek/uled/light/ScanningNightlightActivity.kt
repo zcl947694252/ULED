@@ -97,7 +97,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
         scanFilters.add(ScanFilter.Builder()
                 .setManufacturerData(Constant.VENDOR_ID,
-                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.LIGHT_LIGHT.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NIGHT_LIGHT.toByte()),
                         byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
                 .build())
         return scanFilters
@@ -293,7 +293,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
         connectDisposable?.dispose()
         scanDisposable?.dispose()
         progressBtn.progress = 100  //进度控件显示成完成状态
-        if (mDeviceInfo?.productUUID == DeviceType.LIGHT_LIGHT) {
+        if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
             startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!)
         }
     }
@@ -354,7 +354,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
         val MAX_RSSI = 81
         when (leScanEvent.args.productUUID) {
-            DeviceType.LIGHT_LIGHT -> {
+            DeviceType.NIGHT_LIGHT -> {
                 if(leScanEvent.args.rssi<MAX_RSSI){
                     scanDisposable?.dispose()
                     LeBluetooth.getInstance().stopScan()
