@@ -450,7 +450,8 @@ object DBUtils {
         val colorNodeNew = DbColorNode()
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
 
-        colorNodeNew.index=gradientId
+        colorNodeNew.belongDynamicModeId=gradientId
+        colorNodeNew.index=colorNode.index
         colorNodeNew.brightness=colorNode.brightness
         colorNodeNew.colorTemperature=colorNode.colorTemperature
         colorNodeNew.rgbw=colorNode.rgbw

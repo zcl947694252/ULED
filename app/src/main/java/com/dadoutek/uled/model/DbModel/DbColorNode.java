@@ -17,8 +17,9 @@ public class DbColorNode  implements Serializable{
 
     @Id(autoincrement = true)
     private Long id;
-    @NotNull
     private long index=0;
+    @NotNull
+    private long belongDynamicModeId=0;
     private int brightness=100;
     private int colorTemperature=0;
     private int rgbw=-1;
@@ -70,4 +71,11 @@ public class DbColorNode  implements Serializable{
         this.rgbw = rgbw;
     }
 
+    public long getBelongDynamicModeId() {
+        return belongDynamicModeId;
+    }
+
+    public void setBelongDynamicModeId(long belongDynamicModeId) {
+        this.belongDynamicModeId = belongDynamicModeId;
+    }
 }

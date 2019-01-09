@@ -95,19 +95,18 @@
                     android:textColor="@color/white" />
             </LinearLayout>
 
-            <com.skydoves.colorpickerview.ColorPickerView
+            <top.defaults.colorpicker.ColorPickerView
                 android:id="@+id/color_picker"
-                android:layout_width="match_parent"
-                android:layout_height="370dp"
+                android:layout_width="wrap_content"
+                android:layout_height="380dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:palette="@drawable/palette"
-                app:selector="@drawable/wheel" />
-
+                app:selector="@drawable/wheel"
+                app:enableBrightness="false"
+                />
 
             <LinearLayout
                 android:id="@+id/tip"

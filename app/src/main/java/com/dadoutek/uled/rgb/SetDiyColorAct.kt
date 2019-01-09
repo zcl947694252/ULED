@@ -141,15 +141,15 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             diyGradient?.speed=speed
 
             DBUtils.updateGradient(diyGradient!!)
-            val index = diyGradient?.getId()!!
-            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(index))
+            val belongDynamicModeId = diyGradient?.getId()!!
+            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(belongDynamicModeId))
 
             for(item in colorNodeList!!){
-                item.index=index
+                item.belongDynamicModeId=belongDynamicModeId
                 DBUtils.saveColorNode(item)
             }
 
-            deleteGradient(index)
+            deleteGradient(belongDynamicModeId)
             Thread.sleep(200)
             startSendCmdToAddDiyGradient(diyGradient!!)
             hideLoadingDialog()
@@ -176,9 +176,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             DBUtils.saveGradient(diyGradient!!, false)
 
-            val index = diyGradient!!.id
+            val belongDynamicModeId = diyGradient!!.id
             for(item in colorNodeList!!){
-                item.index=index
+                item.index=belongDynamicModeId
                 DBUtils.saveColorNode(item)
             }
 
@@ -337,18 +337,35 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             var colorNode = DbColorNode()
             when (i) {
                 0 -> {
+                    colorNode.index=0
                     colorNode.rgbw=0x00ff0000
                 }
                 1 -> {
+                    colorNode.index=1
                     colorNode.rgbw=0x0000ff00
                 }
                 2 -> {
+                    colorNode.index=2
                     colorNode.rgbw=0x000000ff
                 }
                 3 -> {
+                    colorNode.index=3
                     colorNode.rgbw=0x00ffffff
                 }
-                4,5,6,7->{
+                4 -> {
+                    colorNode.index=4
+                    colorNode.rgbw=-1
+                }
+                5 -> {
+                    colorNode.index=5
+                    colorNode.rgbw=-1
+                }
+                6 -> {
+                    colorNode.index=6
+                    colorNode.rgbw=-1
+                }
+                7 -> {
+                    colorNode.index=7
                     colorNode.rgbw=-1
                 }
             }

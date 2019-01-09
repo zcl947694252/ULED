@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
@@ -56,6 +57,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import top.defaults.colorpicker.ColorObserver
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -294,7 +296,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         sbBrightness!!.max = 100
 
-        color_picker!!.setColorListener(colorEnvelopeListener)
+        color_picker.reset()
+        color_picker.subscribe(colorObserver)
         color_picker!!.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
@@ -323,12 +326,20 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         tv_brightness_rgb!!.text = getString(R.string.device_setting_brightness, light!!.brightness.toString() + "")
 
         var w = ((light?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var r=Color.red(light?.color?:0)
+        var g=Color.green(light?.color?:0)
+        var b=Color.blue(light?.color?:0)
         if(w==-1){
             w=0
         }
+
+        color_r.text = r.toString()
+        color_g.text = g.toString()
+        color_b.text = b.toString()
+
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
-
+        color_picker.setInitialColor((light?.color?:0 and 0xffffff) or 0xff000000.toInt())
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
     }
@@ -505,6 +516,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         this.group = this.intent.extras!!.get("group") as DbGroup
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initViewGroup() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
@@ -515,11 +527,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }
         
         dynamic_rgb.setOnClickListener(this.clickListener)
-
-        this.color_picker!!.setOnTouchListener { v, _ ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
-            false
-        }
 
         btn_remove_group?.setOnClickListener(clickListener)
         btn_rename?.setOnClickListener(clickListener)
@@ -545,16 +552,29 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
 
         var w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var r=Color.red(group?.color?:0)
+        var g=Color.green(group?.color?:0)
+        var b=Color.blue(group?.color?:0)
         if(w==-1){
             w=0
         }
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
+        color_r.text = r.toString()
+        color_g.text = g.toString()
+        color_b.text = b.toString()
 
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
-        this.color_picker?.setColorListener(colorEnvelopeListener)
+        color_picker.reset()
+        color_picker.subscribe(colorObserver)
+        color_picker.setInitialColor((group?.color?:0 and 0xffffff) or 0xff000000.toInt())
+        color_picker!!.setOnTouchListener { v, _ ->
+//            v.parent.requestDisallowInterceptTouchEvent(true)
+            v.parent.parent.requestDisallowInterceptTouchEvent(true)
+            false
+        }
         checkGroupIsSystemGroup()
     }
 
@@ -566,6 +586,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
 
+        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
         val showBrightness=brightness
         var showW=w
         Thread {
@@ -824,21 +845,21 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }.start()
     }
 
-    private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
-        val argb = envelope.argb
-
-
-        color_r?.text = argb[1].toString()
-        color_g?.text = argb[2].toString()
-        color_b?.text = argb[3].toString()
+    private val colorObserver = ColorObserver { color, fromUser ->
+        val r = Color.red(color)
+        val g = Color.green(color)
+        val b = Color.blue(color)
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
         val w = sb_w_bright.progress
 
-        val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
-            if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+            if (r == 0 && g == 0 && b == 0) {
             } else {
                 Thread {
                     if(currentShowGroupSetPage){
@@ -847,11 +868,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                         light?.color=color
                     }
 
-                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
+                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
 
                 }.start()
             }
         }
+    }
+    
+    private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
+
     }
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
