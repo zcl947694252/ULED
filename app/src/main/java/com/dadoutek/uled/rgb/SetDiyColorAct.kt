@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.SeekBar
 import com.blankj.utilcode.util.ToastUtils
@@ -23,6 +24,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
+import kotlinx.android.synthetic.main.toolbar.*
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     var colorNodeList: ArrayList<DbColorNode>? = null
@@ -65,14 +67,27 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         sbSpeed.setOnSeekBarChangeListener(barChangeListener)
 
         if (isChange) {
+            toolbar.title = getString(R.string.update_gradient)
             editName.setText(diyGradient?.name)
             sbSpeed.progress= diyGradient?.speed!!
             tvSpeed.text = getString(R.string.speed_text, diyGradient?.speed!!)
         } else {
+            toolbar.title = getString(R.string.add_gradient)
             editName.setText(DBUtils.getDefaultModeName())
             sbSpeed.progress= 50
             tvSpeed.text = getString(R.string.speed_text, 50)
         }
+
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {

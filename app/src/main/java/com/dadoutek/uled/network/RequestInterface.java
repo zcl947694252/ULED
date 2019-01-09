@@ -195,7 +195,7 @@ public interface RequestInterface {
     //更新渐变
     @PUT("api/ext/soybean/dynamic-change/update/{did}")
     Observable<Response<String>> updateGradient(@Header("token") String token,
-                                             @Path("rid") int rid,
+                                             @Path("did") int did,
                                              @Body RequestBody body);
 
     //删除渐变

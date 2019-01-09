@@ -520,4 +520,6 @@
     <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
     <string name="install_old_device_tip">搜索已安装设备</string>
     <string name="search_new_device">搜索新设备</string>
+    <string name="update_gradient">修改渐变</string>
+    <string name="add_gradient">添加渐变</string>
 </resources>

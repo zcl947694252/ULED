@@ -365,7 +365,8 @@ object Commander : EventListener<String> {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         val gradientActionType= 0x01
         val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte())
+        val deleteType=0x01
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(),deleteType.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 

@@ -3,6 +3,7 @@ package com.dadoutek.uled.rgb
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
@@ -64,10 +65,18 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
             tv_brightness_w.text = getString(R.string.w_bright,50)
         }else{
             var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
+            var r=Color.red(colorNode?.rgbw!!)
+            var g=Color.green(colorNode?.rgbw!!)
+            var b=Color.blue(colorNode?.rgbw!!)
+
             sbBrightness.progress=colorNode!!.brightness
             sb_w_bright.progress=w
             tv_brightness_rgb.text = getString(R.string.device_setting_brightness,colorNode!!.brightness)
             tv_brightness_w.text = getString(R.string.w_bright,w)
+
+            color_r.text = r.toString()
+            color_g.text = g.toString()
+            color_b.text = b.toString()
         }
 
         btn_save.setOnClickListener(this)
@@ -98,16 +107,17 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
     private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
         val argb = envelope.argb
 
-
-        color_r?.text = argb[1].toString()
-        color_g?.text = argb[2].toString()
-        color_b?.text = argb[3].toString()
         val w = sb_w_bright.progress
 
         val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
+
+            color_r?.text = argb[1].toString()
+            color_g?.text = argb[2].toString()
+            color_b?.text = argb[3].toString()
+
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
             if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
             } else {
