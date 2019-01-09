@@ -25,6 +25,7 @@ import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
 import kotlinx.android.synthetic.main.toolbar.*
+import top.defaults.colorpicker.ColorObserver
 import java.util.ArrayList
 import javax.xml.transform.Result
 
@@ -49,8 +50,9 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        
-        color_picker!!.setColorListener(colorEnvelopeListener)
+
+        color_picker.reset()
+        color_picker.subscribe(colorObserver)
         color_picker!!.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
@@ -64,10 +66,12 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
             tv_brightness_rgb.text = getString(R.string.device_setting_brightness,50)
             tv_brightness_w.text = getString(R.string.w_bright,50)
         }else{
+
             var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
             var r=Color.red(colorNode?.rgbw!!)
             var g=Color.green(colorNode?.rgbw!!)
             var b=Color.blue(colorNode?.rgbw!!)
+            color_picker.setInitialColor((colorNode?.rgbw?:0 and 0xffffff) or 0xff000000.toInt())
 
             sbBrightness.progress=colorNode!!.brightness
             sb_w_bright.progress=w
@@ -104,27 +108,29 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         finish()
     }
 
-    private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
-        val argb = envelope.argb
+    private val colorObserver = ColorObserver { color, fromUser ->
+        val r = Color.red(color)
+        val g = Color.green(color)
+        val b = Color.blue(color)
 
         val w = sb_w_bright.progress
 
-        val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
 
-            color_r?.text = argb[1].toString()
-            color_g?.text = argb[2].toString()
-            color_b?.text = argb[3].toString()
+            color_r?.text = r.toString()
+            color_g?.text = g.toString()
+            color_b?.text = b.toString()
 
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
-            if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+            if (r == 0 && g == 0 && b == 0) {
             } else {
                 Thread {
                     colorNode!!.rgbw=color
 
-                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
+                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
 
                 }.start()
             }
