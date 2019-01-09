@@ -340,6 +340,7 @@ object Commander : EventListener<String> {
     fun closeGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
+        //关闭渐变
         val gradientActionType= 0x03
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
@@ -350,9 +351,24 @@ object Commander : EventListener<String> {
     fun applyGradient(dstAddr: Int,id: Int,speed: Int,firstAddress: Int,successCallback: (version: String?) -> Unit,
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
+        //开始内置渐变
         val gradientActionType= 0x02
         val params: ByteArray
             params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        for(i in 0..2){
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            Thread.sleep(50)
+        }
+    }
+
+    //加载自定义渐变
+    fun applyDiyGradient(dstAddr: Int,id: Int,speed: Int,firstAddress: Int,successCallback: (version: String?) -> Unit,
+                      failedCallback: () -> Unit){
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        //开始自定义渐变
+        val gradientActionType= 0x02
+        val params: ByteArray
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         for(i in 0..2){
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
@@ -363,8 +379,10 @@ object Commander : EventListener<String> {
     fun deleteGradient(dstAddr: Int,id: Int,successCallback: (version: String?) -> Unit,
                        failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
+        //删除渐变
         val gradientActionType= 0x01
         val params: ByteArray
+        //删除方式为删除索引
         val deleteType=0x01
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(),deleteType.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)

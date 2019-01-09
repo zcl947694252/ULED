@@ -224,7 +224,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         Thread {
             stopGradient()
             Thread.sleep(200)
-            Commander.applyGradient(dstAddress, diyGradientList!![position].id.toInt(),
+            Commander.applyDiyGradient(dstAddress, diyGradientList!![position].id.toInt(),
                     diyGradientList!![position].speed, firstLightAddress, successCallback = {}, failedCallback = {})
 
         }.start()

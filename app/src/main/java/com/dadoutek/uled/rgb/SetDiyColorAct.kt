@@ -3,6 +3,7 @@ package com.dadoutek.uled.rgb
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -230,7 +231,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     r = (item.rgbw and 0xff0000) shr 16
                     g = (item.rgbw and 0x00ff00) shr 8
                     b = (item.rgbw and 0x0000ff)
-                    w = item.rgbw shr 18
+                    w = Color.alpha(item.rgbw)
 
                     Thread.sleep(1000)
                     if(brightness > 99){
