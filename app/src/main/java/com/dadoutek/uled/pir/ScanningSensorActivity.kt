@@ -89,12 +89,14 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.onClick {
             mRetryConnectCount = 0
             isSupportInstallOldDevice=false
+            progressOldBtn.progress=0
             startScan()
         }
 
-        installOldDevice.onClick {
+        progressOldBtn.onClick {
             mRetryConnectCount = 0
             isSupportInstallOldDevice=true
+            progressBtn.progress=0
             startScan()
         }
     }
@@ -118,6 +120,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun startScan() {
+        LeBluetooth.getInstance().stopScan()
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
@@ -159,8 +162,13 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                 }.start()
 
                 LogUtils.d("pir开始扫描")
-                progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                if(isSupportInstallOldDevice){
+                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                }else{
+                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                }
             } else {
 
             }
@@ -183,6 +191,7 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     override fun onResume() {
         super.onResume()
         progressBtn.progress = 0
+        progressOldBtn.progress = 0
     }
 
     override fun onPause() {
@@ -260,8 +269,13 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
     private fun onLeScanTimeout() {
         LogUtils.d("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main){
-            progressBtn.progress = -1   //控件显示Error状态
-            progressBtn.text = getString(R.string.not_find_pir)
+            if(isSupportInstallOldDevice){
+                progressOldBtn.progress = -1   //控件显示Error状态
+                progressOldBtn.text = getString(R.string.not_find_pir)
+            }else{
+                progressBtn.progress = -1   //控件显示Error状态
+                progressBtn.text = getString(R.string.not_find_pir)
+            }
         }
     }
 
@@ -307,7 +321,12 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         scanDisposable?.dispose()
-        progressBtn.progress = 100  //进度控件显示成完成状态
+        if(isSupportInstallOldDevice){
+            progressOldBtn.progress = 100  //进度控件显示成完成状态
+        }else{
+            progressBtn.progress = 100  //进度控件显示成完成状态
+        }
+
         if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
             startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
         }else if(mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT){
@@ -321,8 +340,13 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
         TelinkLightService.Instance().idleMode(true)
 
         LogUtils.d("showConnectFailed")
-        progressBtn.progress = -1    //控件显示Error状态
-        progressBtn.text = getString(R.string.connect_failed)
+        if(isSupportInstallOldDevice){
+            progressOldBtn.progress = -1    //控件显示Error状态
+            progressOldBtn.text = getString(R.string.connect_failed)
+        }else{
+            progressBtn.progress = -1    //控件显示Error状态
+            progressBtn.text = getString(R.string.connect_failed)
+        }
     }
 
 
@@ -378,7 +402,12 @@ class ScanningSensorActivity : AppCompatActivity(), EventListener<String> {
                     LeBluetooth.getInstance().stopScan()
                     mDeviceInfo = leScanEvent.args
                     connect()
-                    progressBtn.text = getString(R.string.connecting)
+                    if(isSupportInstallOldDevice){
+                        progressOldBtn.text = getString(R.string.connecting)
+                    }else{
+                        progressBtn.text = getString(R.string.connecting)
+                    }
+
                 }else{
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }

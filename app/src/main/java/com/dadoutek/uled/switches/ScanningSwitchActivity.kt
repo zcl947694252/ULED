@@ -24,6 +24,7 @@ import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
@@ -126,12 +127,14 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=false
+            progressOldBtn.progress=0
             startScan()
         }
 
-        installOldDevice.onClick {
+        progressOldBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=true
+            progressBtn.progress=0
             startScan()
         }
     }
@@ -160,6 +163,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun startScan() {
+        LeBluetooth.getInstance().stopScan()
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
@@ -193,9 +197,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 startCheckRSSITimer()
                 TelinkLightService.Instance()?.startScan(params)
 
-                progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-
+                if(isSupportInstallOldDevice){
+                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                }else{
+                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                }
 //                scanDisposable?.dispose()
 //                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
 //                        .SECONDS)
@@ -265,6 +273,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     override fun onResume() {
         super.onResume()
         progressBtn.progress = 0
+        progressOldBtn.progress=0
     }
 
     override fun onPause() {
@@ -345,8 +354,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         LogUtils.d("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
-            progressBtn.progress = -1   //控件显示Error状态
-            progressBtn.text = getString(R.string.not_found_switch)
+            if(isSupportInstallOldDevice){
+                progressOldBtn.progress = -1   //控件显示Error状态
+                progressOldBtn.text = getString(R.string.not_found_switch)
+            }else{
+                progressBtn.progress = -1   //控件显示Error状态
+                progressBtn.text = getString(R.string.not_found_switch)
+            }
         }
     }
 
@@ -409,7 +423,12 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
 //        scanDisposable?.dispose()
-        progressBtn.progress = 100  //进度控件显示成完成状态
+        if(isSupportInstallOldDevice){
+            progressOldBtn.progress = 100  //进度控件显示成完成状态
+        }else{
+            progressBtn.progress = 100  //进度控件显示成完成状态
+        }
+
         if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                 bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
             startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
@@ -424,8 +443,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         TelinkLightService.Instance().idleMode(true)
 
         LogUtils.d("showConnectFailed")
-        progressBtn.progress = -1    //控件显示Error状态
-        progressBtn.text = getString(R.string.connect_failed)
+        if(isSupportInstallOldDevice){
+            progressOldBtn.progress = -1    //控件显示Error状态
+            progressOldBtn.text = getString(R.string.connect_failed)
+        }else{
+            progressBtn.progress = -1    //控件显示Error状态
+            progressBtn.text = getString(R.string.connect_failed)
+        }
     }
 
 
@@ -463,7 +487,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
-                            progressBtn.text = getString(R.string.connecting)
+                            if(isSupportInstallOldDevice){
+                                progressOldBtn.text = getString(R.string.connecting)
+                            }else{
+                                progressBtn.text = getString(R.string.connecting)
+                            }
                         }
                     } else {
                         //没有授予权限
