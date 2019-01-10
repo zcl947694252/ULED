@@ -522,4 +522,5 @@
     <string name="search_new_device">搜索新设备</string>
     <string name="update_gradient">修改渐变</string>
     <string name="add_gradient">添加渐变</string>
+    <string name="config_night_light_select_group">请至少选择一个分组</string>
 </resources>
