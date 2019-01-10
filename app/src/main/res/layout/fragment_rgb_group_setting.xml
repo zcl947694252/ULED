@@ -5,18 +5,21 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <ScrollView
-        android:id="@+id/scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/white"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
-        app:layout_constraintTop_toTopOf="parent">
+    <!--<ScrollView-->
+        <!--android:id="@+id/scroll_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:background="@color/white"-->
+        <!--android:scrollbars="none"-->
+        <!--app:layout_constraintBottom_toTopOf="@+id/bottomBar"-->
+        <!--app:layout_constraintTop_toTopOf="parent">-->
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+            app:layout_constraintTop_toTopOf="parent">
+            >
 
             <LinearLayout
                 android:id="@+id/ll_r"
@@ -95,19 +98,17 @@
                     android:textColor="@color/white" />
             </LinearLayout>
 
-            <top.defaults.colorpicker.ColorPickerView
-                android:id="@+id/color_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="380dp"
-                android:layout_marginTop="15dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:palette="@drawable/palette"
-                app:selector="@drawable/wheel"
-                app:enableBrightness="false"
-                />
-
+                <top.defaults.colorpicker.ColorPickerView
+                    android:id="@+id/color_picker"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:enableBrightness="false"
+                    android:gravity="center"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/tip"
+                    />
             <LinearLayout
                 android:id="@+id/tip"
                 android:layout_width="match_parent"
@@ -117,7 +118,7 @@
                 android:paddingEnd="15dp"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/color_picker">
+                app:layout_constraintBottom_toTopOf="@+id/brightness">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -143,7 +144,7 @@
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tip">
+                app:layout_constraintBottom_toTopOf="@+id/lightVersion">
 
                 <TextView
                     android:id="@+id/tv_brightness_rgb"
@@ -178,102 +179,20 @@
 
             </LinearLayout>
 
-            <!-- Color -->
-
-            <!--<View-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="1dp"-->
-            <!--android:layout_marginTop="2dp"-->
-            <!--android:layout_marginBottom="2dp"-->
-            <!--android:background="@color/border_line" />-->
-
-            <!-- Temperature -->
-
-            <!--<View-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="1dp"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--android:layout_marginBottom="10dp"-->
-            <!--android:background="@color/border_line" />-->
-
-            <LinearLayout
-                android:id="@+id/group_view_func_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/brightness">
-
-                <Button
-                    android:id="@+id/btn_remove_group"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/click_btn"
-                    android:text="@string/delete_group"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/btn_rename"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/click_btn"
-                    android:text="@string/rename_the_group"
-                    android:textColor="@android:color/white" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/light_view_bt_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/brightness">
-
-                <Button
-                    android:id="@+id/update_group"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/click_btn"
-                    android:text="@string/update_group"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/btn_remove"
-                    android:layout_width="0dp"
-                    android:layout_height="46dp"
-                    android:layout_margin="10dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/click_btn"
-                    android:text="@string/factory_reset"
-                    android:textColor="@android:color/white" />
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/lightVersion"
                 android:text="1.0.0"
                 android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/light_view_bt_layout"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="15dp"
                 android:visibility="gone"
                 />
 
         </android.support.constraint.ConstraintLayout>
-    </ScrollView>
+    <!--</ScrollView>-->
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/bottomBar"

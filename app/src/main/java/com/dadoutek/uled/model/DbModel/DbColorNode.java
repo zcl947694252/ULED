@@ -28,11 +28,12 @@ public class DbColorNode  implements Serializable{
     @Transient
     public int dstAddress=0;
 
-    @Generated(hash = 1603503987)
-    public DbColorNode(Long id, long index, int brightness, int colorTemperature,
-            int rgbw) {
+    @Generated(hash = 1039490734)
+    public DbColorNode(Long id, long index, long belongDynamicModeId,
+            int brightness, int colorTemperature, int rgbw) {
         this.id = id;
         this.index = index;
+        this.belongDynamicModeId = belongDynamicModeId;
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.rgbw = rgbw;

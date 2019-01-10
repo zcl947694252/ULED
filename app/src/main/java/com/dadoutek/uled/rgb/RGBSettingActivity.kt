@@ -13,10 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.View.OnClickListener
 import android.widget.*
 import com.blankj.utilcode.util.LogUtils
@@ -62,7 +59,8 @@ import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
+class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTouchListener {
+
     private var mApplication: TelinkLightApplication? = null
     private var stopTracking = false
     private var presetColors: MutableList<ItemColorPreset>? = null
@@ -227,8 +225,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val type=intent.getStringExtra(Constant.TYPE_VIEW)
         if(type==Constant.TYPE_GROUP){
             currentShowGroupSetPage=true
-            group_view_func_btn.visibility=View.GONE
-            light_view_bt_layout.visibility=View.GONE
             initToolbarGroup()
             initDataGroup()
             initViewGroup()
@@ -236,8 +232,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             this.mApp = this.application as TelinkLightApplication?
         }else{
             currentShowGroupSetPage=false
-            group_view_func_btn.visibility=View.GONE
-            light_view_bt_layout.visibility=View.GONE
             initToolbar()
             initView()
             getVersion()
@@ -287,9 +281,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
-        btn_rename!!.setOnClickListener(this.clickListener)
-        update_group!!.setOnClickListener(this.clickListener)
-        btn_remove!!.setOnClickListener(this.clickListener)
         dynamic_rgb!!.setOnClickListener(this.clickListener)
 
         mRxPermission = RxPermissions(this)
@@ -298,10 +289,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         color_picker.reset()
         color_picker.subscribe(colorObserver)
-        color_picker!!.setOnTouchListener { v, event ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
-            false
-        }
+        this.color_picker!!.setOnTouchListener(this)
 
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
 
@@ -321,7 +309,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
-        btn_rename!!.visibility = View.GONE
         sbBrightness!!.progress = light!!.brightness
         tv_brightness_rgb!!.text = getString(R.string.device_setting_brightness, light!!.brightness.toString() + "")
 
@@ -516,6 +503,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         this.group = this.intent.extras!!.get("group") as DbGroup
     }
 
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        v?.parent?.requestDisallowInterceptTouchEvent(true)
+        LogUtils.d("--------")
+        return false
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun initViewGroup() {
         if (group != null) {
@@ -525,11 +518,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                 toolbar.title = group?.name
             }
         }
-        
+
+        color_picker.isLongClickable=true
+        this.color_picker!!.setOnTouchListener(this)
+        color_picker.isEnabled=true
+
         dynamic_rgb.setOnClickListener(this.clickListener)
 
-        btn_remove_group?.setOnClickListener(clickListener)
-        btn_rename?.setOnClickListener(clickListener)
 //        dynamicRgb?.setOnClickListener(this)
 
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
@@ -570,11 +565,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         color_picker.reset()
         color_picker.subscribe(colorObserver)
         color_picker.setInitialColor((group?.color?:0 and 0xffffff) or 0xff000000.toInt())
-        color_picker!!.setOnTouchListener { v, _ ->
-//            v.parent.requestDisallowInterceptTouchEvent(true)
-            v.parent.parent.requestDisallowInterceptTouchEvent(true)
-            false
-        }
         checkGroupIsSystemGroup()
     }
 
@@ -921,8 +911,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr == 0xFFFF) {
-            btn_remove_group!!.visibility = View.GONE
-            btn_rename!!.visibility = View.GONE
+
         }
     }
 

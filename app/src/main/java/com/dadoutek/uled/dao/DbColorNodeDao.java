@@ -29,9 +29,10 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Index = new Property(1, long.class, "index", false, "INDEX");
-        public final static Property Brightness = new Property(2, int.class, "brightness", false, "BRIGHTNESS");
-        public final static Property ColorTemperature = new Property(3, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
-        public final static Property Rgbw = new Property(4, int.class, "rgbw", false, "RGBW");
+        public final static Property BelongDynamicModeId = new Property(2, long.class, "belongDynamicModeId", false, "BELONG_DYNAMIC_MODE_ID");
+        public final static Property Brightness = new Property(3, int.class, "brightness", false, "BRIGHTNESS");
+        public final static Property ColorTemperature = new Property(4, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
+        public final static Property Rgbw = new Property(5, int.class, "rgbw", false, "RGBW");
     }
 
     private Query<DbColorNode> dbDiyGradient_ColorNodesQuery;
@@ -50,9 +51,10 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"DB_COLOR_NODE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"INDEX\" INTEGER NOT NULL ," + // 1: index
-                "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 2: brightness
-                "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 3: colorTemperature
-                "\"RGBW\" INTEGER NOT NULL );"); // 4: rgbw
+                "\"BELONG_DYNAMIC_MODE_ID\" INTEGER NOT NULL ," + // 2: belongDynamicModeId
+                "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 3: brightness
+                "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 4: colorTemperature
+                "\"RGBW\" INTEGER NOT NULL );"); // 5: rgbw
     }
 
     /** Drops the underlying database table. */
@@ -70,9 +72,10 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getIndex());
-        stmt.bindLong(3, entity.getBrightness());
-        stmt.bindLong(4, entity.getColorTemperature());
-        stmt.bindLong(5, entity.getRgbw());
+        stmt.bindLong(3, entity.getBelongDynamicModeId());
+        stmt.bindLong(4, entity.getBrightness());
+        stmt.bindLong(5, entity.getColorTemperature());
+        stmt.bindLong(6, entity.getRgbw());
     }
 
     @Override
@@ -84,9 +87,10 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
             stmt.bindLong(1, id);
         }
         stmt.bindLong(2, entity.getIndex());
-        stmt.bindLong(3, entity.getBrightness());
-        stmt.bindLong(4, entity.getColorTemperature());
-        stmt.bindLong(5, entity.getRgbw());
+        stmt.bindLong(3, entity.getBelongDynamicModeId());
+        stmt.bindLong(4, entity.getBrightness());
+        stmt.bindLong(5, entity.getColorTemperature());
+        stmt.bindLong(6, entity.getRgbw());
     }
 
     @Override
@@ -99,9 +103,10 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
         DbColorNode entity = new DbColorNode( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.getLong(offset + 1), // index
-            cursor.getInt(offset + 2), // brightness
-            cursor.getInt(offset + 3), // colorTemperature
-            cursor.getInt(offset + 4) // rgbw
+            cursor.getLong(offset + 2), // belongDynamicModeId
+            cursor.getInt(offset + 3), // brightness
+            cursor.getInt(offset + 4), // colorTemperature
+            cursor.getInt(offset + 5) // rgbw
         );
         return entity;
     }
@@ -110,9 +115,10 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
     public void readEntity(Cursor cursor, DbColorNode entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setIndex(cursor.getLong(offset + 1));
-        entity.setBrightness(cursor.getInt(offset + 2));
-        entity.setColorTemperature(cursor.getInt(offset + 3));
-        entity.setRgbw(cursor.getInt(offset + 4));
+        entity.setBelongDynamicModeId(cursor.getLong(offset + 2));
+        entity.setBrightness(cursor.getInt(offset + 3));
+        entity.setColorTemperature(cursor.getInt(offset + 4));
+        entity.setRgbw(cursor.getInt(offset + 5));
      }
     
     @Override
