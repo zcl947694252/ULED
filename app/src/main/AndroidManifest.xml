@@ -210,6 +210,9 @@
         <activity
             android:name=".light.DeviceResetGroupActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".tellink.TelinkBaseActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

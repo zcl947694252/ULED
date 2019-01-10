@@ -29,6 +29,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.scene.SceneFragment
+import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
@@ -67,7 +68,7 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
+class MainActivity : TelinkBaseActivity(), EventListener<String>{
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
@@ -736,10 +737,6 @@ class MainActivity : TelinkMeshErrorDealActivity(), EventListener<String>{
                 productUUID == DeviceType.NORMAL_SWITCH2 ||
                 productUUID == DeviceType.SCENE_SWITCH ||
                 productUUID == DeviceType.SENSOR)
-    }
-
-    override fun onLocationEnable() {
-//        connect()
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
