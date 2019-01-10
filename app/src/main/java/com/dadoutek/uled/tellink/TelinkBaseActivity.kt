@@ -1,7 +1,9 @@
 package com.dadoutek.uled.tellink
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -14,12 +16,18 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.util.StringUtils
+import com.telink.bluetooth.LeBluetooth
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.design.indefiniteSnackbar
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import android.bluetooth.BluetoothAdapter
+
+
 
 open class TelinkBaseActivity : AppCompatActivity() {
 
@@ -34,6 +42,21 @@ open class TelinkBaseActivity : AppCompatActivity() {
         foreground = true
     }
 
+    override fun onStart() {
+        super.onStart()
+    }
+
+    //增加全局监听蓝牙开启状态
+    private fun showOpenBluetoothDialog(context: Context) {
+        val dialogTip=AlertDialog.Builder(context)
+        dialogTip.setMessage(R.string.openBluetooth)
+        dialogTip.setPositiveButton(android.R.string.ok) { dialog, which ->
+            LeBluetooth.getInstance().enable(applicationContext)
+        }
+        dialogTip.setCancelable(false)
+        dialogTip.create().show()
+    }
+
     override fun onPause() {
         super.onPause()
         foreground = false
@@ -43,6 +66,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         foreground = true
+        val blueadapter = BluetoothAdapter.getDefaultAdapter()
+        if (!blueadapter.isEnabled) {
+            showOpenBluetoothDialog(ActivityUtils.getTopActivity())
+        }
     }
 
     override fun onDestroy() {
