@@ -147,16 +147,16 @@ public class DbColorNodeDao extends AbstractDao<DbColorNode, Long> {
     }
     
     /** Internal query to resolve the "colorNodes" to-many relationship of DbDiyGradient. */
-    public List<DbColorNode> _queryDbDiyGradient_ColorNodes(long index) {
+    public List<DbColorNode> _queryDbDiyGradient_ColorNodes(long belongDynamicModeId) {
         synchronized (this) {
             if (dbDiyGradient_ColorNodesQuery == null) {
                 QueryBuilder<DbColorNode> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.Index.eq(null));
+                queryBuilder.where(Properties.BelongDynamicModeId.eq(null));
                 dbDiyGradient_ColorNodesQuery = queryBuilder.build();
             }
         }
         Query<DbColorNode> query = dbDiyGradient_ColorNodesQuery.forCurrentThread();
-        query.setParameter(0, index);
+        query.setParameter(0, belongDynamicModeId);
         return query.list();
     }
 
