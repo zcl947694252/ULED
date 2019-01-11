@@ -124,13 +124,6 @@ object Commander : EventListener<String> {
             var blue = color and 0x0000ff
             var w = color shr 24
 
-//            val minVal = 0x50.toByte()
-//            if (green and 0xff <= minVal)
-//                green = 0
-//            if (red and 0xff <= minVal)
-//                red = 0
-//            if (blue and 0xff <= minVal)
-//                blue = 0
             params = byteArrayOf(0x01, sceneId.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
             TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params)
         }
