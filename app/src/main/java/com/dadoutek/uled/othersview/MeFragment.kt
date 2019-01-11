@@ -281,6 +281,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         builder.setNegativeButton(R.string.normal_light) { dialog, which ->
             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,false)
             startActivityForResult(intent,Activity.RESULT_OK)
+            Log.d("","")
         }
         builder.create().show()
     }
