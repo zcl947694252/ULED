@@ -29,6 +29,9 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_light_light.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import java.util.regex.Pattern
 
@@ -370,7 +373,10 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             val mesh = mApplication.getMesh()
 
             if (showGroupList?.size != 0) {
-                showLoadingDialog(getString(R.string.configuring_switch))
+                GlobalScope.launch(Dispatchers.Main) {
+                    showLoadingDialog(getString(R.string.configuring_switch))
+                }
+
                 configLightlight()
                 Thread.sleep(300)
 
