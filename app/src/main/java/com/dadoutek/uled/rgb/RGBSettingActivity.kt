@@ -864,14 +864,14 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         val opcode = Opcode.SET_TEMPERATURE
 
-        val minVal = 0x50
-
-        if (green.toInt() and 0xff <= minVal)
-            green = 0
-        if (red.toInt() and 0xff <= minVal)
-            red = 0
-        if (blue.toInt() and 0xff <= minVal)
-            blue = 0
+//        val minVal = 0x50
+//
+//        if (green.toInt() and 0xff <= minVal)
+//            green = 0
+//        if (red.toInt() and 0xff <= minVal)
+//            red = 0
+//        if (blue.toInt() and 0xff <= minVal)
+//            blue = 0
 
         val params = byteArrayOf(0x04, red, green, blue)
 

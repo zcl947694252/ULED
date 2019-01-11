@@ -527,13 +527,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 var blue = color and 0x0000ff
                 var w = color shr 24
 
-                val minVal = 0x50.toByte()
-                if (green and 0xff <= minVal)
-                    green = 0
-                if (red and 0xff <= minVal)
-                    red = 0
-                if (blue and 0xff <= minVal)
-                    blue = 0
+//                val minVal = 0x50.toByte()
+//                if (green and 0xff <= minVal)
+//                    green = 0
+//                if (red and 0xff <= minVal)
+//                    red = 0
+//                if (blue and 0xff <= minVal)
+//                    blue = 0
 
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
@@ -626,13 +626,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             var blue = color and 0x0000ff
             var w = color shr 24
 
-            val minVal = 0x50.toByte()
-            if (green and 0xff <= minVal)
-                green = 0
-            if (red and 0xff <= minVal)
-                red = 0
-            if (blue and 0xff <= minVal)
-                blue = 0
+//            val minVal = 0x50.toByte()
+//            if (green and 0xff <= minVal)
+//                green = 0
+//            if (red and 0xff <= minVal)
+//                red = 0
+//            if (blue and 0xff <= minVal)
+//                blue = 0
 
             val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
             Log.d("RGBCOLOR", logStr)
