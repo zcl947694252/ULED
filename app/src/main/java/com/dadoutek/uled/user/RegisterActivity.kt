@@ -7,7 +7,6 @@ import android.widget.Toast
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
@@ -153,7 +152,11 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理验证成功的结果
-                        register()
+                        if(isChangePwd){
+                            startChange()
+                        }else{
+                            register()
+                        }
                     } else {
                         // TODO 处理错误的结果
 //                        ToastUtils.showLong(R.string.verification_code_error)
@@ -255,31 +258,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         } else {
             return true
         }
-    }
-
-    // 提交验证码，其中的code表示验证码，如“1357”
-    fun submitCode(country: String, phone: String, code: String): Boolean {
-        // 注册一个事件回调，用于处理提交验证码操作的结果
-        SMSSDK.registerEventHandler(object : EventHandler() {
-            override fun afterEvent(event: Int, result: Int, data: Any?) {
-                if (result == SMSSDK.RESULT_COMPLETE) {
-                    // TODO 处理验证成功的结果
-                    if(isChangePwd){
-                        startChange()
-                    }else{
-                        register()
-                    }
-                } else {
-                    // TODO 处理错误的结果
-                    ToastUtils.showLong(R.string.verification_code_error)
-                    hideLoadingDialog()
-                }
-
-            }
-        })
-        // 触发操作
-        SMSSDK.submitVerificationCode(country, phone, code)
-        return false
     }
 
     private fun getAccount() {
