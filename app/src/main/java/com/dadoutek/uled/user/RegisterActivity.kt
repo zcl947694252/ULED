@@ -4,6 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
@@ -69,6 +74,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
             dbUser=DbUser()
             register_completed.setText(R.string.btn_ok)
         }
+        SMSSDK.registerEventHandler(eventHandler)
     }
 
     private fun initToolbar() {
@@ -113,29 +119,53 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
-            sendCode(countryCode!!, phoneNum)
+            SMSSDK.getVerificationCode(countryCode, phoneNum)
         }
     }
 
-    // 请求验证码，其中country表示国家代码，如“86”；phone表示手机号码，如“13800138000”
-    fun sendCode(country: String, phone: String) {
-        timing()
-        // 注册一个事件回调，用于处理发送验证码操作的结果
-        SMSSDK.registerEventHandler(object : EventHandler() {
-            override fun afterEvent(event: Int, result: Int, data: Any?) {
-                if (result == SMSSDK.RESULT_COMPLETE) {
-                    // TODO 处理成功得到验证码的结果
-                    // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
-                    ToastUtils.showLong(R.string.send_message_success)
-                } else {
-                    // TODO 处理错误的结果
-                    ToastUtils.showLong(R.string.send_message_fail)
-                }
+    override fun onDestroy() {
+        super.onDestroy()
+        SMSSDK.unregisterEventHandler(eventHandler);
+    }
 
-            }
-        })
-        // 触发操作
-        SMSSDK.getVerificationCode(country, phone)
+    val eventHandler = object : EventHandler() {
+        override fun afterEvent(event: Int, result: Int, data: Any?) {
+            // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
+            val msg = Message()
+            msg.arg1 = event
+            msg.arg2 = result
+            msg.obj = data
+            Handler(Looper.getMainLooper(), Handler.Callback { msg ->
+                val event = msg.arg1
+                val result = msg.arg2
+                val data = msg.obj
+                if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
+                    if (result == SMSSDK.RESULT_COMPLETE) {
+                        // TODO 处理成功得到验证码的结果
+                        // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
+                        ToastUtils.showLong(R.string.send_message_success)
+                        timing()
+                    } else {
+                        // TODO 处理错误的结果
+                        val a=(data as Throwable)
+                        ToastUtils.showLong(a.localizedMessage)
+                    }
+                } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+                    if (result == SMSSDK.RESULT_COMPLETE) {
+                        // TODO 处理验证成功的结果
+                        register()
+                    } else {
+                        // TODO 处理错误的结果
+//                        ToastUtils.showLong(R.string.verification_code_error)
+                        val a=(data as Throwable)
+                        ToastUtils.showLong(a.localizedMessage)
+                        hideLoadingDialog()
+                    }
+                }
+                // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
+                false
+            }).sendMessage(msg)
+        }
     }
 
     private fun timing() {
@@ -313,5 +343,8 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observerUpdatePassword)
+    }
+    fun submitCode(country: String, phone: String, code: String){
+        SMSSDK.submitVerificationCode(country, phone, code)
     }
 }
