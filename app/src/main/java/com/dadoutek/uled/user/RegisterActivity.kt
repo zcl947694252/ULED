@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import butterknife.ButterKnife
 import cn.smssdk.EventHandler
@@ -30,6 +31,8 @@ import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.*
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.hbb20.CCPCountry.setDialogTitle
 import com.hbb20.CountryCodePicker
 import io.reactivex.Observable
@@ -39,6 +42,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_ota_update.view.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 /**
@@ -55,6 +59,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         setContentView(R.layout.activity_register)
         ButterKnife.bind(this)
         initView()
@@ -130,7 +135,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                     } else {
                         // TODO 处理错误的结果
                         val a=(data as Throwable)
-                        ToastUtils.showLong(a.localizedMessage)
+                        val jsonObject=JSONObject(a.localizedMessage)
+                        val message=jsonObject.opt("detail").toString()
+                        ToastUtils.showLong(message)
                     }
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
@@ -140,7 +147,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         // TODO 处理错误的结果
 //                        ToastUtils.showLong(R.string.verification_code_error)
                         val a=(data as Throwable)
-                        ToastUtils.showLong(a.localizedMessage)
+                        val jsonObject=JSONObject(a.localizedMessage)
+                        val message=jsonObject.opt("detail").toString()
+                        ToastUtils.showLong(message)
                         hideLoadingDialog()
                     }
                 }

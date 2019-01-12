@@ -429,11 +429,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun saveScene(){
         if (checked()) {
-            if(notCheckedGroupList?.size?:0>0){
-                showChangeOtherGroupCloseDialog()
-            }else{
+//            if(notCheckedGroupList?.size?:0>0){
+//                showChangeOtherGroupCloseDialog()
+//            }else{
                 saveAndFinish()
-            }
+//            }
         }
     }
 
