@@ -562,4 +562,5 @@
     <string name="install_old_device_tip">Search for installed devices</string>
     <string name="search_new_device">Search for new devices</string>
     <string name="config_night_light_select_group">Please select at least one group</string>
+    <string name="net_work_error">No network available</string>
 </resources>

@@ -85,19 +85,27 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.register_completed -> {
-                if (checkIsOK()) {
-                    if (Constant.TEST_REGISTER) {
-                        showLoadingDialog(getString(R.string.registing))
-                        register()
-                    } else {
-                        showLoadingDialog(getString(R.string.registing))
-                        submitCode(countryCode
-                                ?: "", userName!!, edit_verification.editText!!.text.toString().trim { it <= ' ' })
+                if(NetWorkUtils.isNetworkAvalible(this)){
+                    if (checkIsOK()) {
+                        if (Constant.TEST_REGISTER) {
+                            showLoadingDialog(getString(R.string.registing))
+                            register()
+                        } else {
+                            showLoadingDialog(getString(R.string.registing))
+                            submitCode(countryCode
+                                    ?: "", userName!!, edit_verification.editText!!.text.toString().trim { it <= ' ' })
+                        }
                     }
+                }else{
+                    ToastUtils.showLong(getString(R.string.net_work_error))
                 }
             }
             R.id.btn_send_verification ->
-                send_verification()
+                if(NetWorkUtils.isNetworkAvalible(this)){
+                    send_verification()
+                }else{
+                    ToastUtils.showLong(getString(R.string.net_work_error))
+                }
         }
     }
 
