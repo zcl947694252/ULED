@@ -2,15 +2,20 @@ package com.dadoutek.uled.scene
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.IBinder
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -31,7 +36,7 @@ import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
 
-class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
+class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var currentPageIsEdit=false
     private var scene: DbScene? = null
     private var isChangeScene = false
@@ -56,6 +61,54 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             edit_name.setText(DBUtils.getDefaultNewSceneName())
             initOnLayoutListener()
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (ev.action == MotionEvent.ACTION_DOWN) {
+            val v = currentFocus
+            if (isShouldHideKeyboard(v, ev)) {
+                val res = hideKeyboard(v.windowToken)
+                if (res) {
+                    //隐藏了输入法，则不再分发事件
+                    return true
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    /**
+     * 根据EditText所在坐标和用户点击的坐标相对比，来判断是否隐藏键盘，因为当用户点击EditText时则不能隐藏
+     *
+     * @param v
+     * @param event
+     * @return
+     */
+    private fun isShouldHideKeyboard(v: View?, event: MotionEvent): Boolean {
+        if (v != null && v is EditText) {
+            val l = intArrayOf(0, 0)
+            v.getLocationInWindow(l)
+            val left = l[0]
+            val top = l[1]
+            val bottom = top + v.height
+            val right = left + v.width
+            return !(event.x > left && event.x < right
+                    && event.y > top && event.y < bottom)
+        }
+        // 如果焦点不是EditText则忽略，这个发生在视图刚绘制完，第一个焦点不在EditText上，和用户用轨迹球选择其他的焦点
+        return false
+    }
+
+    /**
+     * 获取InputMethodManager，隐藏软键盘
+     * @param token
+     */
+    private fun hideKeyboard(token: IBinder?): Boolean {
+        if (token != null) {
+            val im = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            return im.hideSoftInputFromWindow(token, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+        return false
     }
 
     private fun initOnLayoutListener() {
