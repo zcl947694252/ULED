@@ -454,8 +454,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr == 0xFFFF) {
-            btn_remove_group!!.visibility = View.GONE
-            btn_rename!!.visibility = View.GONE
+            show_group_btn!!.visibility=View.GONE
         }
     }
 
@@ -654,7 +653,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             }
 
             val opcode: Byte
-            val params: ByteArray
+            var params: ByteArray
             if (view === sbBrightness) {
                 //                progress += 5;
                 //                Log.d(TAG, "onValueChange: "+progress);
@@ -666,8 +665,14 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 }else{
                     light?.brightness = progress
                 }
-                
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+
+                if(progress>98){
+                    params = byteArrayOf(98)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                }else{
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                }
+
                 if(isStopTracking){
                     if(currentShowPageGroup){
                         DBUtils.updateGroup(group!!)

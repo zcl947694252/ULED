@@ -66,10 +66,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         foreground = true
-        val blueadapter = BluetoothAdapter.getDefaultAdapter()
-        if (!blueadapter.isEnabled) {
-            showOpenBluetoothDialog(ActivityUtils.getTopActivity())
-        }
+//        val blueadapter = BluetoothAdapter.getDefaultAdapter()
+//        if (!blueadapter.isEnabled) {
+//            showOpenBluetoothDialog(ActivityUtils.getTopActivity())
+//        }
     }
 
     override fun onDestroy() {
