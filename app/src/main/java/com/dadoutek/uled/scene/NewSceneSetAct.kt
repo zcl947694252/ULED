@@ -398,19 +398,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
-//                else{
-//                    if(showCheckListData!![i].meshAddr!=0xffff){
-//                        val newItemGroup=ItemGroup()
-//                        newItemGroup.brightness=0
-//                        newItemGroup.temperature=0
-//                        newItemGroup.color=0xffffff
-//                        newItemGroup.checked=true
-//                        newItemGroup.enableCheck=true
-//                        newItemGroup.gpName=showCheckListData!![i].name
-//                        newItemGroup.groupAress=showCheckListData!![i].meshAddr
-//                        notCheckedGroupList!!.add(newItemGroup)
-//                    }
-//                }
             }
             showGroupList?.clear()
             showGroupList?.addAll(oldResultItemList)
