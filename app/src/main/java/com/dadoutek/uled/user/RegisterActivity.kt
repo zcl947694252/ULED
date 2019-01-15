@@ -2,7 +2,6 @@ package com.dadoutek.uled.user
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import android.os.Handler
 import android.os.Looper
@@ -34,7 +33,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.hbb20.CCPCountry.setDialogTitle
 import com.hbb20.CountryCodePicker
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -341,5 +339,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     }
     fun submitCode(country: String, phone: String, code: String){
         SMSSDK.submitVerificationCode(country, phone, code)
+    }
+    
+    private fun startChange() {
+        getAccount()
     }
 }
