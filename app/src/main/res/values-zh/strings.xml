@@ -509,4 +509,5 @@
     <string name="config_night_light_select_group">请至少选择一个分组</string>
     <string name="net_work_error">无可用网络</string>
     <string name="please_check_group_tip">请选择分组:</string>
+    <string name="tip_phone_ble_off">手机蓝牙关闭,升级失败</string>
 </resources>

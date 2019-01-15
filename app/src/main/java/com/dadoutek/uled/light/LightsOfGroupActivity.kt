@@ -504,8 +504,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-                indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
-                    LeBluetooth.getInstance().enable(applicationContext)
+                GlobalScope.launch(Dispatchers.Main) {
+                    indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
+                        LeBluetooth.getInstance().enable(applicationContext)
+                    }
                 }
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
