@@ -135,20 +135,16 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         //添加分割线
         recyclerView_select_group_list_view.addItemDecoration(decoration)
         nightLightEditGroupAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
-        nightLightEditGroupAdapter?.onItemChildClickListener = onItemChildClickListenerCheck
+        nightLightEditGroupAdapter?.onItemClickListener = onItemClickListenerCheck
     }
 
-    internal var onItemChildClickListenerCheck: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        when (view.id) {
-            R.id.group_check_state -> {
+    internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
                 val item = showCheckListData!!.get(position)
                 if (item.enableCheck) {
                     showCheckListData!!.get(position).checked = !item.checked
                     changeCheckedViewData()
                     adapter?.notifyDataSetChanged()
                 }
-            }
-        }
     }
 
     private fun changeCheckedViewData() {

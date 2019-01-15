@@ -2,9 +2,12 @@ package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -196,11 +199,55 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     };
 
+    private BroadcastReceiver mReceiver = new  BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                        String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED .equals(action) ) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+
+                switch (state) {
+                    case BluetoothAdapter.STATE_ON:{
+                        log("蓝牙打开");
+                        TelinkLightService.Instance().idleMode(true);
+                    }
+                    case BluetoothAdapter.STATE_OFF:{
+                        log("蓝牙关闭");
+                        ToastUtils.showLong(R.string.tip_phone_ble_off);
+                        TelinkLightService.Instance().idleMode(true);
+                        showUpdateFailView();
+                    }
+                }
+            }
+        }
+//        override fun onReceive(context: Context, intent: Intent) {
+//            val action = intent.action
+//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
+//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
+//
+//                when (state) {
+//                    BluetoothAdapter.STATE_ON -> {
+//                        TelinkLightService.Instance().idleMode(true)
+//                        retryConnectCount = 0
+//                        startScan()
+//                    }
+//                    BluetoothAdapter.STATE_OFF -> {
+//
+//                    }
+//                }
+//            }
+//        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_update);
         ButterKnife.bind(this);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
+        registerReceiver(mReceiver, filter);
         mesh = TelinkLightApplication.getApp().getMesh();
         if (mesh == null || TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
             toast("Mesh Error!");
@@ -296,7 +343,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     @Override
     protected void onLocationEnable() {
-        startScan();
+//        startScan();
     }
 
     private void addEventListener() {
@@ -508,6 +555,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     protected void onDestroy() {
         super.onDestroy();
         TelinkLog.i("OTAUpdate#onStop#removeEventListener");
+        unregisterReceiver(mReceiver);
         TelinkLightApplication.getApp().removeEventListener(this);
         if (this.delayHandler != null) {
             this.delayHandler.removeCallbacksAndMessages(null);
@@ -704,6 +752,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         List<ScanFilter> scanFilters = new ArrayList<>();
         ScanFilter scanFilter = new ScanFilter.Builder()
                 .setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount())
+                .setDeviceAddress(dbLight.getMacAddr())
                 .build();
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
@@ -838,7 +887,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             btn_start_update.setClickable(false);
             mode = MODE_IDLE;
             TelinkLightApplication.getApp().removeEventListener(this);
-            addEventListener();
+            stopScanTimer();
+            LeBluetooth.getInstance().stopScan();
+            stopConnectTimer();
+//            addEventListener();
         });
     }
 

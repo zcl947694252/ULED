@@ -33,18 +33,18 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TelinkLightService.Instance().idleMode(true);
-        setContentView(R.layout.activity_ota_device_list);
-        mApp = (TelinkLightApplication) this.getApplication();
-        mDevices = DBUtils.INSTANCE.getAllLight();
-        normal();
-        mDeviceAdapter = new DeviceListAdapter();
-        mDeviceListView = (GridView) findViewById(R.id.devices);
-        mDeviceListView.setAdapter(mDeviceAdapter);
-        mDeviceListView.setOnItemClickListener(this);
-
-        mNext = (Button) findViewById(R.id.next);
-        mNext.setOnClickListener(this);
+//        TelinkLightService.Instance().idleMode(true);
+//        setContentView(R.layout.activity_ota_device_list);
+//        mApp = (TelinkLightApplication) this.getApplication();
+//        mDevices = DBUtils.INSTANCE.getAllLight();
+//        normal();
+//        mDeviceAdapter = new DeviceListAdapter();
+//        mDeviceListView = (GridView) findViewById(R.id.devices);
+//        mDeviceListView.setAdapter(mDeviceAdapter);
+//        mDeviceListView.setOnItemClickListener(this);
+//
+//        mNext = (Button) findViewById(R.id.next);
+//        mNext.setOnClickListener(this);
     }
 
     @Override

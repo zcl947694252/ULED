@@ -8,6 +8,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.ItemGroup
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
@@ -64,15 +65,12 @@ class SceneGroupAdapter
             if (fromUser) {
                 val address = data[position].groupAress
                 val opcode: Byte
-                val params: ByteArray
                 if (seekBar.id == R.id.sbBrightness) {
-                    opcode = 0xD2.toByte()
-                    params = byteArrayOf(progress.toByte())
-                    Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
+                    opcode = Opcode.SET_LUM
+                    Thread { sendCmd(opcode, address, progress) }.start()
                 } else if (seekBar.id == R.id.sbTemperature) {
-                    opcode = 0xE2.toByte()
-                    params = byteArrayOf(0x05, progress.toByte())
-                    Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
+                    opcode = Opcode.SET_TEMPERATURE
+                    Thread { sendCmd(opcode, address, progress) }.start()
                 }
             }
             this.preTime = currentTime
@@ -87,20 +85,17 @@ class SceneGroupAdapter
         val pos = seekBar.tag as Int
         val address = data[pos].groupAress
         val opcode: Byte
-        val params: ByteArray
         val itemGroup = data[pos]
         if (seekBar.id == R.id.sbBrightness) {
             (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.tvBrightness)) as TextView).text = seekBar.progress.toString() + "%"
             itemGroup.brightness = seekBar.progress
-            opcode = 0xD2.toByte()
-            params = byteArrayOf(seekBar.progress.toByte())
-            Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
+            opcode = Opcode.SET_LUM
+            Thread { sendCmd(opcode, address, seekBar.progress) }.start()
         } else if (seekBar.id == R.id.sbTemperature) {
             (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.tvTemperature)) as TextView).text = seekBar.progress.toString() + "%"
             itemGroup.temperature = seekBar.progress
-            opcode = 0xE2.toByte()
-            params = byteArrayOf(0x05, seekBar.progress.toByte())
-            Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params) }.start()
+            opcode = Opcode.SET_TEMPERATURE
+            Thread { sendCmd(opcode, address, seekBar.progress) }.start()
         }
         notifyItemChanged(seekBar.tag as Int)
     }
@@ -117,5 +112,19 @@ class SceneGroupAdapter
                 tvTemperature?.text = progress.toString() + "%"
             }
         }
+    }
+
+    fun sendCmd(opcode: Byte, address: Int, progress: Int) {
+        var progressCmd=progress
+        if(progress>98){
+            progressCmd=98
+        }
+        var params: ByteArray
+        if(opcode==Opcode.SET_TEMPERATURE){
+            params = byteArrayOf(0x05, progressCmd.toByte())
+        }else{
+            params = byteArrayOf(progressCmd.toByte())
+        }
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
     }
 }

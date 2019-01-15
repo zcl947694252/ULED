@@ -16,6 +16,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 
 import com.telink.util.ContextUtil;
 
@@ -209,13 +210,16 @@ public final class LeBluetooth {
                 if (mCallback != null)
                     mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
             } else {
-                ScanSettings scanSettings = new ScanSettings.Builder()
-//                        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-//                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-//                        .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE)
-//                                .setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT)
-//                                .setNumOfMatches()
-                        .build();
+                ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
+                if(Build.VERSION.SDK_INT >= 23)
+                {
+//                    scanSettingsBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
+                    scanSettingsBuilder .setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
+                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
+                }
+                scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+//                                .setNumOfMatches(5)
+                ScanSettings scanSettings=scanSettingsBuilder.build();
 //                mScanner.startScan(mScanCallback);
                 mScanner.startScan(scanFilters, scanSettings, mScanCallback);
                 synchronized (this) {

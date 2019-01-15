@@ -188,7 +188,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-        this.light = this.intent.extras!!.get("light") as DbLight
+        this.light = this.intent.extras?.get("light") as DbLight
         this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
         groupsInit = ArrayList()
 

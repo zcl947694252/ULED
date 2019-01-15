@@ -200,7 +200,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             resetAllGroup.visibility=View.GONE
         }
 
-        userIcon!!.setBackgroundResource(R.drawable.ic_launcher)
+        userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
         userName!!.text = DBUtils.lastUser!!.phone
     }
 

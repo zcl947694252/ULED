@@ -1464,16 +1464,18 @@ public final class LightController extends EventBus<Integer> implements LightPer
         private int progress;
 
         public void set(byte[] data) {
-            this.clear();
+            if(data!=null){
+                this.clear();
 
-            this.data = data;
-            int length = this.data.length;
-            int size = 16;
+                this.data = data;
+                int length = this.data.length;
+                int size = 16;
 
-            if (length % size == 0) {
-                total = length / size;
-            } else {
-                total = (int) Math.floor(length / size + 1);
+                if (length % size == 0) {
+                    total = length / size;
+                } else {
+                    total = (int) Math.floor(length / size + 1);
+                }
             }
         }
 
