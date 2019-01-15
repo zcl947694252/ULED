@@ -233,7 +233,7 @@ public class Peripheral extends BluetoothGattCallback {
      *******************************************************************************/
 
     protected void onConnect() {
-        //this.requestConnectionPriority(CONNECTION_PRIORITY_BALANCED);
+        this.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
         this.enableMonitorRssi(this.monitorRssi);
     }
 
@@ -871,6 +871,8 @@ public class Peripheral extends BluetoothGattCallback {
     @Override
     public void onServicesDiscovered(BluetoothGatt gatt, int status) {
         super.onServicesDiscovered(gatt, status);
+
+//        gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
             List<BluetoothGattService> services = gatt.getServices();
