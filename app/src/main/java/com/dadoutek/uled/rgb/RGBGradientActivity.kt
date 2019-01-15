@@ -262,7 +262,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     fun deleteGradient(position: Int, adapter: BaseQuickAdapter<Any, BaseViewHolder>, dialog: DialogInterface) {
         startDeleteGradientCmd(diyGradientList!![position].id)
         DBUtils.deleteGradient(diyGradientList!![position])
-        DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(diyGradientList!![position].id!!))
+        DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![position].id!!))
         adapter.remove(position)
         dialog.dismiss()
     }

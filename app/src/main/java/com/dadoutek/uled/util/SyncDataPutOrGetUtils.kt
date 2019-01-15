@@ -213,7 +213,7 @@ class SyncDataPutOrGetUtils {
                         body.type = gradient.type
                         body.speed = gradient.speed
                         body.belongRegionId = gradient.belongRegionId
-                        body.colorNodes = DBUtils.getColorNodeListByIndex(changeId)
+                        body.colorNodes = DBUtils.getColorNodeListByDynamicModeId(changeId)
 
                         postInfoStr = gson.toJson(body)
 
@@ -222,7 +222,7 @@ class SyncDataPutOrGetUtils {
 
                     when (type) {
                         Constant.DB_ADD -> {
-                            val node = DBUtils.getColorNodeListByIndex(changeId)
+                            val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
                             LogUtils.d("scene_add--id=="+changeId)
                             if(bodyGradient!=null){
                                 return GradientModel.add(token, bodyGradient

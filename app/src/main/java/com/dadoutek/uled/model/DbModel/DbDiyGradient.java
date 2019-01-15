@@ -27,7 +27,7 @@ public class DbDiyGradient implements Parcelable {
 
     private Long belongRegionId;
 
-    @ToMany(referencedJoinProperty = "belongDynamicModeId")
+    @ToMany(referencedJoinProperty = "belongDynamicChangeId")
     private List<DbColorNode> colorNodes;
 
     protected DbDiyGradient(Parcel in) {

@@ -3,7 +3,6 @@ package com.dadoutek.uled.model.DbModel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import com.blankj.utilcode.util.LogUtils
 
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -13,9 +12,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.SharedPreferencesUtils
-
-import org.greenrobot.greendao.query.Query
-import org.greenrobot.greendao.query.QueryBuilder
 
 import java.util.ArrayList
 
@@ -188,8 +184,8 @@ object DBUtils {
         return null
     }
     
-    fun getColorNodeListByIndex(id: Long): ArrayList<DbColorNode> {
-        val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.Index.eq(id)).build()
+    fun getColorNodeListByDynamicModeId(id: Long): ArrayList<DbColorNode> {
+        val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.BelongDynamicChangeId.eq(id)).build()
         return ArrayList(query.list())
     }
 
@@ -450,7 +446,7 @@ object DBUtils {
         val colorNodeNew = DbColorNode()
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
 
-        colorNodeNew.belongDynamicModeId=gradientId
+        colorNodeNew.belongDynamicChangeId =gradientId
         colorNodeNew.index=colorNode.index
         colorNodeNew.brightness=colorNode.brightness
         colorNodeNew.colorTemperature=colorNode.colorTemperature

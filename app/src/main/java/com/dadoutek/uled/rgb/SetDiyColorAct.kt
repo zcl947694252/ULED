@@ -19,9 +19,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
@@ -48,7 +46,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
         if (isChange) {
             diyGradient = intent.getParcelableExtra(Constant.GRADIENT_KEY) as? DbDiyGradient
-            colorNodeList = DBUtils.getColorNodeListByIndex(diyGradient!!.id)
+            colorNodeList = DBUtils.getColorNodeListByDynamicModeId(diyGradient!!.id)
         } else {
             creatNewData()
         }
@@ -141,11 +139,11 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             diyGradient?.speed=speed
 
             DBUtils.updateGradient(diyGradient!!)
-            val belongDynamicModeId = diyGradient?.getId()!!
-            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByIndex(belongDynamicModeId))
+            val belongDynamicModeId = diyGradient?.id!!
+            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(belongDynamicModeId))
 
             for(item in colorNodeList!!){
-                item.belongDynamicModeId=belongDynamicModeId
+                item.belongDynamicChangeId =belongDynamicModeId
                 DBUtils.saveColorNode(item)
             }
 
@@ -178,7 +176,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             val belongDynamicModeId = diyGradient!!.id
             for(item in colorNodeList!!){
-                item.index=belongDynamicModeId
+                item.belongDynamicChangeId =belongDynamicModeId
                 DBUtils.saveColorNode(item)
             }
 

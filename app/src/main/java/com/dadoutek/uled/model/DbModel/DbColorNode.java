@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.Serializable;
 import org.greenrobot.greendao.annotation.Generated;
@@ -18,7 +17,7 @@ public class DbColorNode  implements Serializable{
     @Id(autoincrement = true)
     private Long id;
     private long index=0;
-    private long belongDynamicModeId=0;
+    private long belongDynamicChangeId =0;
     private int brightness=100;
     private int colorTemperature=0;
     private int rgbw=-1;
@@ -27,55 +26,99 @@ public class DbColorNode  implements Serializable{
     @Transient
     public int dstAddress=0;
 
-    @Generated(hash = 1039490734)
-    public DbColorNode(Long id, long index, long belongDynamicModeId,
-            int brightness, int colorTemperature, int rgbw) {
+    public DbColorNode() {
+    }
+
+    public DbColorNode(Long id, long index, long belongDynamicChangeId, int brightness, int colorTemperature, int rgbw, int dstAddress) {
         this.id = id;
         this.index = index;
-        this.belongDynamicModeId = belongDynamicModeId;
+        this.belongDynamicChangeId = belongDynamicChangeId;
+        this.brightness = brightness;
+        this.colorTemperature = colorTemperature;
+        this.rgbw = rgbw;
+        this.dstAddress = dstAddress;
+    }
+
+    @Generated(hash = 631372582)
+    public DbColorNode(Long id, long index, long belongDynamicChangeId, int brightness, int colorTemperature, int rgbw) {
+        this.id = id;
+        this.index = index;
+        this.belongDynamicChangeId = belongDynamicChangeId;
         this.brightness = brightness;
         this.colorTemperature = colorTemperature;
         this.rgbw = rgbw;
     }
-    @Generated(hash = 1783393701)
-    public DbColorNode() {
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
+
     public Long getId() {
-        return this.id;
+        return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public long getIndex() {
-        return this.index;
+        return index;
     }
+
     public void setIndex(long index) {
         this.index = index;
     }
-    public int getBrightness() {
-        return this.brightness;
+
+    public long getBelongDynamicChangeId() {
+        return belongDynamicChangeId;
     }
+
+    public void setBelongDynamicChangeId(long belongDynamicChangeId) {
+        this.belongDynamicChangeId = belongDynamicChangeId;
+    }
+
+    public int getBrightness() {
+        return brightness;
+    }
+
     public void setBrightness(int brightness) {
         this.brightness = brightness;
     }
+
     public int getColorTemperature() {
-        return this.colorTemperature;
+        return colorTemperature;
     }
+
     public void setColorTemperature(int colorTemperature) {
         this.colorTemperature = colorTemperature;
     }
+
     public int getRgbw() {
-        return this.rgbw;
+        return rgbw;
     }
+
     public void setRgbw(int rgbw) {
         this.rgbw = rgbw;
     }
 
-    public long getBelongDynamicModeId() {
-        return belongDynamicModeId;
+    public int getDstAddress() {
+        return dstAddress;
     }
 
-    public void setBelongDynamicModeId(long belongDynamicModeId) {
-        this.belongDynamicModeId = belongDynamicModeId;
+    public void setDstAddress(int dstAddress) {
+        this.dstAddress = dstAddress;
+    }
+
+    @Override
+    public String toString() {
+        return "DbColorNode{" +
+                "id=" + id +
+                ", index=" + index +
+                ", belongDynamicChangeId=" + belongDynamicChangeId +
+                ", brightness=" + brightness +
+                ", colorTemperature=" + colorTemperature +
+                ", rgbw=" + rgbw +
+                ", dstAddress=" + dstAddress +
+                '}';
     }
 }
