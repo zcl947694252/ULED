@@ -7,8 +7,8 @@ apply plugin: 'com.mob.sdk'
 
 // 在MobSDK的扩展中注册SMSSDK的相关信息
 MobSDK {
-    appKey "25cf78c05e01c"
-    appSecret "2a92040882a1b70888d4290aeb6e09c7"
+    appKey "260b846a2a8f8"
+    appSecret "886a329e066cc1fba6db79e0d5a299bf"
 
     permissions{
 //        去掉无用的权限
@@ -18,7 +18,7 @@ MobSDK {
                 "android.permission.READ_CONTACTS",
                 "android.permission.RECEIVE_SMS"
     }
-    SMSSDK {             version "3.2.1"                 }
+    SMSSDK {             version "3.3.0"                 }
 }
 
 android {

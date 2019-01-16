@@ -67,7 +67,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         super.onResume()
         foreground = true
         val blueadapter = BluetoothAdapter.getDefaultAdapter()
-        if (!blueadapter.isEnabled) {
+        if (blueadapter?.isEnabled == false) {
             showOpenBluetoothDialog(ActivityUtils.getTopActivity())
         }
     }
