@@ -18,7 +18,7 @@ MobSDK {
                 "android.permission.READ_CONTACTS",
                 "android.permission.RECEIVE_SMS"
     }
-    SMSSDK {             version "3.3.0"                 }
+    SMSSDK {             version "3.2.1"                 }
 }
 
 android {
