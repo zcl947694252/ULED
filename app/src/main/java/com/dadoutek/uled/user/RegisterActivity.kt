@@ -142,10 +142,16 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         timing()
                     } else {
                         // TODO 处理错误的结果
-                        val a=(data as Throwable)
-                        val jsonObject=JSONObject(a.localizedMessage)
-                        val message=jsonObject.opt("detail").toString()
-                        ToastUtils.showLong(message)
+                        if(result == SMSSDK.RESULT_ERROR){
+                            val a=(data as Throwable)
+                            val jsonObject=JSONObject(a.localizedMessage)
+                            val message=jsonObject.opt("detail").toString()
+                            ToastUtils.showLong(message)
+                        }else{
+                            val a=(data as Throwable)
+                            a.printStackTrace()
+                            ToastUtils.showLong(a.message)
+                        }
                     }
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
@@ -153,12 +159,17 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         register()
                     } else {
                         // TODO 处理错误的结果
-//                        ToastUtils.showLong(R.string.verification_code_error)
-                        val a=(data as Throwable)
-                        val jsonObject=JSONObject(a.localizedMessage)
-                        val message=jsonObject.opt("detail").toString()
-                        ToastUtils.showLong(message)
-                        hideLoadingDialog()
+                        if(result == SMSSDK.RESULT_ERROR){
+                            val a=(data as Throwable)
+                            val jsonObject=JSONObject(a.localizedMessage)
+                            val message=jsonObject.opt("detail").toString()
+                            ToastUtils.showLong(message)
+                            hideLoadingDialog()
+                        }else{
+                            val a=(data as Throwable)
+                            a.printStackTrace()
+                            ToastUtils.showLong(a.message)
+                        }
                     }
                 }
                 // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
@@ -225,7 +236,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:" + msg)
+            LogUtils.d("GetDataError:$msg")
         }
 
     }
