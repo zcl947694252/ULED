@@ -267,7 +267,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
         autoConnect()
     }
 
-    fun autoConnect() {
+    public fun autoConnect() {
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
             Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()

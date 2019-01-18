@@ -238,7 +238,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     private fun initToolbar() {
         toolbar.title = getString(R.string.night_light_title)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener { doFinish() }
 
     }
 

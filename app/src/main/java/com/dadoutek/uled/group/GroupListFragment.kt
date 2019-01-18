@@ -47,6 +47,7 @@ import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -72,6 +73,7 @@ class GroupListFragment : BaseFragment() {
     //是否正在引导
     private var isGuide = false
     var firstShowGuide = true
+    private var isFristUserClickCheckConnect=true
     private var guideShowCurrentPage = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +97,7 @@ class GroupListFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        isFristUserClickCheckConnect=true
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -123,6 +126,7 @@ class GroupListFragment : BaseFragment() {
 
     override fun onStop() {
         super.onStop()
+        isFristUserClickCheckConnect=false
     }
 
     private fun getView(inflater: LayoutInflater): View {
@@ -208,6 +212,7 @@ class GroupListFragment : BaseFragment() {
 
             if (TelinkLightApplication.getInstance().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                checkConnect()
             } else {
                 when (view.getId()) {
                     R.id.btn_on -> {
@@ -266,6 +271,20 @@ class GroupListFragment : BaseFragment() {
             R.id.install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
             R.id.install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
             R.id.install_light_light -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
+        }
+    }
+
+    private fun checkConnect() {
+        try {
+            if(TelinkLightApplication.getInstance().connectDevice==null){
+                if(isFristUserClickCheckConnect){
+                    val activity=activity as MainActivity
+                    activity.autoConnect()
+                    isFristUserClickCheckConnect=false
+                }
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
         }
     }
 

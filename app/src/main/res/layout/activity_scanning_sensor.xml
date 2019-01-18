@@ -20,7 +20,7 @@
         android:id="@+id/tvHint1"
         android:layout_width="320dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="50dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="@string/install_sensor_tips1"
@@ -29,7 +29,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/include"
         app:layout_constraintVertical_bias="0.8" />
 
 
@@ -43,10 +42,8 @@
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/include"
-        app:layout_constraintVertical_bias="0.627"
         app:pb_colorComplete="@color/green_complete"
         app:pb_colorError="@color/red_error"
         app:pb_colorNormal="@color/primary"

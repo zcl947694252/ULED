@@ -53,9 +53,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private var MD5PassWord: String? = null
     private var countryCode: String? = null
     private val mCompositeDisposable = CompositeDisposable()
-    private val TIME_INTERVAL: Long = 60
     private var isChangePwd=false
     private var dbUser: DbUser? = null
+    private val TIME_INTERVAL: Long = 30
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -202,7 +202,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    val num = 59 - it as Long
+                    val num = 29 - it as Long
                     if (num == 0L) {
                         btn_send_verification.text = resources.getString(R.string.reget)
                         btn_send_verification.isEnabled = true
