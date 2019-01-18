@@ -151,9 +151,9 @@
             android:name=".light.LightsOfGroupActivity"
             android:screenOrientation="portrait"
             />
-        <activity
-            android:name=".scene.SetSceneAct"
-            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".scene.SetSceneAct"-->
+            <!--android:screenOrientation="portrait" />-->
         <activity
             android:name=".switches.ConfigSceneSwitchActivity"
             android:screenOrientation="portrait" />
@@ -195,9 +195,9 @@
         <activity
             android:name=".rgb.RGBSettingActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".rgb.SelectColorActivity"
-            android:screenOrientation="portrait" />
+        <!--<activity-->
+            <!--android:name=".rgb.SelectColorActivity"-->
+            <!--android:screenOrientation="portrait" />-->
         <activity
             android:name=".rgb.RGBGradientActivity"
             android:screenOrientation="portrait" />
@@ -220,6 +220,7 @@
         <activity
             android:name=".rgb.SelectColorGradientAct"
             android:screenOrientation="portrait" />
+        <activity
             android:name=".light.DeviceResetGroupActivity"
             android:screenOrientation="portrait" />
         <activity
