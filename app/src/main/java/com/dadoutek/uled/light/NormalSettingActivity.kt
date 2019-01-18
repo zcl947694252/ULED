@@ -524,6 +524,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
+        //设置光标默认在最后
         editTitle.setSelection(editTitle.getText().toString().length)
 //        btn_sure_edit_rename.visibility = View.VISIBLE
 //        btn_sure_edit_rename.setOnClickListener {
