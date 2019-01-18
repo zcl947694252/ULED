@@ -320,15 +320,15 @@
     <string name="by_info_reset">了解详情</string>
     <string name="by_light_reset_title">物理恢复</string>
     <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
-    <string name="question_1">1.如何恢复出厂设置？</string>
+    <string name="question_1">2.如何恢复出厂设置？</string>
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
     <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源1秒，断开电源6s，重复约5-6次，直至灯闪烁。
         开关：接上电源，同时按住开关4个按键中的左上按键与右下按键。期间蓝灯会常亮。
         传感器：接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="common_question">常见问题</string>
-    <string name="question_2">2.部分华为手机存在蓝牙不稳定</string>
+    <string name="question_2">3.部分华为手机存在蓝牙不稳定</string>
     <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
-    <string name="question_3">3.无法控制，连接不上</string>
+    <string name="question_3">4.无法控制，连接不上</string>
     <string name="question3_answer">一些手机使用过久可能手机蓝牙会出现无法使用的情况，可以试试把手机蓝牙关掉，再打开，甚至一些低端机型需要重启手机才可以使用蓝牙</string>
     <string name="group_limit">最多添加255个组,目前已达上限</string>
     <string name="data_empty">数据已经为空</string>
@@ -371,7 +371,7 @@
     <string name="ota_str">固件升级</string>
     <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
-    <string name="question0">去哪更新APP？</string>
+    <string name="question0">1.去哪更新APP？</string>
     <string name="update_group">修改分组</string>
     <string name="the_last_version">当前已经是最新版本！</string>
     <string name="updateSuccess">升级成功!</string>
@@ -526,4 +526,5 @@
     <string name="net_work_error">无可用网络</string>
     <string name="please_check_group_tip">请选择分组:</string>
     <string name="tip_phone_ble_off">手机蓝牙关闭,升级失败</string>
+    <string name="instruction_manual">使用说明书: http://www.dadoutek.com/app/README/index.html</string>
 </resources>

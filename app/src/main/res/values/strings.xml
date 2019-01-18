@@ -324,15 +324,15 @@
     <string name="by_info_reset">Learn more</string>
     <string name="by_light_reset_title">Physical reset</string>
     <string name="by_light_reset_mesage">I have already physically restored the lamp to factory settings and started initializing APP data?</string>
-    <string name="question_1">1. How to reset my lights?</string>
+    <string name="question_1">2. How to reset my lights?</string>
     <string name="question_1_anser1">(1) uled app reset: This method will directly reset the lights to the factory settings through the App. Please ensure that the lights are connected.</string>
     <string name="qustion_2_anser2">(2)Light: Connect to power supply for 1 second, disconnect to power supply for 6s, repeat about 5-6 times until the light flashes.
         Switch: Connect to power supply and simultaneously press the upper left button and the lower right button of the 4 buttons. The blue light will always be on during the period.
         Sensor: Connect to power supply for 1 second, disconnect to power supply for 1 second, repeat about 5-6 times until the sensor flashes.</string>
     <string name="common_question">Q&amp;A</string>
-    <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
+    <string name="question_2">3. Some Huawei phones have Bluetooth instability</string>
     <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
-    <string name="question_3">3. Can not control, not connect</string>
+    <string name="question_3">4. Can not control, not connect</string>
     <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
     <string name="group_limit">Add up to 255 groups up to the current limit</string>
     <string name="data_empty">Data is empty</string>
@@ -374,7 +374,7 @@
     <string name="ota_str">OTA</string>
     <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
-    <string name="question0">Where can I update my app?</string>
+    <string name="question0">1.Where can I update my app?</string>
     <string name="update_group">Modify group</string>
     <string name="the_last_version">It is the latest version!</string>
     <string name="updateSuccess">Update succeed!</string>
@@ -581,4 +581,5 @@
     <string name="net_work_error">No network available</string>
     <string name="please_check_group_tip">Please select a group:</string>
     <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
+    <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
 </resources>
