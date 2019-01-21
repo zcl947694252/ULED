@@ -266,8 +266,8 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             idList.add(list[i].id!!.toInt())
         }
 
-        var id = 0
-        for (i in 12..17) {
+        var id = 1
+        for (i in 1..6) {
             if (idList.contains(i)) {
                 Log.d("sceneID", "getSceneId: " + "aaaaa")
                 continue
@@ -279,7 +279,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         if (list.size == 0) {
-            id = 12
+            id = 1
         }
 
         return java.lang.Long.valueOf(id.toLong())

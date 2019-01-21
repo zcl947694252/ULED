@@ -567,7 +567,7 @@
     <string name="name_not_null_tip">Name cannot be empty</string>
     <string name="mode_str">Mode</string>
     <string name="save_gradient_dialog_tip">Save gradient…</string>
-    <string name="add_gradient_limit">最大只能添加6个渐变!</string>
+    <string name="add_gradient_limit">You can only add up to 6 gradients!</string>
     <string name="color_checked_set">Select color</string>
     <string name="one_click_group">One-click grouping</string>
     <string name="please_select_light_type">Please select the type of light</string>
@@ -575,8 +575,8 @@
     <string name="tip_save_scene_all_group">Is the unselected group brightness white light set to 0?</string>
     <string name="install_old_device_tip">Search for installed devices</string>
     <string name="search_new_device">Search for new devices</string>
-    <string name="update_gradient">修改渐变</string>
-    <string name="add_gradient">添加渐变</string>
+    <string name="update_gradient">Modify the gradient</string>
+    <string name="add_gradient">Add gradient</string>
     <string name="config_night_light_select_group">Please select at least one group</string>
     <string name="net_work_error">No network available</string>
     <string name="please_check_group_tip">Please select a group:</string>
