@@ -458,8 +458,8 @@ object Commander : EventListener<String> {
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
-//            va
-// l version = Strings.bytesToString(data)
+//
+//          val version = Strings.bytesToString(data)
             val meshAddress = event.args.src
 
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
@@ -468,7 +468,6 @@ object Commander : EventListener<String> {
             if(version != ""){
                 mGetVersionSuccess = true
             }
-            SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
             version = Strings.bytesToString(data)
@@ -481,7 +480,6 @@ object Commander : EventListener<String> {
             if(version != ""){
                 mGetVersionSuccess = true
             }
-            SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
     }
