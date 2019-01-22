@@ -583,11 +583,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
 
         try {
 
-            if(brightness!! > 98){
-                brightness=98
+            if(brightness!! > Constant.MAX_VALUE){
+                brightness=Constant.MAX_VALUE
             }
-            if(w>98){
-                w=98
+            if(w>Constant.MAX_VALUE){
+                w=Constant.MAX_VALUE
             }
             if(w==-1){
                 w=0
@@ -699,7 +699,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 100
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
@@ -746,8 +746,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
             var brightness=0
             var w=0
             if (view == sbBrightness) {
-                if(progress>98){
-                    brightness=98
+                if(progress > Constant.MAX_VALUE){
+                    brightness = Constant.MAX_VALUE
                 }else{
                     brightness=progress
                 }
@@ -771,8 +771,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
                 }
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
-                if(progress>98){
-                    w=98
+                if(progress>Constant.MAX_VALUE){
+                    w=Constant.MAX_VALUE
                 }else{
                     w=progress
                 }

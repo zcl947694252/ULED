@@ -345,6 +345,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         }, {
             ToastUtils.showLong(R.string.error_disconnect_tip)
             SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
+            hideLoadingDialog()
             null
         })
     }

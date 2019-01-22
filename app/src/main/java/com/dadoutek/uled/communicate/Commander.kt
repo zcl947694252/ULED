@@ -180,10 +180,15 @@ object Commander : EventListener<String> {
         mGroupingAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
+
         val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddr shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
-        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+        Thread{
+            Thread.sleep(200)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        }.start()
+
+        Observable.interval(0, 300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
@@ -359,7 +364,7 @@ object Commander : EventListener<String> {
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //开始自定义渐变
-        val gradientActionType= 0x02
+        val gradientActionType= 0x04
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         for(i in 0..2){

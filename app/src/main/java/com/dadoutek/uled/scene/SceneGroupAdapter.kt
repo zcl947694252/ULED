@@ -6,6 +6,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
@@ -21,7 +22,7 @@ import java.util.*
 class SceneGroupAdapter
 (layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdapter<ItemGroup, BaseViewHolder>(layoutResId, data), SeekBar.OnSeekBarChangeListener {
     private var preTime: Long = 0
-    private val delayTime = 100
+    private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
         val position = helper.layoutPosition
         val sbBrightness = helper.getView<SeekBar>(R.id.sbBrightness)
@@ -116,8 +117,8 @@ class SceneGroupAdapter
 
     fun sendCmd(opcode: Byte, address: Int, progress: Int) {
         var progressCmd=progress
-        if(progress>98){
-            progressCmd=98
+        if(progress > Constant.MAX_VALUE){
+            progressCmd=Constant.MAX_VALUE
         }
         var params: ByteArray
         if(opcode==Opcode.SET_TEMPERATURE){

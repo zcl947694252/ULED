@@ -164,7 +164,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 100
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
