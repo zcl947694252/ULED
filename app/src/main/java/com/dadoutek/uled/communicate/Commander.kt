@@ -124,13 +124,6 @@ object Commander : EventListener<String> {
             var blue = color and 0x0000ff
             var w = color shr 24
 
-//            val minVal = 0x50.toByte()
-//            if (green and 0xff <= minVal)
-//                green = 0
-//            if (red and 0xff <= minVal)
-//                red = 0
-//            if (blue and 0xff <= minVal)
-//                blue = 0
             params = byteArrayOf(0x01, sceneId.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
             TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params)
         }
@@ -187,10 +180,15 @@ object Commander : EventListener<String> {
         mGroupingAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
+
         val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddr shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
-        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+        Thread{
+            Thread.sleep(200)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        }.start()
+
+        Observable.interval(0, 300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
@@ -340,6 +338,7 @@ object Commander : EventListener<String> {
     fun closeGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
+        //关闭渐变
         val gradientActionType= 0x03
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
@@ -350,9 +349,24 @@ object Commander : EventListener<String> {
     fun applyGradient(dstAddr: Int,id: Int,speed: Int,firstAddress: Int,successCallback: (version: String?) -> Unit,
                       failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
+        //开始内置渐变
         val gradientActionType= 0x02
         val params: ByteArray
             params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        for(i in 0..2){
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            Thread.sleep(50)
+        }
+    }
+
+    //加载自定义渐变
+    fun applyDiyGradient(dstAddr: Int,id: Int,speed: Int,firstAddress: Int,successCallback: (version: String?) -> Unit,
+                      failedCallback: () -> Unit){
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        //开始自定义渐变
+        val gradientActionType= 0x04
+        val params: ByteArray
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         for(i in 0..2){
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
@@ -363,9 +377,12 @@ object Commander : EventListener<String> {
     fun deleteGradient(dstAddr: Int,id: Int,successCallback: (version: String?) -> Unit,
                        failedCallback: () -> Unit){
         var opcode = Opcode.APPLY_RGB_GRADIENT
+        //删除渐变
         val gradientActionType= 0x01
         val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte())
+        //删除方式为删除索引
+        val deleteType=0x01
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(),deleteType.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
@@ -441,8 +458,8 @@ object Commander : EventListener<String> {
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
-//            va
-// l version = Strings.bytesToString(data)
+//
+//          val version = Strings.bytesToString(data)
             val meshAddress = event.args.src
 
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
@@ -451,7 +468,6 @@ object Commander : EventListener<String> {
             if(version != ""){
                 mGetVersionSuccess = true
             }
-            SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
             version = Strings.bytesToString(data)
@@ -464,7 +480,6 @@ object Commander : EventListener<String> {
             if(version != ""){
                 mGetVersionSuccess = true
             }
-            SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
     }

@@ -17,6 +17,8 @@ public class Constant implements Serializable {
 //    public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
 
     public static final int MAX_GROUP_COUNT = 250;
+    public static final int MAX_VALUE = 99;
+    public static final int MAX_SCROLL_DELAY_VALUE = 40;
 
     public static final String NEW_MESH_NAME = "dadou";
     public static final String NEW_MESH_PASSWORD = "123";
@@ -25,9 +27,12 @@ public class Constant implements Serializable {
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
 
     public static final String GROUPS_KEY = "LastGroups";
+    public static final String COLOR_NODE_KEY = "COLOR_NODE_KEY";
     public static final String CURRENT_SELECT_SCENE = "CURRENT_SELECT_SCENE";
     public static final String IS_CHANGE_SCENE = "IS_CHANGE_SCENE";
+    public static final String IS_CHANGE_COLOR = "IS_CHANGE_COLOR";
     public static final String SCENE_KEY = "SCENE_LAST";
+    public static final String GRADIENT_KEY = "GRADIENT_KEY";
     public static final String LIGHTS_KEY = "LastLights";
     public static final String DEFAULT_GROUP_ID = "DEFAULT_GROUP_ID";
 
@@ -54,7 +59,7 @@ public class Constant implements Serializable {
     public static final String IS_LOGIN = "IS_LOGIN";
 
     //网络请求服务器测试地址
-//    public static final String BASE_URL = "http://101.132.137.180/";
+//    public static final String BASE_URL = "http://tmp.ibeelink.com/";
 
     //网络请求服务器正式地址
     public static final String BASE_URL = "https://mqtt.beesmartnet.com/";

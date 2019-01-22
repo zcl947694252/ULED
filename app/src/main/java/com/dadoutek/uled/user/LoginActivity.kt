@@ -140,7 +140,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun forgetPassword() {
-        val intent = Intent(this@LoginActivity, PhoneVerificationActivity::class.java)
+        val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
         intent.putExtra("fromLogin", "forgetPassword")
         startActivity(intent)
     }

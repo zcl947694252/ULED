@@ -538,6 +538,7 @@ public class Peripheral extends BluetoothGattCallback {
         if (!success) {
             this.commandError(errorMsg);
             this.commandCompleted();
+            Log.d("checkXConnect-wrerro", "writeCharacteristic: ");
         }
     }
 

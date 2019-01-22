@@ -84,6 +84,7 @@ import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.bluetooth.light.Parameters;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
+import com.telink.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -520,10 +521,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 dbLight.setBelongGroupId(allLightId);
                 ToastUtils.showLong(R.string.group_fail_tip);
                 updateGroupResult(dbLight, dbGroup);
-                if (index + 1 > selectLights.size() - 1)
-                    completeGroup(selectLights);
-                else
-                    setGroupOneByOne(dbGroup, selectLights, index + 1);
+                if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+                    ToastUtils.showLong("断开连接");
+                }else{
+                    if (index + 1 > selectLights.size() - 1)
+                        completeGroup(selectLights);
+                    else
+                        setGroupOneByOne(dbGroup, selectLights, index + 1);
+                }
                 return null;
             }
         });
@@ -762,6 +767,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         groups.get(position).checked = checkStateChange;
     }
 
+    private boolean startConnect=false;
     /**
      * 自动重连
      * 此处用作设备登录
@@ -770,19 +776,31 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
-                TelinkLightService.Instance().idleMode(true);
+//                LeBluetooth.getInstance().stopScan();
+//                TelinkLightService.Instance().idleMode(true);
+
+                startConnect=true;
 
                 String account = DBUtils.INSTANCE.getLastUser().getAccount();
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 connectParams.setMeshName(account);
+                connectParams.setConnectMac(bestRssiDevice.macAddress);
                 connectParams.setPassword(NetworkFactory.md5(
                         NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
-                TelinkLightService.Instance().autoConnect(connectParams);
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(300);
+                        TelinkLightService.Instance().autoConnect(connectParams);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+//                connectDevice(bestRssiDevice.macAddress);
             }
 
             //刷新Notify参数
@@ -792,6 +810,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             //开启自动刷新Notify
             TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
         }
+    }
+
+    private static final int TIME_OUT_CONNECT = 15;
+    public void connectDevice(String mac) {
+//        log("connectDevice :" + mac);
+//        btn_start_update.setText(R.string.start_connect);
+        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
     }
 
     @Override
@@ -1455,6 +1480,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
     }
 
+    private DeviceInfo bestRssiDevice=null;
+
     private void onDeviceStatusChanged(DeviceEvent event) {
 
         DeviceInfo deviceInfo = event.getArgs();
@@ -1473,7 +1500,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 deviceInfo1.productUUID = deviceInfo.productUUID;
                 deviceInfo1.status = deviceInfo.status;
                 deviceInfo1.meshName = deviceInfo.meshName;
-
+                if(bestRssiDevice==null){
+                    bestRssiDevice = deviceInfo;
+                }else{
+                    if(bestRssiDevice.rssi<deviceInfo.rssi){
+                        bestRssiDevice = deviceInfo;
+                    }
+                }
 //                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
 
                 new Thread(() -> DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this)).start();
@@ -1565,6 +1598,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             case LightAdapter.STATUS_LOGOUT:
                 isLoginSuccess = false;
                 break;
+//                case LightAdapter.STATUS_CONNECTED:
+//                    if(startConnect){
+//                        login();
+//                    }
+//                    break;
         }
+    }
+
+    private void login() {
+//        log("login");
+        String account = DBUtils.INSTANCE.getLastUser().getAccount();
+        String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16);
+        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
     }
 }

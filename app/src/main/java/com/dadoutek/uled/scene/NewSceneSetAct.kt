@@ -141,7 +141,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
             val guide1=sceneEditListAdapter!!.getViewByPosition(0,R.id.group_check_state)
             GuideUtils.guideBuilder(this, GuideUtils.STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
                     .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_1),
-                             View.OnClickListener {guide1.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                             View.OnClickListener {
+                                changeCheck(0)
+                             }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -310,13 +312,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     }
 
     internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-                val item = showCheckListData!!.get(position)
-                if(item.enableCheck){
-                    showCheckListData!!.get(position).checked = !item.checked
-                    changeCheckedViewData()
-                    sceneEditListAdapter?.notifyDataSetChanged()
-                }
-                step2Guide()
+        changeCheck(position)
+    }
+
+    fun changeCheck(position: Int) {
+        val item = showCheckListData!!.get(position)
+        if(item.enableCheck){
+            showCheckListData!!.get(position).checked = !item.checked
+            changeCheckedViewData()
+            sceneEditListAdapter?.notifyDataSetChanged()
+        }
+        step2Guide()
     }
 
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
@@ -567,13 +573,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
                 var blue = color and 0x0000ff
                 var w = color shr 24
 
-//                val minVal = 0x50.toByte()
-//                if (green and 0xff <= minVal)
-//                    green = 0
-//                if (red and 0xff <= minVal)
-//                    red = 0
-//                if (blue and 0xff <= minVal)
-//                    blue = 0
 
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)

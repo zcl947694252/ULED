@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
@@ -12,10 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
-import android.view.KeyEvent
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.View.OnClickListener
 import android.widget.*
 import com.blankj.utilcode.util.LogUtils
@@ -56,11 +54,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
+import top.defaults.colorpicker.ColorObserver
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
+class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTouchListener {
+
     private var mApplication: TelinkLightApplication? = null
     private var stopTracking = false
     private var presetColors: MutableList<ItemColorPreset>? = null
@@ -178,6 +178,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
@@ -199,6 +203,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
         override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }
@@ -220,8 +225,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val type=intent.getStringExtra(Constant.TYPE_VIEW)
         if(type==Constant.TYPE_GROUP){
             currentShowGroupSetPage=true
-            group_view_func_btn.visibility=View.GONE
-            light_view_bt_layout.visibility=View.GONE
             initToolbarGroup()
             initDataGroup()
             initViewGroup()
@@ -229,8 +232,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             this.mApp = this.application as TelinkLightApplication?
         }else{
             currentShowGroupSetPage=false
-            group_view_func_btn.visibility=View.GONE
-            light_view_bt_layout.visibility=View.GONE
             initToolbar()
             initView()
             getVersion()
@@ -280,20 +281,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
 
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
-        btn_rename!!.setOnClickListener(this.clickListener)
-        update_group!!.setOnClickListener(this.clickListener)
-        btn_remove!!.setOnClickListener(this.clickListener)
         dynamic_rgb!!.setOnClickListener(this.clickListener)
 
         mRxPermission = RxPermissions(this)
 
         sbBrightness!!.max = 100
 
-        color_picker!!.setColorListener(colorEnvelopeListener)
-        color_picker!!.setOnTouchListener { v, event ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
-            false
-        }
+        color_picker.reset()
+        color_picker.subscribe(colorObserver)
+        this.color_picker!!.setOnTouchListener(this)
 
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
 
@@ -313,17 +309,24 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
-        btn_rename!!.visibility = View.GONE
         sbBrightness!!.progress = light!!.brightness
         tv_brightness_rgb!!.text = getString(R.string.device_setting_brightness, light!!.brightness.toString() + "")
 
         var w = ((light?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var r=Color.red(light?.color?:0)
+        var g=Color.green(light?.color?:0)
+        var b=Color.blue(light?.color?:0)
         if(w==-1){
             w=0
         }
+
+        color_r.text = r.toString()
+        color_g.text = g.toString()
+        color_b.text = b.toString()
+
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
-
+        color_picker.setInitialColor((light?.color?:0 and 0xffffff) or 0xff000000.toInt())
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
     }
@@ -500,6 +503,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         this.group = this.intent.extras!!.get("group") as DbGroup
     }
 
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        v?.parent?.requestDisallowInterceptTouchEvent(true)
+        LogUtils.d("--------")
+        return false
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun initViewGroup() {
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
@@ -508,16 +518,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                 toolbar.title = group?.name
             }
         }
-        
+
+        color_picker.isLongClickable=true
+        this.color_picker!!.setOnTouchListener(this)
+        color_picker.isEnabled=true
+
         dynamic_rgb.setOnClickListener(this.clickListener)
 
-        this.color_picker!!.setOnTouchListener { v, _ ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
-            false
-        }
-
-        btn_remove_group?.setOnClickListener(clickListener)
-        btn_rename?.setOnClickListener(clickListener)
 //        dynamicRgb?.setOnClickListener(this)
 
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
@@ -540,16 +547,24 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         tv_brightness_rgb.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
 
         var w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var r=Color.red(group?.color?:0)
+        var g=Color.green(group?.color?:0)
+        var b=Color.blue(group?.color?:0)
         if(w==-1){
             w=0
         }
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
 
+        color_r.text = r.toString()
+        color_g.text = g.toString()
+        color_b.text = b.toString()
 
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
-        this.color_picker?.setColorListener(colorEnvelopeListener)
+        color_picker.reset()
+        color_picker.subscribe(colorObserver)
+        color_picker.setInitialColor((group?.color?:0 and 0xffffff) or 0xff000000.toInt())
         checkGroupIsSystemGroup()
     }
 
@@ -561,17 +576,18 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
 
+        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
         val showBrightness=brightness
         var showW=w
         Thread {
 
         try {
 
-            if(brightness!! > 98){
-                brightness=98
+            if(brightness!! > Constant.MAX_VALUE){
+                brightness=Constant.MAX_VALUE
             }
-            if(w>98){
-                w=98
+            if(w>Constant.MAX_VALUE){
+                w=Constant.MAX_VALUE
             }
             if(w==-1){
                 w=0
@@ -683,7 +699,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 100
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
@@ -730,8 +746,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
             var brightness=0
             var w=0
             if (view == sbBrightness) {
-                if(progress>98){
-                    brightness=98
+                if(progress > Constant.MAX_VALUE){
+                    brightness = Constant.MAX_VALUE
                 }else{
                     brightness=progress
                 }
@@ -755,8 +771,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                 }
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
-                if(progress>98){
-                    w=98
+                if(progress>Constant.MAX_VALUE){
+                    w=Constant.MAX_VALUE
                 }else{
                     w=progress
                 }
@@ -819,21 +835,21 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }.start()
     }
 
-    private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
-        val argb = envelope.argb
-
-
-        color_r?.text = argb[1].toString()
-        color_g?.text = argb[2].toString()
-        color_b?.text = argb[3].toString()
+    private val colorObserver = ColorObserver { color, fromUser ->
+        val r = Color.red(color)
+        val g = Color.green(color)
+        val b = Color.blue(color)
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
         val w = sb_w_bright.progress
 
-        val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
-            if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+            if (r == 0 && g == 0 && b == 0) {
             } else {
                 Thread {
                     if(currentShowGroupSetPage){
@@ -842,11 +858,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
                         light?.color=color
                     }
 
-                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
+                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
 
                 }.start()
             }
         }
+    }
+    
+    private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
+
     }
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
@@ -863,15 +883,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
         }
 
         val opcode = Opcode.SET_TEMPERATURE
-
-//        val minVal = 0x50
-//
-//        if (green.toInt() and 0xff <= minVal)
-//            green = 0
-//        if (red.toInt() and 0xff <= minVal)
-//            red = 0
-//        if (blue.toInt() and 0xff <= minVal)
-//            blue = 0
 
         val params = byteArrayOf(0x04, red, green, blue)
 
@@ -891,8 +902,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String> {
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr == 0xFFFF) {
-            btn_remove_group!!.visibility = View.GONE
-            btn_rename!!.visibility = View.GONE
+
         }
     }
 

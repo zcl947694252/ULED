@@ -242,12 +242,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
 
         override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(R.string.verification_version_success);
+            //            ToastUtils.showLong(.string.verification_version_success);
             hideLoadingDialog()
         }
 
@@ -263,6 +267,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         }
 
         override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }
@@ -400,6 +405,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     override fun onResume() {
         super.onResume()
         addEventListeners()
+//        test()
     }
 
     private fun initType() {
@@ -417,6 +423,46 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             initToolbarLight()
             initViewLight()
             getVersion()
+        }
+    }
+
+    private fun test(){
+        for(i in 0..100){
+            Thread{
+                Thread.sleep(1000)
+                getVersionTest()
+            }.start()
+        }
+    }
+
+    var count=0
+    private fun getVersionTest() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            Commander.getDeviceVersion(light!!.meshAddr, { s ->
+                localVersion = s
+                if(!localVersion!!.startsWith("LC")){
+                    ToastUtils.showLong("版本号出错："+localVersion)
+                    txtTitle!!.visibility = View.VISIBLE
+                    txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
+                    light!!.version = localVersion
+                    tvOta!!.visibility = View.VISIBLE
+                }else{
+                    count++
+                    ToastUtils.showShort("版本号正确次数："+localVersion)
+                    txtTitle!!.visibility = View.GONE
+                    tvOta!!.visibility = View.GONE
+                }
+                null
+            }, {
+                if (txtTitle != null) {
+                    txtTitle!!.visibility = View.GONE
+                    tvOta!!.visibility = View.GONE
+                }
+                null
+            })
+        } else {
+            dstAdress = 0
         }
     }
 
@@ -609,7 +655,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 100
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             LogUtils.d("progress:_3__"+seekBar.progress)
@@ -667,8 +713,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     light?.brightness = progress
                 }
 
-                if(progress>98){
-                    params = byteArrayOf(98)
+                if(progress>Constant.MAX_VALUE){
+                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
                 }else{
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)

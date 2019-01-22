@@ -4,14 +4,18 @@ import android.content.Context;
 import android.util.Log;
 
 import com.dadoutek.uled.dao.DaoMaster;
+import com.dadoutek.uled.dao.DbColorNodeDao;
 import com.dadoutek.uled.dao.DbDataChangeDao;
 import com.dadoutek.uled.dao.DbDeleteGroupDao;
+import com.dadoutek.uled.dao.DbDiyGradientDao;
 import com.dadoutek.uled.dao.DbGroupDao;
 import com.dadoutek.uled.dao.DbLightDao;
 import com.dadoutek.uled.dao.DbRegionDao;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import com.dadoutek.uled.dao.DbSceneDao;
 import com.dadoutek.uled.dao.DbUserDao;
+import com.dadoutek.uled.model.DbModel.DbColorNode;
+import com.dadoutek.uled.model.DbModel.DbDiyGradient;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.util.MigrationHelper;
 
@@ -28,7 +32,8 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
         if(oldVersion < newVersion){
             MigrationHelper.migrate(db,DbRegionDao.class,DbGroupDao.class,
                     DbLightDao.class,DbDataChangeDao.class,DbDeleteGroupDao.class,
-                    DbSceneDao.class,DbSceneActionsDao.class,DbUserDao.class);
+                    DbSceneDao.class,DbSceneActionsDao.class,DbUserDao.class,DbDiyGradientDao.class,
+                    DbColorNodeDao.class);
         }
 
         switch (oldVersion) {

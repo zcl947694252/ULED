@@ -3,6 +3,7 @@ package com.dadoutek.uled.othersview
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
@@ -23,6 +24,7 @@ import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color.*
 import kotlinx.android.synthetic.main.toolbar.*
+import top.defaults.colorpicker.ColorObserver
 import java.util.ArrayList
 import javax.xml.transform.Result
 
@@ -50,8 +52,9 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
         setSupportActionBar(toolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        
-        color_picker!!.setColorListener(colorEnvelopeListener)
+
+        color_picker.reset()
+        color_picker.subscribe(colorObserver)
         color_picker!!.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
@@ -74,10 +77,18 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
         var w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var r=Color.red(itemGroup?.color!!)
+        var g=Color.green(itemGroup?.color!!)
+        var b= Color.blue(itemGroup?.color!!)
+        color_picker.setInitialColor((itemGroup?.color?:0 and 0xffffff) or 0xff000000.toInt())
         if(w==-1){
             w=0
         }
 
+        color_r.text = r.toString()
+        color_g.text = g.toString()
+        color_b.text = b.toString()
+        
         wValue=w
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
         sb_w_bright.progress = w
@@ -107,33 +118,34 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
         setResult(Activity.RESULT_OK,intent)
         finish()
     }
-
-    private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
-        val argb = envelope.argb
-
-
-        color_r?.text = argb[1].toString()
-        color_g?.text = argb[2].toString()
-        color_b?.text = argb[3].toString()
+    
+    private val colorObserver = ColorObserver { color, fromUser ->
+        val r = Color.red(color)
+        val g = Color.green(color)
+        val b = Color.blue(color)
+        
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
         val w = sb_w_bright.progress
 
-        val color: Int = (w shl 24) or (argb[1] shl 16) or (argb[2] shl 8) or argb[3]
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
-            if (argb[1] == 0 && argb[2] == 0 && argb[3] == 0) {
+            if (r == 0 && g == 0 && b == 0) {
             } else {
                 Thread {
                     itemGroup!!.color=color
 
-                    changeColor(argb[1].toByte(), argb[2].toByte(), argb[3].toByte(), false)
+                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
 
                 }.start()
             }
         }
     }
-
+    
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
 
         var red = R
@@ -142,14 +154,6 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
 
         val opcode = Opcode.SET_TEMPERATURE
 
-//        val minVal = 0x50
-//
-//        if (green.toInt() and 0xff <= minVal)
-//            green = 0
-//        if (red.toInt() and 0xff <= minVal)
-//            red = 0
-//        if (blue.toInt() and 0xff <= minVal)
-//            blue = 0
 
         val params = byteArrayOf(0x04, red, green, blue)
 
@@ -172,6 +176,8 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
+
+        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
 //        Thread {
         changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
 
@@ -209,7 +215,7 @@ class SelectColorAct:TelinkBaseActivity(),View.OnClickListener {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 100
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
