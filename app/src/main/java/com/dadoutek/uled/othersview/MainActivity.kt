@@ -60,6 +60,7 @@ import kotlinx.coroutines.launch
 
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -209,6 +210,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 
         //移除事件
         this.mApplication?.removeEventListener(this)
+
+        try {
+            this.unregisterReceiver(mReceiver)
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
         stopConnectTimer()
     }
 
@@ -495,7 +502,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(mReceiver)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()

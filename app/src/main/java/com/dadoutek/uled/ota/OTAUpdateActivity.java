@@ -153,6 +153,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
     private long TIME_OUT_SENDDATA = 10;
+    private boolean OTA_IS_HAVEN_START=false;
 
     private Handler delayHandler = new Handler();
     @SuppressLint("HandlerLeak")
@@ -210,6 +211,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     case BluetoothAdapter.STATE_ON:{
                         log("蓝牙打开");
                         TelinkLightService.Instance().idleMode(true);
+                        LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF:{
                         log("蓝牙关闭");
@@ -798,6 +800,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         visibleHandler.obtainMessage(View.GONE, otaProgress).sendToTarget();
 
         if (TelinkLightApplication.getApp().getConnectDevice() != null) {
+            OTA_IS_HAVEN_START=true;
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             startScan();
@@ -889,9 +892,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             LeBluetooth.getInstance().stopScan();
             stopConnectTimer();
 //            addEventListener();
-            btn_start_update.setText(getString(R.string.re_upgrade));
-            btn_start_update.setVisibility(View.VISIBLE);
-            btn_start_update.setClickable(true);
+            if(OTA_IS_HAVEN_START){
+                btn_start_update.setVisibility(View.GONE);
+                btn_start_update.setClickable(false);
+                TelinkLightApplication.getApp().removeEventListener(this);
+            }else{
+                btn_start_update.setText(getString(R.string.re_upgrade));
+                btn_start_update.setVisibility(View.VISIBLE);
+                btn_start_update.setClickable(true);
+            }
         });
     }
 
