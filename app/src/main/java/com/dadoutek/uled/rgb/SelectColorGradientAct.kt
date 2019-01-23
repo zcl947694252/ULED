@@ -51,7 +51,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
-        color_picker.reset()
+        color_picker.setInitialColor(Color.WHITE)
         color_picker.subscribe(colorObserver)
         color_picker!!.setOnTouchListener { v, event ->
             v.parent.requestDisallowInterceptTouchEvent(true)
@@ -61,10 +61,11 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
         if(colorNode!!.rgbw==-1){
-            sbBrightness.progress=50
-            sb_w_bright.progress=50
-            tv_brightness_rgb.text = getString(R.string.device_setting_brightness,50)
-            tv_brightness_w.text = getString(R.string.w_bright,50)
+            sbBrightness.progress=100
+            colorNode!!.brightness=100
+            sb_w_bright.progress=0
+            tv_brightness_rgb.text = getString(R.string.device_setting_brightness,100)
+            tv_brightness_w.text = getString(R.string.w_bright,0)
         }else{
 
             var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
@@ -88,7 +89,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> doFinish()
+            android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -119,22 +120,20 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 //        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
-
-            color_r?.text = r.toString()
-            color_g?.text = g.toString()
-            color_b?.text = b.toString()
-
 //            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
             if (r == 0 && g == 0 && b == 0) {
             } else {
                 Thread {
-                    colorNode!!.rgbw=color
-
                     changeColor(r.toByte(), g.toByte(), b.toByte(), false)
-
                 }.start()
             }
         }
+
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
+
+        colorNode!!.rgbw=color
     }
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
