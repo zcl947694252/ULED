@@ -883,14 +883,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         runOnUiThread(() -> {
             text_info.setVisibility(View.VISIBLE);
             text_info.setText(R.string.update_fail);
-            btn_start_update.setVisibility(View.GONE);
-            btn_start_update.setClickable(false);
             mode = MODE_IDLE;
-            TelinkLightApplication.getApp().removeEventListener(this);
+//            TelinkLightApplication.getApp().removeEventListener(this);
             stopScanTimer();
             LeBluetooth.getInstance().stopScan();
             stopConnectTimer();
 //            addEventListener();
+            btn_start_update.setText(getString(R.string.re_upgrade));
+            btn_start_update.setVisibility(View.VISIBLE);
+            btn_start_update.setClickable(true);
         });
     }
 

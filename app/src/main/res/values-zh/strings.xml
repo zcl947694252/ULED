@@ -527,4 +527,5 @@
     <string name="please_check_group_tip">请选择分组:</string>
     <string name="tip_phone_ble_off">手机蓝牙关闭,升级失败</string>
     <string name="instruction_manual">使用说明书: http://www.dadoutek.com/app/README/index.html</string>
+    <string name="re_upgrade">重新升级</string>
 </resources>

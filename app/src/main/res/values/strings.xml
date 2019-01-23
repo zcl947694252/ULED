@@ -582,4 +582,5 @@
     <string name="please_check_group_tip">Please select a group:</string>
     <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
     <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
+    <string name="re_upgrade">Re-upgrade</string>
 </resources>
