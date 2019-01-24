@@ -242,12 +242,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
         override fun startGetVersion() {
             showLoadingDialog(getString(R.string.verification_version))
         }
 
         override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(R.string.verification_version_success);
+            //            ToastUtils.showLong(.string.verification_version_success);
             hideLoadingDialog()
         }
 
@@ -263,21 +267,26 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         }
 
         override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
             ToastUtils.showLong(R.string.download_pack_fail)
         }
     }
 
     private fun checkPermission() {
-        mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    if (granted!!) {
+//        if(light!!.macAddr.length<16){
+//            ToastUtils.showLong(getString(R.string.bt_error))
+//        }else{
+            mDisposable.add(
+                    mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                        if (granted!!) {
                             OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
 //                          transformView()
-                    } else {
-                        ToastUtils.showLong(R.string.update_permission_tip)
-                    }
-                })
+                        } else {
+                            ToastUtils.showLong(R.string.update_permission_tip)
+                        }
+                    })
+//        }
     }
 
     private fun transformView() {
@@ -400,6 +409,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     override fun onResume() {
         super.onResume()
         addEventListeners()
+//        test()
     }
 
     private fun initType() {
@@ -417,6 +427,46 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             initToolbarLight()
             initViewLight()
             getVersion()
+        }
+    }
+
+    private fun test(){
+        for(i in 0..100){
+            Thread{
+                Thread.sleep(1000)
+                getVersionTest()
+            }.start()
+        }
+    }
+
+    var count=0
+    private fun getVersionTest() {
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            Commander.getDeviceVersion(light!!.meshAddr, { s ->
+                localVersion = s
+                if(!localVersion!!.startsWith("LC")){
+                    ToastUtils.showLong("版本号出错："+localVersion)
+                    txtTitle!!.visibility = View.VISIBLE
+                    txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
+                    light!!.version = localVersion
+                    tvOta!!.visibility = View.VISIBLE
+                }else{
+                    count++
+                    ToastUtils.showShort("版本号正确次数："+localVersion)
+                    txtTitle!!.visibility = View.GONE
+                    tvOta!!.visibility = View.GONE
+                }
+                null
+            }, {
+                if (txtTitle != null) {
+                    txtTitle!!.visibility = View.GONE
+                    tvOta!!.visibility = View.GONE
+                }
+                null
+            })
+        } else {
+            dstAdress = 0
         }
     }
 
@@ -524,6 +574,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         editTitle?.setFocusableInTouchMode(true)
         editTitle?.setFocusable(true)
         editTitle?.requestFocus()
+        //设置光标默认在最后
         editTitle.setSelection(editTitle.getText().toString().length)
 //        btn_sure_edit_rename.visibility = View.VISIBLE
 //        btn_sure_edit_rename.setOnClickListener {
@@ -570,6 +621,10 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
+
+            editTitle.visibility=View.GONE
+            titleCenterName.visibility=View.VISIBLE
+            titleCenterName.text = group?.name
         }
         else {
             var canSave=true
@@ -596,6 +651,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
+            editTitle.visibility=View.GONE
+            titleCenterName.visibility=View.VISIBLE
+            titleCenterName.text = light?.name
         }else{
             editTitle.visibility=View.GONE
             titleCenterName.visibility=View.VISIBLE
@@ -608,7 +666,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = 100
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             LogUtils.d("progress:_3__"+seekBar.progress)
@@ -666,8 +724,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     light?.brightness = progress
                 }
 
-                if(progress>98){
-                    params = byteArrayOf(98)
+                if(progress>Constant.MAX_VALUE){
+                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
                 }else{
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)

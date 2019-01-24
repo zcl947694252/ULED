@@ -1,6 +1,5 @@
 package com.dadoutek.uled.communicate
 
-import android.provider.Contacts
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -9,13 +8,13 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -124,13 +123,6 @@ object Commander : EventListener<String> {
             var blue = color and 0x0000ff
             var w = color shr 24
 
-//            val minVal = 0x50.toByte()
-//            if (green and 0xff <= minVal)
-//                green = 0
-//            if (red and 0xff <= minVal)
-//                red = 0
-//            if (blue and 0xff <= minVal)
-//                blue = 0
             params = byteArrayOf(0x01, sceneId.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
             TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params)
         }
@@ -187,10 +179,15 @@ object Commander : EventListener<String> {
         mGroupingAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
+
         val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddr shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
-        Observable.interval(0, 200, TimeUnit.MILLISECONDS)
+        Thread {
+            Thread.sleep(200)
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        }.start()
+
+        Observable.interval(0, 300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
@@ -337,35 +334,54 @@ object Commander : EventListener<String> {
     }
 
     //关闭渐变
-    fun closeGradient(dstAddr: Int,id: Int,speed: Int,successCallback: (version: String?) -> Unit,
-                      failedCallback: () -> Unit){
+    fun closeGradient(dstAddr: Int, id: Int, speed: Int, successCallback: (version: String?) -> Unit,
+                      failedCallback: () -> Unit) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
-        val gradientActionType= 0x03
+        //关闭渐变
+        val gradientActionType = 0x03
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
     //加载渐变
-    fun applyGradient(dstAddr: Int,id: Int,speed: Int,firstAddress: Int,successCallback: (version: String?) -> Unit,
-                      failedCallback: () -> Unit){
+    fun applyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit,
+                      failedCallback: () -> Unit) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
-        val gradientActionType= 0x02
+        //开始内置渐变
+        val gradientActionType = 0x02
         val params: ByteArray
-            params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
-        for(i in 0..2){
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        for (i in 0..2) {
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            Thread.sleep(50)
+        }
+    }
+
+    //加载自定义渐变
+    fun applyDiyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit,
+                         failedCallback: () -> Unit) {
+        var opcode = Opcode.APPLY_RGB_GRADIENT
+        //开始自定义渐变
+        val gradientActionType = 0x04
+        val params: ByteArray
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        for (i in 0..2) {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
         }
     }
 
     //删除渐变
-    fun deleteGradient(dstAddr: Int,id: Int,successCallback: (version: String?) -> Unit,
-                       failedCallback: () -> Unit){
+    fun deleteGradient(dstAddr: Int, id: Int, successCallback: (version: String?) -> Unit,
+                       failedCallback: () -> Unit) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
-        val gradientActionType= 0x01
+        //删除渐变
+        val gradientActionType = 0x01
         val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte())
+        //删除方式为删除索引
+        val deleteType = 0x01
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), deleteType.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
@@ -377,18 +393,18 @@ object Commander : EventListener<String> {
      * (C没值就都先传FF)(W没值就都先传FF)
      * 双色温渐变模式：[16]: 色温
      */
-    fun addGradient(dstAddr: Int,id:Int,node: Int,mode: Int,brightness: Int,
-                    r:Int,g:Int,b:Int,c:Int=0xff,w:Int=0xff,successCallback: (version: String?) -> Unit,
-                    failedCallback: () -> Unit){
+    fun addGradient(dstAddr: Int, id: Int, node: Int, mode: Int, brightness: Int,
+                    r: Int, g: Int, b: Int, c: Int = 0xff, w: Int = 0xff, successCallback: (version: String?) -> Unit,
+                    failedCallback: () -> Unit) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
-        val gradientActionType= 0x00
+        val gradientActionType = 0x00
         val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(),id.toByte(),node.toByte(),
-                mode.toByte(),brightness.toByte(),r.toByte(),g.toByte(),b.toByte(),c.toByte(),w.toByte())
+        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), node.toByte(),
+                mode.toByte(), brightness.toByte(), r.toByte(), g.toByte(), b.toByte(), c.toByte(), w.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
     }
 
-    fun getDeviceVersion(dstAddr: Int,successCallback: (version: String?) -> Unit,
+    fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit,
                          failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 
@@ -441,17 +457,16 @@ object Commander : EventListener<String> {
         val data = event.args.params
         if (data[0] == (Opcode.GET_VERSION and 0x3F)) {
             version = Strings.bytesToString(Arrays.copyOfRange(data, 1, data.size - 1))
-//            va
-// l version = Strings.bytesToString(data)
+//
+//          val version = Strings.bytesToString(data)
             val meshAddress = event.args.src
 
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
 //            light.version = version
 
-            if(version != ""){
+            if (version != "") {
                 mGetVersionSuccess = true
             }
-            SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
             version = Strings.bytesToString(data)
@@ -461,10 +476,9 @@ object Commander : EventListener<String> {
 //            val light = DBUtils.getLightByMeshAddr(meshAddress)
 //            light.version = version
 
-            if(version != ""){
+            if (version != "") {
                 mGetVersionSuccess = true
             }
-            SharedPreferencesUtils.saveCurrentLightVsersion(version)
             TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
     }
@@ -478,5 +492,45 @@ object Commander : EventListener<String> {
 //        if(data[0].toInt()== mLightAddr){
         mResetSuccess = true
 //        }
+    }
+
+    /**
+     * 自动重连
+     * 此处用作设备登录
+     */
+    fun autoConnect(macAddress: String,successCallback: (version: String?) -> Unit,
+                    failedCallback: () -> Unit) {
+        if (TelinkLightService.Instance() != null) {
+            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                TelinkLightService.Instance().idleMode(true);
+                val account = DBUtils.lastUser!!.account
+
+                //自动重连参数
+                val connectParams = Parameters.createAutoConnectParameters()
+                connectParams.setMeshName(account)
+                connectParams.setConnectMac(macAddress)
+                connectParams.setPassword(NetworkFactory.md5(
+                        NetworkFactory.md5(account) + account).substring(0, 16))
+                connectParams.autoEnableNotification(true)
+
+                //连接，如断开会自动重连
+                Thread {
+                    try {
+                        Thread.sleep(300)
+                        TelinkLightService.Instance().autoConnect(connectParams)
+                    } catch (e: InterruptedException) {
+                        e.printStackTrace()
+                    }
+                }.start()
+                //                connectDevice(bestRssiDevice.macAddress);
+            }
+
+            //刷新Notify参数
+            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+            refreshNotifyParams.setRefreshRepeatCount(1)
+            refreshNotifyParams.setRefreshInterval(2000)
+            //开启自动刷新Notify
+            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+        }
     }
 }

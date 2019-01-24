@@ -26,6 +26,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_light_light.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -219,20 +220,20 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun getVersion() {
-//        var dstAdress = 0
-//        if (TelinkApplication.getInstance().connectDevice != null) {
-//            dstAdress = mDeviceInfo.meshAddress
-//            Commander.getDeviceVersion(dstAdress,
-//                    successCallback = {
-//                        versionLayoutPS.visibility = View.VISIBLE
-//                        tvPSVersion.text = it
-//                    },
-//                    failedCallback = {
-//                        versionLayoutPS.visibility = View.GONE
-//                    })
-//        } else {
-//            dstAdress = 0
-//        }
+        var dstAdress = 0
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            dstAdress = mDeviceInfo.meshAddress
+            Commander.getDeviceVersion(dstAdress,
+                    successCallback = {
+                        versionLayoutPS.visibility = View.VISIBLE
+                        tvPSVersion.text = it
+                    },
+                    failedCallback = {
+                        versionLayoutPS.visibility = View.GONE
+                    })
+        } else {
+            dstAdress = 0
+        }
     }
 
     private fun initToolbar() {

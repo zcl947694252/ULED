@@ -19,6 +19,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.ActivityUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
@@ -60,6 +61,7 @@ import kotlinx.coroutines.launch
 
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -105,9 +107,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
                         TelinkLightService.Instance().idleMode(true)
                         retryConnectCount = 0
                         startScan()
+                        LogUtil.d("STATE_ON")
                     }
                     BluetoothAdapter.STATE_OFF -> {
-
+                        LogUtil.d("STATE_OFF")
                     }
                 }
             }
@@ -125,10 +128,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
-        val filter = IntentFilter()
-        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
-        registerReceiver(mReceiver, filter)
 
         initBottomNavigation()
 
@@ -209,6 +208,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 
         //移除事件
         this.mApplication?.removeEventListener(this)
+
+        try {
+            this.unregisterReceiver(mReceiver)
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
         stopConnectTimer()
     }
 
@@ -230,6 +235,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 //            GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_GROUPLIST_KEY,false)
 //            tranHome()
 //        }
+        val filter = IntentFilter()
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+        registerReceiver(mReceiver, filter)
     }
 
     var locationServiceDialog: AlertDialog? = null
@@ -495,7 +504,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(mReceiver)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()

@@ -324,15 +324,15 @@
     <string name="by_info_reset">Learn more</string>
     <string name="by_light_reset_title">Physical reset</string>
     <string name="by_light_reset_mesage">I have already physically restored the lamp to factory settings and started initializing APP data?</string>
-    <string name="question_1">1. How to reset my lights?</string>
+    <string name="question_1">2. How to reset my lights?</string>
     <string name="question_1_anser1">(1) uled app reset: This method will directly reset the lights to the factory settings through the App. Please ensure that the lights are connected.</string>
     <string name="qustion_2_anser2">(2)Light: Connect to power supply for 1 second, disconnect to power supply for 6s, repeat about 5-6 times until the light flashes.
         Switch: Connect to power supply and simultaneously press the upper left button and the lower right button of the 4 buttons. The blue light will always be on during the period.
         Sensor: Connect to power supply for 1 second, disconnect to power supply for 1 second, repeat about 5-6 times until the sensor flashes.</string>
     <string name="common_question">Q&amp;A</string>
-    <string name="question_2">2. Some Huawei phones have Bluetooth instability</string>
+    <string name="question_2">3. Some Huawei phones have Bluetooth instability</string>
     <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
-    <string name="question_3">3. Can not control, not connect</string>
+    <string name="question_3">4. Can not control, not connect</string>
     <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
     <string name="group_limit">Add up to 255 groups up to the current limit</string>
     <string name="data_empty">Data is empty</string>
@@ -374,7 +374,7 @@
     <string name="ota_str">OTA</string>
     <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
-    <string name="question0">Where can I update my app?</string>
+    <string name="question0">1.Where can I update my app?</string>
     <string name="update_group">Modify group</string>
     <string name="the_last_version">It is the latest version!</string>
     <string name="updateSuccess">Update succeed!</string>
@@ -477,7 +477,7 @@
         
     <string name="repeat_name">The group name already exists. Please re-enter the group name </string>
         
-    <string name="dynamic_rgb">Dynamic RGB</string>
+    <string name="dynamic_rgb">Gradient</string>
         
     <string name="speed_text">Speed: %1$s%%</string>
         
@@ -554,6 +554,20 @@
     <string name="not_null_scene">Scene name cannot be empty</string>
     <string name="get_update_file">Get the upgrade package…</string>
     <string name="firware_version">Firmware version: %1$s</string>
+    <string name="mode_preset">Built-in mode</string>
+    <string name="mode_diy">customize</string>
+    <string name="please_check_group">Please select a group:</string>
+    <string name="tv_speed">Speed: %1$s</string>
+    <string name="str_gradient">Gradient</string>
+    <string name="str_jump">Jump</string>
+    <string name="str_strobe">Strobe</string>
+    <string name="save">Save</string>
+    <string name="diy_action_tip">*Click the button to change the color, long press to delete the color</string>
+    <string name="color_check">Selection of color</string>
+    <string name="name_not_null_tip">Name cannot be empty</string>
+    <string name="mode_str">Mode</string>
+    <string name="save_gradient_dialog_tip">Save gradient…</string>
+    <string name="add_gradient_limit">You can only add up to 6 gradients!</string>
     <string name="color_checked_set">Select color</string>
     <string name="one_click_group">One-click grouping</string>
     <string name="please_select_light_type">Please select the type of light</string>
@@ -561,8 +575,14 @@
     <string name="tip_save_scene_all_group">Is the unselected group brightness white light set to 0?</string>
     <string name="install_old_device_tip">Search for installed devices</string>
     <string name="search_new_device">Search for new devices</string>
+    <string name="update_gradient">Modify the gradient</string>
+    <string name="add_gradient">Add gradient</string>
     <string name="config_night_light_select_group">Please select at least one group</string>
     <string name="net_work_error">No network available</string>
     <string name="please_check_group_tip">Please select a group:</string>
     <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
+    <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
+    <string name="re_upgrade">Re-upgrade</string>
+    <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
+    <string name="get_code_ing">Get verification...</string>
 </resources>

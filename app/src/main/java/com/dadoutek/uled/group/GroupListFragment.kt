@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
+import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
@@ -236,6 +237,8 @@ class GroupListFragment : BaseFragment() {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)
                         intent.putExtra("group", group)
                         startActivityForResult(intent, 0)
+
+//                        ActivityUtils.startActivityForResult(intent)
                     }
                 }
             }

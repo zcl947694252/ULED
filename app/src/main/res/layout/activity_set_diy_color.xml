@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background_color"
+    >
+
+    <include layout="@layout/toolbar" android:id="@+id/topView"/>
+    
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        app:layout_constraintTop_toBottomOf="@id/topView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+        <TextView
+            android:id="@+id/nameTitle"
+            android:text="名称"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+        <EditText
+            android:id="@+id/editName"
+            app:layout_constraintTop_toBottomOf="@id/nameTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:maxLines="1"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/selectColorRecyclerView"
+            android:layout_width="320dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="160dp"
+            app:layout_constraintTop_toBottomOf="@id/editName"
+            android:layout_marginTop="15dp"
+            >
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/tip"
+            android:textSize="15sp"
+            android:text="@string/diy_action_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/selectColorRecyclerView"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <RadioGroup
+            android:id="@+id/typeSelect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/tip"
+            android:layout_marginTop="15dp"
+            android:visibility="gone"
+            >
+            <RadioButton
+                android:text="@string/str_gradient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                />
+            <RadioButton
+                android:text="@string/str_jump"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                />
+            <RadioButton
+                android:text="@string/str_strobe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tvSpeed"
+            android:text="@string/tv_speed"
+            android:textSize="15sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/typeSelect"
+            android:layout_marginTop="15dp"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <SeekBar
+            android:id="@+id/sbSpeed"
+            app:layout_constraintTop_toBottomOf="@id/tvSpeed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:max="100"
+            android:progress="50"
+            />
+
+        <Button
+            android:id="@+id/saveNode"
+            android:text="@string/save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

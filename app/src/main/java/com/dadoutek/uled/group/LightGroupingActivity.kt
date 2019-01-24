@@ -301,6 +301,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
+         //设置光标默认在最后
+        textGp.setSelection(textGp.getText().toString().length)
         AlertDialog.Builder(this@LightGroupingActivity)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)

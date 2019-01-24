@@ -28,8 +28,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 210
-        versionName "2.2.16"
+        versionCode 225
+        versionName "2.3.0"
 
         multiDexEnabled true
 
@@ -76,8 +76,8 @@ repositories {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 8
-    //设置DaoMaster、D0.aoSession、Dao包名，也就是要放置这些类的包的全路径。
+    schemaVersion 9
+    //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
     targetGenDir 'src/main/java'
@@ -130,5 +130,7 @@ dependencies {
     implementation 'com.github.skydoves:colorpickerview:2.0.1'
 //    implementation 'com.github.huburt-Hu:NewbieGuide:v2.4.0'
     implementation 'mi-appstore:xiaomi-update-sdk:4.0.3'
+    implementation 'com.github.duanhong169:colorpicker:1.1.5'
 //    implementation 'com.github.wanglu1209:WPopup:lastReleases'
+//    implementation 'actionsheet:1.0.3'
 }

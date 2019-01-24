@@ -29,6 +29,7 @@ object LightModel {
         dbLight.colorTemperature = colorTemperature
         dbLight.belongGroupId = belongGroupId.toLong()
         dbLight.color = color
+        dbLight.id=lid.toLong()
         return NetworkFactory.getApi()
                 .updateLight(token,lid,dbLight)
                 .compose(NetworkTransformer())

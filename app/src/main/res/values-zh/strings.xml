@@ -320,15 +320,15 @@
     <string name="by_info_reset">了解详情</string>
     <string name="by_light_reset_title">物理恢复</string>
     <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
-    <string name="question_1">1.如何恢复出厂设置？</string>
+    <string name="question_1">2.如何恢复出厂设置？</string>
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
     <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源1秒，断开电源6s，重复约5-6次，直至灯闪烁。
         开关：接上电源，同时按住开关4个按键中的左上按键与右下按键。期间蓝灯会常亮。
         传感器：接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="common_question">常见问题</string>
-    <string name="question_2">2.部分华为手机存在蓝牙不稳定</string>
+    <string name="question_2">3.部分华为手机存在蓝牙不稳定</string>
     <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
-    <string name="question_3">3.无法控制，连接不上</string>
+    <string name="question_3">4.无法控制，连接不上</string>
     <string name="question3_answer">一些手机使用过久可能手机蓝牙会出现无法使用的情况，可以试试把手机蓝牙关掉，再打开，甚至一些低端机型需要重启手机才可以使用蓝牙</string>
     <string name="group_limit">最多添加255个组,目前已达上限</string>
     <string name="data_empty">数据已经为空</string>
@@ -371,7 +371,7 @@
     <string name="ota_str">固件升级</string>
     <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
-    <string name="question0">去哪更新APP？</string>
+    <string name="question0">1.去哪更新APP？</string>
     <string name="update_group">修改分组</string>
     <string name="the_last_version">当前已经是最新版本！</string>
     <string name="updateSuccess">升级成功!</string>
@@ -446,7 +446,7 @@
     <string name="is_exit_ota">OTA进行中，你真的想退出吗？</string>
     <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
-    <string name="dynamic_rgb">动态RGB</string>
+    <string name="dynamic_rgb">渐变</string>
     <string name="speed_text">速度：%1$s%%</string>
     <string name="dynamic_gradient">渐变</string>
     <string name="stop">停止</string>
@@ -499,6 +499,20 @@
     <string name="not_null_scene">场景名不能为空</string>
     <string name="get_update_file">获取升级包...</string>
     <string name="firware_version">固件版本号:%1$s</string>
+    <string name="mode_preset">内置模式</string>
+    <string name="mode_diy">自定义</string>
+    <string name="please_check_group">请选择分组:</string>
+    <string name="tv_speed">速度:%1$s</string>
+    <string name="str_gradient">渐变</string>
+    <string name="str_jump">跳变</string>
+    <string name="str_strobe">频闪</string>
+    <string name="save">保存</string>
+    <string name="diy_action_tip">*点击按钮修改颜色,长按删除颜色</string>
+    <string name="color_check">颜色选择</string>
+    <string name="name_not_null_tip">名称不可以为空</string>
+    <string name="mode_str">模式</string>
+    <string name="save_gradient_dialog_tip">保存渐变中...</string>
+    <string name="add_gradient_limit">最大只能添加6个渐变!</string>
     <string name="color_checked_set">颜色选择</string>
     <string name="one_click_group">一键分组</string>
     <string name="please_select_light_type">请选灯类型</string>
@@ -506,8 +520,14 @@
     <string name="tip_save_scene_all_group">是否将未选择的组亮度白光置为0？</string>
     <string name="install_old_device_tip">搜索已安装设备</string>
     <string name="search_new_device">搜索新设备</string>
+    <string name="update_gradient">修改渐变</string>
+    <string name="add_gradient">添加渐变</string>
     <string name="config_night_light_select_group">请至少选择一个分组</string>
     <string name="net_work_error">无可用网络</string>
     <string name="please_check_group_tip">请选择分组:</string>
     <string name="tip_phone_ble_off">手机蓝牙关闭,升级失败</string>
+    <string name="instruction_manual">使用说明书: http://www.dadoutek.com/app/README/index.html</string>
+    <string name="re_upgrade">重新升级</string>
+    <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
+    <string name="get_code_ing">获取验证...</string>
 </resources>
