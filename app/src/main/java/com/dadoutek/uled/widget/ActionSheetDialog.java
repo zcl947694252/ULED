@@ -23,7 +23,7 @@
  * SOFTWARE.
  */
 
-package com.android.actionsheetdialog;
+package com.dadoutek.uled.widget;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -45,6 +45,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.dadoutek.uled.R;
 
 import java.util.ArrayList;
 import java.util.List;

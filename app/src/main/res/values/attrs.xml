@@ -1,2 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <declare-styleable name="ActionSheetDialog">
+        <!-- Attributes for title-->
+        <attr name="titleTextColor" format="color" />
+        <attr name="titleTextSize" format="dimension" />
+        <attr name="titleHeight" format="dimension" />
+        <attr name="titleDivider" format="reference" />
+        <attr name="titleDividerInset" format="dimension" />
+        <attr name="titleDividerHeight" format="dimension" />
+        <!-- Attributes for message-->
+        <attr name="messageTextColor" format="color" />
+        <attr name="messageTextSize" format="dimension" />
+        <attr name="messageHeight" format="dimension" />
+        <attr name="messageDivider" format="reference" />
+        <attr name="messageDividerInset" format="dimension" />
+        <attr name="messageDividerHeight" format="dimension" />
+        <!-- Attributes for items-->
+        <attr name="itemTextColor" format="color" />
+        <attr name="itemTextSize" format="dimension" />
+        <attr name="itemHeight" format="dimension" />
+        <attr name="itemDivider" format="reference" />
+        <attr name="itemDividerInset" format="dimension" />
+        <attr name="itemDividerHeight" format="dimension" />
+        <!-- Attributes for positive button-->
+        <attr name="positiveTextColor" format="color" />
+        <attr name="positiveTextSize" format="dimension" />
+        <attr name="positiveHeight" format="dimension" />
+        <!-- Attributes for negative button-->
+        <attr name="cancelTextColor" format="color" />
+        <attr name="cancelTextSize" format="dimension" />
+        <attr name="cancelHeight" format="dimension" />
+        <attr name="cancelTopMargins" format="dimension" />
+        <attr name="cancelBackground" format="reference" />
+        <!-- Attributes for dialog window-->
+        <attr name="sheetMargins" format="dimension" />
+        <attr name="contentBackground" format="reference" />
+        <attr name="windowAnimations" format="reference" />
+    </declare-styleable>
+</resources>
