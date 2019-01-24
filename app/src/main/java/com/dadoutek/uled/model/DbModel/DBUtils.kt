@@ -257,9 +257,9 @@ object DBUtils {
     }
 
     fun getGroupByMesh(mesh: Int): DbGroup {
-        val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
+        val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
         Log.d("datasave", "getGroupByMesh: $mesh")
-        return dbGroup
+        return dbGroupLs[0]
     }
 
     
