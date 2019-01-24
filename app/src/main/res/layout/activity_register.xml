@@ -32,6 +32,7 @@
             android:inputType="phone"
             android:maxLength="16"
             android:maxLines="1"
+            android:singleLine="true"
             android:padding="5dp"
             />
     </android.support.design.widget.TextInputLayout>
@@ -72,6 +73,7 @@
             android:inputType="textPassword"
             android:maxLength="16"
             android:maxLines="1"
+            android:singleLine="true"
             android:padding="5dp"
             />
     </android.support.design.widget.TextInputLayout>
@@ -107,6 +109,7 @@
             android:maxLength="16"
             android:maxLines="1"
             android:padding="5dp"
+            android:singleLine="true"
             />
     </android.support.design.widget.TextInputLayout>
 

@@ -56,7 +56,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         initToolbar()
         initData()
         initView()
-        initGesture()
+//        initGesture()
     }
 
     private fun initGesture() {
@@ -105,9 +105,9 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         }, null)
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return mDetector!!.onTouchEvent(event)
-    }
+//    override fun onTouchEvent(event: MotionEvent?): Boolean {
+//        return mDetector!!.onTouchEvent(event)
+//    }
 
     override fun onPause() {
         super.onPause()
@@ -164,10 +164,10 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         builtInModeRecycleView!!.layoutManager = layoutmanager
         this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
         builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
-        builtInModeRecycleView?.setOnTouchListener { v, event ->
-            mDetector?.onTouchEvent(event)
-            false
-        }
+//        builtInModeRecycleView?.setOnTouchListener { v, event ->
+////            mDetector?.onTouchEvent(event)
+//            false
+//        }
         rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
         rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
     }
@@ -179,10 +179,10 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         builtDiyModeRecycleView!!.layoutManager = layoutmanager
         this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
-        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
-            mDetector?.onTouchEvent(event)
-            false
-        }
+//        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
+//            mDetector?.onTouchEvent(event)
+//            false
+//        }
         rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
         rgbDiyGradientAdapter!!.onItemClickListener = onItemClickListener
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildDiyClickListener

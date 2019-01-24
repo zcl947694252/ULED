@@ -2,8 +2,12 @@ package com.dadoutek.uled.light
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanFilter
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -23,6 +27,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.Toast
 import butterknife.ButterKnife
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -235,7 +240,43 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         super.onResume()
 //        initData()
 //        initView()
+//        Thread {
+//            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+//            Thread.sleep(2500)
+//            if (this@LightsOfGroupActivity == null ||
+//                    this@LightsOfGroupActivity.isDestroyed ||
+//                    this@LightsOfGroupActivity.isFinishing || !acitivityIsAlive) {
+//            } else {
+//                autoConnect()
+//            }
+//        }.start()
+//
+//        val filter = IntentFilter()
+//        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+//        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+//        registerReceiver(mReceiver, filter)
     }
+
+//    private val mReceiver = object : BroadcastReceiver() {
+//        override fun onReceive(context: Context, intent: Intent) {
+//            val action = intent.action
+//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
+//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
+//
+//                when (state) {
+//                    BluetoothAdapter.STATE_ON -> {
+//                        TelinkLightService.Instance().idleMode(true)
+//                        retryConnectCount = 0
+//                        autoConnect()
+//                        LogUtil.d("STATE_ON")
+//                    }
+//                    BluetoothAdapter.STATE_OFF -> {
+//                        LogUtil.d("STATE_OFF")
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     override fun onStop() {
         super.onStop()
@@ -326,7 +367,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             searchView!!.setSubmitButtonEnabled(true)
             searchView!!.backgroundColor = resources.getColor(R.color.blue)
             searchView!!.alpha = 0.3f
-            val icon = searchView!!.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_button)
+//            val icon = searchView!!.findViewById<ImageView>(android.support.v7.appcompat.R.id.search_button)
             return super.onCreateOptionsMenu(menu)
         }
         return true
@@ -756,6 +797,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         this.mApplication?.removeEventListener(this)
         stopConnectTimer()
         mCheckRssiDisposal?.dispose()
+//        try {
+//            this.unregisterReceiver(mReceiver)
+//        }catch (e:Exception){
+//            e.printStackTrace()
+//        }
     }
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {

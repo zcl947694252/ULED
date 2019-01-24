@@ -211,12 +211,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     case BluetoothAdapter.STATE_ON:{
                         log("蓝牙打开");
                         TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF:{
                         log("蓝牙关闭");
                         ToastUtils.showLong(R.string.tip_phone_ble_off);
                         TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService.Instance().disconnect();
                         showUpdateFailView();
                     }
                 }

@@ -35,6 +35,7 @@
             android:inputType="phone"
             android:maxLength="16"
             android:maxLines="1"
+            android:singleLine="true"
             android:padding="5dp" />
     </android.support.design.widget.TextInputLayout>
 

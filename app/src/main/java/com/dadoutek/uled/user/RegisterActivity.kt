@@ -129,6 +129,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
+            showLoadingDialog(getString(R.string.get_code_ing))
             SMSSDK.getVerificationCode(countryCode, phoneNum)
         }
     }
@@ -168,6 +169,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                             ToastUtils.showLong(a.message)
                         }
                     }
+                    hideLoadingDialog()
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理验证成功的结果

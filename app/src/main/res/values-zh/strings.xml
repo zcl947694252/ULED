@@ -446,7 +446,7 @@
     <string name="is_exit_ota">OTA进行中，你真的想退出吗？</string>
     <string name="show_guide_again_tip">要再看一次APP教程吗？</string>
     <string name="repeat_name">已经有该组名存在,请重新输入组名</string>
-    <string name="dynamic_rgb">动态RGB</string>
+    <string name="dynamic_rgb">渐变</string>
     <string name="speed_text">速度：%1$s%%</string>
     <string name="dynamic_gradient">渐变</string>
     <string name="stop">停止</string>
@@ -529,4 +529,5 @@
     <string name="instruction_manual">使用说明书: http://www.dadoutek.com/app/README/index.html</string>
     <string name="re_upgrade">重新升级</string>
     <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
+    <string name="get_code_ing">获取验证...</string>
 </resources>

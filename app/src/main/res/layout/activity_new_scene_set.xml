@@ -76,6 +76,8 @@
                 android:layout_marginBottom="8dp"
                 android:hint="@string/plaese_input_scene_name"
                 android:lines="1"
+                android:maxLines="1"
+                android:singleLine="true"
                 android:maxLength="16"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"

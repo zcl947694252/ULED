@@ -477,7 +477,7 @@
         
     <string name="repeat_name">The group name already exists. Please re-enter the group name </string>
         
-    <string name="dynamic_rgb">Dynamic RGB</string>
+    <string name="dynamic_rgb">Gradient</string>
         
     <string name="speed_text">Speed: %1$s%%</string>
         
@@ -583,5 +583,6 @@
     <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
     <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
     <string name="re_upgrade">Re-upgrade</string>
-    <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
+    <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
+    <string name="get_code_ing">获取验证...</string>
 </resources>
