@@ -273,9 +273,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun checkPermission() {
-        if(light!!.macAddr.length<16){
-            ToastUtils.showLong(getString(R.string.bt_error))
-        }else{
+//        if(light!!.macAddr.length<16){
+//            ToastUtils.showLong(getString(R.string.bt_error))
+//        }else{
             mDisposable.add(
                     mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
@@ -286,7 +286,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             ToastUtils.showLong(R.string.update_permission_tip)
                         }
                     })
-        }
+//        }
     }
 
     private fun transformView() {
@@ -621,6 +621,10 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
+
+            editTitle.visibility=View.GONE
+            titleCenterName.visibility=View.VISIBLE
+            titleCenterName.text = group?.name
         }
         else {
             var canSave=true
@@ -647,6 +651,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
+            editTitle.visibility=View.GONE
+            titleCenterName.visibility=View.VISIBLE
+            titleCenterName.text = light?.name
         }else{
             editTitle.visibility=View.GONE
             titleCenterName.visibility=View.VISIBLE

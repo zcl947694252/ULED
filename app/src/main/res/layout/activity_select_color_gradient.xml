@@ -7,9 +7,6 @@
 
     <include layout="@layout/toolbar" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -103,6 +100,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/brightness"
                 app:palette="@drawable/palette"
                 app:selector="@drawable/wheel"
                 app:enableBrightness="false"
@@ -117,7 +115,7 @@
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/color_picker">
+               app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
                     android:id="@+id/tv_brightness_rgb"
@@ -162,6 +160,4 @@
                     />
             </LinearLayout>
         </android.support.constraint.ConstraintLayout>
-    </ScrollView>
-
 </LinearLayout>

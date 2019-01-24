@@ -752,10 +752,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      */
     private synchronized void startScan() {
         List<ScanFilter> scanFilters = new ArrayList<>();
-        ScanFilter scanFilter = new ScanFilter.Builder()
-                .setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount())
-                .setDeviceAddress(dbLight.getMacAddr())
-                .build();
+        ScanFilter.Builder scanFilterBuilder = new ScanFilter.Builder();
+        scanFilterBuilder.setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount());
+        if(dbLight.getMacAddr().length()>16){
+            scanFilterBuilder.setDeviceAddress(dbLight.getMacAddr());
+        }
+        ScanFilter scanFilter = scanFilterBuilder.build();
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
@@ -765,7 +767,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
-        params.setScanMac(dbLight.getMacAddr());
+        if(dbLight.getMacAddr().length()>16){
+            params.setScanMac(dbLight.getMacAddr());
+        }
         TelinkLightService.Instance().startScan(params);
         startScanTimer();
         log("startScan ");
