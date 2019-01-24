@@ -142,15 +142,19 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
     }
 
     private fun checkPermission() {
-        mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    if (granted!!) {
-                        OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
-                    } else {
-                        ToastUtils.showLong(R.string.update_permission_tip)
-                    }
-                })
+//        if(light!!.macAddr.length<16){
+//            ToastUtils.showLong(getString(R.string.bt_error))
+//        }else{
+            mDisposable.add(
+                    mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                        if (granted!!) {
+                            OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                        } else {
+                            ToastUtils.showLong(R.string.update_permission_tip)
+                        }
+                    })
+//        }
     }
 
     private fun renameLight() {

@@ -153,6 +153,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
     private long TIME_OUT_SENDDATA = 10;
+    private boolean OTA_IS_HAVEN_START=false;
 
     private Handler delayHandler = new Handler();
     @SuppressLint("HandlerLeak")
@@ -210,6 +211,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     case BluetoothAdapter.STATE_ON:{
                         log("蓝牙打开");
                         TelinkLightService.Instance().idleMode(true);
+                        LeBluetooth.getInstance().stopScan();
                     }
                     case BluetoothAdapter.STATE_OFF:{
                         log("蓝牙关闭");
@@ -750,10 +752,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      */
     private synchronized void startScan() {
         List<ScanFilter> scanFilters = new ArrayList<>();
-        ScanFilter scanFilter = new ScanFilter.Builder()
-                .setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount())
-                .setDeviceAddress(dbLight.getMacAddr())
-                .build();
+        ScanFilter.Builder scanFilterBuilder = new ScanFilter.Builder();
+        scanFilterBuilder.setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount());
+        if(dbLight.getMacAddr().length()>16){
+            scanFilterBuilder.setDeviceAddress(dbLight.getMacAddr());
+        }
+        ScanFilter scanFilter = scanFilterBuilder.build();
         scanFilters.add(scanFilter);
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
@@ -763,7 +767,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
-        params.setScanMac(dbLight.getMacAddr());
+        if(dbLight.getMacAddr().length()>16){
+            params.setScanMac(dbLight.getMacAddr());
+        }
         TelinkLightService.Instance().startScan(params);
         startScanTimer();
         log("startScan ");
@@ -798,6 +804,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         visibleHandler.obtainMessage(View.GONE, otaProgress).sendToTarget();
 
         if (TelinkLightApplication.getApp().getConnectDevice() != null) {
+            OTA_IS_HAVEN_START=true;
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             startScan();
@@ -883,14 +890,21 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         runOnUiThread(() -> {
             text_info.setVisibility(View.VISIBLE);
             text_info.setText(R.string.update_fail);
-            btn_start_update.setVisibility(View.GONE);
-            btn_start_update.setClickable(false);
             mode = MODE_IDLE;
-            TelinkLightApplication.getApp().removeEventListener(this);
+//            TelinkLightApplication.getApp().removeEventListener(this);
             stopScanTimer();
             LeBluetooth.getInstance().stopScan();
             stopConnectTimer();
 //            addEventListener();
+            if(OTA_IS_HAVEN_START){
+                btn_start_update.setVisibility(View.GONE);
+                btn_start_update.setClickable(false);
+                TelinkLightApplication.getApp().removeEventListener(this);
+            }else{
+                btn_start_update.setText(getString(R.string.re_upgrade));
+                btn_start_update.setVisibility(View.VISIBLE);
+                btn_start_update.setClickable(true);
+            }
         });
     }
 
