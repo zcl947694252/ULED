@@ -59,6 +59,8 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private var mConfigFailSnackbar: Snackbar? = null
 
+    private var isGlassSwitch=false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_group)
@@ -81,6 +83,9 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                     successCallback = {
                         versionLayout.visibility = View.VISIBLE
                         tvLightVersion.text = it
+                        if(it!!.startsWith("ST")){
+                            isGlassSwitch=true
+                        }
                     },
                     failedCallback = {
                         versionLayout.visibility = View.GONE
@@ -302,16 +307,22 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun showConfigSuccessDialog() {
         try{
-            AlertDialog.Builder(this)
-                    .setCancelable(false)
-                    .setTitle(R.string.install_success)
-                    .setMessage(R.string.tip_config_switch_success)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        TelinkLightService.Instance().idleMode(true)
-                        TelinkLightService.Instance().disconnect()
-                        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-                    }
-                    .show()
+            if(isGlassSwitch){
+                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance().disconnect()
+                ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+            }else{
+                AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setTitle(R.string.install_success)
+                        .setMessage(R.string.tip_config_switch_success)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            TelinkLightService.Instance().idleMode(true)
+                            TelinkLightService.Instance().disconnect()
+                            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                        }
+                        .show()
+            }
         }catch (e:Exception){
             e.printStackTrace()
         }
