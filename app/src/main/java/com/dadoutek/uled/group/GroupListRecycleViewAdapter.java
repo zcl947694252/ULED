@@ -51,7 +51,8 @@ public class GroupListRecycleViewAdapter extends BaseItemDraggableAdapter<DbGrou
                     .addOnClickListener(R.id.txt_name).
                     addOnClickListener(R.id.btn_on).
                     addOnClickListener(R.id.btn_off).
-                    addOnClickListener(R.id.btn_set);
+                    addOnClickListener(R.id.btn_set).
+                    addOnClickListener(R.id.add_group);
         }
 
     }

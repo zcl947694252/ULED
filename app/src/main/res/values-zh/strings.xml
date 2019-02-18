@@ -530,4 +530,5 @@
     <string name="re_upgrade">重新升级</string>
     <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
     <string name="get_code_ing">获取验证...</string>
+    <string name="add_new_group">+添加分组</string>
 </resources>

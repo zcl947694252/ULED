@@ -585,4 +585,5 @@
     <string name="re_upgrade">Re-upgrade</string>
     <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
     <string name="get_code_ing">Get verification...</string>
+    <string name="add_new_group">+Add group</string>
 </resources>

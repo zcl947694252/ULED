@@ -1,6 +1,7 @@
 package com.dadoutek.uled.group
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
@@ -40,6 +42,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -196,6 +199,7 @@ class GroupListFragment : BaseFragment() {
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
         adapter!!.setOnItemChildClickListener(onItemChildClickListener)
+        adapter!!.addFooterView(getFooterView())
         adapter!!.bindToRecyclerView(recyclerView)
 
         setMove()
@@ -203,6 +207,77 @@ class GroupListFragment : BaseFragment() {
         application = activity!!.application as TelinkLightApplication
         dataManager = DataManager(TelinkLightApplication.getInstance(),
                 application!!.mesh.name, application!!.mesh.password)
+    }
+
+    private fun addNewGroup() {
+        val textGp = EditText(activity)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.setText(DBUtils.getDefaultNewGroupName())
+        //设置光标默认在最后
+        textGp.setSelection(textGp.getText().toString().length)
+        AlertDialog.Builder(activity)
+                .setTitle(R.string.create_new_group)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(textGp)
+
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                    } else {
+                        //往DB里添加组数据
+                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, activity!!)
+                        refreshView()
+                        dialog.dismiss()
+                    }
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    private fun refreshView() {
+        gpList = DBUtils.groupList
+
+        showList = ArrayList()
+
+        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
+
+        //如果有调整过顺序取本地数据，否则取数据库数据
+        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
+            showList = dbOldGroupList
+        } else {
+            showList = gpList
+        }
+
+        val layoutmanager = LinearLayoutManager(activity)
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        recyclerView!!.layoutManager = layoutmanager
+        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, showList)
+
+        val decoration = DividerItemDecoration(activity!!,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+                .divider)))
+        //添加分割线
+        recyclerView?.addItemDecoration(decoration)
+        recyclerView?.itemAnimator = DefaultItemAnimator()
+
+        adapter!!.setOnItemChildClickListener(onItemChildClickListener)
+        adapter!!.addFooterView(getFooterView())
+        adapter!!.bindToRecyclerView(recyclerView)
+
+        recyclerView!!.smoothScrollToPosition(showList!!.size)
+    }
+
+    private fun getFooterView(): View? {
+       val footerView = layoutInflater.inflate(R.layout.gp_fragment_add_view,null)
+        footerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        footerView.setOnClickListener {
+            addNewGroup()
+        }
+
+        return footerView
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -239,6 +314,9 @@ class GroupListFragment : BaseFragment() {
                         startActivityForResult(intent, 0)
 
 //                        ActivityUtils.startActivityForResult(intent)
+                    }
+                    R.id.add_group -> {
+                        addNewGroup()
                     }
                 }
             }
