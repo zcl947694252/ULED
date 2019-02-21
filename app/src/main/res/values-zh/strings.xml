@@ -531,4 +531,15 @@
     <string name="bt_error">该灯异常,请恢复出厂设置再重新安装升级！</string>
     <string name="get_code_ing">获取验证...</string>
     <string name="add_new_group">+添加分组</string>
+    <string name="rename_groups">重命名分组</string>
+    <string name="create_group">创建分组</string>
+    <string name="create_scene_select">创建场景</string>
+    <string name="normal_light_describe">单色温,双色温灯</string>
+    <string name="rgb_light_describe">RGB灯,RGBW灯</string>
+    <string name="switch_name">开关</string>
+    <string name="switch_describe">调光调色开关,场景开关,玻璃开关</string>
+    <string name="sensor">传感器</string>
+    <string name="sensor_describe">小夜灯,PIR</string>
+    <string name="add_device">添加设备</string>
+    <string name="update_name_gp">修改组名</string>
 </resources>

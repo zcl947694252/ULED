@@ -41,6 +41,8 @@ object GuideUtils {
 
     var ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME="ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME"
     var ADDITIONAL_GUIDE_SET_SCENE="ADDITIONAL_GUIDE_SET_SCENE"
+
+    var GUIDE_START_INSTALL_DEVICE_NOW="GUIDE_START_INSTALL_DEVICE_NOW"
     /**
      * 每个页面引导结束标志
      * 本次取值为true则当前页不引导
@@ -171,6 +173,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, MAIN_STEP0_GUIDE_TO_SCENE)
         NewbieGuide.resetLabel(activity, ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
         NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
+        NewbieGuide.resetLabel(activity, GUIDE_START_INSTALL_DEVICE_NOW)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
@@ -184,6 +187,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, STEP0_GUIDE_SELECT_DEVICE_KEY)
         NewbieGuide.resetLabel(activity, STEP1_GUIDE_ADD_DEVICE_KEY)
         NewbieGuide.resetLabel(activity, STEP2_GUIDE_START_INSTALL_DEVICE)
+        NewbieGuide.resetLabel(activity, GUIDE_START_INSTALL_DEVICE_NOW)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
     }
 

@@ -77,7 +77,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                     Commander.addScene(sceneId, light!!.meshAddr, action.color)
                                     Thread.sleep(100)
                                 }
-
                             }
                         }
                         DBUtils.updateLight(light!!)

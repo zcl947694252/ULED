@@ -586,4 +586,15 @@
     <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
     <string name="get_code_ing">Get verification...</string>
     <string name="add_new_group">+Add group</string>
+    <string name="rename_groups"> Rename group </string>
+    <string name="create_group">Create group </string>
+    <string name="create_scene_select">Create a scene</string>
+    <string name="normal_light_describe"> Monochrome temperature, dual color temperature light </string>
+    <string name="rgb_light_describe">RGB lights, RGBW lights</string>
+    <string name="switch_name">Switch </string>
+    <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
+    <string name="sensor">Sensor </string>
+    <string name="sensor_describe">Night light, PIR</string>
+    <string name="add_device">添加设备</string>
+    <string name="update_name_gp">修改组名</string>
 </resources>

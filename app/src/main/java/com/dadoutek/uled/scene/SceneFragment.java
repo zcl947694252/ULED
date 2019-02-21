@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,6 +43,7 @@ import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.LogUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -363,6 +365,7 @@ public class SceneFragment extends BaseFragment implements
 //            initData();
 //            initView();
 //            showLoadingDialog("ss");
+            refreshAllData();
             initOnLayoutListener(1);
         }else{
             if(getActivity()!=null){
@@ -370,6 +373,48 @@ public class SceneFragment extends BaseFragment implements
             }
         }
 
+    }
+
+    private void refreshAllData() {
+        List<DbScene> mOldDatas = scenesListData;
+        List<DbScene> mNewDatas = loadData();
+
+        DiffUtil.DiffResult diffResult=DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return mOldDatas.size();
+            }
+
+            @Override
+            public int getNewListSize() {
+                return mNewDatas.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                return mOldDatas.get(oldItemPosition).getId().equals(mNewDatas.get
+                        (newItemPosition).getId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                DbScene beanOld = mOldDatas.get(oldItemPosition);
+                DbScene beanNew = mNewDatas.get(newItemPosition);
+                if (!beanOld.getName().equals(beanNew.getName())) {
+                    return false;
+                } else return false;
+            }
+        },true);
+
+        scenesListData = mNewDatas;
+        adaper.setNewData(scenesListData);
+        diffResult.dispatchUpdatesTo(adaper);
+    }
+
+    private List<DbScene> loadData() {
+        List<DbScene> showList = new ArrayList<>();
+                showList = DBUtils.INSTANCE.getSceneList();
+        return showList;
     }
 
     @Override

@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
+import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Groups;
@@ -19,11 +20,12 @@ import java.util.List;
  * Created by hejiajun on 2018/3/28.
  */
 
-public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
+public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {
 
     private List<DbGroup> mGroupList;
     //声明自定义的监听接口
     private OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener = null;
+    private OnRecyclerviewItemLongClickListener mOnRecyclerviewItemLongClickListener = null;
 
     @Override
     public void onClick(View v) {
@@ -33,6 +35,12 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
 
     public Group get(int addr) {
         return Groups.getInstance().getByMeshAddress(addr);
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        mOnRecyclerviewItemLongClickListener.onItemLongClickListener(v, ((int) v.getTag()));
+        return false;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -46,9 +54,17 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         }
     }
 
-    public GroupsRecyclerViewAdapter(List<DbGroup> mGroupList, OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener) {
+    public GroupsRecyclerViewAdapter(List<DbGroup> mGroupList, OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener
+            ) {
         this.mGroupList = mGroupList;
         this.mOnRecyclerviewItemClickListener = mOnRecyclerviewItemClickListener;
+    }
+
+    public GroupsRecyclerViewAdapter(List<DbGroup> mGroupList, OnRecyclerviewItemClickListener mOnRecyclerviewItemClickListener
+            ,OnRecyclerviewItemLongClickListener mOnRecyclerviewItemLongClickListener) {
+        this.mGroupList = mGroupList;
+        this.mOnRecyclerviewItemClickListener = mOnRecyclerviewItemClickListener;
+        this.mOnRecyclerviewItemLongClickListener = mOnRecyclerviewItemLongClickListener;
     }
 
     @Override
@@ -56,6 +72,7 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.adpter_item_recycler_groups, parent, false);
         ViewHolder holder = new ViewHolder(view);
         view.setOnClickListener(this);
+        view.setOnLongClickListener(this);
         return holder;
     }
 
