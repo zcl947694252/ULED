@@ -37,130 +37,140 @@
             />
     </android.support.constraint.ConstraintLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/install_device_recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="400dp"
         app:layout_constraintTop_toBottomOf="@id/install_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         >
-        <android.support.v7.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
-            app:layout_constraintTop_toBottomOf="@id/install_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:orientation="vertical"
-            >
+    </android.support.v7.widget.RecyclerView>
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/install_light"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:foreground="?android:attr/selectableItemBackground"
-                >
-                <TextView
-                    android:text="@string/normal_light"
-                    android:textSize="20sp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    />
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="500dp"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/install_title"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--&gt;-->
+        <!--<android.support.v7.widget.LinearLayoutCompat-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="500dp"-->
+            <!--app:layout_constraintTop_toBottomOf="@id/install_title"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--android:orientation="vertical"-->
+            <!--&gt;-->
 
-                <TextView
-                    android:text="@string/normal_light_describe"
-                    android:layout_marginStart="20dp"
-                    android:textSize="15sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </android.support.v7.widget.LinearLayoutCompat>
+            <!--<android.support.v7.widget.LinearLayoutCompat-->
+                <!--android:id="@+id/install_light"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="vertical"-->
+                <!--android:foreground="?android:attr/selectableItemBackground"-->
+                <!--&gt;-->
+                <!--<TextView-->
+                    <!--android:text="@string/normal_light"-->
+                    <!--android:textSize="20sp"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:layout_marginTop="20dp"-->
+                    <!--android:layout_marginBottom="10dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--/>-->
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/install_rgb_light"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="20dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                >
-                <TextView
-                    android:text="@string/rgb_light"
-                    android:textSize="20sp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    />
+                <!--<TextView-->
+                    <!--android:text="@string/normal_light_describe"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content" />-->
+            <!--</android.support.v7.widget.LinearLayoutCompat>-->
 
-                <TextView
-                    android:text="@string/rgb_light_describe"
-                    android:layout_marginStart="20dp"
-                    android:textSize="15sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </android.support.v7.widget.LinearLayoutCompat>
+            <!--<android.support.v7.widget.LinearLayoutCompat-->
+                <!--android:id="@+id/install_rgb_light"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_marginTop="20dp"-->
+                <!--android:foreground="?android:attr/selectableItemBackground"-->
+                <!--&gt;-->
+                <!--<TextView-->
+                    <!--android:text="@string/rgb_light"-->
+                    <!--android:textSize="20sp"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:layout_marginTop="20dp"-->
+                    <!--android:layout_marginBottom="10dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--/>-->
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/install_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="20dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                >
-                <TextView
-                    android:text="@string/switch_name"
-                    android:textSize="20sp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    />
+                <!--<TextView-->
+                    <!--android:text="@string/rgb_light_describe"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content" />-->
+            <!--</android.support.v7.widget.LinearLayoutCompat>-->
 
-                <TextView
-                    android:text="@string/switch_describe"
-                    android:layout_marginStart="20dp"
-                    android:textSize="15sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </android.support.v7.widget.LinearLayoutCompat>
+            <!--<android.support.v7.widget.LinearLayoutCompat-->
+                <!--android:id="@+id/install_switch"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_marginTop="20dp"-->
+                <!--android:foreground="?android:attr/selectableItemBackground"-->
+                <!--&gt;-->
+                <!--<TextView-->
+                    <!--android:text="@string/switch_name"-->
+                    <!--android:textSize="20sp"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:layout_marginTop="20dp"-->
+                    <!--android:layout_marginBottom="10dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--/>-->
 
-            <android.support.v7.widget.LinearLayoutCompat
-                android:id="@+id/install_sensor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="20dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                >
-                <TextView
-                    android:text="@string/sensor"
-                    android:textSize="20sp"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    />
+                <!--<TextView-->
+                    <!--android:text="@string/switch_describe"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content" />-->
+            <!--</android.support.v7.widget.LinearLayoutCompat>-->
 
-                <TextView
-                    android:text="@string/sensor_describe"
-                    android:layout_marginStart="20dp"
-                    android:textSize="15sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </android.support.v7.widget.LinearLayoutCompat>
-        </android.support.v7.widget.LinearLayoutCompat>
+            <!--<android.support.v7.widget.LinearLayoutCompat-->
+                <!--android:id="@+id/install_sensor"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="vertical"-->
+                <!--android:layout_marginTop="20dp"-->
+                <!--android:foreground="?android:attr/selectableItemBackground"-->
+                <!--&gt;-->
+                <!--<TextView-->
+                    <!--android:text="@string/sensor"-->
+                    <!--android:textSize="20sp"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:layout_marginTop="20dp"-->
+                    <!--android:layout_marginBottom="10dp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--/>-->
 
-    </ScrollView>
+                <!--<TextView-->
+                    <!--android:text="@string/sensor_describe"-->
+                    <!--android:layout_marginStart="20dp"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content" />-->
+            <!--</android.support.v7.widget.LinearLayoutCompat>-->
+        <!--</android.support.v7.widget.LinearLayoutCompat>-->
+
+    <!--</ScrollView>-->
 
 </android.support.constraint.ConstraintLayout>

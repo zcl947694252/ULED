@@ -3,6 +3,8 @@ package com.dadoutek.uled.util
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Rect
+import android.graphics.RectF
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -73,6 +75,34 @@ object GuideUtils {
                 .setOnClickListener(onClickListener)
                 .build()
         guide.addHighLightWithOptions(guideTargetView, highlightOptions)
+
+        return guide
+    }
+
+    fun addDiyPositionPage(guideTargetView: View, res: Int, describeRes: String,
+                           onClickListener: View.OnClickListener,jumpViewContent: String,context: Context): GuidePage{
+        val guide = GuidePage.newInstance()
+                .setLayoutRes(res)
+                .setEverywhereCancelable(false)
+                .setOnLayoutInflatedListener { view, controller ->
+                    val tvGuide = view.findViewById<TextView>(R.id.show_guide_content)
+                    tvGuide.text = describeRes
+
+                    val known = view.findViewById<TextView>(R.id.kown)
+                    known.setOnClickListener { v -> controller.remove() }
+
+                    val tvJump = view.findViewById<TextView>(R.id.jump_out)
+                    tvJump.setOnClickListener { v ->
+                        showExitGuideDialog(context,controller,jumpViewContent)
+                    }
+                }
+        val highlightOptions = HighlightOptions.Builder()
+                .setOnClickListener(onClickListener)
+                .build()
+        val location = IntArray(2)
+        guideTargetView.getLocationOnScreen(location)
+        val rect = RectF(location[0].toFloat(), location[1].toFloat(),100f,100f)
+        guide.addHighLightWithOptions(rect, highlightOptions)
 
         return guide
     }

@@ -9,12 +9,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
+import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -32,6 +27,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
@@ -48,9 +44,10 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
     private var inflater: LayoutInflater? = null
@@ -65,17 +62,22 @@ class GroupListFragment : BaseFragment() {
     internal var showList: List<DbGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 16
-    private var install_light: LinearLayoutCompat? = null
-    private var install_rgb_light: LinearLayoutCompat? = null
-    private var install_switch: LinearLayoutCompat? = null
-    private var install_sensor: LinearLayoutCompat? = null
-    private var close_install_list: ImageView? = null
-    private var install_light_light: TextView? = null
+//    private var install_light: LinearLayoutCompat? = null
+//    private var install_rgb_light: LinearLayoutCompat? = null
+//    private var install_switch: LinearLayoutCompat? = null
+//    private var install_sensor: LinearLayoutCompat? = null
+//    private var close_install_list: ImageView? = null
+//    private var install_light_light: TextView? = null
 
     //19-2-20 界面调整
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
+
+    val INSTALL_NORMAL_LIGHT=0
+    val INSTALL_RGB_LIGHT=1
+    val INSTALL_SWITCH=2
+    val INSTALL_SENSOR=3
 
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
@@ -327,39 +329,6 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
-    private val dialogOnClick = View.OnClickListener {
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
-        isGuide = false
-        hidePopupMenu()
-        installDialog?.dismiss()
-        when (it.id) {
-            R.id.install_light -> {
-                if (DBUtils.allLight.size < 254) {
-                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                    startActivityForResult(intent, 0)
-                } else {
-                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                }
-            }
-            R.id.install_rgb_light -> {
-                if (DBUtils.allLight.size < 254) {
-                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    startActivityForResult(intent, 0)
-                } else {
-                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                }
-            }
-            R.id.install_switch -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
-            R.id.install_sensor -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
-            R.id.close_install_list -> { installDialog?.dismiss() }
-        }
-    }
-
     private val onClick = View.OnClickListener {
         var intent: Intent? = null
         //点击任何一个选项跳转页面都隐藏引导
@@ -395,26 +364,74 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun showInstallDeviceList() {
-        val view = LayoutInflater.from(activity!!).inflate(R.layout.dialog_install_list,null)
-        install_light = view.findViewById(R.id.install_light)
-        install_rgb_light = view.findViewById(R.id.install_rgb_light)
-        install_switch = view.findViewById(R.id.install_switch)
-        install_sensor = view.findViewById(R.id.install_sensor)
-        close_install_list = view.findViewById(R.id.close_install_list)
-        install_light?.setOnClickListener(dialogOnClick)
-        install_rgb_light?.setOnClickListener(dialogOnClick)
-        install_switch?.setOnClickListener(dialogOnClick)
-        install_sensor?.setOnClickListener(dialogOnClick)
-        close_install_list?.setOnClickListener(dialogOnClick)
+        val view = View.inflate(activity,R.layout.dialog_install_list,null)
+        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
+        val install_device_recyclerView=view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        close_install_list.setOnClickListener { v ->  installDialog?.dismiss()}
+
+        val installList:ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
+
+        val groupListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
+        val layoutManager =  LinearLayoutManager(activity)
+        install_device_recyclerView?.layoutManager = layoutManager
+        install_device_recyclerView?.adapter = groupListAdapter
+        groupListAdapter.bindToRecyclerView(install_device_recyclerView)
+
+        groupListAdapter.onItemClickListener = onItemClickListenerInstallList
 
         installDialog = AlertDialog.Builder(activity!!)
                 .setView(view)
                 .create()
-        guide3()
+
+        installDialog?.setOnShowListener {
+
+        }
+
         if(isGuide){
             installDialog?.setCancelable(false)
         }
+
         installDialog?.show()
+
+        Thread{
+            Thread.sleep(2000)
+            GlobalScope.launch(Dispatchers.Main){
+                guide3(install_device_recyclerView)
+            }
+        }.start()
+    }
+
+    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener {
+        adapter, view, position ->
+        var intent: Intent? = null
+        //点击任何一个选项跳转页面都隐藏引导
+//        val controller=guide2()
+//            controller?.remove()
+        isGuide = false
+        hidePopupMenu()
+        installDialog?.dismiss()
+        when (position) {
+            INSTALL_NORMAL_LIGHT -> {
+                if (DBUtils.allLight.size < 254) {
+                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                    startActivityForResult(intent, 0)
+                } else {
+                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                }
+            }
+            INSTALL_RGB_LIGHT -> {
+                if (DBUtils.allLight.size < 254) {
+                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    startActivityForResult(intent, 0)
+                } else {
+                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                }
+            }
+            INSTALL_SWITCH -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
+            INSTALL_SENSOR -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
+        }
     }
 
     private fun checkConnect() {
@@ -566,19 +583,21 @@ class GroupListFragment : BaseFragment() {
         return null
     }
 
-    private fun guide3(): Controller? {
+    private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
+        val listView =installDialog?.getListView()
+        installDialog?.getLayoutInflater()
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
         if (guideShowCurrentPage) {
             installDialog?.layoutInflater
             var guide3: View? = null
             if(isRgbClick){
-                guide3 = install_rgb_light
+                guide3 = install_device_recyclerView.getChildAt(1)
             }else{
-                guide3 = install_light
+                guide3 = install_device_recyclerView.getChildAt(0)
             }
 
             return GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
+                    .addGuidePage(GuideUtils.addDiyPositionPage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
                         guide3.performClick()
                         GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, true)
                     }, GuideUtils.END_GROUPLIST_KEY, activity!!))
