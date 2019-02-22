@@ -163,7 +163,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
             val guide6 = confirm
             GuideUtils.guideBuilder(this, GuideUtils.STEP13_GUIDE_ADD_SCENE_SAVE)
                     .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_scene_set1, getString(R.string.add_scene_guide_6),
-                            View.OnClickListener {guide6.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                            View.OnClickListener {
+                                guide6.performClick()
+                                GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, true)
+                            }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 

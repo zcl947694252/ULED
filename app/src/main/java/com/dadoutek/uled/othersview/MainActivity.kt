@@ -14,26 +14,36 @@ import android.os.PersistableBundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
+import com.app.hubert.guide.core.Controller
 import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ToastUtils
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.GroupListFragment
+import com.dadoutek.uled.group.InstallDeviceListAdapter
+import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceListFragment
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.SceneFragment
+import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -70,7 +80,7 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class MainActivity : TelinkBaseActivity(), EventListener<String>{
+class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMainActAndFragment{
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
@@ -143,12 +153,121 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if(ev?.getAction()==MotionEvent.ACTION_DOWN){
-            if(!groupFragment.isHidden){
+            if(bnve.currentItem==0){
                 groupFragment.myPopViewClickPosition(ev.x,ev.y)
+            }else if(bnve.currentItem==1){
+                sceneFragment.myPopViewClickPosition(ev.x,ev.y)
             }
-            return super.dispatchTouchEvent(ev);
+            return super.dispatchTouchEvent(ev)
         }
-        return super.dispatchTouchEvent(ev);
+        return super.dispatchTouchEvent(ev)
+    }
+
+    var installDialog: android.app.AlertDialog?=null
+    var isGuide:Boolean = false
+    var clickRgb:Boolean = false
+    private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
+        this.clickRgb=clickRgb
+        val view = View.inflate(this,R.layout.dialog_install_list,null)
+        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
+        val install_device_recyclerView=view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        close_install_list.setOnClickListener { v ->  installDialog?.dismiss()}
+
+        val installList:ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
+
+        val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
+        val layoutManager =  LinearLayoutManager(this)
+        install_device_recyclerView?.layoutManager = layoutManager
+        install_device_recyclerView?.adapter = installDeviceListAdapter
+        installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
+
+        installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
+
+        installDialog = android.app.AlertDialog.Builder(this)
+                .setView(view)
+                .create()
+
+        installDialog?.setOnShowListener {
+
+        }
+
+        if(isGuide){
+            installDialog?.setCancelable(false)
+        }
+
+        installDialog?.show()
+
+        Thread{
+            Thread.sleep(100)
+            GlobalScope.launch(Dispatchers.Main){
+                guide3(install_device_recyclerView)
+            }
+        }.start()
+    }
+
+    private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
+        val listView =installDialog?.getListView()
+        installDialog?.getLayoutInflater()
+        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, false)
+        if (guideShowCurrentPage) {
+            installDialog?.layoutInflater
+            var guide3: View? = null
+            if(clickRgb){
+                guide3 = install_device_recyclerView.getChildAt(1)
+            }else{
+                guide3 = install_device_recyclerView.getChildAt(0)
+            }
+
+            return GuideUtils.guideBuilder(this, installDialog!!.window.decorView,GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW)
+                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
+                        guide3.performClick()
+                        GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, true)
+                    }, GuideUtils.END_GROUPLIST_KEY, this))
+                    .show()
+        }
+        return null
+    }
+
+    val INSTALL_NORMAL_LIGHT=0
+    val INSTALL_RGB_LIGHT=1
+    val INSTALL_SWITCH=2
+    val INSTALL_SENSOR=3
+
+    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener {
+        adapter, view, position ->
+        var intent: Intent? = null
+        //点击任何一个选项跳转页面都隐藏引导
+//        val controller=guide2()
+//            controller?.remove()
+        isGuide = false
+//        hidePopupMenu()
+        installDialog?.dismiss()
+        when (position) {
+            INSTALL_NORMAL_LIGHT -> {
+                if (DBUtils.allLight.size < 254) {
+                    intent = Intent(this, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                    startActivityForResult(intent, 0)
+                } else {
+                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                }
+            }
+            INSTALL_RGB_LIGHT -> {
+                if (DBUtils.allLight.size < 254) {
+                    intent = Intent(this, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    startActivityForResult(intent, 0)
+                } else {
+                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                }
+            }
+            INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
+            INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
+        }
+    }
+
+    override fun showDeviceListDialog(isGuide: Boolean,isClickRgb:Boolean) {
+        showInstallDeviceList(isGuide,isClickRgb)
     }
 
     /**
@@ -188,7 +307,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
         }
     }
 
-    private fun transScene(){
+    public fun transScene(){
         bnve.currentItem=1
     }
 
@@ -251,6 +370,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
         locationServiceDialog = builder.create()
         locationServiceDialog?.setCancelable(false)
         locationServiceDialog?.show()
+    }
+
+    override fun changeToScene() {
+        transScene()
+    }
+
+    override fun changeToGroup() {
+        tranHome()
     }
 
     fun hideLocationServiceDialog() {
@@ -728,7 +855,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>{
             if (bestRSSIDevice != null) {
                 //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                 if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                    LogUtils.d("change to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                     bestRSSIDevice = deviceInfo
                 }
             } else {

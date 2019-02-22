@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/gpLayout"
@@ -18,125 +19,25 @@
             app:layout_constraintBottom_toBottomOf="parent"
             />
 
-        <LinearLayout
+        <include
             android:id="@+id/dialog_pop"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            layout="@layout/popwindow_install_deive_list"
             app:layout_constraintTop_toBottomOf="@id/toolbar_top"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@color/white"
-            android:orientation="vertical"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:visibility="gone"
-            android:clickable="true"
-            android:focusable="true"
-            android:elevation="10dp"
-            >
-                <TextView
-                android:id="@+id/install_device"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:text="@string/install_device"
-                android:gravity="start|center_vertical"
-                android:layout_gravity="center"
-                android:textSize="16sp"
-                android:paddingStart="10dp"
-                android:textColor="@color/black"
-                android:foreground="?android:attr/selectableItemBackground"
-                />
+            />
 
-                <TextView
-                    android:id="@+id/create_group"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:text="@string/create_group"
-                    android:gravity="start|center_vertical"
-                    android:layout_gravity="center"
-                    android:textSize="16sp"
-                    android:paddingStart="10dp"
-                    android:textColor="@color/black"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    />
-
-                <TextView
-                    android:id="@+id/create_scene"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:text="@string/create_scene_select"
-                    android:gravity="start|center_vertical"
-                    android:layout_gravity="center"
-                    android:textSize="16sp"
-                    android:paddingStart="10dp"
-                    android:textColor="@color/black"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    />
-                <!--<TextView-->
-                    <!--android:id="@+id/install_light"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="@string/normal_light_title"-->
-                    <!--android:gravity="start|center_vertical"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:textSize="16sp"-->
-                    <!--android:paddingStart="10dp"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:foreground="?android:attr/selectableItemBackground"-->
-                    <!--/>-->
-                <!--<TextView-->
-                    <!--android:id="@+id/install_rgb_light"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="@string/rgb_title"-->
-                    <!--android:gravity="start|center_vertical"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:textSize="16sp"-->
-                    <!--android:paddingStart="10dp"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:foreground="?android:attr/selectableItemBackground"-->
-                    <!--/>-->
-                <!--<TextView-->
-                    <!--android:id="@+id/install_switch"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="@string/switch_title"-->
-                    <!--android:gravity="start|center_vertical"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:textSize="16sp"-->
-                    <!--android:paddingStart="10dp"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:foreground="?android:attr/selectableItemBackground"-->
-                    <!--/>-->
-                <!--<TextView-->
-                    <!--android:id="@+id/install_sensor"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="@string/sensor_title"-->
-                    <!--android:gravity="start|center_vertical"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:textSize="16sp"-->
-                    <!--android:paddingStart="10dp"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:foreground="?android:attr/selectableItemBackground"-->
-                    <!--/>-->
-                <!--<TextView-->
-                    <!--android:id="@+id/install_light_light"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="0dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="@string/light_light"-->
-                    <!--android:visibility="gone"-->
-                    <!--android:gravity="start|center_vertical"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:textSize="16sp"-->
-                    <!--android:paddingStart="10dp"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:foreground="?android:attr/selectableItemBackground"-->
-                    <!--/>-->
-        </LinearLayout>
+        <include
+            android:id="@+id/installDialog"
+            layout="@layout/dialog_install_list"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="320dp"
+            android:layout_height="400dp"
+            android:visibility="gone"
+            />
 </android.support.constraint.ConstraintLayout>

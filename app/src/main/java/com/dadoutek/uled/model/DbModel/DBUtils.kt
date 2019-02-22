@@ -61,7 +61,7 @@ object DBUtils {
 //                .list()
 //    }
 
-    val sceneList: List<DbScene>
+    val sceneList: MutableList<DbScene>
          get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()

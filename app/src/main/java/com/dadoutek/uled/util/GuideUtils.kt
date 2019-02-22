@@ -53,6 +53,7 @@ object GuideUtils {
     var END_MAIN_KEY = "END_MAIN_KEY"
     var END_INSTALL_LIGHT_KEY = "END_INSTALL_LIGHT_KEY"
     var END_ADD_SCENE_KEY = "END_ADD_SCENE_KEY"
+    var END_ADD_SCENE_SET_KEY = "END_ADD_SCENE_SET_KEY"
 
     fun addGuidePage(guideTargetView: View,
                      res: Int, describeRes: String, onClickListener: View.OnClickListener,jumpViewContent: String,context: Context): GuidePage {
@@ -125,6 +126,8 @@ object GuideUtils {
                 changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_KEY,true)
             }else if(jumpViewContent== END_MAIN_KEY){
                 changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_MAIN_KEY,true)
+            }else if(jumpViewContent== END_ADD_SCENE_SET_KEY){
+                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_SET_KEY,true)
             }
             alertDialog?.dismiss()
         }
@@ -205,6 +208,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
         NewbieGuide.resetLabel(activity, GUIDE_START_INSTALL_DEVICE_NOW)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
+        SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_SET_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_MAIN_KEY,false)
@@ -252,6 +256,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
         NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
+        SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_SET_KEY,false)
     }
 
     //控制以页面为单位是否结束引导

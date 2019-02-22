@@ -183,24 +183,24 @@ public interface RequestInterface {
                                              @Path("rid") int rid);
 
     //添加渐变
-    @POST("api/ext/soybean/dynamic-change/{did}")
+    @POST("api/ext/soybean/dynamic-changeToScene/{did}")
     Observable<Response<String>> addGradient(@Header("token") String token,
                                           @Body RequestBody body,
                                           @Path("did") int did);
 
     //获取渐变列表
-    @GET("api/ext/soybean/dynamic-change/list")
+    @GET("api/ext/soybean/dynamic-changeToScene/list")
     Observable<Response<List<DbDiyGradient>>> getGradientList(@Header("token") String token);
 
     //更新渐变
-    @PUT("api/ext/soybean/dynamic-change/update/{did}")
+    @PUT("api/ext/soybean/dynamic-changeToScene/update/{did}")
     Observable<Response<String>> updateGradient(@Header("token") String token,
                                              @Path("did") int did,
                                              @Body RequestBody body);
 
     //删除渐变
-    @HTTP(method = "DELETE",path = "api/ext/soybean/dynamic-change/remove",hasBody = true)
-//    @DELETE("api/ext/soybean/dynamic-change/remove")
+    @HTTP(method = "DELETE",path = "api/ext/soybean/dynamic-changeToScene/remove",hasBody = true)
+//    @DELETE("api/ext/soybean/dynamic-changeToScene/remove")
     Observable<Response<String>> deleteGradients(@Header("token") String token,
                                                  @Body DbDeleteGradientBody body);
 

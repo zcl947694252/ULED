@@ -2,6 +2,7 @@ package com.dadoutek.uled.group
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -20,6 +21,7 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
@@ -27,7 +29,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
@@ -44,7 +45,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -62,12 +62,6 @@ class GroupListFragment : BaseFragment() {
     internal var showList: List<DbGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 16
-//    private var install_light: LinearLayoutCompat? = null
-//    private var install_rgb_light: LinearLayoutCompat? = null
-//    private var install_switch: LinearLayoutCompat? = null
-//    private var install_sensor: LinearLayoutCompat? = null
-//    private var close_install_list: ImageView? = null
-//    private var install_light_light: TextView? = null
 
     //19-2-20 界面调整
     private var install_device: TextView? = null
@@ -117,6 +111,7 @@ class GroupListFragment : BaseFragment() {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
             act?.addEventListeners()
+            refreshView()
             initOnLayoutListener()
         }
     }
@@ -126,14 +121,6 @@ class GroupListFragment : BaseFragment() {
 
         if (!hidden) {
 //            this.initData()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        refreshData()
-
-        if (requestCode == 0 && resultCode == Constant.RESULT_OK) {
         }
     }
 
@@ -241,49 +228,40 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun refreshView() {
-        gpList = DBUtils.groupList
+        if(activity!=null){
+            gpList = DBUtils.groupList
 
-        showList = ArrayList()
+            showList = ArrayList()
 
-        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
+            val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
 
-        //如果有调整过顺序取本地数据，否则取数据库数据
-        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
-            showList = dbOldGroupList
-        } else {
-            showList = gpList
-        }
+            //如果有调整过顺序取本地数据，否则取数据库数据
+            if (dbOldGroupList != null && dbOldGroupList.size > 0) {
+                showList = dbOldGroupList
+            } else {
+                showList = gpList
+            }
 
-        val layoutmanager = LinearLayoutManager(activity)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView!!.layoutManager = layoutmanager
-        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, showList)
+            val layoutmanager = LinearLayoutManager(activity)
+            layoutmanager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView?.layoutManager = layoutmanager
+            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, showList)
 
-        val decoration = DividerItemDecoration(activity!!,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                .divider)))
-        //添加分割线
-        recyclerView?.addItemDecoration(decoration)
-        recyclerView?.itemAnimator = DefaultItemAnimator()
+            val decoration = DividerItemDecoration(activity,
+                    DividerItemDecoration
+                            .VERTICAL)
+            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+                    .divider)))
+            //添加分割线
+            recyclerView?.addItemDecoration(decoration)
+            recyclerView?.itemAnimator = DefaultItemAnimator()
 
-        adapter!!.setOnItemChildClickListener(onItemChildClickListener)
+            adapter!!.setOnItemChildClickListener(onItemChildClickListener)
 //        adapter!!.addFooterView(getFooterView())
-        adapter!!.bindToRecyclerView(recyclerView)
+            adapter!!.bindToRecyclerView(recyclerView)
 
-        recyclerView!!.smoothScrollToPosition(showList!!.size)
-    }
-
-    private fun getFooterView(): View? {
-        val footerView = layoutInflater.inflate(R.layout.gp_fragment_add_view, null)
-        footerView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-        footerView.setOnClickListener {
-            addNewGroup()
+            recyclerView?.smoothScrollToPosition(showList!!.size)
         }
-
-        return footerView
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -356,82 +334,39 @@ class GroupListFragment : BaseFragment() {
                     } else {
                         val intent = Intent(activity, NewSceneSetAct::class.java)
                         intent.putExtra(Constant.IS_CHANGE_SCENE, false)
-                        startActivityForResult(intent, 0)
+                        startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
                     }
                 }
             }
         }
     }
 
-    private fun showInstallDeviceList() {
-        val view = View.inflate(activity,R.layout.dialog_install_list,null)
-        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
-        val install_device_recyclerView=view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        close_install_list.setOnClickListener { v ->  installDialog?.dismiss()}
-
-        val installList:ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
-
-        val groupListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
-        val layoutManager =  LinearLayoutManager(activity)
-        install_device_recyclerView?.layoutManager = layoutManager
-        install_device_recyclerView?.adapter = groupListAdapter
-        groupListAdapter.bindToRecyclerView(install_device_recyclerView)
-
-        groupListAdapter.onItemClickListener = onItemClickListenerInstallList
-
-        installDialog = AlertDialog.Builder(activity!!)
-                .setView(view)
-                .create()
-
-        installDialog?.setOnShowListener {
-
+    val CREATE_SCENE_REQUESTCODE = 2
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        refreshData()
+        if(requestCode==CREATE_SCENE_REQUESTCODE){
+            callbackLinkMainActAndFragment?.changeToScene()
         }
-
-        if(isGuide){
-            installDialog?.setCancelable(false)
-        }
-
-        installDialog?.show()
-
-        Thread{
-            Thread.sleep(2000)
-            GlobalScope.launch(Dispatchers.Main){
-                guide3(install_device_recyclerView)
-            }
-        }.start()
     }
 
-    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener {
-        adapter, view, position ->
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
-        isGuide = false
-        hidePopupMenu()
-        installDialog?.dismiss()
-        when (position) {
-            INSTALL_NORMAL_LIGHT -> {
-                if (DBUtils.allLight.size < 254) {
-                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                    startActivityForResult(intent, 0)
-                } else {
-                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                }
-            }
-            INSTALL_RGB_LIGHT -> {
-                if (DBUtils.allLight.size < 254) {
-                    intent = Intent(mContext, DeviceScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    startActivityForResult(intent, 0)
-                } else {
-                    ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                }
-            }
-            INSTALL_SWITCH -> startActivity(Intent(mContext, ScanningSwitchActivity::class.java))
-            INSTALL_SENSOR -> startActivity(Intent(mContext, ScanningSensorActivity::class.java))
+    var callbackLinkMainActAndFragment:CallbackLinkMainActAndFragment?=null
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if(context is CallbackLinkMainActAndFragment){
+            callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        callbackLinkMainActAndFragment = null
+    }
+
+    private fun showInstallDeviceList() {
+          dialog_pop.visibility=View.GONE
+          callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
     }
 
     private fun checkConnect() {
@@ -583,28 +518,28 @@ class GroupListFragment : BaseFragment() {
         return null
     }
 
-    private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
-        val listView =installDialog?.getListView()
-        installDialog?.getLayoutInflater()
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
-        if (guideShowCurrentPage) {
-            installDialog?.layoutInflater
-            var guide3: View? = null
-            if(isRgbClick){
-                guide3 = install_device_recyclerView.getChildAt(1)
-            }else{
-                guide3 = install_device_recyclerView.getChildAt(0)
-            }
-
-            return GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW)
-                    .addGuidePage(GuideUtils.addDiyPositionPage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
-                        guide3.performClick()
-                        GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, true)
-                    }, GuideUtils.END_GROUPLIST_KEY, activity!!))
-                    .show()
-        }
-        return null
-    }
+//    private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
+//        val listView =installDialog?.getListView()
+//        installDialog?.getLayoutInflater()
+//        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
+//        if (guideShowCurrentPage) {
+//            installDialog?.layoutInflater
+//            var guide3: View? = null
+//            if(isRgbClick){
+//                guide3 = install_device_recyclerView.getChildAt(1)
+//            }else{
+//                guide3 = install_device_recyclerView.getChildAt(0)
+//            }
+//
+//            return GuideUtils.guideBuilder(this@GroupListFragment, GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW, installDialog!!.window.decorView)
+//                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
+//                        guide3.performClick()
+//                        GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, true)
+//                    }, GuideUtils.END_GROUPLIST_KEY, activity!!))
+//                    .show()
+//        }
+//        return null
+//    }
 
     private fun initOnLayoutListener() {
         val view = activity?.getWindow()?.getDecorView()
@@ -663,9 +598,6 @@ class GroupListFragment : BaseFragment() {
 
     private fun showPopupMenu() {
         dialog_pop?.visibility = View.VISIBLE
-        if (isGuide) {
-            guide2()
-        }
     }
 
     private fun hidePopupMenu() {

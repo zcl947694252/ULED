@@ -562,7 +562,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                         if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                            com.dadoutek.uled.util.LogUtils.d("change to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                            com.dadoutek.uled.util.LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                             bestRSSIDevice = deviceInfo
                         }
                     } else {
