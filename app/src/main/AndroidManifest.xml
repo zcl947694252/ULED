@@ -220,6 +220,11 @@
             android:windowSoftInputMode="adjustResize|stateVisible"
             />
         <activity
+            android:name=".light.DeviceDetailAct"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible"
+            />
+        <activity
             android:name=".rgb.SelectColorGradientAct"
             android:screenOrientation="portrait" />
         <activity

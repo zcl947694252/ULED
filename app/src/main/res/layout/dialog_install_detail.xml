@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="580dp"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/install_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/btn_rectangle_gray"
+        >
+
+        <ImageView
+            android:id="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/baseline_keyboard_arrow_left_black_36"
+            />
+
+        <TextView
+            android:text="@string/add_device"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/black"
+            />
+
+        <ImageView
+            android:id="@+id/close_install_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/baseline_close_black_24"
+            />
+    </android.support.constraint.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/install_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:text="@string/install_tip1"
+            android:textSize="25sp"
+            android:layout_margin="15dp"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:text="@string/install_tip2"
+            android:textSize="18sp"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18sp"
+            android:textColor="@color/black"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/rectangle_tip_install"
+            />
+
+        <TextView
+            android:text="@string/install_tip3"
+            android:textSize="18sp"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/rectangle_tip_install"
+            />
+
+        <TextView
+            android:text="@string/install_tip4"
+            android:textSize="18sp"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18sp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/rectangle_tip_install"
+            />
+
+        <TextView
+            android:text="@string/install_tip5"
+            android:textSize="25sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="25dp"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:id="@+id/install_tip_question"
+            android:textSize="20sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:text="ssssssssssssssssssssssssssssssssssssssssss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/search_bar"
+        android:text="蓝牙搜索"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        />
+</android.support.constraint.ConstraintLayout>

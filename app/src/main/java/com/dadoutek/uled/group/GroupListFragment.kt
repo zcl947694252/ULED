@@ -105,13 +105,21 @@ class GroupListFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
+
+        refreshView()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
             act?.addEventListeners()
-            refreshView()
+            if(Constant.isCreat){
+                refreshAndMoveBottom()
+                Constant.isCreat=false
+            }else{
+                refreshView()
+            }
+
             initOnLayoutListener()
         }
     }
@@ -195,7 +203,7 @@ class GroupListFragment : BaseFragment() {
 //        adapter!!.addFooterView(getFooterView())
         adapter!!.bindToRecyclerView(recyclerView)
 
-        setMove()
+//        setMove()
 
         application = activity!!.application as TelinkLightApplication
         dataManager = DataManager(TelinkLightApplication.getInstance(),
@@ -220,11 +228,16 @@ class GroupListFragment : BaseFragment() {
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, activity!!)
-                        refreshView()
+                        refreshAndMoveBottom()
                         dialog.dismiss()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    private fun refreshAndMoveBottom(){
+        refreshView()
+        recyclerView?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun refreshView() {
@@ -257,10 +270,10 @@ class GroupListFragment : BaseFragment() {
             recyclerView?.itemAnimator = DefaultItemAnimator()
 
             adapter!!.setOnItemChildClickListener(onItemChildClickListener)
-//        adapter!!.addFooterView(getFooterView())
+//          adapter!!.addFooterView(getFooterView())
             adapter!!.bindToRecyclerView(recyclerView)
 
-            recyclerView?.smoothScrollToPosition(showList!!.size)
+//            setMove()
         }
     }
 
@@ -269,6 +282,7 @@ class GroupListFragment : BaseFragment() {
             val group = showList!![position]
             val dstAddr = group.meshAddr
             var intent: Intent
+            var isCurtain= OtherUtils.isCurtain(group)
 
             if (TelinkLightApplication.getInstance().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
@@ -276,12 +290,20 @@ class GroupListFragment : BaseFragment() {
             } else {
                 when (view.getId()) {
                     R.id.btn_on -> {
-                        Commander.openOrCloseLights(dstAddr, true)
-                        updateLights(true, group)
+                        if(isCurtain){
+                            Commander.openOrCloseCurtain(dstAddr, true,false)
+                        }else{
+                            Commander.openOrCloseLights(dstAddr, true)
+                            updateLights(true, group)
+                        }
                     }
                     R.id.btn_off -> {
-                        Commander.openOrCloseLights(dstAddr, false)
-                        updateLights(false, group)
+                        if(isCurtain){
+                            Commander.openOrCloseCurtain(dstAddr, false,false)
+                        }else{
+                            Commander.openOrCloseLights(dstAddr, false)
+                            updateLights(false, group)
+                        }
                     }
                     R.id.btn_set -> {
                         intent = Intent(mContext, NormalSettingActivity::class.java)
@@ -498,6 +520,7 @@ class GroupListFragment : BaseFragment() {
                     .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_group1, getString(R.string.group_list_guide1), View.OnClickListener {
                         isGuide = true
                         showPopupMenu()
+                        guide2()
                     }, GuideUtils.END_GROUPLIST_KEY, activity!!))
                     .show()
         }
@@ -558,7 +581,6 @@ class GroupListFragment : BaseFragment() {
 
             override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
                                           target: RecyclerView.ViewHolder, to: Int) {
-
             }
 
             override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {

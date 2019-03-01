@@ -179,6 +179,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
     private boolean isSelectAll = false;
     private boolean scanRGBLight = false;
+    private boolean scanCURTAIN = false;
 
     private boolean initHasGroup = false;
     private boolean guideShowCurrentPage = false;
@@ -1059,6 +1060,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void initData() {
         Intent intent = getIntent();
+        scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false);
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
@@ -1068,16 +1070,24 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             groups = new ArrayList<>();
             List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
 
-            if (scanRGBLight) {
+            if(scanCURTAIN){
                 for (int i = 0; i < list.size(); i++) {
-                    if (OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                    if (OtherUtils.isCurtain(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
                         groups.add(list.get(i));
                     }
                 }
-            } else {
-                for (int i = 0; i < list.size(); i++) {
-                    if (OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
-                        groups.add(list.get(i));
+            }else{
+                if (scanRGBLight) {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                            groups.add(list.get(i));
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < list.size(); i++) {
+                        if (OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                            groups.add(list.get(i));
+                        }
                     }
                 }
             }
@@ -1203,7 +1213,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             DbLight light = this.getItem(position);
 
             holder.txtName.setText(R.string.not_grouped);
-            holder.icon.setImageResource(R.drawable.icon_light_on);
+            if(light.getProductUUID()==DeviceType.SMART_CURTAIN){
+                holder.icon.setImageResource(R.drawable.chuanglian);
+            }
+            else{
+                holder.icon.setImageResource(R.drawable.icon_light_on);
+            }
+
             holder.selected.setChecked(light.selected);
 
             if (light.hasGroup) {
@@ -1400,10 +1416,15 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                         List<ScanFilter> scanFilters = new ArrayList<>();
                         byte[] manuData = null;
-                        if (scanRGBLight) {
-                            manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_RGB};
-                        } else {
-                            manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_NORMAL};
+
+                        if(scanCURTAIN){
+                            manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN};
+                        }else{
+                            if (scanRGBLight) {
+                                manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_RGB};
+                            } else {
+                                manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.LIGHT_NORMAL};
+                            }
                         }
 
                         byte[] manuDataMask = new byte[]{0, 0, 0, 0, 0, 0, (byte) 0xFF};
@@ -1482,42 +1503,42 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "--" + deviceInfo.macAddress+"--productUUID:"+deviceInfo.productUUID);
-        if (scanRGBLight) {
-            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
-                    DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
-                //更新参数
-                deviceInfo.meshAddress = meshAddress;
-                String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY, "dadou");
-                LeUpdateParameters params = Parameters.createUpdateParameters();
-                params.setOldMeshName(mesh.getFactoryName());
-                params.setOldPassword(mesh.getFactoryPassword());
-                params.setNewMeshName(mesh.getName());
-                params.setNewPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
-                params.setUpdateDeviceList(deviceInfo);
-                TelinkLightService.Instance().updateMesh(params);
+        if(scanCURTAIN){
+            if (checkIsCurtain(deviceInfo.productUUID) && deviceInfo.productUUID ==
+                    DeviceType.SMART_CURTAIN && deviceInfo.rssi < MAX_RSSI) {
+                updateMesh(deviceInfo,meshAddress,mesh);
             }
-        } else {
-            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
-                    DeviceType.LIGHT_NORMAL && deviceInfo.rssi < MAX_RSSI) {
-                //更新参数
-                deviceInfo.meshAddress = meshAddress;
-                String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY, "dadou");
-                LeUpdateParameters params = Parameters.createUpdateParameters();
-                params.setOldMeshName(mesh.getFactoryName());
-                params.setOldPassword(mesh.getFactoryPassword());
-                params.setNewMeshName(mesh.getName());
-                params.setNewPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
-                params.setUpdateDeviceList(deviceInfo);
-                TelinkLightService.Instance().updateMesh(params);
-
-                Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
-                        "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID);
+        }else{
+            if (scanRGBLight) {
+                if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
+                        DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
+                    updateMesh(deviceInfo,meshAddress,mesh);
+                }
+            } else {
+                if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
+                        DeviceType.LIGHT_NORMAL && deviceInfo.rssi < MAX_RSSI) {
+                    updateMesh(deviceInfo,meshAddress,mesh);
+                }
             }
         }
+    }
+
+    private void updateMesh(DeviceInfo deviceInfo, int meshAddress, Mesh mesh){
+        //更新参数
+        deviceInfo.meshAddress = meshAddress;
+        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou");
+        LeUpdateParameters params = Parameters.createUpdateParameters();
+        params.setOldMeshName(mesh.getFactoryName());
+        params.setOldPassword(mesh.getFactoryPassword());
+        params.setNewMeshName(mesh.getName());
+        params.setNewPassword(NetworkFactory.md5(
+                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+        params.setUpdateDeviceList(deviceInfo);
+        TelinkLightService.Instance().updateMesh(params);
+
+        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
+                "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID);
     }
 
     private boolean checkIsLight(int productUUID) {
@@ -1528,6 +1549,35 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             return true;
         } else {
             return false;
+        }
+    }
+
+    private boolean checkIsCurtain(int productUUID) {
+        if (productUUID == DeviceType.SMART_CURTAIN) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void addDevice(DeviceInfo deviceInfo){
+        int meshAddress = deviceInfo.meshAddress & 0xFF;
+        DbLight light = this.adapter.get(meshAddress);
+
+        if (light == null) {
+            light = new DbLight();
+            light.setName(getString(R.string.unnamed));
+            light.setMeshAddr(meshAddress);
+            light.textColor = this.getResources().getColor(
+                    R.color.black);
+            light.setBelongGroupId(allLightId);
+            light.setMacAddr(deviceInfo.macAddress);
+            light.setMeshUUID(deviceInfo.meshUUID);
+            light.setProductUUID(deviceInfo.productUUID);
+            light.setSelected(false);
+            this.adapter.add(light);
+            this.adapter.notifyDataSetChanged();
+            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
         }
     }
 
@@ -1562,48 +1612,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> DeviceScanningNewActivity.this.mApplication.getMesh().saveOrUpdate(DeviceScanningNewActivity.this)).start();
 
-                if (scanRGBLight) {
-                    if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
-                        int meshAddress = deviceInfo.meshAddress & 0xFF;
-                        DbLight light = this.adapter.get(meshAddress);
-
-
-                        if (light == null) {
-                            light = new DbLight();
-                            light.setName(getString(R.string.unnamed));
-                            light.setMeshAddr(meshAddress);
-                            light.textColor = this.getResources().getColor(
-                                    R.color.black);
-                            light.setBelongGroupId(allLightId);
-                            light.setMacAddr(deviceInfo.macAddress);
-                            light.setMeshUUID(deviceInfo.meshUUID);
-                            light.setProductUUID(deviceInfo.productUUID);
-                            light.setSelected(false);
-                            this.adapter.add(light);
-                            this.adapter.notifyDataSetChanged();
-                            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
-                        }
+                if(scanCURTAIN){
+                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_CURTAIN) {
+                        addDevice(deviceInfo);
                     }
-                } else {
-                    if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_NORMAL) {
-                        int meshAddress = deviceInfo.meshAddress & 0xFF;
-                        DbLight light = this.adapter.get(meshAddress);
-
-
-                        if (light == null) {
-                            light = new DbLight();
-                            light.setName(getString(R.string.unnamed));
-                            light.setMeshAddr(meshAddress);
-                            light.textColor = this.getResources().getColor(
-                                    R.color.black);
-                            light.setBelongGroupId(allLightId);
-                            light.setMacAddr(deviceInfo.macAddress);
-                            light.setMeshUUID(deviceInfo.meshUUID);
-                            light.setProductUUID(deviceInfo.productUUID);
-                            light.setSelected(false);
-                            this.adapter.add(light);
-                            this.adapter.notifyDataSetChanged();
-                            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
+                }else{
+                    if (scanRGBLight) {
+                        if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
+                            addDevice(deviceInfo);
+                        }
+                    } else {
+                        if (checkIsLight(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_NORMAL) {
+                            addDevice(deviceInfo);
                         }
                     }
                 }

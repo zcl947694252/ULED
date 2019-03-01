@@ -33,6 +33,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -421,12 +422,23 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         if (view.id == R.id.img_light) {
             canBeRefresh = true
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-                        byteArrayOf(0x01, 0x00, 0x00))
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                        byteArrayOf(0x01, 0x00, 0x00))
+                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,true,false)
+                }else{
+                    Commander.openOrCloseLights(currentLight!!.meshAddr,true)
+                }
+
                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-                        byteArrayOf(0x00, 0x00, 0x00))
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                        byteArrayOf(0x00, 0x00, 0x00))
+                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,false,false)
+                }else{
+                    Commander.openOrCloseLights(currentLight!!.meshAddr,false)
+                }
                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
 

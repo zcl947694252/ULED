@@ -597,4 +597,12 @@
     <string name="sensor_describe">Night light, PIR</string>
     <string name="add_device">添加设备</string>
     <string name="update_name_gp">修改组名</string>
+    <string name="curtain">窗帘</string>
+    <string name="smart_curtain">智能窗帘</string>
+    <string name="device">设备</string>
+    <string name="install_tip1">准备工作</string>
+    <string name="install_tip2">第一步\n\n请确保设备已经接上电源</string>
+    <string name="install_tip3">第二步\n\n请确保设备未入网</string>
+    <string name="install_tip4">第三步\n\n通过蓝牙搜索添加设备</string>
+    <string name="install_tip5">如果遇到问题,请尝试以下步骤复位设备</string>
 </resources>

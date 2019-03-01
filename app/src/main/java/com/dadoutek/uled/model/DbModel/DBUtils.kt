@@ -167,7 +167,30 @@ object DBUtils {
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD),DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
         return ArrayList(query.list())
     }
-    
+
+    fun getAllSwitch(): ArrayList<DbLight> {
+        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+                .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH)
+                        ,DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
+                        ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)).build()
+        return ArrayList(query.list())
+    }
+
+    fun getAllSensor(): ArrayList<DbLight>{
+        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+                .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
+                        ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SENSOR)
+                        ).build()
+        return ArrayList(query.list())
+    }
+
+    fun getAllCurtain(): ArrayList<DbLight>{
+        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
+                ).build()
+        return ArrayList(query.list())
+    }
+
     fun getActionsBySceneId(id: Long): ArrayList<DbSceneActions> {
         val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
         return ArrayList(query.list())
@@ -205,7 +228,6 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
     }
 
-    
     fun getRegionByID(id: Long): DbRegion {
         return DaoSessionInstance.getInstance().dbRegionDao.load(id)
     }

@@ -36,6 +36,14 @@ public class OtherUtils {
         }
     }
 
+    public static boolean isCurtain(DbGroup dbGroup){
+        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.SMART_CURTAIN){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public static boolean isRGBGroup(DbGroup dbGroup){
         if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_RGB){
             return true;
@@ -92,10 +100,12 @@ public class OtherUtils {
         InstallDeviceModel installDeviceModel2=new InstallDeviceModel(context.getString(R.string.rgb_light),context.getString(R.string.rgb_light_describe));
         InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
         InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
+        InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
         list.add(installDeviceModel1);
         list.add(installDeviceModel2);
         list.add(installDeviceModel3);
         list.add(installDeviceModel4);
+        list.add(installDeviceModel5);
         return list;
     }
 }

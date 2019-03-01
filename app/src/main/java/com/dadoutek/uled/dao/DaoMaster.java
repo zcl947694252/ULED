@@ -22,29 +22,29 @@ public class DaoMaster extends AbstractDaoMaster {
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
         DbLightDao.createTable(db, ifNotExists);
+        DbDiyGradientDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
         DbGroupDao.createTable(db, ifNotExists);
+        DbColorNodeDao.createTable(db, ifNotExists);
         DbSceneActionsDao.createTable(db, ifNotExists);
         DbDeleteGroupDao.createTable(db, ifNotExists);
         DbDataChangeDao.createTable(db, ifNotExists);
         DbRegionDao.createTable(db, ifNotExists);
         DbSceneDao.createTable(db, ifNotExists);
-        DbDiyGradientDao.createTable(db, ifNotExists);
-        DbColorNodeDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
         DbLightDao.dropTable(db, ifExists);
+        DbDiyGradientDao.dropTable(db, ifExists);
         DbUserDao.dropTable(db, ifExists);
         DbGroupDao.dropTable(db, ifExists);
+        DbColorNodeDao.dropTable(db, ifExists);
         DbSceneActionsDao.dropTable(db, ifExists);
         DbDeleteGroupDao.dropTable(db, ifExists);
         DbDataChangeDao.dropTable(db, ifExists);
         DbRegionDao.dropTable(db, ifExists);
         DbSceneDao.dropTable(db, ifExists);
-        DbDiyGradientDao.dropTable(db, ifExists);
-        DbColorNodeDao.dropTable(db, ifExists);
     }
 
     /**
@@ -64,15 +64,15 @@ public class DaoMaster extends AbstractDaoMaster {
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
         registerDaoClass(DbLightDao.class);
+        registerDaoClass(DbDiyGradientDao.class);
         registerDaoClass(DbUserDao.class);
         registerDaoClass(DbGroupDao.class);
+        registerDaoClass(DbColorNodeDao.class);
         registerDaoClass(DbSceneActionsDao.class);
         registerDaoClass(DbDeleteGroupDao.class);
         registerDaoClass(DbDataChangeDao.class);
         registerDaoClass(DbRegionDao.class);
         registerDaoClass(DbSceneDao.class);
-        registerDaoClass(DbDiyGradientDao.class);
-        registerDaoClass(DbColorNodeDao.class);
     }
 
     public DaoSession newSession() {

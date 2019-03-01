@@ -66,6 +66,30 @@ object Commander : EventListener<String> {
         TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
+    /**
+     * groupAddr 目标地址
+     * isOpen  是否开关窗帘
+     * isPause 是否暂停开关窗帘
+     */
+    fun openOrCloseCurtain(groupAddr: Int, isOpen: Boolean, isPause: Boolean) {
+        val opcode = Opcode.CURTAIN_ON_OFF
+        mGroupAddr = groupAddr
+        val params: ByteArray
+
+        if(isPause){
+            params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0B, 0x00, Opcode.CURTAIN_PACK_END)
+        }else{
+            if (isOpen) {
+                //0x64代表延时100ms保证开关同步
+                params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0A, 0x00, Opcode.CURTAIN_PACK_END)
+            } else {
+                params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0C, 0x00, Opcode.CURTAIN_PACK_END)
+            }
+        }
+
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
+    }
+
     @Synchronized
     fun resetLights(lightList: List<DbLight>, successCallback: () -> Unit,
                     failedCallback: () -> Unit) {

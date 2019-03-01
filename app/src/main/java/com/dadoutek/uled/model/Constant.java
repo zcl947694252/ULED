@@ -119,6 +119,8 @@ public class Constant implements Serializable {
     //管理权限本地保存key
     public static String ME_FUNCTION = "ME_FUNCTION";
 
+    public static String DEVICE_TYPE = "DEVICE_TYPE";
+
     //管理权限本地保存key
     public static String OLD_INDEX_DATA = "oldIndexData";
 
@@ -167,6 +169,7 @@ public class Constant implements Serializable {
 
     public static int VENDOR_ID = 0x0211;
     public static String IS_SCAN_RGB_LIGHT="IS_SCAN_RGB_LIGHT";
+    public static String IS_SCAN_CURTAIN="IS_SCAN_CURTAIN";
     public static String TYPE_GROUP="TYPE_GROUP";
     public static String TYPE_LIGHT="TYPE_LIGHT";
     public static String TYPE_VIEW="TYPE_VIEW";
@@ -182,5 +185,11 @@ public class Constant implements Serializable {
     public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
     public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
 //    public static String TAG_GroupListFragment = "GroupListFragment";
+    public static boolean isCreat=false;
 
+    public static int INSTALL_NORMAL_LIGHT=0;
+    public static int INSTALL_RGB_LIGHT=1;
+    public static int INSTALL_SWITCH=2;
+    public static int INSTALL_SENSOR=3;
+    public static int INSTALL_CURTAIN=4;
 }

@@ -209,6 +209,10 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 if (OtherUtils.isRGBGroup(list[i])) {
                     groupsInit?.add(list[i])
                 }
+            } else if (light?.productUUID == DeviceType.SMART_CURTAIN){
+                if (OtherUtils.isCurtain(list[i])) {
+                    groupsInit?.add(list[i])
+                }
             }
 
             if (OtherUtils.groupIsEmpty(list[i])) {

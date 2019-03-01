@@ -2,6 +2,7 @@ package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;

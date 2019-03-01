@@ -233,16 +233,18 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun stepEndGuide1() {
-        if (activity != null) {
+        if (activity != null && adaper!!.itemCount>0) {
             val view = activity!!.window.decorView
             val viewTreeObserver = view.viewTreeObserver
             viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     view.viewTreeObserver.removeOnGlobalLayoutListener(this)
                     val guide2 = adaper!!.getViewByPosition(0, R.id.scene_name) as TextView?
-                    GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.STEP14_GUIDE_APPLY_SCENE)
-                            .addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout.view_guide_simple_scene_2, getString(R.string.apply_scene),
-                                    View.OnClickListener{ v -> stepEndGuide2() }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
+                    if(guide2!=null){
+                        GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.STEP14_GUIDE_APPLY_SCENE)
+                                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple_scene_2, getString(R.string.apply_scene),
+                                        View.OnClickListener{ v -> stepEndGuide2() }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
+                    }
                 }
             })
         }
