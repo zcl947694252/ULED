@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -222,7 +223,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
         install_tip_question.text = describe
-
+        install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
         installDialog = android.app.AlertDialog.Builder(this)
                 .setView(view)
                 .create()
