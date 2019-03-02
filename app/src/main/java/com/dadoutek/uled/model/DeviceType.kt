@@ -12,4 +12,5 @@ object DeviceType {
     const val LIGHT_NORMAL_OLD: Int = 0xFF
     const val LIGHT_RGB: Int = 0x06
     const val SMART_CURTAIN: Int = 0x10
+    const val SMART_CURTAIN_SWITCH: Int = 0x25
 }

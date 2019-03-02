@@ -70,7 +70,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
                 val res = hideKeyboard(v.windowToken)
                 if (res) {
                     //隐藏了输入法，则不再分发事件
-                    return true
+                    return super.dispatchTouchEvent(ev)
                 }
             }
         }

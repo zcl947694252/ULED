@@ -96,7 +96,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 val intent = Intent(activity, NewSceneSetAct::class.java)
                 intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
                 intent.putExtra(Constant.IS_CHANGE_SCENE, true)
-                startActivityForResult(intent, 0)
+                startActivityForResult(intent, 3)
             }
         }
     }
@@ -150,7 +150,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     } else {
                         val intent = Intent(activity, NewSceneSetAct::class.java)
                         intent.putExtra(Constant.IS_CHANGE_SCENE, false)
-                        startActivityForResult(intent, CREATE_GROUP_REQUESTCODE)
+                        startActivityForResult(intent, 3)
                     }
                 }
             }
@@ -324,11 +324,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 3 && resultCode == Constant.RESULT_OK) {
+//        if (requestCode == 3 && resultCode == Constant.RESULT_OK) {
             initData()
             initView()
 //            stepEndGuide1()
-        }
+//        }
     }
 
     @Synchronized
@@ -378,32 +378,35 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val mOldDatas = scenesListData
         val mNewDatas = loadData()
 
-        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int {
-                return mOldDatas!!.size
-            }
+        if(mOldDatas!=null&&mNewDatas!=null) {
 
-            override fun getNewListSize(): Int {
-                return mNewDatas.size
-            }
+            val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                override fun getOldListSize(): Int {
+                    return mOldDatas!!.size
+                }
 
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas!![oldItemPosition].id == mNewDatas[newItemPosition].id
-            }
+                override fun getNewListSize(): Int {
+                    return mNewDatas.size
+                }
 
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas!![oldItemPosition]
-                val beanNew = mNewDatas[newItemPosition]
-                return if (beanOld.name != beanNew.name) {
-                    false
-                } else
-                    false
-            }
-        }, true)
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return mOldDatas!![oldItemPosition].id == mNewDatas[newItemPosition].id
+                }
 
-        scenesListData = mNewDatas
-        adaper!!.setNewData(scenesListData)
-        diffResult.dispatchUpdatesTo(adaper!!)
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    val beanOld = mOldDatas!![oldItemPosition]
+                    val beanNew = mNewDatas[newItemPosition]
+                    return if (beanOld.name != beanNew.name) {
+                        false
+                    } else
+                        false
+                }
+            }, true)
+
+            scenesListData = mNewDatas
+            adaper!!.setNewData(scenesListData)
+            diffResult.dispatchUpdatesTo(adaper!!)
+        }
     }
 
     private fun loadData(): MutableList<DbScene> {
@@ -432,7 +435,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 } else {
                     val intent = Intent(activity, NewSceneSetAct::class.java)
                     intent.putExtra(Constant.IS_CHANGE_SCENE, false)
-                    startActivityForResult(intent, 0)
+                    startActivityForResult(intent, 3)
                 }
             }
         }

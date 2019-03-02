@@ -312,12 +312,12 @@ class GroupListFragment : BaseFragment() {
                         }
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", group)
-                        startActivityForResult(intent, 0)
+                        startActivityForResult(intent, 2)
                     }
                     R.id.txt_name -> {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)
                         intent.putExtra("group", group)
-                        startActivityForResult(intent, 0)
+                        startActivityForResult(intent, 2)
 
 //                        ActivityUtils.startActivityForResult(intent)
                     }
@@ -363,7 +363,7 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
-    val CREATE_SCENE_REQUESTCODE = 2
+    val CREATE_SCENE_REQUESTCODE = 3
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         refreshData()

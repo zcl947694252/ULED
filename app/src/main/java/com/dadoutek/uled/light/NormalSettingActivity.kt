@@ -523,7 +523,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> finish()
+            android.R.id.home -> {
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
+                editTitle?.setFocusableInTouchMode(false)
+                editTitle?.setFocusable(false)
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
