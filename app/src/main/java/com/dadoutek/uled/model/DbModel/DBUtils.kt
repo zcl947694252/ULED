@@ -172,7 +172,8 @@ object DBUtils {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
-                        ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)).build()
+                        ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
+                        ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
         return ArrayList(query.list())
     }
 
@@ -186,7 +187,7 @@ object DBUtils {
 
     fun getAllCurtain(): ArrayList<DbLight>{
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
-                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
+                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)
                 ).build()
         return ArrayList(query.list())
     }

@@ -319,27 +319,27 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
 //        val controller=guide2()
 //            controller?.remove()
         isGuide = false
-//        hidePopupMenu()
         installDialog?.dismiss()
+//        hidePopupMenu()
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId=INSTALL_NORMAL_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_RGB_LIGHT -> {
-                installId=INSTALL_NORMAL_LIGHT
+                installId=INSTALL_RGB_LIGHT
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_CURTAIN -> {
-                installId=INSTALL_NORMAL_LIGHT
+                installId=INSTALL_CURTAIN
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_SWITCH -> {
-                installId=INSTALL_NORMAL_LIGHT
+                installId=INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_SENSOR -> {
-                installId=INSTALL_NORMAL_LIGHT
+                installId=INSTALL_SENSOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
         }
@@ -699,6 +699,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         if (TelinkLightService.Instance() != null)
             TelinkLightService.Instance().disableAutoRefreshNotify()
         isCreate=false
+        installDialog?.dismiss()
     }
 
 

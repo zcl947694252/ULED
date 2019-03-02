@@ -43,7 +43,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -156,6 +158,11 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         scanFilters.add(ScanFilter.Builder()
                 .setManufacturerData(VENDOR_ID,
                         byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
                         byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
                 .build())
         return scanFilters
@@ -434,6 +441,8 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
         } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
             startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+        }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
         }
     }
 
@@ -555,7 +564,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         }
 
         when (leScanEvent.args.productUUID) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,DeviceType.SMART_CURTAIN_SWITCH -> {
                 val MAX_RSSI = 81
                 if (leScanEvent.args.rssi < MAX_RSSI) {
 
