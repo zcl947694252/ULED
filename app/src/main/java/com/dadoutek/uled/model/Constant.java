@@ -187,9 +187,9 @@ public class Constant implements Serializable {
 //    public static String TAG_GroupListFragment = "GroupListFragment";
     public static boolean isCreat=false;
 
-    public static int INSTALL_NORMAL_LIGHT=0;
-    public static int INSTALL_RGB_LIGHT=1;
-    public static int INSTALL_SWITCH=2;
-    public static int INSTALL_SENSOR=3;
-    public static int INSTALL_CURTAIN=4;
+    public static final int INSTALL_NORMAL_LIGHT=0;
+    public static final int INSTALL_RGB_LIGHT=1;
+    public static final int INSTALL_SWITCH=2;
+    public static final int INSTALL_SENSOR=3;
+    public static final int INSTALL_CURTAIN=4;
 }

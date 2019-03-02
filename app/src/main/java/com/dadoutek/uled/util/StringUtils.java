@@ -1,5 +1,6 @@
 package com.dadoutek.uled.util;
 
+import android.content.Context;
 import android.text.InputFilter;
 import android.util.Log;
 import android.widget.EditText;
@@ -179,5 +180,20 @@ public class StringUtils {
         }else{
             return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
         }
+    }
+
+    public static String getInstallDescribe(int type, Context context){
+        switch (type){
+            case Constant.INSTALL_NORMAL_LIGHT:
+            case Constant.INSTALL_RGB_LIGHT:
+                return context.getString(R.string.guide_tip_reset_light);
+            case Constant.INSTALL_SWITCH:
+                return context.getString(R.string.guide_tip_reset_switch);
+            case Constant.INSTALL_SENSOR:
+                return context.getString(R.string.guide_tip_reset_sensor);
+            case Constant.INSTALL_CURTAIN:
+                return context.getString(R.string.guide_tip_reset_curtain);
+        }
+        return "";
     }
 }

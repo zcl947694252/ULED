@@ -218,7 +218,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         val btnBack=view.findViewById<ImageView>(R.id.btnBack)
         val install_tip_question=view.findViewById<TextView>(R.id.install_tip_question)
         val search_bar=view.findViewById<Button>(R.id.search_bar)
-        val install_device_recyclerView=view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
         close_install_list.setOnClickListener(dialogOnclick)
         btnBack.setOnClickListener(dialogOnclick)
         search_bar.setOnClickListener(dialogOnclick)
@@ -233,17 +232,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         }
 
         if(isGuide){
-            installDialog?.setCancelable(false)
+//            installDialog?.setCancelable(false)
         }
 
         installDialog?.show()
-
-        Thread{
-            Thread.sleep(100)
-            GlobalScope.launch(Dispatchers.Main){
-                guide3(install_device_recyclerView)
-            }
-        }.start()
     }
 
     private val dialogOnclick =View.OnClickListener{
@@ -284,6 +276,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                 }
             }
             R.id.btnBack->{
+                installDialog?.dismiss()
                 showInstallDeviceList(isGuide,clickRgb)
             }
         }
@@ -330,23 +323,23 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId=INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail()
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_RGB_LIGHT -> {
                 installId=INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail()
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_CURTAIN -> {
                 installId=INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail()
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_SWITCH -> {
                 installId=INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail()
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
             INSTALL_SENSOR -> {
                 installId=INSTALL_NORMAL_LIGHT
-                showInstallDeviceDetail()
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
         }
     }
