@@ -51,6 +51,7 @@ class Mesh : Serializable {
 
     fun generateMeshAddr(): Int {
         val lights = DBUtils.allLight
+//        val curtains = DBUtils
 
         var meshAddress: Int = -1
         when {

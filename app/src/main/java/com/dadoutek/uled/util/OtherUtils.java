@@ -37,7 +37,7 @@ public class OtherUtils {
     }
 
     public static boolean isCurtain(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.SMART_CURTAIN){
+        if(dbGroup.getDeviceType().equals(Constant.DEVICE_TYPE_CURTAIN)){
             return true;
         }else{
             return false;
@@ -45,7 +45,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_RGB){
+        if(dbGroup.getDeviceType().equals(Constant.DEVICE_TYPE_LIGHT_RGB)){
             return true;
         }else{
             return false;
@@ -53,9 +53,15 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL
-                ||getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL_OLD
-                ||getFirstLightOfGroupUUID(dbGroup)==0x00){
+        if(dbGroup.getDeviceType().equals(Constant.DEVICE_TYPE_LIGHT_NORMAL)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isDefaultGroup(DbGroup dbGroup){
+        if(dbGroup.getDeviceType().equals(Constant.DEVICE_TYPE_DEFAULT)){
             return true;
         }else{
             return false;

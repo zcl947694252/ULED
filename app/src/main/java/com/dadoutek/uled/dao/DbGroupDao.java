@@ -30,7 +30,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         public final static Property Brightness = new Property(3, int.class, "brightness", false, "BRIGHTNESS");
         public final static Property ColorTemperature = new Property(4, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property BelongRegionId = new Property(5, int.class, "belongRegionId", false, "BELONG_REGION_ID");
-        public final static Property Color = new Property(6, int.class, "color", false, "COLOR");
+        public final static Property DeviceType = new Property(6, Long.class, "deviceType", false, "DEVICE_TYPE");
+        public final static Property Color = new Property(7, int.class, "color", false, "COLOR");
     }
 
 
@@ -52,7 +53,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 3: brightness
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 4: colorTemperature
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 5: belongRegionId
-                "\"COLOR\" INTEGER NOT NULL );"); // 6: color
+                "\"DEVICE_TYPE\" INTEGER," + // 6: deviceType
+                "\"COLOR\" INTEGER NOT NULL );"); // 7: color
     }
 
     /** Drops the underlying database table. */
@@ -78,7 +80,12 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         stmt.bindLong(4, entity.getBrightness());
         stmt.bindLong(5, entity.getColorTemperature());
         stmt.bindLong(6, entity.getBelongRegionId());
-        stmt.bindLong(7, entity.getColor());
+ 
+        Long deviceType = entity.getDeviceType();
+        if (deviceType != null) {
+            stmt.bindLong(7, deviceType);
+        }
+        stmt.bindLong(8, entity.getColor());
     }
 
     @Override
@@ -98,7 +105,12 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         stmt.bindLong(4, entity.getBrightness());
         stmt.bindLong(5, entity.getColorTemperature());
         stmt.bindLong(6, entity.getBelongRegionId());
-        stmt.bindLong(7, entity.getColor());
+ 
+        Long deviceType = entity.getDeviceType();
+        if (deviceType != null) {
+            stmt.bindLong(7, deviceType);
+        }
+        stmt.bindLong(8, entity.getColor());
     }
 
     @Override
@@ -115,7 +127,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
             cursor.getInt(offset + 3), // brightness
             cursor.getInt(offset + 4), // colorTemperature
             cursor.getInt(offset + 5), // belongRegionId
-            cursor.getInt(offset + 6) // color
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // deviceType
+            cursor.getInt(offset + 7) // color
         );
         return entity;
     }
@@ -128,7 +141,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         entity.setBrightness(cursor.getInt(offset + 3));
         entity.setColorTemperature(cursor.getInt(offset + 4));
         entity.setBelongRegionId(cursor.getInt(offset + 5));
-        entity.setColor(cursor.getInt(offset + 6));
+        entity.setDeviceType(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
+        entity.setColor(cursor.getInt(offset + 7));
      }
     
     @Override

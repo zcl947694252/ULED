@@ -8,7 +8,7 @@ import java.io.Serializable;
 import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
-public class DbSwitch implements Serializable {
+public class DbSensor implements Serializable {
 
     static final long serialVersionUID = -15515456L;
 
@@ -17,28 +17,25 @@ public class DbSwitch implements Serializable {
     @NotNull
     private int meshAddr;
     private String name;
-    private int controlGroupAddr;
+    private String controlGroupAddr;
     private String macAddr;
     private int productUUID;
-    private String controlSceneId;
     private int index;
     private Long belongGroupId;
-    @Generated(hash = 811812800)
-    public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
-            String macAddr, int productUUID, String controlSceneId, int index,
-            Long belongGroupId) {
+    @Generated(hash = 82280314)
+    public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
+            String macAddr, int productUUID, int index, Long belongGroupId) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
         this.controlGroupAddr = controlGroupAddr;
         this.macAddr = macAddr;
         this.productUUID = productUUID;
-        this.controlSceneId = controlSceneId;
         this.index = index;
         this.belongGroupId = belongGroupId;
     }
-    @Generated(hash = 1179115222)
-    public DbSwitch() {
+    @Generated(hash = 295132781)
+    public DbSensor() {
     }
     public Long getId() {
         return this.id;
@@ -58,10 +55,10 @@ public class DbSwitch implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
-    public int getControlGroupAddr() {
+    public String getControlGroupAddr() {
         return this.controlGroupAddr;
     }
-    public void setControlGroupAddr(int controlGroupAddr) {
+    public void setControlGroupAddr(String controlGroupAddr) {
         this.controlGroupAddr = controlGroupAddr;
     }
     public String getMacAddr() {
@@ -75,12 +72,6 @@ public class DbSwitch implements Serializable {
     }
     public void setProductUUID(int productUUID) {
         this.productUUID = productUUID;
-    }
-    public String getControlSceneId() {
-        return this.controlSceneId;
-    }
-    public void setControlSceneId(String controlSceneId) {
-        this.controlSceneId = controlSceneId;
     }
     public int getIndex() {
         return this.index;

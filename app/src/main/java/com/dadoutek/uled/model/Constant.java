@@ -192,4 +192,9 @@ public class Constant implements Serializable {
     public static final int INSTALL_SWITCH=2;
     public static final int INSTALL_SENSOR=3;
     public static final int INSTALL_CURTAIN=4;
+
+    public static final Long DEVICE_TYPE_DEFAULT=-1L;
+    public static final Long DEVICE_TYPE_LIGHT_NORMAL=4L;
+    public static final Long DEVICE_TYPE_LIGHT_RGB=6L;
+    public static final Long DEVICE_TYPE_CURTAIN=10L;
 }

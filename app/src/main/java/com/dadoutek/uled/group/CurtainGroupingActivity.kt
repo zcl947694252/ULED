@@ -15,6 +15,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
@@ -33,13 +34,13 @@ import com.telink.util.EventListener
 import java.util.*
 
 
-class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
+class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var inflater: LayoutInflater? = null
     private var adapter: DeviceGroupingAdapter? = null
     private var groupsInit: MutableList<DbGroup>? = null
 
-    private var light: DbLight? = null
+    private var curtain: DbCurtain? = null
     private var gpAdress: Int = 0
 
     private var listView: GridView? = null
@@ -56,12 +57,12 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     object : Thread({
                         val sceneIds = getRelatedSceneIds(group.meshAddr)
                         for(i in 0..1){
-                            deletePreGroup(light!!.meshAddr)
+                            deletePreGroup(curtain!!.meshAddr)
                             Thread.sleep(100)
                         }
 
                         for(i in 0..1){
-                            deleteAllSceneByLightAddr(light!!.meshAddr)
+                            deleteAllSceneByLightAddr(curtain!!.meshAddr)
                             Thread.sleep(100)
                         }
 
@@ -74,12 +75,12 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                             val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
                             if (action != null) {
                                 for(i in 0..1){
-                                    Commander.addScene(sceneId, light!!.meshAddr, action.color)
+                                    Commander.addScene(sceneId, curtain!!.meshAddr, action.color)
                                     Thread.sleep(100)
                                 }
                             }
                         }
-                        DBUtils.updateLight(light!!)
+                        DBUtils.updateCurtain(curtain!!)
                         runOnUiThread {
                             hideLoadingDialog()
                             ActivityUtils.finishActivity(RGBSettingActivity::class.java)
@@ -145,8 +146,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      * @param lightMeshAddr 灯的mesh地址
      */
     private fun deletePreGroup(lightMeshAddr: Int) {
-        if (DBUtils.getGroupByID(light!!.belongGroupId!!) != null) {
-            val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!)?.meshAddr
+        if (DBUtils.getGroupByID(curtain!!.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(curtain!!.belongGroupId!!)?.meshAddr
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
                     (groupAddress shr 8 and 0xFF).toByte())
@@ -187,7 +188,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-        this.light = this.intent.extras?.get("light") as DbLight
+        this.curtain = this.intent.extras?.get("curtain") as DbCurtain
         this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
         groupsInit = ArrayList()
 
@@ -199,23 +200,31 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun filter(list: MutableList<DbGroup>) {
         groupsInit?.clear()
         for (i in list.indices) {
-            if (light?.productUUID == DeviceType.LIGHT_NORMAL ||
-                    light?.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
-                    light?.productUUID == 0x00) {
+            if (curtain?.productUUID == DeviceType.LIGHT_NORMAL ||
+                    curtain?.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
+                    curtain?.productUUID == 0x00) {
                 if (OtherUtils.isNormalGroup(list[i])) {
                     groupsInit?.add(list[i])
                 }
-            } else if (light?.productUUID == DeviceType.LIGHT_RGB) {
+            } else if (curtain?.productUUID == DeviceType.LIGHT_RGB) {
                 if (OtherUtils.isRGBGroup(list[i])) {
                     groupsInit?.add(list[i])
                 }
+            } else if (curtain?.productUUID == DeviceType.SMART_CURTAIN){
+                if (OtherUtils.isCurtain(list[i])) {
+                    groupsInit?.add(list[i])
+                }
+            }
+
+            if (OtherUtils.groupIsEmpty(list[i])) {
+                groupsInit?.add(list[i])
             }
         }
     }
 
     private fun getScene() {
         val opcode = 0xc0.toByte()
-        val dstAddress = light!!.meshAddr
+        val dstAddress = curtain!!.meshAddr
         val params = byteArrayOf(0x10, 0x00)
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
@@ -229,7 +238,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun getDeviceGroup() {
         val opcode = 0xDD.toByte()
-        val dstAddress = light!!.meshAddr
+        val dstAddress = curtain!!.meshAddr
         val params = byteArrayOf(0x08, 0x01)
 
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
@@ -239,12 +248,12 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun allocDeviceGroup(group: DbGroup) {
 
         val groupAddress = group.meshAddr
-        val dstAddress = light!!.meshAddr
+        val dstAddress = curtain!!.meshAddr
         val opcode = 0xD7.toByte()
         val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
         params[0] = 0x01
         TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
-        light!!.belongGroupId = group.id
+        curtain!!.belongGroupId = group.id
     }
 
     override fun performed(event: Event<String>) {
@@ -255,7 +264,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             val srcAddress = info.src and 0xFF
             val params = info.params
 
-            if (srcAddress != light!!.meshAddr)
+            if (srcAddress != curtain!!.meshAddr)
                 return
 
             val count = this.adapter!!.count
@@ -298,7 +307,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         textGp.setText(DBUtils.getDefaultNewGroupName())
          //设置光标默认在最后
         textGp.setSelection(textGp.getText().toString().length)
-        AlertDialog.Builder(this@LightGroupingActivity)
+        AlertDialog.Builder(this@CurtainGroupingActivity)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
@@ -328,7 +337,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     override fun onBackPressed() {
-        val builder = AlertDialog.Builder(this@LightGroupingActivity)
+        val builder = AlertDialog.Builder(this@CurtainGroupingActivity)
         builder.setTitle(R.string.group_not_change_tip)
         builder.setPositiveButton(android.R.string.ok) { dialog, which -> finish() }
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }

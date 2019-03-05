@@ -185,9 +185,9 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllCurtain(): ArrayList<DbLight>{
-        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
-                .where(DbLightDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)
+    fun getAllCurtain(): ArrayList<DbCurtain>{
+        val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
+                .where(DbCurtainDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)
                 ).build()
         return ArrayList(query.list())
     }
@@ -396,6 +396,20 @@ object DBUtils {
         }
     }
 
+    fun saveCurtain(curtain: DbCurtain, isFromServer: Boolean) {
+        if (isFromServer) {
+            DaoSessionInstance.getInstance().dbCurtainDao.insert(curtain)
+        } else {
+            //保存灯之前先把所有的灯都分配到当前的所有组去
+            val dbGroup = groupNull
+            curtain.belongGroupId = dbGroup?.id
+
+            DaoSessionInstance.getInstance().dbCurtainDao.save(curtain)
+            recordingChange(curtain.id,
+                    DaoSessionInstance.getInstance().dbCurtainDao.tablename,
+                    Constant.DB_ADD)
+        }
+    }
     
     fun oldToNewSaveLight(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.save(light)
@@ -508,6 +522,12 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
+    fun updateCurtain(curtain: DbCurtain) {
+        DaoSessionInstance.getInstance().dbCurtainDao.update(curtain)
+        recordingChange(curtain.id,
+                DaoSessionInstance.getInstance().dbCurtainDao.tablename,
+                Constant.DB_UPDATE)
+    }
     
     fun updateLightsLocal(lights: MutableList<DbLight>) {
         DaoSessionInstance.getInstance().dbLightDao.updateInTx(lights)
@@ -659,6 +679,29 @@ object DBUtils {
             group.colorTemperature = 100
             group.color = 0xffffff
             group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
+            groups.add(group)
+            //新增数据库保存
+            DBUtils.saveGroup(group, false)
+
+            recordingChange(group.id,
+                    DaoSessionInstance.getInstance().dbGroupDao.tablename,
+                    Constant.DB_ADD)
+        }
+    }
+
+    fun addNewGroupWithType(name: String, groups: MutableList<DbGroup>,type: Long,context: Context) {
+        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        if (!checkReachedTheLimit(groups,name)) {
+            val newMeshAdress: Int
+            val group = DbGroup()
+            newMeshAdress = groupAdress
+            group.meshAddr = newMeshAdress
+            group.name = name
+            group.brightness = 100
+            group.colorTemperature = 100
+            group.color = 0xffffff
+            group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
+            group.deviceType = type
             groups.add(group)
             //新增数据库保存
             DBUtils.saveGroup(group, false)

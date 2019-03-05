@@ -230,6 +230,16 @@
             android:windowSoftInputMode="adjustResize|stateVisible"
             />
         <activity
+            android:name=".curtain.CurtainScanningNewActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible"
+            />
+        <activity
+            android:name=".group.CurtainGroupingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateVisible"
+            />
+        <activity
             android:name=".rgb.SelectColorGradientAct"
             android:screenOrientation="portrait" />
         <activity
