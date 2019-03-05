@@ -193,8 +193,14 @@ public class Constant implements Serializable {
     public static final int INSTALL_SENSOR=3;
     public static final int INSTALL_CURTAIN=4;
 
+    //分组标识
+
+    //默认分组
     public static final Long DEVICE_TYPE_DEFAULT=-1L;
-    public static final Long DEVICE_TYPE_LIGHT_NORMAL=4L;
-    public static final Long DEVICE_TYPE_LIGHT_RGB=6L;
-    public static final Long DEVICE_TYPE_CURTAIN=10L;
+    //普通灯分组
+    public static final Long DEVICE_TYPE_LIGHT_NORMAL= Long.valueOf(0x04);
+    //RGB分组
+    public static final Long DEVICE_TYPE_LIGHT_RGB= Long.valueOf(0x06);
+    //窗帘分组
+    public static final Long DEVICE_TYPE_CURTAIN= Long.valueOf(0x10);
 }

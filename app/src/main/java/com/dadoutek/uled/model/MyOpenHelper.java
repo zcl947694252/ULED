@@ -60,6 +60,10 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                         Map<Long,Integer> map = new HashMap<>();
                         List<DbLight> lights= DBUtils.INSTANCE.getAllLight();
                         for(int k=0;k<lights.size();k++){
+                            DbGroup group=DBUtils.INSTANCE.getGroupByID(lights.get(k).getBelongGroupId());
+                            group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT);
+                            DBUtils.INSTANCE.updateGroup(group);
+
                             map.put(lights.get(k).getBelongGroupId(),lights.get(k).getProductUUID());
                         }
 
@@ -68,8 +72,12 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                             int uuid=entry.getValue();
 
                             DbGroup group=DBUtils.INSTANCE.getGroupByID(id);
-                            group.setDeviceType((long) uuid);
-                            DBUtils.INSTANCE.updateGroup(group);
+
+                            if(group.getMeshAddr()!=0xffff){
+                                group.setDeviceType((long) uuid);
+                                DBUtils.INSTANCE.updateGroup(group);
+                            }
+
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
