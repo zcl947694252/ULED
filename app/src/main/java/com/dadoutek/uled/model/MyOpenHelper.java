@@ -52,6 +52,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                 DbDeleteGroupDao.createTable(db, true);
                 break;
             case 9:
+                //由于新增devicetype对象，进行老用户数据兼容
                 //原有分组判断方式改变，数据库强制更新然后再创建新数据库
                 new Thread(() -> {
                     try {
@@ -59,11 +60,20 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
 
                         Map<Long,Integer> map = new HashMap<>();
                         List<DbLight> lights= DBUtils.INSTANCE.getAllLight();
-                        for(int k=0;k<lights.size();k++){
-                            DbGroup group=DBUtils.INSTANCE.getGroupByID(lights.get(k).getBelongGroupId());
-                            group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT);
-                            DBUtils.INSTANCE.updateGroup(group);
+                        List<DbGroup> groups= DBUtils.INSTANCE.getAllGroups();
 
+                        for(int i=0;i<groups.size();i++){
+                            DbGroup group=DBUtils.INSTANCE.getGroupByID(lights.get(i).getBelongGroupId());
+                            if(group.getMeshAddr()==0xffff){
+                                group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT_ALL);
+                            }else{
+                                group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT);
+                            }
+
+                            DBUtils.INSTANCE.updateGroup(group);
+                        }
+
+                        for(int k=0;k<lights.size();k++){
                             map.put(lights.get(k).getBelongGroupId(),lights.get(k).getProductUUID());
                         }
 

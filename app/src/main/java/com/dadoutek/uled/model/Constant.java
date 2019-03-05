@@ -196,6 +196,8 @@ public class Constant implements Serializable {
     //分组标识
 
     //默认分组
+    public static final Long DEVICE_TYPE_DEFAULT_ALL=0L;
+    //默认分组
     public static final Long DEVICE_TYPE_DEFAULT=-1L;
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL= Long.valueOf(0x04);
