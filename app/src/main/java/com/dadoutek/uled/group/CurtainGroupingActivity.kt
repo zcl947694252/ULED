@@ -14,6 +14,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
@@ -80,6 +81,11 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                 }
                             }
                         }
+
+
+                        group.deviceType=curtain!!.productUUID.toLong()
+
+                        DBUtils.updateGroup(group)
                         DBUtils.updateCurtain(curtain!!)
                         runOnUiThread {
                             hideLoadingDialog()
@@ -200,17 +206,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun filter(list: MutableList<DbGroup>) {
         groupsInit?.clear()
         for (i in list.indices) {
-            if (curtain?.productUUID == DeviceType.LIGHT_NORMAL ||
-                    curtain?.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
-                    curtain?.productUUID == 0x00) {
-                if (OtherUtils.isNormalGroup(list[i])) {
-                    groupsInit?.add(list[i])
-                }
-            } else if (curtain?.productUUID == DeviceType.LIGHT_RGB) {
-                if (OtherUtils.isRGBGroup(list[i])) {
-                    groupsInit?.add(list[i])
-                }
-            } else if (curtain?.productUUID == DeviceType.SMART_CURTAIN){
+            if (curtain?.productUUID == DeviceType.SMART_CURTAIN){
                 if (OtherUtils.isCurtain(list[i])) {
                     groupsInit?.add(list[i])
                 }
@@ -318,7 +314,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, this)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT,this)
                         refreshView()
                         dialog.dismiss()
                     }

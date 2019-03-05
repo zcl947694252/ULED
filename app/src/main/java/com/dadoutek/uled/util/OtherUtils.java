@@ -37,7 +37,7 @@ public class OtherUtils {
     }
 
     public static boolean isCurtain(DbGroup dbGroup){
-        if(dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_CURTAIN.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_CURTAIN.intValue()){
             return true;
         }else{
             return false;
@@ -45,7 +45,7 @@ public class OtherUtils {
     }
 
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_RGB.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_RGB.intValue()){
             return true;
         }else{
             return false;
@@ -53,7 +53,7 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
             return true;
         }else{
             return false;
@@ -61,7 +61,7 @@ public class OtherUtils {
     }
 
     public static boolean isDefaultGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT.intValue()){
             return true;
         }else{
             return false;

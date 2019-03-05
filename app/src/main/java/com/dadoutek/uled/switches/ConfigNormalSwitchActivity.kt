@@ -16,6 +16,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
@@ -325,6 +326,12 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             }
         }catch (e:Exception){
             e.printStackTrace()
+        }finally {
+
+
+
+//            val dbSwitch:DbSwitch=DbSwitch();
+//            dbSwitch.
         }
     }
 

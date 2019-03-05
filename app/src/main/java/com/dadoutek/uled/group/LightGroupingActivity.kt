@@ -14,6 +14,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -79,6 +80,10 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                 }
                             }
                         }
+
+                        group.deviceType=light!!.productUUID.toLong()
+
+                        DBUtils.updateGroup(group)
                         DBUtils.updateLight(light!!)
                         runOnUiThread {
                             hideLoadingDialog()
@@ -146,7 +151,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      */
     private fun deletePreGroup(lightMeshAddr: Int) {
         if (DBUtils.getGroupByID(light!!.belongGroupId!!) != null) {
-            val groupAddress = DBUtils.getGroupByID(light!!.belongGroupId!!)?.meshAddr
+            val groupPre=DBUtils.getGroupByID(light!!.belongGroupId!!)
+            val groupAddress = groupPre?.meshAddr
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
                     (groupAddress shr 8 and 0xFF).toByte())
@@ -311,7 +317,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, this)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT,this)
                         refreshView()
                         dialog.dismiss()
                     }

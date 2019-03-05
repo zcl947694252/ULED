@@ -31,6 +31,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.device.NewDevieFragment
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
@@ -264,7 +265,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                     }
                     INSTALL_CURTAIN -> {
                         if (DBUtils.allLight.size < 254) {
-                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent = Intent(this, CurtainScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                             intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                             startActivityForResult(intent, 0)

@@ -63,7 +63,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                         List<DbGroup> groups= DBUtils.INSTANCE.getAllGroups();
 
                         for(int i=0;i<groups.size();i++){
-                            DbGroup group=DBUtils.INSTANCE.getGroupByID(lights.get(i).getBelongGroupId());
+                            DbGroup group=groups.get(i);
                             if(group.getMeshAddr()==0xffff){
                                 group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT_ALL);
                             }else{
