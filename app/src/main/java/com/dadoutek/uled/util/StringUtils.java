@@ -9,8 +9,12 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbSwitch;
+import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -193,6 +197,44 @@ public class StringUtils {
                 return context.getString(R.string.guide_tip_reset_sensor);
             case Constant.INSTALL_CURTAIN:
                 return context.getString(R.string.guide_tip_reset_curtain);
+        }
+        return "";
+    }
+
+    public static String getSwitchPirDefaultName(int productUUID){
+        String startStr = "";
+        switch (productUUID){
+            case DeviceType.NORMAL_SWITCH:
+                startStr = "普通开关";
+                break;
+            case DeviceType.SCENE_SWITCH:
+                startStr = "场景开关";
+                break;
+            case DeviceType.SMART_CURTAIN_SWITCH:
+                startStr = "窗帘开关";
+            case DeviceType.NIGHT_LIGHT:
+                startStr = "小夜灯";
+            case DeviceType.SENSOR:
+                startStr = "传感器";
+                break;
+        }
+
+        List<DbSwitch> swtitches = DBUtils.INSTANCE.getSwtitchesByProductUUID(productUUID);
+        List<String> swtitchNames = new ArrayList();
+
+        for(int i=0;i<swtitches.size();i++){
+            swtitchNames.add(swtitches.get(i).getName());
+        }
+
+        //开关上限暂时设置到1000方便取名
+        int MaxSwitchCount=1000;
+        for(int i=0;i<MaxSwitchCount;i++){
+            String name = startStr + i;
+            if(swtitchNames.contains(name)){
+                continue;
+            }else {
+                return name;
+            }
         }
         return "";
     }

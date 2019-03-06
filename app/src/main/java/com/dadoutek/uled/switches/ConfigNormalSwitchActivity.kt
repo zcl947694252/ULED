@@ -23,6 +23,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -42,7 +43,6 @@ import kotlinx.coroutines.launch
 
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
-import java.util.concurrent.TimeUnit
 
 
 private const val CONNECT_TIMEOUT = 5
@@ -327,11 +327,15 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         }catch (e:Exception){
             e.printStackTrace()
         }finally {
-
-
-
-//            val dbSwitch:DbSwitch=DbSwitch();
-//            dbSwitch.
+            //确认配置成功后,添加开关到服务器
+            val dbSwitch:DbSwitch=DbSwitch()
+            dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch.macAddr=mDeviceInfo.macAddress
+            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+            dbSwitch.productUUID=mDeviceInfo.productUUID
+            dbSwitch.index=dbSwitch.id.toInt()
+            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            DBUtils.saveSwitch(dbSwitch,false)
         }
     }
 

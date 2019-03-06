@@ -279,6 +279,11 @@ object DBUtils {
         return dbGroup
     }
 
+    fun getSwtitchesByProductUUID(uuid: Int): MutableList<DbSwitch> {
+        val dbSwitches = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.ProductUUID.eq(uuid)).list()
+        return dbSwitches
+    }
+
     fun getGroupByMesh(mesh: Int): DbGroup {
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
         Log.d("datasave", "getGroupByMesh: $mesh")
@@ -392,6 +397,28 @@ object DBUtils {
             DaoSessionInstance.getInstance().dbLightDao.save(light)
             recordingChange(light.id,
                     DaoSessionInstance.getInstance().dbLightDao.tablename,
+                    Constant.DB_ADD)
+        }
+    }
+
+    fun saveSensor(sensor: DbSensor, isFromServer: Boolean) {
+        if (isFromServer) {
+            DaoSessionInstance.getInstance().dbSensorDao.insert(sensor)
+        } else {
+            DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
+            recordingChange(sensor.id,
+                    DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                    Constant.DB_ADD)
+        }
+    }
+
+    fun saveSwitch(dbSwitch: DbSwitch, isFromServer: Boolean) {
+        if (isFromServer) {
+            DaoSessionInstance.getInstance().dbSwitchDao.insert(dbSwitch)
+        } else {
+            DaoSessionInstance.getInstance().dbSwitchDao.save(dbSwitch)
+            recordingChange(dbSwitch.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                     Constant.DB_ADD)
         }
     }
