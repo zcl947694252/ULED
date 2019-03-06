@@ -217,7 +217,9 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 }
             }
 
-
+            if(OtherUtils.isDefaultGroup(list[i])){
+                groupsInit?.add(list[i])
+            }
         }
     }
 
