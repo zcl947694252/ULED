@@ -7,16 +7,13 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DaoSessionInstance
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.util.SharedPreferencesUtils
 
 import java.util.ArrayList
 
 import com.dadoutek.uled.model.Constant.MAX_GROUP_COUNT
-import com.dadoutek.uled.model.DeviceType
 
 /**
  * Created by hejiajun on 2018/5/18.
@@ -49,6 +46,59 @@ object DBUtils {
             return qb.where(
                     DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
                     .list()
+        }
+
+     fun getgroupListWithType(context: Context) : ArrayList<ItemTypeGroup> {
+            val allGIndex = -1
+            val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
+            var itemTypeGroup : ItemTypeGroup?=null
+            
+            val allList = ArrayList<ItemTypeGroup>()
+            
+            val listAll = allGroups
+            val normalList = ArrayList<DbGroup>()
+            val rgbList = ArrayList<DbGroup>()
+            val curtainList = ArrayList<DbGroup>()
+            val otherList = ArrayList<DbGroup>()
+         
+            for(group in listAll){
+              when(group.deviceType){
+                  Constant.DEVICE_TYPE_LIGHT_NORMAL->{
+                      normalList.add(group)
+                  }
+                  Constant.DEVICE_TYPE_LIGHT_RGB->{
+                      rgbList.add(group)
+                  }
+                  Constant.DEVICE_TYPE_CURTAIN->{
+                      curtainList.add(group)
+                  }
+                  else->{
+                      otherList.add(group)
+                  }
+              }
+            }
+
+         if(normalList.size>0){
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.normal_light),normalList)
+             allList.add(itemTypeGroup)
+         }
+
+         if(rgbList.size>0){
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.rgb_light),rgbList)
+             allList.add(itemTypeGroup)
+         }
+
+         if(curtainList.size>0){
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.curtain),curtainList,R.drawable.chuanglian)
+             allList.add(itemTypeGroup)
+         }
+
+         if(otherList.size>0){
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.not_type),otherList)
+             allList.add(itemTypeGroup)
+         }
+
+        return allList
         }
 
 //    
@@ -277,6 +327,11 @@ object DBUtils {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
         Log.d("datasave", "getGroupByMesh: $mesh")
         return dbGroup
+    }
+
+    fun getGroupsByDeviceType(type: Int): MutableList<DbGroup> {
+        val dbSwitches = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.DeviceType.eq(type)).list()
+        return dbSwitches
     }
 
     fun getSwtitchesByProductUUID(uuid: Int): MutableList<DbSwitch> {

@@ -1,37 +1,74 @@
 package com.dadoutek.uled.group
 
+import android.graphics.drawable.ColorDrawable
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
+import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
+import com.dadoutek.uled.model.ItemTypeGroup
 
-class GroupListRecycleViewAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseItemDraggableAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
+class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClickListener1 : MyBaseQuickAdapterOnClickListner,data: List<ItemTypeGroup>) :
+        BaseItemDraggableAdapter<ItemTypeGroup, BaseViewHolder>(layoutResId, data){
 
-    override fun convert(helper: BaseViewHolder, group: DbGroup?) {
+    var recyclerViewChild : RecyclerView ?=null
 
-        if (group != null) {
-            if (group.textColor == 0)
-                group.textColor = mContext.resources
-                        .getColor(R.color.black)
+    private var adapter: GroupListRecycleViewChildAdapter? = null
 
-            if (group.meshAddr == 0xffff) {
-                helper.setText(R.id.txt_name, TelinkLightApplication.getInstance().getString(R.string.allLight))
-            } else {
-                helper.setText(R.id.txt_name, group.name)
-//                if(OtherUtils.isCurtain(group)){
-//                    helper.setText(R.id.btn_set)
-//                }
-            }
-            helper.setTextColor(R.id.txt_name, group.textColor)
-                    .addOnClickListener(R.id.txt_name)
-                    .addOnClickListener(R.id.btn_on)
-                    .addOnClickListener(R.id.btn_off)
-                    .addOnClickListener(R.id.btn_set)
-//                    .addOnClickListener(R.id.add_group)
+    override fun convert(helper: BaseViewHolder, itemTypeGroup : ItemTypeGroup?) {
+        helper.setText(R.id.device_type_name,itemTypeGroup!!.name)
+        if(itemTypeGroup.icon!=0){
+            helper.setBackgroundRes(R.id.device_img, itemTypeGroup.icon)
         }
+        recyclerViewChild=helper.getView<RecyclerView>(R.id.device_type_child_group)
+        val layoutmanager = LinearLayoutManager(mContext)
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        recyclerViewChild!!.layoutManager = layoutmanager
+        this.adapter = GroupListRecycleViewChildAdapter(R.layout.group_item_child, itemTypeGroup!!.list)
 
+        val decoration = DividerItemDecoration(mContext,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(mContext, R.color
+                .divider)))
+        //添加分割线
+//        recyclerView?.addItemDecoration(decoration)
+        recyclerViewChild?.itemAnimator = DefaultItemAnimator()
+
+        adapter!!.setOnItemChildClickListener { adapter, view, position ->
+            onItemChildClickListener1.onItemChildClick(adapter,view,position,helper.adapterPosition)
+        }
+//        adapter!!.addFooterView(getFooterView())
+        adapter!!.bindToRecyclerView(recyclerViewChild)
+        setMove(recyclerViewChild!!)
     }
 
+    private fun setMove(recyclerViewChild: RecyclerView) {
+        val onItemDragListener = object : OnItemDragListener {
+            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {}
+
+            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
+                                          target: RecyclerView.ViewHolder, to: Int) {
+            }
+
+            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+                //                viewHolder.getItemId();
+                val list = adapter!!.data
+            }
+        }
+
+        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(adapter)
+        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerViewChild)
+
+        adapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
+        adapter!!.setOnItemDragListener(onItemDragListener)
+    }
 }

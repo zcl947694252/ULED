@@ -609,4 +609,5 @@
     <string name="guide_tip_reset_switch"> panel switch: Connect the power supply while holding down the upper left button and the lower right button in the switch button. The blue light will always be on during the period. </string>
     <string name="guide_tip_reset_sensor">Connect the power for 1 second, disconnect the power for 1 second, repeat about 5–6 times until the sensor flashes. </string>
     <string name="guide_tip_reset_curtain">Curtain: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
+    <string name="not_type">未分类</string>
 </resources>
