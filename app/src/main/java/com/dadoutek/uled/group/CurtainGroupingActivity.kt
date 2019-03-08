@@ -212,7 +212,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 }
             }
 
-            if (OtherUtils.groupIsEmpty(list[i])) {
+            if(OtherUtils.isDefaultGroup(list[i])){
                 groupsInit?.add(list[i])
             }
         }

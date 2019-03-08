@@ -21,8 +21,11 @@ public class DaoMaster extends AbstractDaoMaster {
 
     /** Creates underlying database table using DAOs. */
     public static void createAllTables(Database db, boolean ifNotExists) {
+        DbSensorDao.createTable(db, ifNotExists);
+        DbSwitchDao.createTable(db, ifNotExists);
         DbLightDao.createTable(db, ifNotExists);
         DbDiyGradientDao.createTable(db, ifNotExists);
+        DbCurtainDao.createTable(db, ifNotExists);
         DbUserDao.createTable(db, ifNotExists);
         DbGroupDao.createTable(db, ifNotExists);
         DbColorNodeDao.createTable(db, ifNotExists);
@@ -31,15 +34,15 @@ public class DaoMaster extends AbstractDaoMaster {
         DbDataChangeDao.createTable(db, ifNotExists);
         DbRegionDao.createTable(db, ifNotExists);
         DbSceneDao.createTable(db, ifNotExists);
-        DbSensorDao.createTable(db, ifNotExists);
-        DbSwitchDao.createTable(db, ifNotExists);
-        DbCurtainDao.createTable(db, ifNotExists);
     }
 
     /** Drops underlying database table using DAOs. */
     public static void dropAllTables(Database db, boolean ifExists) {
+        DbSensorDao.dropTable(db, ifExists);
+        DbSwitchDao.dropTable(db, ifExists);
         DbLightDao.dropTable(db, ifExists);
         DbDiyGradientDao.dropTable(db, ifExists);
+        DbCurtainDao.dropTable(db, ifExists);
         DbUserDao.dropTable(db, ifExists);
         DbGroupDao.dropTable(db, ifExists);
         DbColorNodeDao.dropTable(db, ifExists);
@@ -48,9 +51,6 @@ public class DaoMaster extends AbstractDaoMaster {
         DbDataChangeDao.dropTable(db, ifExists);
         DbRegionDao.dropTable(db, ifExists);
         DbSceneDao.dropTable(db, ifExists);
-        DbSensorDao.dropTable(db, ifExists);
-        DbSwitchDao.dropTable(db, ifExists);
-        DbCurtainDao.dropTable(db, ifExists);
     }
 
     /**
@@ -69,8 +69,11 @@ public class DaoMaster extends AbstractDaoMaster {
 
     public DaoMaster(Database db) {
         super(db, SCHEMA_VERSION);
+        registerDaoClass(DbSensorDao.class);
+        registerDaoClass(DbSwitchDao.class);
         registerDaoClass(DbLightDao.class);
         registerDaoClass(DbDiyGradientDao.class);
+        registerDaoClass(DbCurtainDao.class);
         registerDaoClass(DbUserDao.class);
         registerDaoClass(DbGroupDao.class);
         registerDaoClass(DbColorNodeDao.class);
@@ -79,9 +82,6 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(DbDataChangeDao.class);
         registerDaoClass(DbRegionDao.class);
         registerDaoClass(DbSceneDao.class);
-        registerDaoClass(DbSensorDao.class);
-        registerDaoClass(DbSwitchDao.class);
-        registerDaoClass(DbCurtainDao.class);
     }
 
     public DaoSession newSession() {

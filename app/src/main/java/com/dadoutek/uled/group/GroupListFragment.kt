@@ -22,6 +22,7 @@ import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
+import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
@@ -29,6 +30,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
@@ -55,11 +57,11 @@ class GroupListFragment : BaseFragment() {
     private var mContext: Activity? = null
     private var mApplication: TelinkLightApplication? = null
     private var dataManager: DataManager? = null
-    private var gpList: List<DbGroup>? = null
+    private var gpList: List<ItemTypeGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
     private var recyclerView: RecyclerView? = null
-    internal var showList: List<DbGroup>? = null
+    internal var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 16
 
@@ -160,23 +162,17 @@ class GroupListFragment : BaseFragment() {
 
     private fun initData() {
         this.mApplication = activity!!.application as TelinkLightApplication
-        gpList = DBUtils.groupList
+        gpList = DBUtils.getgroupListWithType(activity!!)
 
         showList = ArrayList()
+        showList = gpList
 
-        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
 
-        //如果有调整过顺序取本地数据，否则取数据库数据
-        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
-            showList = dbOldGroupList
-        } else {
-            showList = gpList
-        }
 
         val layoutmanager = LinearLayoutManager(activity)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
-        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, showList)
+        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener,showList!!)
 
         val decoration = DividerItemDecoration(activity!!,
                 DividerItemDecoration
@@ -187,7 +183,6 @@ class GroupListFragment : BaseFragment() {
         recyclerView?.addItemDecoration(decoration)
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
-        adapter!!.setOnItemChildClickListener(onItemChildClickListener)
 //        adapter!!.addFooterView(getFooterView())
         adapter!!.bindToRecyclerView(recyclerView)
 
@@ -230,23 +225,15 @@ class GroupListFragment : BaseFragment() {
 
     private fun refreshView() {
         if(activity!=null){
-            gpList = DBUtils.groupList
+            gpList = DBUtils.getgroupListWithType(activity!!)
 
             showList = ArrayList()
-
-            val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-
-            //如果有调整过顺序取本地数据，否则取数据库数据
-            if (dbOldGroupList != null && dbOldGroupList.size > 0) {
-                showList = dbOldGroupList
-            } else {
-                showList = gpList
-            }
+            showList = gpList
 
             val layoutmanager = LinearLayoutManager(activity)
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView?.layoutManager = layoutmanager
-            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, showList)
+            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener,showList!!)
 
             val decoration = DividerItemDecoration(activity,
                     DividerItemDecoration
@@ -257,7 +244,6 @@ class GroupListFragment : BaseFragment() {
             recyclerView?.addItemDecoration(decoration)
             recyclerView?.itemAnimator = DefaultItemAnimator()
 
-            adapter!!.setOnItemChildClickListener(onItemChildClickListener)
 //          adapter!!.addFooterView(getFooterView())
             adapter!!.bindToRecyclerView(recyclerView)
 
@@ -265,53 +251,55 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-            val group = showList!![position]
-            val dstAddr = group.meshAddr
-            var intent: Intent
-            var isCurtain= OtherUtils.isCurtain(group)
+    var onItemChildClickListener = object : MyBaseQuickAdapterOnClickListner {
+        override fun onItemChildClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int, groupPosition: Int) {
+            if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
+                val group = showList!![groupPosition].list[position]
+                val dstAddr = group.meshAddr
+                var intent: Intent
+                var isCurtain= OtherUtils.isCurtain(group)
 
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
-                ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                checkConnect()
-            } else {
-                when (view.getId()) {
-                    R.id.btn_on -> {
-                        if(isCurtain){
-                            Commander.openOrCloseCurtain(dstAddr, true,false)
-                        }else{
-                            Commander.openOrCloseLights(dstAddr, true)
-                            updateLights(true, group)
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    checkConnect()
+                } else {
+                    when (view!!.getId()) {
+                        R.id.btn_on -> {
+                            if(isCurtain){
+                                Commander.openOrCloseCurtain(dstAddr, true,false)
+                            }else{
+                                Commander.openOrCloseLights(dstAddr, true)
+                                updateLights(true, group)
+                            }
                         }
-                    }
-                    R.id.btn_off -> {
-                        if(isCurtain){
-                            Commander.openOrCloseCurtain(dstAddr, false,false)
-                        }else{
-                            Commander.openOrCloseLights(dstAddr, false)
-                            updateLights(false, group)
+                        R.id.btn_off -> {
+                            if(isCurtain){
+                                Commander.openOrCloseCurtain(dstAddr, false,false)
+                            }else{
+                                Commander.openOrCloseLights(dstAddr, false)
+                                updateLights(false, group)
+                            }
                         }
-                    }
-                    R.id.btn_set -> {
-                        intent = Intent(mContext, NormalSettingActivity::class.java)
-                        if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
-                            intent = Intent(mContext, RGBSettingActivity::class.java)
+                        R.id.btn_set -> {
+                            intent = Intent(mContext, NormalSettingActivity::class.java)
+                            if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
+                                intent = Intent(mContext, RGBSettingActivity::class.java)
+                            }
+                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                            intent.putExtra("group", group)
+                            startActivityForResult(intent, 2)
                         }
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent.putExtra("group", group)
-                        startActivityForResult(intent, 2)
-                    }
-                    R.id.txt_name -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("group", group)
-                        startActivityForResult(intent, 2)
+                        R.id.txt_name -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("group", group)
+                            startActivityForResult(intent, 2)
 
 //                        ActivityUtils.startActivityForResult(intent)
-                    }
+                        }
 //                    R.id.add_group -> {
 //                        addNewGroup()
 //                    }
+                    }
                 }
             }
         }
@@ -354,7 +342,7 @@ class GroupListFragment : BaseFragment() {
     val CREATE_SCENE_REQUESTCODE = 3
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        refreshData()
+//        refreshData()
         if(requestCode==CREATE_SCENE_REQUESTCODE){
             callbackLinkMainActAndFragment?.changeToScene()
         }
@@ -438,36 +426,36 @@ class GroupListFragment : BaseFragment() {
         return showList
     }
 
-    fun refreshData() {
-        val mOldDatas: List<DbGroup>? = showList
-        val mNewDatas: List<DbGroup>? = loadData()
-        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                (newItemPosition)?.id) ?: false;
-            }
-
-            override fun getOldListSize(): Int {
-                return mOldDatas?.size ?: 0
-            }
-
-            override fun getNewListSize(): Int {
-                return mNewDatas?.size ?: 0
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas?.get(oldItemPosition)
-                val beanNew = mNewDatas?.get(newItemPosition)
-                return if (!beanOld?.name.equals(beanNew?.name)) {
-                    return false//如果有内容不同，就返回false
-                } else true
-
-            }
-        }, true)
-        showList = mNewDatas
-        adapter?.setNewData(showList)
-        adapter?.let { diffResult.dispatchUpdatesTo(it) }
-    }
+//    fun refreshData() {
+//        val mOldDatas: List<DbGroup>? = showList
+//        val mNewDatas: List<DbGroup>? = loadData()
+//        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+//            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
+//                (newItemPosition)?.id) ?: false;
+//            }
+//
+//            override fun getOldListSize(): Int {
+//                return mOldDatas?.size ?: 0
+//            }
+//
+//            override fun getNewListSize(): Int {
+//                return mNewDatas?.size ?: 0
+//            }
+//
+//            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//                val beanOld = mOldDatas?.get(oldItemPosition)
+//                val beanNew = mNewDatas?.get(newItemPosition)
+//                return if (!beanOld?.name.equals(beanNew?.name)) {
+//                    return false//如果有内容不同，就返回false
+//                } else true
+//
+//            }
+//        }, true)
+//        showList = mNewDatas
+//        adapter?.setNewData(showList)
+//        adapter?.let { diffResult.dispatchUpdatesTo(it) }
+//    }
 
     private fun setMove() {
         val onItemDragListener = object : OnItemDragListener {

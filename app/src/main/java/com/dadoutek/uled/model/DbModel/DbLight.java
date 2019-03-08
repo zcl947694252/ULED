@@ -29,6 +29,7 @@ public class DbLight implements Serializable {
     private int meshUUID;
     private int productUUID;
     private Long belongGroupId;
+    private int index;
 
     public int color=0xffffff;//颜色
 
@@ -55,10 +56,10 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    @Generated(hash = 1270224164)
+    @Generated(hash = 111297946)
     public DbLight(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, String macAddr, int meshUUID, int productUUID,
-            Long belongGroupId, int color, int connectionStatus) {
+            Long belongGroupId, int index, int color, int connectionStatus) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -68,6 +69,7 @@ public class DbLight implements Serializable {
         this.meshUUID = meshUUID;
         this.productUUID = productUUID;
         this.belongGroupId = belongGroupId;
+        this.index = index;
         this.color = color;
         this.connectionStatus = connectionStatus;
     }
@@ -217,5 +219,13 @@ public class DbLight implements Serializable {
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_light_on;
         }
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

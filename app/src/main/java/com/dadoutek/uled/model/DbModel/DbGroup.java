@@ -27,6 +27,7 @@ public class DbGroup implements Serializable{
     private int colorTemperature;
     private int belongRegionId;
     private Long deviceType;
+    private int index;
 
     private int color=0xffffff;//颜色;
 
@@ -47,9 +48,10 @@ public class DbGroup implements Serializable{
     public DbGroup() {
     }
 
-    @Generated(hash = 621704256)
+    @Generated(hash = 794192172)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
-            int colorTemperature, int belongRegionId, Long deviceType, int color) {
+            int colorTemperature, int belongRegionId, Long deviceType, int index,
+            int color) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -57,6 +59,7 @@ public class DbGroup implements Serializable{
         this.colorTemperature = colorTemperature;
         this.belongRegionId = belongRegionId;
         this.deviceType = deviceType;
+        this.index = index;
         this.color = color;
     }
 
@@ -150,5 +153,13 @@ public class DbGroup implements Serializable{
 
     public void setDeviceType(Long deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

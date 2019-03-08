@@ -28,7 +28,8 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Type = new Property(2, int.class, "type", false, "TYPE");
         public final static Property Speed = new Property(3, int.class, "speed", false, "SPEED");
-        public final static Property BelongRegionId = new Property(4, Long.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Index = new Property(4, int.class, "index", false, "INDEX");
+        public final static Property BelongRegionId = new Property(5, Long.class, "belongRegionId", false, "BELONG_REGION_ID");
     }
 
     private DaoSession daoSession;
@@ -51,7 +52,8 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
                 "\"NAME\" TEXT," + // 1: name
                 "\"TYPE\" INTEGER NOT NULL ," + // 2: type
                 "\"SPEED\" INTEGER NOT NULL ," + // 3: speed
-                "\"BELONG_REGION_ID\" INTEGER);"); // 4: belongRegionId
+                "\"INDEX\" INTEGER NOT NULL ," + // 4: index
+                "\"BELONG_REGION_ID\" INTEGER);"); // 5: belongRegionId
     }
 
     /** Drops the underlying database table. */
@@ -75,10 +77,11 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         }
         stmt.bindLong(3, entity.getType());
         stmt.bindLong(4, entity.getSpeed());
+        stmt.bindLong(5, entity.getIndex());
  
         Long belongRegionId = entity.getBelongRegionId();
         if (belongRegionId != null) {
-            stmt.bindLong(5, belongRegionId);
+            stmt.bindLong(6, belongRegionId);
         }
     }
 
@@ -97,10 +100,11 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         }
         stmt.bindLong(3, entity.getType());
         stmt.bindLong(4, entity.getSpeed());
+        stmt.bindLong(5, entity.getIndex());
  
         Long belongRegionId = entity.getBelongRegionId();
         if (belongRegionId != null) {
-            stmt.bindLong(5, belongRegionId);
+            stmt.bindLong(6, belongRegionId);
         }
     }
 
@@ -122,7 +126,8 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.getInt(offset + 2), // type
             cursor.getInt(offset + 3), // speed
-            cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4) // belongRegionId
+            cursor.getInt(offset + 4), // index
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5) // belongRegionId
         );
         return entity;
     }
@@ -133,7 +138,8 @@ public class DbDiyGradientDao extends AbstractDao<DbDiyGradient, Long> {
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setType(cursor.getInt(offset + 2));
         entity.setSpeed(cursor.getInt(offset + 3));
-        entity.setBelongRegionId(cursor.isNull(offset + 4) ? null : cursor.getLong(offset + 4));
+        entity.setIndex(cursor.getInt(offset + 4));
+        entity.setBelongRegionId(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
      }
     
     @Override

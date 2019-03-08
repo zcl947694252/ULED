@@ -31,6 +31,8 @@ public class DbScene implements Parcelable{
     @NotNull
     private Long belongRegionId;
 
+    private int index;
+
     @ToMany(referencedJoinProperty = "belongSceneId")
     private List<DbSceneActions> actions;
 
@@ -48,11 +50,12 @@ public class DbScene implements Parcelable{
         }
     }
 
-    @Generated(hash = 1820180226)
-    public DbScene(Long id, String name, @NotNull Long belongRegionId) {
+    @Generated(hash = 276307427)
+    public DbScene(Long id, String name, @NotNull Long belongRegionId, int index) {
         this.id = id;
         this.name = name;
         this.belongRegionId = belongRegionId;
+        this.index = index;
     }
 
     @Generated(hash = 662958756)
@@ -197,5 +200,13 @@ public class DbScene implements Parcelable{
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getDbSceneDao() : null;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
