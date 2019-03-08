@@ -154,6 +154,10 @@ object DBUtils {
     val dataChangeAll: List<DbDataChange>
          get() = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 
+    fun getdataChangeAll(): List<DbDataChange> {
+        return DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
+    }
+
     val dataChangeAllHaveAboutLight: Boolean
          get() {
             val list = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
@@ -277,6 +281,18 @@ object DBUtils {
     
     fun getLightByID(id: Long): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
+    }
+
+    fun getCurtainByID(id: Long): DbCurtain? {
+        return DaoSessionInstance.getInstance().dbCurtainDao.load(id)
+    }
+
+    fun getSwitchByID(id: Long): DbSwitch? {
+        return DaoSessionInstance.getInstance().dbSwitchDao.load(id)
+    }
+
+    fun getSensorByID(id: Long): DbSensor? {
+        return DaoSessionInstance.getInstance().dbSensorDao.load(id)
     }
 
     fun getRegionByID(id: Long): DbRegion {
@@ -787,6 +803,10 @@ object DBUtils {
             groups.add(group)
             //新增数据库保存
             DBUtils.saveGroup(group, false)
+
+            group.index = group.id.toInt()
+
+            DBUtils.updateGroup(group)
 
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,

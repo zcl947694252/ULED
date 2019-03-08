@@ -31,7 +31,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         public final static Property ColorTemperature = new Property(4, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property BelongRegionId = new Property(5, int.class, "belongRegionId", false, "BELONG_REGION_ID");
         public final static Property DeviceType = new Property(6, Long.class, "deviceType", false, "DEVICE_TYPE");
-        public final static Property Color = new Property(7, int.class, "color", false, "COLOR");
+        public final static Property Index = new Property(7, int.class, "index", false, "INDEX");
+        public final static Property Color = new Property(8, int.class, "color", false, "COLOR");
     }
 
 
@@ -54,7 +55,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 4: colorTemperature
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 5: belongRegionId
                 "\"DEVICE_TYPE\" INTEGER," + // 6: deviceType
-                "\"COLOR\" INTEGER NOT NULL );"); // 7: color
+                "\"INDEX\" INTEGER NOT NULL ," + // 7: index
+                "\"COLOR\" INTEGER NOT NULL );"); // 8: color
     }
 
     /** Drops the underlying database table. */
@@ -85,7 +87,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         if (deviceType != null) {
             stmt.bindLong(7, deviceType);
         }
-        stmt.bindLong(8, entity.getColor());
+        stmt.bindLong(8, entity.getIndex());
+        stmt.bindLong(9, entity.getColor());
     }
 
     @Override
@@ -110,7 +113,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         if (deviceType != null) {
             stmt.bindLong(7, deviceType);
         }
-        stmt.bindLong(8, entity.getColor());
+        stmt.bindLong(8, entity.getIndex());
+        stmt.bindLong(9, entity.getColor());
     }
 
     @Override
@@ -128,7 +132,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
             cursor.getInt(offset + 4), // colorTemperature
             cursor.getInt(offset + 5), // belongRegionId
             cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // deviceType
-            cursor.getInt(offset + 7) // color
+            cursor.getInt(offset + 7), // index
+            cursor.getInt(offset + 8) // color
         );
         return entity;
     }
@@ -142,7 +147,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         entity.setColorTemperature(cursor.getInt(offset + 4));
         entity.setBelongRegionId(cursor.getInt(offset + 5));
         entity.setDeviceType(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setColor(cursor.getInt(offset + 7));
+        entity.setIndex(cursor.getInt(offset + 7));
+        entity.setColor(cursor.getInt(offset + 8));
      }
     
     @Override

@@ -145,6 +145,63 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                 }
+                "DB_SWITCH" -> {
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val switch = DBUtils.getSwitchByID(changeId)
+                            return SwitchMdodel.add(token, switch!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return SwitchMdodel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val switch = DBUtils.getSwitchByID(changeId)
+                            if(switch!=null){
+                                return SwitchMdodel.update(token,
+                                        switch,changeId.toInt(),id)
+                            }
+                        }
+                    }
+                }
+                "DB_SENSOR" -> {
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val sensor = DBUtils.getSensorByID(changeId)
+                            return SensorMdodel.add(token, sensor!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return SensorMdodel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val sensor = DBUtils.getSensorByID(changeId)
+                            if(sensor!=null){
+                                return SensorMdodel.update(token,
+                                        sensor,changeId.toInt(),id)
+                            }
+                        }
+                    }
+                }
+                "DB_CURTAIN" -> {
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val curtain = DBUtils.getCurtainByID(changeId)
+                            return CurtainMdodel.add(token, curtain!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return CurtainMdodel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val curtain = DBUtils.getCurtainByID(changeId)
+                            if(curtain!=null){
+                                return CurtainMdodel.update(token,
+                                        curtain,changeId.toInt(),id)
+                            }
+                        }
+                    }
+                }
                 "DB_REGION" -> {
                     when (type) {
                         Constant.DB_ADD -> {
@@ -303,6 +360,30 @@ class SyncDataPutOrGetUtils {
                     .flatMap {
                         for (item in it) {
                             DBUtils.saveLight(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getSwitchList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveSwitch(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getSensorList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveSensor(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getCurtainList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveCurtain(item, true)
                         }
                         NetworkFactory.getApi()
                                 .getGradientList(token)

@@ -27,6 +27,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property BelongRegionId = new Property(2, Long.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Index = new Property(3, int.class, "index", false, "INDEX");
     }
 
     private DaoSession daoSession;
@@ -47,7 +48,8 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"DB_SCENE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
-                "\"BELONG_REGION_ID\" INTEGER NOT NULL );"); // 2: belongRegionId
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 2: belongRegionId
+                "\"INDEX\" INTEGER NOT NULL );"); // 3: index
     }
 
     /** Drops the underlying database table. */
@@ -70,6 +72,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
             stmt.bindString(2, name);
         }
         stmt.bindLong(3, entity.getBelongRegionId());
+        stmt.bindLong(4, entity.getIndex());
     }
 
     @Override
@@ -86,6 +89,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
             stmt.bindString(2, name);
         }
         stmt.bindLong(3, entity.getBelongRegionId());
+        stmt.bindLong(4, entity.getIndex());
     }
 
     @Override
@@ -104,7 +108,8 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         DbScene entity = new DbScene( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
-            cursor.getLong(offset + 2) // belongRegionId
+            cursor.getLong(offset + 2), // belongRegionId
+            cursor.getInt(offset + 3) // index
         );
         return entity;
     }
@@ -114,6 +119,7 @@ public class DbSceneDao extends AbstractDao<DbScene, Long> {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setBelongRegionId(cursor.getLong(offset + 2));
+        entity.setIndex(cursor.getInt(offset + 3));
      }
     
     @Override

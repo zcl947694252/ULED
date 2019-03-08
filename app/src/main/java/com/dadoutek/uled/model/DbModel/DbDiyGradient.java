@@ -25,6 +25,8 @@ public class DbDiyGradient implements Parcelable {
     private int type=0;
     private int speed=50;
 
+    private int index;
+
     private Long belongRegionId;
 
     @ToMany(referencedJoinProperty = "belongDynamicChangeId")
@@ -41,12 +43,13 @@ public class DbDiyGradient implements Parcelable {
         speed = in.readInt();
     }
 
-    @Generated(hash = 670629865)
-    public DbDiyGradient(Long id, String name, int type, int speed, Long belongRegionId) {
+    @Generated(hash = 136035107)
+    public DbDiyGradient(Long id, String name, int type, int speed, int index, Long belongRegionId) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.speed = speed;
+        this.index = index;
         this.belongRegionId = belongRegionId;
     }
 
@@ -199,5 +202,13 @@ public class DbDiyGradient implements Parcelable {
     @Generated(hash = 596063868)
     public synchronized void resetColorNodes() {
         colorNodes = null;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
