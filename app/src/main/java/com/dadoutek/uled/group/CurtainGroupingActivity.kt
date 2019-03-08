@@ -302,7 +302,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
          //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this@CurtainGroupingActivity)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)

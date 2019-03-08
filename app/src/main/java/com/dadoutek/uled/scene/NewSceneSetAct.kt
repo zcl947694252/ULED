@@ -42,6 +42,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var isChangeScene = false
     private var isChange = true
     private var isResult = false
+    private var isToolbar= false
     private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private var showGroupList: ArrayList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
@@ -249,7 +250,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             if(currentPageIsEdit){
-                finish()
+                if(currentPageIsEdit&&!isToolbar){
+                    showExitSaveDialog()
+                }else{
+                    finish()
+                }
             }else{
                 showExitSaveDialog()
             }
@@ -356,13 +361,19 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
 
     //显示配置数据页面
     private fun showEditListVew() {
-        if(scene!=null){
-            edit_name.setText(scene!!.name)
+        if(editSceneName!=null){
+            edit_name.setText(editSceneName)
+        }else{
+            if(scene!=null){
+                edit_name.setText(scene!!.name)
+            }
         }
+        isToolbar=false
         currentPageIsEdit=true
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
         tv_function1.visibility = View.GONE
+        edit_name.setSelection(edit_name.text.length)
 
         initChangeState()
 
@@ -414,6 +425,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     }
 
     private fun save() {
+        isToolbar=true
         if(!currentPageIsEdit){
             saveScene()
         }else{
