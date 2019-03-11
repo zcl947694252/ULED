@@ -496,7 +496,7 @@ object DBUtils {
 
     fun saveCurtain(curtain: DbCurtain, isFromServer: Boolean) {
         if (isFromServer) {
-            DaoSessionInstance.getInstance().dbCurtainDao.insert(curtain)
+            DaoSessionInstance.getInstance().dbCurtainDao.save(curtain)
         } else {
             //保存灯之前先把所有的灯都分配到当前的所有组去
             val dbGroup = groupNull
@@ -741,6 +741,9 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteAll()
         DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
+        DaoSessionInstance.getInstance().dbCurtainDao.deleteAll()
+        DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
+        DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
 
     
