@@ -58,6 +58,8 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
 ////            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
 //        } else {
 
+//        mIsLogging=true;
+
         if (mIsLogging) {
             if(DBUtils.INSTANCE.getAllLight()!=null&& DBUtils.INSTANCE.getAllLight().size()==0){
                 startActivity(new Intent(this,MainActivity.class));

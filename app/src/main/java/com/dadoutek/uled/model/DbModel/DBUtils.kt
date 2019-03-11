@@ -912,6 +912,7 @@ object DBUtils {
         groupAllLights.meshAddr = 0xFFFF
         groupAllLights.brightness = 100
         groupAllLights.colorTemperature = 100
+        groupAllLights.deviceType = 0
         groupAllLights.color = TelinkLightApplication.getInstance().resources.getColor(R.color.gray)
         groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
         val list = groupList

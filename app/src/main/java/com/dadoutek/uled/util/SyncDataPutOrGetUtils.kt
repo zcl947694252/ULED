@@ -105,6 +105,7 @@ class SyncDataPutOrGetUtils {
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
                                      token: String, id: Long): Observable<String>? {
             var result: Observable<String>?
+//            val token = "1"
             when (tableName) {
                 "DB_GROUP" -> {
                     when (type) {
