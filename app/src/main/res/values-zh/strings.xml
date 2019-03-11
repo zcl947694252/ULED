@@ -554,7 +554,6 @@
     <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。</string>
     <string name="guide_tip_reset_sensor">接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="guide_tip_reset_curtain">窗帘：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
-<<<<<<< HEAD
 
     <!--窗帘相关-->
 
@@ -563,7 +562,5 @@
     <string name="accelerate">加速</string>
     <string name="slow_down">减速</string>
     <string name="pause">暂停</string>
-=======
     <string name="not_type">未分类</string>
->>>>>>> 98a21a7d61ac2371c91efb06bba0cce1bfa4e1e9
 </resources>

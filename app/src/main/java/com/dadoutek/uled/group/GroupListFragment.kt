@@ -412,19 +412,19 @@ class GroupListFragment : BaseFragment() {
                 }
     }
 
-    fun loadData(): List<DbGroup> {
-        var showList = mutableListOf<DbGroup>()
-
-        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-
-        //如果有调整过顺序取本地数据，否则取数据库数据
-        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
-            showList = dbOldGroupList
-        } else {
-            showList = DBUtils.groupList
-        }
-        return showList
-    }
+//    fun loadData(): List<DbGroup> {
+//        var showList = mutableListOf<DbGroup>()
+//
+//        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
+//
+//        //如果有调整过顺序取本地数据，否则取数据库数据
+//        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
+//            showList = dbOldGroupList
+//        } else {
+//            showList = DBUtils.groupList
+//        }
+//        return showList
+//    }
 
 //    fun refreshData() {
 //        val mOldDatas: List<DbGroup>? = showList
@@ -457,28 +457,28 @@ class GroupListFragment : BaseFragment() {
 //        adapter?.let { diffResult.dispatchUpdatesTo(it) }
 //    }
 
-    private fun setMove() {
-        val onItemDragListener = object : OnItemDragListener {
-            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {}
-
-            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
-                                          target: RecyclerView.ViewHolder, to: Int) {
-            }
-
-            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
-                //                viewHolder.getItemId();
-                val list = adapter!!.data
-                SharedPreferencesHelper.putObject(activity, Constant.OLD_INDEX_DATA, list)
-            }
-        }
-
-        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(adapter)
-        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-
-        adapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
-        adapter!!.setOnItemDragListener(onItemDragListener)
-    }
+//    private fun setMove() {
+//        val onItemDragListener = object : OnItemDragListener {
+//            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {}
+//
+//            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
+//                                          target: RecyclerView.ViewHolder, to: Int) {
+//            }
+//
+//            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+//                //                viewHolder.getItemId();
+//                val list = adapter!!.data
+//                SharedPreferencesHelper.putObject(activity, Constant.OLD_INDEX_DATA, list)
+//            }
+//        }
+//
+//        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(adapter)
+//        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
+//        itemTouchHelper.attachToRecyclerView(recyclerView)
+//
+//        adapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
+//        adapter!!.setOnItemDragListener(onItemDragListener)
+//    }
 
     fun notifyDataSetChanged() {
         this.adapter!!.notifyDataSetChanged()
