@@ -219,7 +219,7 @@ public interface RequestInterface {
                                             @Query("email") String email,
                                             @Query("introduction") String introduction);
 
-    @POST("auth/clear")
+    @DELETE("auth/clear")
     Observable<Response<String>> clearUserData(@Header("token") String token);
 
     //获取下载链接

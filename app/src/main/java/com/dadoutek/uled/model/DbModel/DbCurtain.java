@@ -13,6 +13,7 @@ import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class DbCurtain implements Serializable {
+
     static final long serialVersionUID = -15515456L;
 
     @Id(autoincrement = true)
