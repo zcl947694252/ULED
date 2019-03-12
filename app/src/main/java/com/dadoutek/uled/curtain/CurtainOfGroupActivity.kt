@@ -27,7 +27,6 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.WindowCurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -43,6 +42,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -409,7 +409,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
-                    intent=Intent(this@CurtainOfGroupActivity,WindowCurtainsActivity::class.java)
+                    intent=Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
                     intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)

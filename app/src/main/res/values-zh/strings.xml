@@ -557,13 +557,10 @@
 
     <!--窗帘相关-->
 
-<<<<<<< HEAD
-=======
     <string name="up">上</string>
     <string name="down">下</string>
     <string name="accelerate">加速</string>
     <string name="slow_down">减速</string>
->>>>>>> 30451d573a731ac93eb8e972e46389ab85345e9a
     <string name="pause">暂停</string>
     <string name="not_type">未分类</string>
 

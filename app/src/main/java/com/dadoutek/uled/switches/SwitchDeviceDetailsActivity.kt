@@ -3,10 +3,7 @@ package com.dadoutek.uled.switches
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
@@ -35,7 +32,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity() {
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
         recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = layoutmanager
+        recyclerView!!.layoutManager = GridLayoutManager(this,3)
         val decoration = DividerItemDecoration(this!!,
                 DividerItemDecoration
                         .VERTICAL)
@@ -44,7 +41,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity() {
         recyclerView!!.addItemDecoration(decoration)
         //添加Item变化动画
         recyclerView!!.itemAnimator = DefaultItemAnimator()
-        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter,switchData)
+        adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData as List<DbSwitch>?)
         adapter!!.bindToRecyclerView(recyclerView)
 
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)

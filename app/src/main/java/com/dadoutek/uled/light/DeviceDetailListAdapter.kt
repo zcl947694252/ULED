@@ -10,7 +10,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         override fun convert(helper: BaseViewHolder, scene: DbLight) {
             if (scene != null) {
                 helper.setText(R.id.name, scene.name)
-                helper.setImageResource(R.id.img_icon,R.drawable.icon_light_on)
+                helper.setImageResource(R.id.img_light,R.drawable.icon_light_on)
             }
         }
 }

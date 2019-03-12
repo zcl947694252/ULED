@@ -239,18 +239,17 @@
         <activity
             android:name=".tellink.TelinkBaseActivity"
             android:screenOrientation="portrait" />
-<<<<<<< HEAD
         <activity
             android:name=".windowcurtains.WindowCurtainsActivity"
             android:screenOrientation="portrait" />
-=======
-        <activity android:name=".WindowCurtains.WindowCurtainsActivity"
-            android:screenOrientation="portrait"
-            />
+
+        <!--<activity android:name=".windowCurtains.WindowCurtainsActivity"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--/>-->
         <activity android:name=".curtain.CurtainOfGroupActivity"
             android:screenOrientation="portrait"
             />
->>>>>>> 30451d573a731ac93eb8e972e46389ab85345e9a
+
     </application>
 
 </manifest>

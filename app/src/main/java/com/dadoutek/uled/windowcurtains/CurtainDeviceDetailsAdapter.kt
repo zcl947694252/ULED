@@ -10,7 +10,7 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
     override fun convert(helper: BaseViewHolder, scene: DbCurtain) {
         if (scene != null) {
             helper.setText(R.id.name, scene.name)
-            helper.setImageResource(R.id.img_icon, R.drawable.icon_light_on)
+            helper.setImageResource(R.id.img_light, R.drawable.icon_light_on)
         }
     }
 }

@@ -3,10 +3,7 @@ package com.dadoutek.uled.scene
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
@@ -31,7 +28,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity() {
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
         recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = layoutmanager
+        recyclerView!!.layoutManager = GridLayoutManager(this,3)
         val decoration = DividerItemDecoration(this!!,
                 DividerItemDecoration
                         .VERTICAL)

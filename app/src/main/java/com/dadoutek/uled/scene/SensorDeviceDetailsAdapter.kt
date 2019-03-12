@@ -10,7 +10,7 @@ class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : Base
     override fun convert(helper: BaseViewHolder, scene: DbSensor) {
         if (scene != null) {
             helper.setText(R.id.name, scene.name)
-            helper.setImageResource(R.id.img_icon, R.drawable.icon_light_on)
+            helper.setImageResource(R.id.img_light, R.drawable.icon_light_on)
         }
     }
 }

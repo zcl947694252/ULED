@@ -6,10 +6,7 @@ import android.hardware.Sensor
 import android.hardware.usb.UsbDevice.getDeviceName
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,7 +58,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
         recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = layoutmanager
+        recyclerView!!.layoutManager = GridLayoutManager(this,3)
         val decoration = DividerItemDecoration(this!!,
                 DividerItemDecoration
                         .VERTICAL)
