@@ -90,15 +90,26 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
 
     private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
 
+        var tempIndex = list[endPos].index
+        var tempIndex1 = list[startPos].index
+
         if(endPos<startPos){
 //            list[endPos].index=list[endPos+1].index
             for(i in endPos..startPos){
-                list[i].index=list[i+1].index
+                if(i==startPos){
+                    list[i].index=tempIndex
+                }else{
+                    list[i].index=list[i+1].index
+                }
             }
         }else if(endPos>startPos){
 //            list[endPos].index=list[endPos-1].index
             for(i in endPos..startPos){
-                list[i].index=list[i-1].index
+                if(i==startPos){
+                    list[i].index=tempIndex
+                }else{
+                    list[i].index=list[i-1].index
+                }
             }
         }
 

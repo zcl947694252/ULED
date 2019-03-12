@@ -220,6 +220,7 @@ public interface RequestInterface {
                                             @Query("introduction") String introduction);
 
     @DELETE("auth/clear")
+//    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
 
     //获取下载链接
