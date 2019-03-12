@@ -33,9 +33,11 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.WindowCurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
@@ -90,6 +92,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
+    private lateinit var curtain:DbCurtain
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
     private lateinit var lightList: MutableList<DbLight>
@@ -109,6 +112,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
+    private var curtains:DbCurtain?=null
 
     override fun onStart() {
         super.onStart()
@@ -454,10 +458,15 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                     intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
                     intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
+                }else if(curtains?.productUUID==DeviceType.SMART_CURTAIN){
+                    intent=Intent(this@LightsOfGroupActivity,WindowCurtainsActivity::class.java)
+                    intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                intent.putExtra(Constant.CURTAINS_ARESS_KEY,curtains)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                intent.putExtra(Constant.CURTAINS_ARESS_KEY,curtain.meshAddr)
                 startActivityForResult(intent, REQ_LIGHT_SETTING)
             } else {
                 ToastUtils.showShort(R.string.reconnecting)

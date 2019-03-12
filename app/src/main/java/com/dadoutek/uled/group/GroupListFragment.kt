@@ -20,6 +20,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
+import com.dadoutek.uled.WindowCurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
@@ -284,6 +285,8 @@ class GroupListFragment : BaseFragment() {
                             intent = Intent(mContext, NormalSettingActivity::class.java)
                             if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
                                 intent = Intent(mContext, RGBSettingActivity::class.java)
+                            }else if(OtherUtils.isCurtain(group)){
+                                intent = Intent(mContext,WindowCurtainsActivity::class.java)
                             }
                             intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                             intent.putExtra("group", group)

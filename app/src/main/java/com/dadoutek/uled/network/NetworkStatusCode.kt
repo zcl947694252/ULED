@@ -93,13 +93,13 @@ object NetworkStatusCode {
     const val ERROR_CONTROL_VER = 65003
     //验证码
 
-    const val ERROR_CONTROL_ACCOUNT_NOT = 65004
+    const val ERROR_CONTROL_ACCOUNT_NOT = 20001
     //账户不存在
 
-    const val ERROR_CONTROL_PASSWORD = 65005
+    const val ERROR_CONTROL_PASSWORD = 20002
     //密码错误
 
-    const val ERROR_CONTROL_ACCOUNT_EXIST = 65006
+    const val ERROR_CONTROL_ACCOUNT_EXIST = 20000
     //账户已经存在
 
     const val ERROR_CONTROL_TOKEN = 65007

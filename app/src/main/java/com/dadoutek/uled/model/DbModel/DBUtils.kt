@@ -222,8 +222,8 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllSwitch(): ArrayList<DbLight> {
-        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+    fun getAllSwitch(): ArrayList<DbSwitch> {
+        val query = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
@@ -231,8 +231,8 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllSensor(): ArrayList<DbLight>{
-        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+    fun getAllSensor(): ArrayList<DbSensor>{
+        val query = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SENSOR)
                         ).build()
@@ -494,7 +494,7 @@ object DBUtils {
 
     fun saveCurtain(curtain: DbCurtain, isFromServer: Boolean) {
         if (isFromServer) {
-            DaoSessionInstance.getInstance().dbCurtainDao.insert(curtain)
+            DaoSessionInstance.getInstance().dbCurtainDao.save(curtain)
         } else {
             //保存灯之前先把所有的灯都分配到当前的所有组去
             val dbGroup = groupNull
@@ -723,6 +723,9 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteAll()
         DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
+        DaoSessionInstance.getInstance().dbCurtainDao.deleteAll()
+        DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
+        DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
 
     

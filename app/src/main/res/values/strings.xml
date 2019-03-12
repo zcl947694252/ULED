@@ -616,5 +616,12 @@
     <string name="accelerate">accelerate</string>
     <string name="slow_down">Slow down</string>
     <string name="pause">pause</string>
-    <string name="not_type">未分类</string>
+    <string name="not_type">not type</string>
+    <string name="second_level">second level</string>
+    <string name="one_level">ont level</string>
+    <string name="three_level">three level</string>
+    <string name="four_level">four level</string>
+    <string name="commutation">commutation</string>
+    <string name="speed_adjustment">Speed adjustment:</string>
+
 </resources>

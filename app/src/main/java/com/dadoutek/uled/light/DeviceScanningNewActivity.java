@@ -1144,6 +1144,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         @Override
         public void error(String msg) {
             ToastUtils.showLong(R.string.upload_data_failed);
+            Log.d("Error",msg);
 //            hideLoadingDialog();
         }
 

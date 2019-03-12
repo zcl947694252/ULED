@@ -8,56 +8,52 @@
     tools:context=".WindowCurtains.WindowCurtainsActivity">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/open"
+        android:layout_gravity="center_horizontal"
         android:text="@string/group_list_on"
         />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/off"
         android:text="@string/group_list_off"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/up"
-        android:text="@string/up"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/down"
-        android:text="@string/down"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/accelerate"
-        android:text="@string/accelerate"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/slow_down"
-        android:text="@string/slow_down"
+        android:layout_gravity="center_horizontal"
         />
 
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/pause"
         android:text="@string/pause"
+        android:layout_gravity="center_horizontal"
         />
 
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/commutation"
+        android:text="@string/commutation"
+        android:layout_gravity="center_horizontal"
+        />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/speed_adjustment"
+        android:layout_marginLeft="5dp"
+        />
+
+    <com.android.ehorizontalselectedview.EHorizontalSelectedView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:id="@+id/hsv"
+        android:layout_marginTop="10dp"
+        />
 
 
 </LinearLayout>

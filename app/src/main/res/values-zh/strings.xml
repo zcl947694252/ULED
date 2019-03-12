@@ -563,4 +563,11 @@
     <string name="slow_down">减速</string>
     <string name="pause">暂停</string>
     <string name="not_type">未分类</string>
+
+    <string name="second_level">二级</string>
+    <string name="one_level">一级</string>
+    <string name="three_level">三级</string>
+    <string name="four_level">四级</string>
+    <string name="commutation">换向</string>f
+    <string name="speed_adjustment">速度调节:</string>
 </resources>
