@@ -22,6 +22,7 @@ import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.WindowCurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -293,9 +294,17 @@ class GroupListFragment : BaseFragment() {
                             startActivityForResult(intent, 2)
                         }
                         R.id.txt_name -> {
-                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                            intent.putExtra("group", group)
-                            startActivityForResult(intent, 2)
+                            if(group.meshAddr!=0xffff){
+                                if(group.deviceType==Constant.DEVICE_TYPE_CURTAIN){
+                                    intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                                    intent.putExtra("group", group)
+                                    startActivityForResult(intent, 2)
+                                }else{
+                                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                                    intent.putExtra("group", group)
+                                    startActivityForResult(intent, 2)
+                                }
+                            }
 
 //                        ActivityUtils.startActivityForResult(intent)
                         }

@@ -243,6 +243,9 @@
         <activity android:name=".WindowCurtains.WindowCurtainsActivity"
             android:screenOrientation="portrait"
             />
+        <activity android:name=".curtain.CurtainOfGroupActivity"
+            android:screenOrientation="portrait"
+            />
     </application>
 
 </manifest>
