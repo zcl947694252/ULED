@@ -1,5 +1,6 @@
 package com.dadoutek.uled.light
 
+import android.hardware.Sensor
 import android.hardware.usb.UsbDevice.getDeviceName
 import android.os.Bundle
 import android.support.v7.widget.RecyclerView
@@ -11,9 +12,7 @@ import butterknife.ButterKnife
 import com.dadoutek.uled.R
 import com.dadoutek.uled.R.string.grouping
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.telink.util.Event
 import com.telink.util.EventListener
@@ -28,11 +27,15 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>{
 
     private var type:Int?=null
 
-    private var nowLightList: ArrayList<DbLight>? = null
+    private var nowLightList: MutableList<DbLight>? = null
 
     private var lightsData: ArrayList<DbLight>? = null
 
-    private var curtainData:ArrayList<DbCurtain>?=null
+//    private var curtainData:MutableList<DbCurtain>?=null
+
+    private var sensorData:ArrayList<DbSensor>?=null
+
+    private var switchData:ArrayList<DbSwitch>?=null
 
     private var curtainList:ArrayList<DbCurtain>?=null
 
@@ -58,7 +61,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>{
     }
 
     private fun initView() {
-        listView=findViewById(R.id.list)
+        listView=findViewById<ListView>(R.id.list)
         this.adapter = DeviceListAdapter()
 
         this.listView!!.adapter = this.adapter
@@ -70,24 +73,24 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>{
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 lightsData = DBUtils.getAllNormalLight()
-                nowLightList!!.addAll(lightsData!!)
+//                nowLightList!!.addAll(lightsData!!)
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 lightsData=DBUtils.getAllRGBLight()
-                nowLightList!!.addAll(lightsData!!)
+//                nowLightList!!.addAll(lightsData!!)
             }
             Constant.INSTALL_SWITCH -> {
-                lightsData=DBUtils.getAllSwitch()
-                nowLightList!!.addAll(lightsData!!)
+                switchData=DBUtils.getAllSwitch()
+//                nowLightList!!.addAll(lightsData!!)
             }
             Constant.INSTALL_SENSOR -> {
-                lightsData=DBUtils.getAllSensor()
-                nowLightList!!.addAll(lightsData!!)
+                sensorData=DBUtils.getAllSensor()
+//                nowLightList!!.addAll(lightsData!!)
             }
-            Constant.INSTALL_CURTAIN -> {
-                curtainData=DBUtils.getAllCurtain()
-                curtainList!!.addAll(curtainData!!)
-            }
+//            Constant.INSTALL_CURTAIN -> {
+//                curtainData=DBUtils.getAllCurtain()
+////                curtainList!!.addAll(curtainData!!)
+//            }
         }
     }
 
@@ -95,6 +98,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>{
     internal inner class DeviceListAdapter : BaseAdapter() {
 
         private var lights: MutableList<DbLight>? = null
+
+        private var switchs:MutableList<DbSwitch>?=null
+
+        private var sensors:MutableList<DbSensor>?=null
+
 
         override fun getCount(): Int {
             return if (this.lights == null) 0 else this.lights!!.size
@@ -117,7 +125,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>{
             val icon = convertView
                     .findViewById<View>(R.id.img_icon) as ImageView
             val txtName = convertView
-                    .findViewById<View>(R.id.name) as TextView
+            .findViewById<View>(R.id.name) as TextView
 
             holder.icon = icon
             holder.txtName = txtName

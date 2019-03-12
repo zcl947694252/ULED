@@ -222,8 +222,8 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllSwitch(): ArrayList<DbLight> {
-        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+    fun getAllSwitch(): ArrayList<DbSwitch> {
+        val query = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
@@ -231,8 +231,8 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllSensor(): ArrayList<DbLight>{
-        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+    fun getAllSensor(): ArrayList<DbSensor>{
+        val query = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
                         ,DbLightDao.Properties.ProductUUID.eq(DeviceType.SENSOR)
                         ).build()
