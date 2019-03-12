@@ -1,14 +1,11 @@
-package com.dadoutek.uled.WindowCurtains
+package com.dadoutek.uled.windowcurtains
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import com.android.ehorizontalselectedview.EHorizontalSelectedView
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -30,7 +27,6 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
     }
 
     private fun initView() {
-//        this.curtain = this.intent.extras!!.get(Constant.CURTAINS_ARESS_KEY) as DbCurtain
         this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
         open.setOnClickListener(this)
         off.setOnClickListener(this)

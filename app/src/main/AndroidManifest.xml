@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.dadoutek.uled">
-
     <!-- 蓝牙权限 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -34,6 +33,10 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <activity android:name=".scene.SensorDeviceDetailsActivity"></activity>
+        <activity android:name=".windowcurtains.CurtainsDeviceDetailsActivity" />
+        <activity android:name=".switches.SwitchDeviceDetailsActivity" />
+
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
@@ -72,8 +75,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".light.NormalSettingActivity"
-            android:theme="@style/FullHeightDialogNew" />
-        <!-- <activity -->
+            android:theme="@style/FullHeightDialogNew" /> <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
         <!-- android:label="@string/activity_device_scanning_label" -->
         <!-- android:screenOrientation="portrait" -->
@@ -147,8 +149,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".light.LightsOfGroupActivity"
-            android:screenOrientation="portrait" />
-        <!-- <activity -->
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".scene.SetSceneAct" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
@@ -170,8 +171,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".light.DeviceScanningNewActivity"
-            android:screenOrientation="portrait" />
-        <!-- <activity -->
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".scene.ChangeSceneAct" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
@@ -191,8 +191,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.RGBSettingActivity"
-            android:screenOrientation="portrait" />
-        <!-- <activity -->
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".rgb.SelectColorActivity" -->
         <!-- android:screenOrientation="portrait" /> -->
         <activity
@@ -218,7 +217,7 @@
         <activity
             android:name=".light.DeviceDetailAct"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".switches.ConfigCurtainSwitchActivity"
             android:screenOrientation="portrait"
@@ -240,9 +239,9 @@
         <activity
             android:name=".tellink.TelinkBaseActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".WindowCurtains.WindowCurtainsActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity
+            android:name=".windowcurtains.WindowCurtainsActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -556,7 +556,7 @@
     <string name="guide_tip_reset_curtain">窗帘：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
 
     <!--窗帘相关-->
-    >
+
     <string name="pause">暂停</string>
     <string name="not_type">未分类</string>
 
@@ -564,6 +564,7 @@
     <string name="one_level">一级</string>
     <string name="three_level">三级</string>
     <string name="four_level">四级</string>
-    <string name="commutation">换向</string>f
+    <string name="commutation">换向</string>
     <string name="speed_adjustment">速度调节:</string>
+    <string name="details">详情</string>
 </resources>

@@ -13,14 +13,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.EditText
-import android.widget.ExpandableListView
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.group.GroupListRecycleViewAdapter
+import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 //import com.dadoutek.uled.light.DeviceDetailAct
@@ -31,12 +30,13 @@ import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
+import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.fragment_new_device.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -214,21 +214,25 @@ class NewDevieFragment :BaseFragment(){
             ToastUtils.showLong(R.string.device_not_connected)
         }else{
             var intent:Intent?=null
-            intent= Intent(activity, DeviceDetailAct::class.java)
             when(position){
                 Constant.INSTALL_NORMAL_LIGHT ->{
+                    intent= Intent(activity, DeviceDetailAct::class.java)
                     intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_NORMAL_LIGHT)
                 }
                 Constant.INSTALL_RGB_LIGHT ->{
+                    intent= Intent(activity, DeviceDetailAct::class.java)
                     intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RGB_LIGHT)
                 }
                 Constant.INSTALL_SWITCH ->{
+                    intent= Intent(activity,SwitchDeviceDetailsActivity::class.java)
                     intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_SWITCH)
                 }
                 Constant.INSTALL_SENSOR ->{
+                    intent= Intent(activity,SensorDeviceDetailsActivity::class.java)
                     intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_SENSOR)
                 }
                 Constant.INSTALL_CURTAIN ->{
+                    intent= Intent(activity,CurtainsDeviceDetailsActivity::class.java)
                     intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN)
                 }
             }
