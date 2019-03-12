@@ -455,7 +455,6 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         UserModel.deleteAllData(dbUser.token)!!.subscribe(object : NetworkObserver<String>() {
             override fun onNext(s: String) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                SharedPreferencesHelper.putObject(activity, Constant.OLD_INDEX_DATA, null)
                 DBUtils.deleteAllData()
                 CleanUtils.cleanInternalSp()
                 CleanUtils.cleanExternalCache()

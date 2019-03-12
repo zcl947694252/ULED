@@ -55,7 +55,7 @@ object DBUtils {
             
             val allList = ArrayList<ItemTypeGroup>()
             
-            val listAll = allGroups
+            val listAll = getAllGroupsOrderByIndex()
             val normalList = ArrayList<DbGroup>()
             val rgbList = ArrayList<DbGroup>()
             val curtainList = ArrayList<DbGroup>()
@@ -350,6 +350,11 @@ object DBUtils {
         return dbSwitches
     }
 
+    fun getAllGroupsOrderByIndex(): MutableList<DbGroup> {
+        val dbSwitches = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().orderAsc(DbGroupDao.Properties.Index).list()
+        return dbSwitches
+    }
+
     fun getSwtitchesByProductUUID(uuid: Int): MutableList<DbSwitch> {
         val dbSwitches = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.ProductUUID.eq(uuid)).list()
         return dbSwitches
@@ -364,6 +369,11 @@ object DBUtils {
     
     fun getLightByGroupID(id: Long): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(id)).build()
+        return ArrayList(query.list())
+    }
+
+    fun getCurtainByGroupID(id: Long): ArrayList<DbCurtain> {
+        val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())
     }
 
@@ -439,13 +449,6 @@ object DBUtils {
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
                     Constant.DB_ADD)
-
-            //本地匹配index
-            val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-            if (dbOldGroupList != null) {
-                dbOldGroupList.add(group)
-                SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, dbOldGroupList)
-            }
         }
     }
 
@@ -598,20 +601,16 @@ object DBUtils {
         recordingChange(group.id,
                 DaoSessionInstance.getInstance().dbGroupDao.tablename,
                 Constant.DB_UPDATE)
-
-        //本地匹配index
-        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-        if (dbOldGroupList != null) {
-            for (k in dbOldGroupList.indices) {
-                if (group.meshAddr == dbOldGroupList[k].meshAddr) {
-                    dbOldGroupList.set(k, group)
-                    SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, dbOldGroupList)
-                    break
-                }
-            }
-        }
     }
 
+    fun updateGroupList(groups: MutableList<DbGroup>) {
+        DaoSessionInstance.getInstance().dbGroupDao.updateInTx(groups)
+        for(group in groups){
+            recordingChange(group.id,
+                    DaoSessionInstance.getInstance().dbGroupDao.tablename,
+                    Constant.DB_UPDATE)
+        }
+    }
     
     fun updateLight(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
@@ -684,18 +683,6 @@ object DBUtils {
         recordingChange(dbGroup.id,
                 DaoSessionInstance.getInstance().dbGroupDao.tablename,
                 Constant.DB_DELETE)
-
-        //本地匹配index
-        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-        if (dbOldGroupList != null) {
-            for (k in dbOldGroupList.indices) {
-                if (dbGroup.meshAddr == dbOldGroupList[k].meshAddr) {
-                    dbOldGroupList.removeAt(k)
-                    SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, dbOldGroupList)
-                    break
-                }
-            }
-        }
     }
 
     
@@ -757,7 +744,6 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteAll()
         DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA, null)
     }
 
     

@@ -220,11 +220,16 @@ public interface RequestInterface {
                                             @Query("introduction") String introduction);
 
     @DELETE("auth/clear")
+//    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
 
     //获取下载链接
     @GET("api/ext/soybean/download/bin/{l1}/{l2}")
     Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1,@Path("l2") int l2);
+
+    //获取下载链接
+    @GET("bin/download")
+    Observable<Response<String>> getFirmwareUrlNew(@Query("version") String version);
 
     //添加开关
     @POST("switch/add/{lid}")

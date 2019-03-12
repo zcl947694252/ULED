@@ -38,39 +38,40 @@ public class OtaPrepareUtils {
     public void gotoUpdateView(Context context, String localVersion, OtaPrepareListner otaPrepareListner) {
         if (checkHaveNetWork(context)) {
 //            //1.获取服务器版本url
-            switch (StringUtils.versionResolution(localVersion, 0)) {
-                case "L":
-                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_STROBE, localVersion, otaPrepareListner);
-                    break;
-                case "LN":
-                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_DIMMING, localVersion, otaPrepareListner);
-                    break;
-                case "LNS":
-                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
-                    break;
-                case "C":
-                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBO_DIMMING, localVersion, otaPrepareListner);
-                    break;
-                case "CS":
-                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
-                    break;
-                case "CR":
-                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_RGB, localVersion, otaPrepareListner);
-                    break;
-                case "LC":
-                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN, localVersion, otaPrepareListner);
-                    break;
-                case "LCS":
-                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING, localVersion, otaPrepareListner);
-                    break;
-                case "L36":
-                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V, localVersion, otaPrepareListner);
-                    break;
-                default:
-                    ToastUtils.showLong(R.string.error_pack);
-                    break;
-            }
+//            switch (StringUtils.versionResolution(localVersion, 0)) {
+//                case "L":
+//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_STROBE, localVersion, otaPrepareListner);
+//                    break;
+//                case "LN":
+//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_DIMMING, localVersion, otaPrepareListner);
+//                    break;
+//                case "LNS":
+//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
+//                    break;
+//                case "C":
+//                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBO_DIMMING, localVersion, otaPrepareListner);
+//                    break;
+//                case "CS":
+//                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT, localVersion, otaPrepareListner);
+//                    break;
+//                case "CR":
+//                    getServerVersion(context, Constant.CONTROLLER, Constant.CONTROLLER_TYPE_RGB, localVersion, otaPrepareListner);
+//                    break;
+//                case "LC":
+//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN, localVersion, otaPrepareListner);
+//                    break;
+//                case "LCS":
+//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING, localVersion, otaPrepareListner);
+//                    break;
+//                case "L36":
+//                    getServerVersion(context, Constant.LIGHT, Constant.LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V, localVersion, otaPrepareListner);
+//                    break;
+//                default:
+//                    ToastUtils.showLong(R.string.error_pack);
+//                    break;
+//            }
 //            transformView();
+            getServerVersionNew(context,localVersion,otaPrepareListner);
         } else {
             ToastUtils.showLong(R.string.network_disconect);
         }
@@ -90,6 +91,28 @@ public class OtaPrepareUtils {
                         + "/" + StringUtils.versionResolutionURL(s, 2);*/
                 localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(s, 2);
                 compareServerVersion(s, localVersion, otaPrepareListner, context);
+            }
+
+            @Override
+            public void onError(@NotNull Throwable e) {
+                super.onError(e);
+                otaPrepareListner.getVersionFail();
+                ToastUtils.showLong(R.string.get_server_version_fail);
+            }
+        });
+        return "";
+    }
+
+    private String getServerVersionNew(Context context,String localVersion, OtaPrepareListner otaPrepareListner) {
+        otaPrepareListner.startGetVersion();
+        DownLoadFileModel.INSTANCE.getUrlNew(localVersion).subscribe(new NetworkObserver<String>() {
+            @Override
+            public void onNext(String s) {
+//                otaPrepareListner.getVersionSuccess(s);
+               /* localPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+                        + "/" + StringUtils.versionResolutionURL(s, 2);*/
+                localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(s, 2);
+                compareServerVersion(s, otaPrepareListner, context);
             }
 
             @Override
@@ -145,6 +168,37 @@ public class OtaPrepareUtils {
         } else {
             ToastUtils.showLong(R.string.getVsersionFail);
         }
+        return false;
+    }
+
+    //2.对比服务器和本地版本大小
+    private boolean compareServerVersion(String serverVersionUrl, OtaPrepareListner otaPrepareListner, Context context) {
+            //开发者模式可以任意升级版本
+            if(SharedPreferencesUtils.isDeveloperModel()){
+                //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
+                File file = new File(localPath);
+                if (file.exists()) {
+                    SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                    otaPrepareListner.downLoadFileSuccess();
+                } else {
+//                    otaPrepareListner.getVersionSuccess("");
+                    download(serverVersionUrl, otaPrepareListner, context);
+                }
+//                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
+            }else{
+                //正常模式只能升级服务器最新版本
+                    //3.服务器版本是最新弹窗提示优先执行下载（下载成功之后直接跳转）
+                    File file = new File(localPath);
+                    if (file.exists()) {
+                        otaPrepareListner.downLoadFileSuccess();
+                        SharedPreferencesUtils.saveUpdateFilePath(localPath);
+                    } else {
+//                        otaPrepareListner.getVersionSuccess("");
+                        download(serverVersionUrl, otaPrepareListner, context);
+                    }
+//                download("https://cdn.beesmartnet.com/static/soybean/L-2.0.8-L208.bin");
+                    return true;
+            }
         return false;
     }
 

@@ -1,4 +1,4 @@
-package com.dadoutek.uled.light
+package com.dadoutek.uled.curtain
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -27,7 +27,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.dadoutek.uled.WindowCurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -82,16 +82,16 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener {
+class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener {
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
     private var mDataManager: DataManager? = null
     private var mApplication: TelinkLightApplication? = null
-    private lateinit var lightList: MutableList<DbLight>
-    private var adapter: LightsOfGroupRecyclerViewAdapter? = null
+    private lateinit var curtainList: MutableList<DbCurtain>
+    private var adapter: CurtainsOfGroupRecyclerViewAdapter? = null
     private var positionCurrent: Int = 0
-    private var currentLight: DbLight? = null
+    private var currentCurtain: DbCurtain? = null
     private var searchView: SearchView? = null
     private var canBeRefresh = true
     private var bestRSSIDevice: DeviceInfo? = null
@@ -147,11 +147,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     fun lazyLoad() {
-//        if (lightList.size != 0) {
+//        if (curtainList.size != 0) {
 //            val guide2: View? = adapter!!.getViewByPosition(0, R.id.img_light)
 //            val guide3 = adapter!!.getViewByPosition(0, R.id.tv_setting)
 //
-//            val builder = GuideUtils.guideBuilder(this@LightsOfGroupActivity, Constant.TAG_LightsOfGroupActivity)
+//            val builder = GuideUtils.guideBuilder(this@CurtainOfGroupActivity, Constant.TAG_LightsOfGroupActivity)
 //            builder.addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout
 //                    .view_guide_simple_light_1, getString(R.string.light_guide_1), View
 //                    .OnClickListener {
@@ -199,8 +199,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun filter(groupName: String?, isSearch: Boolean) {
         val list = DBUtils.groupList
 //        val nameList : ArrayList<String> = ArrayList()
-        if (lightList != null && lightList.size > 0) {
-            lightList.clear()
+        if (curtainList != null && curtainList.size > 0) {
+            curtainList.clear()
         }
 
 //        for(i in list.indices){
@@ -210,7 +210,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         if (isSearch) {
             for (i in list.indices) {
                 if (groupName == list[i].name || (list[i].name).startsWith(groupName!!)) {
-                    lightList.addAll(DBUtils.getLightByGroupID(list[i].id))
+                    curtainList.addAll(DBUtils.getCurtainByGroupID(list[i].id))
                 }
             }
 
@@ -222,7 +222,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
 
             for (j in list.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+                curtainList.addAll(DBUtils.getCurtainByGroupID(list[j].id))
             }
         }
     }
@@ -235,45 +235,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     override fun onResume() {
         super.onResume()
-//        initData()
-//        initView()
-//        Thread {
-//            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-//            Thread.sleep(2500)
-//            if (this@LightsOfGroupActivity == null ||
-//                    this@LightsOfGroupActivity.isDestroyed ||
-//                    this@LightsOfGroupActivity.isFinishing || !acitivityIsAlive) {
-//            } else {
-//                autoConnect()
-//            }
-//        }.start()
-//
-//        val filter = IntentFilter()
-//        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-//        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
-//        registerReceiver(mReceiver, filter)
     }
-
-//    private val mReceiver = object : BroadcastReceiver() {
-//        override fun onReceive(context: Context, intent: Intent) {
-//            val action = intent.action
-//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-//
-//                when (state) {
-//                    BluetoothAdapter.STATE_ON -> {
-//                        TelinkLightService.Instance().idleMode(true)
-//                        retryConnectCount = 0
-//                        autoConnect()
-//                        LogUtil.d("STATE_ON")
-//                    }
-//                    BluetoothAdapter.STATE_OFF -> {
-//                        LogUtil.d("STATE_OFF")
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     override fun onStop() {
         super.onStop()
@@ -295,36 +257,36 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     private fun initData() {
-        lightList = ArrayList()
+        curtainList = ArrayList()
         if (group.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
+            //            curtainList = DBUtils.getAllLight();
+//            curtainList=DBUtils.getAllLight()
             filter("", false)
         } else {
-            lightList = DBUtils.getLightByGroupID(group.id)
+            curtainList = DBUtils.getCurtainByGroupID(group.id)
         }
     }
 
-    private fun getNewData(): MutableList<DbLight> {
+    private fun getNewData(): MutableList<DbCurtain> {
         if (group.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
+            //            curtainList = DBUtils.getAllLight();
+//            curtainList=DBUtils.getAllLight()
             filter("", false)
         } else {
-            lightList = DBUtils.getLightByGroupID(group.id)
+            curtainList = DBUtils.getCurtainByGroupID(group.id)
         }
 
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + lightList.size + ")"
+            toolbar.title = getString(R.string.allLight) + " (" + curtainList.size + ")"
         } else {
-            toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
+            toolbar.title = (group.name ?: "") + " (" + curtainList.size + ")"
         }
-        return lightList
+        return curtainList
     }
 
     fun notifyData() {
-        val mOldDatas: MutableList<DbLight>? = lightList
-        val mNewDatas: MutableList<DbLight>? = getNewData()
+        val mOldDatas: MutableList<DbCurtain>? = curtainList
+        val mNewDatas: MutableList<DbCurtain>? = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
@@ -349,8 +311,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
-        lightList = mNewDatas!!
-        adapter?.setNewData(lightList)
+        curtainList = mNewDatas!!
+        adapter?.setNewData(curtainList)
     }
 
 
@@ -393,67 +355,68 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun initView() {
         if (group.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + lightList.size + ")"
+            toolbar.title = getString(R.string.allLight) + " (" + curtainList.size + ")"
 //            if(searchView==null){
 //                toolbar.inflateMenu(R.menu.menu_search)
 //                searchView = MenuItemCompat.getActionView(toolbar.menu.findItem(R.id.action_search)) as SearchView
 //                searchView!!.setOnQueryTextListener(this)
 //            }
         } else {
-            toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
+            toolbar.title = (group.name ?: "") + " (" + curtainList.size + ")"
         }
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
-        adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
+        adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, curtainList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recycler_view_lights)
-        for (i in lightList.indices) {
-            lightList[i].updateIcon()
+        for (i in curtainList.indices) {
+            curtainList[i].updateIcon()
         }
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        currentLight = lightList[position]
+        currentCurtain = curtainList[position]
         positionCurrent = position
         val opcode = Opcode.LIGHT_ON_OFF
         if (view.id == R.id.img_light) {
             canBeRefresh = true
-            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+            if (currentCurtain!!.connectionStatus == ConnectionStatus.OFF.value) {
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
 //                        byteArrayOf(0x01, 0x00, 0x00))
-                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,true,false)
+                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
+                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,true,false)
                 }else{
-                    Commander.openOrCloseLights(currentLight!!.meshAddr,true)
+                    Commander.openOrCloseLights(currentCurtain!!.meshAddr,true)
                 }
 
-                currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                currentCurtain!!.connectionStatus = ConnectionStatus.ON.value
             } else {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
 //                        byteArrayOf(0x00, 0x00, 0x00))
-                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,false,false)
+                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
+                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,false,false)
                 }else{
-                    Commander.openOrCloseLights(currentLight!!.meshAddr,false)
+                    Commander.openOrCloseLights(currentCurtain!!.meshAddr,false)
                 }
-                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+                currentCurtain!!.connectionStatus = ConnectionStatus.OFF.value
             }
 
-            currentLight!!.updateIcon()
-            DBUtils.updateLight(currentLight!!)
+            currentCurtain!!.updateIcon()
+            DBUtils.updateCurtain(currentCurtain!!)
             runOnUiThread {
                 adapter?.notifyDataSetChanged()
             }
         } else if (view.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
-                var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
-                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                    intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
+                if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
+                    intent=Intent(this@CurtainOfGroupActivity,WindowCurtainsActivity::class.java)
                     intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
                 }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
+                intent.putExtra(Constant.CURTAINS_ARESS_KEY,currentCurtain)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)
                 startActivityForResult(intent, REQ_LIGHT_SETTING)
             } else {
                 ToastUtils.showShort(R.string.reconnecting)
@@ -472,9 +435,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             Thread.sleep(2500)
-            if (this@LightsOfGroupActivity == null ||
-                    this@LightsOfGroupActivity.isDestroyed ||
-                    this@LightsOfGroupActivity.isFinishing || !acitivityIsAlive) {
+            if (this@CurtainOfGroupActivity == null ||
+                    this@CurtainOfGroupActivity.isDestroyed ||
+                    this@CurtainOfGroupActivity.isFinishing || !acitivityIsAlive) {
             } else {
                 autoConnect()
             }
@@ -528,15 +491,15 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         for (notificationInfo in notificationInfoList) {
 
             if (notificationInfo.meshAddress == TelinkApplication.getInstance().connectDevice.meshAddress) {
-                currentLight?.textColor = ContextCompat.getColor(
+                currentCurtain?.textColor = ContextCompat.getColor(
                         this, R.color.primary)
             }
 
-            for (dbLight in lightList) {
-                if (notificationInfo.meshAddress == dbLight.meshAddr) {
-                    dbLight.connectionStatus = notificationInfo.connectionStatus.value
-                    dbLight.updateIcon()
-                    DBUtils.updateLight(dbLight)
+            for (dbCutain in curtainList) {
+                if (notificationInfo.meshAddress == dbCutain.meshAddr) {
+                    dbCutain.connectionStatus = notificationInfo.connectionStatus.value
+                    dbCutain.updateIcon()
+                    DBUtils.updateCurtain(dbCutain)
                     runOnUiThread {
                         adapter?.notifyDataSetChanged()
                     }
@@ -870,10 +833,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         val deviceInfo: DeviceInfo = event.args
 
         Thread {
-            val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
-            if (dbLight != null && dbLight.macAddr == "0") {
-                dbLight.macAddr = deviceInfo.macAddress
-                DBUtils.updateLight(dbLight)
+            val dbCutain = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
+            if (dbCutain != null && dbCutain.macAddr == "0") {
+                dbCutain.macAddr = deviceInfo.macAddress
+                DBUtils.updateLight(dbCutain)
             }
         }.start()
 
