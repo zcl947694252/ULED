@@ -57,12 +57,16 @@ object DBUtils {
             
             val listAll = getAllGroupsOrderByIndex()
             val normalList = ArrayList<DbGroup>()
+            val allLightList = ArrayList<DbGroup>()
             val rgbList = ArrayList<DbGroup>()
             val curtainList = ArrayList<DbGroup>()
             val otherList = ArrayList<DbGroup>()
          
             for(group in listAll){
               when(group.deviceType){
+                  Constant.DEVICE_TYPE_DEFAULT_ALL->{
+                      allLightList.add(group)
+                  }
                   Constant.DEVICE_TYPE_LIGHT_NORMAL->{
                       normalList.add(group)
                   }
@@ -77,6 +81,11 @@ object DBUtils {
                   }
               }
             }
+
+         if(allLightList.size>0){
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.allLight),allLightList)
+             allList.add(itemTypeGroup)
+         }
 
          if(normalList.size>0){
              itemTypeGroup= ItemTypeGroup(context.getString(R.string.normal_light),normalList)
