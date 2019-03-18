@@ -28,6 +28,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -290,7 +291,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                (newItemPosition)?.id) ?: false;
+                (newItemPosition)?.id) ?: false
             }
 
             override fun getOldListSize(): Int {
@@ -417,6 +418,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                 intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)
+                intent.putExtra(Constant.CURTAINS_KEY, currentCurtain!!.productUUID)
                 startActivityForResult(intent, REQ_LIGHT_SETTING)
             } else {
                 ToastUtils.showShort(R.string.reconnecting)

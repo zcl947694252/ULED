@@ -701,6 +701,14 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
+    fun deleteCurtain(dbCurtain: DbCurtain){
+        DaoSessionInstance.getInstance().dbCurtainDao.delete(dbCurtain)
+        recordingChange(dbCurtain.id,
+                DaoSessionInstance.getInstance().dbCurtainDao.tablename,
+                Constant.DB_DELETE
+        )
+    }
+
     
     fun deleteSceneActionsList(sceneActionslist: List<DbSceneActions>) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteInTx(sceneActionslist)

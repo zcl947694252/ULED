@@ -49,6 +49,8 @@ public class Constant implements Serializable {
     public static final String LIGHT_REFRESH_KEY = "LIGHT_REFRESH_KEY";
     public static final String LIGHT_REFRESH_KEY_OK = "LIGHT_REFRESH_KEY_OK";
     public static final String CURTAINS_ARESS_KEY="CURTAINS_ARESS_KEY";
+    public static final String CURTAINS_KEY="CURTAINS_KEY";
+    public static final String LIGHT_KEY="LIGHT_KEY";
 
     //标志链接是否成功
     public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";

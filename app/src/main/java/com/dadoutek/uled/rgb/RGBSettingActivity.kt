@@ -137,7 +137,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
         intent.putExtra("light", light)
-        intent.putExtra("gpAddress", gpAddress)
+        intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
+        intent.putExtra("uuid",light!!.productUUID)
+        intent.putExtra("belongId",light!!.belongGroupId)
+        intent.putExtra("gpAddress", light!!.meshAddr)
         startActivity(intent)
     }
 
