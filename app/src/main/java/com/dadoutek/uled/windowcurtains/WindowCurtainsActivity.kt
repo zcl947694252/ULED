@@ -213,14 +213,15 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
 
 
     private fun clickRestart() {
-        val opcode = Opcode.KICK_OUT
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, null)
-    }
-
-    private fun onceReset() {
         val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEC.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
         val opcode = Opcode.CURTAIN_ON_OFF
         TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+
+    }
+
+    private fun onceReset() {
+        val opcode = Opcode.KICK_OUT
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, null)
     }
 
     private fun electricCommutation() {
