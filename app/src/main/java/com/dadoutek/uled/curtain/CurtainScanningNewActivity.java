@@ -1505,6 +1505,8 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
         Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID);
+        Log.d("MACK",mesh.getFactoryName()+"===>"+mesh.getFactoryPassword()+"--->"+mesh.getName()+"=="+NetworkFactory.md5(
+                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16)+"==123"+account);
     }
 
     private boolean checkIsCurtain(int productUUID) {

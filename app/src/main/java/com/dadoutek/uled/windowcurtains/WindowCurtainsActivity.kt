@@ -15,20 +15,28 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.LightGroupingActivity
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_window_curtains.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
 
@@ -43,6 +51,8 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
     private lateinit var group:DbGroup
 
     private var mConnectDevice: DeviceInfo? = null
+
+    private var compositeDisposable = CompositeDisposable()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -201,10 +211,10 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
        }
     }
 
+
     private fun clickRestart() {
-        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
-        val opcode = Opcode.CURTAIN_ON_OFF
-        TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+        val opcode = Opcode.KICK_OUT
+        TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, null)
     }
 
     private fun onceReset() {
