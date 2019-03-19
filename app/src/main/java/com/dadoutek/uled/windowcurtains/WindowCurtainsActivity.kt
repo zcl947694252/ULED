@@ -134,6 +134,10 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener {
+              finish()
+        }
     }
 
     private fun initView() {
@@ -142,18 +146,21 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
         off.setOnClickListener(this)
         pause.setOnClickListener(this)
         commutation.setOnClickListener(this)
+        setting.setOnClickListener(this)
+        restart.setOnClickListener(this)
         setSpeed()
     }
 
     private fun setSpeed() {
         val horizontalSelectedView = findViewById<EHorizontalSelectedView>(R.id.hsv)
         val objects = ArrayList<String>()
+        objects.add("0")
         objects.add("1")
         objects.add("2")
         objects.add("3")
         objects.add("4")
         horizontalSelectedView.setData(objects)
-        horizontalSelectedView.setSeeSize(4)
+        horizontalSelectedView.setSeeSize(5)
         horizontalSelectedView.setOtherTextSize(25F)
         horizontalSelectedView.setSelectTextSize(25F)
 
@@ -189,7 +196,21 @@ class WindowCurtainsActivity : TelinkBaseActivity() ,View.OnClickListener{
            R.id.off->offWindow()
            R.id.pause->pauseWindow()
            R.id.commutation->electricCommutation()
+           R.id.setting->onceReset()
+           R.id.restart->clickRestart()
        }
+    }
+
+    private fun clickRestart() {
+        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
+        val opcode = Opcode.CURTAIN_ON_OFF
+        TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+    }
+
+    private fun onceReset() {
+        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEC.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
+        val opcode = Opcode.CURTAIN_ON_OFF
+        TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
     }
 
     private fun electricCommutation() {

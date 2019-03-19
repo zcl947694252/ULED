@@ -139,7 +139,7 @@ class SyncDataPutOrGetUtils {
                             if(light!=null){
                                 return LightModel.update(token,
                                         light.name, light.brightness,
-                                        light.colorTemperature, light.belongGroupId.toInt(),light.color,
+                                        light.colorTemperature, light.belongGroupId.toInt(),light.color,light.macAddr,
                                         id, changeId.toInt())
                             }
                         }

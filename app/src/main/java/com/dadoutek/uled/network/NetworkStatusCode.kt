@@ -153,4 +153,7 @@ object NetworkStatusCode {
     const val ERROR_NOT_FIND_KEY = 66004
     //指定的key未找到
 
+    const val ERROR_NOT_VERSION=50001
+    //最新版本
+
 }

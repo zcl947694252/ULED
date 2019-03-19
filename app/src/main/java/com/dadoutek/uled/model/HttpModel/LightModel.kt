@@ -21,7 +21,7 @@ object LightModel {
     }
 
     fun update(token: String, name: String, brightness: Int,
-               colorTemperature: Int, belongGroupId: Int,color: Int,id: Long
+               colorTemperature: Int, belongGroupId: Int,color: Int,macAddr:String,id: Long
                , lid: Int): Observable<String> {
         val dbLight = DbLight()
         dbLight.name = name
@@ -30,6 +30,7 @@ object LightModel {
         dbLight.belongGroupId = belongGroupId.toLong()
         dbLight.color = color
         dbLight.id=lid.toLong()
+        dbLight.macAddr=macAddr
         return NetworkFactory.getApi()
                 .updateLight(token,lid,dbLight)
                 .compose(NetworkTransformer())

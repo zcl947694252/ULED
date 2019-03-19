@@ -229,7 +229,7 @@ public interface RequestInterface {
 
     //获取下载链接
     @GET("bin/download")
-    Observable<Response<String>> getFirmwareUrlNew(@Query("version") String version);
+    Observable<Response<Object>> getFirmwareUrlNew(@Query("version") String version);
 
     //添加开关
     @POST("switch/add/{lid}")

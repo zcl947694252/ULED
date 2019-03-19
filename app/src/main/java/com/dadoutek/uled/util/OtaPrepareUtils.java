@@ -3,6 +3,7 @@ package com.dadoutek.uled.util;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Environment;
+import android.util.Log;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -16,8 +17,12 @@ import com.liulishuo.filedownloader.FileDownloader;
 import com.maning.mndialoglibrary.MProgressBarDialog;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 public class OtaPrepareUtils {
 
@@ -105,14 +110,20 @@ public class OtaPrepareUtils {
 
     private String getServerVersionNew(Context context,String localVersion, OtaPrepareListner otaPrepareListner) {
         otaPrepareListner.startGetVersion();
-        DownLoadFileModel.INSTANCE.getUrlNew(localVersion).subscribe(new NetworkObserver<String>() {
+        DownLoadFileModel.INSTANCE.getUrlNew(localVersion).subscribe(new NetworkObserver<Object>() {
             @Override
-            public void onNext(String s) {
+            public void onNext(Object s) {
 //                otaPrepareListner.getVersionSuccess(s);
                /* localPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
                         + "/" + StringUtils.versionResolutionURL(s, 2);*/
-                localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(s, 2);
-                compareServerVersion(s, otaPrepareListner, context);
+                JSONObject jsonObject=new JSONObject((Map) s);
+                try {
+                    String data=jsonObject.getString("url");
+                    localPath = context.getFilesDir()+ "/" + StringUtils.versionResolutionURL(data, 2);
+                    compareServerVersion(data, otaPrepareListner, context);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
