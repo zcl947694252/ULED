@@ -7,6 +7,7 @@ import android.support.v7.widget.*
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
+import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -18,6 +19,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() {
 
     private var adapter:CurtainDeviceDetailsAdapter?=null
 
+    internal var showList: List<ItemTypeGroup>? = null
+
+    private var gpList: List<ItemTypeGroup>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_curtains_device_details)
@@ -26,7 +31,14 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() {
     }
 
     private fun initData() {
-        curtain=DBUtils.getAllCurtain()
+        gpList = DBUtils.getgroupListWithType(this!!)
+
+        showList = ArrayList()
+        showList = gpList
+
+
+
+//        curtain=DBUtils.getAllCurtain()
     }
 
     private fun initView() {
