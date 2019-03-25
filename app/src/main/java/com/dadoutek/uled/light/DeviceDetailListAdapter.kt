@@ -21,7 +21,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
             if (TelinkLightApplication.getInstance().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getInstance().connectDevice.meshAddress == scene.meshAddr) {
+                if (TelinkLightApplication.getInstance().connectDevice.meshAddress == scene.getMeshAddr()) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {
@@ -30,7 +30,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                 }
             }
 
-            tvLightName.text = scene.name
+            tvLightName.setText(scene.getName())
 
             val myGrad = tvRgbColor.background as GradientDrawable
             if (scene.getColor() == 0 || scene.getColor() == 0xffffff) {
@@ -46,5 +46,4 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                     .setBackgroundRes(R.id.img_light, scene.icon)
                     .addOnClickListener(R.id.img_light)
         }
-
 }

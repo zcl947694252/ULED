@@ -14,6 +14,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSwitch
@@ -173,7 +174,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun saveSwitch(){
             //确认配置成功后,添加开关到服务器
-            val dbSwitch: DbSwitch = DbSwitch()
+            var dbSwitch: DbSwitch = DbSwitch()
+            DBUtils.saveSwitch(dbSwitch,false)
             dbSwitch.controlSceneId=getControlScene()
             dbSwitch.macAddr=mDeviceInfo.macAddress
             dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
@@ -181,6 +183,12 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch.index=dbSwitch.id.toInt()
             dbSwitch.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             DBUtils.saveSwitch(dbSwitch,false)
+
+          dbSwitch= DBUtils.getSwitchByID(dbSwitch.id)!!
+
+           DBUtils.recordingChange(dbSwitch.id,
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_ADD)
     }
 
     private fun getControlScene(): String? {

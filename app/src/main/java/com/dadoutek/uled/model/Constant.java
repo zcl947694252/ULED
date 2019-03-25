@@ -175,6 +175,7 @@ public class Constant implements Serializable {
     public static String IS_SCAN_CURTAIN="IS_SCAN_CURTAIN";
     public static String TYPE_GROUP="TYPE_GROUP";
     public static String TYPE_LIGHT="TYPE_LIGHT";
+    public static String TYPE_CURTAIN="TYPE_CURTAIN";
     public static String TYPE_VIEW="TYPE_VIEW";
     public static String TYPE_VIEW_ADDRESS="TYPE_VIEW_ADDRESS";
 

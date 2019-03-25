@@ -1198,7 +1198,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(R.string.not_grouped);
             if(light.getProductUUID()==DeviceType.SMART_CURTAIN){
-                holder.icon.setImageResource(R.drawable.chuanglian);
+                holder.icon.setImageResource(R.drawable.curtain_on);
             }
             else{
                 holder.icon.setImageResource(R.drawable.icon_light_on);
@@ -1464,7 +1464,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         final Mesh mesh = this.mApplication.getMesh();
         final int meshAddress = mesh.generateMeshAddr();
 
-        if (meshAddress == -1) {
+        if (meshAddress == -0) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));
             if (adapter.getLights() != null && adapter.getLights().size() > 0) {
                 stopTimer();

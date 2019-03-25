@@ -33,9 +33,15 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".scene.SensorDeviceDetailsActivity"></activity>
-        <activity android:name=".windowcurtains.CurtainsDeviceDetailsActivity" />
-        <activity android:name=".switches.SwitchDeviceDetailsActivity" />
+        <activity android:name=".scene.SensorDeviceDetailsActivity"
+            android:label="@string/activity_mesh_add_lable"
+            android:screenOrientation="portrait" />
+        <activity android:name=".windowcurtains.CurtainsDeviceDetailsActivity"
+            android:label="@string/activity_mesh_add_lable"
+            android:screenOrientation="portrait" />
+        <activity android:name=".switches.SwitchDeviceDetailsActivity"
+            android:label="@string/activity_mesh_add_lable"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="android.max_aspect"
@@ -241,15 +247,12 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".windowcurtains.WindowCurtainsActivity"
+            android:screenOrientation="portrait" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- /> -->
+        <activity
+            android:name=".curtain.CurtainOfGroupActivity"
             android:screenOrientation="portrait" />
-
-        <!--<activity android:name=".windowCurtains.WindowCurtainsActivity"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--/>-->
-        <activity android:name=".curtain.CurtainOfGroupActivity"
-            android:screenOrientation="portrait"
-            />
-
     </application>
 
 </manifest>

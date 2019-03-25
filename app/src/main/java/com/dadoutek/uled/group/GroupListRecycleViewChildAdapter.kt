@@ -1,5 +1,6 @@
 package com.dadoutek.uled.group
 
+import android.view.View
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -23,6 +24,10 @@ class GroupListRecycleViewChildAdapter(layoutResId: Int, data: List<DbGroup>?) :
 //                if(OtherUtils.isCurtain(group)){
 //                    helper.setText(R.id.btn_set)
 //                }
+            }
+            if(group.name.equals(R.string.curtain)){
+               helper.setVisible(R.id.btn_off,false)
+                helper.setVisible(R.id.btn_on,false)
             }
             helper.setTextColor(R.id.txt_name, group.textColor)
                     .addOnClickListener(R.id.txt_name)

@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -328,14 +329,16 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             e.printStackTrace()
         }finally {
             //确认配置成功后,添加开关到服务器
+            val newMeshAdress: Int
             val dbSwitch:DbSwitch=DbSwitch()
+            DBUtils.saveSwitch(dbSwitch,false)
             dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
             dbSwitch.macAddr=mDeviceInfo.macAddress
             dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID=mDeviceInfo.productUUID
             dbSwitch.index=dbSwitch.id.toInt()
             dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-            DBUtils.saveSwitch(dbSwitch,false)
+
         }
     }
 
@@ -420,5 +423,39 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         mAdapter.bindToRecyclerView(recyclerView)
 
     }
+
+    val groupAdress: Int
+        get() {
+            val list = DBUtils.groupList
+            val idList = java.util.ArrayList<Int>()
+            for (i in list.indices.reversed()) {
+                if (list[i].meshAddr == 0xffff) {
+                    list.removeAt(i)
+                }
+            }
+
+            for (i in list.indices) {
+                idList.add(list[i].meshAddr)
+            }
+
+            var id = 0
+            for (i in 0x8001..33023) {
+                if (idList.contains(i)) {
+                    Log.d("sceneID", "getSceneId: " + "aaaaa")
+                    continue
+                } else {
+                    id = i
+                    Log.d("sceneID", "getSceneId: bbbbb$id")
+                    break
+                }
+            }
+
+            if (list.size == 0) {
+                id = 0x8001
+            }
+
+            return id
+        }
+
 
 }

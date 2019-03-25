@@ -109,7 +109,7 @@ public interface RequestInterface {
     Observable<Response<List<DbGroup>>> getGroupList(@Header("token") String token);
 
     //更新组
-    @POST("group/add/{rid}")
+    @POST("group/add-batch/{rid}")
     Observable<Response<String>> updateGroup(@Header("token") String token,
                                              @Path("rid") int rid,
                                              @Body DbGroup dbGroup
@@ -283,18 +283,18 @@ public interface RequestInterface {
                                            @Body DbCurtain dbCurtain,
                                            @Path("lid") int lid);
 
-    //获取传感器列表
+    //获取窗帘列表
     @GET("curtain/list")
     Observable<Response<List<DbCurtain>>> getCurtainList(@Header("token") String token);
 
-    //更新传感器
+    //更新窗帘
     @POST("curtain/add/{lid}")
     Observable<Response<String>> updateCurtain(@Header("token") String token,
                                               @Path("lid") int lid,
                                               @Body DbCurtain dbCurtain
     );
 
-    //删除传感器
+    //删除窗帘
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("curtain/remove/{lid}")
     Observable<Response<String>> deleteCurtain(@Header("token") String token,

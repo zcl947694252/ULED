@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
@@ -254,7 +255,6 @@ class GroupListFragment : BaseFragment() {
                 val group = showList!![groupPosition].list[position]
                 val dstAddr = group.meshAddr
                 var intent: Intent
-                var isCurtain= OtherUtils.isCurtain(group)
 
                 if (TelinkLightApplication.getInstance().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
@@ -262,20 +262,12 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     when (view!!.getId()) {
                         R.id.btn_on -> {
-                            if(isCurtain){
-                                Commander.openOrCloseCurtain(dstAddr, true,false)
-                            }else{
                                 Commander.openOrCloseLights(dstAddr, true)
                                 updateLights(true, group)
-                            }
                         }
                         R.id.btn_off -> {
-                            if(isCurtain){
-                                Commander.openOrCloseCurtain(dstAddr, false,false)
-                            }else{
                                 Commander.openOrCloseLights(dstAddr, false)
                                 updateLights(false, group)
-                            }
                         }
                         R.id.btn_set -> {
                             intent = Intent(mContext, NormalSettingActivity::class.java)

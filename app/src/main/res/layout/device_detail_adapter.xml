@@ -9,6 +9,15 @@
     tools:layout_editor_absoluteY="25dp">
 
     <ImageView
+        android:id="@+id/img_light"
+        android:layout_width="108dp"
+        android:layout_height="108dp"
+        android:background="@drawable/icon_light_on"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
         android:id="@+id/tv_setting"
         android:layout_width="34dp"
         android:layout_height="34dp"
@@ -18,15 +27,6 @@
         android:src="@drawable/menubarsetting3x"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="@+id/img_light"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/img_light"
-        android:layout_width="108dp"
-        android:layout_height="108dp"
-        android:background="@drawable/icon_light_on"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

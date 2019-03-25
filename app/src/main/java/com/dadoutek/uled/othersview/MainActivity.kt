@@ -241,12 +241,20 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     }
 
     private val dialogOnclick =View.OnClickListener{
+        var medressData=0
+        var allData=DBUtils.allLight
+        var sizeData=DBUtils.allLight.size
+        if(sizeData!=0){
+            var lightData= allData[sizeData-1]
+            medressData=lightData.meshAddr
+        }
+
         when(it.id){
             R.id.close_install_list->{ installDialog?.dismiss()}
             R.id.search_bar->{
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
-                        if (DBUtils.allLight.size < 254) {
+                        if (medressData < 254) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
                             startActivityForResult(intent, 0)
@@ -255,7 +263,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                         }
                     }
                     INSTALL_RGB_LIGHT -> {
-                        if (DBUtils.allLight.size < 254) {
+                        if (medressData < 254) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                             startActivityForResult(intent, 0)
@@ -264,7 +272,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                         }
                     }
                     INSTALL_CURTAIN -> {
-                        if (DBUtils.allLight.size < 254) {
+                        if (medressData < 254) {
                             intent = Intent(this, CurtainScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                             intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
@@ -501,8 +509,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                                 connectFailedDeviceMacList.clear()
                                 startScan()
                             }
-                            break;
-                        }
+                            break
+                    }
 
                     } else {
                         mNotFoundSnackBar?.dismiss()

@@ -160,7 +160,7 @@ class NewDevieFragment :BaseFragment(){
 
     private fun initToolBar(view: View?) {
         toolbar = view?.findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.group_title)
+        toolbar!!.setTitle(R.string.device_list)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE

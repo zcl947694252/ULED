@@ -335,7 +335,7 @@ class ConfigCurtainSwitchActivity : AppCompatActivity(), EventListener<String> {
             dbSwitch.macAddr=mDeviceInfo.macAddress
             dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID=mDeviceInfo.productUUID
-            dbSwitch.index=dbSwitch.id.toInt()
+//            dbSwitch.index=dbSwitch.id.toInt()
             dbSwitch.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             DBUtils.saveSwitch(dbSwitch,false)
         }

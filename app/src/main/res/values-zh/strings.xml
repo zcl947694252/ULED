@@ -572,4 +572,6 @@
     <string name="speed_adjustment">速度调节:</string>
     <string name="details">详情</string>
     <string name="restart">电机重启</string>
+    <string name="successful_resumption">恢复出厂成功</string>
+    <string name="device_list">设备</string>
 </resources>

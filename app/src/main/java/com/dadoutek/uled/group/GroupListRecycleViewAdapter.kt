@@ -16,6 +16,7 @@ import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.ItemTypeGroup
+import com.dadoutek.uled.othersview.MeFragment
 import com.dadoutek.uled.util.LogUtils
 
 class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClickListener1 : MyBaseQuickAdapterOnClickListner,data: List<ItemTypeGroup>) :

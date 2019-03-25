@@ -13,8 +13,6 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 
 import java.util.ArrayList
 
-import com.dadoutek.uled.model.Constant.MAX_GROUP_COUNT
-
 /**
  * Created by hejiajun on 2018/5/18.
  */
@@ -83,22 +81,22 @@ object DBUtils {
             }
 
          if(allLightList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.allLight),allLightList)
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.allLight),allLightList,R.drawable.icon_light_on)
              allList.add(itemTypeGroup)
          }
 
          if(normalList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.normal_light),normalList)
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.normal_light),normalList,R.drawable.icon_light_on)
              allList.add(itemTypeGroup)
          }
 
          if(rgbList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.rgb_light),rgbList)
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.rgb_light),rgbList,R.drawable.icon_light_on)
              allList.add(itemTypeGroup)
          }
 
          if(curtainList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.curtain),curtainList,R.drawable.chuanglian)
+             itemTypeGroup= ItemTypeGroup(context.getString(R.string.curtain),curtainList,R.drawable.curtain_on)
              allList.add(itemTypeGroup)
          }
 
@@ -775,7 +773,7 @@ object DBUtils {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
         if (!checkReachedTheLimit(groups,name)) {
             val newMeshAdress: Int
-            val group = DbGroup()
+            var group = DbGroup()
             newMeshAdress = groupAdress
             group.meshAddr = newMeshAdress
             group.name = name
@@ -787,6 +785,8 @@ object DBUtils {
             //新增数据库保存
             DBUtils.saveGroup(group, false)
 
+            group=DBUtils.getGroupByMesh(newMeshAdress)
+
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
                     Constant.DB_ADD)
@@ -797,7 +797,7 @@ object DBUtils {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
         if (!checkReachedTheLimit(groups,name)) {
             val newMeshAdress: Int
-            val group = DbGroup()
+            var group = DbGroup()
             newMeshAdress = groupAdress
             group.meshAddr = newMeshAdress
             group.name = name
@@ -811,6 +811,8 @@ object DBUtils {
             DBUtils.saveGroup(group, false)
 
             group.index = group.id.toInt()
+
+            group=DBUtils.getGroupByMesh(newMeshAdress)
 
             DBUtils.updateGroup(group)
 
@@ -875,11 +877,10 @@ object DBUtils {
     }
 
     private fun checkReachedTheLimit(groups: List<DbGroup>,name:String): Boolean {
-        if (groups.size >= MAX_GROUP_COUNT) {
+        if (groups.size>Constant.MAX_GROUP_COUNT ) {
             ToastUtils.showLong(R.string.group_limit)
             return true
         }
-
         for(i in groups.indices){
             if(groups[i].name==name){
                 ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))

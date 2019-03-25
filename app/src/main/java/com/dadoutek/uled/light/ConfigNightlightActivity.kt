@@ -17,13 +17,10 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSensor
-import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.ItemGroup
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -345,14 +342,22 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun saveSensor() {
-        val dbSensor : DbSensor = DbSensor()
+        var dbSensor : DbSensor = DbSensor()
+        DBUtils.saveSensor(dbSensor,false)
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.index = dbSensor.id.toInt()
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
         DBUtils.saveSensor(dbSensor,false)
+
+        dbSensor= DBUtils.getSensorByID(dbSensor.id)!!
+
+        DBUtils.recordingChange(dbSensor.id,
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_ADD)
     }
 
     private fun getControlGroup(): String? {
