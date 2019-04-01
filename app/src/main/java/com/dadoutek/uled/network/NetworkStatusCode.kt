@@ -156,4 +156,7 @@ object NetworkStatusCode {
     const val ERROR_NOT_VERSION=50001
     //最新版本
 
+    const val ERROR_CLIEN=50000
+    //服务器异常
+
 }

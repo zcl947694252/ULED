@@ -227,8 +227,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun updateGroup() {
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
+        intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
         intent.putExtra("light", light)
         intent.putExtra("gpAddress", gpAddress)
+        intent.putExtra("uuid",light!!.productUUID)
+        intent.putExtra("belongId",light!!.belongGroupId)
         startActivity(intent)
        this!!.finish()
     }

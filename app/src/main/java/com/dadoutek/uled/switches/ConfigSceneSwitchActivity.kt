@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -174,20 +175,33 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun saveSwitch(){
             //确认配置成功后,添加开关到服务器
-            var dbSwitch: DbSwitch = DbSwitch()
+            var newMeshAdress: Int
+            var dbSwitch: DbSwitch?=DbSwitch()
             DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch.controlSceneId=getControlScene()
-            dbSwitch.macAddr=mDeviceInfo.macAddress
-            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-            dbSwitch.productUUID=mDeviceInfo.productUUID
-            dbSwitch.index=dbSwitch.id.toInt()
-            dbSwitch.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-            DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        dbSwitch!!.controlSceneId=getControlScene()
+        dbSwitch!!.macAddr=mDeviceInfo.macAddress
+        dbSwitch!!.meshAddr=Constant.SWITCH_PIR_ADDRESS
+        dbSwitch!!.productUUID=mDeviceInfo.productUUID
+        dbSwitch!!.index=dbSwitch.id.toInt()
+//        dbSwitch!!.index=dbSwitch.id.toInt()
+//           dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//             newMeshAdress=groupAdress
+//            dbSwitch!!.controlSceneId=getControlScene()
+//            dbSwitch!!.macAddr=mDeviceInfo.macAddress
+//            dbSwitch!!.meshAddr=Constant.SWITCH_PIR_ADDRESS
+//            dbSwitch!!.productUUID=mDeviceInfo.productUUID
+        DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//        dbSwitch!!.index=dbSwitch.id.toInt()
+//            dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//
+//          dbSwitch= DBUtils.getSwitchByID(dbSwitch.id.toLong())!!
+//          dbSwitch= DBUtils.getSwitchByMeshAddr(mDeviceInfo.macAddress)!!
 
-          dbSwitch= DBUtils.getSwitchByID(dbSwitch.id)!!
-
-           DBUtils.recordingChange(dbSwitch.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+//          DBUtils.saveSwitch(dbSwitch,false)
+        DBUtils.recordingChange(dbSwitch!!.id,
+                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                 Constant.DB_ADD)
     }
 
@@ -448,5 +462,35 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mSceneList = DBUtils.sceneAll
     }
 
+    val groupAdress: Int
+        get() {
+            val list = DBUtils.swtichList
+            val idList = java.util.ArrayList<Int>()
+            for (i in list.indices.reversed()) {
+                if (list[i].meshAddr == 0xffff) {
+                    list.removeAt(i)
+                }
+            }
 
+            for (i in list.indices) {
+                idList.add(list[i].meshAddr)
+            }
+
+            var id = 0
+            for (i in 0x8001..33023) {
+                if (idList.contains(i)) {
+                    Log.d("sceneID", "getSceneId: " + "aaaaa")
+                    continue
+                } else {
+                    id = i
+                    Log.d("sceneID", "getSceneId: bbbbb$id")
+                    break
+                }
+            }
+
+            if (list.size == 0) {
+                id = 0x8001
+            }
+            return id
+        }
 }

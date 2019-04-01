@@ -218,8 +218,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.SetDiyColorAct"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".light.DeviceDetailAct"
             android:screenOrientation="portrait"
@@ -230,8 +229,7 @@
             android:windowSoftInputMode="adjustResize|stateVisible" />
         <activity
             android:name=".curtain.CurtainScanningNewActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".group.CurtainGroupingActivity"
             android:screenOrientation="portrait"
@@ -253,6 +251,7 @@
         <activity
             android:name=".curtain.CurtainOfGroupActivity"
             android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

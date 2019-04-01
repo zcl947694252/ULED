@@ -15,6 +15,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
@@ -329,15 +330,25 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             e.printStackTrace()
         }finally {
             //确认配置成功后,添加开关到服务器
-            val newMeshAdress: Int
-            val dbSwitch:DbSwitch=DbSwitch()
+            var newMeshAdress: Int
+//            var dbSwitch:DbSwitch=DbSwitch()
+            newMeshAdress=groupAdress
+//            DBUtils.saveSwitch(dbSwitch,false)
+            var dbSwitch: DbSwitch?=DbSwitch()
             DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
             dbSwitch.macAddr=mDeviceInfo.macAddress
             dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID=mDeviceInfo.productUUID
             dbSwitch.index=dbSwitch.id.toInt()
             dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
+//            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            DBUtils.recordingChange(dbSwitch!!.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                    Constant.DB_ADD)
 
         }
     }
@@ -456,6 +467,5 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
             return id
         }
-
 
 }

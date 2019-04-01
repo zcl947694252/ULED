@@ -19,7 +19,7 @@ object AccountModel {
     fun login(phone: String, password: String, channel: String): Observable<DbUser> {
         lateinit var account: String
         return NetworkFactory.getApi()
-                .getAccount(phone, channel)
+                .getAccount(phone, "dadou")
                 .compose(NetworkTransformer())
                 .flatMap { response: String ->
                     account = response

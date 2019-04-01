@@ -4,14 +4,19 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        >
+
     <TextView
         android:id="@+id/group_name"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:text="group1"
         android:textColor="@color/black"
-        android:gravity="center_vertical"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_centerVertical="true"
         android:textSize="16sp"
         />
 
@@ -24,9 +29,10 @@
         android:padding="3dp"
         android:background="@color/primary"
         android:textColor="@color/white"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/group_name"
-        app:layout_constraintTop_toTopOf="@id/group_name"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
         />
+
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

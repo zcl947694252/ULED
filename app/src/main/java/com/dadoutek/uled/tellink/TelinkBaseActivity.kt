@@ -26,7 +26,7 @@ import org.jetbrains.anko.design.indefiniteSnackbar
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import android.bluetooth.BluetoothAdapter
-
+import com.blankj.utilcode.util.LogUtils
 
 
 open class TelinkBaseActivity : AppCompatActivity() {
@@ -56,7 +56,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
         dialogTip.setCancelable(false)
         dialogTip.create().show()
     }
-
     override fun onPause() {
         super.onPause()
         foreground = false

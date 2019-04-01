@@ -18,6 +18,8 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.othersview.MeFragment
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.OtherUtils
+import com.telink.TelinkApplication
 
 class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClickListener1 : MyBaseQuickAdapterOnClickListner,data: List<ItemTypeGroup>) :
         BaseItemDraggableAdapter<ItemTypeGroup, BaseViewHolder>(layoutResId, data){
@@ -28,6 +30,37 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
 
     override fun convert(helper: BaseViewHolder, itemTypeGroup : ItemTypeGroup?) {
         helper.setText(R.id.device_type_name,itemTypeGroup!!.name)
+        if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.normal_light)){
+            var num:Int?=null
+            var lightNum:Int=0
+            for(i in itemTypeGroup.list!!.indices){
+                if(OtherUtils.isNormalGroup(itemTypeGroup.list[i])){
+                    num=DBUtils.getLightByGroupID(itemTypeGroup.list[i].id).size
+                    lightNum += num
+                }
+            }
+            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+lightNum+")")
+        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.rgb_light)){
+            var num:Int?=null
+            var RGBNum:Int=0
+            for(i in itemTypeGroup.list!!.indices){
+                if(OtherUtils.isRGBGroup(itemTypeGroup.list[i])){
+                    num=DBUtils.getLightByGroupID(itemTypeGroup.list[i].id).size
+                    RGBNum += num
+                }
+            }
+            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+RGBNum+")")
+        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.curtain)){
+            var num:Int?=null
+            var curtainNum:Int=0
+            for(i in itemTypeGroup.list!!.indices){
+                 if(OtherUtils.isCurtain(itemTypeGroup.list[i])){
+                     num=DBUtils.getCurtainByGroupID(itemTypeGroup.list[i].id).size
+                     curtainNum+=num
+                 }
+            }
+            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+curtainNum+")")
+        }
         if(itemTypeGroup.icon!=0){
             helper.setBackgroundRes(R.id.device_img, itemTypeGroup.icon)
         }
@@ -53,6 +86,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
         adapter!!.bindToRecyclerView(recyclerViewChild)
         setMove(recyclerViewChild!!)
     }
+
 
     private fun setMove(recyclerViewChild: RecyclerView) {
         var startPos=0
@@ -113,4 +147,5 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
 
         DBUtils.updateGroupList(list)
     }
+    
 }

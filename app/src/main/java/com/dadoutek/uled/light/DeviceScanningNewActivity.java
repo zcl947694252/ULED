@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -85,6 +87,8 @@ import com.telink.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -185,6 +189,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
     private long allLightId = 0;
+
+    private String type;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -656,16 +662,20 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         adapter.notifyDataSetChanged();
         btnAddGroups.setVisibility(View.VISIBLE);
         groupsBottom.setVisibility(View.VISIBLE);
+
         layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
+
         groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
 
         disableEventListenerInGrouping();
-
         initOnLayoutListener();
     }
+
+
+
 
     OnRecyclerviewItemLongClickListener onRecyclerviewItemLongClickListener = (v, position) -> {
         showGroupForUpdateNameDialog(position);
@@ -770,6 +780,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 refreshView();
                 dialog.dismiss();
+                InputMethodManager imm = (InputMethodManager) DeviceScanningNewActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 guideStep2();
             }
         });
@@ -778,7 +790,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 dialog.dismiss();
             });
         }
+        textGp.setFocusable(true);
+        textGp.setFocusableInTouchMode(true);
+        textGp.requestFocus();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) textGp.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(textGp, 0);
+            }
+        }, 200);
         builder.show();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE|WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
     private void refreshView() {
@@ -1066,6 +1089,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         Intent intent = getIntent();
         scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false);
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        type=intent.getStringExtra(Constant.TYPE_VIEW);
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();
@@ -1075,13 +1099,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 if (scanRGBLight) {
                     for (int i = 0; i < list.size(); i++) {
-                        if (OtherUtils.isRGBGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                        if (OtherUtils.isRGBGroup(list.get(i))) {
                             groups.add(list.get(i));
                         }
                     }
                 } else {
                     for (int i = 0; i < list.size(); i++) {
-                        if (OtherUtils.isNormalGroup(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                        if (OtherUtils.isNormalGroup(list.get(i))) {
                             groups.add(list.get(i));
                         }
                     }

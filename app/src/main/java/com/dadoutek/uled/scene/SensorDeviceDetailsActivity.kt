@@ -29,14 +29,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity() {
         val layoutmanager = LinearLayoutManager(this)
         recyclerView = findViewById<RecyclerView>(R.id.recycleView)
         recyclerView!!.layoutManager = GridLayoutManager(this,3)
-        val decoration = DividerItemDecoration(this!!,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
-                .divider)))
-        recyclerView!!.addItemDecoration(decoration)
-        //添加Item变化动画
-        recyclerView!!.itemAnimator = DefaultItemAnimator()
+//        val decoration = DividerItemDecoration(this!!,
+//                DividerItemDecoration
+//                        .VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
+//                .divider)))
+//        recyclerView!!.addItemDecoration(decoration)
+//        //添加Item变化动画
+//        recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = SensorDeviceDetailsAdapter(R.layout.device_detail_adapter, sensorData)
         adapter!!.bindToRecyclerView(recyclerView)
 
@@ -44,7 +44,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity() {
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.setTitle(R.string.details)
+        toolbar.title=getString(R.string.sensor) + " (" + sensorData!!.size + ")"
     }
 
     private fun initDate() {

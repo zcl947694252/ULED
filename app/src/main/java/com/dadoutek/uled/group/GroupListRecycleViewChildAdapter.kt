@@ -1,5 +1,6 @@
 package com.dadoutek.uled.group
 
+import android.util.Log
 import android.view.View
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -16,7 +17,7 @@ class GroupListRecycleViewChildAdapter(layoutResId: Int, data: List<DbGroup>?) :
             if (group.textColor == 0)
                 group.textColor = mContext.resources
                         .getColor(R.color.black)
-
+            Log.d("setAddress", group.meshAddr.toString())
             if (group.meshAddr == 0xffff) {
                 helper.setText(R.id.txt_name, TelinkLightApplication.getInstance().getString(R.string.allLight))
             } else {
@@ -25,10 +26,15 @@ class GroupListRecycleViewChildAdapter(layoutResId: Int, data: List<DbGroup>?) :
 //                    helper.setText(R.id.btn_set)
 //                }
             }
-            if(group.name.equals(R.string.curtain)){
-               helper.setVisible(R.id.btn_off,false)
+            if(OtherUtils.isCurtain(group)){
+//                    helper.setText(R.id.btn_set)
+                helper.setVisible(R.id.btn_off,false)
                 helper.setVisible(R.id.btn_on,false)
-            }
+                }
+//            if(group.name==TelinkLightApplication.getInstance().getString(R.string.curtain)){
+//                helper.setVisible(R.id.btn_off,false)
+//                helper.setVisible(R.id.btn_on,false)
+//            }
             helper.setTextColor(R.id.txt_name, group.textColor)
                     .addOnClickListener(R.id.txt_name)
                     .addOnClickListener(R.id.btn_on)

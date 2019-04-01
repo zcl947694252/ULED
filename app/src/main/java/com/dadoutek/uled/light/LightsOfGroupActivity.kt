@@ -12,7 +12,9 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
@@ -105,6 +107,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
+    private var recyclerView: RecyclerView? = null
 
     override fun onStart() {
         super.onStart()
@@ -402,10 +405,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
-        recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
+        recyclerView=findViewById(R.id.recycler_view_lights)
+        recyclerView!!.layoutManager = GridLayoutManager(this, 3)
+        recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
-        adapter!!.bindToRecyclerView(recycler_view_lights)
+        adapter!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {
             lightList[i].updateIcon()
         }
@@ -443,7 +448,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             runOnUiThread {
                 adapter?.notifyDataSetChanged()
             }
-        } else if (view.id == R.id.tv_setting) {
+        } else
+            if (view.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)

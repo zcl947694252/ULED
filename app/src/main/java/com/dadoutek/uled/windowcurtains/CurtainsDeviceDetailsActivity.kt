@@ -19,9 +19,6 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.light.DeviceDetailListAdapter
-import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -153,42 +150,43 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.setTitle(R.string.details)
+        toolbar.title=getString(R.string.curtain) + " (" + curtain.size + ")"
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentLight = curtain?.get(position)
         positionCurrent = position
         val opcode = Opcode.LIGHT_ON_OFF
-        if (view.id == R.id.img_light) {
-            canBeRefresh = true
-            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x01, 0x00, 0x00))
-                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-                } else {
-                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
-                }
-
-                currentLight!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x00, 0x00, 0x00))
-                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                } else {
-                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
-                }
-                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
-            }
-
-            currentLight!!.updateIcon()
-            DBUtils.updateCurtain(currentLight!!)
-            runOnUiThread {
-                adapter?.notifyDataSetChanged()
-            }
-        } else if (view.id == R.id.tv_setting) {
+//        if (view.id == R.id.img_light) {
+//            canBeRefresh = true
+//            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+////                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+////                        byteArrayOf(0x01, 0x00, 0x00))
+//                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+//                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+//                } else {
+//                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+//                }
+//
+//                currentLight!!.connectionStatus = ConnectionStatus.ON.value
+//            } else {
+////                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+////                        byteArrayOf(0x00, 0x00, 0x00))
+//                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+//                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+//                } else {
+//                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+//                }
+//                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+//            }
+//
+//            currentLight!!.updateIcon()
+//            DBUtils.updateCurtain(currentLight!!)
+//            runOnUiThread {
+//                adapter?.notifyDataSetChanged()
+//            }
+//        } else
+        if (view.id == R.id.tv_setting) {
 //            if (scanPb.visibility != View.VISIBLE) {
 //                判断是否为rgb灯
             var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
@@ -214,9 +212,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
         val isConnect = data?.getBooleanExtra("data", false) ?: false
-        if (isConnect) {
-            scanPb.visibility = View.VISIBLE
-        }
+//        if (isConnect) {
+//            scanPb.visibility = View.VISIBLE
+//        }
 
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
@@ -258,6 +256,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
         curtain = mNewDatas!!
         adapter!!.setNewData(curtain)
+        toolbar.title=getString(R.string.curtain) + " (" + curtain.size + ")"
     }
 
     private fun getNewData(): MutableList<DbCurtain> {
@@ -270,11 +269,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
         }
 
-        if (currentLight!!.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + curtain.size + ")"
-        } else {
-            toolbar.title = (currentLight!!.name ?: "")
-        }
+//        if (currentLight!!.meshAddr == 0xffff) {
+//            toolbar.title = getString(R.string.allLight) + " (" + curtain.size + ")"
+//        } else {
+//            toolbar.title = (currentLight!!.name ?: "")
+//        }
         return curtain
     }
 

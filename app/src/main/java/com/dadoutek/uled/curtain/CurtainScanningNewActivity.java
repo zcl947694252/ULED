@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -40,11 +42,13 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
+import com.dadoutek.uled.light.DeviceScanningNewActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DeviceType;
+import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -85,6 +89,8 @@ import com.telink.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
@@ -347,7 +353,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     private void scanSuccess() {
         //更新Title
         tvStopScan.setVisibility(View.GONE);
-        toolbar.setTitle(getString(R.string.title_scanned_lights_num, adapter.getCount()));
+        toolbar.setTitle(getString(R.string.title_curtain_lights_num, adapter.getCount()));
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
@@ -458,7 +464,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 //目前测试调到主页
                 doFinish();
             } else {
-                showToast(getString(R.string.have_lamp_no_group_tip));
+                showToast(getString(R.string.have_curtain_no_group_tip));
             }
         });
     }
@@ -486,14 +492,14 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 //获取当前勾选灯的列表
                 List<DbCurtain> selectLights = getCurrentSelectLights();
 
-                showLoadingDialog(getResources().getString(R.string.grouping_wait_tip,
+                showLoadingDialog(getResources().getString(R.string.grouping_curtain_wait_tip,
                         selectLights.size() + ""));
                 //将灯列表的灯循环设置分组
                 setGroups(group, selectLights);
             }
 
         } else {
-            showToast(getString(R.string.selected_lamp_tip));
+            showToast(getString(R.string.selected_curtain_tip));
         }
     }
 
@@ -516,7 +522,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
             @Override
             public Unit invoke() {
                 dbLight.setBelongGroupId(allLightId);
-                ToastUtils.showLong(R.string.group_fail_tip);
+                ToastUtils.showLong(R.string.curtain_fail_tip);
                 updateGroupResult(dbLight, dbGroup);
                 if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
                     ToastUtils.showLong("断开连接");
@@ -659,9 +665,9 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
+
         groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
-
         disableEventListenerInGrouping();
 
         initOnLayoutListener();
@@ -765,6 +771,8 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_CURTAIN,this);
                 refreshView();
                 dialog.dismiss();
+                InputMethodManager imm = (InputMethodManager) CurtainScanningNewActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 guideStep2();
             }
         });
@@ -773,6 +781,16 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 dialog.dismiss();
             });
         }
+        textGp.setFocusable(true);
+        textGp.setFocusableInTouchMode(true);
+        textGp.requestFocus();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                InputMethodManager inputManager = (InputMethodManager) textGp.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.showSoftInput(textGp, 0);
+            }
+        }, 200);
         builder.show();
     }
 
@@ -805,7 +823,6 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                     updateData(i, true);
                 }
             }
-
             groupsRecyclerViewAdapter.notifyDataSetChanged();
             SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
@@ -1070,7 +1087,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
             if(scanCURTAIN){
                 for (int i = 0; i < list.size(); i++) {
-                    if (OtherUtils.isCurtain(list.get(i)) || list.get(i).getMeshAddr() == 0xffff || OtherUtils.groupIsEmpty(list.get(i))) {
+                    if (OtherUtils.isCurtain(list.get(i))) {
                         groups.add(list.get(i));
                     }
                 }
@@ -1176,7 +1193,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            CurtainScanningNewActivity.DeviceItemHolder holder;
+            DeviceItemHolder holder;
 
             convertView = inflater.inflate(R.layout.device_item, null);
             ImageView icon = (ImageView) convertView
@@ -1559,7 +1576,6 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 deviceInfo1.meshName = deviceInfo.meshName;
                 if (bestRssiDevice == null) {
                     bestRssiDevice = deviceInfo;
-                } else {
                     if (bestRssiDevice.rssi < deviceInfo.rssi) {
                         bestRssiDevice = deviceInfo;
                     }
@@ -1572,6 +1588,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                     if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_CURTAIN) {
                         addDevice(deviceInfo);
                     }
+                } else {
                 }
 
                 //扫描出灯就设置为非首次进入
@@ -1579,7 +1596,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                     isFirtst = false;
                     SharedPreferencesHelper.putBoolean(CurtainScanningNewActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
-                toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
+                toolbar.setTitle(getString(R.string.title_curtain_lights_num, adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);
 
                 Log.d("ScanningTest", "update mesh success");

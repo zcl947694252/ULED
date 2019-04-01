@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -68,6 +69,8 @@ class GroupListFragment : BaseFragment() {
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
+    private var sharedPreferences:SharedPreferences?=null
+
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
     //是否正在引导
@@ -75,6 +78,10 @@ class GroupListFragment : BaseFragment() {
     var firstShowGuide = true
     private var isFristUserClickCheckConnect = true
     private var guideShowCurrentPage = false
+
+    internal var lastPosition: Int = 0
+
+    internal var lastOffset: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,15 +94,32 @@ class GroupListFragment : BaseFragment() {
                               savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
-
         return view
     }
+
+    private fun scrollToPosition() {
+
+        sharedPreferences = mContext!!.getSharedPreferences("key", Activity.MODE_PRIVATE)
+
+        lastOffset = sharedPreferences!!.getInt("lastOffset", 0)
+
+        lastPosition = sharedPreferences!!.getInt("lastPosition", 0)
+
+        if (recyclerView!!.layoutManager != null && lastPosition >= 0) {
+
+            (recyclerView!!.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
+
+        }
+
+    }
+
 
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
 
         refreshView()
+        scrollToPosition()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -184,11 +208,54 @@ class GroupListFragment : BaseFragment() {
 //        adapter!!.addFooterView(getFooterView())
         adapter!!.bindToRecyclerView(recyclerView)
 
+//        getPositionAndOffset()
+
+        recyclerView!!.setOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (recyclerView!!.layoutManager != null) {
+                    getPositionAndOffset()
+                }
+            }
+        })
+
 //        setMove()
 
         application = activity!!.application as TelinkLightApplication
         dataManager = DataManager(TelinkLightApplication.getInstance(),
                 application!!.mesh.name, application!!.mesh.password)
+    }
+
+    private fun getPositionAndOffset() {
+
+        val layoutManager = recyclerView!!.layoutManager as LinearLayoutManager
+
+        //获取可视的第一个view
+
+        val topView = layoutManager.getChildAt(0)
+
+        if (topView != null) {
+
+            //获取与该view的顶部的偏移量
+
+            lastOffset = topView.top
+
+            //得到该View的数组位置
+
+            lastPosition = layoutManager.getPosition(topView)
+
+            sharedPreferences = mContext!!.getSharedPreferences("key", Activity.MODE_PRIVATE)
+
+            val editor = sharedPreferences!!.edit()
+
+            editor.putInt("lastOffset", lastOffset)
+
+            editor.putInt("lastPosition", lastPosition)
+
+            editor.commit()
+
+        }
+
     }
 
     private fun addNewGroup() {

@@ -24,15 +24,13 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
+import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.LogUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -380,11 +378,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_select_group_list_view.layoutManager = layoutmanager
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, showCheckListData!!)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        //添加分割线
-        recyclerView_select_group_list_view.addItemDecoration(decoration)
+        var  list= ArrayList<DbGroup>()
+        for(h in showCheckListData!!.indices){
+            if(!OtherUtils.isCurtain(showCheckListData!![h])){
+                list!!.add(showCheckListData!![h])
+            }
+        }
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list!!)
+//        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+//        //添加分割线
+//        recyclerView_select_group_list_view.addItemDecoration(decoration)
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
         sceneEditListAdapter?.onItemClickListener=onItemClickListenerCheck
     }

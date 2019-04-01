@@ -54,11 +54,13 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                    var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
-                            dbDataChangeList[i].changeId,
-                            dbDataChangeList[i].changeType,
-                            dbUser!!.token, dbDataChangeList[i].id!!)
-                    observable?.let { observableList.add(it) }
+                        var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
+                                dbDataChangeList[i].changeId,
+                                dbDataChangeList[i].changeType,
+                                dbUser!!.token, dbDataChangeList[i].id!!)
+                        observable?.let { observableList.add(it) }
+
+
 
                     if (i == dbDataChangeList.size - 1) {
 //                                observableNew = observableList.get(j).mergeWith(observableList.get(j-1))
@@ -343,15 +345,17 @@ class SyncDataPutOrGetUtils {
                     .getRegionList(token)
                     .compose(NetworkTransformer())
                     .flatMap {
+                        Log.d("itSize", it.size.toString())
                         for (item in it) {
                             DBUtils.saveRegion(item, true)
                         }
-
+                        Log.d("itSize", it.size.toString())
                         if (it.size != 0) {
                             setupMesh()
                             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
                                     Constant.USER_TYPE, Constant.USER_TYPE_NEW)
-                        } else {
+                        }
+                        else {
                             setupMeshCreat(accountNow)
                         }
                         NetworkFactory.getApi()

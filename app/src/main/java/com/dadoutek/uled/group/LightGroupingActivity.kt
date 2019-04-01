@@ -107,7 +107,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                 DBUtils.updateLight(lights!!)
                                 runOnUiThread {
                                     hideLoadingDialog()
-                                    ActivityUtils.finishActivity(RGBSettingActivity::class.java)
+                                    ActivityUtils.finishActivity(WindowCurtainsActivity::class.java)
                                     finish()
                                 }
                             }) {

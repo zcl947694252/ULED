@@ -28,6 +28,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
@@ -89,7 +90,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                         DBUtils.updateCurtain(curtain!!)
                         runOnUiThread {
                             hideLoadingDialog()
-                            ActivityUtils.finishActivity(RGBSettingActivity::class.java)
+                            ActivityUtils.finishActivity(WindowCurtainsActivity::class.java)
                             finish()
                         }
                     }) {

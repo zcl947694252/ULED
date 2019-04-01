@@ -378,35 +378,36 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         currentCurtain = curtainList[position]
         positionCurrent = position
         val opcode = Opcode.LIGHT_ON_OFF
-        if (view.id == R.id.img_light) {
-            canBeRefresh = true
-            if (currentCurtain!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
-//                        byteArrayOf(0x01, 0x00, 0x00))
-                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,true,false)
-                }else{
-                    Commander.openOrCloseLights(currentCurtain!!.meshAddr,true)
-                }
-
-                currentCurtain!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
-//                        byteArrayOf(0x00, 0x00, 0x00))
-                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,false,false)
-                }else{
-                    Commander.openOrCloseLights(currentCurtain!!.meshAddr,false)
-                }
-                currentCurtain!!.connectionStatus = ConnectionStatus.OFF.value
-            }
-
-            currentCurtain!!.updateIcon()
-            DBUtils.updateCurtain(currentCurtain!!)
-            runOnUiThread {
-                adapter?.notifyDataSetChanged()
-            }
-        } else if (view.id == R.id.tv_setting) {
+//        if (view.id == R.id.img_light) {
+//            canBeRefresh = true
+//            if (currentCurtain!!.connectionStatus == ConnectionStatus.OFF.value) {
+////                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
+////                        byteArrayOf(0x01, 0x00, 0x00))
+//                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
+//                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,true,false)
+//                }else{
+//                    Commander.openOrCloseLights(currentCurtain!!.meshAddr,true)
+//                }
+//
+//                currentCurtain!!.connectionStatus = ConnectionStatus.ON.value
+//            } else {
+////                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
+////                        byteArrayOf(0x00, 0x00, 0x00))
+//                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
+//                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,false,false)
+//                }else{
+//                    Commander.openOrCloseLights(currentCurtain!!.meshAddr,false)
+//                }
+//                currentCurtain!!.connectionStatus = ConnectionStatus.OFF.value
+//            }
+//
+//            currentCurtain!!.updateIcon()
+//            DBUtils.updateCurtain(currentCurtain!!)
+//            runOnUiThread {
+//                adapter?.notifyDataSetChanged()
+//            }
+//        } else
+    if (view.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){

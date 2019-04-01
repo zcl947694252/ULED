@@ -28,7 +28,10 @@ class SceneGroupAdapter
         val sbBrightness = helper.getView<SeekBar>(R.id.sbBrightness)
         val sBtemperature = helper.getView<SeekBar>(R.id.sbTemperature)
 
-        helper.setText(R.id.name_gp, item.gpName)
+
+//        if(DBUtils.getCurtainName(item.gpName).size==0){
+            helper.setText(R.id.name_gp, item.gpName)
+//        }
         helper.setBackgroundColor(R.id.rgb_view, if (item.color == 0)
             TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
         else

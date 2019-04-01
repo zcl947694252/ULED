@@ -300,7 +300,7 @@
     <string name="reset_fail_tip1">There are no lights, please check if the lights are installed</string>
     <string name="tip_reset_sure">Confirm all lights reset？</string>
     <string name="delete_lamp_tip">There is a light reset failed, please retry after connecting</string>
-    <string name="error_disconnect_tip">Disconnected, please retry after connecting</string>
+    <string name="error_disconnect_tip">Factory Settings are being restored, please wait</string>
     <string name="scene_16_tip">Up to 16 Scenes!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Start to download data…</string>
@@ -627,4 +627,26 @@
     <string name="restart">Click restart</string>
     <string name="successful_resumption">Successful Resumption</string>
     <string name="device_list">Device</string>
+
+    <string name="scan_curtain_num">Total: %1$s curtain are currently scanned</string>
+    <string name="title_curtain_lights_num">Scanning %1$d</string>
+    <string name="title_curtain_lights_num_total">%1$d)</string>
+
+    <string name="delete_switch_confirm">Confirm the delete switch?</string>
+
+    <string name="delete_switch_success">Delete Success</string>
+
+    <string name="have_curtain_no_group_tip">There are no curtain grouping, please complete the grouping operation</string>
+
+    <string name="grouping_curtain_wait_tip">There are currently %1$s curtain grouping, please wait!</string>
+    <string name="selected_curtain_tip">Please Select at Least ONE Curtain to Group</string>
+    <string name="curtain_fail_tip">There is a curtain grouped failed, please check and try again!</string>
+
+    <string name="hand_recovery">Hand recovery</string>
+    <string name="software_restart">Software restart</string>
+    <string name="slow_up_the_cache">Slow up the cache</string>
+
+    <string name="slow_up_the_cache_cancel">cancel slow up the cache</string>
+
+    <string name="hand_cancel">Hand cancel</string>
 </resources>

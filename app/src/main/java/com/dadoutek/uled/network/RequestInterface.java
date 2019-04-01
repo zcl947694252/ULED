@@ -8,7 +8,9 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.model.DbModel.DbSensor;
+import com.dadoutek.uled.model.DbModel.DbSensorChild;
 import com.dadoutek.uled.model.DbModel.DbSwitch;
+import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 
@@ -219,6 +221,7 @@ public interface RequestInterface {
                                             @Query("email") String email,
                                             @Query("introduction") String introduction);
 
+
     @DELETE("auth/clear")
 //    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
@@ -234,7 +237,7 @@ public interface RequestInterface {
     //添加开关
     @POST("switch/add/{lid}")
     Observable<Response<String>> addSwitch(@Header("token") String token,
-                                          @Body DbSwitch dbSwitch,
+                                          @Body DbSwitchChild dbSwitch,
                                           @Path("lid") int lid);
 
     //获取开关列表
@@ -245,7 +248,7 @@ public interface RequestInterface {
     @POST("switch/add/{lid}")
     Observable<Response<String>> updateSwitch(@Header("token") String token,
                                              @Path("lid") int lid,
-                                             @Body DbSwitch dbSwitch
+                                             @Body DbSwitchChild dbSwitch
     );
 
     //删除开关
@@ -257,7 +260,7 @@ public interface RequestInterface {
     //添加传感器
     @POST("sensor/add/{lid}")
     Observable<Response<String>> addSensor(@Header("token") String token,
-                                           @Body DbSensor dbSensor,
+                                           @Body DbSensorChild dbSensor,
                                            @Path("lid") int lid);
 
     //获取传感器列表
@@ -268,7 +271,7 @@ public interface RequestInterface {
     @POST("sensor/add/{lid}")
     Observable<Response<String>> updateSensor(@Header("token") String token,
                                               @Path("lid") int lid,
-                                              @Body DbSensor dbSensor
+                                              @Body DbSensorChild dbSensor
     );
 
     //删除传感器
@@ -277,7 +280,7 @@ public interface RequestInterface {
     Observable<Response<String>> deleteSensor(@Header("token") String token,
                                               @Path("lid") int lid);
 
-    //添加传感器
+    //添加窗帘
     @POST("curtain/add/{lid}")
     Observable<Response<String>> addCurtain(@Header("token") String token,
                                            @Body DbCurtain dbCurtain,
@@ -299,4 +302,9 @@ public interface RequestInterface {
     @DELETE("curtain/remove/{lid}")
     Observable<Response<String>> deleteCurtain(@Header("token") String token,
                                               @Path("lid") int lid);
+
+    @GET("app/isAvailable")
+//    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)
+    Observable<Response<Object>> isAvailavle(@Query("platform") int device,
+                                             @Query("currentVersion") String version);
 }

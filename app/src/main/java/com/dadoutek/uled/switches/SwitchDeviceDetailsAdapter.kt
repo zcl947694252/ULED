@@ -12,6 +12,10 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
         if (scene != null) {
             helper.setText(R.id.name, scene.name)
             helper.setImageResource(R.id.img_light, R.drawable.icon_light_on)
+            helper.addOnClickListener(R.id.tv_setting)
+                    .setTag(R.id.tv_setting, helper.adapterPosition)
+                    .setTag(R.id.img_light, helper.adapterPosition)
+                    .addOnClickListener(R.id.img_light)
         }
     }
 }

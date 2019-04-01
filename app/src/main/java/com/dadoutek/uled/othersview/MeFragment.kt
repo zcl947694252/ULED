@@ -34,6 +34,7 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceResetGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -123,6 +124,17 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
             for (i in groupList.indices) {
                 lightList.addAll(DBUtils.getLightByGroupID(groupList[i].id!!))
+            }
+            return lightList
+        }
+
+    private val allCutain: List<DbCurtain>
+        get() {
+            val groupList = DBUtils.groupList
+            val lightList = ArrayList<DbCurtain>()
+
+            for (i in groupList.indices) {
+                lightList.addAll(DBUtils.getCurtainByGroupID(groupList[i].id!!))
             }
             return lightList
         }
@@ -336,18 +348,36 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, true)
         val lightList = allLights
+        val curtainList=allCutain
         Commander.resetLights(lightList, {
             SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
             syncData()
-            hideLoadingDialog()
+//            hideLoadingDialog()
             activity?.bnve?.currentItem=0
             null
         }, {
-            ToastUtils.showLong(R.string.error_disconnect_tip)
+//            ToastUtils.showLong(R.string.error_disconnect_tip)
             SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
-            hideLoadingDialog()
+//            hideLoadingDialog()
             null
         })
+
+        Commander.resetCurtain(curtainList, {
+            SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
+            syncData()
+//            hideLoadingDialog()
+            activity?.bnve?.currentItem=0
+            null
+        }, {
+//            ToastUtils.showLong(R.string.error_disconnect_tip)
+            SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
+//            hideLoadingDialog()
+            null
+        })
+        if(lightList.isEmpty() && curtainList.isEmpty()){
+            hideLoadingDialog()
+            ToastUtils.showLong(R.string.successful_resumption)
+        }
     }
 
     private fun syncData() {

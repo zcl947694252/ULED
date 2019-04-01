@@ -9,8 +9,20 @@ import io.reactivex.schedulers.Schedulers
 
 object SensorMdodel {
     fun add(token: String, sensor: DbSensor, id: Long, changeId: Long?): Observable<String>? {
+        var dbChild=DbSensorChild()
+        dbChild.productUUID=sensor.productUUID
+        dbChild.meshAddr=sensor.meshAddr
+        dbChild.macAddr=sensor.macAddr
+        dbChild.name=sensor.name
+        dbChild.id=sensor.id
+        dbChild.index=sensor.index
+        if(sensor.controlGroupAddr!=null){
+            dbChild.list=sensor.controlGroupAddr
+        }else{
+            dbChild.list=" "
+        }
         return NetworkFactory.getApi()
-                .addSensor(token,sensor,changeId!!.toInt())
+                .addSensor(token,dbChild,changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -20,8 +32,20 @@ object SensorMdodel {
     }
 
     fun update(token: String, dbSensor: DbSensor, lid: Int, id: Long): Observable<String> {
+        var dbChild=DbSensorChild()
+        dbChild.productUUID=dbSensor.productUUID
+        dbChild.meshAddr=dbSensor.meshAddr
+        dbChild.macAddr=dbSensor.macAddr
+        dbChild.name=dbSensor.name
+        dbChild.id=dbSensor.id
+        dbChild.index=dbSensor.index
+        if(dbSensor.controlGroupAddr!=null){
+            dbChild.list=dbSensor.controlGroupAddr
+        }else{
+            dbChild.list=" "
+        }
         return NetworkFactory.getApi()
-                .updateSensor(token,lid,dbSensor)
+                .updateSensor(token,lid,dbChild)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

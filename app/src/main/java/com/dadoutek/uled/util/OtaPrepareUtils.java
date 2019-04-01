@@ -130,7 +130,7 @@ public class OtaPrepareUtils {
             public void onError(@NotNull Throwable e) {
                 super.onError(e);
                 otaPrepareListner.getVersionFail();
-                ToastUtils.showLong(R.string.get_server_version_fail);
+                ToastUtils.showLong(e.getMessage());
             }
         });
         return "";

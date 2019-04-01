@@ -51,6 +51,7 @@ public class Constant implements Serializable {
     public static final String CURTAINS_ARESS_KEY="CURTAINS_ARESS_KEY";
     public static final String CURTAINS_KEY="CURTAINS_KEY";
     public static final String LIGHT_KEY="LIGHT_KEY";
+    public static final String RGB_LIGHT_KEY="RGB_LIGHT_KEY";
 
     //标志链接是否成功
     public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";
@@ -203,6 +204,8 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_DEFAULT_ALL=0L;
     //默认分组
     public static final Long DEVICE_TYPE_DEFAULT=-1L;
+    //默认分组
+    public static final Long DEVICE_TYPE_NO=1L;
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL= Long.valueOf(0x04);
     //RGB分组

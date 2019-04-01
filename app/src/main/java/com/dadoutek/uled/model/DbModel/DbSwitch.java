@@ -25,8 +25,8 @@ public class DbSwitch implements Serializable {
     private Long belongGroupId;
     @Generated(hash = 811812800)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
-            String macAddr, int productUUID, String controlSceneId, int index,
-            Long belongGroupId) {
+                    String macAddr, int productUUID, String controlSceneId, int index,
+                    Long belongGroupId) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;

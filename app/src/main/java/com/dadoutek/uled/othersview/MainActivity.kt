@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
@@ -41,7 +42,9 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.scene.SceneFragment
@@ -76,6 +79,8 @@ import kotlinx.coroutines.launch
 
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import org.json.JSONException
+import org.json.JSONObject
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -113,6 +118,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     private var guideShowCurrentPage = false
     private var installId = 0
 
+
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -141,6 +147,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+        var version=packageName(this)
         detectUpdate()
 
         this.setContentView(R.layout.activity_main)
@@ -257,6 +264,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                         if (medressData < 254) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                            intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -266,6 +274,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                         if (medressData < 254) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                            intent.putExtra(Constant.TYPE_VIEW,Constant.RGB_LIGHT_KEY)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -362,9 +371,42 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
      * 检查App是否有新版本
      */
     private fun detectUpdate() {
-        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true);
-        XiaomiUpdateAgent.update(this);
+        var version=packageName(this)
+        UpdateModel.checkVersion(0,version)!!.subscribe(object : NetworkObserver<Any>() {
+            override fun onNext(s: Any) {
+                val jsonObject = JSONObject(s as Map<*, *>)
+                try {
+                    val data = jsonObject.getString("isUsable")
+                    var judge="false"
+                    if(data==judge){
+                        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
+                        XiaomiUpdateAgent.update(this@MainActivity)
+                 }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+            override fun onError(e: Throwable) {
+                super.onError(e)
+                ToastUtils.showLong(R.string.get_server_version_fail)
+            }
+        })
+
     }
+
+    fun packageName(context: Context): String {
+        val manager = context.getPackageManager()
+        var name: String? = null
+        try {
+            val info = manager.getPackageInfo(context.getPackageName(), 0)
+            name = info.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+
+        return name!!
+    }
+
 
     private fun initBottomNavigation() {
         deviceFragment = DeviceListFragment()
@@ -647,8 +689,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
-        Log.d("mack", pwd
-                +"==="+account+",account--->"+Strings.stringToBytes(account, 16)+",pwd==>"+Strings.stringToBytes(pwd, 16))
     }
 
     private fun onNError(event: DeviceEvent) {
@@ -1039,6 +1079,4 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         }
         return super.onKeyDown(keyCode, event)
     }
-
-
 }

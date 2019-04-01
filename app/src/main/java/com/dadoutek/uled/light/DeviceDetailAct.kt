@@ -161,7 +161,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbar.setTitle(R.string.details)
+        when (type) {
+            Constant.INSTALL_NORMAL_LIGHT -> {
+                toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
+            }
+            Constant.INSTALL_RGB_LIGHT -> {
+                toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
+            }
+        }
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -256,9 +263,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
         val isConnect = data?.getBooleanExtra("data", false) ?: false
-        if (isConnect) {
-            scanPb.visibility = View.VISIBLE
-        }
+//        if (isConnect) {
+//            scanPb.visibility = View.VISIBLE
+//        }
 
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
@@ -300,7 +307,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         }, true)
         adaper?.let { diffResult.dispatchUpdatesTo(it) }
         lightsData = mNewDatas!!
+        toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
         adaper!!.setNewData(lightsData)
+
     }
 
     private fun getNewData(): MutableList<DbLight> {
@@ -319,11 +328,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
             }
         }
 
-        if (currentLight!!.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
-        } else {
-            toolbar.title = (currentLight!!.name ?: "")
-        }
+//        if (currentLight!!.meshAddr == 0xffff) {
+//            toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
+//        } else {
+//            toolbar.title = (currentLight!!.name ?: "")
+//        }
         return lightsData
     }
 

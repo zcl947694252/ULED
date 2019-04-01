@@ -296,7 +296,7 @@
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
     <string name="tip_reset_sure">确定要将所有灯恢复出厂设置吗？</string>
     <string name="delete_lamp_tip">有灯恢复出厂设置失败，请连接后重试</string>
-    <string name="error_disconnect_tip">断开连接,请连接后重试</string>
+    <string name="error_disconnect_tip">正在恢复出厂设置，请稍后！</string>
     <string name="scene_16_tip">最多16个场景！</string>
     <string name="server_exception">服务器异常</string>
     <string name="start_sync">即将开始同步数据..</string>
@@ -324,7 +324,8 @@
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
     <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源1秒，断开电源6s，重复约5-6次，直至灯闪烁。
         开关：接上电源，同时按住开关4个按键中的左上按键与右下按键。期间蓝灯会常亮。
-        传感器：接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
+        传感器：接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。
+        窗帘：接上电源7秒，断开电源7秒，重复约5-6次。</string>
     <string name="common_question">常见问题</string>
     <string name="question_2">3.部分华为手机存在蓝牙不稳定</string>
     <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
@@ -383,7 +384,7 @@
     <string name="exit_update">2s后退出升级页面</string>
     <string name="scan_and_connect">扫描连接…</string>
     <string name="network_disconect">网络未连接</string>
-    <string name="getVsersionFail">获取版本号失败</string>
+    <string name="getVsersionFail">已经是最新版本</string>
     <string name="get_server_version_fail">获取服务器版本失败！</string>
     <string name="download_pack_fail">升级包下载失败</string>
     <string name="error_pack">升级包错误！</string>
@@ -551,7 +552,7 @@
     <string name="install_tip4">第三步\n\n通过蓝牙搜索添加设备</string>
     <string name="install_tip5">如果遇到问题,请尝试以下步骤复位设备</string>
     <string name="guide_tip_reset_light">灯：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
-    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。</string>
+    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。\n\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右上按键和开关键。期间蓝灯会常亮。</string>
     <string name="guide_tip_reset_sensor">接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="guide_tip_reset_curtain">窗帘：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
 
@@ -574,4 +575,19 @@
     <string name="restart">电机重启</string>
     <string name="successful_resumption">恢复出厂成功</string>
     <string name="device_list">设备</string>
+    <string name="scan_curtain_num">总计：当前扫描出了 %1$s 个窗帘</string>
+    <string name="title_curtain_lights_num">已扫到 %1$d 个窗帘</string>
+    <string name="title_curtain_lights_num_total">扫描完毕(已扫到%1$d个窗帘)</string>
+    <string name="delete_switch_confirm">确定删除此开关？</string>
+    <string name="delete_switch_success">删除成功</string>
+    <string name="have_curtain_no_group_tip">还有窗帘没有分组，请完成分组操作</string>
+    <string name="grouping_curtain_wait_tip">当前有%1$s个窗帘正在分组，请稍候！</string>
+    <string name="selected_curtain_tip">至少选择一个窗帘进行分组</string>
+    <string name="curtain_fail_tip">有窗帘分组失败，请检查并重试！</string>
+    <string name="hand_recovery">手拉恢复</string>
+    <string name="software_restart">软件重启</string>
+    <string name="slow_up_the_cache">缓起缓停</string>
+    <string name="slow_up_the_cache_cancel">取消缓起缓停</string>
+
+    <string name="hand_cancel">手拉取消</string>
 </resources>

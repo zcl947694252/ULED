@@ -3,6 +3,7 @@ package com.dadoutek.uled.communicate
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
@@ -119,6 +120,45 @@ object Commander : EventListener<String> {
                     }
                     Thread.sleep(sleepTime)
                     DBUtils.deleteLight(light)
+                }
+                GlobalScope.launch(Dispatchers.Main) {
+                    successCallback.invoke()
+                }
+            }.start()
+        } else {
+            failedCallback.invoke()
+        }
+    }
+
+    @Synchronized
+    fun resetCurtain(lightList: List<DbCurtain>, successCallback: () -> Unit,
+                    failedCallback: () -> Unit) {
+        val sleepTime: Long = 200
+        val resendCmdTime: Int = 3
+        var connectDeviceIndex: Int = 0
+        val lastIndex = lightList.size - 1
+        val connectDeviceMeshAddr = TelinkLightApplication.getInstance()?.connectDevice?.meshAddress
+                ?: 0x00
+
+        if (lightList.isNotEmpty()) {
+            Thread {
+                //找到当前连接的灯的mesh地址
+                for (k in lightList.indices) {
+                    if (lightList[k].meshAddr == connectDeviceMeshAddr) {
+                        connectDeviceIndex = k
+                        break
+                    }
+                }
+                //把当前连接的灯放到list的最后一个
+                Collections.swap(lightList, lastIndex, connectDeviceIndex)
+                for (light in lightList) {
+                    for (k in 0..resendCmdTime) {
+                        val opcode = Opcode.KICK_OUT
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light.meshAddr, null)
+                        Thread.sleep(sleepTime)
+                    }
+                    Thread.sleep(sleepTime)
+                    DBUtils.deleteCurtain(light)
                 }
                 GlobalScope.launch(Dispatchers.Main) {
                     successCallback.invoke()

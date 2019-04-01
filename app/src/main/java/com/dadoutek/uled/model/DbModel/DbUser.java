@@ -15,7 +15,7 @@ public class DbUser {
     //头像
     private String avatar;
     //渠道id
-    private String channel="bee-CCPXKC";
+    private String channel="dadou";
     //用户邮箱
     private String email;
     //用户名

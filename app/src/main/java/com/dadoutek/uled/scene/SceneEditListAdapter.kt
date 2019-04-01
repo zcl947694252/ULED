@@ -1,6 +1,7 @@
 package com.dadoutek.uled.scene
 
 import android.content.Context
+import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
 
@@ -21,8 +22,8 @@ import java.util.Objects
 class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        helper.setText(R.id.group_name,item.name)
         val tvState = helper.getView<TextView>(R.id.group_check_state)
+         helper.setText(R.id.group_name,item.name)
         if (item.isChecked) {
             tvState.text = mContext.getString(R.string.selected)
             tvState.setTextColor(mContext.resources.getColor(R.color.white))

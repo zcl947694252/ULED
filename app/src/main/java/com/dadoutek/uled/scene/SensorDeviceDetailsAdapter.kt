@@ -11,6 +11,10 @@ class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : Base
         if (scene != null) {
             helper.setText(R.id.name, scene.name)
             helper.setImageResource(R.id.img_light, R.drawable.icon_light_on)
+            helper.addOnClickListener(R.id.tv_setting)
+                    .setTag(R.id.tv_setting, helper.adapterPosition)
+                    .setTag(R.id.img_light, helper.adapterPosition)
+                    .addOnClickListener(R.id.img_light)
         }
     }
 }
