@@ -426,7 +426,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
     private fun exitLogin() {
         isClickExlogin = true
-        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight) {
+        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size==0 && !DBUtils.dataChangeAllHaveAboutCurtain) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                 TelinkLightService.Instance().disconnect()

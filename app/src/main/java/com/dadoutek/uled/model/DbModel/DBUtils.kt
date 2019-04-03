@@ -186,6 +186,17 @@ object DBUtils {
             return false
         }
 
+    val dataChangeAllHaveAboutCurtain: Boolean
+        get() {
+            val list = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
+            for (i in list.indices) {
+                if (list[i].tableName == "DB_CURTAIN") {
+                    return true
+                }
+            }
+            return false
+        }
+
     val allGroups: MutableList<DbGroup>
          get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
 
