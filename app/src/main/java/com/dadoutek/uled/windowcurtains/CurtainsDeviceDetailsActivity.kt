@@ -192,8 +192,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             var intent = Intent(this@CurtainsDeviceDetailsActivity, WindowCurtainsActivity::class.java)
             intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_CURTAIN)
             intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-            intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+            intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentLight!!.meshAddr)
             intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+            Log.d("currentLight", currentLight!!.meshAddr.toString())
             startActivityForResult(intent, REQ_LIGHT_SETTING)
 //            }
 //        else {

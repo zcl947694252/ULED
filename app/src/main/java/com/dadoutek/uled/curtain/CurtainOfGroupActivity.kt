@@ -415,7 +415,6 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_CURTAIN)
                 }
                 intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
-                intent.putExtra(Constant.CURTAINS_ARESS_KEY,currentCurtain)
                 intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                 intent.putExtra(Constant.CURTAINS_ARESS_KEY, currentCurtain!!.meshAddr)

@@ -340,7 +340,7 @@ class GroupListFragment : BaseFragment() {
                             intent = Intent(mContext, NormalSettingActivity::class.java)
                             if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
                                 intent = Intent(mContext, RGBSettingActivity::class.java)
-                            }else if(OtherUtils.isCurtain(group)){
+                            }else if(OtherUtils.isCurtain(group)&& group.meshAddr != 0xffff){
                                 intent = Intent(mContext,WindowCurtainsActivity::class.java)
                             }
                             intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
