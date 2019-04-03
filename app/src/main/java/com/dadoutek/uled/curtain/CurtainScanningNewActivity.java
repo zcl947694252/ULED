@@ -1481,7 +1481,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         final Mesh mesh = this.mApplication.getMesh();
         final int meshAddress = mesh.generateMeshAddr();
 
-        if (meshAddress == -0) {
+        if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));
             if (adapter.getLights() != null && adapter.getLights().size() > 0) {
                 stopTimer();

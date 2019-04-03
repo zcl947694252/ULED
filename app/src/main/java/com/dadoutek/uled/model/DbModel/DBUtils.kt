@@ -36,6 +36,9 @@ object DBUtils {
     val allLight: List<DbLight>
          get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
 
+    val allCurtain:List<DbCurtain>
+         get()=DaoSessionInstance.getInstance().dbCurtainDao.loadAll()
+
     val groupList: MutableList<DbGroup>
         get() {
             val allGIndex = -1

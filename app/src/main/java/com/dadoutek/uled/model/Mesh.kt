@@ -51,6 +51,7 @@ class Mesh : Serializable {
 
     fun generateMeshAddr(): Int {
         val lights = DBUtils.allLight
+        val curtain=DBUtils.allCurtain
 
         var meshAddress: Int = -1
         when {
@@ -59,7 +60,8 @@ class Mesh : Serializable {
             else -> {
                 for (meshAddr in MeshUtils.DEVICE_ADDRESS_MIN .. MeshUtils.DEVICE_ADDRESS_MAX) {
                     val address = lights.map { it.meshAddr }
-                    if (!address.contains(meshAddr)) {
+                    val curtains=curtain.map { it.meshAddr }
+                    if (!address.contains(meshAddr) && !curtains.contains(meshAddr)) {
                         meshAddress = meshAddr
                         break
                     }

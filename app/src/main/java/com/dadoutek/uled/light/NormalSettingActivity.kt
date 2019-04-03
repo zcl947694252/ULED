@@ -232,6 +232,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         intent.putExtra("gpAddress", gpAddress)
         intent.putExtra("uuid",light!!.productUUID)
         intent.putExtra("belongId",light!!.belongGroupId)
+        Log.d("addLight",light!!.productUUID.toString()+","+light!!.meshAddr)
         startActivity(intent)
        this!!.finish()
     }
@@ -283,8 +284,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                         if (granted!!) {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
-//                          transformView()
+//                            OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
+                          transformView()
                         } else {
                             ToastUtils.showLong(R.string.update_permission_tip)
                         }

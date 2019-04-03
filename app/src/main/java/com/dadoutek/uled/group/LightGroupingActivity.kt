@@ -70,7 +70,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                             isStartGroup=true
                             showLoadingDialog(getString(R.string.grouping))
                             object : Thread({
-                                val sceneIds = getRelatedSceneIds(lights!!.meshAddr)
+                                val sceneIds = getRelatedSceneIds(group.meshAddr)
                                 for(i in 0..1){
                                     deletePreGroup(lights!!.meshAddr)
                                     Thread.sleep(100)
@@ -96,8 +96,8 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                     }
                                 }
 
-                                group.deviceType= this.lights!!.productUUID.toLong()
-                                Log.d("message", group.deviceType.toString()+"===address:"+lights!!.meshAddr)
+                                group.deviceType= lights!!.productUUID.toLong()
+                                Log.d("message", "deviceType="+group.deviceType.toString()+",address="+lights!!.meshAddr+",productUUID="+lights!!.productUUID)
 
 //                                var dbLight=DBUtils.getLightByMeshAddr(this!!.address!!)
 
@@ -107,7 +107,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                 DBUtils.updateLight(lights!!)
                                 runOnUiThread {
                                     hideLoadingDialog()
-                                    ActivityUtils.finishActivity(WindowCurtainsActivity::class.java)
+                                    ActivityUtils.finishActivity(RGBSettingActivity::class.java)
                                     finish()
                                 }
                             }) {
@@ -159,7 +159,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      */
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        Log.d("message",lights!!.meshAddr.toString())
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
@@ -171,14 +170,12 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      * @param lightMeshAddr 灯的mesh地址
      */
     private fun deletePreGroup(lightMeshAddr: Int) {
-            if (DBUtils.getGroupByID(lights!!.belongGroupId) != null) {
-                Log.d("message",lights!!.belongGroupId.toString())
-                val groupPre=DBUtils.getGroupByID(lights!!.belongGroupId)
-                val groupAddress = groupPre?.meshAddr
-                val opcode = Opcode.SET_GROUP
-                val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
-                        (groupAddress shr 8 and 0xFF).toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        if (DBUtils.getGroupByID(lights!!.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(lights!!.belongGroupId!!)?.meshAddr
+            val opcode = Opcode.SET_GROUP
+            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
+                    (groupAddress shr 8 and 0xFF).toByte())
+            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
         }
     }
 
@@ -222,7 +219,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 //        }else if(type.equals(Constant.LIGHT_KEY)){
 //            this.light = this.intent.extras?.get("light") as DbLight
 //        }
-        groupsInit = ArrayList()
 
         this.type=this.intent.getStringExtra(Constant.TYPE_VIEW)
 //        this.productUuid=this.intent.getIntExtra("uuid",0)
@@ -231,7 +227,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         this.lights = this.intent.extras?.get("light") as DbLight
 //        Log.d("message", productUuid!!.toString()+"====>"+address!!.toString()+"--->"+beLongId!!.toString())
 
-
+        groupsInit = ArrayList()
         val list = DBUtils.groupList
         filter(list)
 //        groupsInit = DBUtils.groupList

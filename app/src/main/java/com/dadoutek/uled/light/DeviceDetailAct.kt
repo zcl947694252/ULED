@@ -307,7 +307,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         }, true)
         adaper?.let { diffResult.dispatchUpdatesTo(it) }
         lightsData = mNewDatas!!
-        toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
+        when (type) {
+            Constant.INSTALL_NORMAL_LIGHT -> {
+                toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
+            }
+            Constant.INSTALL_RGB_LIGHT -> {
+                toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
+            }
+        }
         adaper!!.setNewData(lightsData)
 
     }

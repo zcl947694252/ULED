@@ -141,6 +141,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
         intent.putExtra("uuid",light!!.productUUID)
         intent.putExtra("belongId",light!!.belongGroupId)
         intent.putExtra("gpAddress", light!!.meshAddr)
+        Log.d("addLight",light!!.productUUID.toString()+","+light!!.meshAddr)
         startActivity(intent)
     }
 
