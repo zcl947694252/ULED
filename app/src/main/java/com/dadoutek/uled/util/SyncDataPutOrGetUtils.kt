@@ -353,8 +353,7 @@ class SyncDataPutOrGetUtils {
                             setupMesh()
                             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
                                     Constant.USER_TYPE, Constant.USER_TYPE_NEW)
-                        }
-                        else {
+                        } else {
                             setupMeshCreat(accountNow)
                         }
                         NetworkFactory.getApi()

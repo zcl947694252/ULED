@@ -29,7 +29,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 233
-        versionName "2.3.2.1"
+        versionName "2.3.2.2"
 
         multiDexEnabled true
 

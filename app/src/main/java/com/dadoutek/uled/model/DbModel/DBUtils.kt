@@ -71,7 +71,7 @@ object DBUtils {
             for(group in listAll){
               when(group.deviceType){
                   Constant.DEVICE_TYPE_DEFAULT_ALL->{
-                      allLightList.add(group)
+                      otherList.add(group)
                   }
                   Constant.DEVICE_TYPE_LIGHT_NORMAL->{
                       normalList.add(group)
@@ -83,6 +83,7 @@ object DBUtils {
                       curtainList.add(group)
                   }
                   Constant.DEVICE_TYPE_NO->{
+                      allLightList.add(group)
                   }
                   else->{
                       otherList.add(group)
@@ -987,9 +988,10 @@ object DBUtils {
         groupAllLights.meshAddr = 0xFFFF
         groupAllLights.brightness = 100
         groupAllLights.colorTemperature = 100
-        groupAllLights.deviceType = 0
+        groupAllLights.deviceType = 1
         groupAllLights.color = TelinkLightApplication.getInstance().resources.getColor(R.color.gray)
         groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
+        groupAllLights.id=1
         val list = groupList
         DaoSessionInstance.getInstance().dbGroupDao.insert(groupAllLights)
         recordingChange(groupAllLights.id,
