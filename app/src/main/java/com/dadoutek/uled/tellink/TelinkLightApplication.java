@@ -1,5 +1,6 @@
 package com.dadoutek.uled.tellink;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     private static DaoSession daoSession;
 
+    @SuppressLint("SdCardPath")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -45,6 +47,8 @@ public final class TelinkLightApplication extends TelinkApplication {
         if (!AppUtils.isAppDebug()) {
             LogUtils.getConfig().setLogSwitch(false);
         }
+        LogUtils.getConfig().setLog2FileSwitch(true);
+//        LogUtils.getConfig().setDir("/mnt/sdcard/log");
 
         MobSDK.init(this);
 //        CrashReport.testJavaCrash();

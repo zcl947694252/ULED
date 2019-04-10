@@ -2,6 +2,7 @@ package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
@@ -1021,6 +1022,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             case LightAdapter.STATUS_LOGIN:
                 TelinkLog.i("OTAUpdate#STATUS_LOGIN");
                 log("login success");
+                LeBluetooth.getInstance().stopScan();
                 stopConnectTimer();
                 connectRetryCount = 0;
                 if (this.mode == MODE_COMPLETE) return;

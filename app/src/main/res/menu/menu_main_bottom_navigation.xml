@@ -3,6 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/bnve_device"
+        android:icon="@drawable/baseline_devices_other_white_36"
+        android:title="@string/device" />
+    <item
         android:id="@+id/bnve_group"
         android:icon="@drawable/ic_bottom_group"
         android:title="@string/group_title" />
@@ -18,6 +22,4 @@
         android:id="@+id/bnve_account"
         android:icon="@drawable/ic_bottom_me"
         android:title="@string/me" />
-
-
 </menu>

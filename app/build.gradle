@@ -10,7 +10,7 @@ MobSDK {
     appKey "260b846a2a8f8"
     appSecret "886a329e066cc1fba6db79e0d5a299bf"
 
-    permissions{
+    permissions {
 //        去掉无用的权限
         exclude "android.permission.READ_SMS",
                 "android.permission.READ_PHONE_STATE",
@@ -18,7 +18,7 @@ MobSDK {
                 "android.permission.READ_CONTACTS",
                 "android.permission.RECEIVE_SMS"
     }
-    SMSSDK {             version "3.2.1"                 }
+    SMSSDK { version "3.2.1" }
 }
 
 android {
@@ -26,10 +26,10 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.dadoutek.uled"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 28
-        versionCode 226
-        versionName "2.3.1"
+        versionCode 234
+        versionName "2.3.3"
 
         multiDexEnabled true
 
@@ -37,7 +37,7 @@ android {
 
         ndk {
             // 设置支持的SO库架构
-            abiFilters 'armeabi' , 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+            abiFilters 'armeabi', 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
     }
     buildTypes {
@@ -76,7 +76,7 @@ repositories {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 9
+    schemaVersion 10
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
@@ -131,6 +131,7 @@ dependencies {
 //    implementation 'com.github.huburt-Hu:NewbieGuide:v2.4.0'
     implementation 'mi-appstore:xiaomi-update-sdk:4.0.3'
     implementation 'com.github.duanhong169:colorpicker:1.1.5'
+    implementation 'com.ccx1:EHorizontalSelectedView:1.0.0'
 //    implementation 'com.github.wanglu1209:WPopup:lastReleases'
 //    implementation 'actionsheet:1.0.3'
 }

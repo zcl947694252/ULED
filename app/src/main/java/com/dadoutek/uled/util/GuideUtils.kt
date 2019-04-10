@@ -3,6 +3,8 @@ package com.dadoutek.uled.util
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Rect
+import android.graphics.RectF
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -41,6 +43,8 @@ object GuideUtils {
 
     var ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME="ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME"
     var ADDITIONAL_GUIDE_SET_SCENE="ADDITIONAL_GUIDE_SET_SCENE"
+
+    var GUIDE_START_INSTALL_DEVICE_NOW="GUIDE_START_INSTALL_DEVICE_NOW"
     /**
      * 每个页面引导结束标志
      * 本次取值为true则当前页不引导
@@ -49,6 +53,7 @@ object GuideUtils {
     var END_MAIN_KEY = "END_MAIN_KEY"
     var END_INSTALL_LIGHT_KEY = "END_INSTALL_LIGHT_KEY"
     var END_ADD_SCENE_KEY = "END_ADD_SCENE_KEY"
+    var END_ADD_SCENE_SET_KEY = "END_ADD_SCENE_SET_KEY"
 
     fun addGuidePage(guideTargetView: View,
                      res: Int, describeRes: String, onClickListener: View.OnClickListener,jumpViewContent: String,context: Context): GuidePage {
@@ -75,6 +80,34 @@ object GuideUtils {
         return guide
     }
 
+    fun addDiyPositionPage(guideTargetView: View, res: Int, describeRes: String,
+                           onClickListener: View.OnClickListener,jumpViewContent: String,context: Context): GuidePage{
+        val guide = GuidePage.newInstance()
+                .setLayoutRes(res)
+                .setEverywhereCancelable(false)
+                .setOnLayoutInflatedListener { view, controller ->
+                    val tvGuide = view.findViewById<TextView>(R.id.show_guide_content)
+                    tvGuide.text = describeRes
+
+                    val known = view.findViewById<TextView>(R.id.kown)
+                    known.setOnClickListener { v -> controller.remove() }
+
+                    val tvJump = view.findViewById<TextView>(R.id.jump_out)
+                    tvJump.setOnClickListener { v ->
+                        showExitGuideDialog(context,controller,jumpViewContent)
+                    }
+                }
+        val highlightOptions = HighlightOptions.Builder()
+                .setOnClickListener(onClickListener)
+                .build()
+        val location = IntArray(2)
+        guideTargetView.getLocationOnScreen(location)
+        val rect = RectF(location[0].toFloat(), location[1].toFloat(),100f,100f)
+        guide.addHighLightWithOptions(rect, highlightOptions)
+
+        return guide
+    }
+
     //显示退出引导弹窗
     fun showExitGuideDialog(context: Context, controller: Controller, jumpViewContent: String){
         val builder=AlertDialog.Builder(context)
@@ -93,6 +126,8 @@ object GuideUtils {
                 changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_KEY,true)
             }else if(jumpViewContent== END_MAIN_KEY){
                 changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_MAIN_KEY,true)
+            }else if(jumpViewContent== END_ADD_SCENE_SET_KEY){
+                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_SET_KEY,true)
             }
             alertDialog?.dismiss()
         }
@@ -171,7 +206,9 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, MAIN_STEP0_GUIDE_TO_SCENE)
         NewbieGuide.resetLabel(activity, ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
         NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
+        NewbieGuide.resetLabel(activity, GUIDE_START_INSTALL_DEVICE_NOW)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
+        SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_SET_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_INSTALL_LIGHT_KEY,false)
         SharedPreferencesHelper.putBoolean(activity, END_MAIN_KEY,false)
@@ -184,6 +221,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, STEP0_GUIDE_SELECT_DEVICE_KEY)
         NewbieGuide.resetLabel(activity, STEP1_GUIDE_ADD_DEVICE_KEY)
         NewbieGuide.resetLabel(activity, STEP2_GUIDE_START_INSTALL_DEVICE)
+        NewbieGuide.resetLabel(activity, GUIDE_START_INSTALL_DEVICE_NOW)
         SharedPreferencesHelper.putBoolean(activity, END_GROUPLIST_KEY,false)
     }
 
@@ -218,6 +256,7 @@ object GuideUtils {
         NewbieGuide.resetLabel(activity, ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
         NewbieGuide.resetLabel(activity, ADDITIONAL_GUIDE_SET_SCENE)
         SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_KEY,false)
+        SharedPreferencesHelper.putBoolean(activity, END_ADD_SCENE_SET_KEY,false)
     }
 
     //控制以页面为单位是否结束引导

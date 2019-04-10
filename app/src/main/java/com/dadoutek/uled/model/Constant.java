@@ -48,6 +48,10 @@ public class Constant implements Serializable {
     public static final String GROUP_ARESS_KEY = "GROUP_ARESS_KEY";
     public static final String LIGHT_REFRESH_KEY = "LIGHT_REFRESH_KEY";
     public static final String LIGHT_REFRESH_KEY_OK = "LIGHT_REFRESH_KEY_OK";
+    public static final String CURTAINS_ARESS_KEY="CURTAINS_ARESS_KEY";
+    public static final String CURTAINS_KEY="CURTAINS_KEY";
+    public static final String LIGHT_KEY="LIGHT_KEY";
+    public static final String RGB_LIGHT_KEY="RGB_LIGHT_KEY";
 
     //标志链接是否成功
     public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";
@@ -62,7 +66,7 @@ public class Constant implements Serializable {
 //    public static final String BASE_URL = "http://tmp.ibeelink.com/";
 
     //网络请求服务器正式地址
-    public static final String BASE_URL = "https://mqtt.beesmartnet.com/";
+    public static final String BASE_URL = "http://47.107.227.130/smartlight/";
 
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY = "DB_NAME_KEY";
@@ -119,6 +123,8 @@ public class Constant implements Serializable {
     //管理权限本地保存key
     public static String ME_FUNCTION = "ME_FUNCTION";
 
+    public static String DEVICE_TYPE = "DEVICE_TYPE";
+
     //管理权限本地保存key
     public static String OLD_INDEX_DATA = "oldIndexData";
 
@@ -167,8 +173,10 @@ public class Constant implements Serializable {
 
     public static int VENDOR_ID = 0x0211;
     public static String IS_SCAN_RGB_LIGHT="IS_SCAN_RGB_LIGHT";
+    public static String IS_SCAN_CURTAIN="IS_SCAN_CURTAIN";
     public static String TYPE_GROUP="TYPE_GROUP";
     public static String TYPE_LIGHT="TYPE_LIGHT";
+    public static String TYPE_CURTAIN="TYPE_CURTAIN";
     public static String TYPE_VIEW="TYPE_VIEW";
     public static String TYPE_VIEW_ADDRESS="TYPE_VIEW_ADDRESS";
 
@@ -182,5 +190,26 @@ public class Constant implements Serializable {
     public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
     public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
 //    public static String TAG_GroupListFragment = "GroupListFragment";
+    public static boolean isCreat=false;
 
+    public static final int INSTALL_NORMAL_LIGHT=0;
+    public static final int INSTALL_RGB_LIGHT=1;
+    public static final int INSTALL_SWITCH=2;
+    public static final int INSTALL_SENSOR=3;
+    public static final int INSTALL_CURTAIN=4;
+
+    //分组标识
+
+    //默认分组
+    public static final Long DEVICE_TYPE_DEFAULT_ALL=0L;
+    //默认分组
+    public static final Long DEVICE_TYPE_DEFAULT=-1L;
+    //默认分组
+    public static final Long DEVICE_TYPE_NO=1L;
+    //普通灯分组
+    public static final Long DEVICE_TYPE_LIGHT_NORMAL= Long.valueOf(0x04);
+    //RGB分组
+    public static final Long DEVICE_TYPE_LIGHT_RGB= Long.valueOf(0x06);
+    //窗帘分组
+    public static final Long DEVICE_TYPE_CURTAIN= Long.valueOf(0x10);
 }

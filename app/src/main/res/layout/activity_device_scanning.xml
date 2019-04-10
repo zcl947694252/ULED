@@ -14,7 +14,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-
     <LinearLayout
         android:id="@+id/groups_bottom"
         android:layout_width="0dp"
@@ -97,6 +96,7 @@
         android:verticalSpacing="10dp"
         app:layout_constraintBottom_toTopOf="@id/btn_add_groups"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/light_num_layout" />
 
@@ -110,6 +110,8 @@
         android:layout_marginTop="10dp"
         android:background="@color/primary"
         android:text="log"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:textColor="@android:color/white"
         android:visibility="gone" />
 
@@ -129,6 +131,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!--<Button-->
+        <!--android:id="@+id/rename_groups"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="46dp"-->
+        <!--android:layout_marginBottom="5dp"-->
+        <!--android:layout_marginLeft="5dp"-->
+        <!--android:layout_marginRight="5dp"-->
+        <!--android:layout_marginTop="10dp"-->
+        <!--android:background="@color/primary"-->
+        <!--android:gravity="center"-->
+        <!--android:text="@string/rename_groups"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--android:visibility="visible"-->
+        <!--app:layout_constraintBottom_toTopOf="@id/btn_add_groups"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent" />-->
+
     <Button
         android:id="@+id/btn_add_groups"
         android:layout_width="match_parent"
@@ -141,7 +160,7 @@
         android:gravity="center"
         android:text="@string/set_group"
         android:textColor="@android:color/white"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/grouping_completed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

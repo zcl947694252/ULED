@@ -13,6 +13,7 @@
         <!-- Brightness -->
 
         <LinearLayout
+            android:id="@+id/seekBar_linearLayout_one"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -98,6 +99,7 @@
         <!-- Temperature -->
 
         <LinearLayout
+            android:id="@+id/seekBar_linearLayout_two"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"

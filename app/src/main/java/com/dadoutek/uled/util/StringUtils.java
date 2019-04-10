@@ -1,5 +1,6 @@
 package com.dadoutek.uled.util;
 
+import android.content.Context;
 import android.text.InputFilter;
 import android.util.Log;
 import android.widget.EditText;
@@ -7,9 +8,14 @@ import android.widget.EditText;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.DbModel.DbSwitch;
+import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -179,5 +185,72 @@ public class StringUtils {
         }else{
             return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
         }
+    }
+
+    public static String getCurtainName(DbCurtain curtain) {
+
+        if(DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId())==null){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }
+
+        //如果当前灯没分组  显示未分组
+        if(DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getMeshAddr()==0xffff){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }else{
+            return DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getName();
+        }
+    }
+
+    public static String getInstallDescribe(int type, Context context){
+        switch (type){
+            case Constant.INSTALL_NORMAL_LIGHT:
+            case Constant.INSTALL_RGB_LIGHT:
+                return context.getString(R.string.guide_tip_reset_light);
+            case Constant.INSTALL_SWITCH:
+                return context.getString(R.string.guide_tip_reset_switch);
+            case Constant.INSTALL_SENSOR:
+                return context.getString(R.string.guide_tip_reset_sensor);
+            case Constant.INSTALL_CURTAIN:
+                return context.getString(R.string.guide_tip_reset_curtain);
+        }
+        return "";
+    }
+
+    public static String getSwitchPirDefaultName(int productUUID){
+        String startStr = "";
+        switch (productUUID){
+            case DeviceType.NORMAL_SWITCH:
+                startStr = "普通开关";
+                break;
+            case DeviceType.SCENE_SWITCH:
+                startStr = "场景开关";
+                break;
+            case DeviceType.SMART_CURTAIN_SWITCH:
+                startStr = "窗帘开关";
+            case DeviceType.NIGHT_LIGHT:
+                startStr = "小夜灯";
+            case DeviceType.SENSOR:
+                startStr = "传感器";
+                break;
+        }
+
+        List<DbSwitch> swtitches = DBUtils.INSTANCE.getSwtitchesByProductUUID(productUUID);
+        List<String> swtitchNames = new ArrayList();
+
+        for(int i=0;i<swtitches.size();i++){
+            swtitchNames.add(swtitches.get(i).getName());
+        }
+
+        //开关上限暂时设置到1000方便取名
+        int MaxSwitchCount=1000;
+        for(int i=0;i<MaxSwitchCount;i++){
+            String name = startStr + i;
+            if(swtitchNames.contains(name)){
+                continue;
+            }else {
+                return name;
+            }
+        }
+        return "";
     }
 }

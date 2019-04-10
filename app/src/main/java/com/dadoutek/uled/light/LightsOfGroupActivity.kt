@@ -2,12 +2,8 @@ package com.dadoutek.uled.light
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanFilter
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -16,7 +12,9 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.util.DiffUtil
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
@@ -24,17 +22,18 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
-import android.widget.ImageView
 import android.widget.Toast
 import butterknife.ButterKnife
-import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
@@ -108,6 +107,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
+    private var recyclerView: RecyclerView? = null
 
     override fun onStart() {
         super.onStart()
@@ -405,10 +405,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
-        recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
+        recyclerView=findViewById(R.id.recycler_view_lights)
+        recyclerView!!.layoutManager = GridLayoutManager(this, 3)
+        recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
-        adapter!!.bindToRecyclerView(recycler_view_lights)
+        adapter!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {
             lightList[i].updateIcon()
         }
@@ -421,12 +423,23 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         if (view.id == R.id.img_light) {
             canBeRefresh = true
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-                        byteArrayOf(0x01, 0x00, 0x00))
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                        byteArrayOf(0x01, 0x00, 0x00))
+                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,true,false)
+                }else{
+                    Commander.openOrCloseLights(currentLight!!.meshAddr,true)
+                }
+
                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-                        byteArrayOf(0x00, 0x00, 0x00))
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                        byteArrayOf(0x00, 0x00, 0x00))
+                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,false,false)
+                }else{
+                    Commander.openOrCloseLights(currentLight!!.meshAddr,false)
+                }
                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
 
@@ -435,7 +448,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             runOnUiThread {
                 adapter?.notifyDataSetChanged()
             }
-        } else if (view.id == R.id.tv_setting) {
+        } else
+            if (view.id == R.id.tv_setting) {
             if (scanPb.visibility != View.VISIBLE) {
                 //判断是否为rgb灯
                 var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
@@ -546,7 +560,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
+                    root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
                 }
@@ -874,7 +888,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             if (bestRSSIDevice != null) {
                 //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                 if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                    LogUtils.d("change to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                     bestRSSIDevice = deviceInfo
                 }
             } else {

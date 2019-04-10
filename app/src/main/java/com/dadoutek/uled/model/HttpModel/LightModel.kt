@@ -20,18 +20,10 @@ object LightModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, name: String, brightness: Int,
-               colorTemperature: Int, belongGroupId: Int,color: Int,id: Long
+    fun update(token: String, light:DbLight,id: Long
                , lid: Int): Observable<String> {
-        val dbLight = DbLight()
-        dbLight.name = name
-        dbLight.brightness = brightness
-        dbLight.colorTemperature = colorTemperature
-        dbLight.belongGroupId = belongGroupId.toLong()
-        dbLight.color = color
-        dbLight.id=lid.toLong()
         return NetworkFactory.getApi()
-                .updateLight(token,lid,dbLight)
+                .updateLight(token,lid,light)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

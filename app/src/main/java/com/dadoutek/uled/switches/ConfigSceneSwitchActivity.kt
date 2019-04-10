@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -14,8 +15,10 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
@@ -23,6 +26,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -158,6 +162,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
+                        saveSwitch()
                         TelinkLightService.Instance().idleMode(true)
                         TelinkLightService.Instance().disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -166,6 +171,51 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }catch (e:Exception){
             e.printStackTrace()
         }
+    }
+
+    private fun saveSwitch(){
+            //确认配置成功后,添加开关到服务器
+            var newMeshAdress: Int
+            var dbSwitch: DbSwitch?=DbSwitch()
+            DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        dbSwitch!!.controlSceneId=getControlScene()
+        dbSwitch!!.macAddr=mDeviceInfo.macAddress
+        dbSwitch!!.meshAddr=Constant.SWITCH_PIR_ADDRESS
+        dbSwitch!!.productUUID=mDeviceInfo.productUUID
+        dbSwitch!!.index=dbSwitch.id.toInt()
+//        dbSwitch!!.index=dbSwitch.id.toInt()
+//           dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//             newMeshAdress=groupAdress
+//            dbSwitch!!.controlSceneId=getControlScene()
+//            dbSwitch!!.macAddr=mDeviceInfo.macAddress
+//            dbSwitch!!.meshAddr=Constant.SWITCH_PIR_ADDRESS
+//            dbSwitch!!.productUUID=mDeviceInfo.productUUID
+        DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//        dbSwitch!!.index=dbSwitch.id.toInt()
+//            dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//
+//          dbSwitch= DBUtils.getSwitchByID(dbSwitch.id.toLong())!!
+//          dbSwitch= DBUtils.getSwitchByMeshAddr(mDeviceInfo.macAddress)!!
+
+//          DBUtils.saveSwitch(dbSwitch,false)
+        DBUtils.recordingChange(dbSwitch!!.id,
+                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                Constant.DB_ADD)
+    }
+
+    private fun getControlScene(): String? {
+        var controlSceneIdList =""
+        val map: Map<Int, DbScene> = mAdapter.sceneMap
+        for(scene in map.values){
+            if(controlSceneIdList.isEmpty()){
+                controlSceneIdList = scene.id.toString()
+            }else{
+                controlSceneIdList += ","+scene.id.toString()
+            }
+        }
+        return controlSceneIdList
     }
 
     private fun showCancelDialog() {
@@ -412,5 +462,35 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mSceneList = DBUtils.sceneAll
     }
 
+    val groupAdress: Int
+        get() {
+            val list = DBUtils.swtichList
+            val idList = java.util.ArrayList<Int>()
+            for (i in list.indices.reversed()) {
+                if (list[i].meshAddr == 0xffff) {
+                    list.removeAt(i)
+                }
+            }
 
+            for (i in list.indices) {
+                idList.add(list[i].meshAddr)
+            }
+
+            var id = 0
+            for (i in 0x8001..33023) {
+                if (idList.contains(i)) {
+                    Log.d("sceneID", "getSceneId: " + "aaaaa")
+                    continue
+                } else {
+                    id = i
+                    Log.d("sceneID", "getSceneId: bbbbb$id")
+                    break
+                }
+            }
+
+            if (list.size == 0) {
+                id = 0x8001
+            }
+            return id
+        }
 }

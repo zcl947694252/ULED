@@ -37,6 +37,10 @@ object ServerResultException {
                 //服务器异常
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.server_exception))
             }
+            NetworkStatusCode.ERROR_NOT_VERSION->{
+                //当前最新版本
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.the_last_version))
+            }
             else -> {
                 throw RuntimeException(response.message)
             }

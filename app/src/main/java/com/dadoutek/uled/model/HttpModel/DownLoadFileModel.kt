@@ -23,4 +23,14 @@ object DownLoadFileModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun getUrlNew(localVersion: String): Observable<Any>? {
+        return NetworkFactory.getApi()
+                .getFirmwareUrlNew(localVersion)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

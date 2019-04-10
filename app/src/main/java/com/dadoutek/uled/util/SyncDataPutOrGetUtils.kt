@@ -54,11 +54,13 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                    var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
-                            dbDataChangeList[i].changeId,
-                            dbDataChangeList[i].changeType,
-                            dbUser!!.token, dbDataChangeList[i].id!!)
-                    observable?.let { observableList.add(it) }
+                        var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
+                                dbDataChangeList[i].changeId,
+                                dbDataChangeList[i].changeType,
+                                dbUser!!.token, dbDataChangeList[i].id!!)
+                        observable?.let { observableList.add(it) }
+
+
 
                     if (i == dbDataChangeList.size - 1) {
 //                                observableNew = observableList.get(j).mergeWith(observableList.get(j-1))
@@ -105,20 +107,21 @@ class SyncDataPutOrGetUtils {
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
                                      token: String, id: Long): Observable<String>? {
             var result: Observable<String>?
+//            val token = "1"
             when (tableName) {
                 "DB_GROUP" -> {
                     when (type) {
                         Constant.DB_ADD -> {
                             val group = DBUtils.getGroupByID(changeId)
                             return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
-
                         }
                         Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                         Constant.DB_UPDATE -> {
                             val group = DBUtils.getGroupByID(changeId)
                             if(group!=null){
-                                return GroupMdodel.update(token, changeId.toInt(),
-                                        group!!.name, group.brightness, group.colorTemperature, group.color,id)
+//                                return GroupMdodel.update(token, changeId.toInt(),
+//                                        group!!.name, group.brightness, group.colorTemperature, group.color,id)
+                                return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
                             }
                         }
                     }
@@ -128,6 +131,7 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val light = DBUtils.getLightByID(changeId)
+                            Log.d("addLight123:",light!!.productUUID.toString())
                             return LightModel.add(token, light!!, id, changeId)
                         }
                         Constant.DB_DELETE -> {
@@ -137,10 +141,65 @@ class SyncDataPutOrGetUtils {
                         Constant.DB_UPDATE -> {
                             val light = DBUtils.getLightByID(changeId)
                             if(light!=null){
-                                return LightModel.update(token,
-                                        light.name, light.brightness,
-                                        light.colorTemperature, light.belongGroupId.toInt(),light.color,
+                                return LightModel.update(token,light,
                                         id, changeId.toInt())
+                            }
+                        }
+                    }
+                }
+                "DB_SWITCH" -> {
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val switch = DBUtils.getSwitchByID(changeId)
+                            return SwitchMdodel.add(token, switch!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return SwitchMdodel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val switch = DBUtils.getSwitchByID(changeId)
+                            if(switch!=null){
+                                return SwitchMdodel.update(token,
+                                        switch,changeId.toInt(),id)
+                            }
+                        }
+                    }
+                }
+                "DB_SENSOR" -> {
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val sensor = DBUtils.getSensorByID(changeId)
+                            return SensorMdodel.add(token, sensor!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return SensorMdodel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val sensor = DBUtils.getSensorByID(changeId)
+                            if(sensor!=null){
+                                return SensorMdodel.update(token,
+                                        sensor,changeId.toInt(),id)
+                            }
+                        }
+                    }
+                }
+                "DB_CURTAIN" -> {
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val curtain = DBUtils.getCurtainByID(changeId)
+                            return CurtainMdodel.add(token, curtain!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return CurtainMdodel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val curtain = DBUtils.getCurtainByID(changeId)
+                            if(curtain!=null){
+                                return CurtainMdodel.update(token,
+                                        curtain,changeId.toInt(),id)
                             }
                         }
                     }
@@ -285,10 +344,11 @@ class SyncDataPutOrGetUtils {
                     .getRegionList(token)
                     .compose(NetworkTransformer())
                     .flatMap {
+                        Log.d("itSize", it.size.toString())
                         for (item in it) {
                             DBUtils.saveRegion(item, true)
                         }
-
+                        Log.d("itSize", it.size.toString())
                         if (it.size != 0) {
                             setupMesh()
                             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
@@ -303,6 +363,30 @@ class SyncDataPutOrGetUtils {
                     .flatMap {
                         for (item in it) {
                             DBUtils.saveLight(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getSwitchList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveSwitch(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getSensorList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveSensor(item, true)
+                        }
+                        NetworkFactory.getApi()
+                                .getCurtainList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveCurtain(item, true)
                         }
                         NetworkFactory.getApi()
                                 .getGradientList(token)

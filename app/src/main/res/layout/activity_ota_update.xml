@@ -144,18 +144,17 @@
 
     <com.dinuscxj.progressbar.CircleProgressBar
         android:id="@+id/progress_view"
-        android:layout_gravity="center"
-        android:layout_marginTop="30dp"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        app:style="solid"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        app:progress_background_color="@color/gray_dark"
+        app:progress_end_color="@color/primary"
+        app:progress_start_color="@color/primary"
         app:progress_start_degree="-90"
         app:progress_text_color="@color/red"
         app:progress_text_size="18sp"
-        app:progress_background_color="@color/gray_dark"
-        app:progress_start_color="@color/primary"
-        app:progress_end_color="@color/primary"
-        />
+        app:style="solid" />
 
     <TextView
         android:id="@+id/text_info"

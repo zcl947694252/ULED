@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".windowcurtains.WindowCurtainsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <include layout="@layout/toolbar"/>
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/open"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/group_list_on"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/off"
+        android:text="@string/group_list_off"
+        android:layout_gravity="center_horizontal"
+        />
+
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/pause"
+        android:text="@string/pause"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/commutation"
+        android:text="@string/commutation"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/setting"
+        android:text="@string/one_click_reset"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/restart"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/restart"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/delete_group"
+        android:id="@+id/delete_Group"
+        android:visibility="gone"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/update_group"
+        android:text="@string/update_group"
+        android:visibility="gone"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/hand_recovery"
+        android:text="@string/hand_recovery"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/software_restart"
+        android:text="@string/software_restart"
+        />
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/slow_up"
+        android:text="@string/slow_up_the_cache"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="@string/speed_adjustment"
+        android:layout_marginLeft="5dp"
+        />
+
+    <com.android.ehorizontalselectedview.EHorizontalSelectedView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:id="@+id/hsv"
+        android:layout_marginTop="10dp"
+        />
+    </LinearLayout>
+
+</ScrollView>

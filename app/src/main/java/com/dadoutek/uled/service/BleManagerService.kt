@@ -46,16 +46,16 @@
 //    }
 //
 //    private fun initListner() {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//        TODO("not implemented") //To changeToScene body of created functions use File | Settings | File Templates.
 //
 //    }
 //
 //    override fun onBind(intent: Intent?): IBinder {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//        TODO("not implemented") //To changeToScene body of created functions use File | Settings | File Templates.
 //    }
 //
 //    override fun performed(event: Event<String>?) {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//        TODO("not implemented") //To changeToScene body of created functions use File | Settings | File Templates.
 //        when (event?.getType()) {
 //            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
 //

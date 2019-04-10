@@ -24,15 +24,13 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
+import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.LogUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -42,6 +40,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var isChangeScene = false
     private var isChange = true
     private var isResult = false
+    private var isToolbar= false
     private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private var showGroupList: ArrayList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
@@ -70,7 +69,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
                 val res = hideKeyboard(v.windowToken)
                 if (res) {
                     //隐藏了输入法，则不再分发事件
-                    return true
+                    return super.dispatchTouchEvent(ev)
                 }
             }
         }
@@ -163,7 +162,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
             val guide6 = confirm
             GuideUtils.guideBuilder(this, GuideUtils.STEP13_GUIDE_ADD_SCENE_SAVE)
                     .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_scene_set1, getString(R.string.add_scene_guide_6),
-                            View.OnClickListener {guide6.performClick()}, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                            View.OnClickListener {
+                                guide6.performClick()
+                                GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, true)
+                            }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -246,7 +248,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             if(currentPageIsEdit){
-                finish()
+                if(currentPageIsEdit&&!isToolbar){
+                    showExitSaveDialog()
+                }else{
+                    finish()
+                }
             }else{
                 showExitSaveDialog()
             }
@@ -353,24 +359,36 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
 
     //显示配置数据页面
     private fun showEditListVew() {
-        if(scene!=null){
-            edit_name.setText(scene!!.name)
+        if(editSceneName!=null){
+            edit_name.setText(editSceneName)
+        }else{
+            if(scene!=null){
+                edit_name.setText(scene!!.name)
+            }
         }
+        isToolbar=false
         currentPageIsEdit=true
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
         tv_function1.visibility = View.GONE
+        edit_name.setSelection(edit_name.text.length)
 
         initChangeState()
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_select_group_list_view.layoutManager = layoutmanager
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, showCheckListData!!)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-        //添加分割线
-        recyclerView_select_group_list_view.addItemDecoration(decoration)
+        var  list= ArrayList<DbGroup>()
+        for(h in showCheckListData!!.indices){
+            if(!OtherUtils.isCurtain(showCheckListData!![h])){
+                list!!.add(showCheckListData!![h])
+            }
+        }
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list!!)
+//        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+//        //添加分割线
+//        recyclerView_select_group_list_view.addItemDecoration(decoration)
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
         sceneEditListAdapter?.onItemClickListener=onItemClickListenerCheck
     }
@@ -411,6 +429,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     }
 
     private fun save() {
+        isToolbar=true
         if(!currentPageIsEdit){
             saveScene()
         }else{

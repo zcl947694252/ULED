@@ -137,7 +137,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
         intent.putExtra("light", light)
-        intent.putExtra("gpAddress", gpAddress)
+        intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
+        intent.putExtra("uuid",light!!.productUUID)
+        intent.putExtra("belongId",light!!.belongGroupId)
+        intent.putExtra("gpAddress", light!!.meshAddr)
+        Log.d("addLight",light!!.productUUID.toString()+","+light!!.meshAddr)
         startActivity(intent)
     }
 
@@ -256,15 +260,18 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
                         tvOta!!.visibility = View.VISIBLE
                     } else {
 //                        toolbar.title!!.visibility = View.GONE
-                        tvOta!!.visibility = View.GONE
+                        lightVersion!!.visibility = View.VISIBLE
+                        lightVersion!!.text =  resources.getString(R.string.firmware_version,localVersion)
+                        light!!.version = localVersion
+                        tvOta!!.visibility = View.VISIBLE
                     }
                 }
                 null
             }, {
                 if (toolbar.title != null) {
 //                    toolbar.title!!.visibility = View.GONE
-                    lightVersion.visibility=View.GONE
-                    tvOta!!.visibility = View.GONE
+                    lightVersion.visibility=View.VISIBLE
+                    tvOta!!.visibility = View.VISIBLE
                 }
                 null
             })

@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
@@ -14,14 +15,17 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -41,7 +45,6 @@ import kotlinx.coroutines.launch
 
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
-import java.util.concurrent.TimeUnit
 
 
 private const val CONNECT_TIMEOUT = 5
@@ -325,6 +328,28 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             }
         }catch (e:Exception){
             e.printStackTrace()
+        }finally {
+            //确认配置成功后,添加开关到服务器
+            var newMeshAdress: Int
+//            var dbSwitch:DbSwitch=DbSwitch()
+            newMeshAdress=groupAdress
+//            DBUtils.saveSwitch(dbSwitch,false)
+            var dbSwitch: DbSwitch?=DbSwitch()
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch.macAddr=mDeviceInfo.macAddress
+            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+            dbSwitch.productUUID=mDeviceInfo.productUUID
+            dbSwitch.index=dbSwitch.id.toInt()
+            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
+//            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            DBUtils.recordingChange(dbSwitch!!.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                    Constant.DB_ADD)
+
         }
     }
 
@@ -409,5 +434,38 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         mAdapter.bindToRecyclerView(recyclerView)
 
     }
+
+    val groupAdress: Int
+        get() {
+            val list = DBUtils.groupList
+            val idList = java.util.ArrayList<Int>()
+            for (i in list.indices.reversed()) {
+                if (list[i].meshAddr == 0xffff) {
+                    list.removeAt(i)
+                }
+            }
+
+            for (i in list.indices) {
+                idList.add(list[i].meshAddr)
+            }
+
+            var id = 0
+            for (i in 0x8001..33023) {
+                if (idList.contains(i)) {
+                    Log.d("sceneID", "getSceneId: " + "aaaaa")
+                    continue
+                } else {
+                    id = i
+                    Log.d("sceneID", "getSceneId: bbbbb$id")
+                    break
+                }
+            }
+
+            if (list.size == 0) {
+                id = 0x8001
+            }
+
+            return id
+        }
 
 }

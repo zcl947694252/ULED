@@ -1,13 +1,17 @@
 package com.dadoutek.uled.util;
 
+import android.content.Context;
 import android.graphics.Color;
 
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DeviceType;
+import com.dadoutek.uled.model.InstallDeviceModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class OtherUtils {
@@ -32,8 +36,16 @@ public class OtherUtils {
         }
     }
 
+    public static boolean isCurtain(DbGroup dbGroup){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_CURTAIN.intValue()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public static boolean isRGBGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_RGB){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_RGB.intValue()){
             return true;
         }else{
             return false;
@@ -41,9 +53,15 @@ public class OtherUtils {
     }
 
     public static boolean isNormalGroup(DbGroup dbGroup){
-        if(getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL
-                ||getFirstLightOfGroupUUID(dbGroup)==DeviceType.LIGHT_NORMAL_OLD
-                ||getFirstLightOfGroupUUID(dbGroup)==0x00){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_LIGHT_NORMAL.intValue()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isDefaultGroup(DbGroup dbGroup){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT.intValue()){
             return true;
         }else{
             return false;
@@ -80,5 +98,20 @@ public class OtherUtils {
             case 4:return Color.parseColor("#800080");
         }
         return 0;
+    }
+
+    public static ArrayList<InstallDeviceModel> getInstallDeviceList(Context context){
+        ArrayList<InstallDeviceModel> list = new ArrayList<>();
+        InstallDeviceModel installDeviceModel1=new InstallDeviceModel(context.getString(R.string.normal_light),context.getString(R.string.normal_light_describe));
+        InstallDeviceModel installDeviceModel2=new InstallDeviceModel(context.getString(R.string.rgb_light),context.getString(R.string.rgb_light_describe));
+        InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
+        InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
+        InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
+        list.add(installDeviceModel1);
+        list.add(installDeviceModel2);
+        list.add(installDeviceModel3);
+        list.add(installDeviceModel4);
+        list.add(installDeviceModel5);
+        return list;
     }
 }

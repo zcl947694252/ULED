@@ -227,8 +227,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun updateGroup() {
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
+        intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
         intent.putExtra("light", light)
         intent.putExtra("gpAddress", gpAddress)
+        intent.putExtra("uuid",light!!.productUUID)
+        intent.putExtra("belongId",light!!.belongGroupId)
+        Log.d("addLight",light!!.productUUID.toString()+","+light!!.meshAddr)
         startActivity(intent)
        this!!.finish()
     }
@@ -523,7 +527,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> finish()
+            android.R.id.home -> {
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
+                editTitle?.setFocusableInTouchMode(false)
+                editTitle?.setFocusable(false)
+                finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

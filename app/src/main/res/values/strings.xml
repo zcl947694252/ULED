@@ -300,7 +300,7 @@
     <string name="reset_fail_tip1">There are no lights, please check if the lights are installed</string>
     <string name="tip_reset_sure">Confirm all lights reset？</string>
     <string name="delete_lamp_tip">There is a light reset failed, please retry after connecting</string>
-    <string name="error_disconnect_tip">Disconnected, please retry after connecting</string>
+    <string name="error_disconnect_tip">Factory Settings are being restored, please wait</string>
     <string name="scene_16_tip">Up to 16 Scenes!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Start to download data…</string>
@@ -585,4 +585,68 @@
     <string name="re_upgrade">Re-upgrade</string>
     <string name="bt_error">The light is abnormal. Please restore the factory settings and re-install the upgrade!</string>
     <string name="get_code_ing">Get verification...</string>
+    <string name="add_new_group">+Add group</string>
+    <string name="rename_groups"> Rename group </string>
+    <string name="create_group">Create group </string>
+    <string name="create_scene_select">Create a scene</string>
+    <string name="normal_light_describe"> Monochrome temperature, dual color temperature light </string>
+    <string name="rgb_light_describe">RGB lights, RGBW lights</string>
+    <string name="switch_name">Switch </string>
+    <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
+    <string name="sensor">Sensor </string>
+    <string name="sensor_describe">Night light, PIR</string>
+    <string name="add_device">Add device </string>
+    <string name="update_name_gp"> modify the group name </string>
+    <string name="curtain">curtain </string>    
+    <string name="smart_curtain">Smart Curtains</string>
+    <string name="device">device </string>
+    <string name="install_tip1">Ready to work</string>
+    <string name="install_tip2">First step\nPlease make sure the device is connected to the power </string>
+    <string name="install_tip3">Step 2\nPlease make sure the device is not connected to the network</string>
+    <string name="install_tip4">Step 3\nAdd devices via Bluetooth search</string>
+    <string name="install_tip5">If you encounter problems, please try the following steps to reset the device </string>
+    <string name="guide_tip_reset_light"> Lamp: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
+    <string name="guide_tip_reset_switch"> panel switch: Connect the power supply while holding down the upper left button and the lower right button in the switch button. The blue light will always be on during the period. </string>
+    <string name="guide_tip_reset_sensor">Connect the power for 1 second, disconnect the power for 1 second, repeat about 5–6 times until the sensor flashes. </string>
+    <string name="guide_tip_reset_curtain">Curtain: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
+
+    <!--窗帘相关-->
+    <string name="up">up</string>
+    <string name="down">down</string>
+    <string name="accelerate">accelerate</string>
+    <string name="slow_down">Slow down</string>
+    <string name="pause">pause</string>
+    <string name="not_type">not type</string>
+    <string name="second_level">second level</string>
+    <string name="one_level">ont level</string>
+    <string name="three_level">three level</string>
+    <string name="four_level">four level</string>
+    <string name="commutation">commutation</string>
+    <string name="speed_adjustment">Speed adjustment:</string>
+    <string name="details">Details</string>
+    <string name="restart">Click restart</string>
+    <string name="successful_resumption">Successful Resumption</string>
+    <string name="device_list">Device</string>
+
+    <string name="scan_curtain_num">Total: %1$s curtain are currently scanned</string>
+    <string name="title_curtain_lights_num">Scanning %1$d</string>
+    <string name="title_curtain_lights_num_total">%1$d)</string>
+
+    <string name="delete_switch_confirm">Confirm the delete switch?</string>
+
+    <string name="delete_switch_success">Delete Success</string>
+
+    <string name="have_curtain_no_group_tip">There are no curtain grouping, please complete the grouping operation</string>
+
+    <string name="grouping_curtain_wait_tip">There are currently %1$s curtain grouping, please wait!</string>
+    <string name="selected_curtain_tip">Please Select at Least ONE Curtain to Group</string>
+    <string name="curtain_fail_tip">There is a curtain grouped failed, please check and try again!</string>
+
+    <string name="hand_recovery">Hand recovery</string>
+    <string name="software_restart">Software restart</string>
+    <string name="slow_up_the_cache">Slow up the cache</string>
+
+    <string name="slow_up_the_cache_cancel">cancel slow up the cache</string>
+
+    <string name="hand_cancel">Hand cancel</string>
 </resources>
