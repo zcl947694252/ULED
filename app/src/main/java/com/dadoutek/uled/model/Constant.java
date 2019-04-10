@@ -95,6 +95,9 @@ public class Constant implements Serializable {
     //用户信息
     public static String USER_INFO = "USER_INFO";
 
+    //开发者模式
+    public static String DEVELOPER_MODEL ="DEVELOPER_MODEL";
+
     //用户信息
     public static String UPDATE_FILE_ADRESS = "UPDATE_FILE_ADRESS";
 

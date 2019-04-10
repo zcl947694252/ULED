@@ -43,7 +43,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var isToolbar= false
     private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private var showGroupList: ArrayList<ItemGroup>? = null
-    private var showCheckListData: MutableList<DbGroup>? = null
+    private var showCheckListData: ArrayList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName:String?=null
@@ -51,6 +51,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var guideShowCurrentPage = false
     private val DATA_LIST_KEY="DATA_LIST_KEY"
     private val SCENE_KEY="SCENE_KEY"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -186,15 +187,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMesh(actions[i].groupAddr)
                 val itemGroup = ItemGroup()
-                itemGroup.gpName=item.name
-                itemGroup.enableCheck = false
-                itemGroup.groupAress=actions[i].groupAddr
-                itemGroup.brightness =actions[i].brightness
-                itemGroup.temperature = actions[i].colorTemperature
-                itemGroup.color=actions[i].color
-                item.checked = true
-                showGroupList!!.add(itemGroup)
-                groupMeshAddrArrayList.add(item.getMeshAddr())
+                if(item != null){
+                    itemGroup.gpName= item.name
+                    itemGroup.enableCheck = false
+                    itemGroup.groupAress=actions[i].groupAddr
+                    itemGroup.brightness =actions[i].brightness
+                    itemGroup.temperature = actions[i].colorTemperature
+                    itemGroup.color=actions[i].color
+                    item.checked = true
+                    showGroupList!!.add(itemGroup)
+                    groupMeshAddrArrayList.add(item.getMeshAddr())
+                }
             }
         }
 
@@ -203,7 +206,14 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     }
 
     fun initChangeState(){
-        showCheckListData = DBUtils.allGroups
+        var list=DBUtils.allGroups
+        showCheckListData=ArrayList<DbGroup>()
+        for(h in list.indices){
+            if(!OtherUtils.isCurtain(list[h])){
+                showCheckListData!!.add(list[h])
+        }
+        }
+//        showCheckListData = DBUtils.allGroups
         if(showGroupList!!.size!=0){
             for(i in showCheckListData!!.indices){
                 for(j in showGroupList!!.indices){
@@ -378,13 +388,12 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_select_group_list_view.layoutManager = layoutmanager
-        var  list= ArrayList<DbGroup>()
-        for(h in showCheckListData!!.indices){
-            if(!OtherUtils.isCurtain(showCheckListData!![h])){
-                list!!.add(showCheckListData!![h])
-            }
-        }
-        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list!!)
+//        for(h in showCheckListData!!.indices){
+//            if(!OtherUtils.isCurtain(showCheckListData!![h])){
+//                scenceList!!.add(showCheckListData!![h])
+//            }
+//        }
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, this!!.showCheckListData!!)
 //        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
 //        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
 //        //添加分割线

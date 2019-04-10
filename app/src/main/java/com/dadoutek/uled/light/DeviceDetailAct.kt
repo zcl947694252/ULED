@@ -320,11 +320,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun getNewData(): MutableList<DbLight> {
-        if (currentLight!!.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
-            filter("", false)
-        } else {
+//        if (currentLight!!.meshAddr == 0xffff) {
+//            //            lightList = DBUtils.getAllLight();
+////            lightList=DBUtils.getAllLight()
+//            filter("", false)
+//        } else {
             when (type) {
                 Constant.INSTALL_NORMAL_LIGHT -> {
                     lightsData = DBUtils.getAllNormalLight()
@@ -333,7 +333,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
                     lightsData = DBUtils.getAllRGBLight()
                 }
             }
-        }
+//    }
 
 //        if (currentLight!!.meshAddr == 0xffff) {
 //            toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"

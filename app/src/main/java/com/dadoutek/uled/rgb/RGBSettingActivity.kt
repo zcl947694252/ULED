@@ -35,10 +35,7 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.OtherUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -153,7 +150,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
                     mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                         if (granted!!) {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                            val info = SharedPreferencesUtils.getUserDeveloperModelr()
+                            if(info=="true"){
+                                transformView()
+                            }else {
+                                OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                            }
                         } else {
                             ToastUtils.showLong(R.string.update_permission_tip)
                         }

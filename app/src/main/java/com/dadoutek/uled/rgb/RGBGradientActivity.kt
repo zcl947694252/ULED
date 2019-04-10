@@ -130,8 +130,10 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
         if (type == Constant.TYPE_GROUP) {
             val lightList = DBUtils.getLightByGroupMesh(dstAddress)
-            if (lightList.size > 0) {
-                firstLightAddress = lightList[0].meshAddr
+            if (lightList != null) {
+                if (lightList.size > 0) {
+                    firstLightAddress = lightList[0].meshAddr
+                }
             }
         } else {
             firstLightAddress = dstAddress

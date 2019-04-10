@@ -35,6 +35,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtaPrepareUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -284,8 +285,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                         if (granted!!) {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
-//                          transformView()
+                            val info = SharedPreferencesUtils.getUserDeveloperModelr()
+                            if(info=="true"){
+                                transformView()
+                            }else {
+                                OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
+                            }
                         } else {
                             ToastUtils.showLong(R.string.update_permission_tip)
                         }

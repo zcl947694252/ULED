@@ -261,14 +261,14 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     }
 
     private fun getNewData(): MutableList<DbCurtain> {
-        if (currentLight!!.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
-            filter("", false)
-        } else {
+//        if (currentLight!!.meshAddr == 0xffff) {
+//            //            lightList = DBUtils.getAllLight();
+////            lightList=DBUtils.getAllLight()
+//            filter("", false)
+//        } else {
                 curtain = DBUtils.getAllCurtain()
-
-        }
+//
+//        }
 
 //        if (currentLight!!.meshAddr == 0xffff) {
 //            toolbar.title = getString(R.string.allLight) + " (" + curtain.size + ")"

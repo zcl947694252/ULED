@@ -422,13 +422,16 @@ object DBUtils {
     }
 
 
-    fun getGroupByMesh(mesh: Int): DbGroup {
+    fun getGroupByMesh(mesh: Int): DbGroup? {
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
         Log.d("datasave", "getGroupByMesh: $mesh")
-        return dbGroupLs[0]
+        if(dbGroupLs.size>0){
+            return dbGroupLs[0]
+        }
+        return null
     }
 
-    
+
     fun getLightByGroupID(id: Long): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())
@@ -444,15 +447,18 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getLightByGroupMesh(mesh: Int): ArrayList<DbLight> {
+    fun getLightByGroupMesh(mesh: Int): ArrayList<DbLight> ?{
         val group= getGroupByMesh(mesh)
-        val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
-        return ArrayList(query.list())
+        if(group!=null){
+            val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
+            return ArrayList(query.list())
+        }
+        return null
     }
 
     /********************************************保存 */
 
-    
+
     fun saveRegion(dbRegion: DbRegion, isFromServer: Boolean) {
         if (isFromServer) {
             val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
@@ -484,7 +490,7 @@ object DBUtils {
         }
     }
 
-    
+
     fun insertRegion(dbRegion: DbRegion) {
         //判断原来是否保存过这个区域
         val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
@@ -507,7 +513,7 @@ object DBUtils {
         }
     }
 
-    
+
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
@@ -519,14 +525,14 @@ object DBUtils {
         }
     }
 
-    
+
     fun saveDeleteGroup(group: DbGroup) {
         val dbDeleteGroup = DbDeleteGroup()
         dbDeleteGroup.groupAress = group.meshAddr
         DaoSessionInstance.getInstance().dbDeleteGroupDao.save(dbDeleteGroup)
     }
 
-    
+
     fun saveLight(light: DbLight, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbLightDao.insert(light)
@@ -578,7 +584,7 @@ object DBUtils {
                     Constant.DB_ADD)
         }
     }
-    
+
     fun oldToNewSaveLight(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.save(light)
         recordingChange(light.id,
@@ -586,7 +592,7 @@ object DBUtils {
                 Constant.DB_ADD)
     }
 
-    
+
     fun saveUser(dbUser: DbUser) {
         DaoSessionInstance.getInstance().dbUserDao.insertOrReplace(dbUser)
         recordingChange(dbUser.id,
@@ -594,7 +600,7 @@ object DBUtils {
                 Constant.DB_ADD)
     }
 
-    
+
     fun saveScene(dbScene: DbScene, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbSceneDao.insert(dbScene)
@@ -606,7 +612,7 @@ object DBUtils {
         }
     }
 
-    
+
     fun saveSceneActions(sceneActions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(sceneActions)
         //        recordingChange(sceneActions.getId(),
@@ -662,7 +668,7 @@ object DBUtils {
 
     /********************************************更改 */
 
-    
+
     fun updateGroup(group: DbGroup) {
         DaoSessionInstance.getInstance().dbGroupDao.update(group)
         recordingChange(group.id,
@@ -678,7 +684,7 @@ object DBUtils {
                     Constant.DB_UPDATE)
         }
     }
-    
+
     fun updateLight(light: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
         recordingChange(light.id,
@@ -692,7 +698,7 @@ object DBUtils {
                 DaoSessionInstance.getInstance().dbCurtainDao.tablename,
                 Constant.DB_UPDATE)
     }
-    
+
     fun updateLightsLocal(lights: MutableList<DbLight>) {
         DaoSessionInstance.getInstance().dbLightDao.updateInTx(lights)
     }
@@ -702,7 +708,7 @@ object DBUtils {
     }
 
 
-    
+
     fun updateScene(scene: DbScene) {
         DaoSessionInstance.getInstance().dbSceneDao.update(scene)
         recordingChange(scene.id,
@@ -710,7 +716,7 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
-    
+
     fun updateDbActions(actions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.update(actions)
         recordingChange(actions.id,
@@ -743,7 +749,7 @@ object DBUtils {
      * 只删除分组，不动组里的灯
      * @param dbGroup
      */
-    
+
     fun deleteGroupOnly(dbGroup: DbGroup) {
         //        saveDeleteGroup(dbGroup);
         DaoSessionInstance.getInstance().dbGroupDao.delete(dbGroup)
@@ -752,7 +758,7 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
-    
+
     fun deleteLight(dbLight: DbLight) {
         DaoSessionInstance.getInstance().dbLightDao.delete(dbLight)
         recordingChange(dbLight.id,
@@ -760,7 +766,7 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
-    
+
     fun deleteScene(dbScene: DbScene) {
         DaoSessionInstance.getInstance().dbSceneDao.delete(dbScene)
         recordingChange(dbScene.id,
@@ -817,7 +823,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
 
-    
+
     fun deleteLocalData() {
         //        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
@@ -833,14 +839,14 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
     }
 
-    
+
     fun deleteDbDataChange(id: Long) {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteByKey(id)
     }
 
     /********************************************其他 */
 
-    
+
     fun addNewGroup(name: String, groups: MutableList<DbGroup>, context: Context) {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
         if (!checkReachedTheLimit(groups,name)) {
@@ -857,11 +863,13 @@ object DBUtils {
             //新增数据库保存
             DBUtils.saveGroup(group, false)
 
-            group=DBUtils.getGroupByMesh(newMeshAdress)
+            group= DBUtils.getGroupByMesh(newMeshAdress)!!
+            if(group!=null){
+                recordingChange(group.id,
+                        DaoSessionInstance.getInstance().dbGroupDao.tablename,
+                        Constant.DB_ADD)
+            }
 
-            recordingChange(group.id,
-                    DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                    Constant.DB_ADD)
         }
     }
 

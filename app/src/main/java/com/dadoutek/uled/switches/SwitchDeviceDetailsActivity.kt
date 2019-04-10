@@ -430,20 +430,20 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun getNewData(): MutableList<DbSwitch>{
-        if (currentLight!!.meshAddr == 0xffff) {
-            //            lightList = DBUtils.getAllLight();
-//            lightList=DBUtils.getAllLight()
-            filter("", false)
-        } else {
+//        if (currentLight!!.meshAddr == 0xffff) {
+//            //            lightList = DBUtils.getAllLight();
+////            lightList=DBUtils.getAllLight()
+//            filter("", false)
+//        } else {
             switchData = DBUtils.getAllSwitch()
 
-        }
+//        }
 
-        if (currentLight!!.meshAddr == 0xffff) {
-            toolbar.title = getString(R.string.allLight) + " (" + switchData!!.size + ")"
-        } else {
+//        if (currentLight!!.meshAddr == 0xffff) {
+//            toolbar.title = getString(R.string.allLight) + " (" + switchData!!.size + ")"
+//        } else {
             toolbar.title = (currentLight!!.name ?: "")
-        }
+//        }
         return switchData
     }
 
