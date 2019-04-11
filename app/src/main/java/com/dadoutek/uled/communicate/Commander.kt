@@ -500,7 +500,8 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        if (t >= 10) {   //30次 * 200 = 6000, 也就是超过了2s就超时
+                        val timeOut=20
+                        if (t >= timeOut) {   //30次 * 200 = 6000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
                         } else if (mGetVersionSuccess) {
