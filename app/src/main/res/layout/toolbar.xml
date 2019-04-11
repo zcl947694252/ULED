@@ -64,6 +64,17 @@
             android:foreground="?android:attr/selectableItemBackground"
             />
 
+        <ImageView
+            android:id="@+id/image_bluetooth"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:src="@drawable/bluetooth_no"
+            android:visibility="gone"
+            android:foreground="?android:attr/selectableItemBackground" />
+
         <TextView
             android:id="@+id/btnStopGradient"
             android:layout_width="wrap_content"

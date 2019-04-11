@@ -456,7 +456,6 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             LogUtils.getConfig().setLog2FileSwitch(true)
             LogUtils.getConfig().setDir(LOG_PATH_DIR)
             SharedPreferencesUtils.setDeveloperModel(true)
-            SharedPreferencesUtils.saveUserDeveloperModel("true")
         }
     }
 

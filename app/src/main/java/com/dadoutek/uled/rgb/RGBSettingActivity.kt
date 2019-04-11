@@ -150,8 +150,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
                     mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                         if (granted!!) {
-                            val info = SharedPreferencesUtils.getUserDeveloperModelr()
-                            if(info=="true"){
+                            var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+                            if(isBoolean){
                                 transformView()
                             }else {
                                 OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)

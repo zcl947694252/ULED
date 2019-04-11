@@ -88,19 +88,9 @@ public class SharedPreferencesUtils {
                 Constant.USER_INFO,"");
     }
 
-    public static void saveUserDeveloperModel(String key){
-        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                Constant.DEVELOPER_MODEL,key);
-    }
-
     public static void saveUpdateFilePath(String path){
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
                 Constant.UPDATE_FILE_ADRESS,path);
-    }
-
-    public static String getUserDeveloperModelr(){
-        return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DEVELOPER_MODEL,"");
     }
 
     public static String getUpdateFilePath(){

@@ -36,6 +36,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -285,8 +286,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                         if (granted!!) {
-                            val info = SharedPreferencesUtils.getUserDeveloperModelr()
-                            if(info=="true"){
+                            var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+                            if(isBoolean){
                                 transformView()
                             }else {
                                 OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
@@ -582,24 +583,45 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        intent.putExtra("group", group)
 //        startActivity(intent)
 //        this?.finish()
-        editTitle.visibility=View.VISIBLE
-        titleCenterName.visibility=View.GONE
-        isRenameState=true
-        tvOta.setText(android.R.string.ok)
-        editTitle?.setFocusableInTouchMode(true)
-        editTitle?.setFocusable(true)
-        editTitle?.requestFocus()
-        //设置光标默认在最后
-        editTitle.setSelection(editTitle.getText().toString().length)
-//        btn_sure_edit_rename.visibility = View.VISIBLE
-//        btn_sure_edit_rename.setOnClickListener {
-//            saveName()
-//            btn_sure_edit_rename.visibility = View.GONE
-//        }
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
-        editTitle?.setOnEditorActionListener(this)
+//        editTitle.visibility=View.VISIBLE
+//        titleCenterName.visibility=View.GONE
+//        isRenameState=true
+//        tvOta.setText(android.R.string.ok)
+//        editTitle?.setFocusableInTouchMode(true)
+//        editTitle?.setFocusable(true)
+//        editTitle?.requestFocus()
+//        //设置光标默认在最后
+//        editTitle.setSelection(editTitle.getText().toString().length)
+////        btn_sure_edit_rename.visibility = View.VISIBLE
+////        btn_sure_edit_rename.setOnClickListener {
+////            saveName()
+////            btn_sure_edit_rename.visibility = View.GONE
+////        }
+//        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
+//        editTitle?.setOnEditorActionListener(this)
+        val textGp = EditText(this)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.setText(light?.name)
+        textGp.setSelection(textGp.getText().toString().length)
+        android.app.AlertDialog.Builder(this@NormalSettingActivity)
+                .setTitle(R.string.rename)
+                .setView(textGp)
+
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                    } else {
+                        light?.name=textGp.text.toString().trim { it <= ' ' }
+                        DBUtils.updateLight(light!!)
+                        toolbar.title=light?.name
+                        dialog.dismiss()
+                    }
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
+
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
         doWhichOperation(actionId)

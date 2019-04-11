@@ -72,6 +72,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -788,6 +789,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                     if (mConnectSuccessSnackBar?.isShown != true)
                         mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
                         mConnectSnackBar?.dismiss()
+
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
