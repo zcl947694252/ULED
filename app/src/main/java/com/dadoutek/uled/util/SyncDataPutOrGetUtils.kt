@@ -23,6 +23,7 @@ import okhttp3.RequestBody
 
 
 class SyncDataPutOrGetUtils {
+
     companion object {
 
         /********************************同步数据之上传数据 */
@@ -131,7 +132,6 @@ class SyncDataPutOrGetUtils {
                     when (type) {
                         Constant.DB_ADD -> {
                             val light = DBUtils.getLightByID(changeId)
-                            Log.d("addLight123:",light!!.productUUID.toString())
                             return LightModel.add(token, light!!, id, changeId)
                         }
                         Constant.DB_DELETE -> {
@@ -147,6 +147,27 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                 }
+
+                "DB_CONNECTOR"->{
+                    when (type) {
+                        Constant.DB_ADD -> {
+                            val light = DBUtils.getConnectorByID(changeId)
+                            return ConnectorModel.add(token, light!!, id, changeId)
+                        }
+                        Constant.DB_DELETE -> {
+                            return ConnectorModel.delete(token,
+                                    id, changeId.toInt())
+                        }
+                        Constant.DB_UPDATE -> {
+                            val light = DBUtils.getConnectorByID(changeId)
+                            if(light!=null){
+                                return ConnectorModel.update(token,light,
+                                        id, changeId.toInt())
+                            }
+                        }
+                    }
+                }
+
                 "DB_SWITCH" -> {
                     when (type) {
                         Constant.DB_ADD -> {
@@ -338,6 +359,8 @@ class SyncDataPutOrGetUtils {
             startGet(token, dbUser.account, syncCallBack)
         }
 
+        private var acc: String?=null
+
         private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
 
             NetworkFactory.getApi()
@@ -345,10 +368,10 @@ class SyncDataPutOrGetUtils {
                     .compose(NetworkTransformer())
                     .flatMap {
                         Log.d("itSize", it.size.toString())
+                        acc=accountNow
                         for (item in it) {
                             DBUtils.saveRegion(item, true)
                         }
-                        Log.d("itSize", it.size.toString())
                         if (it.size != 0) {
                             setupMesh()
                             SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
@@ -381,6 +404,14 @@ class SyncDataPutOrGetUtils {
                             DBUtils.saveSensor(item, true)
                         }
                         NetworkFactory.getApi()
+                                .getRelyList(token)
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                        for (item in it) {
+                            DBUtils.saveConnector(item, true)
+                        }
+                        NetworkFactory.getApi()
                                 .getCurtainList(token)
                                 .compose(NetworkTransformer())
                     }
@@ -404,6 +435,7 @@ class SyncDataPutOrGetUtils {
                                 .getGroupList(token)
                                 .compose(NetworkTransformer())
                     }
+
                     .flatMap {
                         for (item in it) {
                             DBUtils.saveGroup(item, true)
@@ -477,6 +509,8 @@ class SyncDataPutOrGetUtils {
                 application.setupMesh(mesh)
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
                 return
+            }else{
+                setupMeshCreat(this!!.acc!!)
             }
         }
 

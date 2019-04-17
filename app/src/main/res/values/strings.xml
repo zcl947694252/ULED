@@ -604,11 +604,14 @@
     <string name="install_tip2">First step\nPlease make sure the device is connected to the power </string>
     <string name="install_tip3">Step 2\nPlease make sure the device is not connected to the network</string>
     <string name="install_tip4">Step 3\nAdd devices via Bluetooth search</string>
+    <string name="switch_tip2">First step\nPlug the USB into the switch</string>
+    <string name="switch_tip3">Step 2\nPress any button</string>
+    <string name="switch_tip4">Step 3\nThe indicator on the right side of the bottom of the switch will be always on.</string>
     <string name="install_tip5">If you encounter problems, please try the following steps to reset the device </string>
     <string name="guide_tip_reset_light"> Lamp: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
     <string name="guide_tip_reset_switch"> panel switch: Connect the power supply while holding down the upper left button and the lower right button in the switch button. The blue light will always be on during the period. </string>
     <string name="guide_tip_reset_sensor">Connect the power for 1 second, disconnect the power for 1 second, repeat about 5–6 times until the sensor flashes. </string>
-    <string name="guide_tip_reset_curtain">Curtain: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
+    <string name="guide_tip_reset_curtain">Curtain: Long press the button at the bottom of the curtain for 5 seconds. The indicator is always on. Let go and press the button again until the indicator flashes for 3 times. </string>
 
     <!--窗帘相关-->
     <string name="up">up</string>
@@ -649,4 +652,21 @@
     <string name="slow_up_the_cache_cancel">cancel slow up the cache</string>
 
     <string name="hand_cancel">Hand cancel</string>
+
+    <string name="delete_user">Make sure to delete the phone number？</string>
+
+    <string name="connector">Bluetooth Connector</string>
+
+
+    <string name="scan_connector_num">Total: %1$s connector are currently scanned</string>
+    <string name="title_connector_lights_num">Scanning %1$d</string>
+    <string name="title_connector_lights_num_total">%1$d)</string>
+    <string name="have_connector_no_group_tip">There are no connector grouping, please complete the grouping operation</string>
+    <string name="grouping_connector_wait_tip">There are currently %1$s connector grouping, please wait!</string>
+    <string name="selected_connector_tip">Please Select at Least ONE Connector to Group</string>
+    <string name="connector_fail_tip">There is a connector grouped failed, please check and try again!</string>
+
+    <string name="device_page">This functionality has been moved to the device page!</string>
+
+    <string name="batch_group">批量分组</string>
 </resources>

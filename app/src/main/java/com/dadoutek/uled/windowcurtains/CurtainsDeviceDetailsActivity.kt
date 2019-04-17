@@ -14,6 +14,7 @@ import android.support.v7.widget.*
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
@@ -286,6 +287,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
+                    var root=findViewById<LinearLayout>(R.id.root)
                     root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }

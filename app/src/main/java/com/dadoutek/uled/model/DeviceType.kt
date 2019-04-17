@@ -13,4 +13,6 @@ object DeviceType {
     const val LIGHT_RGB: Int = 0x06
     const val SMART_CURTAIN: Int = 0x10
     const val SMART_CURTAIN_SWITCH: Int = 0x25
+    const val SMART_CONNECTOR: Int = 0x05
+    const val USER_CHANNEL = "dadou"
 }

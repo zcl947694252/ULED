@@ -14,4 +14,6 @@ public class ItemGroup implements Serializable {
     public String gpName = "";
     public boolean enableCheck=false;
     public boolean checked=false;
+    public int deviceType;
+    public boolean isNo=true;
 }

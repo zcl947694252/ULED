@@ -1,34 +1,61 @@
 package com.dadoutek.uled.user
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.os.PowerManager
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
+import android.support.v7.util.DiffUtil
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
+import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.curtain.CurtainOfGroupActivity
+import com.dadoutek.uled.group.GroupListRecycleViewAdapter
+import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.light.LightsOfGroupActivity
+import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.xiaomi.market.sdk.Log
 import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/15.
@@ -42,11 +69,21 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private var mWakeLock: PowerManager.WakeLock? = null
     private var SAVE_USER_NAME_KEY="SAVE_USER_NAME_KEY"
     private var SAVE_USER_PW_KEY="SAVE_USER_PW_KEY"
+    private var recyclerView: RecyclerView? = null
+    private var adapter: PhoneListRecycleViewAdapter? = null
+    private var phoneList:ArrayList<DbUser>?=null
+    private var isPhone=true
+    private var currentUser: DbUser? = null
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        phoneList= DBUtils.getAllUser()
+        Log.d("dataSize", phoneList!!.size.toString())
+        if(phoneList!!.size==0){
+            date_phone.visibility=View.GONE
+        }
         detectUpdate()
 
         //页面存在耗时操作 需要保持屏幕常亮
@@ -63,6 +100,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         initData()
         initView()
     }
+
 
     override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
         outState?.putString(SAVE_USER_NAME_KEY,phone)
@@ -111,10 +149,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
         }
+        recyclerView = findViewById(R.id.list_phone)
 
         btn_login.setOnClickListener(this)
         btn_register.setOnClickListener(this)
         forget_password.setOnClickListener(this)
+        date_phone.setOnClickListener(this)
 
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email!!.editText)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password!!.editText)
@@ -136,7 +176,135 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                 startActivity(intent)
             }
             R.id.forget_password -> forgetPassword()
+            R.id.date_phone->phoneList()
         }
+    }
+
+    private fun phoneList() {
+        if(isPhone){
+            list_phone.visibility=View.VISIBLE
+            edit_user_password.visibility=View.GONE
+            btn_login.visibility=View.GONE
+            btn_register.visibility=View.GONE
+            forget_password.visibility=View.GONE
+            val layoutmanager = LinearLayoutManager(this)
+            layoutmanager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView!!.layoutManager = layoutmanager
+            this.adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list,phoneList!!)
+
+            val decoration = DividerItemDecoration(this,
+                    DividerItemDecoration
+                            .VERTICAL)
+            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                    .divider)))
+            //添加分割线
+            recyclerView?.addItemDecoration(decoration)
+            recyclerView?.itemAnimator = DefaultItemAnimator()
+
+//        adapter!!.addFooterView(getFooterView())
+            adapter!!.bindToRecyclerView(recyclerView)
+            adapter!!.onItemChildClickListener = onItemChildClickListener
+            isPhone=false
+            date_phone.setImageResource(R.drawable.up)
+        }else{
+            list_phone.visibility=View.GONE
+            edit_user_password.visibility=View.VISIBLE
+            btn_login.visibility=View.VISIBLE
+            btn_register.visibility=View.VISIBLE
+            forget_password.visibility=View.VISIBLE
+            isPhone=true
+            date_phone.setImageResource(R.drawable.down)
+        }
+    }
+
+    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        currentUser = phoneList?.get(position)
+        if(view.id==R.id.phone_text){
+            edit_user_phone_or_email!!.editText!!.setText(currentUser!!.phone)
+            edit_user_password!!.editText!!.setText(currentUser!!.password)
+            list_phone.visibility=View.GONE
+            login()
+      }
+        if(view.id==R.id.delete_image){
+            AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_user)
+                    .setPositiveButton(android.R.string.ok) { dialog, which ->
+                      DBUtils.deleteUser(currentUser!!)
+                      newPhoneList()
+                    }
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show()
+        }
+     }
+
+    private fun newPhoneList() {
+        var message:List<String>?=null
+        val info = SharedPreferencesUtils.getLastUser()
+        if (info != null && !info.isEmpty()) {
+            message = info.split("-")
+            edit_user_phone_or_email!!.editText!!.setText(message[0])
+            edit_user_password!!.editText!!.setText(message[1])
+        }
+        if(currentUser!!.phone== message!![0]){
+            SharedPreferencesHelper.removeKey(this,Constant.USER_INFO)
+            edit_user_phone_or_email!!.editText!!.setText("")
+            edit_user_password!!.editText!!.setText("")
+            list_phone.visibility=View.GONE
+            edit_user_password.visibility=View.VISIBLE
+            btn_login.visibility=View.VISIBLE
+            btn_register.visibility=View.VISIBLE
+            forget_password.visibility=View.VISIBLE
+            isPhone=true
+            date_phone.setImageResource(R.drawable.down)
+        }
+        notifyData()
+    }
+
+    fun notifyData() {
+        val mOldDatas: MutableList<DbUser>? = phoneList
+        val mNewDatas: MutableList<DbUser>? = getNewData()
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
+                (newItemPosition)?.id) ?: false
+            }
+
+            override fun getOldListSize(): Int {
+                return mOldDatas?.size ?: 0
+            }
+
+            override fun getNewListSize(): Int {
+                return mNewDatas?.size ?: 0
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val beanOld = mOldDatas?.get(oldItemPosition)
+                val beanNew = mNewDatas?.get(newItemPosition)
+                return if (!beanOld?.name.equals(beanNew?.name)) {
+                    return false//如果有内容不同，就返回false
+                } else true
+
+            }
+        }, true)
+        adapter?.let { diffResult.dispatchUpdatesTo(it) }
+        phoneList = (mNewDatas as ArrayList<DbUser>?)!!
+        if(phoneList!!.size==0){
+                list_phone.visibility=View.GONE
+                edit_user_password.visibility=View.VISIBLE
+                btn_login.visibility=View.VISIBLE
+                btn_register.visibility=View.VISIBLE
+                forget_password.visibility=View.VISIBLE
+                isPhone=true
+                date_phone.visibility=View.GONE
+            }else{
+            adapter!!.setNewData(phoneList)
+        }
+
+    }
+
+    private fun getNewData(): MutableList<DbUser> {
+        phoneList = DBUtils.getAllUser()
+
+        return phoneList as ArrayList<DbUser>
     }
 
     private fun forgetPassword() {
@@ -170,6 +338,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
 //                            showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                            SharedPreferencesUtils.setUserLogin(true)
                         }
 
                         override fun onError(e: Throwable) {

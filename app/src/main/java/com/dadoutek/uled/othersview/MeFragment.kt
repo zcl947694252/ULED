@@ -34,6 +34,7 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceResetGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
@@ -135,6 +136,18 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
             for (i in groupList.indices) {
                 lightList.addAll(DBUtils.getCurtainByGroupID(groupList[i].id!!))
+            }
+            return lightList
+        }
+
+
+    private val allRely: List<DbConnector>
+        get() {
+            val groupList = DBUtils.groupList
+            val lightList = ArrayList<DbConnector>()
+
+            for (i in groupList.indices) {
+                lightList.addAll(DBUtils.getConnectorByGroupID(groupList[i].id!!))
             }
             return lightList
         }
@@ -349,32 +362,39 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, true)
         val lightList = allLights
         val curtainList=allCutain
-        Commander.resetLights(lightList, {
-            SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
-            syncData()
-//            hideLoadingDialog()
-            activity?.bnve?.currentItem=0
-            null
-        }, {
-//            ToastUtils.showLong(R.string.error_disconnect_tip)
-            SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
-//            hideLoadingDialog()
-            null
-        })
+        val relyList = allRely
+        var meshAdre= ArrayList<Int>()
+        if(lightList.size>0){
+            for(k in lightList.indices){
+                meshAdre.add(lightList[k].meshAddr)
+            }
+        }
 
-        Commander.resetCurtain(curtainList, {
-            SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
-            syncData()
-//            hideLoadingDialog()
-            activity?.bnve?.currentItem=0
-            null
-        }, {
-//            ToastUtils.showLong(R.string.error_disconnect_tip)
-            SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
-//            hideLoadingDialog()
-            null
-        })
-        if(lightList.isEmpty() && curtainList.isEmpty()){
+        if(curtainList.size>0){
+            for(k in curtainList.indices){
+                meshAdre.add(curtainList[k].meshAddr)
+            }
+        }
+
+        if(relyList.size>0){
+            for(k in relyList.indices){
+                meshAdre.add(relyList[k].meshAddr)
+            }
+        }
+
+        if(curtainList.size>0){
+            Commander.resetLights(meshAdre, {
+                SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
+                syncData()
+                activity?.bnve?.currentItem=0
+                null
+            }, {
+                SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
+                null
+            })
+        }
+
+        if(lightList.isEmpty() && curtainList.isEmpty() && relyList.isEmpty()){
             hideLoadingDialog()
             ToastUtils.showLong(R.string.successful_resumption)
         }
@@ -426,7 +446,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
     private fun exitLogin() {
         isClickExlogin = true
-        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size==0 && !DBUtils.dataChangeAllHaveAboutCurtain) {
+        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size==0 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.size == 0 && !DBUtils.dataChangeAllHaveAboutRelay) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                 TelinkLightService.Instance().disconnect()

@@ -28,6 +28,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.R.string.grouping
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.group.BatchGroupActivity
+import com.dadoutek.uled.group.LightGroupingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType
@@ -64,6 +66,7 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -163,7 +166,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         }
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
+                toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
@@ -225,7 +228,18 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
     private fun initDate() {
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                lightsData = DBUtils.getAllNormalLight()
+//                lightsData = DBUtils.getAllNormalLight()
+//                if(lightsData.size>0){
+//                   toolbar!!.tv_function1.visibility=View.VISIBLE
+//                   var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+//                    batchGroup.setText(R.string.batch_group)
+//                    batchGroup.setOnClickListener(View.OnClickListener {
+//                        val intent = Intent(this,
+//                                BatchGroupActivity::class.java)
+//                        startActivity(intent)
+//                        this!!.finish()
+//                    })
+//                }
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 lightsData = DBUtils.getAllRGBLight()
@@ -309,7 +323,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         lightsData = mNewDatas!!
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
+                toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
@@ -351,8 +365,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
-                        LeBluetooth.getInstance().enable(applicationContext)
+                        var root= this@DeviceDetailAct.findViewById<LinearLayout>(R.id.root)
+                        root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
+                            LeBluetooth.getInstance().enable(applicationContext)
                     }
                 }
             } else {

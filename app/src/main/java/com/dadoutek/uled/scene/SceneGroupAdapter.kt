@@ -38,14 +38,43 @@ class SceneGroupAdapter
             (0xff0000 shl 8) or (item.color and 0xffffff))
         helper.setProgress(R.id.sbBrightness, item.brightness)
         helper.setProgress(R.id.sbTemperature, item.temperature)
-        helper.setText(R.id.tvBrightness, sbBrightness.progress.toString() + "%")
-        helper.setText(R.id.tvTemperature, sBtemperature.progress.toString() + "%")
+//        if(sbBrightness.progress.toString()!="-1" || sbBrightness.progress.toString()!="-2"){
+            helper.setText(R.id.tvBrightness, sbBrightness.progress.toString() + "%")
+            helper.setText(R.id.tvTemperature, sBtemperature.progress.toString() + "%")
+//        }else{
+//            if(sbBrightness.progress.toString()=="-1"){
+//                helper.setChecked(R.id.rg_xx,true)
+//            }else{
+//                helper.setChecked(R.id.rg_yy,true)
+//            }
+//        }
+
         if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
             helper.setGone(R.id.scene_rgb_layout, true)
             helper.setGone(R.id.sb_temperature_layout, false)
-        } else {
+        } else  if(OtherUtils.isNormalGroup(DBUtils.getGroupByMesh(item.groupAress))){
             helper.setGone(R.id.scene_rgb_layout, false)
             helper.setGone(R.id.sb_temperature_layout, true)
+        }else if(OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAress))){
+            helper.setGone(R.id.scene_rgb_layout,false)
+            helper.setGone(R.id.sb_temperature_layout,false)
+            helper.setGone(R.id.linearLayout2,false)
+            helper.setGone(R.id.scene_switch_layout,true)
+            if(item.isNo){
+                helper.setChecked(R.id.rg_xx,true)
+            }else{
+                helper.setChecked(R.id.rg_yy,true)
+            }
+        }else{
+            helper.setGone(R.id.scene_rgb_layout,false)
+            helper.setGone(R.id.sb_temperature_layout,false)
+            helper.setGone(R.id.linearLayout2,false)
+            helper.setGone(R.id.scene_switch_layout,true)
+            if(item.isNo){
+                helper.setChecked(R.id.rg_xx,true)
+            }else{
+                helper.setChecked(R.id.rg_yy,true)
+            }
         }
 
         sbBrightness.tag = position
@@ -54,6 +83,8 @@ class SceneGroupAdapter
         sBtemperature.setOnSeekBarChangeListener(this)
         helper.addOnClickListener(R.id.btn_delete)
         helper.addOnClickListener(R.id.rgb_view)
+        helper.addOnClickListener(R.id.rg_xx)
+        helper.addOnClickListener(R.id.rg_yy)
     }
 
 

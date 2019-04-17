@@ -24,20 +24,27 @@ public class DbSceneActions {
     private int brightness;
 
     public int color=0xffffff;//颜色;
-    
+
+    private boolean isOn;
+
+    private int deviceType;
+
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
 
-    @Generated(hash = 1872468931)
+    @Generated(hash = 1303864798)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
-            int colorTemperature, int brightness, int color) {
+            int colorTemperature, int brightness, int color, boolean isOn,
+            int deviceType) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
         this.colorTemperature = colorTemperature;
         this.brightness = brightness;
         this.color = color;
+        this.isOn = isOn;
+        this.deviceType = deviceType;
     }
 
     public Long getId() {
@@ -86,5 +93,21 @@ public class DbSceneActions {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public boolean getIsOn() {
+        return this.isOn;
+    }
+
+    public void setIsOn(boolean isOn) {
+        this.isOn = isOn;
+    }
+
+    public int getDeviceType() {
+        return this.deviceType;
+    }
+
+    public void setDeviceType(int deviceType) {
+        this.deviceType = deviceType;
     }
 }

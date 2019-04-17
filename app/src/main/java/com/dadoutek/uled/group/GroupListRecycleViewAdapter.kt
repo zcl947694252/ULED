@@ -60,6 +60,16 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
                  }
             }
             helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+curtainNum+")")
+        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.connector)){
+            var num:Int?=null
+            var curtainNum:Int=0
+            for(i in itemTypeGroup.list!!.indices){
+                if(OtherUtils.isConnector(itemTypeGroup.list[i])){
+                    num=DBUtils.getConnectorByGroupID(itemTypeGroup.list[i].id).size
+                    curtainNum+=num
+                }
+            }
+            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+curtainNum+")")
         }
         if(itemTypeGroup.icon!=0){
             helper.setBackgroundRes(R.id.device_img, itemTypeGroup.icon)
@@ -70,14 +80,14 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
         recyclerViewChild!!.layoutManager = layoutmanager
         this.adapter = GroupListRecycleViewChildAdapter(R.layout.group_item_child, itemTypeGroup!!.list)
 
-        val decoration = DividerItemDecoration(mContext,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(mContext, R.color
-                .divider)))
+//        val decoration = DividerItemDecoration(mContext,
+//                DividerItemDecoration
+//                        .VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(mContext, R.color
+//                .divider)))
         //添加分割线
-//        recyclerView?.addItemDecoration(decoration)
-        recyclerViewChild?.itemAnimator = DefaultItemAnimator() as RecyclerView.ItemAnimator?
+////        recyclerView?.addItemDecoration(decoration)
+//        recyclerViewChild?.itemAnimator = DefaultItemAnimator() as RecyclerView.ItemAnimator?
 
         adapter!!.setOnItemChildClickListener { adapter, view, position ->
             onItemChildClickListener1.onItemChildClick(adapter,view,position,helper.adapterPosition)

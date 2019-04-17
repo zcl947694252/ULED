@@ -59,6 +59,12 @@ public class SharedPreferencesUtils {
         return list;
     }
 
+    //true表示用于已登陆此版本
+    public static void setUserLogin(boolean model){
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
+                Constant.USER_LOGIN,model);
+    }
+
     //true表示处于开发者模式，false标书用户模式
     public static void setDeveloperModel(boolean model){
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),

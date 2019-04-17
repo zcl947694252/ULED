@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DbColorNodeDao;
+import com.dadoutek.uled.dao.DbConnectorDao;
 import com.dadoutek.uled.dao.DbCurtainDao;
 import com.dadoutek.uled.dao.DbDataChangeDao;
 import com.dadoutek.uled.dao.DbDeleteGroupDao;
@@ -19,6 +20,7 @@ import com.dadoutek.uled.dao.DbSwitchDao;
 import com.dadoutek.uled.dao.DbUserDao;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbColorNode;
+import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbDiyGradient;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -44,7 +46,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
             MigrationHelper.migrate(db,DbRegionDao.class,DbGroupDao.class,
                     DbLightDao.class,DbDataChangeDao.class,DbDeleteGroupDao.class,
                     DbSceneDao.class,DbSceneActionsDao.class,DbUserDao.class,DbDiyGradientDao.class,
-                    DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class);
+                    DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class, DbConnectorDao.class);
         }
 
         switch (oldVersion) {

@@ -35,7 +35,7 @@ object CurtainMdodel {
 
     fun delete(token: String,  id: Long,  lid: Int): Observable<String>? {
         return NetworkFactory.getApi()
-                .deleteLight(token,lid)
+                .deleteCurtain(token,lid)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

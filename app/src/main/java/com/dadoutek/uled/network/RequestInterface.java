@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network;
 
+import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbDeleteGradientBody;
 import com.dadoutek.uled.model.DbModel.DbDiyGradient;
@@ -280,11 +281,34 @@ public interface RequestInterface {
     Observable<Response<String>> deleteSensor(@Header("token") String token,
                                               @Path("lid") int lid);
 
+    //添加连接器
+    @POST("relay/add/{lid}")
+    Observable<Response<String>> addRely(@Header("token") String token,
+                                           @Body DbConnector dbConnector,
+                                           @Path("lid") int lid);
+
+    //获取连接器列表
+    @GET("relay/list")
+    Observable<Response<List<DbConnector>>> getRelyList(@Header("token") String token);
+
+    //更新连接器
+    @POST("relay/add/{lid}")
+    Observable<Response<String>> updateRely(@Header("token") String token,
+                                              @Path("lid") int lid,
+                                              @Body DbConnector dbConnector
+    );
+
+    //删除连接器
+    //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
+    @DELETE("relay/remove/{lid}")
+    Observable<Response<String>> deleteRely(@Header("token") String token,
+                                              @Path("lid") int lid);
+
     //添加窗帘
     @POST("curtain/add/{lid}")
     Observable<Response<String>> addCurtain(@Header("token") String token,
-                                           @Body DbCurtain dbCurtain,
-                                           @Path("lid") int lid);
+                                            @Body DbCurtain dbCurtain,
+                                            @Path("lid") int lid);
 
     //获取窗帘列表
     @GET("curtain/list")
@@ -293,15 +317,15 @@ public interface RequestInterface {
     //更新窗帘
     @POST("curtain/add/{lid}")
     Observable<Response<String>> updateCurtain(@Header("token") String token,
-                                              @Path("lid") int lid,
-                                              @Body DbCurtain dbCurtain
+                                               @Path("lid") int lid,
+                                               @Body DbCurtain dbCurtain
     );
 
     //删除窗帘
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("curtain/remove/{lid}")
     Observable<Response<String>> deleteCurtain(@Header("token") String token,
-                                              @Path("lid") int lid);
+                                               @Path("lid") int lid);
 
     @GET("app/isAvailable")
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)

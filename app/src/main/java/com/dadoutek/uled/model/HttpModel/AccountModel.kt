@@ -16,7 +16,9 @@ import kotlinx.coroutines.launch
 
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
+    var userPassword:String?=null
     fun login(phone: String, password: String, channel: String): Observable<DbUser> {
+        userPassword=password
         lateinit var account: String
         return NetworkFactory.getApi()
                 .getAccount(phone, "dadou")
@@ -133,9 +135,12 @@ object AccountModel {
         //数据库分库
         DaoSessionInstance.destroySession()
         DaoSessionInstance.getInstance()
-
+        DaoSessionUser.destroySession()
+        DaoSessionUser.getInstance()
 
         DBUtils.saveUser(user)
+        user.password= userPassword
+        DBUtils.saveUserDao(user)
     }
 
     private fun setIsLogin(isLogin: Boolean) {

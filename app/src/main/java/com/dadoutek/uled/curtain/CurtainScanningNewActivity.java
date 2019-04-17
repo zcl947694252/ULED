@@ -251,7 +251,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private boolean hasGroup() {
-        if (groups.size() == 0) {
+        if (groups.size() == -1) {
             groups = new ArrayList<>();
             return false;
         } else {
@@ -562,9 +562,11 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
             isSelectAll = false;
         }
 
-        for (int i = 0; i < selectLights.size(); i++) {
-            //让选中的灯停下来别再发闪的命令了。
-            stopBlink(selectLights.get(i));
+        if(selectLights.size()>0){
+            for (int i = 0; i < selectLights.size(); i++) {
+                //让选中的灯停下来别再发闪的命令了。
+                stopBlink(selectLights.get(i));
+            }
         }
 
         setGroupOneByOne(group, selectLights, 0);

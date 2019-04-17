@@ -43,8 +43,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
-        super.onStart()
-    }
+    super.onStart()
+}
 
     //增加全局监听蓝牙开启状态
     private fun showOpenBluetoothDialog(context: Context) {

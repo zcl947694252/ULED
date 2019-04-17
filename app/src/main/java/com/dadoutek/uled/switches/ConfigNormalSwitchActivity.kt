@@ -174,6 +174,19 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                                         mIsConfiguring = false
                                     }
                                 })
+                    setGroupForSwitch()
+                    Thread.sleep(800)
+                    Commander.updateMeshName(successCallback = {
+                    mIsConfiguring = true
+                    disconnect()
+                    },
+                     failedCallback = {
+                     mConfigFailSnackbar=snackbar(configGroupRoot, getString(R.string.group_failed))
+                     GlobalScope.launch(Dispatchers.Main) {
+                     progressBar.visibility = View.GONE
+                     mIsConfiguring = false
+                                }
+                            })
                     }).start()
                 } else {
                     snackbar(view, getString(R.string.please_select_group))

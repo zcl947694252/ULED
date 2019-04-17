@@ -8,6 +8,7 @@ import android.widget.EditText;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
+import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbSwitch;
@@ -185,6 +186,20 @@ public class StringUtils {
         }else{
             return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
         }
+    }
+
+    public static String getConnectorName(DbConnector connector){
+        if(DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId())==null){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }
+
+        //如果当前灯没分组  显示未分组
+        if(DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getMeshAddr()==0xffff){
+            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+        }else{
+            return DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getName();
+        }
+
     }
 
     public static String getCurtainName(DbCurtain curtain) {

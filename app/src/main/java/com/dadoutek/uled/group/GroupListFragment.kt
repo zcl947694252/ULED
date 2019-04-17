@@ -15,6 +15,7 @@ import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
@@ -22,6 +23,8 @@ import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.connector.ConnectorOfGroupActivity
+import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
@@ -69,7 +72,7 @@ class GroupListFragment : BaseFragment() {
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
-    private var sharedPreferences:SharedPreferences?=null
+    private var sharedPreferences: SharedPreferences? = null
 
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
@@ -126,10 +129,10 @@ class GroupListFragment : BaseFragment() {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
             act?.addEventListeners()
-            if(Constant.isCreat){
+            if (Constant.isCreat) {
                 refreshAndMoveBottom()
-                Constant.isCreat=false
-            }else{
+                Constant.isCreat = false
+            } else {
                 refreshView()
             }
 
@@ -190,11 +193,10 @@ class GroupListFragment : BaseFragment() {
         showList = gpList
 
 
-
         val layoutmanager = LinearLayoutManager(activity)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
-        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener,showList!!)
+        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
 
         val decoration = DividerItemDecoration(activity!!,
                 DividerItemDecoration
@@ -275,7 +277,7 @@ class GroupListFragment : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT,activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT, activity!!)
                         refreshAndMoveBottom()
                         dialog.dismiss()
                     }
@@ -283,13 +285,13 @@ class GroupListFragment : BaseFragment() {
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
-    private fun refreshAndMoveBottom(){
+    private fun refreshAndMoveBottom() {
         refreshView()
         recyclerView?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun refreshView() {
-        if(activity!=null){
+        if (activity != null) {
             gpList = DBUtils.getgroupListWithType(activity!!)
 
             showList = ArrayList()
@@ -298,20 +300,19 @@ class GroupListFragment : BaseFragment() {
             val layoutmanager = LinearLayoutManager(activity)
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView?.layoutManager = layoutmanager
-            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener,showList!!)
+            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
 
-            val decoration = DividerItemDecoration(activity,
-                    DividerItemDecoration
-                            .VERTICAL)
-            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                    .divider)))
+//            val decoration = DividerItemDecoration(activity,
+//                    DividerItemDecoration
+//                            .VERTICAL)
+//            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+//                    .divider)))
             //添加分割线
-            recyclerView?.addItemDecoration(decoration)
+//            recyclerView?.addItemDecoration(decoration)
             recyclerView?.itemAnimator = DefaultItemAnimator()
 
 //          adapter!!.addFooterView(getFooterView())
             adapter!!.bindToRecyclerView(recyclerView)
-
 //            setMove()
         }
     }
@@ -329,35 +330,43 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     when (view!!.getId()) {
                         R.id.btn_on -> {
-                                Commander.openOrCloseLights(dstAddr, true)
-                                updateLights(true, group)
+                            Commander.openOrCloseLights(dstAddr, true)
+                            updateLights(true, group)
                         }
                         R.id.btn_off -> {
-                                Commander.openOrCloseLights(dstAddr, false)
-                                updateLights(false, group)
+                            Commander.openOrCloseLights(dstAddr, false)
+                            updateLights(false, group)
                         }
                         R.id.btn_set -> {
                             intent = Intent(mContext, NormalSettingActivity::class.java)
                             if (OtherUtils.isRGBGroup(group) && group.meshAddr != 0xffff) {
                                 intent = Intent(mContext, RGBSettingActivity::class.java)
-                            }else if(OtherUtils.isCurtain(group)&& group.meshAddr != 0xffff){
-                                intent = Intent(mContext,WindowCurtainsActivity::class.java)
+                            } else if (OtherUtils.isCurtain(group) && group.meshAddr != 0xffff) {
+                                intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                            } else if (OtherUtils.isConnector(group) && group.meshAddr != 0xfffff) {
+                                intent = Intent(mContext, ConnectorSettingActivity::class.java)
                             }
                             intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                             intent.putExtra("group", group)
                             startActivityForResult(intent, 2)
                         }
                         R.id.txt_name -> {
-                            if(group.meshAddr!=0xffff){
-                                if(group.deviceType==Constant.DEVICE_TYPE_CURTAIN){
+                            if (group.meshAddr != 0xffff) {
+                                if (group.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
                                     intent = Intent(mContext, CurtainOfGroupActivity::class.java)
                                     intent.putExtra("group", group)
                                     startActivityForResult(intent, 2)
-                                }else{
+                                } else if (group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
+                                    intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                                    intent.putExtra("group", group)
+                                    startActivityForResult(intent, 2)
+                                } else {
                                     intent = Intent(mContext, LightsOfGroupActivity::class.java)
                                     intent.putExtra("group", group)
                                     startActivityForResult(intent, 2)
                                 }
+                            } else if (group.deviceType == Constant.DEVICE_TYPE_NO) {
+                                Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
                             }
 
 //                        ActivityUtils.startActivityForResult(intent)
@@ -382,7 +391,7 @@ class GroupListFragment : BaseFragment() {
                 showInstallDeviceList()
             }
             R.id.create_group -> {
-                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -390,7 +399,7 @@ class GroupListFragment : BaseFragment() {
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -409,16 +418,16 @@ class GroupListFragment : BaseFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 //        refreshData()
-        if(requestCode==CREATE_SCENE_REQUESTCODE){
+        if (requestCode == CREATE_SCENE_REQUESTCODE) {
             callbackLinkMainActAndFragment?.changeToScene()
         }
     }
 
-    var callbackLinkMainActAndFragment:CallbackLinkMainActAndFragment?=null
+    var callbackLinkMainActAndFragment: CallbackLinkMainActAndFragment? = null
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if(context is CallbackLinkMainActAndFragment){
+        if (context is CallbackLinkMainActAndFragment) {
             callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
         }
     }
@@ -429,8 +438,8 @@ class GroupListFragment : BaseFragment() {
     }
 
     private fun showInstallDeviceList() {
-          dialog_pop.visibility=View.GONE
-          callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
+        dialog_pop.visibility = View.GONE
+        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide, isRgbClick)
     }
 
     private fun checkConnect() {

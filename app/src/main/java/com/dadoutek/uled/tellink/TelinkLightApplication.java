@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
+import com.dadoutek.uled.model.DaoSessionUser;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
@@ -42,13 +43,16 @@ public final class TelinkLightApplication extends TelinkApplication {
         super.onCreate();
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
         DaoSessionInstance.checkAndUpdateDatabase();
+        DaoSessionUser.checkAndUpdateDatabase();
 
         Utils.init(this);
         if (!AppUtils.isAppDebug()) {
             LogUtils.getConfig().setLogSwitch(false);
+//            LogUtils.getConfig().setLog2FileSwitch(false);
+        }else{
+//            LogUtils.getConfig().setLog2FileSwitch(true);
+            //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
         }
-        LogUtils.getConfig().setLog2FileSwitch(true);
-//        LogUtils.getConfig().setDir("/mnt/sdcard/log");
 
         MobSDK.init(this);
 //        CrashReport.testJavaCrash();

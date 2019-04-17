@@ -237,6 +237,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
                         showLoadingDialog(getString(R.string.sync_now))
                         SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                        SharedPreferencesUtils.setUserLogin(true)
                     }
 
                     override fun onError(e: Throwable) {

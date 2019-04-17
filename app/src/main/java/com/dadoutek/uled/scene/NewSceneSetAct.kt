@@ -43,7 +43,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var isToolbar= false
     private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private var showGroupList: ArrayList<ItemGroup>? = null
-    private var showCheckListData: ArrayList<DbGroup>? = null
+    private var showCheckListData: MutableList<DbGroup>? = null
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName:String?=null
@@ -51,6 +51,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     private var guideShowCurrentPage = false
     private val DATA_LIST_KEY="DATA_LIST_KEY"
     private val SCENE_KEY="SCENE_KEY"
+    private var isStatue: String? = null
+    private var isNo=true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,6 +196,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
                     itemGroup.brightness =actions[i].brightness
                     itemGroup.temperature = actions[i].colorTemperature
                     itemGroup.color=actions[i].color
+                    itemGroup.isNo=actions[i].isOn
                     item.checked = true
                     showGroupList!!.add(itemGroup)
                     groupMeshAddrArrayList.add(item.getMeshAddr())
@@ -206,14 +209,15 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
     }
 
     fun initChangeState(){
-        var list=DBUtils.allGroups
-        showCheckListData=ArrayList<DbGroup>()
-        for(h in list.indices){
-            if(!OtherUtils.isCurtain(list[h])){
-                showCheckListData!!.add(list[h])
-        }
-        }
+//        var list=DBUtils.allGroups
+//        showCheckListData=ArrayList<DbGroup>()
+//        for(h in list.indices){
+//            if(!OtherUtils.isCurtain(list[h])){
+//                showCheckListData!!.add(list[h])
+//        }
+//        }
 //        showCheckListData = DBUtils.allGroups
+        showCheckListData = DBUtils.allGroups
         if(showGroupList!!.size!=0){
             for(i in showCheckListData!!.indices){
                 for(j in showGroupList!!.indices){
@@ -296,7 +300,31 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
         when (view.id) {
             R.id.btn_delete -> delete(adapter, position)
             R.id.rgb_view -> changeToColorSelect(position)
+            R.id.rg_xx->open(position)
+            R.id.rg_yy->close(position)
         }
+    }
+
+    private fun close(position: Int) {
+//        Thread{
+//            var address= this!!.showCheckListData!![position].meshAddr
+//            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0C, 0x00, Opcode.CURTAIN_PACK_END)
+//            val opcode = Opcode.CURTAIN_ON_OFF
+//            TelinkLightService.Instance().sendCommandNoResponse(opcode,address,params)
+//            isStatue="false"
+//        }.start()
+        this!!.showGroupList!![position].isNo=false
+    }
+
+    private fun open(position: Int) {
+//        Thread{
+//            var address= this!!.showCheckListData!![position].meshAddr
+//            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0A, 0x00, Opcode.CURTAIN_PACK_END)
+//            val opcode = Opcode.CURTAIN_ON_OFF
+//            TelinkLightService.Instance().sendCommandNoResponse(opcode,address,params)
+//            isStatue="true"
+//        }.start()
+        this!!.showGroupList!![position].isNo=true
     }
 
     private fun changeToColorSelect(position: Int) {
@@ -394,6 +422,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
 //            }
 //        }
         this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, this!!.showCheckListData!!)
+        var  list= ArrayList<DbGroup>()
+        for(h in showCheckListData!!.indices){
+            if(!OtherUtils.isCurtain(showCheckListData!![h])||!OtherUtils.isConnector(showCheckListData!![h])){
+                list!!.add(showCheckListData!![h])
+            }
+        }
+        this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list!!)
 //        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
 //        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
 //        //添加分割线
@@ -552,6 +587,37 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
 
             for (i in itemGroups!!.indices) {
                 val sceneActions = DbSceneActions()
+
+                if(OtherUtils.isCurtain(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.deviceType=0x10
+                    sceneActions.isOn=itemGroups.get(i).isNo
+
+                    DBUtils.saveSceneActions(sceneActions)
+                }else if(OtherUtils.isConnector(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.deviceType=0x05
+                    sceneActions.isOn=itemGroups.get(i).isNo
+
+                    DBUtils.saveSceneActions(sceneActions)
+                }else{
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.deviceType=0x04
+
+                    DBUtils.saveSceneActions(sceneActions)
+                }
                 sceneActions.belongSceneId = idAction
                 sceneActions.brightness = itemGroups.get(i).brightness
                 sceneActions.setColor(itemGroups.get(i).color)
@@ -560,9 +626,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
                 //                sceneActions.setGroupAddr(0xFFFF);
                 //                DBUtils.saveSceneActions(sceneActions);
                 //                break;
-                //            } else {
-                sceneActions.groupAddr = itemGroups.get(i).groupAress
-                DBUtils.saveSceneActions(sceneActions)
+//                //            } else {
+//                sceneActions.groupAddr = itemGroups.get(i).groupAress
+//                DBUtils.saveSceneActions(sceneActions)
                 //            }
             }
 
@@ -600,10 +666,28 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
                 var green = color and 0x00ff00 shr 8
                 var blue = color and 0x0000ff
                 var w = color shr 24
+                var type=list[i].deviceType
+                if(type==0x10){
+                    if(list[i].isOn){
+                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x01)
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    }else{
+                        params = byteArrayOf(0x01, id.toByte(),light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x00)
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    }
+                }else if(type==0x05){
+                    if(list[i].isOn){
+                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x01)
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    }else{
+                        params = byteArrayOf(0x01, id.toByte(),light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x00)
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    }
+                }else {
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }
 
-
-                params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
             } while (count < 3)
         }
     }
@@ -649,15 +733,41 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
 
             for (i in itemGroups!!.indices) {
                 val sceneActions = DbSceneActions()
-                sceneActions.belongSceneId = idAction
-                sceneActions.brightness = itemGroups.get(i).brightness
-                sceneActions.colorTemperature = itemGroups.get(i).temperature
-                sceneActions.groupAddr = itemGroups.get(i).groupAress
-                sceneActions.setColor(itemGroups.get(i).color)
 
-                nameList.add(itemGroups.get(i).groupAress)
-                DBUtils.saveSceneActions(sceneActions)
-            }
+                if(OtherUtils.isCurtain(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.deviceType=0x10
+                    sceneActions.isOn=itemGroups.get(i).isNo
+
+                    nameList.add(itemGroups.get(i).groupAress)
+                    DBUtils.saveSceneActions(sceneActions)
+                }else if(OtherUtils.isConnector(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.deviceType=0x05
+                    sceneActions.isOn=itemGroups.get(i).isNo
+
+                    DBUtils.saveSceneActions(sceneActions)
+                }else{
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.deviceType=0x04
+
+                    nameList.add(itemGroups.get(i).groupAress)
+                    DBUtils.saveSceneActions(sceneActions)
+                }
+                    }
+
 
             isChange = compareList(nameList, groupMeshAddrArrayList)
 
@@ -703,8 +813,27 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener{
 
             val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
             Log.d("RGBCOLOR", logStr)
-            params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+            var type=list[i].deviceType
+            if(type==0x10){
+                if(list[i].isOn){
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x01)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }else{
+                    params = byteArrayOf(0x01, id.toByte(),light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x00)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }
+            }else if(type==0x05){
+                if(list[i].isOn){
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x01)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }else{
+                    params = byteArrayOf(0x01, id.toByte(),light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(),0x00)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }
+            }else {
+                params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+            }
         }
     }
 

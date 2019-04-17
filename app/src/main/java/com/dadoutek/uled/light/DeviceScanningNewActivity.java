@@ -212,8 +212,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             }
         } else {
             nowLightList.get(position).selected = false;
-            this.updateList.remove(light);
-            stopBlink(light);
+            if(light!=null){
+                stopBlink(light);
+                this.updateList.remove(light);
+            }
             if ((!isSelectLight()) && isAllLightsGrouped()) {
                 btnAddGroups.setText(R.string.complete);
             }
@@ -251,7 +253,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private boolean hasGroup() {
-        if (groups.size() == 0) {
+        if (groups.size() == -1) {
             groups = new ArrayList<>();
             return false;
         } else {
@@ -589,11 +591,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     public void onBackPressed() {
 //        super.onBackPressed();
         if (grouping) {
-            for (int i = 0; i < getCurrentSelectLights().size(); i++) {
-                //让选中的灯停下来别再发闪的命令了。
-                stopBlink(getCurrentSelectLights().get(i));
+            if(getCurrentSelectLights().size()>0){
+                for (int i = 0; i < getCurrentSelectLights().size(); i++) {
+                    //让选中的灯停下来别再发闪的命令了。
+                    stopBlink(getCurrentSelectLights().get(i));
+                }
+                doFinish();
             }
-            doFinish();
         } else {
             new AlertDialog.Builder(this)
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -1112,7 +1116,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 }
         }
 
-        if (groups.size() > 1) {
+        if (groups.size() > 0) {
             for (int i = 0; i < groups.size(); i++) {
                 if (i == groups.size() - 1) {
                     groups.get(i).checked = true;

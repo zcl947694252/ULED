@@ -265,7 +265,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
                         lightVersion!!.visibility = View.VISIBLE
                         lightVersion!!.text =  resources.getString(R.string.firmware_version,localVersion)
                         light!!.version = localVersion
-                        tvOta!!.visibility = View.VISIBLE
+                        tvOta!!.visibility = View.GONE
                     }
                 }
                 null
@@ -273,7 +273,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
                 if (toolbar.title != null) {
 //                    toolbar.title!!.visibility = View.GONE
                     lightVersion.visibility=View.VISIBLE
-                    tvOta!!.visibility = View.VISIBLE
+                    tvOta!!.visibility = View.GONE
                 }
                 null
             })

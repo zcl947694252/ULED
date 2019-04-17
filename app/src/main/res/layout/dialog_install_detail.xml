@@ -74,6 +74,7 @@
             />
 
         <TextView
+            android:id="@+id/step_one"
             android:text="@string/install_tip2"
             android:textSize="15sp"
             android:gravity="center_vertical"
@@ -88,6 +89,23 @@
             />
 
         <TextView
+            android:id="@+id/switch_step_one"
+            android:text="@string/switch_tip2"
+            android:textSize="15sp"
+            android:gravity="center_vertical"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18sp"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/rectangle_tip_install"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/step_two"
             android:text="@string/install_tip3"
             android:textSize="15sp"
             android:gravity="center_vertical"
@@ -102,7 +120,8 @@
             />
 
         <TextView
-            android:text="@string/install_tip4"
+            android:id="@+id/switch_step_two"
+            android:text="@string/switch_tip3"
             android:textSize="15sp"
             android:gravity="center_vertical"
             android:layout_marginStart="18dp"
@@ -113,6 +132,38 @@
             android:layout_width="match_parent"
             android:layout_height="70dp"
             android:background="@drawable/rectangle_tip_install"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/step_three"
+        android:text="@string/install_tip4"
+        android:textSize="15sp"
+        android:gravity="center_vertical"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18sp"
+        android:layout_marginTop="10dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@drawable/rectangle_tip_install"
+        />
+
+        <TextView
+            android:id="@+id/switch_step_three"
+            android:text="@string/switch_tip4"
+            android:textSize="15sp"
+            android:gravity="center_vertical"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18sp"
+            android:layout_marginTop="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:background="@drawable/rectangle_tip_install"
+            android:visibility="gone"
             />
 
         <TextView

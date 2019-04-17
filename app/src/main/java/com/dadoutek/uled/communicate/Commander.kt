@@ -92,7 +92,7 @@ object Commander : EventListener<String> {
     }
 
     @Synchronized
-    fun resetLights(lightList: List<DbLight>, successCallback: () -> Unit,
+    fun resetLights(lightList: List<Int>, successCallback: () -> Unit,
                     failedCallback: () -> Unit) {
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
@@ -105,7 +105,7 @@ object Commander : EventListener<String> {
             Thread {
                 //找到当前连接的灯的mesh地址
                 for (k in lightList.indices) {
-                    if (lightList[k].meshAddr == connectDeviceMeshAddr) {
+                    if (lightList[k] == connectDeviceMeshAddr) {
                         connectDeviceIndex = k
                         break
                     }
@@ -115,11 +115,27 @@ object Commander : EventListener<String> {
                 for (light in lightList) {
                     for (k in 0..resendCmdTime) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light.meshAddr, null)
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light, null)
                         Thread.sleep(sleepTime)
                     }
                     Thread.sleep(sleepTime)
-                    DBUtils.deleteLight(light)
+                    for(k in lightList.indices)
+                        if(DBUtils.getLightByMeshAddr(lightList[k])!=null){
+                            var ligh=DBUtils.getLightByMeshAddr(lightList[k])
+                            if (ligh != null) {
+                                DBUtils.deleteLight(ligh)
+                        }
+                        }else if(DBUtils.getCurtainByMeshAddr(lightList[k])!=null){
+                            var curtain=DBUtils.getCurtainByMeshAddr(lightList[k])
+                            if (curtain!= null) {
+                                DBUtils.deleteCurtain(curtain)
+                            }
+                    }else if(DBUtils.getRelyByMeshAddr(lightList[k])!=null){
+                            var rely=DBUtils.getRelyByMeshAddr(lightList[k])
+                            if (rely != null) {
+                                DBUtils.deleteConnector(rely)
+                            }
+                        }
                 }
                 GlobalScope.launch(Dispatchers.Main) {
                     successCallback.invoke()
@@ -219,8 +235,9 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
+                        val timeOut=30
                         LogUtils.d("mGroupSuccess = $mGroupSuccess")
-                        if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                        if (t >= timeOut) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
                         } else if (mGroupSuccess) {
@@ -319,7 +336,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                        if (t >= 30) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
                         } else if (mUpdateMeshSuccess) {
@@ -500,8 +517,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        val timeOut=20
-                        if (t >= timeOut) {   //30次 * 200 = 6000, 也就是超过了2s就超时
+                        if (t >= 10) {   //30次 * 200 = 6000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
                         } else if (mGetVersionSuccess) {

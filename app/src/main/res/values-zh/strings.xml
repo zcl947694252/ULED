@@ -550,11 +550,14 @@
     <string name="install_tip2">第一步\n\n请确保设备已经接上电源</string>
     <string name="install_tip3">第二步\n\n请确保设备未入网</string>
     <string name="install_tip4">第三步\n\n通过蓝牙搜索添加设备</string>
+    <string name="switch_tip2">第一步\n\n把USB插入开关</string>
+    <string name="switch_tip3">第二步\n\n按任意一个按键</string>
+    <string name="switch_tip4">第三步\n\n开关底部右边的指示灯会常亮</string>
     <string name="install_tip5">如果遇到问题,请尝试以下步骤复位设备</string>
     <string name="guide_tip_reset_light">灯：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
-    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。\n\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右上按键和开关键。期间蓝灯会常亮。</string>
+    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。\n\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右下按键和开关键。期间蓝灯会常亮。</string>
     <string name="guide_tip_reset_sensor">接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
-    <string name="guide_tip_reset_curtain">窗帘：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
+    <string name="guide_tip_reset_curtain">窗帘：长按窗帘底部按键5秒，指示灯常亮，松手，再长按按键，直到指示灯闪烁3次。</string>
 
     <!--窗帘相关-->
 
@@ -562,7 +565,7 @@
     <string name="down">下</string>
     <string name="accelerate">加速</string>
     <string name="slow_down">减速</string>
-    <string name="pause">暂停</string>
+    <string name="pause">停止</string>
     <string name="not_type">未分类</string>
 
     <string name="second_level">二级</string>
@@ -590,4 +593,18 @@
     <string name="slow_up_the_cache_cancel">取消缓起缓停</string>
 
     <string name="hand_cancel">手拉取消</string>
+    <string name="delete_user">确定删除该手机号？</string>
+    
+    <string name="connector">蓝牙接收器</string>
+    <string name="scan_connector_num">总计：当前扫描出了 %1$s 个链接器</string>
+    <string name="title_connector_lights_num">已扫到 %1$d 个链接器</string>
+    <string name="title_connector_lights_num_total">扫描完毕(已扫到%1$d个链接器)</string>
+    <string name="have_connector_no_group_tip">还有链接器没有分组，请完成分组操作</string>
+    <string name="grouping_connector_wait_tip">当前有%1$s个链接器正在分组，请稍候！</string>
+    <string name="selected_connector_tip">至少选择一个链接器进行分组</string>
+    <string name="connector_fail_tip">有链接器分组失败，请检查并重试！</string>
+    
+    <string name="device_page">此功能已转移到设备页面!</string>
+
+    <string name="batch_group">Batch Group</string>
 </resources>

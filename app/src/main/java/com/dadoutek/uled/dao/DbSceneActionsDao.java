@@ -33,6 +33,8 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         public final static Property ColorTemperature = new Property(3, int.class, "colorTemperature", false, "COLOR_TEMPERATURE");
         public final static Property Brightness = new Property(4, int.class, "brightness", false, "BRIGHTNESS");
         public final static Property Color = new Property(5, int.class, "color", false, "COLOR");
+        public final static Property IsOn = new Property(6, boolean.class, "isOn", false, "IS_ON");
+        public final static Property DeviceType = new Property(7, int.class, "deviceType", false, "DEVICE_TYPE");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -54,7 +56,9 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
                 "\"GROUP_ADDR\" INTEGER NOT NULL ," + // 2: groupAddr
                 "\"COLOR_TEMPERATURE\" INTEGER NOT NULL ," + // 3: colorTemperature
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
-                "\"COLOR\" INTEGER NOT NULL );"); // 5: color
+                "\"COLOR\" INTEGER NOT NULL ," + // 5: color
+                "\"IS_ON\" INTEGER NOT NULL ," + // 6: isOn
+                "\"DEVICE_TYPE\" INTEGER NOT NULL );"); // 7: deviceType
     }
 
     /** Drops the underlying database table. */
@@ -76,6 +80,8 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(4, entity.getColorTemperature());
         stmt.bindLong(5, entity.getBrightness());
         stmt.bindLong(6, entity.getColor());
+        stmt.bindLong(7, entity.getIsOn() ? 1L: 0L);
+        stmt.bindLong(8, entity.getDeviceType());
     }
 
     @Override
@@ -91,6 +97,8 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(4, entity.getColorTemperature());
         stmt.bindLong(5, entity.getBrightness());
         stmt.bindLong(6, entity.getColor());
+        stmt.bindLong(7, entity.getIsOn() ? 1L: 0L);
+        stmt.bindLong(8, entity.getDeviceType());
     }
 
     @Override
@@ -106,7 +114,9 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
             cursor.getInt(offset + 2), // groupAddr
             cursor.getInt(offset + 3), // colorTemperature
             cursor.getInt(offset + 4), // brightness
-            cursor.getInt(offset + 5) // color
+            cursor.getInt(offset + 5), // color
+            cursor.getShort(offset + 6) != 0, // isOn
+            cursor.getInt(offset + 7) // deviceType
         );
         return entity;
     }
@@ -119,6 +129,8 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         entity.setColorTemperature(cursor.getInt(offset + 3));
         entity.setBrightness(cursor.getInt(offset + 4));
         entity.setColor(cursor.getInt(offset + 5));
+        entity.setIsOn(cursor.getShort(offset + 6) != 0);
+        entity.setDeviceType(cursor.getInt(offset + 7));
      }
     
     @Override

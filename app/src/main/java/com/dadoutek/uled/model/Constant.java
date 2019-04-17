@@ -63,7 +63,7 @@ public class Constant implements Serializable {
     public static final String IS_LOGIN = "IS_LOGIN";
 
     //网络请求服务器测试地址
-//    public static final String BASE_URL = "http://tmp.ibeelink.com/";
+//    public static final String BASE_URL = "http://47.107.227.130/smartlight_test/";
 
     //网络请求服务器正式地址
     public static final String BASE_URL = "http://47.107.227.130/smartlight/";
@@ -94,6 +94,9 @@ public class Constant implements Serializable {
 
     //用户信息
     public static String USER_INFO = "USER_INFO";
+
+    //用户登录此版本
+    public static String USER_LOGIN="USER_LOGIN";
 
     //开发者模式
     public static String DEVELOPER_MODEL ="DEVELOPER_MODEL";
@@ -200,6 +203,7 @@ public class Constant implements Serializable {
     public static final int INSTALL_SWITCH=2;
     public static final int INSTALL_SENSOR=3;
     public static final int INSTALL_CURTAIN=4;
+    public static final int INSTALL_CONNECTOR=5;
 
     //分组标识
 
@@ -215,4 +219,6 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_LIGHT_RGB= Long.valueOf(0x06);
     //窗帘分组
     public static final Long DEVICE_TYPE_CURTAIN= Long.valueOf(0x10);
+    //连接器
+    public static final Long DEVICE_TYPE_CONNECTOR=Long.valueOf(0x05);
 }

@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -519,7 +520,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
+                    var root=findViewById<ConstraintLayout>(R.id.configPirRoot)
+                    root.indefiniteSnackbar( R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
                 }

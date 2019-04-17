@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -108,6 +109,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
     private var recyclerView: RecyclerView? = null
+    private var mConnectSnackBar: Snackbar? = null
+    private var mScanSnackBar: Snackbar? = null
 
     override fun onStart() {
         super.onStart()
@@ -560,6 +563,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
+                    var root=findViewById<ConstraintLayout>(R.id.configPirRoot)
                     root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
@@ -582,7 +586,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                 connectFailedDeviceMacList.clear()
                                 startScan()
                             }
-                            break;
+                            break
                         }
 
                     } else {
@@ -656,6 +660,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                 TelinkLightService.Instance().startScan(params)
                                 startCheckRSSITimer()
 
+
                             } else {
                                 //没有授予权限
                                 DialogUtils.showNoBlePermissionDialog(this, {
@@ -694,6 +699,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                 progressBar?.visibility = View.VISIBLE
                                 TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
+
                             }
                         } else {
                             //没有授予权限
@@ -843,6 +849,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 adapter?.notifyDataSetChanged()
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
+//            LightAdapter.STATUS_LOGOUT -> {
+//                retryConnect()
+//            }
             LightAdapter.STATUS_CONNECTING -> {
                 Log.d("connectting", "444")
                 scanPb.visibility = View.VISIBLE

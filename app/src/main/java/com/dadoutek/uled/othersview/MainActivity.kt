@@ -2,6 +2,7 @@ package com.dadoutek.uled.othersview
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanFilter
 import android.content.BroadcastReceiver
@@ -12,6 +13,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
+import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
@@ -32,11 +34,13 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.device.NewDevieFragment
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceListFragment
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
@@ -72,6 +76,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.dialog_install_detail.*
+import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -82,6 +88,7 @@ import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 import org.json.JSONException
 import org.json.JSONObject
+import org.w3c.dom.Text
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -119,6 +126,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     private var guideShowCurrentPage = false
     private var installId = 0
 
+    private lateinit var stepOneText:TextView
+    private lateinit var stepTwoText:TextView
+    private lateinit var stepThreeText:TextView
+    private lateinit var switchStepOne:TextView
+    private lateinit var switchStepTwo:TextView
+    private lateinit var swicthStepThree:TextView
+    internal var isClickExlogin = false
+
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -148,15 +163,109 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+//        var isLoginVersion= SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.USER_LOGIN,false)
+//        if(isLoginVersion){
+//
+//        }else{
+//            exitLogin()
+//        }
         var version=packageName(this)
+        var list=DBUtils.getAllUser()
+        com.xiaomi.market.sdk.Log.d("dataSize1", list.size.toString())
         detectUpdate()
+
 
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
-
         initBottomNavigation()
 
         isCreate=true
+    }
+
+    private fun exitLogin() {
+        isClickExlogin = true
+        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size==0 && !DBUtils.dataChangeAllHaveAboutCurtain) {
+            if (isClickExlogin) {
+                SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+                TelinkLightService.Instance().disconnect()
+                TelinkLightService.Instance().idleMode(true)
+
+                restartApplication()
+            }
+            hideLoadingDialog()
+        } else {
+            checkNetworkAndSync(this)
+        }
+
+    }
+
+    // 如果没有网络，则弹出网络设置对话框
+    fun checkNetworkAndSync(activity: Activity?) {
+        if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
+            android.app.AlertDialog.Builder(activity)
+                    .setTitle(R.string.network_tip_title)
+                    .setMessage(R.string.net_disconnect_tip_message)
+                    .setPositiveButton(android.R.string.ok
+                    ) { dialog, whichButton ->
+                        // 跳转到设置界面
+                        activity.startActivityForResult(Intent(
+                                Settings.ACTION_WIRELESS_SETTINGS),
+                                0)
+                    }.create().show()
+        } else {
+            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+        }
+    }
+
+    internal var syncCallback: SyncCallback = object : SyncCallback {
+
+        override fun start() {
+            showLoadingDialog(getString(R.string.tip_start_sync))
+        }
+
+        override fun complete() {
+            if (isClickExlogin) {
+                SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
+                TelinkLightService.Instance().disconnect()
+                TelinkLightService.Instance().idleMode(true)
+
+                restartApplication()
+            } else {
+                ToastUtils.showLong(getString(R.string.upload_data_success))
+            }
+            hideLoadingDialog()
+        }
+
+        override fun error(msg: String) {
+            if (isClickExlogin) {
+                android.app.AlertDialog.Builder(this@MainActivity)
+                        .setTitle(R.string.sync_error_exlogin)
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                            SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
+                            TelinkLightService.Instance().idleMode(true)
+                            dialog.dismiss()
+                            restartApplication()
+                        }
+                        .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which ->
+                            dialog.dismiss()
+                            isClickExlogin = false
+                            hideLoadingDialog()
+                        }.show()
+            } else {
+                isClickExlogin = false
+                hideLoadingDialog()
+            }
+
+            //            Log.d("SyncLog", "error: " + msg);
+            //            ToastUtils.showLong(getString(R.string.sync_error_contant));
+        }
+    }
+
+    //重启app并杀死原进程
+    private fun restartApplication() {
+        ActivityUtils.finishAllActivities(true)
+        ActivityUtils.startActivity(SplashActivity::class.java)
     }
 
     //防止viewpager嵌套fragment,fragment放置后台时间过长,fragment被系统回收了
@@ -226,6 +335,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         val view = View.inflate(this,R.layout.dialog_install_detail,null)
         val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack=view.findViewById<ImageView>(R.id.btnBack)
+        stepOneText = view.findViewById<TextView>(R.id.step_one)
+        stepTwoText = view.findViewById<TextView>(R.id.step_two)
+        stepThreeText = view.findViewById<TextView>(R.id.step_three)
+        switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
+        switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
+        swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
         val install_tip_question=view.findViewById<TextView>(R.id.install_tip_question)
         val search_bar=view.findViewById<Button>(R.id.search_bar)
         close_install_list.setOnClickListener(dialogOnclick)
@@ -293,6 +408,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                     }
                     INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    INSTALL_CONNECTOR -> {
+                        intent = Intent(this, ScanningConnectorActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        startActivityForResult(intent, 0)}
                 }
             }
             R.id.btnBack->{
@@ -330,6 +450,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     val INSTALL_SWITCH=2
     val INSTALL_SENSOR=3
     val INSTALL_CURTAIN=4
+    val INSTALL_CONNECTOR=5
 
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener {
         adapter, view, position ->
@@ -356,9 +477,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
             INSTALL_SWITCH -> {
                 installId=INSTALL_SWITCH
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                stepOneText.visibility = View.GONE
+                stepTwoText.visibility = View.GONE
+                stepThreeText.visibility = View.GONE
+                switchStepOne.visibility = View.VISIBLE
+                switchStepTwo.visibility = View.VISIBLE
+                swicthStepThree.visibility = View.VISIBLE
             }
             INSTALL_SENSOR -> {
                 installId=INSTALL_SENSOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            }
+            INSTALL_CONNECTOR->{
+                installId=INSTALL_CONNECTOR
                 showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
             }
         }
@@ -535,7 +666,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-                indefiniteSnackbar(root, R.string.openBluetooth, android.R.string.ok) {
+                root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                     LeBluetooth.getInstance().enable(applicationContext)
                 }
             } else {
@@ -769,7 +900,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
     }
 
-    private fun onDeviceStatusChanged(event: DeviceEvent) {
+       private fun onDeviceStatusChanged(event: DeviceEvent) {
 
         val deviceInfo = event.args
 
@@ -788,9 +919,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
 
                     if (mConnectSuccessSnackBar?.isShown != true)
                         mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
-                        mConnectSnackBar?.dismiss()
+                    mConnectSnackBar?.dismiss()
 
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+//                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
@@ -1082,4 +1213,5 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         }
         return super.onKeyDown(keyCode, event)
     }
+
 }

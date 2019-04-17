@@ -19,6 +19,7 @@ import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
 import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
@@ -233,6 +234,10 @@ class NewDevieFragment :BaseFragment(){
                 }
                 Constant.INSTALL_CURTAIN ->{
                     intent= Intent(activity,CurtainsDeviceDetailsActivity::class.java)
+                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN)
+                }
+                Constant.INSTALL_CONNECTOR->{
+                    intent= Intent(activity,ConnectorDeviceDetailActivity::class.java)
                     intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN)
                 }
             }
