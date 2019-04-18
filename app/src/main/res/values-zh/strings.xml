@@ -225,7 +225,7 @@
     <string name="tip_register_input_error">用户名或密码不能包含特殊字符</string>
     <string name="register_title_name">注册</string>
     <string name="login_bt_name">登录</string>
-    <string name="user_login_title">用户登录</string>
+    <string name="user_login_title">登录</string>
     <string name="logging_tip">正在登录</string>
     <string name="login_success">登录成功</string>
     <string name="user_register">用户注册</string>
@@ -558,6 +558,7 @@
     <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。\n\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右下按键和开关键。期间蓝灯会常亮。</string>
     <string name="guide_tip_reset_sensor">接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="guide_tip_reset_curtain">窗帘：长按窗帘底部按键5秒，指示灯常亮，松手，再长按按键，直到指示灯闪烁3次。</string>
+    <string name="guide_tip_reset_relay">蓝牙接收器：长按接收器的白色按钮5秒，直至蓝牙接收器闪烁。</string>
 
     <!--窗帘相关-->
 
@@ -606,5 +607,5 @@
     
     <string name="device_page">此功能已转移到设备页面!</string>
 
-    <string name="batch_group">Batch Group</string>
+    <string name="batch_group">批量分组</string>
 </resources>

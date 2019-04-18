@@ -37,6 +37,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.scene.SceneRecycleListAdapter
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -138,6 +139,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         initView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        inflater = this.layoutInflater
+        initDate()
+        initView()
+    }
+
     private fun initView() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
@@ -228,21 +237,34 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
     private fun initDate() {
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-//                lightsData = DBUtils.getAllNormalLight()
-//                if(lightsData.size>0){
-//                   toolbar!!.tv_function1.visibility=View.VISIBLE
-//                   var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
-//                    batchGroup.setText(R.string.batch_group)
-//                    batchGroup.setOnClickListener(View.OnClickListener {
-//                        val intent = Intent(this,
-//                                BatchGroupActivity::class.java)
-//                        startActivity(intent)
-//                        this!!.finish()
-//                    })
-//                }
+                lightsData = DBUtils.getAllNormalLight()
+                if(lightsData.size>0){
+                   toolbar!!.tv_function1.visibility=View.VISIBLE
+                   var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+                    batchGroup.setText(R.string.batch_group)
+                    batchGroup.setOnClickListener(View.OnClickListener {
+                        val intent = Intent(this,
+                                BatchGroupActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        startActivity(intent)
+                    })
+                }
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 lightsData = DBUtils.getAllRGBLight()
+                if(lightsData.size>0){
+                    toolbar!!.tv_function1.visibility=View.VISIBLE
+                    var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+                    batchGroup.setText(R.string.batch_group)
+                    batchGroup.setOnClickListener(View.OnClickListener {
+                        val intent = Intent(this,
+                                RgbBatchGroupActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        startActivity(intent)
+                    })
+                }
             }
         }
 //        lightList = ArrayList()

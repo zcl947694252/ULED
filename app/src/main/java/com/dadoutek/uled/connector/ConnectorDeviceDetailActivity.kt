@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
@@ -37,6 +38,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.windowcurtains.CurtainBatchGroupActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -57,6 +59,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -118,6 +121,13 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        inflater = this.layoutInflater
+        initDate()
+        initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         inflater = this.layoutInflater
         initDate()
         initView()
@@ -206,7 +216,20 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun initDate() {
-                lightsData = DBUtils.getAllConnctor()
+        lightsData = DBUtils.getAllConnctor()
+
+        if(lightsData.size>0){
+            toolbar!!.tv_function1.visibility=View.VISIBLE
+            var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+            batchGroup.setText(R.string.batch_group)
+            batchGroup.setOnClickListener(View.OnClickListener {
+                val intent = Intent(this,
+                        ConnectorBatchGroupActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                startActivity(intent)
+            })
+        }
 
 //        lightList = ArrayList()
 //        if (group.meshAddr == 0xffff) {

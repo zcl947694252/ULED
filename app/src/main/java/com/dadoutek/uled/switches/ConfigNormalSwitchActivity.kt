@@ -25,6 +25,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -438,7 +439,9 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
             group.checked = false
-            mGroupArrayList.add(group)
+            if(OtherUtils.isNormalGroup(group)){
+                mGroupArrayList.add(group)
+            }
         }
         if (groupList.size > 0) {
             groupList[0].checked = true

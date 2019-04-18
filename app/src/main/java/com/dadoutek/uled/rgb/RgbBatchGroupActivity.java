@@ -1,9 +1,7 @@
-package com.dadoutek.uled.group;
+package com.dadoutek.uled.rgb;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
@@ -34,34 +32,28 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.connector.ScanningConnectorActivity;
+import com.dadoutek.uled.group.BatchGroupActivity;
+import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.light.DeviceDetailAct;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DeviceType;
-import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.LogInfoActivity;
-import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
-import com.dadoutek.uled.util.AppUtils;
-import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
@@ -76,15 +68,10 @@ import com.telink.bluetooth.event.LeScanEvent;
 import com.telink.bluetooth.event.MeshEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
-import com.telink.bluetooth.light.ErrorReportInfo;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
-import com.telink.bluetooth.light.LeScanParameters;
-import com.telink.bluetooth.light.LeUpdateParameters;
 import com.telink.bluetooth.light.LightAdapter;
-import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.bluetooth.light.Parameters;
-import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
@@ -106,9 +93,7 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
-import static com.dadoutek.uled.model.Constant.VENDOR_ID;
-
-public class BatchGroupActivity extends TelinkMeshErrorDealActivity
+public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -379,7 +364,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-            finish();
+        finish();
     }
 
     @Override
@@ -696,7 +681,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         final EditText textGp = new EditText(this);
         textGp.setText(DBUtils.INSTANCE.getDefaultNewGroupName());
         StringUtils.initEditTextFilter(textGp);
-        AlertDialog.Builder builder = new AlertDialog.Builder(BatchGroupActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.create_new_group);
         builder.setIcon(android.R.drawable.ic_dialog_info);
         builder.setView(textGp);
@@ -707,10 +692,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showShort(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_LIGHT_NORMAL,this);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_LIGHT_RGB,this);
                 refreshView();
                 dialog.dismiss();
-                InputMethodManager imm = (InputMethodManager) BatchGroupActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 guideStep2();
             }
@@ -831,7 +816,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         //设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_batch_group);
+        setContentView(R.layout.activity_rgb_batch_group);
         ButterKnife.bind(this);
         initData();
         initView();
@@ -927,7 +912,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 doFinish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
-                startActivity(new Intent(BatchGroupActivity.this, LogInfoActivity.class));
+                startActivity(new Intent(RgbBatchGroupActivity.this, LogInfoActivity.class));
             }
         }
     };
@@ -944,7 +929,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
-        List <DbLight> list=DBUtils.INSTANCE.getAllNormalLight();
+        List <DbLight> list=DBUtils.INSTANCE.getAllRGBLight();
         this.adapter = new DeviceListAdapter(list,this);
         nowLightList.addAll(list);
 
@@ -1006,7 +991,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
             if(scanCURTAIN){
                 for (int i = 0; i < list.size(); i++) {
-                    if (OtherUtils.isNormalGroup(list.get(i))) {
+                    if (OtherUtils.isRGBGroup(list.get(i))) {
                         groups.add(list.get(i));
                     }
                 }
@@ -1093,8 +1078,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         private  Context context;
 
         public DeviceListAdapter(List<DbLight> connectors,Context mContext) {
-             lights=connectors;
-             context=mContext;
+            lights=connectors;
+            context=mContext;
         }
 
         @Override
@@ -1136,7 +1121,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             DbLight light = this.getItem(position);
 
             holder.txtName.setText(light.getName());
-            if(light.getProductUUID()== DeviceType.LIGHT_NORMAL){
+            if(light.getProductUUID()== DeviceType.LIGHT_RGB){
                 holder.icon.setImageResource(R.drawable.icon_light_on);
             }
             else{
@@ -1145,9 +1130,9 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.selected.setChecked(light.selected);
 
-                holder.txtName.setText(getDeviceName(light));
-                holder.icon.setVisibility(View.VISIBLE);
-                holder.selected.setVisibility(View.VISIBLE);
+            holder.txtName.setText(getDeviceName(light));
+            holder.icon.setVisibility(View.VISIBLE);
+            holder.selected.setVisibility(View.VISIBLE);
 
             return convertView;
         }
@@ -1219,7 +1204,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private boolean checkIsCurtain(int productUUID) {
-        if (productUUID == DeviceType.LIGHT_NORMAL) {
+        if (productUUID == DeviceType.LIGHT_RGB) {
             return true;
         } else {
             return false;
@@ -1274,10 +1259,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 }
 //                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
 
-                new Thread(() -> BatchGroupActivity.this.mApplication.getMesh().saveOrUpdate(BatchGroupActivity.this)).start();
+                new Thread(() -> this.mApplication.getMesh().saveOrUpdate(this)).start();
 
                 if(scanCURTAIN){
-                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_NORMAL) {
+                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_RGB) {
                         addDevice(deviceInfo);
                     }
                 } else {
@@ -1286,7 +1271,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 //扫描出灯就设置为非首次进入
                 if (isFirtst) {
                     isFirtst = false;
-                    SharedPreferencesHelper.putBoolean(BatchGroupActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
+                    SharedPreferencesHelper.putBoolean(this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
                 toolbar.setTitle(getString(R.string.title_connector_lights_num, adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);

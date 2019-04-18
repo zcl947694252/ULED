@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/toolbar_update_group"
+        android:icon="@mipmap/ic_launcher"
+        android:orderInCategory="1"
+        android:title="@string/update_group"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/toolbar_reset"
+        android:orderInCategory="2"
+        android:title="@string/factory_reset"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/toolbar_rename_light"
+        android:orderInCategory="2"
+        android:title="@string/btn_rename_light"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/toolbar_ota"
+        android:title="@string/ota"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+
+    <item
+       android:id="@+id/toolbar_commutation"
+       android:title="@string/commutation"
+       android:orderInCategory="2"
+       app:showAsAction="never" />
+
+    <item
+        android:id="@+id/toolbar_restart"
+        android:title="@string/restart"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/toolbar_hand_recovery"
+        android:title="@string/hand_recovery"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/toolbar_software_restart"
+        android:title="@string/software_restart"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/toolbar_slow_up"
+        android:title="@string/slow_up_the_cache"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+
+</menu>

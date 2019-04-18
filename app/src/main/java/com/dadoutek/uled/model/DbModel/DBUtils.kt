@@ -299,7 +299,7 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllCurtain(): ArrayList<DbCurtain>{
+    fun getAllCurtains(): ArrayList<DbCurtain>{
         val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
                 .where(DbCurtainDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)
                 ).build()
@@ -345,9 +345,12 @@ object DBUtils {
             return group
     }
 
-    fun getUserPhone(phone:String): DbUser{
+    fun getUserPhone(phone:String): DbUser?{
         val dbUser = DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Phone.eq(phone)).unique()
-        return dbUser
+        if(dbUser!=null){
+            return dbUser
+        }
+        return null
     }
 
     fun getLightMesAddr(mesAddr:Int): DbLight?{

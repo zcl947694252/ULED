@@ -140,7 +140,9 @@ object AccountModel {
 
         DBUtils.saveUser(user)
         user.password= userPassword
-        DBUtils.saveUserDao(user)
+        if(DBUtils.getUserPhone(user.phone)==null){
+            DBUtils.saveUserDao(user)
+        }
     }
 
     private fun setIsLogin(isLogin: Boolean) {

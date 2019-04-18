@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
@@ -26,6 +27,7 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -51,6 +53,7 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -115,6 +118,10 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_curtains_device_details)
+    }
+
+    override fun onResume() {
+        super.onResume()
         initData()
         initView()
     }
@@ -122,9 +129,21 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     private fun initData() {
         gpList = DBUtils.getgroupListWithType(this!!)
 
-        curtain=DBUtils.getAllCurtain()
+        curtain=DBUtils.getAllCurtains()
         showList = ArrayList()
         showList = gpList
+        if(curtain.size>0){
+            toolbar!!.tv_function1.visibility=View.VISIBLE
+            var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+            batchGroup.setText(R.string.batch_group)
+            batchGroup.setOnClickListener(View.OnClickListener {
+                val intent = Intent(this,
+                        CurtainBatchGroupActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                startActivity(intent)
+            })
+        }
 
     }
 
@@ -267,7 +286,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 ////            lightList=DBUtils.getAllLight()
 //            filter("", false)
 //        } else {
-                curtain = DBUtils.getAllCurtain()
+                curtain = DBUtils.getAllCurtains()
 //
 //        }
 

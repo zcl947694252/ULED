@@ -63,7 +63,7 @@
             app:isb_ticks_count="4"
             app:isb_track_background_color="#C8C8C8"
             app:isb_track_background_size="2dp"
-            app:isb_track_progress_color="#C8C8C8"
+            app:isb_track_progress_color="#0080EA"
             app:isb_track_progress_size="2dp"
             tools:layout_editor_absoluteY="5dp" />
 

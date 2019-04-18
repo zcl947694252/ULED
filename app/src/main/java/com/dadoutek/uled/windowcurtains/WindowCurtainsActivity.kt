@@ -122,17 +122,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             initGroupData()
             initViewGroup()
             initToolGroupBar()
-//            group_delete=findViewById(R.id.delete_Group)
-//            this.group_delete.visibility=View.VISIBLE
         } else {
+            currentShowGroupSetPage=false
             initToolbar()
             initMeshDresData()
 //            getVersion()
-//            updateGroup=findViewById(R.id.update_group)
-//            this.updateGroup.visibility=View.VISIBLE
-//            otaButton=findViewById(R.id.ota)
-//            this.otaButton.visibility=View.VISIBLE
-//            versionText=findViewById(R.id.version)
         }
     }
 
@@ -242,10 +236,28 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 renameLight()
             }
             R.id.toolbar_reset -> {
-                remove()
+                onceReset()
             }
             R.id.toolbar_update_group -> {
                 updateGroup()
+            }
+            R.id.toolbar_commutation->{
+                electricCommutation()
+            }
+            R.id.toolbar_hand_recovery->{
+                handRecovery()
+            }
+            R.id.toolbar_restart->{
+                clickRestart()
+            }
+            R.id.toolbar_software_restart->{
+                sofwareRestart()
+            }
+            R.id.toolbar_slow_up->{
+                slowUp()
+            }
+            R.id.toolbar_ota->{
+                updateOTA()
             }
         }
         true
@@ -317,6 +329,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         intent.putExtra("uuid", curtain!!.productUUID)
         intent.putExtra("belongId", curtain!!.belongGroupId)
         startActivity(intent)
+
     }
 
     private fun renameLight() {
@@ -358,11 +371,38 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (currentShowGroupSetPage) {
-            getMenuInflater().inflate(R.menu.menu_rgb_group_setting, menu)
+            getMenuInflater().inflate(R.menu.menu_curtain_group, menu)
         } else {
-            getMenuInflater().inflate(R.menu.menu_rgb_light_setting, menu)
+            getMenuInflater().inflate(R.menu.menu_curtain_setting, menu)
         }
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        if(handBoolean){
+            if (menu != null) {
+                menu.findItem(R.id.toolbar_hand_recovery).setTitle(R.string.hand_recovery)
+            }
+//            handBoolean=false
+        }else{
+            if (menu != null) {
+                menu.findItem(R.id.toolbar_hand_recovery).setTitle(R.string.hand_cancel)
+            }
+//            handBoolean=true
+        }
+
+        if(slowBoolean){
+            if(menu!=null){
+               menu.findItem(R.id.toolbar_slow_up).setTitle(R.string.slow_up_the_cache)
+            }
+        }else{
+            if(menu!=null){
+                menu.findItem(R.id.toolbar_slow_up).setTitle(R.string.slow_up_the_cache_cancel)
+            }
+        }
+
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun initView() {
@@ -375,19 +415,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         open.setOnClickListener(this)
         off.setOnClickListener(this)
         pause.setOnClickListener(this)
-//        commutation.setOnClickListener(this)
-//        setting.setOnClickListener(this)
-//        restart.setOnClickListener(this)
-//        delete_Group.setOnClickListener(this)
-//        update_group.setOnClickListener(this)
-//        slow_up.setOnClickListener(this)
-//        hand_recovery.setOnClickListener(this)
-//        software_restart.setOnClickListener(this)
-//        mRxPermission = RxPermissions(this)
-//        if(type==Constant.TYPE_GROUP){
-//            setting.visibility=View.GONE
-//        }
-//        ota.setOnClickListener(this)
         setSpeed()
     }
 
@@ -466,15 +493,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             R.id.open -> openWindow()
             R.id.off -> offWindow()
             R.id.pause -> pauseWindow()
-//           R.id.commutation->electricCommutation()
-//           R.id.setting->onceReset()
-//           R.id.restart->clickRestart()
-//           R.id.delete_Group->removeGroup()
-//           R.id.update_group->updateGroup()
-//           R.id.hand_recovery->handRecovery()
-//           R.id.software_restart->sofwareRestart()
-//           R.id.slow_up->slowUp()
-//           R.id.ota->updateOTA()
         }
     }
 
@@ -539,38 +557,38 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         finish()
     }
 
-//    private fun slowUp() {
-//        if(type==Constant.TYPE_GROUP){
-//            if(slowBoolean){
-//                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x01, Opcode.CURTAIN_PACK_END)
-//                val opcode = Opcode.CURTAIN_ON_OFF
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
-//                slowBoolean=false
+    private fun slowUp() {
+        if(type==Constant.TYPE_GROUP){
+            if(slowBoolean){
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x01, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+                slowBoolean=false
 //                slow_up.setText(R.string.slow_up_the_cache_cancel)
-//            }else{
-//                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
-//                val opcode = Opcode.CURTAIN_ON_OFF
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
-//                slowBoolean=true
+            }else{
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+                slowBoolean=true
 //                slow_up.setText(R.string.slow_up_the_cache)
-//            }
-//        }else{
-//            if(slowBoolean){
-//                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x01, Opcode.CURTAIN_PACK_END)
-//                val opcode = Opcode.CURTAIN_ON_OFF
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
-//                slowBoolean=false
+            }
+        }else{
+            if(slowBoolean){
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x01, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                slowBoolean=false
 //                slow_up.setText(R.string.slow_up_the_cache_cancel)
-//            }else{
-//                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
-//                val opcode = Opcode.CURTAIN_ON_OFF
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
-//                slowBoolean=true
+            }else{
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x21.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                slowBoolean=true
 //                slow_up.setText(R.string.slow_up_the_cache)
-//            }
-//        }
-//
-//    }
+            }
+        }
+
+    }
 
     private fun sofwareRestart() {
         if (type == Constant.TYPE_GROUP) {
@@ -585,37 +603,37 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
     }
 
-//    private fun handRecovery() {
-////        if(type==Constant.TYPE_GROUP){
-////            if(handBoolean){
-////                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
-////                val opcode = Opcode.CURTAIN_ON_OFF
-////                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
-////                hand_recovery.setText(R.string.hand_cancel)
-////                handBoolean=false
-////            }else{
-////                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
-////                val opcode = Opcode.CURTAIN_ON_OFF
-////                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
-////                hand_recovery.setText(R.string.hand_recovery)
-////                handBoolean=true
-////            }
-////        }else{
-////            if(handBoolean){
-////                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
-////                val opcode = Opcode.CURTAIN_ON_OFF
-////                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
-////                handBoolean=false
-////                hand_recovery.setText(R.string.hand_cancel)
-////            }else{
-////                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
-////                val opcode = Opcode.CURTAIN_ON_OFF
-////                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
-////                handBoolean=true
-////                hand_recovery.setText(R.string.hand_recovery)
-////            }
-////        }
-////    }
+    private fun handRecovery() {
+        if(type==Constant.TYPE_GROUP){
+            if(handBoolean){
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+//                hand_recovery.setText(R.string.hand_cancel)
+                handBoolean=false
+            }else{
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+//                hand_recovery.setText(R.string.hand_recovery)
+                handBoolean=true
+            }
+        }else{
+            if(handBoolean){
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                handBoolean=false
+//                hand_recovery.setText(R.string.hand_cancel)
+            }else{
+                val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
+                val opcode = Opcode.CURTAIN_ON_OFF
+                TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                handBoolean=true
+//                hand_recovery.setText(R.string.hand_recovery)
+            }
+        }
+    }
 
 
     private fun clickRestart() {
@@ -632,7 +650,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun onceReset() {
-        Log.d("===", type)
         if (type == Constant.TYPE_GROUP) {
             val opcode = Opcode.KICK_OUT
             TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, null)
@@ -683,10 +700,20 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+            pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
+            closeBtn.setImageResource(R.drawable.icon_open)
+            closeText.setTextColor(Color.parseColor("#333333"))
+            openBtn.setImageResource(R.drawable.icon_open)
+            openText.setTextColor(Color.parseColor("#333333"))
         } else {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, params)
+            pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
+            closeBtn.setImageResource(R.drawable.icon_open)
+            closeText.setTextColor(Color.parseColor("#333333"))
+            openBtn.setImageResource(R.drawable.icon_open)
+            openText.setTextColor(Color.parseColor("#333333"))
         }
 
     }
@@ -697,11 +724,21 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
             curtainImage.setImageResource(R.drawable.curtain_close)
+            pauseBtn.setImageResource(R.drawable.icon_suspend)
+            closeBtn.setImageResource(R.drawable.icon_open_yes)
+            closeText.setTextColor(Color.parseColor("#0080EA"))
+            openBtn.setImageResource(R.drawable.icon_open)
+            openText.setTextColor(Color.parseColor("#333333"))
         } else {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, params)
             curtainImage.setImageResource(R.drawable.curtain_close)
+            pauseBtn.setImageResource(R.drawable.icon_suspend)
+            closeBtn.setImageResource(R.drawable.icon_open_yes)
+            closeText.setTextColor(Color.parseColor("#0080EA"))
+            openBtn.setImageResource(R.drawable.icon_open)
+            openText.setTextColor(Color.parseColor("#333333"))
         }
     }
 
@@ -711,11 +748,21 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
             curtainImage.setImageResource(R.drawable.curtain)
+            pauseBtn.setImageResource(R.drawable.icon_suspend)
+            openBtn.setImageResource(R.drawable.icon_open_yes)
+            openText.setTextColor(Color.parseColor("#0080EA"))
+            closeBtn.setImageResource(R.drawable.icon_open)
+            closeText.setTextColor(Color.parseColor("#333333"))
         } else {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, params)
             curtainImage.setImageResource(R.drawable.curtain)
+            pauseBtn.setImageResource(R.drawable.icon_suspend)
+            openBtn.setImageResource(R.drawable.icon_open_yes)
+            openText.setTextColor(Color.parseColor("#0080EA"))
+            closeBtn.setImageResource(R.drawable.icon_open)
+            closeText.setTextColor(Color.parseColor("#333333"))
         }
 
     }

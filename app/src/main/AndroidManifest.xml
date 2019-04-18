@@ -33,18 +33,23 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".ota.OTAConnectorActivity"
+        <activity android:name=".connector.ConnectorBatchGroupActivity"
             android:screenOrientation="portrait"
             />
-        <activity android:name=".connector.ConnectorGroupingActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".switches.SwitchSettingActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".ota.OTAUpdateSwitchActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity android:name=".windowcurtains.CurtainBatchGroupActivity" />
+        <activity android:name=".rgb.RgbBatchGroupActivity" />
+        <activity
+            android:name=".ota.OTAConnectorActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".connector.ConnectorGroupingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".switches.SwitchSettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ota.OTAUpdateSwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".group.BatchGroupActivity"
             android:screenOrientation="portrait" />

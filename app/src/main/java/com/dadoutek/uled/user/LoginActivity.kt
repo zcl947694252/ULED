@@ -122,11 +122,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         isFirstLauch = intent.getBooleanExtra(IS_FIRST_LAUNCH, true)
     }
 
-    private fun initToolbar() {
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = getString(R.string.user_login_title)
-    }
+//    private fun initToolbar() {
+//        setSupportActionBar(toolbar)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.title = getString(R.string.user_login_title)
+//    }
 
     override fun onPause() {
         super.onPause()
@@ -144,7 +144,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun initView() {
-        initToolbar()
+//        initToolbar()
         //        txtHeaderTitle.setText(R.string.user_login_title);
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()

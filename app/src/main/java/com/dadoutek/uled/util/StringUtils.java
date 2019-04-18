@@ -227,6 +227,8 @@ public class StringUtils {
                 return context.getString(R.string.guide_tip_reset_sensor);
             case Constant.INSTALL_CURTAIN:
                 return context.getString(R.string.guide_tip_reset_curtain);
+            case Constant.INSTALL_CONNECTOR:
+                return context.getString(R.string.guide_tip_reset_relay);
         }
         return "";
     }
