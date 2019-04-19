@@ -1,5 +1,7 @@
 package com.dadoutek.uled.switches
 
+import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
@@ -11,22 +13,32 @@ import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
+import com.dadoutek.uled.model.DbModel.DBUtils.saveSwitch
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.DialogUtils.hideLoadingDialog
+import com.dadoutek.uled.util.DialogUtils.showLoadingDialog
+import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -36,6 +48,7 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -50,12 +63,15 @@ import org.jetbrains.anko.design.snackbar
 
 private const val CONNECT_TIMEOUT = 5
 
-class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
+class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
     private lateinit var mAdapter: SelectSwitchGroupRvAdapter
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
+    private var localVersion: String? = null
+    private val mDisposable = CompositeDisposable()
+    private var mRxPermission: RxPermissions? = null
 
     private var mDisconnectSnackBar: Snackbar? = null
 
@@ -85,14 +101,17 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             dstAdress = mDeviceInfo.meshAddress
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
+                        localVersion=it
                         versionLayout.visibility = View.VISIBLE
                         tvLightVersion.text = it
+//                        tvOta!!.visibility = View.VISIBLE
                         if(it!!.startsWith("STS")){
                             isGlassSwitch=true
                         }
                     },
                     failedCallback = {
                         versionLayout.visibility = View.GONE
+//                        tvOta!!.visibility = View.GONE
                     })
         } else {
             dstAdress = 0
@@ -337,6 +356,7 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
+                            saveSwitch()
                             TelinkLightService.Instance().idleMode(true)
                             TelinkLightService.Instance().disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -345,29 +365,55 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
             }
         }catch (e:Exception){
             e.printStackTrace()
-        }finally {
-            //确认配置成功后,添加开关到服务器
-            var newMeshAdress: Int
-//            var dbSwitch:DbSwitch=DbSwitch()
-            newMeshAdress=groupAdress
+        }
+//        finally {
+//            //确认配置成功后,添加开关到服务器
+//            var newMeshAdress: Int
+////            var dbSwitch:DbSwitch=DbSwitch()
+//            newMeshAdress=groupAdress
+////            DBUtils.saveSwitch(dbSwitch,false)
+//            var dbSwitch: DbSwitch?=DbSwitch()
+////            DBUtils.saveSwitch(dbSwitch,false)
+//            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+//            dbSwitch.macAddr=mDeviceInfo.macAddress
+//            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+//            dbSwitch.productUUID=mDeviceInfo.productUUID
+////            dbSwitch!!.index=dbSwitch.id.toInt()
+//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//
+////            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
 //            DBUtils.saveSwitch(dbSwitch,false)
-            var dbSwitch: DbSwitch?=DbSwitch()
-            DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-            dbSwitch.macAddr=mDeviceInfo.macAddress
-            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-            dbSwitch.productUUID=mDeviceInfo.productUUID
-            dbSwitch.index=dbSwitch.id.toInt()
-            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//            dbSwitch!!.index=dbSwitch.id.toInt()
+//            recordingChange(dbSwitch!!.id,
+//                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+//                    Constant.DB_ADD)
+//
+//        }
+    }
+
+    private fun saveSwitch(){
+        var newMeshAdress: Int
+//            var dbSwitch:DbSwitch=DbSwitch()
+        newMeshAdress=groupAdress
+//            DBUtils.saveSwitch(dbSwitch,false)
+        var dbSwitch: DbSwitch?=DbSwitch()
+        DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+        dbSwitch.macAddr=mDeviceInfo.macAddress
+        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+        dbSwitch.productUUID=mDeviceInfo.productUUID
+        dbSwitch!!.index=dbSwitch.id.toInt()
+        dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
 //            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
-            DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            DBUtils.recordingChange(dbSwitch!!.id,
-                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                    Constant.DB_ADD)
+        DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//        dbSwitch!!.index=dbSwitch.id.toInt()
+        recordingChange(dbSwitch!!.id,
+                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                Constant.DB_ADD)
 
-        }
     }
 
     private var mConnectingSnackBar: Snackbar? = null
@@ -438,15 +484,17 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
-            group.checked = false
-            if(OtherUtils.isNormalGroup(group)){
+//            group.checked = false
+//            if(OtherUtils.isNormalGroup(group)){
+//                group.checked = false
                 mGroupArrayList.add(group)
-            }
+//            }
         }
         if (groupList.size > 0) {
             groupList[0].checked = true
         }
 
+        mRxPermission = RxPermissions(this)
         mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
@@ -486,5 +534,65 @@ class ConfigNormalSwitchActivity : AppCompatActivity(), EventListener<String> {
 
             return id
         }
+
+//    private fun checkPermission() {
+//        if(light!!.macAddr.length<16){
+//            ToastUtils.showLong(getString(R.string.bt_error))
+//        }else{
+///      mDisposable.add(
+//                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+//                    if (granted!!) {
+//                        var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+//                        if(isBoolean){
+//                            transformView()
+//                        }else {
+//                            OtaPrepareUtils.instance().gotoUpdateView(this@ConfigNormalSwitchActivity, localVersion, otaPrepareListner)
+//                        }
+//                    } else {
+//                        ToastUtils.showLong(R.string.update_permission_tip)
+//                    }
+//                })
+////        }
+//    }*/
+
+//    private fun transformView() {
+//        val intent = Intent(this@ConfigNormalSwitchActivity, OTASwitchActivity::class.java)
+//        intent.putExtra(Constant.UPDATE_LIGHT, Constant.SWITCH_PIR_ADDRESS)
+//        startActivity(intent)
+//        finish()
+//    }
+//
+//    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+//
+//        override fun downLoadFileStart() {
+//            showLoadingDialog(getString(R.string.get_update_file))
+//        }
+//
+//        override fun startGetVersion() {
+//            showLoadingDialog(getString(R.string.verification_version))
+//        }
+//
+//        override fun getVersionSuccess(s: String) {
+//            //            ToastUtils.showLong(.string.verification_version_success);
+//            hideLoadingDialog()
+//        }
+//
+//        override fun getVersionFail() {
+//            ToastUtils.showLong(R.string.verification_version_fail)
+//            hideLoadingDialog()
+//        }
+//
+//
+//        override fun downLoadFileSuccess() {
+//            hideLoadingDialog()
+//            transformView()
+//        }
+//
+//        override fun downLoadFileFail(message: String) {
+//            hideLoadingDialog()
+//            ToastUtils.showLong(R.string.download_pack_fail)
+//        }
+//    }
 
 }

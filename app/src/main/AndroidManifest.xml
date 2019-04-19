@@ -33,9 +33,10 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".connector.ConnectorBatchGroupActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity android:name=".switches.OTASwitchActivity"></activity>
+        <activity
+            android:name=".connector.ConnectorBatchGroupActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".windowcurtains.CurtainBatchGroupActivity" />
         <activity android:name=".rgb.RgbBatchGroupActivity" />
         <activity

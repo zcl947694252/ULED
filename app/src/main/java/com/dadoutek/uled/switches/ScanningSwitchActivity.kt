@@ -3,6 +3,7 @@ package com.dadoutek.uled.switches
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -13,10 +14,13 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.VENDOR_ID
+import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateSwitchActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -24,6 +28,7 @@ import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.DialogUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -42,6 +47,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
+import kotlinx.android.synthetic.main.activity_scene_set.view.*
+import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -74,6 +81,8 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
     private var retryConnectCount = 0
 
     private var isSupportInstallOldDevice=false
+
+    private var isOTA=true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,6 +138,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=false
+            isOTA=true
             progressOldBtn.progress=0
             startScan()
         }
@@ -136,7 +146,14 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         progressOldBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=true
+            isOTA=true
             progressBtn.progress=0
+            startScan()
+        }
+        otaBtn.onClick {
+//            retryConnectCount = 0
+            isOTA=false
+            otaBtn.progress=0
             startScan()
         }
     }
@@ -204,13 +221,20 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 startCheckRSSITimer()
                 TelinkLightService.Instance()?.startScan(params)
 
-                if(isSupportInstallOldDevice){
-                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                }else{
-                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                if(isOTA){
+                    if(isSupportInstallOldDevice){
+                        progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                        progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                    }else{
+                        progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                        progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                    }
+                }else {
+                    otaBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    otaBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
                 }
+
+
 //                scanDisposable?.dispose()
 //                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
 //                        .SECONDS)
@@ -361,13 +385,19 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         LogUtils.d("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
-            if(isSupportInstallOldDevice){
-                progressOldBtn.progress = -1   //控件显示Error状态
-                progressOldBtn.text = getString(R.string.not_found_switch)
+            if(isOTA){
+                if(isSupportInstallOldDevice){
+                    progressOldBtn.progress = -1   //控件显示Error状态
+                    progressOldBtn.text = getString(R.string.not_found_switch)
+                }else{
+                    progressBtn.progress = -1   //控件显示Error状态
+                    progressBtn.text = getString(R.string.not_found_switch)
+                }
             }else{
-                progressBtn.progress = -1   //控件显示Error状态
-                progressBtn.text = getString(R.string.not_found_switch)
+                otaBtn.progress = -1   //控件显示Error状态
+                otaBtn.text = getString(R.string.not_found_switch)
             }
+
         }
     }
 
@@ -430,19 +460,35 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
 //        scanDisposable?.dispose()
-        if(isSupportInstallOldDevice){
-            progressOldBtn.progress = 100  //进度控件显示成完成状态
+        if(isOTA){
+            if(isSupportInstallOldDevice){
+                progressOldBtn.progress = 100  //进度控件显示成完成状态
+            }else{
+                progressBtn.progress = 100  //进度控件显示成完成状态
+            }
         }else{
-            progressBtn.progress = 100  //进度控件显示成完成状态
+            otaBtn.progress=100
         }
 
-        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
-        }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+
+        if(isOTA){
+            if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                    bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            }
+        }else {
+//            var dbSwitch=DbSwitch()
+//            dbSwitch.macAddr= bestRSSIDevice!!.macAddress
+//            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+//            dbSwitch.productUUID= bestRSSIDevice!!.productUUID
+//            val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
+//            intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
+//            startActivity(intent)
+//            finish()
         }
     }
 
@@ -452,13 +498,19 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
         TelinkLightService.Instance().idleMode(true)
 
         LogUtils.d("showConnectFailed")
-        if(isSupportInstallOldDevice){
-            progressOldBtn.progress = -1    //控件显示Error状态
-            progressOldBtn.text = getString(R.string.connect_failed)
+        if(isOTA){
+            if(isSupportInstallOldDevice){
+                progressOldBtn.progress = -1    //控件显示Error状态
+                progressOldBtn.text = getString(R.string.connect_failed)
+            }else{
+                progressBtn.progress = -1    //控件显示Error状态
+                progressBtn.text = getString(R.string.connect_failed)
+            }
         }else{
-            progressBtn.progress = -1    //控件显示Error状态
-            progressBtn.text = getString(R.string.connect_failed)
+            otaBtn.progress = -1    //控件显示Error状态
+            otaBtn.text = getString(R.string.connect_failed)
         }
+
     }
 
 
@@ -490,16 +542,20 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                     if (it) {
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
-                            progressBar?.visibility = View.VISIBLE
+//                            progressBar?.visibility = View.VISIBLE
                             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
                             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
-                            if(isSupportInstallOldDevice){
-                                progressOldBtn.text = getString(R.string.connecting)
+                            if(isOTA){
+                                if(isSupportInstallOldDevice){
+                                    progressOldBtn.text = getString(R.string.connecting)
+                                }else{
+                                    progressBtn.text = getString(R.string.connecting)
+                                }
                             }else{
-                                progressBtn.text = getString(R.string.connecting)
+                                otaBtn.text = getString(R.string.connecting)
                             }
                         }
                     } else {
@@ -591,4 +647,24 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
             }
         }
     }
+
+    private fun getVersion() {
+        var dstAdress = 0
+//            dstAdress = mDeviceInfo.meshAddress
+//            Commander.getDeviceVersion(dstAdress,
+//                    successCallback = {
+//                        localVersion=it
+//                        versionLayout.visibility = View.VISIBLE
+//                        tvLightVersion.text = it
+////                        tvOta!!.visibility = View.VISIBLE
+//                        if(it!!.startsWith("STS")){
+//                            isGlassSwitch=true
+//                        }
+//                    },
+//                    failedCallback = {
+//                        versionLayout.visibility = View.GONE
+////                        tvOta!!.visibility = View.GONE
+//                    })
+//        }
+}
 }

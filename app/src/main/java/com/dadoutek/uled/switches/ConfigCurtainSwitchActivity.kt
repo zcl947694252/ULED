@@ -16,12 +16,14 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
@@ -49,7 +51,7 @@ import org.jetbrains.anko.design.snackbar
 
 private const val CONNECT_TIMEOUT = 5
 
-class ConfigCurtainSwitchActivity : AppCompatActivity(), EventListener<String> {
+class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mApplication: TelinkLightApplication
@@ -86,12 +88,14 @@ class ConfigCurtainSwitchActivity : AppCompatActivity(), EventListener<String> {
                     successCallback = {
                         versionLayout.visibility = View.VISIBLE
                         tvLightVersion.text = it
+//                        tvOta!!.visibility = View.VISIBLE
                         if(it!!.startsWith("ST")){
                             isGlassSwitch=true
                         }
                     },
                     failedCallback = {
                         versionLayout.visibility = View.GONE
+//                        tvOta!!.visibility = View.GONE
                     })
         } else {
             dstAdress = 0
@@ -322,6 +326,7 @@ class ConfigCurtainSwitchActivity : AppCompatActivity(), EventListener<String> {
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
+                            saveSwitch()
                             TelinkLightService.Instance().idleMode(true)
                             TelinkLightService.Instance().disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -347,10 +352,30 @@ class ConfigCurtainSwitchActivity : AppCompatActivity(), EventListener<String> {
 //            dbSwitch= DBUtils.getSwitchByID(dbSwitch.index.toLong())!!
             DBUtils.saveSwitch(dbSwitch,false)
             dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            DBUtils.recordingChange(dbSwitch!!.id,
+            recordingChange(dbSwitch!!.id,
                     DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                     Constant.DB_ADD)
         }
+    }
+
+    private fun saveSwitch(){
+        var dbSwitch: DbSwitch?=DbSwitch()
+        DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+        dbSwitch.macAddr=mDeviceInfo.macAddress
+        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+        dbSwitch.productUUID=mDeviceInfo.productUUID
+        dbSwitch.index=dbSwitch.id.toInt()
+        dbSwitch.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
+//            dbSwitch= DBUtils.getSwitchByID(dbSwitch.index.toLong())!!
+        DBUtils.saveSwitch(dbSwitch,false)
+        dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+        recordingChange(dbSwitch!!.id,
+                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                Constant.DB_ADD)
     }
 
     private var mConnectingSnackBar: Snackbar? = null
@@ -421,13 +446,13 @@ class ConfigCurtainSwitchActivity : AppCompatActivity(), EventListener<String> {
 
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
-            group.checked = false
             if(OtherUtils.isCurtain(group)){
+                group.checked = false
                 mGroupArrayList.add(group)
             }
         }
-        if (groupList.size > 0) {
-            groupList[0].checked = true
+        if (mGroupArrayList.size > 0) {
+            mGroupArrayList[0].checked = true
         }
 
         mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)

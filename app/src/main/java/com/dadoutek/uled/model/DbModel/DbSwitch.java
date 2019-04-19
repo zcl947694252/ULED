@@ -1,11 +1,15 @@
 package com.dadoutek.uled.model.DbModel;
 
+import com.dadoutek.uled.R;
+import com.google.gson.annotations.Expose;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.Serializable;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Transient;
 
 @Entity
 public class DbSwitch implements Serializable {
@@ -23,6 +27,27 @@ public class DbSwitch implements Serializable {
     private String controlSceneId;
     private int index;
     private Long belongGroupId;
+
+
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean selected;//选择状态
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public String version;//选择状态
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean hasGroup = false;//当前灯是否有被分组
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public int textColor;//文字颜色
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public int icon = R.drawable.icon_light_on;//灯状态显示图
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public int connectionStatus = 1;//链接状态
+
     @Generated(hash = 811812800)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
                     String macAddr, int productUUID, String controlSceneId, int index,
@@ -93,5 +118,53 @@ public class DbSwitch implements Serializable {
     }
     public void setBelongGroupId(Long belongGroupId) {
         this.belongGroupId = belongGroupId;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public boolean isHasGroup() {
+        return hasGroup;
+    }
+
+    public void setHasGroup(boolean hasGroup) {
+        this.hasGroup = hasGroup;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
+
+    public int getConnectionStatus() {
+        return connectionStatus;
+    }
+
+    public void setConnectionStatus(int connectionStatus) {
+        this.connectionStatus = connectionStatus;
     }
 }
