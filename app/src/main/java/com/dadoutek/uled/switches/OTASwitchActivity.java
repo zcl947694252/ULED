@@ -153,7 +153,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int MSG_OTA_PROGRESS = 11;
     private static final int MSG_MESH_OTA_PROGRESS = 12;
     private static final int MSG_LOG = 13;
-    private static final int TIME_OUT_SCAN = 20;
+    private static final int TIME_OUT_SCAN = 30;
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
     private long TIME_OUT_SENDDATA = 10;
@@ -686,7 +686,8 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
                     TelinkLightApplication.getInstance().getConnectDevice().meshAddress == dbLight.getMeshAddr()) {
                 startOTA();
             } else {
-                startScan();
+//                startScan();
+                startOTA();
             }
 //            }
         }
@@ -1008,7 +1009,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
             case LightAdapter.STATUS_LOGOUT:
                 TelinkLog.i("OTAUpdate#STATUS_LOGOUT");
                 log("logout +connectRetryCount=" + connectRetryCount);
-
+//                login();
                 if (connectRetryCount > 0) {
                     if (connectRetryCount >= 3) {
 //                    btn_start_update.setText(R.string.update_fail);

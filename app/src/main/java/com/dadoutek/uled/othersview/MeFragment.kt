@@ -382,7 +382,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             }
         }
 
-        if(curtainList.size>0){
+        if(meshAdre.size>0){
             Commander.resetLights(meshAdre, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
@@ -394,7 +394,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             })
         }
 
-        if(lightList.isEmpty() && curtainList.isEmpty() && relyList.isEmpty()){
+        if(meshAdre.isEmpty()){
             hideLoadingDialog()
             ToastUtils.showLong(R.string.successful_resumption)
         }
@@ -462,20 +462,40 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     }
 
 
+
+
     private fun developerMode() {
-        //将mHints数组内的所有元素左移一个位置
-        System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-        //获得当前系统已经启动的时间
-        mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-        if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-            ToastUtils.showLong(R.string.developer_mode)
-            copyDataBase!!.visibility = View.VISIBLE
-            chearCache!!.visibility = View.VISIBLE
-            resetAllGroup.visibility=View.VISIBLE
-            //开发者模式启动时启动LOG日志
-            LogUtils.getConfig().setLog2FileSwitch(true)
-            LogUtils.getConfig().setDir(LOG_PATH_DIR)
-            SharedPreferencesUtils.setDeveloperModel(true)
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+        if(isBoolean){
+            //将mHints数组内的所有元素左移一个位置
+            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+            //获得当前系统已经启动的时间
+            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+                ToastUtils.showLong(R.string.developer_mode_close)
+                copyDataBase!!.visibility = View.GONE
+                chearCache!!.visibility = View.GONE
+                resetAllGroup.visibility = View.GONE
+                //开发者模式启动时启动LOG日志
+                LogUtils.getConfig().setLog2FileSwitch(false)
+                LogUtils.getConfig().setDir(LOG_PATH_DIR)
+                SharedPreferencesUtils.setDeveloperModel(false)
+            }
+        }else{
+            //将mHints数组内的所有元素左移一个位置
+            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+            //获得当前系统已经启动的时间
+            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+                ToastUtils.showLong(R.string.developer_mode)
+                copyDataBase!!.visibility = View.VISIBLE
+                chearCache!!.visibility = View.VISIBLE
+                resetAllGroup.visibility=View.VISIBLE
+                //开发者模式启动时启动LOG日志
+                LogUtils.getConfig().setLog2FileSwitch(true)
+                LogUtils.getConfig().setDir(LOG_PATH_DIR)
+                SharedPreferencesUtils.setDeveloperModel(true)
+            }
         }
     }
 

@@ -66,7 +66,10 @@ public class Constant implements Serializable {
 //    public static final String BASE_URL = "http://47.107.227.130/smartlight_test/";
 
     //网络请求服务器正式地址
-    public static final String BASE_URL = "http://47.107.227.130/smartlight/";
+//    public static final String BASE_URL = "http://47.107.227.130/smartlight/";
+
+    //网络请求服务器域名地址
+    public static final String BASE_URL="https://dev.dadoutek.com/smartlight/";
 
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY = "DB_NAME_KEY";

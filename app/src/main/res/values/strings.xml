@@ -670,4 +670,6 @@
     <string name="device_page">This functionality has been moved to the device page!</string>
 
     <string name="batch_group">Batch group</string>
+
+    <string name="developer_mode_close">Enter developer mode close</string>
 </resources>

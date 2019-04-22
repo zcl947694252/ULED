@@ -124,9 +124,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             initToolGroupBar()
         } else {
             currentShowGroupSetPage=false
+            versionText=findViewById(R.id.versionText)
             initToolbar()
             initMeshDresData()
-//            getVersion()
+            getVersion()
         }
     }
 
@@ -497,7 +498,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun updateOTA() {
-//        checkPermission()
+        if(versionText.text.toString()!=null){
+            checkPermission()
+        }
     }
 
     private fun checkPermission() {

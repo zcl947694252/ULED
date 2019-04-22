@@ -294,7 +294,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 }
                 LogUtils.d("onError login")
                 showDisconnectSnackBar()
-
             }
         }
     }
@@ -485,13 +484,13 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
 //            group.checked = false
-//            if(OtherUtils.isNormalGroup(group)){
-//                group.checked = false
+            if(OtherUtils.isNormalGroup(group)){
+                group.checked = false
                 mGroupArrayList.add(group)
-//            }
+            }
         }
-        if (groupList.size > 0) {
-            groupList[0].checked = true
+        if (mGroupArrayList.size > 0) {
+            mGroupArrayList[0].checked = true
         }
 
         mRxPermission = RxPermissions(this)

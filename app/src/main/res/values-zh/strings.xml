@@ -608,4 +608,6 @@
     <string name="device_page">此功能已转移到设备页面!</string>
 
     <string name="batch_group">批量分组</string>
+
+    <string name="developer_mode_close">关闭开发者模式</string>
 </resources>

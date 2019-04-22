@@ -15,17 +15,26 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.VENDOR_ID
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.ota.OTAUpdateSwitchActivity
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.DialogUtils.hideLoadingDialog
+import com.dadoutek.uled.util.OtaPrepareUtils
+import com.dadoutek.uled.util.StringUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -33,26 +42,26 @@ import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.ErrorReportInfo
-import com.telink.bluetooth.light.LeScanParameters
-import com.telink.bluetooth.light.LightAdapter
+import com.telink.bluetooth.light.*
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.activity_scene_set.view.*
+import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -63,10 +72,17 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val MAX_RETRY_CONNECT_TIME = 1
 
 
-class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
+class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
+
     private var connectDisposable: Disposable? = null
 
     private lateinit var mApplication: TelinkLightApplication
+
+    private val mDisposable = CompositeDisposable()
+
+    private var mRxPermission: RxPermissions? = null
+
+    private var localVersion: String? = null
 
 //    private var scanDisposable: Disposable? = null
 
@@ -84,10 +100,13 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private var isOTA=true
 
+    private var dbSwitch=DbSwitch()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
         this.mApplication = this.application as TelinkLightApplication
+        mRxPermission = RxPermissions(this)
         initView()
         initListener()
         readyConnection()
@@ -481,14 +500,7 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
                 startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
             }
         }else {
-//            var dbSwitch=DbSwitch()
-//            dbSwitch.macAddr= bestRSSIDevice!!.macAddress
-//            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-//            dbSwitch.productUUID= bestRSSIDevice!!.productUUID
-//            val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
-//            intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
-//            startActivity(intent)
-//            finish()
+            getVersion()
         }
     }
 
@@ -650,21 +662,137 @@ class ScanningSwitchActivity : AppCompatActivity(), EventListener<String> {
 
     private fun getVersion() {
         var dstAdress = 0
-//            dstAdress = mDeviceInfo.meshAddress
-//            Commander.getDeviceVersion(dstAdress,
-//                    successCallback = {
+            dstAdress = bestRSSIDevice!!.meshAddress
+            Commander.getDeviceVersion(dstAdress,
+                    successCallback = {
 //                        localVersion=it
 //                        versionLayout.visibility = View.VISIBLE
+                        localVersion = it
+                        dbSwitch.version=it
 //                        tvLightVersion.text = it
-////                        tvOta!!.visibility = View.VISIBLE
+//                        tvOta!!.visibility = View.VISIBLE
 //                        if(it!!.startsWith("STS")){
-//                            isGlassSwitch=true
-//                        }
-//                    },
-//                    failedCallback = {
+//                        isGlassSwitch=true
+//                            otaSwitch()
+                        checkPermission()
+//                    }
+                    },
+                    failedCallback = {
 //                        versionLayout.visibility = View.GONE
-////                        tvOta!!.visibility = View.GONE
-//                    })
+//                        tvOta!!.visibility = View.GONE
+                    })
+        }
+
+    private fun checkPermission() {
+//        if(light!!.macAddr.length<16){
+//            ToastUtils.showLong(getString(R.string.bt_error))
+//        }else{
+        mDisposable.add(
+                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                    if (granted!!) {
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+                        if(isBoolean){
+                            transformView()
+                        }else {
+                            OtaPrepareUtils.instance().gotoUpdateView(this@ScanningSwitchActivity, localVersion, otaPrepareListner)
+                        }
+                    } else {
+                        ToastUtils.showLong(R.string.update_permission_tip)
+                    }
+                })
 //        }
-}
+    }
+
+    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+
+        override fun downLoadFileStart() {
+            showLoadingDialog(getString(R.string.get_update_file))
+        }
+
+        override fun startGetVersion() {
+            showLoadingDialog(getString(R.string.verification_version))
+        }
+
+        override fun getVersionSuccess(s: String) {
+            //            ToastUtils.showLong(.string.verification_version_success);
+            hideLoadingDialog()
+        }
+
+        override fun getVersionFail() {
+            ToastUtils.showLong(R.string.verification_version_fail)
+            hideLoadingDialog()
+        }
+
+
+        override fun downLoadFileSuccess() {
+            hideLoadingDialog()
+            transformView()
+        }
+
+        override fun downLoadFileFail(message: String) {
+            hideLoadingDialog()
+            ToastUtils.showLong(R.string.download_pack_fail)
+        }
+    }
+
+    private fun transformView() {
+        setGroupForSwitch()
+//        dbSwitch.macAddr= bestRSSIDevice!!.macAddress
+//        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+//        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
+//        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
+////        DBUtils.saveSwitch(dbSwitch,false)
+//        val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
+//        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
+//        startActivity(intent)
+//        finish()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mDisposable.dispose()
+    }
+
+    private fun setGroupForSwitch() {
+        val mesh = this.mApplication.mesh
+        val params = Parameters.createUpdateParameters()
+        if (BuildConfig.DEBUG) {
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+        } else {
+            params.setOldMeshName(mesh.factoryName)
+        }
+        params.setOldPassword(mesh.factoryPassword)
+        params.setNewMeshName(mesh.name)
+        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou")
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+            params.setNewPassword(NetworkFactory.md5(
+                    NetworkFactory.md5(mesh?.password) + account))
+        } else {
+            params.setNewPassword(mesh?.password)
+        }
+
+        params.setUpdateDeviceList(bestRSSIDevice)
+        val groupAddress = bestRSSIDevice!!.meshAddress
+        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
+                (groupAddress shr 8 and 0xFF).toByte())
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, bestRSSIDevice!!.meshAddress,
+                paramBytes)
+        otaUpdate()
+    }
+
+    private fun otaUpdate() {
+         dbSwitch.macAddr= bestRSSIDevice!!.macAddress
+        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
+        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
+//        DBUtils.saveSwitch(dbSwitch,false)
+        val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
+        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
+        startActivity(intent)
+        finish()
+    }
 }

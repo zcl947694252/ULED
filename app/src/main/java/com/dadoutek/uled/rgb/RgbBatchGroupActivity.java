@@ -306,7 +306,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     private void scanSuccess() {
         //更新Title
         tvStopScan.setVisibility(View.GONE);
-        toolbar.setTitle(getString(R.string.title_connector_lights_num, adapter.getCount()));
+        toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
@@ -412,7 +412,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 //目前测试调到主页
                 doFinish();
             } else {
-                showToast(getString(R.string.have_connector_no_group_tip));
+                showToast(getString(R.string.have_lamp_no_group_tip));
             }
         });
     }
@@ -440,14 +440,14 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 //获取当前勾选灯的列表
                 List<DbLight> selectLights = getCurrentSelectLights();
 
-                showLoadingDialog(getResources().getString(R.string.grouping_connector_wait_tip,
+                showLoadingDialog(getResources().getString(R.string.grouping_wait_tip,
                         selectLights.size() + ""));
                 //将灯列表的灯循环设置分组
                 setGroups(group, selectLights);
             }
 
         } else {
-            showToast(getString(R.string.selected_connector_tip));
+            showToast(getString(R.string.selected_lamp_tip));
         }
     }
 
@@ -470,7 +470,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             @Override
             public Unit invoke() {
                 dbLight.setBelongGroupId(allLightId);
-                ToastUtils.showLong(R.string.connector_fail_tip);
+                ToastUtils.showLong(R.string.group_fail_tip);
                 updateGroupResult(dbLight, dbGroup);
                 if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
                     ToastUtils.showLong("断开连接");
@@ -1273,7 +1273,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                     isFirtst = false;
                     SharedPreferencesHelper.putBoolean(this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
-                toolbar.setTitle(getString(R.string.title_connector_lights_num, adapter.getCount()));
+                toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);
 
                 Log.d("ScanningTest", "update mesh success");
