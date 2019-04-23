@@ -71,24 +71,24 @@
             app:pb_textError="@string/not_found_switch"
             app:pb_textProgress="@string/searching" />
 
-        <com.dd.processbutton.iml.ActionProcessButton
-            android:id="@+id/otaBtn"
-            android:layout_width="320dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="@string/ota"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progressOldBtn"
-            app:pb_colorComplete="@color/green_complete"
-            app:pb_colorError="@color/red_error"
-            app:pb_colorNormal="@color/primary"
-            app:pb_colorPressed="@android:color/holo_blue_dark"
-            app:pb_colorProgress="@color/primary"
-            app:pb_textComplete="@string/connected"
-            app:pb_textError="@string/not_found_switch"
-            app:pb_textProgress="@string/searching" />
+        <!--<com.dd.processbutton.iml.ActionProcessButton-->
+            <!--android:id="@+id/otaBtn"-->
+            <!--android:layout_width="320dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginTop="15dp"-->
+            <!--android:text="@string/ota"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toBottomOf="@id/progressOldBtn"-->
+            <!--app:pb_colorComplete="@color/green_complete"-->
+            <!--app:pb_colorError="@color/red_error"-->
+            <!--app:pb_colorNormal="@color/primary"-->
+            <!--app:pb_colorPressed="@android:color/holo_blue_dark"-->
+            <!--app:pb_colorProgress="@color/primary"-->
+            <!--app:pb_textComplete="@string/connected"-->
+            <!--app:pb_textError="@string/not_found_switch"-->
+            <!--app:pb_textProgress="@string/searching" />-->
 
         <TextView
             android:id="@+id/tvHint1"
@@ -113,10 +113,10 @@
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.505"
+            app:layout_constraintHorizontal_bias="0.494"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.377" />
+            app:layout_constraintVertical_bias="0.508" />
 
         <TextView
             android:id="@+id/tvHint3"

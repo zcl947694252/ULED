@@ -98,7 +98,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var isSupportInstallOldDevice=false
 
-    private var isOTA=true
+//    private var isOTA=true
 
     private var dbSwitch=DbSwitch()
 
@@ -157,7 +157,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         progressBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=false
-            isOTA=true
+//            isOTA=true
             progressOldBtn.progress=0
             startScan()
         }
@@ -165,16 +165,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         progressOldBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=true
-            isOTA=true
+//            isOTA=true
             progressBtn.progress=0
             startScan()
         }
-        otaBtn.onClick {
-//            retryConnectCount = 0
-            isOTA=false
-            otaBtn.progress=0
-            startScan()
-        }
+//        otaBtn.onClick {
+////            retryConnectCount = 0
+//            isOTA=false
+//            otaBtn.progress=0
+//            startScan()
+//        }
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {
@@ -240,7 +240,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 startCheckRSSITimer()
                 TelinkLightService.Instance()?.startScan(params)
 
-                if(isOTA){
+//                if(isOTA){
                     if(isSupportInstallOldDevice){
                         progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                         progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
@@ -248,10 +248,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                         progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
                     }
-                }else {
-                    otaBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                    otaBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                }
+//                }
+//                else {
+//                    otaBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+//                    otaBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+//                }
 
 
 //                scanDisposable?.dispose()
@@ -404,7 +405,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         LogUtils.d("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
-            if(isOTA){
+//            if(isOTA){
                 if(isSupportInstallOldDevice){
                     progressOldBtn.progress = -1   //控件显示Error状态
                     progressOldBtn.text = getString(R.string.not_found_switch)
@@ -412,10 +413,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     progressBtn.progress = -1   //控件显示Error状态
                     progressBtn.text = getString(R.string.not_found_switch)
                 }
-            }else{
-                otaBtn.progress = -1   //控件显示Error状态
-                otaBtn.text = getString(R.string.not_found_switch)
-            }
+//            }
+//            else{
+//                otaBtn.progress = -1   //控件显示Error状态
+//                otaBtn.text = getString(R.string.not_found_switch)
+//            }
 
         }
     }
@@ -479,18 +481,19 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
 //        scanDisposable?.dispose()
-        if(isOTA){
+//        if(isOTA){
             if(isSupportInstallOldDevice){
                 progressOldBtn.progress = 100  //进度控件显示成完成状态
             }else{
                 progressBtn.progress = 100  //进度控件显示成完成状态
             }
-        }else{
-            otaBtn.progress=100
-        }
+//        }
+//        else{
+//            otaBtn.progress=100
+//        }
 
 
-        if(isOTA){
+//        if(isOTA){
             if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                     bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
                 startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
@@ -499,9 +502,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
                 startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
             }
-        }else {
-            getVersion()
-        }
+//        }
+//        else {
+//            getVersion()
+//        }
     }
 
 
@@ -510,7 +514,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         TelinkLightService.Instance().idleMode(true)
 
         LogUtils.d("showConnectFailed")
-        if(isOTA){
+//        if(isOTA){
             if(isSupportInstallOldDevice){
                 progressOldBtn.progress = -1    //控件显示Error状态
                 progressOldBtn.text = getString(R.string.connect_failed)
@@ -518,10 +522,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 progressBtn.progress = -1    //控件显示Error状态
                 progressBtn.text = getString(R.string.connect_failed)
             }
-        }else{
-            otaBtn.progress = -1    //控件显示Error状态
-            otaBtn.text = getString(R.string.connect_failed)
-        }
+//        }
+//        else{
+//            otaBtn.progress = -1    //控件显示Error状态
+//            otaBtn.text = getString(R.string.connect_failed)
+//        }
 
     }
 
@@ -560,15 +565,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
-                            if(isOTA){
+//                            if(isOTA){
                                 if(isSupportInstallOldDevice){
                                     progressOldBtn.text = getString(R.string.connecting)
                                 }else{
                                     progressBtn.text = getString(R.string.connecting)
                                 }
-                            }else{
-                                otaBtn.text = getString(R.string.connecting)
-                            }
+//                            }
+//                            else{
+//                                otaBtn.text = getString(R.string.connecting)
+//                            }
                         }
                     } else {
                         //没有授予权限
@@ -660,85 +666,132 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun getVersion() {
-        var dstAdress = 0
-            dstAdress = bestRSSIDevice!!.meshAddress
-            Commander.getDeviceVersion(dstAdress,
-                    successCallback = {
-//                        localVersion=it
-//                        versionLayout.visibility = View.VISIBLE
-                        localVersion = it
-                        dbSwitch.version=it
-//                        tvLightVersion.text = it
-//                        tvOta!!.visibility = View.VISIBLE
-//                        if(it!!.startsWith("STS")){
-//                        isGlassSwitch=true
-//                            otaSwitch()
-                        checkPermission()
-//                    }
-                    },
-                    failedCallback = {
-//                        versionLayout.visibility = View.GONE
-//                        tvOta!!.visibility = View.GONE
-                    })
-        }
-
-    private fun checkPermission() {
-//        if(light!!.macAddr.length<16){
-//            ToastUtils.showLong(getString(R.string.bt_error))
-//        }else{
-        mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
-                        if(isBoolean){
-                            transformView()
-                        }else {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@ScanningSwitchActivity, localVersion, otaPrepareListner)
-                        }
-                    } else {
-                        ToastUtils.showLong(R.string.update_permission_tip)
-                    }
-                })
+//    private fun getVersion() {
+//        var dstAdress = 0
+//            dstAdress = bestRSSIDevice!!.meshAddress
+//            Commander.getDeviceVersion(dstAdress,
+//                    successCallback = {
+////                        localVersion=it
+////                        versionLayout.visibility = View.VISIBLE
+//                        localVersion = it
+//                        dbSwitch.version=it
+////                        tvLightVersion.text = it
+////                        tvOta!!.visibility = View.VISIBLE
+////                        if(it!!.startsWith("STS")){
+////                        isGlassSwitch=true
+////                            otaSwitch()
+//                        checkPermission()
+////                    }
+//                    },
+//                    failedCallback = {
+////                        versionLayout.visibility = View.GONE
+////                        tvOta!!.visibility = View.GONE
+//                    })
 //        }
-    }
 
-    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+//    private fun checkPermission() {
+////        if(light!!.macAddr.length<16){
+////            ToastUtils.showLong(getString(R.string.bt_error))
+////        }else{
+//        mDisposable.add(
+//                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+//                    if (granted!!) {
+//                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+//                        if(isBoolean){
+//                            transformView()
+//                        }else {
+//                            OtaPrepareUtils.instance().gotoUpdateView(this@ScanningSwitchActivity, localVersion, otaPrepareListner)
+//                        }
+//                    } else {
+//                        ToastUtils.showLong(R.string.update_permission_tip)
+//                    }
+//                })
+////        }
+//    }
 
-        override fun downLoadFileStart() {
-            showLoadingDialog(getString(R.string.get_update_file))
-        }
+//    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+//
+//        override fun downLoadFileStart() {
+//            showLoadingDialog(getString(R.string.get_update_file))
+//        }
+//
+//        override fun startGetVersion() {
+//            showLoadingDialog(getString(R.string.verification_version))
+//        }
+//
+//        override fun getVersionSuccess(s: String) {
+//            //            ToastUtils.showLong(.string.verification_version_success);
+//            hideLoadingDialog()
+//        }
+//
+//        override fun getVersionFail() {
+//            ToastUtils.showLong(R.string.verification_version_fail)
+//            hideLoadingDialog()
+//        }
+//
+//
+//        override fun downLoadFileSuccess() {
+//            hideLoadingDialog()
+//            transformView()
+//        }
+//
+//        override fun downLoadFileFail(message: String) {
+//            hideLoadingDialog()
+//            ToastUtils.showLong(R.string.download_pack_fail)
+//        }
+//    }
 
-        override fun startGetVersion() {
-            showLoadingDialog(getString(R.string.verification_version))
-        }
+//    private fun transformView() {
+//        setGroupForSwitch()
+////        dbSwitch.macAddr= bestRSSIDevice!!.macAddress
+////        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+////        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
+////        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
+//////        DBUtils.saveSwitch(dbSwitch,false)
+////        val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
+////        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
+////        startActivity(intent)
+////        finish()
+//    }
+//
+//
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        mDisposable.dispose()
+//    }
 
-        override fun getVersionSuccess(s: String) {
-            //            ToastUtils.showLong(.string.verification_version_success);
-            hideLoadingDialog()
-        }
+//    private fun setGroupForSwitch() {
+//        val mesh = this.mApplication.mesh
+//        val params = Parameters.createUpdateParameters()
+//        if (BuildConfig.DEBUG) {
+//            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+//        } else {
+//            params.setOldMeshName(mesh.factoryName)
+//        }
+//        params.setOldPassword(mesh.factoryPassword)
+//        params.setNewMeshName(mesh.name)
+//        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+//                Constant.DB_NAME_KEY, "dadou")
+//        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+//                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+//            params.setNewPassword(NetworkFactory.md5(
+//                    NetworkFactory.md5(mesh?.password) + account))
+//        } else {
+//            params.setNewPassword(mesh?.password)
+//        }
+//
+//        params.setUpdateDeviceList(bestRSSIDevice)
+//        val groupAddress = bestRSSIDevice!!.meshAddress
+//        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
+//                (groupAddress shr 8 and 0xFF).toByte())
+//        TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, bestRSSIDevice!!.meshAddress,
+//                paramBytes)
+//        otaUpdate()
+//    }
 
-        override fun getVersionFail() {
-            ToastUtils.showLong(R.string.verification_version_fail)
-            hideLoadingDialog()
-        }
-
-
-        override fun downLoadFileSuccess() {
-            hideLoadingDialog()
-            transformView()
-        }
-
-        override fun downLoadFileFail(message: String) {
-            hideLoadingDialog()
-            ToastUtils.showLong(R.string.download_pack_fail)
-        }
-    }
-
-    private fun transformView() {
-        setGroupForSwitch()
-//        dbSwitch.macAddr= bestRSSIDevice!!.macAddress
+//    private fun otaUpdate() {
+//         dbSwitch.macAddr= bestRSSIDevice!!.macAddress
 //        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
 //        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
 //        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
@@ -747,52 +800,5 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
 //        startActivity(intent)
 //        finish()
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mDisposable.dispose()
-    }
-
-    private fun setGroupForSwitch() {
-        val mesh = this.mApplication.mesh
-        val params = Parameters.createUpdateParameters()
-        if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-        } else {
-            params.setOldMeshName(mesh.factoryName)
-        }
-        params.setOldPassword(mesh.factoryPassword)
-        params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
-
-        params.setUpdateDeviceList(bestRSSIDevice)
-        val groupAddress = bestRSSIDevice!!.meshAddress
-        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
-                (groupAddress shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, bestRSSIDevice!!.meshAddress,
-                paramBytes)
-        otaUpdate()
-    }
-
-    private fun otaUpdate() {
-         dbSwitch.macAddr= bestRSSIDevice!!.macAddress
-        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
-        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
-//        DBUtils.saveSwitch(dbSwitch,false)
-        val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
-        startActivity(intent)
-        finish()
-    }
+//    }
 }
