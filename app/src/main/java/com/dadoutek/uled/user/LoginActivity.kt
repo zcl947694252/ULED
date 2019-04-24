@@ -23,11 +23,13 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AlphaAnimation
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.KeyboardUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -64,6 +66,10 @@ import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 /**
@@ -112,6 +118,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
         initData()
         initView()
+        initListener()
 //        addLayoutListener(linearLayout_1,btn_login)
     }
 
@@ -157,31 +164,20 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
 
-    private fun initView() {
-        initToolbar()
-        //        txtHeaderTitle.setText(R.string.user_login_title);
-        if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
-            transformView()
-        }
-        phoneEdit = findViewById(R.id.edit_user_phone_or_email)
-        passwordEdit = findViewById(R.id.edit_user_password)
-        recyclerView = findViewById(R.id.list_phone)
+    private fun initListener() {
+        KeyboardUtils.registerSoftInputChangedListener(this, KeyboardUtils.OnSoftInputChangedListener {
+            if (it > 0) {
+                if (clThirdPartyLogin.visibility == View.VISIBLE)
+                    clThirdPartyLogin.visibility = View.GONE        //Dismiss third party login if keyboard is show.
 
-        phoneEdit!!.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                //                Toast.makeText(MainActivity.this,s,Toast.LENGTH_LONG).show();
+            } else {
+                if (clThirdPartyLogin.visibility == View.GONE) {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        delay(20)
+                        clThirdPartyLogin.visibility = View.VISIBLE     //Display third party login if keyboard isn't show.
+                    }
 
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                Log.e("onTextChanged", count.toString())
-                //                Log.e("TAG_START", String.valueOf(start));
-                //                Log.e("TAG_BEFORE", String.valueOf(before));
-                //                Log.e("TAG_COUNT", String.valueOf(count));
-            }
-
-            override fun afterTextChanged(s: Editable) {
-
+                }
             }
         })
 
@@ -194,6 +190,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password)
+    }
+
+    private fun initView() {
+        initToolbar()
+        //        txtHeaderTitle.setText(R.string.user_login_title);
+        if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
+            transformView()
+        }
 
         val info = SharedPreferencesUtils.getLastUser()
         if (info != null && !info.isEmpty()) {
@@ -221,15 +225,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun eyePassword() {
-         if(isPassword){
-             eye_btn.setImageResource(R.drawable.icon_turn)
-             isPassword=false
-             edit_user_password.transformationMethod = PasswordTransformationMethod.getInstance()
-         }else{
-             isPassword=true
-             eye_btn.setImageResource(R.drawable.icon_open_eye)
-             edit_user_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
-         }
+        if (isPassword) {
+            eye_btn.setImageResource(R.drawable.icon_turn)
+            isPassword = false
+            edit_user_password.transformationMethod = PasswordTransformationMethod.getInstance()
+        } else {
+            isPassword = true
+            eye_btn.setImageResource(R.drawable.icon_open_eye)
+            edit_user_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+        }
     }
 
     private fun phoneList() {
@@ -237,14 +241,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             list_phone.visibility = View.VISIBLE
             edit_user_password.visibility = View.GONE
             btn_login.visibility = View.GONE
-            eye_btn.visibility=View.GONE
+            eye_btn.visibility = View.GONE
 //            btn_register.visibility=View.GONE
             forget_password.visibility = View.GONE
-            sms_password_login.visibility=View.GONE
-            third_party_text.visibility=View.GONE
-            qq_btn.visibility=View.GONE
-            google_btn.visibility=View.GONE
-            facebook_btn.visibility=View.GONE
+            sms_password_login.visibility = View.GONE
+            third_party_text.visibility = View.GONE
+            qq_btn.visibility = View.GONE
+            google_btn.visibility = View.GONE
+            facebook_btn.visibility = View.GONE
             val layoutmanager = LinearLayoutManager(this)
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
@@ -270,12 +274,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             btn_login.visibility = View.VISIBLE
             btn_register.visibility = View.VISIBLE
             forget_password.visibility = View.VISIBLE
-            eye_btn.visibility=View.VISIBLE
-            sms_password_login.visibility=View.VISIBLE
-            third_party_text.visibility=View.VISIBLE
-            qq_btn.visibility=View.VISIBLE
-            google_btn.visibility=View.VISIBLE
-            facebook_btn.visibility=View.VISIBLE
+            eye_btn.visibility = View.VISIBLE
+            sms_password_login.visibility = View.VISIBLE
+            third_party_text.visibility = View.VISIBLE
+            qq_btn.visibility = View.VISIBLE
+            google_btn.visibility = View.VISIBLE
+            facebook_btn.visibility = View.VISIBLE
             isPhone = true
             date_phone.setImageResource(R.drawable.icon_down)
         }
@@ -317,12 +321,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             btn_login.visibility = View.VISIBLE
             btn_register.visibility = View.VISIBLE
             forget_password.visibility = View.VISIBLE
-            eye_btn.visibility=View.VISIBLE
-            sms_password_login.visibility=View.VISIBLE
-            third_party_text.visibility=View.VISIBLE
-            qq_btn.visibility=View.VISIBLE
-            google_btn.visibility=View.VISIBLE
-            facebook_btn.visibility=View.VISIBLE
+            eye_btn.visibility = View.VISIBLE
+            sms_password_login.visibility = View.VISIBLE
+            third_party_text.visibility = View.VISIBLE
+            qq_btn.visibility = View.VISIBLE
+            google_btn.visibility = View.VISIBLE
+            facebook_btn.visibility = View.VISIBLE
             isPhone = true
             date_phone.setImageResource(R.drawable.icon_down)
         }

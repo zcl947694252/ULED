@@ -2,10 +2,10 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout_1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    android:id="@+id/linearLayout_1"
     tools:context=".user.LoginActivity">
 
     <ImageView
@@ -21,15 +21,17 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="@string/user_login_title"
-        android:textStyle="bold"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/user_login_title"
         android:textColor="#333333"
         android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintVertical_bias="0.0" />
 
 
     <TextView
@@ -61,29 +63,31 @@
         android:id="@+id/edit_user_phone_or_email"
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="8dp"
         android:layout_marginRight="25dp"
+        android:layout_marginBottom="8dp"
         android:hint="@string/please_phone_number"
         android:inputType="phone"
         android:maxLength="16"
         android:maxLines="1"
         android:textColor="#333333"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintVertical_bias="0.16000003" />
 
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list_phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/edit_user_phone_or_email"
         app:layout_constraintStart_toStartOf="@+id/edit_user_phone_or_email"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone_or_email"
-        android:visibility="gone"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone_or_email" />
 
     <EditText
         android:id="@+id/edit_user_password"
@@ -105,7 +109,6 @@
         android:id="@+id/date_phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
         android:padding="10dp"
         android:src="@drawable/icon_down"
         app:layout_constraintBottom_toBottomOf="@+id/edit_user_phone_or_email"
@@ -117,7 +120,6 @@
         android:id="@+id/eye_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="25dp"
         android:padding="10dp"
         android:src="@drawable/icon_turn"
         app:layout_constraintBottom_toBottomOf="@+id/edit_user_password"
@@ -129,7 +131,6 @@
         android:id="@+id/forget_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:padding="5dp"
         android:text="@string/forget_password"
         android:textColor="#666666"
@@ -142,14 +143,16 @@
         android:id="@+id/btn_login"
         android:layout_width="320dp"
         android:layout_height="44dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/btn_rec_black_bt"
         android:text="@string/user_login_title"
-        android:textSize="18sp"
         android:textColor="#ffffff"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/edit_user_password"
         app:layout_constraintStart_toStartOf="@+id/edit_user_password"
-        app:layout_constraintTop_toBottomOf="@+id/forget_password" />
+        app:layout_constraintTop_toBottomOf="@+id/forget_password"
+        app:layout_constraintVertical_bias="0.100000024" />
 
     <TextView
         android:id="@+id/sms_password_login"
@@ -166,46 +169,55 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_login" />
 
 
-    <TextView
-        android:id="@+id/third_party_text"
-        android:layout_width="wrap_content"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/clThirdPartyLogin"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/third_party"
-        android:textColor="#999999"
-        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/edit_user_password"
-        app:layout_constraintTop_toBottomOf="@+id/sms_password_login" />
+        app:layout_constraintEnd_toEndOf="@+id/edit_user_phone_or_email"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/sms_password_login"
+        app:layout_constraintVertical_bias="0.9">
 
-    <ImageView
-        android:id="@+id/facebook_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_facebook"
-        app:layout_constraintBottom_toBottomOf="@+id/third_party_text"
-        app:layout_constraintEnd_toEndOf="@+id/edit_user_password"
-        app:layout_constraintTop_toTopOf="@+id/third_party_text" />
+        <TextView
+            android:id="@+id/third_party_text"
+            android:layout_width="wrap_content"
+            android:layout_height="21dp"
+            android:text="@string/third_party"
+            android:textColor="#999999"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/google_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:src="@drawable/icon_google"
-        app:layout_constraintBottom_toBottomOf="@+id/third_party_text"
-        app:layout_constraintEnd_toStartOf="@+id/facebook_btn"
-        app:layout_constraintTop_toTopOf="@+id/third_party_text" />
+        <ImageView
+            android:id="@+id/facebook_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_facebook"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/qq_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:src="@drawable/icon_qq"
-        app:layout_constraintBottom_toBottomOf="@+id/third_party_text"
-        app:layout_constraintEnd_toStartOf="@+id/google_btn"
-        app:layout_constraintTop_toTopOf="@+id/third_party_text" />
+        <ImageView
+            android:id="@+id/google_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/icon_google"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/facebook_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/qq_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/icon_qq"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/google_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
