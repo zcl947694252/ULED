@@ -261,6 +261,7 @@
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="upload_data">上传本地数据</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
+    <string name="exit_tips_in_groups">确定退出分组?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
     <string name="account_exist">账户已存在</string>

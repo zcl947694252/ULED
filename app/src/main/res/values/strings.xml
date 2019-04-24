@@ -269,6 +269,7 @@
     <string name="tip_used_name">The current name is already used</string>
     <string name="upload_data">Upload data</string>
     <string name="exit_tips_in_scanning">Do you really want to quit scanning?</string>
+    <string name="exit_tips_in_groups">Determine exit group?</string>
     <string name="login_timeout">Login timeout</string>
     <string name="account_not_exist">Account not exist</string>
     <string name="account_exist">Account already exists</string>
