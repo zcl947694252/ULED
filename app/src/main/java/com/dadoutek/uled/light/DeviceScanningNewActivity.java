@@ -1,6 +1,7 @@
 package com.dadoutek.uled.light;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
@@ -442,6 +443,22 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         //确定当前分组
         sureGroupingEvent();
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(DeviceScanningNewActivity.this)
+                        .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+//                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
+//                        finish();
+                            doFinish();
+                        })
+                        .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
+                        }))
+                        .setMessage(R.string.exit_tips_in_group)
+                        .show();
+            }
+        });
     }
 
     private void sureGroupingEvent() {
@@ -1065,6 +1082,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         onLeScanTimeout();
     };
 
+    @SuppressLint("ResourceType")
     private void initToolbar() {
         toolbar.setTitle(R.string.scanning);
         setSupportActionBar(toolbar);
@@ -1072,6 +1090,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        toolbar.setNavigationContentDescription(R.drawable.navigation_back_white);
     }
 
     @Override

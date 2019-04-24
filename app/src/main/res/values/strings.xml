@@ -672,4 +672,12 @@
     <string name="batch_group">Batch group</string>
 
     <string name="developer_mode_close">Enter developer mode close</string>
-</resources>
+
+    <string name="sms_sign">Sign in with SMS verification code</string>
+    <string name="third_party">Third party sign</string>
+    <string name="please_phone_number">Please enter the phone number</string>
+    <string name="please_password">Please enter your login password</string>
+    <string name="no_account">No account yet, please</string>
+
+    <string name="exit_tips_in_group">Are you sure you want to group out?</string>
+    </resources>

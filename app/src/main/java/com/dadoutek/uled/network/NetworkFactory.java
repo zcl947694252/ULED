@@ -2,6 +2,8 @@ package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
 
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.model.Constant;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -49,13 +51,24 @@ public class NetworkFactory {
             okHttpClient = initHttpClient();
         }
         if (api == null) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
-                    .addConverterFactory(gsonConverterFactory)
-                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
-                    .build();
-            api = retrofit.create(RequestInterface.class);
+            if (!AppUtils.isAppDebug()) {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .client(okHttpClient)
+                        .baseUrl(Constant.BASE_URL)
+                        .addConverterFactory(gsonConverterFactory)
+                        .addCallAdapterFactory(rxJavaCallAdapterFactory)
+                        .build();
+                api = retrofit.create(RequestInterface.class);
+            }else{
+                Retrofit retrofit = new Retrofit.Builder()
+                        .client(okHttpClient)
+                        .baseUrl(Constant.BASE_DEBUG_URL)
+                        .addConverterFactory(gsonConverterFactory)
+                        .addCallAdapterFactory(rxJavaCallAdapterFactory)
+                        .build();
+                api = retrofit.create(RequestInterface.class);
+            }
+
         }
         return api;
     }

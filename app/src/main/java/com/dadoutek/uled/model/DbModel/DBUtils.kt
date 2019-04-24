@@ -931,6 +931,14 @@ object DBUtils {
         )
     }
 
+    fun deleteSensor(dbSensor: DbSensor){
+        DaoSessionInstance.getInstance().dbSensorDao.delete(dbSensor)
+        recordingChange(dbSensor.id,
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_DELETE
+        )
+    }
+
 
 
     fun deleteSceneActionsList(sceneActionslist: List<DbSceneActions>) {

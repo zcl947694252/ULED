@@ -261,6 +261,7 @@
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="upload_data">上传本地数据</string>
     <string name="exit_tips_in_scanning">正在扫描中，确定要退出吗?</string>
+    <string name="exit_tips_in_group">确定要分组退出吗?</string>
     <string name="login_timeout">登录超时</string>
     <string name="account_not_exist">账户不存在</string>
     <string name="account_exist">账户已存在</string>
@@ -610,4 +611,10 @@
     <string name="batch_group">批量分组</string>
 
     <string name="developer_mode_close">关闭开发者模式</string>
+    
+    <string name="sms_sign">使用短信验证码登录</string>
+    <string name="third_party">第三方登录</string>
+    <string name="please_phone_number">请输入手机号码</string>
+    <string name="please_password">请输入登录密码</string>
+    <string name="no_account">还没有账号，立即</string>
 </resources>

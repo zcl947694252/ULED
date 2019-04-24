@@ -63,7 +63,7 @@ public class Constant implements Serializable {
     public static final String IS_LOGIN = "IS_LOGIN";
 
     //网络请求服务器测试地址
-//    public static final String BASE_URL = "http://47.107.227.130/smartlight_test/";
+    public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
 
     //网络请求服务器正式地址
 //    public static final String BASE_URL = "http://47.107.227.130/smartlight/";
