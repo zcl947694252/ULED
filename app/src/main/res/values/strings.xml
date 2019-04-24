@@ -680,4 +680,9 @@
     <string name="no_account">No account yet, please</string>
 
     <string name="exit_tips_in_group">Are you sure you want to group out?</string>
+
+    <string name="brightness">brightness</string>
+    <string name="color_temperature">Color temperature</string>
+    <string name="brightness_adjustment">Brightness adjustment：</string>
+    <string name="color_temperature_adjustment">Color Temperature Adjustment：</string>
     </resources>

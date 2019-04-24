@@ -617,4 +617,8 @@
     <string name="please_phone_number">请输入手机号码</string>
     <string name="please_password">请输入登录密码</string>
     <string name="no_account">还没有账号，立即</string>
-</resources>
+    <string name="brightness">亮度</string>
+    <string name="color_temperature">色温</string>
+    <string name="brightness_adjustment">亮度调节：</string>
+    <string name="color_temperature_adjustment">色温调节：</string>
+    </resources>
