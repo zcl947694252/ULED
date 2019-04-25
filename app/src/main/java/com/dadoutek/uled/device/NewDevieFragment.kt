@@ -36,6 +36,7 @@ import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.SpaceItemDecoration
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.coroutines.Dispatchers
@@ -177,17 +178,18 @@ class NewDevieFragment :BaseFragment(){
 
     private fun initView(view: View?) {
         val layoutmanager = LinearLayoutManager(activity)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView!!.layoutManager = layoutmanager
+//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        recyclerView!!.layoutManager = GridLayoutManager(this.activity,2)
         newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item,deviceTypeList!!)
 
-        val decoration = DividerItemDecoration(activity!!,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                .divider)))
-        //添加分割线
-        recyclerView?.addItemDecoration(decoration)
+//        val decoration = DividerItemDecoration(activity!!,
+//                DividerItemDecoration
+//                        .VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+//                .divider)))
+//        //添加分割线
+//        recyclerView?.addItemDecoration(decoration)
+        recyclerView?.addItemDecoration(SpaceItemDecoration(40))
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
         newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)

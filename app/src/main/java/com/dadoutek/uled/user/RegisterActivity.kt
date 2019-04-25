@@ -1,11 +1,15 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.Toast
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -37,7 +41,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
+import kotlinx.android.synthetic.main.activity_register.edit_user_password
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.HashMap
 import org.json.JSONObject
@@ -50,12 +56,15 @@ import java.util.concurrent.TimeUnit
 class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private var userName: String? = null
     private var userPassWord: String? = null
+    private var userPassWordAgain: String? = null
     private var MD5PassWord: String? = null
     private var countryCode: String? = null
     private val mCompositeDisposable = CompositeDisposable()
-    private var isChangePwd=false
+    private var isChangePwd = false
     private var dbUser: DbUser? = null
     private val TIME_INTERVAL: Long = 30
+    private var isPassword = false
+    private var isPasswordAgain = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,27 +75,30 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initView() {
-        val changeKey=intent.getStringExtra("fromLogin")
+        val changeKey = intent.getStringExtra("fromLogin")
         isChangePwd = changeKey != "register"
         initToolbar()
         countryCode = ccp.selectedCountryCode
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
-        StringUtils.initEditTextFilterForRegister(edit_user_phone!!.editText)
-        StringUtils.initEditTextFilterForRegister(edit_user_password!!.editText)
+        image_password_btn.setOnClickListener(this)
+        image_again_password_btn.setOnClickListener(this)
+        StringUtils.initEditTextFilterForRegister(edit_user_phone)
+        StringUtils.initEditTextFilterForRegister(edit_user_password)
+        StringUtils.initEditTextFilterForRegister(again_password)
 
-        if(isChangePwd){
-            dbUser=DbUser()
+        if (isChangePwd) {
+            dbUser = DbUser()
             register_completed.setText(R.string.btn_ok)
         }
         SMSSDK.registerEventHandler(eventHandler)
     }
 
     private fun initToolbar() {
-        if(isChangePwd){
+        if (isChangePwd) {
             toolbar.title = getString(R.string.update_password)
-        }else{
+        } else {
             toolbar.title = getString(R.string.user_register)
         }
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
@@ -96,36 +108,67 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.register_completed -> {
-                if(NetWorkUtils.isNetworkAvalible(this)){
+                if (NetWorkUtils.isNetworkAvalible(this)) {
                     if (checkIsOK()) {
                         if (Constant.TEST_REGISTER) {
                             showLoadingDialog(getString(R.string.registing))
                             register()
                         } else {
-                            if(isChangePwd){
+                            if (isChangePwd) {
                                 showLoadingDialog(getString(R.string.updating_password))
-                            }else{
+                            } else {
                                 showLoadingDialog(getString(R.string.registing))
                             }
                             submitCode(countryCode
-                                    ?: "", userName!!, edit_verification.editText!!.text.toString().trim { it <= ' ' })
+                                    ?: "", userName!!, edit_verification.text.toString().trim { it <= ' ' })
                         }
                     }
-                }else{
+                } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))
                 }
             }
             R.id.btn_send_verification ->
-                if(NetWorkUtils.isNetworkAvalible(this)){
+                if (NetWorkUtils.isNetworkAvalible(this)) {
                     send_verification()
-                }else{
+                } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))
                 }
+
+            R.id.image_password_btn -> eyePassword()
+            R.id.image_again_password_btn -> eyePasswordAgain()
+        }
+    }
+
+    private fun eyePasswordAgain() {
+        if (isPasswordAgain) {
+            image_again_password_btn.setImageResource(R.drawable.icon_turn)
+            isPasswordAgain = false
+            again_password.transformationMethod = PasswordTransformationMethod.getInstance()
+            again_password.setSelection(again_password.text.length)
+        } else {
+            isPasswordAgain = true
+            image_again_password_btn.setImageResource(R.drawable.icon_open_eye)
+            again_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            again_password.setSelection(again_password.text.length)
+        }
+    }
+
+    private fun eyePassword() {
+        if (isPassword) {
+            image_password_btn.setImageResource(R.drawable.icon_turn)
+            isPassword = false
+            edit_user_password.transformationMethod = PasswordTransformationMethod.getInstance()
+            edit_user_password.setSelection(edit_user_password.text.length)
+        } else {
+            isPassword = true
+            image_password_btn.setImageResource(R.drawable.icon_open_eye)
+            edit_user_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            edit_user_password.setSelection(edit_user_password.text.length)
         }
     }
 
     private fun send_verification() {
-        val phoneNum = edit_user_phone.getEditText()!!.getText().toString().trim({ it <= ' ' })
+        val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
@@ -158,13 +201,13 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         timing()
                     } else {
                         // TODO 处理错误的结果
-                        if(result == SMSSDK.RESULT_ERROR){
-                            val a=(data as Throwable)
-                            val jsonObject=JSONObject(a.localizedMessage)
-                            val message=jsonObject.opt("detail").toString()
+                        if (result == SMSSDK.RESULT_ERROR) {
+                            val a = (data as Throwable)
+                            val jsonObject = JSONObject(a.localizedMessage)
+                            val message = jsonObject.opt("detail").toString()
                             ToastUtils.showLong(message)
-                        }else{
-                            val a=(data as Throwable)
+                        } else {
+                            val a = (data as Throwable)
                             a.printStackTrace()
                             ToastUtils.showLong(a.message)
                         }
@@ -173,21 +216,21 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理验证成功的结果
-                        if(isChangePwd){
+                        if (isChangePwd) {
                             startChange()
-                        }else{
+                        } else {
                             register()
                         }
                     } else {
                         // TODO 处理错误的结果
-                        if(result == SMSSDK.RESULT_ERROR){
-                            val a=(data as Throwable)
-                            val jsonObject=JSONObject(a.localizedMessage)
-                            val message=jsonObject.opt("detail").toString()
+                        if (result == SMSSDK.RESULT_ERROR) {
+                            val a = (data as Throwable)
+                            val jsonObject = JSONObject(a.localizedMessage)
+                            val message = jsonObject.opt("detail").toString()
                             ToastUtils.showLong(message)
                             hideLoadingDialog()
-                        }else{
-                            val a=(data as Throwable)
+                        } else {
+                            val a = (data as Throwable)
                             a.printStackTrace()
                             ToastUtils.showLong(a.message)
                         }
@@ -199,17 +242,22 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun timing() {
         mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    val num = 29 - it as Long
+                    val num = 59 - it as Long
                     if (num == 0L) {
                         btn_send_verification.text = resources.getString(R.string.reget)
+                        btn_send_verification.setBackgroundResource(R.drawable.get_code_btn)
+                        btn_send_verification.setTextColor(Color.parseColor("#18B4ED"))
                         btn_send_verification.isEnabled = true
                     } else {
-                        btn_send_verification.text = getString(R.string.regetCount, num)
+                        btn_send_verification.text = num.toString() + " s"
+                        btn_send_verification.setBackgroundResource(R.drawable.get_code_btn_false)
+                        btn_send_verification.setTextColor(Color.parseColor("#999999"))
                         btn_send_verification.isEnabled = false
                     }
                 })
@@ -275,14 +323,18 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun checkIsOK(): Boolean {
-        userName = edit_user_phone!!.editText!!.text.toString().trim { it <= ' ' }
-        userPassWord = edit_user_password!!.editText!!.text.toString().trim { it <= ' ' }
+        userName = edit_user_phone!!.text.toString().trim { it <= ' ' }
+        userPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }
+        userPassWordAgain = again_password!!.text.toString().trim { it <= ' ' }
 
         if (compileExChar(userName!!)) {
             ToastUtils.showLong(R.string.phone_input_error)
             return false
         } else if (compileExChar(userName!!) || compileExChar(userPassWord!!)) {
             ToastUtils.showLong(R.string.tip_register_input_error)
+            return false
+        } else if (userPassWord != userPassWordAgain) {
+            ToastUtils.showLong(R.string.two_password_inconsistent)
             return false
         } else {
             return true
@@ -346,15 +398,16 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun updatePassword() {
         MD5PassWord = md5(userPassWord)
         NetworkFactory.getApi()
-                .putPassword(dbUser!!.account,MD5PassWord)
+                .putPassword(dbUser!!.account, MD5PassWord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observerUpdatePassword)
     }
-    fun submitCode(country: String, phone: String, code: String){
+
+    fun submitCode(country: String, phone: String, code: String) {
         SMSSDK.submitVerificationCode(country, phone, code)
     }
-    
+
     private fun startChange() {
         getAccount()
     }

@@ -10,13 +10,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
 import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
@@ -306,6 +309,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         install_device_recyclerView?.layoutManager = layoutManager
         install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
+                val decoration = DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)))
+        //添加分割线
+        install_device_recyclerView?.addItemDecoration(decoration)
 
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 

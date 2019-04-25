@@ -33,18 +33,19 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".switches.OTASwitchActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity android:name=".user.VerificationCodeActivity"></activity>
+        <activity
+            android:name=".switches.OTASwitchActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".connector.ConnectorBatchGroupActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".windowcurtains.CurtainBatchGroupActivity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".rgb.RgbBatchGroupActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity
+            android:name=".windowcurtains.CurtainBatchGroupActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".rgb.RgbBatchGroupActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ota.OTAConnectorActivity"
             android:screenOrientation="portrait" />
@@ -151,9 +152,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.LogInfoActivity"
-            android:screenOrientation="portrait"
-
-            />
+            android:screenOrientation="portrait" />
         <!--
              <activity
              android:name=".activity.OTAPrepareActivity"
@@ -209,7 +208,7 @@
         <activity
             android:name=".user.RegisterActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".user.PhoneVerificationActivity"
             android:screenOrientation="portrait" />

@@ -199,12 +199,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             transformView()
         }
 
+        recyclerView=findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
         if (info != null && !info.isEmpty()) {
             val messge = info.split("-")
-            btn_login.isEnabled = true
-            btn_login.setBackgroundResource(R.drawable.btn_rec_blue_bt)
-            btn_login.setTextColor(Color.parseColor("#333333"))
             edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
         }
@@ -229,10 +227,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             eye_btn.setImageResource(R.drawable.icon_turn)
             isPassword = false
             edit_user_password.transformationMethod = PasswordTransformationMethod.getInstance()
+            edit_user_password.setSelection(edit_user_password.text.length)
         } else {
             isPassword = true
             eye_btn.setImageResource(R.drawable.icon_open_eye)
             edit_user_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
+            edit_user_password.setSelection(edit_user_password.text.length)
         }
     }
 
@@ -382,7 +382,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun forgetPassword() {
-        val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+        val intent = Intent(this@LoginActivity, ForgetPassWordActivity::class.java)
         intent.putExtra("fromLogin", "forgetPassword")
         startActivity(intent)
     }

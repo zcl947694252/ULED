@@ -223,6 +223,7 @@
     <string name="register_success">注册成功</string>
     <string name="phone_input_error">手机号格式错误</string>
     <string name="tip_register_input_error">用户名或密码不能包含特殊字符</string>
+    <string name="two_password_inconsistent">两个密码不一致</string>
     <string name="register_title_name">注册</string>
     <string name="login_bt_name">登录</string>
     <string name="user_login_title">登录</string>
@@ -243,7 +244,7 @@
     <string name="verification_code_error">验证码错误</string>
     <string name="successful_verification">验证成功</string>
     <string name="exit_login">退出登录</string>
-    <string name="forget_password">忘记密码？</string>
+    <string name="forget_password">忘记密码?</string>
     <string name="verification_phone">验证</string>
     <string name="update_password">修改密码</string>
     <string name="password_input_error">密码不能包含特殊字符</string>
@@ -536,16 +537,17 @@
     <string name="rename_groups">重命名分组</string>
     <string name="create_group">创建分组</string>
     <string name="create_scene_select">创建场景</string>
-    <string name="normal_light_describe">单色温,双色温灯</string>
-    <string name="rgb_light_describe">RGB灯,RGBW灯</string>
+    <string name="normal_light_describe">例如：单色温,双色温灯</string>
+    <string name="rgb_light_describe">例如：RGB灯,RGBW灯</string>
     <string name="switch_name">开关</string>
-    <string name="switch_describe">调光调色开关,场景开关,玻璃开关</string>
+    <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
     <string name="sensor">传感器</string>
-    <string name="sensor_describe">小夜灯,PIR</string>
+    <string name="sensor_describe">例如：小夜灯,PIR</string>
     <string name="add_device">添加设备</string>
     <string name="update_name_gp">修改组名</string>
     <string name="curtain">窗帘</string>
-    <string name="smart_curtain">智能窗帘</string>
+    <string name="smart_curtain">例如：智能窗帘</string>
+    <string name="for_connector">例如：蓝牙接收器</string>
     <string name="device">设备</string>
     <string name="install_tip1">准备工作</string>
     <string name="install_tip2">第一步\n\n请确保设备已经接上电源</string>
@@ -621,4 +623,12 @@
     <string name="color_temperature">色温</string>
     <string name="brightness_adjustment">亮度调节：</string>
     <string name="color_temperature_adjustment">色温调节：</string>
+
+    <string name="welcome_register">您好，欢迎注册账号</string>
+    <string name="please_code">请输入验证码</string>
+    <string name="please_again_password">请再次确认登录密码</string>
+    <string name="get_verification_code">获取验证码</string>
+    <string name="follow_password">按步骤操作即可找回密码</string>
+    <string name="new_password">请输入您的新密码</string>
+    <string name="number">数量</string>
     </resources>

@@ -65,7 +65,7 @@ class SceneGroupAdapter
             }else{
                 helper.setChecked(R.id.rg_yy,true)
             }
-        }else{
+        }else if(OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAress))){
             helper.setGone(R.id.scene_rgb_layout,false)
             helper.setGone(R.id.sb_temperature_layout,false)
             helper.setGone(R.id.linearLayout2,false)
@@ -75,6 +75,9 @@ class SceneGroupAdapter
             }else{
                 helper.setChecked(R.id.rg_yy,true)
             }
+        }else{
+            helper.setGone(R.id.scene_rgb_layout, false)
+            helper.setGone(R.id.sb_temperature_layout, true)
         }
 
         sbBrightness.tag = position

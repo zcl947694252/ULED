@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/bnve_device"
-        android:icon="@drawable/icon_facility_def"
+        android:icon="@drawable/icon_device_unselected"
         android:title="@string/device" />
     <item
         android:id="@+id/bnve_group"

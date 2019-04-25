@@ -685,4 +685,14 @@
     <string name="color_temperature">Color temperature</string>
     <string name="brightness_adjustment">Brightness adjustment：</string>
     <string name="color_temperature_adjustment">Color Temperature Adjustment：</string>
-    </resources>
+
+    <string name="welcome_register">Hello, welcome to register</string>
+    <string name="please_code">please enter verification code</string>
+    <string name="please_again_password">Please the login password again.</string>
+    <string name="get_verification_code">get code</string>
+    <string name="follow_password">Follow the steps to retrieve your password.</string>
+    <string name="new_password">Please enter your new password</string>
+    <string name="two_password_inconsistent">Two passwords are inconsistent</string>
+    <string name="number">Number</string>
+    <string name="for_connector">Connector</string>
+</resources>
