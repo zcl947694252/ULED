@@ -51,6 +51,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -65,7 +66,8 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,View.OnClickListener {
+
     override fun performed(event: Event<String>?) {
     }
 
@@ -79,8 +81,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private var mTelinkLightService: TelinkLightService? = null
 
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
-    private var recyclerView:RecyclerView?=null
 
     private var adapter:SwitchDeviceDetailsAdapter?=null
 
@@ -103,28 +103,51 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_device_details)
+//        initData()
+//        initView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         initData()
         initView()
     }
 
     private fun initData() {
         switchData=DBUtils.getAllSwitch()
+        if(switchData.size>0){
+            no_device_relativeLayout.visibility=View.GONE
+            recycleView.visibility=View.VISIBLE
+        }else{
+            no_device_relativeLayout.visibility=View.VISIBLE
+            recycleView.visibility=View.GONE
+        }
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.add_device_btn->addDevice()
+        }
+    }
+
+    private fun addDevice() {
+        startActivity(Intent(this, ScanningSwitchActivity::class.java))
     }
 
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
-        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = GridLayoutManager(this,3)
-        recyclerView!!.itemAnimator = DefaultItemAnimator()
+        recycleView!!.layoutManager = GridLayoutManager(this,3)
+        recycleView!!.itemAnimator = DefaultItemAnimator()
         adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData)
-        adapter!!.bindToRecyclerView(recyclerView)
+        adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
         for (i in switchData?.indices!!) {
 //            switchData!![i].updateIcon()
         }
 
+        add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()

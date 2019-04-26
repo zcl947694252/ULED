@@ -419,10 +419,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                     INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        intent = Intent(this, ScanningConnectorActivity::class.java)
-                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                        startActivityForResult(intent, 0)}
+                        if(medressData<254){
+                            intent = Intent(this, ScanningConnectorActivity::class.java)
+                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                            startActivityForResult(intent, 0)
+                        }else{
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
                 }
             }
             R.id.btnBack->{

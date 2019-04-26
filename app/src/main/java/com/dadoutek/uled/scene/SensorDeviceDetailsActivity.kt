@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
+import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -25,6 +26,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -48,6 +50,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.activity_sensor_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -63,14 +66,12 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> ,View.OnClickListener{
 
     override fun performed(event: Event<String>?) {
     }
 
     private lateinit var sensorData:MutableList<DbSensor>
-
-    private var recyclerView:RecyclerView?=null
 
     private var adapter:SensorDeviceDetailsAdapter?=null
 
@@ -102,14 +103,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sensor_device_details)
+    }
+
+    override fun onResume() {
+        super.onResume()
         initDate()
         initView()
     }
 
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
-        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = GridLayoutManager(this,3)
+        recycleView!!.layoutManager = GridLayoutManager(this,3)
 //        val decoration = DividerItemDecoration(this!!,
 //                DividerItemDecoration
 //                        .VERTICAL)
@@ -119,8 +123,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 //        //添加Item变化动画
 //        recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = SensorDeviceDetailsAdapter(R.layout.device_detail_adapter, sensorData)
-        adapter!!.bindToRecyclerView(recyclerView)
+        adapter!!.bindToRecyclerView(recycleView)
 
+        add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
@@ -130,7 +135,25 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun initDate() {
         sensorData=DBUtils.getAllSensor()
+        if(sensorData.size>0){
+            recycleView.visibility=View.VISIBLE
+            no_device_relativeLayout.visibility=View.GONE
+        }else{
+            recycleView.visibility=View.GONE
+            no_device_relativeLayout.visibility=View.VISIBLE
+        }
     }
+
+    override fun onClick(v: View?) {
+           when(v?.id){
+               R.id.add_device_btn->addDevice()
+           }
+    }
+
+    private fun addDevice() {
+        startActivity(Intent(this, ScanningSensorActivity::class.java))
+    }
+
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentLight = sensorData?.get(position)

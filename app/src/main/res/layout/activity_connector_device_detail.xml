@@ -1,9 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".connector.ConnectorDeviceDetailActivity">
 
-</android.support.constraint.ConstraintLayout>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:id="@+id/root"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/topView"
+        layout="@layout/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/no_device_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_no_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/no_device"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="120dp"
+            />
+
+        <Button
+            android:id="@+id/add_device_btn"
+            android:layout_width="140dp"
+            android:layout_height="38dp"
+            android:text="@string/device_scan_add"
+            android:background="@drawable/add_device_bt"
+            android:textColor="@color/blue_background"
+            android:textSize="18sp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/image_no_device"
+            android:layout_marginTop="72dp"
+            />
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recycleView"
+        android:visibility="gone"
+        />
+
+</LinearLayout>

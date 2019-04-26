@@ -173,7 +173,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 if (clThirdPartyLogin.visibility == View.GONE) {
                     GlobalScope.launch(Dispatchers.Main) {
-                        delay(20)
+//                        delay(20)
                         clThirdPartyLogin.visibility = View.VISIBLE     //Display third party login if keyboard isn't show.
                     }
 

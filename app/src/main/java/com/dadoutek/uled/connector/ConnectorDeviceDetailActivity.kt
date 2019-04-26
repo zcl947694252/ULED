@@ -56,6 +56,7 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_connector_device_detail.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -72,15 +73,13 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String> {
+class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String>,View.OnClickListener{
 
     private var type: Int? = null
 
     private lateinit var lightsData: MutableList<DbConnector>
 
     private var inflater: LayoutInflater? = null
-
-    private var recyclerView: RecyclerView? = null
 
     private var adaper: DeviceDetailConnectorAdapter? = null
 
@@ -119,7 +118,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_device_detail)
+        setContentView(R.layout.activity_connector_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initDate()
@@ -138,8 +137,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         val layoutmanager = LinearLayoutManager(this)
-        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = GridLayoutManager(this, 3) as RecyclerView.LayoutManager?
+        recycleView!!.layoutManager = GridLayoutManager(this, 3) as RecyclerView.LayoutManager?
 //        val decoration = DividerItemDecoration(this!!,
 //                DividerItemDecoration
 //                        .VERTICAL)
@@ -147,14 +145,14 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 //                .divider)))
 //        recyclerView!!.addItemDecoration(decoration)
         //添加Item变化动画
-        recyclerView!!.itemAnimator = DefaultItemAnimator()
+        recycleView!!.itemAnimator = DefaultItemAnimator()
         adaper = DeviceDetailConnectorAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
-        adaper!!.bindToRecyclerView(recyclerView)
+        adaper!!.bindToRecyclerView(recycleView)
         for (i in lightsData?.indices!!) {
             lightsData!![i].updateIcon()
         }
-
+        add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
@@ -162,6 +160,19 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
         toolbar.title=getString(R.string.connector) + " (" + lightsData.size + ")"
 
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.add_device_btn->addDevice()
+        }
+    }
+
+    private fun addDevice() {
+        intent = Intent(this, ScanningConnectorActivity::class.java)
+        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        startActivityForResult(intent, 0)
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -220,6 +231,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
         if(lightsData.size>0){
             toolbar!!.tv_function1.visibility=View.VISIBLE
+            recycleView.visibility=View.VISIBLE
+            no_device_relativeLayout.visibility=View.GONE
             var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
             batchGroup.setText(R.string.batch_group)
             batchGroup.setOnClickListener(View.OnClickListener {
@@ -229,6 +242,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                 startActivity(intent)
             })
+        }else{
+            recycleView.visibility=View.GONE
+            no_device_relativeLayout.visibility=View.VISIBLE
         }
 
 //        lightList = ArrayList()

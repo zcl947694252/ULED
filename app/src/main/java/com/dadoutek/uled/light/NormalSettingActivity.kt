@@ -556,10 +556,10 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         titleCenterName.visibility=View.VISIBLE
         titleCenterName.setText(light?.name)
 
-        tvOta!!.setOnClickListener(this.clickListener)
-        updateGroup.setOnClickListener(this.clickListener)
-        btnRemove.setOnClickListener(this.clickListener)
-        btnRename.setOnClickListener(clickListener)
+//        tvOta!!.setOnClickListener(this.clickListener)
+//        updateGroup.setOnClickListener(this.clickListener)
+//        btnRemove.setOnClickListener(this.clickListener)
+//        btnRename.setOnClickListener(clickListener)
         mRxPermission = RxPermissions(this)
 
         this.sbBrightness?.max = 100
