@@ -21,6 +21,8 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.curtain.CurtainScanningNewActivity
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -49,9 +51,11 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_curtains_device_details.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.item_install_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
@@ -67,14 +71,15 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 
-class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<String> {
+class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<String> ,View.OnClickListener{
+
     override fun performed(event: Event<String>?) {
 
     }
 
     private lateinit var curtain:MutableList<DbCurtain>
 
-    private var recyclerView:RecyclerView?=null
+//    private var recyclerView:RecyclerView?=null
 
     private var adapter:CurtainDeviceDetailsAdapter?=null
 
@@ -131,9 +136,12 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
         curtain=DBUtils.getAllCurtains()
         showList = ArrayList()
+//        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
         showList = gpList
         if(curtain.size>0){
             toolbar!!.tv_function1.visibility=View.VISIBLE
+            recycleView.visibility=View.VISIBLE
+            no_device_relativeLayout.visibility=View.GONE
             var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
             batchGroup.setText(R.string.batch_group)
             batchGroup.setOnClickListener(View.OnClickListener {
@@ -143,14 +151,15 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                 startActivity(intent)
             })
+        }else {
+            recycleView.visibility=View.GONE
+            no_device_relativeLayout.visibility=View.VISIBLE
         }
-
     }
 
     private fun initView() {
         val layoutmanager = LinearLayoutManager(this)
-        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = GridLayoutManager(this,3)
+        recycleView!!.layoutManager = GridLayoutManager(this,3)
 //        val decoration = DividerItemDecoration(this!!,
 //                DividerItemDecoration
 //                        .VERTICAL)
@@ -158,19 +167,33 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 //                .divider)))
 //        recyclerView!!.addItemDecoration(decoration)
         //添加Item变化动画
-        recyclerView!!.itemAnimator = DefaultItemAnimator()
+        recycleView!!.itemAnimator = DefaultItemAnimator()
         adapter = CurtainDeviceDetailsAdapter(R.layout.device_detail_adapter, curtain)
-        adapter!!.bindToRecyclerView(recyclerView)
+        adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         for (i in curtain?.indices!!) {
             curtain!![i].updateIcon()
         }
 
+        add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             finish()
         }
         toolbar.title=getString(R.string.curtain) + " (" + curtain.size + ")"
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id){
+            R.id.add_device_btn->addCurtainDevice()
+        }
+    }
+
+    private fun addCurtainDevice() {
+        intent = Intent(this, CurtainScanningNewActivity::class.java)
+        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        startActivityForResult(intent, 0)
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->

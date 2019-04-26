@@ -304,7 +304,7 @@
     <string name="start_sync">即将开始同步数据..</string>
     <string name="download_data_success">下载数据成功</string>
     <string name="sync_now">同步数据中…</string>
-    <string name="install_device">安装设备</string>
+    <string name="install_device">添加设备</string>
     <string name="tip_start_sync">开始同步..</string>
     <string name="upload_data_success">上传数据成功</string>
     <string name="network_tip_title">网络状态提示</string>
@@ -535,8 +535,8 @@
     <string name="get_code_ing">获取验证...</string>
     <string name="add_new_group">+添加分组</string>
     <string name="rename_groups">重命名分组</string>
-    <string name="create_group">创建分组</string>
-    <string name="create_scene_select">创建场景</string>
+    <string name="create_group">添加分组</string>
+    <string name="create_scene_select">添加场景</string>
     <string name="normal_light_describe">例如：单色温,双色温灯</string>
     <string name="rgb_light_describe">例如：RGB灯,RGBW灯</string>
     <string name="switch_name">开关</string>
@@ -631,4 +631,5 @@
     <string name="follow_password">按步骤操作即可找回密码</string>
     <string name="new_password">请输入您的新密码</string>
     <string name="number">数量</string>
+    <string name="login_password">使用密码登录</string>
     </resources>

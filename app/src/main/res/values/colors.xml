@@ -22,4 +22,9 @@
     <color name="background_color">#f6f6f6</color>
     <color name="mode_check_color">#80858C91</color>
     <color name="color_gray">#00000000</color>
+    
+    <color name="black_three">#333333</color>
+    <color name="black_six">#666666</color>
+    <color name="black_nine">#999999</color>
+    <color name="blue_background">#18B4ED</color>
 </resources>

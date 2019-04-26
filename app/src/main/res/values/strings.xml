@@ -695,4 +695,5 @@
     <string name="two_password_inconsistent">Two passwords are inconsistent</string>
     <string name="number">Number</string>
     <string name="for_connector">Connector</string>
+    <string name="login_password">Log in with a password</string>
 </resources>

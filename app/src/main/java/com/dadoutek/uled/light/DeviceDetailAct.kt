@@ -63,6 +63,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_config_light_light.*
+import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
@@ -92,8 +93,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
     private lateinit var lightsData: MutableList<DbLight>
 
     private var inflater: LayoutInflater? = null
-
-    private var recyclerView: RecyclerView? = null
 
     private var adaper: DeviceDetailListAdapter? = null
 
@@ -152,8 +151,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         val layoutmanager = LinearLayoutManager(this)
-        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
-        recyclerView!!.layoutManager = GridLayoutManager(this, 3) as RecyclerView.LayoutManager?
+        recycleView!!.layoutManager = GridLayoutManager(this, 3) as RecyclerView.LayoutManager?
 //        val decoration = DividerItemDecoration(this!!,
 //                DividerItemDecoration
 //                        .VERTICAL)
@@ -161,10 +159,10 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
 //                .divider)))
 //        recyclerView!!.addItemDecoration(decoration)
         //添加Item变化动画
-        recyclerView!!.itemAnimator = DefaultItemAnimator()
+        recycleView!!.itemAnimator = DefaultItemAnimator()
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
-        adaper!!.bindToRecyclerView(recyclerView)
+        adaper!!.bindToRecyclerView(recycleView)
         for (i in lightsData?.indices!!) {
             lightsData!![i].updateIcon()
         }
