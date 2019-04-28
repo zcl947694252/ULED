@@ -154,7 +154,7 @@
     <string name="title_scanned_lights_num">扫描完毕(已扫到%1$d个灯)</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
-    <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
+    <string name="empty_cache_tip">清除数据前需要对灯物理恢复,否则数据将会出现异常,开始清除数据？</string>
     <string name="factory_reset">恢复出厂</string>
     <string name="add_str_group">添加组</string>
     <string name="creat_group_fail_tip">创建失败,组名已存在！</string>

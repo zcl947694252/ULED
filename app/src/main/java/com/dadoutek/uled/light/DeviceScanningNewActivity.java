@@ -577,7 +577,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         }
 
         if (isSelectAll) {
-            toolbar.getMenu().findItem(R.id.menu_select_all).setTitle(getString(R.string.select_all));
             isSelectAll = false;
         }
 

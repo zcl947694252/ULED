@@ -6,6 +6,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Context.POWER_SERVICE
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.*
@@ -502,15 +503,35 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
     //清空缓存初始化APP
     private fun emptyTheCache() {
-        AlertDialog.Builder(activity)
-                .setTitle(activity!!.getString(R.string.empty_cache_title))
+//       val dialog :AlertDialog= AlertDialog.Builder(activity)
+////                .setTitle(activity!!.getString(R.string.empty_cache_title))
+////                .setMessage(activity!!.getString(R.string.empty_cache_tip))
+////                .setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }
+////                .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
+////                    TelinkLightService.Instance().idleMode(true)
+////                    clearData()
+////                }
+////                .create().show()
+        val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
-                .setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
                     TelinkLightService.Instance().idleMode(true)
                     clearData()
+                }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }.create()
+        alertDialog.show()
+        val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+        btn.isEnabled = false
+        val text = getString(android.R.string.ok)
+        val timeout = 5
+        val intervalDisposable = Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .takeWhile { t: Long -> t < timeout }
+                .doOnComplete {
+                    btn.isEnabled = true
+                    btn.text = text
                 }
-                .create().show()
+                .subscribe {
+                    btn.text = "$text (${timeout - it})"
+                }
     }
 
     private fun clearData() {
