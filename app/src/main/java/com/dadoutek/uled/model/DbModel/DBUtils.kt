@@ -44,7 +44,7 @@ object DBUtils {
 
     val groupList: MutableList<DbGroup>
         get() {
-            val allGIndex = -1
+            val allGIndex = 0
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
 
             return qb.where(
