@@ -112,6 +112,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_window_curtains)
+        mRxPermission = RxPermissions(this)
         initView()
         initViewType()
     }
@@ -427,22 +428,27 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 override fun onSeeking(seekParams: SeekParams) {
                     val i = seekParams.progress
                     Log.e("TAG", i.toString())
-                    if(i==1){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 1, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr,params)
-                    }else if(i==2){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 2, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
-                    }else if(i==3){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 3, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
-                    }else if(i==4){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 4, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+                    when (i) {
+                        1 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 1, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr,params)
+                        }
+                        2 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 2, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+                        }
+                        3 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 3, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+                        }
+                        4 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 4, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode,curtainGroup!!.meshAddr,params)
+                        }
                     }
                 }
 
@@ -459,22 +465,27 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 override fun onSeeking(seekParams: SeekParams) {
                     val i = seekParams.progress
                     Log.e("TAG", i.toString())
-                    if(i==1){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 1, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!,params)
-                    }else if(i==2){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 2, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
-                    }else if(i==3){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 3, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
-                    }else if(i==4){
-                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 4, Opcode.CURTAIN_PACK_END)
-                        val opcode = Opcode.CURTAIN_ON_OFF
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                    when (i) {
+                        1 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 1, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!,params)
+                        }
+                        2 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 2, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                        }
+                        3 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 3, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                        }
+                        4 -> {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x15, 4, Opcode.CURTAIN_PACK_END)
+                            val opcode = Opcode.CURTAIN_ON_OFF
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode,ctAdress!!,params)
+                        }
                     }
                 }
 

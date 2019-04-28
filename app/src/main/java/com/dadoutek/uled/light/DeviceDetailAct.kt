@@ -63,7 +63,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_config_light_light.*
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
+import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -216,7 +216,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
                 adapter?.notifyDataSetChanged()
             }
         } else if (view.id == R.id.tv_setting) {
-//            if (scanPb.visibility != View.VISIBLE) {
+            if (scanPb.visibility != View.VISIBLE) {
 //                判断是否为rgb灯
                 var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
                 if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
@@ -227,10 +227,10 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
                 intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
                 intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                 startActivityForResult(intent, REQ_LIGHT_SETTING)
-//            }
-//        else {
-//                ToastUtils.showShort(R.string.reconnecting)
-//            }
+            }
+        else {
+                ToastUtils.showShort(R.string.reconnecting)
+            }
         }
     }
 
@@ -299,9 +299,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String> {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
         val isConnect = data?.getBooleanExtra("data", false) ?: false
-//        if (isConnect) {
-//            scanPb.visibility = View.VISIBLE
-//        }
+        if (isConnect) {
+            scanPb.visibility = View.VISIBLE
+        }
 
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态

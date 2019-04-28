@@ -49,7 +49,7 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
+import kotlinx.android.synthetic.main.activity_curtains_device_details.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -233,9 +233,9 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
         val isConnect = data?.getBooleanExtra("data", false) ?: false
-//        if (isConnect) {
-//            scanPb.visibility = View.VISIBLE
-//        }
+        if (isConnect) {
+            scanPb.visibility = View.VISIBLE
+        }
 
         Thread {
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
