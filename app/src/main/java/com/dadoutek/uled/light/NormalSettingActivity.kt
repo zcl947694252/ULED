@@ -52,7 +52,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
+import kotlinx.android.synthetic.main.fragment_device_setting.sbBrightness
+import kotlinx.android.synthetic.main.fragment_device_setting.txtTitle
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -113,7 +116,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
             R.id.btn_rename -> renameGroup()
+
+            R.id.light_switch -> lightSwitch()
         }
+    }
+
+    private fun lightSwitch() {
+
     }
 
     private fun renameGroup() {
@@ -426,14 +435,14 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val type=intent.getStringExtra(Constant.TYPE_VIEW)
         if(type==Constant.TYPE_GROUP){
             currentShowPageGroup=true
-            show_light_btn.visibility=View.GONE
-            show_group_btn.visibility=View.VISIBLE
+//            show_light_btn.visibility=View.GONE
+//            show_group_btn.visibility=View.VISIBLE
             initDataGroup()
             initViewGroup()
         }else{
             currentShowPageGroup=false
-            show_light_btn.visibility=View.VISIBLE
-            show_group_btn.visibility=View.GONE
+//            show_light_btn.visibility=View.VISIBLE
+//            show_group_btn.visibility=View.GONE
             initToolbarLight()
             initViewLight()
             getVersion()
@@ -561,6 +570,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        btnRemove.setOnClickListener(this.clickListener)
 //        btnRename.setOnClickListener(clickListener)
         mRxPermission = RxPermissions(this)
+        light_switch.setOnClickListener(this.clickListener)
+        brightness_btn.setOnClickListener(this.clickListener)
+        temperature_btn.setOnClickListener(this.clickListener)
 
         this.sbBrightness?.max = 100
         this.sbTemperature?.max = 100
@@ -568,9 +580,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
         sbBrightness?.progress = light!!.brightness
-        tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
+//        tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
         sbTemperature?.progress = light!!.colorTemperature
-        tvTemperature.text = getString(R.string.device_setting_temperature, light?.colorTemperature.toString() + "")
+//        tvTemperature.text = getString(R.string.device_setting_temperature, light?.colorTemperature.toString() + "")
 
 //        sendInitCmd(light.getBrightness(),light.getColorTemperature());
 

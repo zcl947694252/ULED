@@ -704,18 +704,18 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
             pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
-            closeBtn.setImageResource(R.drawable.icon_open)
+            closeBtn.setImageResource(R.drawable.icon_curtain_close)
             closeText.setTextColor(Color.parseColor("#333333"))
-            openBtn.setImageResource(R.drawable.icon_open)
+            openBtn.setImageResource(R.drawable.icon_curtain_close)
             openText.setTextColor(Color.parseColor("#333333"))
         } else {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
             val opcode = Opcode.CURTAIN_ON_OFF
             TelinkLightService.Instance().sendCommandNoResponse(opcode, ctAdress!!, params)
             pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
-            closeBtn.setImageResource(R.drawable.icon_open)
+            closeBtn.setImageResource(R.drawable.icon_curtain_close)
             closeText.setTextColor(Color.parseColor("#333333"))
-            openBtn.setImageResource(R.drawable.icon_open)
+            openBtn.setImageResource(R.drawable.icon_curtain_close)
             openText.setTextColor(Color.parseColor("#333333"))
         }
 
@@ -730,7 +730,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             pauseBtn.setImageResource(R.drawable.icon_suspend)
             closeBtn.setImageResource(R.drawable.icon_open_yes)
             closeText.setTextColor(Color.parseColor("#0080EA"))
-            openBtn.setImageResource(R.drawable.icon_open)
+            openBtn.setImageResource(R.drawable.icon_curtain_close)
             openText.setTextColor(Color.parseColor("#333333"))
         } else {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
@@ -740,7 +740,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             pauseBtn.setImageResource(R.drawable.icon_suspend)
             closeBtn.setImageResource(R.drawable.icon_open_yes)
             closeText.setTextColor(Color.parseColor("#0080EA"))
-            openBtn.setImageResource(R.drawable.icon_open)
+            openBtn.setImageResource(R.drawable.icon_curtain_close)
             openText.setTextColor(Color.parseColor("#333333"))
         }
     }
@@ -754,7 +754,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             pauseBtn.setImageResource(R.drawable.icon_suspend)
             openBtn.setImageResource(R.drawable.icon_open_yes)
             openText.setTextColor(Color.parseColor("#0080EA"))
-            closeBtn.setImageResource(R.drawable.icon_open)
+            closeBtn.setImageResource(R.drawable.icon_curtain_close)
             closeText.setTextColor(Color.parseColor("#333333"))
         } else {
             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
@@ -764,7 +764,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             pauseBtn.setImageResource(R.drawable.icon_suspend)
             openBtn.setImageResource(R.drawable.icon_open_yes)
             openText.setTextColor(Color.parseColor("#0080EA"))
-            closeBtn.setImageResource(R.drawable.icon_open)
+            closeBtn.setImageResource(R.drawable.icon_curtain_close)
             closeText.setTextColor(Color.parseColor("#333333"))
         }
 
