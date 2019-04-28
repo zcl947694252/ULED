@@ -174,7 +174,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT,activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL,activity!!)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
