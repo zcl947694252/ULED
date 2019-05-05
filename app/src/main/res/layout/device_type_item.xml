@@ -5,6 +5,7 @@
     android:layout_width="160dp"
     android:layout_height="110dp"
     android:background="@drawable/device_fragment_background"
+    android:elevation="5dp"
     >
 
     <ImageView

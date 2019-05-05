@@ -70,7 +70,7 @@ public class OtherUtils {
     }
 
     public static boolean isDefaultGroup(DbGroup dbGroup){
-        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT.intValue()){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT_ALL.intValue()){
             return true;
         }else{
             return false;

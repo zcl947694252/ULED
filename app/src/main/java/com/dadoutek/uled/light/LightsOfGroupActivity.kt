@@ -408,7 +408,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
-        recyclerView=findViewById(R.id.recycler_view_lights)
+        recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
@@ -428,20 +428,20 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
 //                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
 //                        byteArrayOf(0x01, 0x00, 0x00))
-                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,true,false)
-                }else{
-                    Commander.openOrCloseLights(currentLight!!.meshAddr,true)
+                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                } else {
+                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
                 }
 
                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
 //                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
 //                        byteArrayOf(0x00, 0x00, 0x00))
-                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,false,false)
-                }else{
-                    Commander.openOrCloseLights(currentLight!!.meshAddr,false)
+                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                } else {
+                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
                 }
                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
@@ -453,21 +453,21 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
         } else
             if (view.id == R.id.tv_setting) {
-            if (scanPb.visibility != View.VISIBLE) {
-                //判断是否为rgb灯
-                var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
-                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                    intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
+                if (scanPb.visibility != View.VISIBLE) {
+                    //判断是否为rgb灯
+                    var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
+                    if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                        intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                    }
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                    startActivityForResult(intent, REQ_LIGHT_SETTING)
+                } else {
+                    ToastUtils.showShort(R.string.reconnecting)
                 }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                startActivityForResult(intent, REQ_LIGHT_SETTING)
-            } else {
-                ToastUtils.showShort(R.string.reconnecting)
             }
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -563,7 +563,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    var root=findViewById<ConstraintLayout>(R.id.configPirRoot)
+                    var root = findViewById<ConstraintLayout>(R.id.configPirRoot)
                     root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
@@ -571,17 +571,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
-                     GlobalScope.launch(Dispatchers.Main) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         showOpenLocationServiceDialog()
                     }
                 } else {
-                     GlobalScope.launch(Dispatchers.Main) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
                     mTelinkLightService = TelinkLightService.Instance()
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                             GlobalScope.launch(Dispatchers.Main) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
                                 startScan()
@@ -590,7 +590,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                         }
 
                     } else {
-                         GlobalScope.launch(Dispatchers.Main) {
+                        GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
@@ -690,7 +690,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun connect(mac: String) {
         try {
             mCheckRssiDisposal?.dispose()
-            mCheckRssiDisposal=RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+            mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
                     .subscribe {
                         if (it) {
@@ -706,7 +706,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
                     }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -833,7 +833,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
                 TelinkLightService.Instance().enableNotification()
                 TelinkLightService.Instance().updateNotification()
-                 GlobalScope.launch(Dispatchers.Main) {
+                GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE

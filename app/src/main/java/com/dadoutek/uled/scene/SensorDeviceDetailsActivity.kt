@@ -124,6 +124,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 //        recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = SensorDeviceDetailsAdapter(R.layout.device_detail_adapter, sensorData)
         adapter!!.bindToRecyclerView(recycleView)
+        adapter!!.onItemChildClickListener = onItemChildClickListener
 
         add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)

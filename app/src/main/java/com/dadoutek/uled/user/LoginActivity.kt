@@ -187,6 +187,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         forget_password.setOnClickListener(this)
         date_phone.setOnClickListener(this)
         eye_btn.setOnClickListener(this)
+        sms_password_login.setOnClickListener(this)
 
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email)
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password)
@@ -219,7 +220,13 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.forget_password -> forgetPassword()
             R.id.date_phone -> phoneList()
             R.id.eye_btn -> eyePassword()
+            R.id.sms_password_login -> verificationCode()
         }
+    }
+
+    private fun verificationCode() {
+         val intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
+         startActivity(intent)
     }
 
     private fun eyePassword() {

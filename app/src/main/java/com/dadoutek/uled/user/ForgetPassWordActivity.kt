@@ -73,7 +73,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener {
     private val mCompositeDisposable = CompositeDisposable()
     private var isChangePwd = false
     private var dbUser: DbUser? = null
-    private val TIME_INTERVAL: Long = 30
+    private val TIME_INTERVAL: Long = 60
     private var isPassword=false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,12 +86,13 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initView() {
         val changeKey = intent.getStringExtra("fromLogin")
         isChangePwd = changeKey != "register"
-        initToolbar()
+//        initToolbar()
         countryCode = ccp.selectedCountryCode
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
         forget_password_btn.setOnClickListener(this)
+        image_return.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
         StringUtils.initEditTextFilterForRegister(edit_forget_password)
 
@@ -102,15 +103,15 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener {
         SMSSDK.registerEventHandler(eventHandler)
     }
 
-    private fun initToolbar() {
-        if (isChangePwd) {
-            toolbar.title = getString(R.string.forget_password)
-        } else {
-            toolbar.title = getString(R.string.user_register)
-        }
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish() }
-    }
+//    private fun initToolbar() {
+//        if (isChangePwd) {
+//            toolbar.title = getString(R.string.forget_password)
+//        } else {
+//            toolbar.title = getString(R.string.user_register)
+//        }
+//        toolbar.setNavigationIcon(R.drawable.icon_return)
+//        toolbar.setNavigationOnClickListener { finish() }
+//    }
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -141,6 +142,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener {
                     ToastUtils.showLong(getString(R.string.net_work_error))
                 }
             R.id.forget_password_btn -> eyePassword()
+            R.id.image_return -> finish()
         }
     }
 

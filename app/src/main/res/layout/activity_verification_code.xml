@@ -62,7 +62,7 @@
     <com.hbb20.CountryCodePicker
         android:id="@+id/ccp"
         android:layout_width="70dp"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         app:ccpDialog_showCloseIcon="true"
         app:ccpDialog_showTitle="false"
         app:ccp_autoDetectLanguage="true"
@@ -72,17 +72,16 @@
         app:ccp_showNameCode="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintHorizontal_bias="0.123"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView"
-        app:layout_constraintVertical_bias="0.16000003" />
+        app:layout_constraintTop_toBottomOf="@id/imageView"
+        app:layout_constraintVertical_bias="0.13999999" />
 
     <EditText
         android:id="@+id/edit_user_phone"
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
         android:hint="@string/please_phone_number"
@@ -91,12 +90,32 @@
         android:maxLines="1"
         android:textColor="@color/black_three"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/ccp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/ccp"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="@+id/ccp"
         app:layout_constraintVertical_bias="0.07999998" />
+
+    <ImageView
+        android:id="@+id/date_phone_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:src="@drawable/icon_down"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_user_phone"
+        app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
+        app:layout_constraintTop_toTopOf="@+id/edit_user_phone" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_phone_code"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
+        app:layout_constraintStart_toStartOf="@+id/ccp"
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
 
     <EditText
         android:id="@+id/edit_verification"
@@ -123,6 +142,7 @@
         android:text="@string/get_verification_code"
         android:textColor="@color/blue_background"
         android:textSize="13sp"
+        android:elevation="10dp"
         app:layout_constraintEnd_toEndOf="@+id/edit_verification"
         app:layout_constraintTop_toTopOf="@+id/edit_verification" />
 
@@ -131,7 +151,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="登录后自动注册账号"
+        android:text="@string/account_after_login"
         android:textColor="@color/blue_background"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="@+id/edit_verification"
@@ -139,7 +159,7 @@
 
 
     <Button
-        android:id="@+id/register_completed"
+        android:id="@+id/sms_login"
         android:layout_width="320dp"
         android:layout_height="44dp"
         android:layout_marginTop="15dp"
@@ -156,15 +176,16 @@
 
 
     <TextView
+        android:id="@+id/password_login"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login_password"
+        android:layout_height="20dp"
         android:layout_marginTop="20dp"
+        android:text="@string/login_password"
         android:textColor="@color/black_six"
         android:textSize="15sp"
-        app:layout_constraintEnd_toEndOf="@+id/register_completed"
-        app:layout_constraintStart_toStartOf="@+id/register_completed"
-        app:layout_constraintTop_toBottomOf="@+id/register_completed" />
+        app:layout_constraintEnd_toEndOf="@+id/sms_login"
+        app:layout_constraintStart_toStartOf="@+id/sms_login"
+        app:layout_constraintTop_toBottomOf="@+id/sms_login" />
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/clThirdPartyLogin"

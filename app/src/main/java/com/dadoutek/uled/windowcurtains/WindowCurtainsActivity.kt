@@ -146,7 +146,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(curtain!!.meshAddr, { s ->
                 localVersion = s
-//                if (txtTitle != null) {
+                if (versionText != null) {
                 if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                     versionText.text = resources.getString(R.string.firmware_version, localVersion)
                     curtain!!.version = localVersion
@@ -158,7 +158,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                     this.versionText.visibility = View.VISIBLE
 //                        tvOta!!.visibility = View.GONE
                 }
-//                }
+                }
                 null
             }, {
                 if (txtTitle != null) {
@@ -187,6 +187,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private fun initMeshDresData() {
         this.ctAdress = this.intent.getIntExtra(Constant.CURTAINS_ARESS_KEY, 0)
         this.curtain = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbCurtain
+        versionText.text=""
         toolbar.title = curtain?.name
     }
 
@@ -498,7 +499,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun updateOTA() {
-        if(versionText.text.toString()!=null){
+        if(versionText.text!=null){
             checkPermission()
         }
     }

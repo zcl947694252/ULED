@@ -632,4 +632,6 @@
     <string name="new_password">请输入您的新密码</string>
     <string name="number">数量</string>
     <string name="login_password">使用密码登录</string>
+    <string name="account_after_login">登录后自动注册账号</string>
+    <string name="online_upgrade">在线升级</string>
     </resources>

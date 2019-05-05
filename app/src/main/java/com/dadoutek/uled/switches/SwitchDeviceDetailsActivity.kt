@@ -143,9 +143,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
-        for (i in switchData?.indices!!) {
-//            switchData!![i].updateIcon()
-        }
+//        for (i in switchData?.indices!!) {
+////            switchData!![i].updateIcon()
+//        }
 
         add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)

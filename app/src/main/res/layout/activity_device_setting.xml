@@ -12,10 +12,10 @@
     <!--<include layout="@layout/fragment_device_setting"/>-->
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/light_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/icon_light"
         app:layout_constraintEnd_toEndOf="@+id/include2"
@@ -28,16 +28,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="40dp"
         android:text="@string/brightness_adjustment"
-        android:textColor="#333333"
+        android:textColor="@color/black_three"
         android:textSize="15sp"
         app:layout_constraintStart_toStartOf="@+id/include2"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/light_image" />
 
 
     <SeekBar
-        android:id="@+id/sbBrightness"
+        android:id="@+id/light_sbBrightness"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -62,7 +62,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/include2"
         app:layout_constraintStart_toStartOf="@+id/include2"
-        app:layout_constraintTop_toBottomOf="@+id/sbBrightness" />
+        app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
 
 
     <ImageView
@@ -72,12 +72,12 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/icon_btn"
+        android:src="@drawable/icon_unselected"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/light_switch"
         app:layout_constraintHorizontal_bias="0.39"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sbBrightness" />
+        app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
 
 
     <TextView
@@ -85,7 +85,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/brightness"
-        android:textColor="#18B4ED"
+        android:textColor="@color/black_nine"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/light_switch"
         app:layout_constraintEnd_toEndOf="@+id/brightness_btn"
@@ -111,7 +111,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/color_temperature"
-        android:textColor="#999999"
+        android:textColor="@color/black_nine"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/brightness_text"
         app:layout_constraintEnd_toEndOf="@+id/temperature_btn"
@@ -120,14 +120,14 @@
 
 
     <TextView
-        android:id="@+id/txtTitle"
+        android:id="@+id/textTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="10dp"
         android:text="version"
         android:textColor="@color/black_nine"
-        android:textSize="15sp"
+        android:textSize="13sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/include2"

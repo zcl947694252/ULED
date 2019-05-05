@@ -54,6 +54,10 @@ public interface RequestInterface {
     Observable<Response<DbUser>> putPassword(@Field("account") String account,
                                              @Field("password") String password);
 
+    @FormUrlEncoded
+    @POST("auth/login_SMS")
+    Observable<Response<DbUser>> smsLogin(@Field("phone") String phone);
+
     //用户注册相关接口
     @FormUrlEncoded
     @POST("auth/register")

@@ -696,4 +696,6 @@
     <string name="number">Number</string>
     <string name="for_connector">Connector</string>
     <string name="login_password">Log in with a password</string>
+    <string name="account_after_login">Automatically register an account after login</string>
+    <string name="online_upgrade">Upgrade</string>
 </resources>

@@ -62,7 +62,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private val mCompositeDisposable = CompositeDisposable()
     private var isChangePwd = false
     private var dbUser: DbUser? = null
-    private val TIME_INTERVAL: Long = 30
+    private val TIME_INTERVAL: Long = 60
     private var isPassword = false
     private var isPasswordAgain = false
 
@@ -77,13 +77,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initView() {
         val changeKey = intent.getStringExtra("fromLogin")
         isChangePwd = changeKey != "register"
-        initToolbar()
+//        initToolbar()
         countryCode = ccp.selectedCountryCode
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
         image_password_btn.setOnClickListener(this)
         image_again_password_btn.setOnClickListener(this)
+        return_image.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
         StringUtils.initEditTextFilterForRegister(edit_user_password)
         StringUtils.initEditTextFilterForRegister(again_password)
@@ -95,15 +96,16 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         SMSSDK.registerEventHandler(eventHandler)
     }
 
-    private fun initToolbar() {
-        if (isChangePwd) {
-            toolbar.title = getString(R.string.update_password)
-        } else {
-            toolbar.title = getString(R.string.user_register)
-        }
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener { finish() }
-    }
+//    private fun initToolbar() {
+//        toolbar.setBackgroundResource(R.color.white)
+//        if (isChangePwd) {
+//            toolbar.title = getString(R.string.update_password)
+//        } else {
+//            toolbar.title = getString(R.string.user_register)
+//        }
+//        toolbar.setNavigationIcon(R.drawable.icon_return)
+//        toolbar.setNavigationOnClickListener { finish() }
+//    }
 
     override fun onClick(v: View?) {
         when (v!!.id) {
@@ -136,6 +138,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.image_password_btn -> eyePassword()
             R.id.image_again_password_btn -> eyePasswordAgain()
+            R.id.return_image -> finish()
         }
     }
 

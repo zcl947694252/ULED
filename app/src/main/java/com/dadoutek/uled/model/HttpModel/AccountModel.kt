@@ -48,6 +48,32 @@ object AccountModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun smsLogin(phone: String): Observable<DbUser> {
+        lateinit var account: String
+        return NetworkFactory.getApi()
+                .getAccount(phone, "dadou")
+                .compose(NetworkTransformer())
+                .flatMap { response: String ->
+                    account = response
+                    NetworkFactory.getApi()
+                            .getsalt(response)
+                            .compose(NetworkTransformer())
+
+                }
+                .flatMap { response: String ->
+                    val salt = response
+
+                    NetworkFactory.getApi().smsLogin(phone)
+                            .compose(NetworkTransformer())
+                }
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                    initDatBase(it)
+                    Thread.sleep(2000)
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun update(token: String, avatar: String, name: String, email: String, introduction: String): Observable<String>? {
         return NetworkFactory.getApi()
                 .updateUser(token, avatar, name, email, introduction)
