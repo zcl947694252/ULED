@@ -86,6 +86,7 @@ class NewDevieFragment :BaseFragment(){
         if (isVisibleToUser) {
             val act = activity as MainActivity?
             act?.addEventListeners()
+//            refreshView()
             initOnLayoutListener()
         }
     }
@@ -177,6 +178,7 @@ class NewDevieFragment :BaseFragment(){
     }
 
     private fun initView(view: View?) {
+//        refreshView()
         val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = GridLayoutManager(this.activity,2)
@@ -189,7 +191,7 @@ class NewDevieFragment :BaseFragment(){
 //                .divider)))
 //        //添加分割线
 //        recyclerView?.addItemDecoration(decoration)
-        recyclerView?.addItemDecoration(SpaceItemDecoration(40))
+        recyclerView?.addItemDecoration(SpaceItemDecoration(32))
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
         newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
@@ -205,6 +207,27 @@ class NewDevieFragment :BaseFragment(){
         create_scene?.setOnClickListener(onClick)
     }
 
+    private fun refreshView() {
+        val layoutmanager = LinearLayoutManager(activity)
+//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        recyclerView!!.layoutManager = GridLayoutManager(this.activity,2)
+        newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item,deviceTypeList!!)
+
+//        val decoration = DividerItemDecoration(activity!!,
+//                DividerItemDecoration
+//                        .VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+//                .divider)))
+//        //添加分割线
+//        recyclerView?.addItemDecoration(decoration)
+        recyclerView?.addItemDecoration(SpaceItemDecoration(32))
+        recyclerView?.itemAnimator = DefaultItemAnimator()
+
+        newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
+//        adapter!!.addFooterView(getFooterView())
+        newDeviceAdapter!!.bindToRecyclerView(recyclerView)
+    }
+
 //    allDeviceList!!.add(DBUtils.getAllNormalLight())
 //    allDeviceList!!.add(DBUtils.getAllRGBLight())
 //    allDeviceList!!.add(DBUtils.getAllSwitch())
@@ -213,9 +236,9 @@ class NewDevieFragment :BaseFragment(){
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener {
         adapter, view, position ->
-        if(TelinkLightApplication.getInstance().connectDevice==null){
-            ToastUtils.showLong(R.string.device_not_connected)
-        }else{
+//        if(TelinkLightApplication.getInstance().connectDevice==null){
+//            ToastUtils.showLong(R.string.device_not_connected)
+//        }else{
             var intent:Intent?=null
             when(position){
                 Constant.INSTALL_NORMAL_LIGHT ->{
@@ -244,7 +267,7 @@ class NewDevieFragment :BaseFragment(){
                 }
             }
             startActivityForResult(intent, Activity.RESULT_OK)
-        }
+//        }
     }
 
     private fun initData() {

@@ -296,6 +296,49 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         Thread.sleep(300)
     }
 
+    private fun configNewlight() {
+//        val spGroup = groupConvertSpecialValue(groupAddr)
+        val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
+
+        val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
+        val timeL: Byte = (selectTime and 0xff).toByte()
+        val paramBytes = byteArrayOf(
+                DeviceType.NIGHT_LIGHT.toByte(),
+                switchMode.toByte(), timeL, timeH
+        )
+        val paramBytesGroup: ByteArray
+        paramBytesGroup = byteArrayOf(
+                DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0
+        )
+
+        var canSendGroup = true
+        for (i in showGroupList!!.indices) {
+            if (showGroupList!![i].groupAress == 0xffff) {
+//                canSendGroup=false
+                paramBytesGroup[i + 2] = 0xFF.toByte()
+                break
+            } else {
+                val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
+                paramBytesGroup[i + 2] = groupL
+                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+            }
+        }
+
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                mDeviceInfo.meshAddress,
+                paramBytes)
+
+        Thread.sleep(300)
+
+        if (canSendGroup) {
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                    mDeviceInfo.meshAddress,
+                    paramBytesGroup)
+        }
+
+        Thread.sleep(300)
+    }
+
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             R.id.spDelay -> {

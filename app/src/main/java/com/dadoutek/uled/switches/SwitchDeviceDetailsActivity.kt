@@ -12,27 +12,34 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
-import android.widget.Toast
+import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.connector.ScanningConnectorActivity
+import com.dadoutek.uled.curtain.CurtainScanningNewActivity
+import com.dadoutek.uled.group.InstallDeviceListAdapter
+import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.pir.ScanningSensorActivity
+import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.BleUtils
-import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.*
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -52,6 +59,7 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_switch_device_details.*
+import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -69,6 +77,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,View.OnClickListener {
 
     override fun performed(event: Event<String>?) {
+
     }
 
     private lateinit var switchData:MutableList<DbSwitch>
@@ -79,6 +88,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private var retryConnectCount = 0
 
     private var mTelinkLightService: TelinkLightService? = null
+
+    private val SCENE_MAX_COUNT = 16
 
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
 
@@ -100,6 +111,22 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private var mConnectDisposal: Disposable? = null
 
+    private var install_device: TextView? = null
+    private var create_group: TextView? = null
+    private var create_scene: TextView? = null
+
+    private lateinit var stepOneText:TextView
+    private lateinit var stepTwoText:TextView
+    private lateinit var stepThreeText:TextView
+    private lateinit var switchStepOne:TextView
+    private lateinit var switchStepTwo:TextView
+    private lateinit var swicthStepThree:TextView
+
+    private var isRgbClick = false
+//    private var isGuide = false
+
+    private var installId = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_device_details)
@@ -118,9 +145,18 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         if(switchData.size>0){
             no_device_relativeLayout.visibility=View.GONE
             recycleView.visibility=View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         }else{
             no_device_relativeLayout.visibility=View.VISIBLE
             recycleView.visibility=View.GONE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                if (dialog?.visibility == View.GONE) {
+                    showPopupMenu()
+                } else {
+                    hidePopupMenu()
+                }
+            }
         }
     }
 
@@ -146,6 +182,21 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //        for (i in switchData?.indices!!) {
 ////            switchData!![i].updateIcon()
 //        }
+//        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+//        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+//            if (dialog?.visibility == View.GONE) {
+//                showPopupMenu()
+//            } else {
+//                hidePopupMenu()
+//            }
+//        }
+
+        install_device = findViewById(R.id.install_device)
+        create_group = findViewById(R.id.create_group)
+        create_scene = findViewById(R.id.create_scene)
+        install_device?.setOnClickListener(onClick)
+        create_group?.setOnClickListener(onClick)
+        create_scene?.setOnClickListener(onClick)
 
         add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
@@ -153,6 +204,16 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             finish()
         }
         toolbar.title=getString(R.string.switch_name) + " (" + switchData!!.size + ")"
+    }
+
+    private fun showPopupMenu() {
+        dialog?.visibility = View.VISIBLE
+    }
+
+    private fun hidePopupMenu() {
+//        if (!isGuide || GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)) {
+//            dialog_pop?.visibility = View.GONE
+//        }
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -485,5 +546,276 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //        for(i in list.indices){
 //            nameList.add(list[i].name)
 //        }
+    }
+
+    private val onClick = View.OnClickListener {
+        var intent: Intent? = null
+        //点击任何一个选项跳转页面都隐藏引导
+//        val controller=guide2()
+//            controller?.remove()
+        hidePopupMenu()
+        when (it.id) {
+            R.id.install_device -> {
+                showInstallDeviceList()
+            }
+            R.id.create_group -> {
+                dialog?.visibility = View.GONE
+                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                    ToastUtils.showLong(getString(R.string.device_not_connected))
+                } else {
+                    addNewGroup()
+                }
+            }
+            R.id.create_scene -> {
+                dialog?.visibility = View.GONE
+                val nowSize = DBUtils.sceneList.size
+                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                    ToastUtils.showLong(getString(R.string.device_not_connected))
+                } else {
+                    if (nowSize >= SCENE_MAX_COUNT) {
+                        ToastUtils.showLong(R.string.scene_16_tip)
+                    } else {
+                        val intent = Intent(this, NewSceneSetAct::class.java)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showInstallDeviceList() {
+        dialog.visibility=View.GONE
+//        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
+        showInstallDeviceList(isGuide,isRgbClick)
+    }
+
+    var installDialog: android.app.AlertDialog?=null
+    var isGuide:Boolean = false
+    var clickRgb:Boolean = false
+    private fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
+        this.clickRgb=clickRgb
+        val view = View.inflate(this,R.layout.dialog_install_list,null)
+        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
+        val install_device_recyclerView=view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        close_install_list.setOnClickListener { v ->  installDialog?.dismiss()}
+
+        val installList:ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
+
+        val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
+        val layoutManager =  LinearLayoutManager(this)
+        install_device_recyclerView?.layoutManager = layoutManager
+        install_device_recyclerView?.adapter = installDeviceListAdapter
+        installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
+        val decoration = DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)))
+        //添加分割线
+        install_device_recyclerView?.addItemDecoration(decoration)
+
+        installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
+
+        installDialog = android.app.AlertDialog.Builder(this)
+                .setView(view)
+                .create()
+
+        installDialog?.setOnShowListener {
+
+        }
+
+        if(isGuide){
+            installDialog?.setCancelable(false)
+        }
+
+        installDialog?.show()
+
+        Thread{
+            Thread.sleep(100)
+            GlobalScope.launch(Dispatchers.Main){
+//                guide3(install_device_recyclerView)
+            }
+        }.start()
+    }
+
+    val INSTALL_NORMAL_LIGHT=0
+    val INSTALL_RGB_LIGHT=1
+    val INSTALL_SWITCH=2
+    val INSTALL_SENSOR=3
+    val INSTALL_CURTAIN=4
+    val INSTALL_CONNECTOR=5
+    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener {
+        adapter, view, position ->
+        var intent: Intent? = null
+        //点击任何一个选项跳转页面都隐藏引导
+//        val controller=guide2()
+//            controller?.remove()
+        isGuide = false
+        installDialog?.dismiss()
+//        hidePopupMenu()
+        when (position) {
+            INSTALL_NORMAL_LIGHT -> {
+                installId=INSTALL_NORMAL_LIGHT
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            }
+            INSTALL_RGB_LIGHT -> {
+                installId=INSTALL_RGB_LIGHT
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            }
+            INSTALL_CURTAIN -> {
+                installId=INSTALL_CURTAIN
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            }
+            INSTALL_SWITCH -> {
+                installId=INSTALL_SWITCH
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+                stepOneText.visibility = View.GONE
+                stepTwoText.visibility = View.GONE
+                stepThreeText.visibility = View.GONE
+                switchStepOne.visibility = View.VISIBLE
+                switchStepTwo.visibility = View.VISIBLE
+                swicthStepThree.visibility = View.VISIBLE
+            }
+            INSTALL_SENSOR -> {
+                installId=INSTALL_SENSOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            }
+            INSTALL_CONNECTOR->{
+                installId=INSTALL_CONNECTOR
+                showInstallDeviceDetail(StringUtils.getInstallDescribe(installId,this))
+            }
+        }
+    }
+
+    private fun showInstallDeviceDetail(describe : String){
+        val view = View.inflate(this,R.layout.dialog_install_detail,null)
+        val close_install_list=view.findViewById<ImageView>(R.id.close_install_list)
+        val btnBack=view.findViewById<ImageView>(R.id.btnBack)
+        stepOneText = view.findViewById<TextView>(R.id.step_one)
+        stepTwoText = view.findViewById<TextView>(R.id.step_two)
+        stepThreeText = view.findViewById<TextView>(R.id.step_three)
+        switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
+        switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
+        swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
+        val install_tip_question=view.findViewById<TextView>(R.id.install_tip_question)
+        val search_bar=view.findViewById<Button>(R.id.search_bar)
+        close_install_list.setOnClickListener(dialogOnclick)
+        btnBack.setOnClickListener(dialogOnclick)
+        search_bar.setOnClickListener(dialogOnclick)
+        install_tip_question.text = describe
+        install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
+        installDialog = android.app.AlertDialog.Builder(this)
+                .setView(view)
+                .create()
+
+        installDialog?.setOnShowListener {
+
+        }
+
+        if(isGuide){
+//            installDialog?.setCancelable(false)
+        }
+
+        installDialog?.show()
+    }
+
+    private val dialogOnclick =View.OnClickListener{
+        var medressData=0
+        var allData=DBUtils.allLight
+        var sizeData=DBUtils.allLight.size
+        if(sizeData!=0){
+            var lightData= allData[sizeData-1]
+            medressData=lightData.meshAddr
+        }
+
+        when(it.id){
+            R.id.close_install_list->{ installDialog?.dismiss()}
+            R.id.search_bar->{
+                when (installId) {
+                    INSTALL_NORMAL_LIGHT -> {
+                        if (medressData < 254) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                            intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_RGB_LIGHT -> {
+                        if (medressData < 254) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                            intent.putExtra(Constant.TYPE_VIEW,Constant.RGB_LIGHT_KEY)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_CURTAIN -> {
+                        if (medressData < 254) {
+                            intent = Intent(this, CurtainScanningNewActivity::class.java)
+                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                            startActivityForResult(intent, 0)
+                        } else {
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                    INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                    INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    INSTALL_CONNECTOR -> {
+                        if(medressData<254){
+                            intent = Intent(this, ScanningConnectorActivity::class.java)
+                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                            startActivityForResult(intent, 0)
+                        }else{
+                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+                        }
+                    }
+                }
+            }
+            R.id.btnBack->{
+                installDialog?.dismiss()
+                showInstallDeviceList(isGuide,clickRgb)
+            }
+        }
+    }
+
+    private fun addNewGroup() {
+//        dialog?.visibility = View.GONE
+        val textGp = EditText(this)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.setText(DBUtils.getDefaultNewGroupName())
+        //设置光标默认在最后
+        textGp.setSelection(textGp.getText().toString().length)
+        android.app.AlertDialog.Builder(this)
+                .setTitle(R.string.create_new_group)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .setView(textGp)
+
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                    } else {
+                        //往DB里添加组数据
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL,this)
+//                        callbackLinkMainActAndFragment?.changeToGroup()
+                        dialog.dismiss()
+                    }
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+    }
+
+    val CREATE_SCENE_REQUESTCODE = 2
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+//        refreshData()
+        if(requestCode==CREATE_SCENE_REQUESTCODE){
+//            callbackLinkMainActAndFragment?.changeToScene()
+        }
     }
 }

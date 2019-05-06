@@ -213,11 +213,11 @@ public class DbLight implements Serializable {
     public void updateIcon() {
 
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_light_offline;
+            this.icon = R.drawable.icon_light_set_close;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.icon_light_off;
+            this.icon = R.drawable.icon_light_set_close;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.icon_light_on;
+            this.icon = R.drawable.icon_light_set;
         }
     }
 

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".scene.SensorDeviceDetailsActivity">
 
     <include
@@ -42,11 +41,21 @@
             />
     </RelativeLayout>
 
+    <include
+        android:id="@+id/dialog_pir"
+        layout="@layout/popwindow_install_deive_list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/topView"
+        android:visibility="gone"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/recycleView"
         android:visibility="gone"
+        android:layout_below="@+id/topView"
         />
 
-</LinearLayout>
+</RelativeLayout>

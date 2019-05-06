@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="5dp">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
 
-    <ImageView
-        android:id="@+id/group_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ic_group_black_48dp"
-        android:layout_gravity="center_horizontal" />
+    <!--<ImageView-->
+        <!--android:id="@+id/group_img"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@drawable/ic_group_black_48dp"-->
+        <!--android:layout_gravity="center_horizontal" />-->
 
     <TextView
         android:id="@+id/group_name"
-        android:text="group 1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" />
-</LinearLayout>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="18dp"
+        android:text="group 1"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/black_nine"
+        />
+
+    <ImageView
+        android:id="@+id/group_img"
+        android:layout_width="15dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/btn_rec_blue_bt"
+        app:layout_constraintEnd_toEndOf="@+id/group_name"
+        app:layout_constraintStart_toStartOf="@+id/group_name"
+        app:layout_constraintTop_toBottomOf="@+id/group_name" />
+</android.support.constraint.ConstraintLayout>

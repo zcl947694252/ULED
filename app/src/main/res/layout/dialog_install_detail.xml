@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="525dp"
+    android:layout_height="550dp"
     android:background="@color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -12,7 +13,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="@drawable/btn_rectangle_gray"
         >
 
         <ImageView
@@ -35,7 +35,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:textColor="@color/black"
+            android:textColor="@color/black_three"
             />
 
         <ImageView
@@ -46,157 +46,166 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="20dp"
-            android:src="@drawable/baseline_close_black_24"
+            android:src="@drawable/add_device_down"
+            android:padding="5dp"
             />
     </android.support.constraint.ConstraintLayout>
 
-    <LinearLayout
-        android:id="@+id/content"
-        android:layout_width="0dp"
-        android:layout_height="435dp"
-        app:layout_constraintTop_toBottomOf="@id/install_title"
-        app:layout_constraintBottom_toTopOf="@id/search_bar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:orientation="vertical"
-        >
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eeeeee"
+        app:layout_constraintStart_toStartOf="@+id/install_title"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout2" />
 
-        <TextView
-            android:text="@string/install_tip1"
-            android:textSize="20sp"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="0dp"
-            android:textColor="@color/black"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/install_title">
+
+        <ImageView
+            android:id="@+id/imageView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/icon_one"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             android:id="@+id/step_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:text="@string/install_tip2"
-            android:textSize="15sp"
-            android:gravity="center_vertical"
-            android:layout_marginStart="18dp"
-            android:layout_marginEnd="18sp"
-            android:paddingStart="20dp"
-            android:paddingEnd="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:background="@drawable/rectangle_tip_install"
-            />
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+            app:layout_constraintStart_toStartOf="@+id/imageView4" />
 
         <TextView
             android:id="@+id/switch_step_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
             android:text="@string/switch_tip2"
-            android:textSize="15sp"
-            android:gravity="center_vertical"
-            android:layout_marginStart="18dp"
-            android:layout_marginEnd="18sp"
-            android:paddingStart="20dp"
-            android:paddingEnd="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:background="@drawable/rectangle_tip_install"
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
             android:visibility="gone"
-            />
+            app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+            app:layout_constraintStart_toStartOf="@+id/imageView4" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="25dp"
+            android:src="@drawable/icon_two"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/step_one" />
 
         <TextView
             android:id="@+id/step_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
             android:text="@string/install_tip3"
-            android:textSize="15sp"
-            android:gravity="center_vertical"
-            android:layout_marginStart="18dp"
-            android:layout_marginEnd="18sp"
-            android:layout_marginTop="10dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="0dp"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:background="@drawable/rectangle_tip_install"
-            />
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+            app:layout_constraintEnd_toEndOf="@+id/imageView6" />
 
         <TextView
             android:id="@+id/switch_step_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
             android:text="@string/switch_tip3"
-            android:textSize="15sp"
-            android:gravity="center_vertical"
-            android:layout_marginStart="18dp"
-            android:layout_marginEnd="18sp"
-            android:layout_marginTop="10dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="0dp"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:background="@drawable/rectangle_tip_install"
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
             android:visibility="gone"
-            />
+            app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+            app:layout_constraintEnd_toEndOf="@+id/imageView6" />
+
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:src="@drawable/icon_three"
+            app:layout_constraintStart_toStartOf="@+id/imageView4"
+            app:layout_constraintTop_toBottomOf="@+id/imageView6" />
+
 
         <TextView
             android:id="@+id/step_three"
-        android:text="@string/install_tip4"
-        android:textSize="15sp"
-        android:gravity="center_vertical"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18sp"
-        android:layout_marginTop="10dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="0dp"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:background="@drawable/rectangle_tip_install"
-        />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/install_tip4"
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView7"
+            app:layout_constraintStart_toStartOf="@+id/step_one" />
 
         <TextView
             android:id="@+id/switch_step_three"
-            android:text="@string/switch_tip4"
-            android:textSize="15sp"
-            android:gravity="center_vertical"
-            android:layout_marginStart="18dp"
-            android:layout_marginEnd="18sp"
-            android:layout_marginTop="10dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="0dp"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:background="@drawable/rectangle_tip_install"
-            android:visibility="gone"
-            />
-
-        <TextView
-            android:text="@string/install_tip5"
-            android:textSize="20sp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
-            android:textColor="@color/black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:text="@string/switch_tip4"
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView7"
+            app:layout_constraintStart_toStartOf="@+id/switch_step_one" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="46dp"
+            android:text="@string/install_tip5"
+            android:textColor="@color/black_three"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="@+id/imageView7"
+            app:layout_constraintTop_toBottomOf="@+id/step_three" />
+
 
         <TextView
             android:id="@+id/install_tip_question"
-            android:textSize="15sp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:lineSpacingExtra="10dp"
             android:scrollbars="vertical"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
             android:text="@string/guide_tip_reset_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:textColor="@color/black_three"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/imageView6"
+            app:layout_constraintHorizontal_bias="0.26"
+            app:layout_constraintStart_toStartOf="@+id/imageView7"
+            app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-    </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
 
     <Button
         android:id="@+id/search_bar"
-        android:text="蓝牙搜索"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        />
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/btn_rec_blue_bt"
+        android:text="蓝牙搜索"
+        android:textColor="@color/black_three"
+        android:textSize="15sp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 </android.support.constraint.ConstraintLayout>

@@ -339,7 +339,7 @@ object DBUtils {
         return group.name
     }
 
-    
+
     fun getGroupByID(id: Long): DbGroup? {
         val group:DbGroup? = DaoSessionInstance.getInstance().dbGroupDao.load(id)
             return group

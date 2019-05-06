@@ -1,49 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:gravity="center_horizontal"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    tools:layout_editor_absoluteY="25dp">
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/img_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="15dp"
+        android:contentDescription="@null"
+        android:scaleType="center"
+        android:src="@drawable/icon_light_set"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/img_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:contentDescription="@null"
-            android:scaleType="center"
-            android:src="@drawable/icon_light_on" />
+    <CheckBox
+        android:id="@+id/selected"
+        style="@style/CustomCheckboxTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        app:layout_constraintBottom_toTopOf="@+id/img_icon"
+        app:layout_constraintEnd_toEndOf="@+id/img_icon" />
 
-        <TextView
-            android:id="@+id/txt_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:textSize="14sp" />
+    <TextView
+        android:id="@+id/txt_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/img_icon"
+        app:layout_constraintStart_toStartOf="@+id/img_icon"
+        app:layout_constraintTop_toBottomOf="@+id/img_icon" />
 
-        <TextView
-            android:id="@+id/txt_mac"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="false"
-            android:textSize="12sp"
-            android:visibility="gone" />
+    <TextView
+        android:id="@+id/txt_mac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="false"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/img_icon"
+        app:layout_constraintStart_toStartOf="@+id/img_icon"
+        app:layout_constraintTop_toBottomOf="@+id/txt_name"
+        android:visibility="gone"
+        />
 
-        <CheckBox
-            android:id="@+id/selected"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:clickable="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:visibility="gone" />
+    <!--<LinearLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:gravity="center_horizontal"-->
+        <!--android:orientation="vertical">-->
 
-    </LinearLayout>
+        <!--<ImageView-->
+            <!--android:id="@+id/img_icon"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:contentDescription="@null"-->
+            <!--android:scaleType="center"-->
+            <!--android:src="@drawable/icon_light_set"-->
+            <!--android:layout_marginTop="15dp"-->
+            <!--/>-->
 
-</LinearLayout>
+        <!--<TextView-->
+            <!--android:id="@+id/txt_name"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:singleLine="true"-->
+            <!--android:textSize="14sp" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/txt_mac"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:singleLine="false"-->
+            <!--android:textSize="12sp"-->
+            <!--android:visibility="gone" />-->
+
+        <!--<CheckBox-->
+            <!--android:id="@+id/selected"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:checked="true"-->
+            <!--android:clickable="false"-->
+            <!--android:focusable="false"-->
+            <!--android:focusableInTouchMode="false"-->
+            <!--style="@style/CustomCheckboxTheme"-->
+            <!--/>-->
+    <!--</LinearLayout>-->
+
+</android.support.constraint.ConstraintLayout>

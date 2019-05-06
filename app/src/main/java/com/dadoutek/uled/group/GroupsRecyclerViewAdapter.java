@@ -1,5 +1,6 @@
 package com.dadoutek.uled.group;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,9 +83,12 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
         holder.groupName.setText(group.getName());
         holder.itemView.setTag(position);//给view设置tag以作为参数传递到监听回调方法中
         if (mGroupList.get(position).checked) {
-            holder.groupImage.setImageResource(R.drawable.ic_group_black_48dp);
+//            holder.groupImage.setBackgroundResource(R.drawable.btn_rec_blue_bt);
+            holder.groupName.setTextColor(Color.parseColor("#18B4ED"));
+            holder.groupImage.setVisibility(View.VISIBLE);
         } else {
-            holder.groupImage.setImageResource(R.drawable.ic_group_white_48dp);
+            holder.groupImage.setVisibility(View.GONE);
+            holder.groupName.setTextColor(Color.parseColor("#999999"));
         }
 
         RecyclerView.LayoutParams param = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
@@ -95,8 +99,8 @@ public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecycl
             holder.itemView.setLayoutParams(param);
         } else {
             holder.itemView.setVisibility(View.VISIBLE);
-            param.width = RecyclerView.LayoutParams.WRAP_CONTENT;
-            param.height = RecyclerView.LayoutParams.WRAP_CONTENT;
+//            param.width = RecyclerView.LayoutParams.WRAP_CONTENT;
+//            param.height = RecyclerView.LayoutParams.WRAP_CONTENT;
             holder.itemView.setLayoutParams(param);
         }
 

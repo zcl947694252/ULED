@@ -29,7 +29,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                         tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                         tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                     } else {
-                        tvName.setTextColor(mContext.resources.getColor(R.color.gray))
+                        tvName.setTextColor(mContext.resources.getColor(R.color.black_three))
                         tvLightName.setTextColor(mContext.resources.getColor(R.color.black))
                     }
                 }

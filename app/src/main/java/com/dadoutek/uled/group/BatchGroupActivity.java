@@ -668,6 +668,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_select_all:
+                item.setTitle(R.string.select_all);
                 if (isSelectAll) {
                     isSelectAll = false;
                     item.setTitle(R.string.select_all);
@@ -971,6 +972,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void initToolbar() {
         toolbar.setTitle(R.string.batch_group);
+        toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+        toolbar.setOnMenuItemClickListener(this);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -980,6 +983,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_grouping_select_all, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -1137,10 +1141,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if(light.getProductUUID()== DeviceType.LIGHT_NORMAL){
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_light_set);
             }
             else{
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_light_set);
             }
 
             holder.selected.setChecked(light.selected);
