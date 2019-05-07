@@ -332,7 +332,6 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         val timeL: Byte = (selectTime and 0xff).toByte()
         var mode= getModeValue()
         val paramBytes = byteArrayOf(
-                DeviceType.NIGHT_LIGHT.toByte(),
                 switchMode.toByte(), 0x00,0x00,
                 selectTime.toByte(),
                 tietMinimumBrightness.text.toString().toInt().toByte(),

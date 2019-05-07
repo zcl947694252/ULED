@@ -140,8 +140,8 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/minimum_brightness_percentage"
                     android:inputType="number"
-                    android:maxLength="2"
                     android:visibility="gone"
+                    android:maxLength="2"
                     android:text="0" />
             </android.support.design.widget.TextInputLayout>
 
@@ -156,18 +156,18 @@
                 app:autoSizeTextType = "uniform"
                 app:autoSizeMaxTextSize="18sp"
                 android:visibility="gone"
-                app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
-                app:layout_constraintTop_toBottomOf="@+id/tilMinimumBrightness" />
+                app:layout_constraintStart_toStartOf="@+id/tilMinimum_Brightness"
+                app:layout_constraintTop_toBottomOf="@+id/tilMinimum_Brightness" />
 
             <Spinner
                 android:id="@+id/spTrigger_lux"
                 android:layout_width="148dp"
                 android:layout_height="wrap_content"
                 android:entries="@array/trigger_lux_array"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_TriggerLux"
-                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimum_Brightness"
                 app:layout_constraintHorizontal_bias="1.0"
+                android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/tv_TriggerLux"
                 app:layout_constraintTop_toTopOf="@+id/tv_TriggerLux" />
 
