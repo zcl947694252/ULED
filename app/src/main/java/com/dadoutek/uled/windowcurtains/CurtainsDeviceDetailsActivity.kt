@@ -180,6 +180,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         }else {
             recycleView.visibility=View.GONE
             no_device_relativeLayout.visibility=View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 if (dialog_curtain?.visibility == View.GONE) {
                     showPopupMenu()

@@ -534,6 +534,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         }else{
             recycleView.visibility=View.GONE
             no_device_relativeLayout.visibility=View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 if (dialog_relay?.visibility == View.GONE) {
                     showPopupMenu()
