@@ -63,6 +63,13 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     private var modeDelayUnit = 0
     private var modeSwitchMode = 0
 
+    private val MODE_START_UP_MODE_OPEN = 0
+    private val MODE_DELAY_UNIT_SECONDS = 0
+    private val MODE_SWITCH_MODE_MOMENT = 0
+
+    private val MODE_START_UP_MODE_CLOSE = 1
+    private val MODE_DELAY_UNIT_MINUTE = 2
+    private val MODE_SWITCH_MODE_GRADIENT = 4
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_light_light)
@@ -77,6 +84,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         showDataListView()
         spDelay.onItemSelectedListener = this
         spSwitchMode.onItemSelectedListener = this
+        sp_SwitchMode.onItemSelectedListener=this
         secondsList = resources.getStringArray(R.array.light_light_time_list)
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, secondsList)
         spDelay.adapter = adapter
@@ -238,6 +246,16 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                     successCallback = {
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
+                        var version=tvPSVersion.text.toString()
+                        var num=version.substring(2,3)
+                        if(num.toDouble()>=3.0){
+                            tv_TriggerLux.visibility = View.VISIBLE
+                            spTrigger_lux.visibility = View.VISIBLE
+                            tietMinimumBrightness.visibility = View.VISIBLE
+                            tilMinimum_Brightness.visibility = View.VISIBLE
+                            sp_SwitchMode.visibility = View.VISIBLE
+                            tv_SwitchMode.visibility = View.VISIBLE
+                        }
                     },
                     failedCallback = {
                         versionLayoutPS.visibility = View.GONE
@@ -339,17 +357,17 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             }
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                mDeviceInfo.meshAddress,
-                paramBytes)
-
-        Thread.sleep(300)
-
         if (canSendGroup) {
             TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
+
+        Thread.sleep(300)
+
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                mDeviceInfo.meshAddress,
+                paramBytes)
 
         Thread.sleep(300)
     }
@@ -359,17 +377,43 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             R.id.spDelay -> {
                 val time = getTime(spDelay.selectedItem as String)
                 if (position > 4) {
-                    selectTime = time * 60
+                    selectTime = time
+                    modeDelayUnit =MODE_DELAY_UNIT_MINUTE
                 } else {
                     selectTime = time
+                    modeDelayUnit =MODE_DELAY_UNIT_SECONDS
                 }
             }
             R.id.spSwitchMode -> {
-                if (position == 0) {
-                    switchMode = CMD_OPEN_LIGHT
+//                if (position == 0) {
+//                    switchMode = CMD_OPEN_LIGHT
+//                } else {
+//                    switchMode = CMD_CLOSE_LIGHT
+//                }
+                var version = tvPSVersion.text.toString()
+                var num = version.substring(2, 3)
+                if (num.toDouble() >= 3.0) {
+                    if (position == 0) {//开灯
+                        tietMinimumBrightness?.setText("0")
+                        modeStartUpMode = MODE_START_UP_MODE_OPEN
+                    } else if (position == 1) {//关灯
+                        tietMinimumBrightness?.setText("99")
+                        modeStartUpMode = MODE_START_UP_MODE_CLOSE
+                    }
                 } else {
-                    switchMode = CMD_CLOSE_LIGHT
+                    if (position == 0) {
+                        switchMode = CMD_OPEN_LIGHT
+                    } else {
+                        switchMode = CMD_CLOSE_LIGHT
+                    }
                 }
+            }
+            R.id.sp_SwitchMode -> {
+            if (position == 0) {
+                modeSwitchMode = MODE_SWITCH_MODE_MOMENT
+            } else {
+                modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
+            }
             }
         }
     }
@@ -455,7 +499,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
 
     private fun configDevice() {
         var version=tvPSVersion.text.toString()
-        if(version.toDouble()>=3.0){
+            var num=version.substring(2,3)
+            if(num.toDouble()>=3.0){
             if (tietMinimumBrightness.text?.isEmpty() != false) {
                 snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
             } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
