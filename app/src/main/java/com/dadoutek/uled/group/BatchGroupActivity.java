@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -136,6 +137,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     ConstraintLayout topView;
     @BindView(R.id.scanPb)
     MaterialProgressBar scanPb;
+    @BindView(R.id.add_group_relativeLayout)
+    RelativeLayout add_relativeLayout;
+    @BindView(R.id.add_group)
+    RelativeLayout add_group;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -379,7 +384,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-            finish();
+        finish();
     }
 
     @Override
@@ -627,8 +632,16 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        if (groups.size() > 0) {
+            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+            add_relativeLayout.setVisibility(View.GONE);
+            add_group.setVisibility(View.VISIBLE);
+        } else {
+            add_relativeLayout.setVisibility(View.VISIBLE);
+            add_group.setVisibility(View.GONE);
+        }
+
         disableEventListenerInGrouping();
 
         initOnLayoutListener();
@@ -708,7 +721,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showShort(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_LIGHT_NORMAL,this);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_LIGHT_NORMAL, this);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm = (InputMethodManager) BatchGroupActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -945,8 +958,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
-        List <DbLight> list=DBUtils.INSTANCE.getAllNormalLight();
-        this.adapter = new DeviceListAdapter(list,this);
+        List<DbLight> list = DBUtils.INSTANCE.getAllNormalLight();
+        this.adapter = new DeviceListAdapter(list, this);
         nowLightList.addAll(list);
 
         groupsBottom = findViewById(R.id.groups_bottom);
@@ -956,11 +969,17 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         this.groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
         this.btnLog = findViewById(R.id.btn_log);
         this.btnScan = (Button) this.findViewById(R.id.btn_scan);
+        this.add_group = (RelativeLayout) this.findViewById(R.id.add_group);
+        this.add_relativeLayout = (RelativeLayout) this.findViewById(R.id.add_group_relativeLayout);
         this.btnScan.setEnabled(false);
         this.btnScan.setBackgroundResource(R.color.gray);
         deviceListView = this.findViewById(R.id.list_devices);
         deviceListView.setAdapter(this.adapter);
         this.updateList = new ArrayList<>();
+
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
 
         startGrouping();
     }
@@ -1008,7 +1027,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             groups = new ArrayList<>();
             List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
 
-            if(scanCURTAIN){
+            if (scanCURTAIN) {
                 for (int i = 0; i < list.size(); i++) {
                     if (OtherUtils.isNormalGroup(list.get(i))) {
                         groups.add(list.get(i));
@@ -1088,17 +1107,18 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         public ImageView icon;
         public TextView txtName;
         public CheckBox selected;
+        public TextView lightName;
     }
 
     final class DeviceListAdapter extends BaseAdapter {
 
         private List<DbLight> lights;
 
-        private  Context context;
+        private Context context;
 
-        public DeviceListAdapter(List<DbLight> connectors,Context mContext) {
-             lights=connectors;
-             context=mContext;
+        public DeviceListAdapter(List<DbLight> connectors, Context mContext) {
+            lights = connectors;
+            context = mContext;
         }
 
         @Override
@@ -1127,12 +1147,14 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             TextView txtName = (TextView) convertView
                     .findViewById(R.id.txt_name);
             CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
+            TextView lightName = (TextView) convertView.findViewById(R.id.light_name);
 
             holder = new DeviceItemHolder();
 
             holder.icon = icon;
             holder.txtName = txtName;
             holder.selected = selected;
+            holder.lightName = lightName;
 
             convertView.setTag(holder);
 
@@ -1140,18 +1162,18 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             DbLight light = this.getItem(position);
 
             holder.txtName.setText(light.getName());
-            if(light.getProductUUID()== DeviceType.LIGHT_NORMAL){
+            if (light.getProductUUID() == DeviceType.LIGHT_NORMAL) {
                 holder.icon.setImageResource(R.drawable.icon_light_set);
-            }
-            else{
+            } else {
                 holder.icon.setImageResource(R.drawable.icon_light_set);
             }
 
             holder.selected.setChecked(light.selected);
 
-                holder.txtName.setText(getDeviceName(light));
-                holder.icon.setVisibility(View.VISIBLE);
-                holder.selected.setVisibility(View.VISIBLE);
+            holder.lightName.setText(light.getName());
+            holder.txtName.setText(getDeviceName(light));
+            holder.icon.setVisibility(View.VISIBLE);
+            holder.selected.setVisibility(View.VISIBLE);
 
             return convertView;
         }
@@ -1230,7 +1252,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-    private void addDevice(DeviceInfo deviceInfo){
+    private void addDevice(DeviceInfo deviceInfo) {
         int meshAddress = deviceInfo.meshAddress & 0xFF;
         DbLight light = this.adapter.get(meshAddress);
 
@@ -1280,7 +1302,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
                 new Thread(() -> BatchGroupActivity.this.mApplication.getMesh().saveOrUpdate(BatchGroupActivity.this)).start();
 
-                if(scanCURTAIN){
+                if (scanCURTAIN) {
                     if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.LIGHT_NORMAL) {
                         addDevice(deviceInfo);
                     }

@@ -8,6 +8,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -83,6 +85,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private var isLightSwitch = true
     private var isBrightness = true
 
+    internal var downTime: Long = 0//Button被按下时的时间
+    internal var thisTime: Long = 0//while每次循环时的时间
+    internal var onBtnTouch = false//Button是否被按下
+    internal var tvValue = 0//TextView中的值
+
     private val clickListener = OnClickListener { v ->
         when (v.id) {
             R.id.tvOta -> {
@@ -137,6 +144,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         var light_current = DBUtils.getLightByID(light!!.id)
         if (light_current != null) {
             light_sbBrightness?.progress = light_current.colorTemperature
+            tv_Brightness.text = light_current.colorTemperature.toString() + "%"
             Log.e("TAG_SET_C", light_current.colorTemperature.toString())
         }
         isBrightness = false
@@ -152,6 +160,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         var light_current = DBUtils.getLightByID(light!!.id)
         if (light_current != null) {
             light_sbBrightness?.progress = light_current.brightness
+            tv_Brightness.text = light_current.brightness.toString() + "%"
             Log.e("TAG_SET_B", light_current.brightness.toString())
         }
 
@@ -167,9 +176,49 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 light_switch.setImageResource(R.drawable.icon_light_open)
                 light_image.setImageResource(R.drawable.icon_light)
                 light_current.connectionStatus = ConnectionStatus.ON.value
-                light_sbBrightness!!.setOnTouchListener { v, event -> false }
+                light_sbBrightness!!.setOnTouchListener { v, event -> false}
                 light_sbBrightness.thumb.setColorFilter(Color.parseColor("#18B4ED"), PorterDuff.Mode.SRC_ATOP)
                 light_sbBrightness.progressDrawable.setColorFilter(Color.parseColor("#18B4ED"), PorterDuff.Mode.SRC_ATOP)
+                device_light_add.setImageResource(R.drawable.icon_puls)
+                device_light_minus.setImageResource(R.drawable.icon_minus)
+                device_light_add.setOnTouchListener { v, event -> false }
+                device_light_minus.setOnTouchListener { v, event ->
+                    if (event.action == MotionEvent.ACTION_DOWN) {
+                    //                    tvValue = Integer.parseInt(textView.getText().toString());
+                    downTime = System.currentTimeMillis()
+                    onBtnTouch = true
+                    val t = object : Thread() {
+                        override fun run() {
+                            while (onBtnTouch) {
+                                thisTime = System.currentTimeMillis()
+                                if (thisTime - downTime >= 500) {
+                                    tvValue++
+                                    val msg = handler.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    handler.sendMessage(msg)
+                                    try {
+                                        Thread.sleep(100)
+                                    } catch (e: InterruptedException) {
+                                        e.printStackTrace()
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    t.start()
+                } else if (event.action == MotionEvent.ACTION_UP) {
+                    onBtnTouch = false
+                    if (thisTime - downTime < 500) {
+                        tvValue++
+                        val msg = handler.obtainMessage()
+                        msg.arg1 = tvValue
+                        handler.sendMessage(msg)
+                    }
+                } else if (event.action == MotionEvent.ACTION_CANCEL) {
+                    onBtnTouch = false
+                }
+                    false }
             } else {
                 Commander.openOrCloseLights(light_current.meshAddr, false)
                 light_current.connectionStatus = ConnectionStatus.OFF.value
@@ -178,8 +227,30 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 light_sbBrightness!!.setOnTouchListener { v, event -> true }
                 light_sbBrightness.thumb.setColorFilter(Color.parseColor("#999999"), PorterDuff.Mode.SRC_ATOP)
                 light_sbBrightness.progressDrawable.setColorFilter(Color.parseColor("#999999"), PorterDuff.Mode.SRC_ATOP)
+                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                device_light_add.setOnTouchListener { v, event -> true }
+                device_light_minus.setOnTouchListener { v, event -> true }
             }
             DBUtils.updateLight(light_current)
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private val handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            //            textView.setText(String.valueOf(msg.arg1));
+            light_sbBrightness.progress--
+            if(light_sbBrightness.progress<0){
+                device_light_minus.setOnTouchListener { v, event -> true }
+                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+            }
+            tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+            if(light_sbBrightness.progress<100){
+                device_light_add.setOnTouchListener { v, event -> false }
+                device_light_add.setImageResource(R.drawable.icon_puls)
+            }
         }
     }
 
@@ -621,7 +692,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             R.id.toolbar_update_group -> {
                 updateGroup()
             }
-            R.id.toolbar_ota ->{
+            R.id.toolbar_ota -> {
                 updateOTA()
             }
         }
@@ -629,7 +700,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun updateOTA() {
-        if(textTitle.text!=null){
+        if (textTitle.text != null) {
             checkPermission()
         }
     }
@@ -679,12 +750,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness!!.setOnTouchListener { v, event -> true }
             light_sbBrightness.thumb.setColorFilter(Color.parseColor("#999999"), PorterDuff.Mode.SRC_ATOP)
             light_sbBrightness.progressDrawable.setColorFilter(Color.parseColor("#999999"), PorterDuff.Mode.SRC_ATOP)
+            device_light_add.setImageResource(R.drawable.icon_puls_no)
+            device_light_minus.setImageResource(R.drawable.icon_minus_no)
         } else {
             light_image.setImageResource(R.drawable.icon_light)
             light_switch.setImageResource(R.drawable.icon_light_open)
             light_sbBrightness!!.setOnTouchListener { v, event -> false }
             light_sbBrightness.thumb.setColorFilter(Color.parseColor("#18B4ED"), PorterDuff.Mode.SRC_ATOP)
             light_sbBrightness.progressDrawable.setColorFilter(Color.parseColor("#18B4ED"), PorterDuff.Mode.SRC_ATOP)
+            device_light_add.setImageResource(R.drawable.icon_puls)
+            device_light_minus.setImageResource(R.drawable.icon_minus)
         }
 
 //        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
@@ -841,7 +916,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                        fromUser: Boolean) {
             LogUtils.d("progress:_2__" + progress)
             val currentTime = System.currentTimeMillis()
-
+            tv_Brightness.text = seekBar.progress.toString() + "%"
             onValueChangeView(seekBar, progress, true, false)
             if (currentTime - this.preTime > this.delayTime) {
                 this.onValueChange(seekBar, progress, true, false)
@@ -898,6 +973,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             if (light_current != null) {
                                 light_current.brightness = light!!.brightness
                                 DBUtils.updateLight(light_current)
+                                tv_Brightness.text = light_current.brightness.toString() + "%"
                                 Log.e("TAG_TRUE_C", light!!.colorTemperature.toString())
                                 Log.e("TAG_TRUE_B", light!!.brightness.toString())
                             }
@@ -923,6 +999,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             var light_current = DBUtils.getLightByID(light!!.id)
                             if (light_current != null) {
                                 light_current.colorTemperature = light!!.colorTemperature
+                                tv_Brightness.text = light_current.colorTemperature.toString() + "%"
                                 DBUtils.updateLight(light_current)
 //                                DBUtils.updateLight(light!!)
                                 Log.e("TAG_FASLE_C", light!!.colorTemperature.toString())

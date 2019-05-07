@@ -15,7 +15,7 @@
         android:id="@+id/light_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/icon_light"
         app:layout_constraintEnd_toEndOf="@+id/include2"
@@ -45,10 +45,41 @@
         android:layout_marginTop="20dp"
         android:max="100"
         android:padding="5dp"
-        android:progress="15"
+        android:progress="0"
         app:layout_constraintEnd_toEndOf="@+id/include2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/adjustment" />
+
+    <ImageView
+        android:id="@+id/device_light_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/icon_puls"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="@+id/light_sbBrightness"
+        app:layout_constraintTop_toBottomOf="@+id/light_sbBrightness" />
+
+    <TextView
+        android:id="@+id/tv_Brightness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="0%"
+        android:textSize="15sp"
+        android:textColor="@color/black_three"
+        app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
+        app:layout_constraintEnd_toStartOf="@+id/device_light_add"
+        app:layout_constraintTop_toTopOf="@+id/device_light_add" />
+
+    <ImageView
+        android:id="@+id/device_light_minus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/icon_minus"
+        app:layout_constraintBottom_toBottomOf="@+id/device_light_add"
+        app:layout_constraintEnd_toStartOf="@+id/tv_Brightness" />
 
 
     <ImageView
