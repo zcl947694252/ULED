@@ -68,7 +68,7 @@
             <Spinner
                 android:id="@+id/spDelay"
                 android:layout_width="148dp"
-                android:layout_height="wrap_content"
+                android:layout_height="14dp"
                 android:entries="@array/delay_unit"
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/tvDelay"
@@ -100,6 +100,49 @@
                 app:layout_constraintStart_toEndOf="@+id/tvSwitchMode"
                 app:layout_constraintTop_toTopOf="@+id/tvSwitchMode" />
 
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/tilMinimumBrightness"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintStart_toStartOf="@id/tvSwitchMode"
+                app:layout_constraintTop_toBottomOf="@id/tvSwitchMode">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/tietMinimumBrightness"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/minimum_brightness_percentage"
+                    android:inputType="number"
+                    android:maxLength="2"
+                    android:text="0" />
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tvTriggerLux"
+                android:layout_width="140dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="32dp"
+                android:text="@string/trigger_lux"
+                android:textSize="18sp"
+                app:autoSizeTextType = "uniform"
+                app:autoSizeMaxTextSize="18sp"
+                app:layout_constraintStart_toStartOf="@+id/tilMinimumBrightness"
+                app:layout_constraintTop_toBottomOf="@+id/tilMinimumBrightness" />
+
+            <Spinner
+                android:id="@+id/spTrigger_lux"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:entries="@array/trigger_lux_array"
+                app:layout_constraintBottom_toBottomOf="@+id/tvTriggerLux"
+                app:layout_constraintEnd_toEndOf="@+id/tilMinimumBrightness"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/tvTriggerLux"
+                app:layout_constraintTop_toTopOf="@+id/tvTriggerLux" />
+
+
             <TextView
                 android:id="@+id/tvSelectGroup"
                 android:layout_width="wrap_content"
@@ -108,8 +151,8 @@
                 android:text="@string/select_group"
                 android:textSize="18sp"
                 android:visibility="visible"
-                app:layout_constraintStart_toStartOf="@id/tvSwitchMode"
-                app:layout_constraintTop_toBottomOf="@id/tvSwitchMode"
+                app:layout_constraintStart_toStartOf="@+id/tvTriggerLux"
+                app:layout_constraintTop_toBottomOf="@+id/tvTriggerLux"
                 />
 
             <Button

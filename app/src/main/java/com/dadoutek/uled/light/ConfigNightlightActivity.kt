@@ -29,6 +29,13 @@ import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_light_light.*
+import kotlinx.android.synthetic.main.activity_config_light_light.configPirRoot
+import kotlinx.android.synthetic.main.activity_config_light_light.fabConfirm
+import kotlinx.android.synthetic.main.activity_config_light_light.spSwitchMode
+import kotlinx.android.synthetic.main.activity_config_light_light.tietMinimumBrightness
+import kotlinx.android.synthetic.main.activity_config_light_light.tvPSVersion
+import kotlinx.android.synthetic.main.activity_config_light_light.versionLayoutPS
+import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -51,6 +58,10 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
 
     private var showGroupList: MutableList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
+
+    private var modeStartUpMode = 0
+    private var modeDelayUnit = 0
+    private var modeSwitchMode = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -296,6 +307,53 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         Thread.sleep(300)
     }
 
+    private fun configNewlight() {
+//        val spGroup = groupConvertSpecialValue(groupAddr)
+        val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
+        val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
+        val timeL: Byte = (selectTime and 0xff).toByte()
+        var mode= getModeValue()
+        val paramBytes = byteArrayOf(
+                DeviceType.NIGHT_LIGHT.toByte(),
+                switchMode.toByte(), 0x00,0x00,
+                selectTime.toByte(),
+                tietMinimumBrightness.text.toString().toInt().toByte(),
+                spTrigger_lux.selectedItem.toString().toInt().toByte(),
+                mode.toByte()
+        )
+        val paramBytesGroup: ByteArray
+        paramBytesGroup = byteArrayOf(
+                DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0
+        )
+
+        var canSendGroup = true
+        for (i in showGroupList!!.indices) {
+            if (showGroupList!![i].groupAress == 0xffff) {
+//                canSendGroup=false
+                paramBytesGroup[i + 2] = 0xFF.toByte()
+                break
+            } else {
+                val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
+                paramBytesGroup[i + 2] = groupL
+                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+            }
+        }
+
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                mDeviceInfo.meshAddress,
+                paramBytes)
+
+        Thread.sleep(300)
+
+        if (canSendGroup) {
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                    mDeviceInfo.meshAddress,
+                    paramBytesGroup)
+        }
+
+        Thread.sleep(300)
+    }
+
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             R.id.spDelay -> {
@@ -396,32 +454,75 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun configDevice() {
-        Thread {
+        var version=tvPSVersion.text.toString()
+        if(version.toDouble()>=3.0){
+            if (tietMinimumBrightness.text?.isEmpty() != false) {
+                snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
+            } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
+                ToastUtils.showLong(getString(R.string.max_tip_brightness))
+            } else {
+                Thread {
+                    val mApplication = this.application as TelinkLightApplication
+                    val mesh = mApplication.getMesh()
 
-            val mApplication = this.application as TelinkLightApplication
-            val mesh = mApplication.getMesh()
+                    if (showGroupList?.size != 0) {
+                        GlobalScope.launch(Dispatchers.Main) {
+                            showLoadingDialog(getString(R.string.configuring_switch))
+                        }
 
-            if (showGroupList?.size != 0) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    showLoadingDialog(getString(R.string.configuring_switch))
+                        configNewlight()
+                        Thread.sleep(300)
+
+                        Commander.updateMeshName(
+                                successCallback = {
+                                    hideLoadingDialog()
+                                    configureComplete()
+                                },
+                                failedCallback = {
+                                    snackbar(configPirRoot, getString(R.string.pace_fail))
+                                    hideLoadingDialog()
+                                })
+                    } else {
+                        ToastUtils.showLong(getString(R.string.config_night_light_select_group))
+                    }
+
+                }.start()
+
+            }
+        }else{
+            Thread {
+
+                val mApplication = this.application as TelinkLightApplication
+                val mesh = mApplication.getMesh()
+
+                if (showGroupList?.size != 0) {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        showLoadingDialog(getString(R.string.configuring_switch))
+                    }
+
+                    configLightlight()
+                    Thread.sleep(300)
+
+                    Commander.updateMeshName(
+                            successCallback = {
+                                hideLoadingDialog()
+                                configureComplete()
+                            },
+                            failedCallback = {
+                                snackbar(configPirRoot, getString(R.string.pace_fail))
+                                hideLoadingDialog()
+                            })
+                } else {
+                    ToastUtils.showLong(getString(R.string.config_night_light_select_group))
                 }
 
-                configLightlight()
-                Thread.sleep(300)
+            }.start()
+        }
+    }
 
-                Commander.updateMeshName(
-                        successCallback = {
-                            hideLoadingDialog()
-                            configureComplete()
-                        },
-                        failedCallback = {
-                            snackbar(configPirRoot, getString(R.string.pace_fail))
-                            hideLoadingDialog()
-                        })
-            } else {
-                ToastUtils.showLong(getString(R.string.config_night_light_select_group))
-            }
-
-        }.start()
+    private fun getModeValue(): Int {
+        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
+        return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 }
