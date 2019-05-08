@@ -18,62 +18,68 @@ import java.util.List;
 
 public class SharedPreferencesUtils {
 
-    public static void saveCurrentUseRegion(long id){
+    public static void saveCurrentUseRegion(long id) {
         SharedPreferencesHelper.putLong(TelinkLightApplication.getInstance(),
-                Constant.CURRENT_USE_REGION_KEY,id);
+                Constant.CURRENT_USE_REGION_KEY, id);
     }
 
-    public static long getCurrentUseRegion(){
+    public static long getCurrentUseRegion() {
         return SharedPreferencesHelper.getLong(TelinkLightApplication.getInstance(),
-                Constant.CURRENT_USE_REGION_KEY,-1);
+                Constant.CURRENT_USE_REGION_KEY, -1);
     }
 
-    public static void saveCurrentLightVsersion(String vsersion){
+    public static void saveCurrentLightVsersion(String vsersion) {
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                Constant.CURRENT_LIGHT_VSERSION_KEY,vsersion);
+                Constant.CURRENT_LIGHT_VSERSION_KEY, vsersion);
     }
 
-    public static String getCurrentLightVersion(){
+    public static String getCurrentLightVersion() {
         return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.CURRENT_LIGHT_VSERSION_KEY,"");
+                Constant.CURRENT_LIGHT_VSERSION_KEY, "");
     }
 
-    public static void saveCurrentUserList(String account){
-        List<String> userList=getCurrentUserList();
-        if(userList==null){
-            userList=new ArrayList<>();
+    public static void saveCurrentUserList(String account) {
+        List<String> userList = getCurrentUserList();
+        if (userList == null) {
+            userList = new ArrayList<>();
         }
-        if(!userList.contains(account)){
+        if (!userList.contains(account)) {
             userList.add(account);
         }
         SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
-                Constant.CURRENT_USE_LIST_KEY,userList);
+                Constant.CURRENT_USE_LIST_KEY, userList);
     }
 
-    public static List<String> getCurrentUserList(){
-        List<String> list=(List<String>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+    public static List<String> getCurrentUserList() {
+        List<String> list = (List<String>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
                 Constant.CURRENT_USE_LIST_KEY);
-        if(list==null){
-            list=new ArrayList<>();
+        if (list == null) {
+            list = new ArrayList<>();
         }
         return list;
     }
 
     //true表示用于已登陆此版本
-    public static void setUserLogin(boolean model){
+    public static void setUserLogin(boolean model) {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
-                Constant.USER_LOGIN,model);
+                Constant.USER_LOGIN, model);
     }
 
     //true表示处于开发者模式，false标书用户模式
-    public static void setDeveloperModel(boolean model){
+    public static void setDeveloperModel(boolean model) {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
-                Constant.IS_DEVELOPER_MODE,model);
+                Constant.IS_DEVELOPER_MODE, model);
     }
 
-    public static boolean isDeveloperModel(){
+    //true表示处于已连接，false表示未连接
+    public static void setBluetoothState(boolean model) {
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
+                Constant.IS_BLUETOOTH_STATE,model);
+    }
+
+    public static boolean isDeveloperModel() {
         return SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),
-                Constant.IS_DEVELOPER_MODE,false);
+                Constant.IS_DEVELOPER_MODE, false);
     }
 
     public static boolean getConnectState(Context context) {
@@ -84,33 +90,33 @@ public class SharedPreferencesUtils {
         return true;
     }
 
-    public static void saveLastUser(String info){
-         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                Constant.USER_INFO,info);
-    }
-
-    public static String getLastUser(){
-        return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.USER_INFO,"");
-    }
-
-    public static void saveUpdateFilePath(String path){
+    public static void saveLastUser(String info) {
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
-                Constant.UPDATE_FILE_ADRESS,path);
+                Constant.USER_INFO, info);
     }
 
-    public static String getUpdateFilePath(){
+    public static String getLastUser() {
         return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.UPDATE_FILE_ADRESS,"");
+                Constant.USER_INFO, "");
     }
 
-    public static void setShowGuideAgain(boolean model){
+    public static void saveUpdateFilePath(String path) {
+        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                Constant.UPDATE_FILE_ADRESS, path);
+    }
+
+    public static String getUpdateFilePath() {
+        return SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.UPDATE_FILE_ADRESS, "");
+    }
+
+    public static void setShowGuideAgain(boolean model) {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
-                Constant.IS_SHOWGUIDE_AGAIN,model);
+                Constant.IS_SHOWGUIDE_AGAIN, model);
     }
 
-    public static boolean isShowGuideAgain(){
+    public static boolean isShowGuideAgain() {
         return SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),
-                Constant.IS_SHOWGUIDE_AGAIN,false);
+                Constant.IS_SHOWGUIDE_AGAIN, false);
     }
 }

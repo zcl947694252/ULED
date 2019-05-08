@@ -28,6 +28,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -186,7 +187,7 @@ class NewDevieFragment :BaseFragment(){
 
 //        val decoration = DividerItemDecoration(activity!!,
 //                DividerItemDecoration
-//                        .VERTICAL)
+//                        .VERTICAL)=
 //        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
 //                .divider)))
 //        //添加分割线
@@ -208,24 +209,16 @@ class NewDevieFragment :BaseFragment(){
     }
 
     private fun refreshView() {
-        val layoutmanager = LinearLayoutManager(activity)
-//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView!!.layoutManager = GridLayoutManager(this.activity,2)
-        newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item,deviceTypeList!!)
-
-//        val decoration = DividerItemDecoration(activity!!,
-//                DividerItemDecoration
-//                        .VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-//                .divider)))
-//        //添加分割线
-//        recyclerView?.addItemDecoration(decoration)
-        recyclerView?.addItemDecoration(SpaceItemDecoration(32))
-        recyclerView?.itemAnimator = DefaultItemAnimator()
-
-        newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
-//        adapter!!.addFooterView(getFooterView())
-        newDeviceAdapter!!.bindToRecyclerView(recyclerView)
+        if (activity != null) {
+        }
+//            deviceTypeList = ArrayList<String>()
+//            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
+//            for(installDeviceModel in installList){
+//                deviceTypeList!!.add(installDeviceModel.deviceType)
+//            }
+//
+//            allDeviceList = ArrayList()
+//        }
     }
 
 //    allDeviceList!!.add(DBUtils.getAllNormalLight())

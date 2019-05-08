@@ -1,12 +1,21 @@
 package com.dadoutek.uled.tellink;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.text.TextUtils;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
+import com.dadoutek.uled.R;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
@@ -35,7 +44,10 @@ public final class TelinkLightApplication extends TelinkApplication {
     private Toast toast;
     private int onlineCount = 0;
 
+//    private BluetoothStateBroadcastReceive mReceive;
+
     private static DaoSession daoSession;
+    private Object Toolbar;
 
     @SuppressLint("SdCardPath")
     @Override
@@ -53,7 +65,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 //            LogUtils.getConfig().setLog2FileSwitch(true);
             //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
         }
-
+//        registerBluetoothReceiver();
         MobSDK.init(this);
 //        CrashReport.testJavaCrash();
 
@@ -61,6 +73,19 @@ public final class TelinkLightApplication extends TelinkApplication {
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
     }
+
+//    private void registerBluetoothReceiver(){
+//        if(mReceive == null){
+//            mReceive = new BluetoothStateBroadcastReceive();
+//        }
+//        IntentFilter intentFilter = new IntentFilter();
+//        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+//        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+//        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+//        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF");
+//        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON");
+//        registerReceiver(mReceive, intentFilter);
+//    }
 
     public static TelinkLightApplication getApp() {
         return thiz;
@@ -99,7 +124,15 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void doDestroy() {
         TelinkLog.onDestroy();
         super.doDestroy();
+//        unregisterBluetoothReceiver();
     }
+
+//    private void unregisterBluetoothReceiver(){
+//        if(mReceive != null){
+//            unregisterReceiver(mReceive);
+//            mReceive = null;
+//        }
+//    }
 
     public Mesh getMesh() {
         if (this.mesh == null) {
@@ -169,6 +202,36 @@ public final class TelinkLightApplication extends TelinkApplication {
             showToast("save success --" + fileName);
         }
     }
+
+//    public class BluetoothStateBroadcastReceive extends BroadcastReceiver {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//            switch (action){
+//                case BluetoothDevice.ACTION_ACL_CONNECTED:
+//                    Toast.makeText(context , "蓝牙设备:" + device.getName() + "已链接", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case BluetoothDevice.ACTION_ACL_DISCONNECTED:
+//                    Toast.makeText(context , "蓝牙设备:" + device.getName() + "已断开", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case BluetoothAdapter.ACTION_STATE_CHANGED:
+//                    int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+//                    switch (blueState){
+//                        case BluetoothAdapter.STATE_OFF:
+//                            Toast.makeText(context , "蓝牙已关闭", Toast.LENGTH_SHORT).show();
+//////                            (ImageView)findViewById(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no);
+//                            break;
+//                        case BluetoothAdapter.STATE_ON:
+//                            Toast.makeText(context , "蓝牙已开启"  , Toast.LENGTH_SHORT).show();
+//                            break;
+//                    }
+//                    break;
+//            }
+//        }
+//
+//    }
 
 
     public void showToast(CharSequence s) {

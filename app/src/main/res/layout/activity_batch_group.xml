@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/icon_add"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="145dp"
+                android:layout_marginLeft="140dp"
                 />
 
             <TextView

@@ -118,6 +118,7 @@ object Commander : EventListener<String> {
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, light, null)
                         Thread.sleep(sleepTime)
                     }
+                    DBUtils.deleteAll()
                     Thread.sleep(sleepTime)
                     for(k in lightList.indices)
                         if(DBUtils.getLightByMeshAddr(lightList[k])!=null){

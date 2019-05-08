@@ -45,7 +45,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
+            android:paddingEnd="8dp"
             android:text="@string/install_device"
             android:textColor="@color/white"
             android:visibility="gone" />
@@ -57,7 +57,7 @@
             android:layout_gravity="end"
             android:foreground="?android:attr/selectableItemBackground"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
+            android:paddingEnd="8dp"
             android:src="@drawable/ic_delete_white_24dp"
             android:visibility="gone" />
 
@@ -68,9 +68,8 @@
             android:layout_gravity="end"
             android:foreground="?android:attr/selectableItemBackground"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:src="@drawable/bluetooth_no"
-            android:visibility="gone" />
+            android:paddingEnd="8dp"
+            android:src="@drawable/bluetooth_no" />
 
         <TextView
             android:id="@+id/btnStopGradient"
@@ -80,7 +79,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
+            android:paddingEnd="8dp"
             android:text="@string/stop"
             android:textColor="@android:color/white"
             android:textSize="16sp"
@@ -94,7 +93,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
+            android:paddingEnd="8dp"
             android:text="@string/ota"
             android:textColor="@android:color/white"
             android:textSize="16sp"
@@ -108,7 +107,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
+            android:paddingEnd="8dp"
             android:text="@string/rename"
             android:textColor="@android:color/white"
             android:textSize="16sp"

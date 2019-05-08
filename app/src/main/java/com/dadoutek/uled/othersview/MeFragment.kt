@@ -4,9 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.*
 import android.provider.Settings
@@ -72,6 +76,8 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     private var compositeDisposable = CompositeDisposable()
     private var mWakeLock: PowerManager.WakeLock? = null
 
+    private var mReceive: BluetoothStateBroadcastReceive? = null
+
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
         override fun start() {
@@ -115,6 +121,19 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             //            Log.d("SyncLog", "error: " + msg);
             //            ToastUtils.showLong(getString(R.string.sync_error_contant));
         }
+    }
+
+    private fun registerBluetoothReceiver() {
+        if (mReceive == null) {
+            mReceive = BluetoothStateBroadcastReceive()
+        }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
+        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF")
+        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
+        activity?.registerReceiver(mReceive, intentFilter)
     }
 
 
@@ -162,6 +181,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         } else {
             sleepTime = 200
         }
+        registerBluetoothReceiver()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -187,6 +207,17 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         if (mWakeLock != null) {
             mWakeLock?.acquire()
         }
+
+        val blueadapter = BluetoothAdapter.getDefaultAdapter()
+        if (blueadapter?.isEnabled == false) {
+           bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+        }else{
+           if (TelinkLightApplication.getInstance().connectDevice == null) {
+               bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                }else{
+               bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                }
+        }
     }
 
     override fun onDestroy() {
@@ -194,25 +225,33 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
+        unregisterBluetoothReceiver()
+    }
+
+    private fun unregisterBluetoothReceiver() {
+        if (mReceive != null) {
+            activity?.unregisterReceiver(mReceive)
+            mReceive = null
+        }
     }
 
     fun initClick(){
         chearCache?.setOnClickListener(this)
         updateIte?.setOnClickListener(this)
         copyDataBase?.setOnClickListener(this)
-        appVersion?.setOnClickListener(this)
+//        appVersion?.setOnClickListener(this)
         exitLogin?.setOnClickListener(this)
         oneClickBackup?.setOnClickListener(this)
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
-        showGuideAgain?.setOnClickListener(this)
+//        showGuideAgain?.setOnClickListener(this)
         resetAllGroup?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
-        toolbar.title=getString(R.string.fragment_name_me)
+//        toolbar.title=getString(R.string.fragment_name_me)
         val versionName = AppUtils.getVersionName(activity!!)
-        appVersion!!.text = versionName
+//        appVersion!!.text = versionName
         //暂时屏蔽
         updateIte!!.visibility = View.GONE
         if (SharedPreferencesUtils.isDeveloperModel()) {
@@ -236,6 +275,33 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             //            getVersion();
         } else {
             compositeDisposable.dispose()
+        }
+    }
+
+    inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+            when (action) {
+                BluetoothDevice.ACTION_ACL_CONNECTED -> {
+                    bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                }
+                BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+                    bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                }
+                BluetoothAdapter.ACTION_STATE_CHANGED -> {
+                    val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
+                    when (blueState) {
+                        BluetoothAdapter.STATE_OFF -> {
+                                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                        }
+                        BluetoothAdapter.STATE_ON -> {
+                                bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -278,12 +344,12 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             R.id.chearCache -> emptyTheCache()
             R.id.updateIte -> ToastUtils.showShort(R.string.wait_develop)
             R.id.copyDataBase -> verifyStoragePermissions(activity)
-            R.id.appVersion -> developerMode()
+//            R.id.appVersion -> developerMode()
             R.id.exitLogin -> exitLogin()
             R.id.oneClickBackup -> checkNetworkAndSync(activity)
             R.id.oneClickReset -> showSureResetDialogByApp()
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
-            R.id.showGuideAgain -> showGuideAgainFun()
+//            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.resetAllGroup -> gotoResetAllGroup()
         }
     }
@@ -582,4 +648,6 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
         private val LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
     }
+
+
 }

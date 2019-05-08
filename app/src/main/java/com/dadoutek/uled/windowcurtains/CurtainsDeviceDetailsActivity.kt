@@ -169,6 +169,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             no_device_relativeLayout.visibility=View.GONE
             var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
             batchGroup.setText(R.string.batch_group)
             batchGroup.setOnClickListener(View.OnClickListener {
                 val intent = Intent(this,
@@ -180,6 +181,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         }else {
             recycleView.visibility=View.GONE
             no_device_relativeLayout.visibility=View.VISIBLE
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                 if (dialog_curtain?.visibility == View.GONE) {

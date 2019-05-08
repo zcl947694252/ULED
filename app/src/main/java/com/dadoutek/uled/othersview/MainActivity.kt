@@ -136,6 +136,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
     private lateinit var switchStepTwo:TextView
     private lateinit var swicthStepThree:TextView
     internal var isClickExlogin = false
+    private  var isState= false
 
 
     private val mReceiver = object : BroadcastReceiver() {
@@ -753,7 +754,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
 
                         if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
                             mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
-
                     } else {
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, {
@@ -935,8 +935,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
                     if (mConnectSuccessSnackBar?.isShown != true)
                         mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
                     mConnectSnackBar?.dismiss()
-
-//                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)

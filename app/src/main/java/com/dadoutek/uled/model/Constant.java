@@ -48,10 +48,10 @@ public class Constant implements Serializable {
     public static final String GROUP_ARESS_KEY = "GROUP_ARESS_KEY";
     public static final String LIGHT_REFRESH_KEY = "LIGHT_REFRESH_KEY";
     public static final String LIGHT_REFRESH_KEY_OK = "LIGHT_REFRESH_KEY_OK";
-    public static final String CURTAINS_ARESS_KEY="CURTAINS_ARESS_KEY";
-    public static final String CURTAINS_KEY="CURTAINS_KEY";
-    public static final String LIGHT_KEY="LIGHT_KEY";
-    public static final String RGB_LIGHT_KEY="RGB_LIGHT_KEY";
+    public static final String CURTAINS_ARESS_KEY = "CURTAINS_ARESS_KEY";
+    public static final String CURTAINS_KEY = "CURTAINS_KEY";
+    public static final String LIGHT_KEY = "LIGHT_KEY";
+    public static final String RGB_LIGHT_KEY = "RGB_LIGHT_KEY";
 
     //标志链接是否成功
     public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";
@@ -69,7 +69,7 @@ public class Constant implements Serializable {
 //    public static final String BASE_URL = "http://47.107.227.130/smartlight/";
 
     //网络请求服务器域名地址
-    public static final String BASE_URL="https://dev.dadoutek.com/smartlight/";
+    public static final String BASE_URL = "https://dev.dadoutek.com/smartlight/";
 
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY = "DB_NAME_KEY";
@@ -95,14 +95,17 @@ public class Constant implements Serializable {
     //是否重置引导显示
     public static String IS_SHOWGUIDE_AGAIN = "IS_DEVELOPER_MODE";
 
+    //是否连接成功
+    public static String IS_BLUETOOTH_STATE = "IS_BLUETOOTH_STATE";
+
     //用户信息
     public static String USER_INFO = "USER_INFO";
 
     //用户登录此版本
-    public static String USER_LOGIN="USER_LOGIN";
+    public static String USER_LOGIN = "USER_LOGIN";
 
     //开发者模式
-    public static String DEVELOPER_MODEL ="DEVELOPER_MODEL";
+    public static String DEVELOPER_MODEL = "DEVELOPER_MODEL";
 
     //用户信息
     public static String UPDATE_FILE_ADRESS = "UPDATE_FILE_ADRESS";
@@ -143,51 +146,51 @@ public class Constant implements Serializable {
     //是否注册跳过验证码（目前用来测试）
     public static boolean TEST_REGISTER = false;
 
-    public static String UPDATE_LIGHT="UPDATE_LIGHT";
+    public static String UPDATE_LIGHT = "UPDATE_LIGHT";
 
-    public static String FIRMWARE_TYPE_LIGHT="FIRMWARE_TYPE_LIGHT";
-    public static String FIRMWARE_TYPE_CONTROLLER="FIRMWARE_TYPE_CONTROLLER";
+    public static String FIRMWARE_TYPE_LIGHT = "FIRMWARE_TYPE_LIGHT";
+    public static String FIRMWARE_TYPE_CONTROLLER = "FIRMWARE_TYPE_CONTROLLER";
 
-    public static String PRESET_COLOR ="PRESET_COLOR";
+    public static String PRESET_COLOR = "PRESET_COLOR";
 
-    public static int LIGHT=1;
-    public static int CONTROLLER=2;
+    public static int LIGHT = 1;
+    public static int CONTROLLER = 2;
 
     //l有频闪;ln无频闪;lns无频闪单调光;ln不带s调光调色
 
     //🈶频闪
-    public static int LIGHT_TYPE_STROBE=1;
+    public static int LIGHT_TYPE_STROBE = 1;
     //无频闪单调光
-    public static int LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT=2;
+    public static int LIGHT_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT = 2;
     //无频闪调光调色
-    public static int LIGHT_TYPE_NO_STROBO_DIMMING=3;
+    public static int LIGHT_TYPE_NO_STROBO_DIMMING = 3;
     //无频闪costdown
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN=4;
+    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN = 4;
     //无频闪costdown双调光
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING=5;
+    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_DUAL_DIMMING = 5;
     //无频闪costdown48转36V
-    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V=6;
+    public static int LIGHT_TYPE_NO_STROBO_COSTDOWN_48_TO_36V = 6;
 
     //无频闪单调光
-    public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT=1;
+    public static int CONTROLLER_TYPE_NO_STROBOSCOPIC_MONOTONE_LIGHT = 1;
     //无频闪调光调色
-    public static int CONTROLLER_TYPE_NO_STROBO_DIMMING=2;
+    public static int CONTROLLER_TYPE_NO_STROBO_DIMMING = 2;
     //RGB控制器
-    public static int CONTROLLER_TYPE_RGB=3;
+    public static int CONTROLLER_TYPE_RGB = 3;
 
-    public static int OTA_SUPPORT_LOWEST_VERSION=206;
+    public static int OTA_SUPPORT_LOWEST_VERSION = 206;
 
-    public static int TURN_ON_THE_LIGHT_AFTER_PASSING=0;
-    public static int TURN_OFF_THE_LIGHT_AFTER_PASSING=1;
+    public static int TURN_ON_THE_LIGHT_AFTER_PASSING = 0;
+    public static int TURN_OFF_THE_LIGHT_AFTER_PASSING = 1;
 
     public static int VENDOR_ID = 0x0211;
-    public static String IS_SCAN_RGB_LIGHT="IS_SCAN_RGB_LIGHT";
-    public static String IS_SCAN_CURTAIN="IS_SCAN_CURTAIN";
-    public static String TYPE_GROUP="TYPE_GROUP";
-    public static String TYPE_LIGHT="TYPE_LIGHT";
-    public static String TYPE_CURTAIN="TYPE_CURTAIN";
-    public static String TYPE_VIEW="TYPE_VIEW";
-    public static String TYPE_VIEW_ADDRESS="TYPE_VIEW_ADDRESS";
+    public static String IS_SCAN_RGB_LIGHT = "IS_SCAN_RGB_LIGHT";
+    public static String IS_SCAN_CURTAIN = "IS_SCAN_CURTAIN";
+    public static String TYPE_GROUP = "TYPE_GROUP";
+    public static String TYPE_LIGHT = "TYPE_LIGHT";
+    public static String TYPE_CURTAIN = "TYPE_CURTAIN";
+    public static String TYPE_VIEW = "TYPE_VIEW";
+    public static String TYPE_VIEW_ADDRESS = "TYPE_VIEW_ADDRESS";
 
     //导航页标签
     public static String TAG_GroupListFragment = "GroupListFragment";
@@ -198,30 +201,30 @@ public class Constant implements Serializable {
     public static String TAG_SetSceneAct = "TAG_SetSceneAct";
     public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
     public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
-//    public static String TAG_GroupListFragment = "GroupListFragment";
-    public static boolean isCreat=false;
+    //    public static String TAG_GroupListFragment = "GroupListFragment";
+    public static boolean isCreat = false;
 
-    public static final int INSTALL_NORMAL_LIGHT=0;
-    public static final int INSTALL_RGB_LIGHT=1;
-    public static final int INSTALL_SWITCH=2;
-    public static final int INSTALL_SENSOR=3;
-    public static final int INSTALL_CURTAIN=4;
-    public static final int INSTALL_CONNECTOR=5;
+    public static final int INSTALL_NORMAL_LIGHT = 0;
+    public static final int INSTALL_RGB_LIGHT = 1;
+    public static final int INSTALL_SWITCH = 2;
+    public static final int INSTALL_SENSOR = 3;
+    public static final int INSTALL_CURTAIN = 4;
+    public static final int INSTALL_CONNECTOR = 5;
 
     //分组标识
 
     //默认分组
-    public static final Long DEVICE_TYPE_DEFAULT_ALL=0L;
+    public static final Long DEVICE_TYPE_DEFAULT_ALL = 0L;
     //默认分组
-    public static final Long DEVICE_TYPE_DEFAULT=-1L;
+    public static final Long DEVICE_TYPE_DEFAULT = -1L;
     //默认分组
-    public static final Long DEVICE_TYPE_NO=1L;
+    public static final Long DEVICE_TYPE_NO = 1L;
     //普通灯分组
-    public static final Long DEVICE_TYPE_LIGHT_NORMAL= Long.valueOf(0x04);
+    public static final Long DEVICE_TYPE_LIGHT_NORMAL = Long.valueOf(0x04);
     //RGB分组
-    public static final Long DEVICE_TYPE_LIGHT_RGB= Long.valueOf(0x06);
+    public static final Long DEVICE_TYPE_LIGHT_RGB = Long.valueOf(0x06);
     //窗帘分组
-    public static final Long DEVICE_TYPE_CURTAIN= Long.valueOf(0x10);
+    public static final Long DEVICE_TYPE_CURTAIN = Long.valueOf(0x10);
     //连接器
-    public static final Long DEVICE_TYPE_CONNECTOR=Long.valueOf(0x05);
+    public static final Long DEVICE_TYPE_CONNECTOR = Long.valueOf(0x05);
 }

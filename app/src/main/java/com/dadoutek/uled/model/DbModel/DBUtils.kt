@@ -973,6 +973,11 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
     }
 
+    fun deleteAll(){
+        DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
+        DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
+    }
+
 
     fun deleteLocalData() {
         //        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
