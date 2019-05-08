@@ -251,8 +251,6 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                         if(num.toDouble()>=3.0){
                             tv_TriggerLux.visibility = View.VISIBLE
                             spTrigger_lux.visibility = View.VISIBLE
-                            tietMinimumBrightness.visibility = View.VISIBLE
-                            tilMinimum_Brightness.visibility = View.VISIBLE
                             sp_SwitchMode.visibility = View.VISIBLE
                             tv_SwitchMode.visibility = View.VISIBLE
                         }
