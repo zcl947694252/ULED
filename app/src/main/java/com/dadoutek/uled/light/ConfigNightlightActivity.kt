@@ -85,6 +85,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         spDelay.onItemSelectedListener = this
         spSwitchMode.onItemSelectedListener = this
         sp_SwitchMode.onItemSelectedListener=this
+        sp_DelayUnit.onItemSelectedListener=this
         secondsList = resources.getStringArray(R.array.light_light_time_list)
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, secondsList)
         spDelay.adapter = adapter
@@ -249,8 +250,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                         var version=tvPSVersion.text.toString()
                         var num=version.substring(2,3)
                         if(num.toDouble()>=3.0){
-                            tv_TriggerLux.visibility = View.VISIBLE
-                            spTrigger_lux.visibility = View.VISIBLE
+//                            tv_TriggerLux.visibility = View.VISIBLE
+//                            spTrigger_lux.visibility = View.VISIBLE
                             sp_SwitchMode.visibility = View.VISIBLE
                             tv_SwitchMode.visibility = View.VISIBLE
                         }
@@ -331,9 +332,9 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         var mode= getModeValue()
         val paramBytes = byteArrayOf(
                 switchMode.toByte(), 0x00,0x00,
-                selectTime.toByte(),
+                tiet_Delay.toString().toInt().toByte(),
                 tietMinimumBrightness.text.toString().toInt().toByte(),
-                spTrigger_lux.selectedItem.toString().toInt().toByte(),
+                0x00,
                 mode.toByte()
         )
         val paramBytesGroup: ByteArray
@@ -411,6 +412,16 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             } else {
                 modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
             }
+            }
+
+            R.id.sp_DelayUnit -> {
+                if (position == 0) {
+                    til_Delay.hint = getString(R.string.delay_minute)
+                    modeDelayUnit = MODE_DELAY_UNIT_MINUTE
+                } else {
+                    til_Delay.hint = getString(R.string.delay_seconds)
+                    modeDelayUnit = MODE_DELAY_UNIT_SECONDS
+                }
             }
         }
     }
