@@ -1,5 +1,6 @@
 package com.dadoutek.uled.group
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -7,7 +8,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
@@ -26,35 +29,50 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
+import com.dadoutek.uled.device.NewDevieFragment
+import com.dadoutek.uled.fragment.CWLightFragmentList
+import com.dadoutek.uled.fragment.CurtainFragmentList
+import com.dadoutek.uled.fragment.RGBLightFragmentList
+import com.dadoutek.uled.fragment.RelayFragmentList
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
+import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
+import com.dadoutek.uled.light.DeviceListFragment
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbDeviceName
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.othersview.MeFragment
+import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.*
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.support.v4.onPageChangeListener
+import org.jetbrains.anko.support.v4.viewPager
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
+
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
     private var mContext: Activity? = null
@@ -63,10 +81,23 @@ class GroupListFragment : BaseFragment() {
     private var gpList: List<ItemTypeGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
-    private var recyclerView: RecyclerView? = null
+    //    private var recyclerView: RecyclerView? = null
     internal var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 16
+    private var deviceRecyclerView: RecyclerView? = null
+
+    private var viewPager: ViewPager? = null
+
+    internal var deviceName: ArrayList<DbDeviceName>? = null
+
+    private lateinit var cwLightFragment: CWLightFragmentList
+    private lateinit var rgbLightFragment: RGBLightFragmentList
+    private lateinit var curtianFragment: CurtainFragmentList
+    private lateinit var relayFragment: RelayFragmentList
+
+    //当前所选组index
+    private var currentGroupIndex = -1
 
     //19-2-20 界面调整
     private var install_device: TextView? = null
@@ -86,6 +117,13 @@ class GroupListFragment : BaseFragment() {
     internal var lastPosition: Int = 0
 
     internal var lastOffset: Int = 0
+
+    private var deviceNameAdapter: GroupNameAdapter? = null
+
+//    private var cw_light_btn: TextView? = null
+//    private var rgb_light_btn: TextView? = null
+//    private var curtain_btn: TextView? = null
+//    private var relay_btn: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,11 +147,11 @@ class GroupListFragment : BaseFragment() {
 
         lastPosition = sharedPreferences!!.getInt("lastPosition", 0)
 
-        if (recyclerView!!.layoutManager != null && lastPosition >= 0) {
-
-            (recyclerView!!.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
-
-        }
+//        if (recyclerView!!.layoutManager != null && lastPosition >= 0) {
+//
+//            (recyclerView!!.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
+//
+//        }
 
     }
 
@@ -158,6 +196,8 @@ class GroupListFragment : BaseFragment() {
 
         val view = inflater.inflate(R.layout.fragment_group_list, null)
 
+        viewPager = view.findViewById(R.id.list_groups)
+
         toolbar = view.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_title)
 
@@ -174,7 +214,7 @@ class GroupListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
-        recyclerView = view.findViewById(R.id.list_groups)
+        deviceRecyclerView = view.findViewById(R.id.recyclerView_name)
 
         install_device = view.findViewById(R.id.install_device)
         create_group = view.findViewById(R.id.create_group)
@@ -190,36 +230,58 @@ class GroupListFragment : BaseFragment() {
         this.mApplication = activity!!.application as TelinkLightApplication
         gpList = DBUtils.getgroupListWithType(activity!!)
 
+        deviceName = ArrayList()
+        var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light),
+                TelinkLightApplication.getInstance().getString(R.string.rgb_light),
+                TelinkLightApplication.getInstance().getString(R.string.curtain),
+                TelinkLightApplication.getInstance().getString(R.string.connector))
+
+        for (i in stringName.indices) {
+            var device = DbDeviceName()
+            device.name = stringName[i]
+            deviceName!!.add(device)
+        }
+
+        initBottomNavigation()
+
+        val layoutManager = LinearLayoutManager(activity)
+        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+        deviceRecyclerView!!.layoutManager = layoutManager
+        deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
+        deviceRecyclerView!!.setAdapter(deviceNameAdapter)
+
         showList = ArrayList()
         showList = gpList
 
-        val layoutmanager = LinearLayoutManager(activity)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView!!.layoutManager = layoutmanager
-        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
+        var allGroup = DBUtils.getAllGroupsOrderByIndex()
 
-        val decoration = DividerItemDecoration(activity!!,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                .divider)))
-        //添加分割线
-        recyclerView?.addItemDecoration(decoration)
-        recyclerView?.itemAnimator = DefaultItemAnimator()
-
-//        adapter!!.addFooterView(getFooterView())
-        adapter!!.bindToRecyclerView(recyclerView)
-
-//        getPositionAndOffset()
-
-        recyclerView!!.setOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (recyclerView!!.layoutManager != null) {
-                    getPositionAndOffset()
-                }
-            }
-        })
+//        val layoutmanager = LinearLayoutManager(activity)
+//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+//        recyclerView!!.layoutManager = layoutmanager
+//        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
+//
+////        val decoration = DividerItemDecoration(activity!!,
+////                DividerItemDecoration
+////                        .VERTICAL)
+////        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+////                .divider)))
+////        //添加分割线
+////        recyclerView?.addItemDecoration(decoration)
+//        recyclerView?.itemAnimator = DefaultItemAnimator()
+//
+////        adapter!!.addFooterView(getFooterView())
+//        adapter!!.bindToRecyclerView(recyclerView)
+//
+////        getPositionAndOffset()
+//
+//        recyclerView!!.setOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+//                super.onScrollStateChanged(recyclerView, newState)
+//                if (recyclerView!!.layoutManager != null) {
+//                    getPositionAndOffset()
+//                }
+//            }
+//        })
 
 //        setMove()
 
@@ -228,37 +290,80 @@ class GroupListFragment : BaseFragment() {
                 application!!.mesh.name, application!!.mesh.password)
     }
 
-    private fun getPositionAndOffset() {
+    private fun initBottomNavigation() {
+        cwLightFragment = CWLightFragmentList()
+        rgbLightFragment = RGBLightFragmentList()
+        curtianFragment = CurtainFragmentList()
+        relayFragment = RelayFragmentList()
 
-        val layoutManager = recyclerView!!.layoutManager as LinearLayoutManager
+        val fragments: List<Fragment> = listOf(cwLightFragment, rgbLightFragment, curtianFragment, relayFragment)
+        val vpAdapter = ViewPagerAdapter(activity?.supportFragmentManager, fragments)
+        viewPager?.adapter = vpAdapter
 
-        //获取可视的第一个view
+        viewPager?.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(p0: Int) {
+            }
 
-        val topView = layoutManager.getChildAt(0)
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
+                if(p0==0){
+                    updateData(0,true)
+                    updateData(1,false)
+                    updateData(2,false)
+                    updateData(3,false)
+                }else if(p0==1){
+                    updateData(0,false)
+                    updateData(1,true)
+                    updateData(2,false)
+                    updateData(3,false)
+                }else if(p0==2){
+                    updateData(2,true)
+                    updateData(1,false)
+                    updateData(0,false)
+                    updateData(3,false)
+                }else if(p0==3){
+                    updateData(3,true)
+                    updateData(0,false)
+                    updateData(1,false)
+                    updateData(2,false)
+                }
+                deviceNameAdapter?.notifyDataSetChanged()
+            }
 
-        if (topView != null) {
+            override fun onPageSelected(p0: Int) {
+            }
+        })
+    }
 
-            //获取与该view的顶部的偏移量
 
-            lastOffset = topView.top
 
-            //得到该View的数组位置
-
-            lastPosition = layoutManager.getPosition(topView)
-
-            sharedPreferences = mContext!!.getSharedPreferences("key", Activity.MODE_PRIVATE)
-
-            val editor = sharedPreferences!!.edit()
-
-            editor.putInt("lastOffset", lastOffset)
-
-            editor.putInt("lastPosition", lastPosition)
-
-            editor.commit()
-
+    private val onRecyclerviewItemClickListener = OnRecyclerviewItemClickListener { v, position ->
+        currentGroupIndex = position
+        for (i in deviceName!!.indices.reversed()) {
+            if (i != position && deviceName!!.get(i).checked) {
+                updateData(i, false)
+                Log.e("TAG_false",position.toString())
+            } else if (i == position && !deviceName!!.get(i).checked) {
+                updateData(i, true)
+                Log.e("TAG_text",position.toString())
+            } else if (i == position && deviceName!!.get(i).checked) {
+                updateData(i, true)
+                Log.e("TAG_position", position.toString())
+            }
         }
 
+        viewPager?.currentItem = position
+        Log.e("TAG_ITEM",position.toString())
+
+
+        deviceNameAdapter?.notifyDataSetChanged()
+//        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+//                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
+
+    private fun updateData(position: Int, checkStateChange: Boolean) {
+        deviceName!![position].checked = checkStateChange
+    }
+
 
     private fun addNewGroup() {
         val textGp = EditText(activity)
@@ -287,7 +392,7 @@ class GroupListFragment : BaseFragment() {
 
     private fun refreshAndMoveBottom() {
         refreshView()
-        recyclerView?.smoothScrollToPosition(showList!!.size)
+//        recyclerView?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun refreshView() {
@@ -297,22 +402,42 @@ class GroupListFragment : BaseFragment() {
             showList = ArrayList()
             showList = gpList
 
-            val layoutmanager = LinearLayoutManager(activity)
-            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView?.layoutManager = layoutmanager
-            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
+            deviceName = ArrayList()
+            var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light),
+                    TelinkLightApplication.getInstance().getString(R.string.rgb_light),
+                    TelinkLightApplication.getInstance().getString(R.string.curtain),
+                    TelinkLightApplication.getInstance().getString(R.string.connector))
 
-//            val decoration = DividerItemDecoration(activity,
-//                    DividerItemDecoration
-//                            .VERTICAL)
-//            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-//                    .divider)))
-            //添加分割线
-//            recyclerView?.addItemDecoration(decoration)
-            recyclerView?.itemAnimator = DefaultItemAnimator()
+            for (i in stringName.indices) {
+                var device = DbDeviceName()
+                device.name = stringName[i]
+                deviceName!!.add(device)
+            }
 
-//          adapter!!.addFooterView(getFooterView())
-            adapter!!.bindToRecyclerView(recyclerView)
+            initBottomNavigation()
+
+            val layoutManager = LinearLayoutManager(activity)
+            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+            deviceRecyclerView!!.layoutManager = layoutManager
+            deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
+            deviceRecyclerView!!.setAdapter(deviceNameAdapter)
+
+//            val layoutmanager = LinearLayoutManager(activity)
+////            layoutmanager.orientation = LinearLayoutManager.VERTICAL
+//            recyclerView?.layoutManager = layoutmanager
+//            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
+//
+////            val decoration = DividerItemDecoration(activity,
+////                    DividerItemDecoration
+////                            .VERTICAL)
+////            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+////                    .divider)))
+//            //添加分割线
+////            recyclerView?.addItemDecoration(decoration)
+//            recyclerView?.itemAnimator = DefaultItemAnimator()
+//
+////          adapter!!.addFooterView(getFooterView())
+//            adapter!!.bindToRecyclerView(recyclerView)
 //            setMove()
         }
     }

@@ -89,9 +89,9 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
 ////        recyclerView?.addItemDecoration(decoration)
 //        recyclerViewChild?.itemAnimator = DefaultItemAnimator() as RecyclerView.ItemAnimator?
 
-        adapter!!.setOnItemChildClickListener { adapter, view, position ->
-            onItemChildClickListener1.onItemChildClick(adapter,view,position,helper.adapterPosition)
-        }
+//        adapter!!.setOnItemChildClickListener { adapter, view, position ->
+//            onItemChildClickListener1.onItemChildClick(adapter,view,position,helper.adapterPosition)
+//        }
 //        adapter!!.addFooterView(getFooterView())
         adapter!!.bindToRecyclerView(recyclerViewChild)
         setMove(recyclerViewChild!!)

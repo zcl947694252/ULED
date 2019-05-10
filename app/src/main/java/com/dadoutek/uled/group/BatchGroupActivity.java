@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.le.ScanFilter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -89,6 +91,7 @@ import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -193,6 +196,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
     private long allLightId = 0;
+
+    private AlertDialog.Builder builder;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -597,11 +602,57 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             if (groups.size() > 1) {
                 Toast.makeText(this, R.string.please_select_group, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, R.string.tip_add_gp, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, R.string.tip_add_gp, Toast.LENGTH_SHORT).show();
+                setUpGroup();
             }
             return null;
         }
         return groups.get(currentGroupIndex);
+    }
+
+    private void setUpGroup() {
+        builder=new AlertDialog.Builder(this);
+        builder.setTitle(R.string.tips);
+        builder.setMessage(R.string.tips_message);
+
+        //监听下方button点击事件
+        builder.setPositiveButton(R.string.create_now, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                addNewGroup();
+            }
+        });
+        builder.setNegativeButton(R.string.btn_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        //设置对话框是可取消的
+        builder.setCancelable(false);
+        AlertDialog dialog=builder.create();
+        dialog.show();
+
+        Button btn=dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        btn.setTextColor(Color.parseColor("#18B4ED"));
+        Button bn=dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        bn.setTextColor(Color.parseColor("#333333"));
+//        TextView tvTitle = Objects.requireNonNull(dialog.getWindow()).findViewById(R.id.alertTitle);
+//        tvTitle.setTextColor(Color.GREEN);
+
+        try {
+            Field mAlert = AlertDialog.class.getDeclaredField("mAlert");
+            mAlert.setAccessible(true);
+            Object mController = mAlert.get(dialog);
+            Field mTitleView = mController.getClass().getDeclaredField("mTitleView");
+            mTitleView.setAccessible(true);
+            TextView tvTitle = (TextView) mTitleView.get(mController);
+            tvTitle.setTextColor(Color.parseColor("#18B4ED"));
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1167,9 +1218,9 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if (light.getProductUUID() == DeviceType.LIGHT_NORMAL) {
-                holder.icon.setImageResource(R.drawable.icon_light_set);
+                holder.icon.setImageResource(R.drawable.icon_device_open);
             } else {
-                holder.icon.setImageResource(R.drawable.icon_light_set);
+                holder.icon.setImageResource(R.drawable.icon_device_open);
             }
 
             holder.selected.setChecked(light.selected);

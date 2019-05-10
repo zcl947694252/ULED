@@ -210,6 +210,32 @@ class NewDevieFragment :BaseFragment(){
 
     private fun refreshView() {
         if (activity != null) {
+            deviceTypeList = ArrayList<String>()
+            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
+            for(installDeviceModel in installList){
+                deviceTypeList!!.add(installDeviceModel.deviceType)
+            }
+
+            allDeviceList = ArrayList()
+            val layoutmanager = LinearLayoutManager(activity)
+//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView = view?.findViewById<RecyclerView>(R.id.deviceTypeList)
+            recyclerView!!.layoutManager = GridLayoutManager(this.activity,2)
+            newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item,deviceTypeList!!)
+
+//        val decoration = DividerItemDecoration(activity!!,
+//                DividerItemDecoration
+//                        .VERTICAL)=
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+//                .divider)))
+//        //添加分割线
+//        recyclerView?.addItemDecoration(decoration)
+//            recyclerView?.addItemDecoration(SpaceItemDecoration(32))
+            recyclerView?.itemAnimator = DefaultItemAnimator()
+
+            newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
+//        adapter!!.addFooterView(getFooterView())
+            newDeviceAdapter!!.bindToRecyclerView(recyclerView)
         }
 //            deviceTypeList = ArrayList<String>()
 //            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)

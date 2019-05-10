@@ -173,7 +173,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         val layoutmanager = LinearLayoutManager(this)
-        recycleView!!.layoutManager = GridLayoutManager(this, 4) as RecyclerView.LayoutManager?
+        recycleView!!.layoutManager = GridLayoutManager(this, 3) as RecyclerView.LayoutManager?
 //        val decoration = DividerItemDecoration(this!!,
 //                DividerItemDecoration
 //                        .VERTICAL)

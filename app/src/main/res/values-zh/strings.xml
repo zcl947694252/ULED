@@ -110,6 +110,7 @@
     <string name="btn_ok">确定</string>
     <string name="btn_cancel">取消</string>
     <string name="add_groups">添加分组</string>
+    <string name="add_group">添加群组</string>
     <string name="set_group">设置分组</string>
     <string name="loading">加载中</string>
     <string name="scan_end">未扫描到设备！</string>
@@ -441,8 +442,8 @@
     <string name="btn_jump_over">跳过</string>
     <string name="reset_boot_tutorial">重新查看引导页</string>
     <string name="select_device_tip">请选择需要安装的设备</string>
-    <string name="normal_light">普通灯</string>
-    <string name="rgb_light">RGB灯</string>
+    <string name="normal_light">冷暖灯</string>
+    <string name="rgb_light">全彩灯</string>
     <string name="i_know_tip">我知道了!</string>
 
     <string name="warning">警告</string>
@@ -468,12 +469,12 @@
     <string name="allLight">所有灯</string>
     <string name="group_list_on">开</string>
     <string name="group_list_off">关</string>
-    <string name="normal_light_title">普通灯</string>
-    <string name="rgb_title">RGB灯</string>
+    <string name="normal_light_title">冷暖灯</string>
+    <string name="rgb_title">全彩灯</string>
     <string name="switch_title">开关</string>
     <string name="apply_scene">点击此处即可应用场景</string>
 
-    <string name="group_title">组 </string>
+    <string name="group_title">群组</string>
     <string name="jump_out_guide_tip">是否确定跳过引导教程？</string>
     <string name="do_you_really_want_to_cancel">真的要取消安装吗？</string>
     <string name="device_disconnected">设备已断开</string>
@@ -634,4 +635,8 @@
     <string name="login_password">使用密码登录</string>
     <string name="account_after_login">登录后自动注册账号</string>
     <string name="online_upgrade">在线升级</string>
+
+    <string name="tips">提示</string>
+    <string name="create_now">立即创建</string>
+    <string name="tips_message">您还有没有组，是否创建？</string>
     </resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/gpLayout"
@@ -9,15 +10,266 @@
 
         <include layout="@layout/toolbar" android:id="@+id/toolbar_top"/>
 
-        <android.support.v7.widget.RecyclerView
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="67dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_top">
+
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/allLight"
+                    android:textColor="@color/blue_background"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="共10个"
+                    android:textColor="@color/blue_background"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@+id/textView6"
+                    app:layout_constraintTop_toBottomOf="@+id/textView6" />
+
+
+                <ImageView
+                    android:id="@+id/imageView9"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/icon_open_group"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/group_list_on"
+                    android:textColor="@color/white"
+                    android:textSize="17sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView9"
+                    app:layout_constraintEnd_toEndOf="@+id/imageView9"
+                    app:layout_constraintStart_toStartOf="@+id/imageView9"
+                    app:layout_constraintTop_toTopOf="@+id/imageView9" />
+
+
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="1dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@color/black_nine"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView9"
+                    app:layout_constraintEnd_toStartOf="@+id/imageView9"
+                    app:layout_constraintTop_toTopOf="@+id/imageView9" />
+
+                <ImageView
+                    android:id="@+id/imageView10"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/icon_down_group"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView9"
+                    app:layout_constraintEnd_toStartOf="@+id/view3"
+                    app:layout_constraintTop_toTopOf="@+id/imageView9" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/group_list_off"
+                    android:textColor="@color/black_nine"
+                    android:textSize="17sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView10"
+                    app:layout_constraintEnd_toEndOf="@+id/imageView10"
+                    app:layout_constraintStart_toStartOf="@+id/imageView10"
+                    app:layout_constraintTop_toTopOf="@+id/imageView10" />
+
+
+                <View
+                    android:id="@+id/view4"
+                    android:layout_width="1dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@color/black_nine"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView10"
+                    app:layout_constraintEnd_toStartOf="@+id/imageView10"
+                    app:layout_constraintTop_toTopOf="@+id/imageView10" />
+
+
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/icon_setting_group"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView10"
+                    app:layout_constraintEnd_toStartOf="@+id/view4"
+                    app:layout_constraintTop_toTopOf="@+id/imageView10" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
+        <View
+            android:id="@+id/view5"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:background="#eeeeee"
+            app:layout_constraintBottom_toBottomOf="@+id/constraintLayout3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout4"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view5">
+
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclerView_name"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginStart="15dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!--<TextView-->
+                    <!--android:id="@+id/cw_light_btn"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/normal_light"-->
+                    <!--android:textSize="15sp"-->
+                    <!--android:textColor="@color/blue_background"-->
+                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--app:layout_constraintHorizontal_bias="0.04"-->
+                    <!--app:layout_constraintStart_toStartOf="parent"-->
+                    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+                <!--<ImageView-->
+                    <!--android:id="@+id/cw_light_image"-->
+                    <!--android:layout_width="22dp"-->
+                    <!--android:layout_height="2dp"-->
+                    <!--android:layout_marginTop="4dp"-->
+                    <!--android:src="@color/blue_background"-->
+                    <!--app:layout_constraintEnd_toEndOf="@+id/cw_light_btn"-->
+                    <!--app:layout_constraintStart_toStartOf="@+id/cw_light_btn"-->
+                    <!--app:layout_constraintTop_toBottomOf="@+id/cw_light_btn" />-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/rgb_light_btn"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/rgb_light"-->
+                    <!--android:textSize="15sp"-->
+                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--app:layout_constraintHorizontal_bias="0.33"-->
+                    <!--app:layout_constraintStart_toStartOf="parent"-->
+                    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+                <!--<ImageView-->
+                    <!--android:id="@+id/rgb_light_image"-->
+                    <!--android:layout_width="22dp"-->
+                    <!--android:layout_height="2dp"-->
+                    <!--android:src="@color/blue_background"-->
+                    <!--android:layout_marginTop="4dp"-->
+                    <!--android:visibility="gone"-->
+                    <!--app:layout_constraintEnd_toEndOf="@+id/rgb_light_btn"-->
+                    <!--app:layout_constraintStart_toStartOf="@+id/rgb_light_btn"-->
+                    <!--app:layout_constraintTop_toBottomOf="@+id/rgb_light_btn" />-->
+
+
+                <!--<TextView-->
+                    <!--android:id="@+id/curtain_btn"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/curtain"-->
+                    <!--android:textSize="15sp"-->
+                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--app:layout_constraintHorizontal_bias="0.61"-->
+                    <!--app:layout_constraintStart_toStartOf="parent"-->
+                    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+                <!--<ImageView-->
+                    <!--android:id="@+id/curtain_image"-->
+                    <!--android:layout_width="22dp"-->
+                    <!--android:layout_height="2dp"-->
+                    <!--android:src="@color/blue_background"-->
+                    <!--android:layout_marginTop="4dp"-->
+                    <!--android:visibility="gone"-->
+                    <!--app:layout_constraintEnd_toEndOf="@+id/curtain_btn"-->
+                    <!--app:layout_constraintStart_toStartOf="@+id/curtain_btn"-->
+                    <!--app:layout_constraintTop_toBottomOf="@+id/curtain_btn" />-->
+
+
+                <!--<TextView-->
+                    <!--android:id="@+id/relay_btn"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/connector"-->
+                    <!--android:textSize="15sp"-->
+                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                    <!--app:layout_constraintEnd_toEndOf="parent"-->
+                    <!--app:layout_constraintHorizontal_bias="0.96"-->
+                    <!--app:layout_constraintStart_toStartOf="parent"-->
+                    <!--app:layout_constraintTop_toTopOf="parent" />-->
+
+                <!--<ImageView-->
+                    <!--android:id="@+id/relay_image"-->
+                    <!--android:layout_width="22dp"-->
+                    <!--android:layout_height="2dp"-->
+                    <!--android:src="@color/blue_background"-->
+                    <!--android:layout_marginTop="4dp"-->
+                    <!--android:visibility="gone"-->
+                    <!--app:layout_constraintEnd_toEndOf="@+id/relay_btn"-->
+                    <!--app:layout_constraintStart_toStartOf="@+id/relay_btn"-->
+                    <!--app:layout_constraintTop_toBottomOf="@+id/relay_btn" />-->
+
+
+        </android.support.constraint.ConstraintLayout>
+
+        <View
+            android:id="@+id/view6"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#eeeeee"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
+
+        <android.support.v4.view.ViewPager
             android:id="@+id/list_groups"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_top"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view6"
+            app:layout_constraintVertical_bias="0.0" />
 
         <include
             android:id="@+id/dialog_pop"

@@ -364,7 +364,7 @@
     <string name="switch_version">Version:</string>
     <string name="group_fail">Group failed, Bluetooth is not connected, please check Bluetooth status</string>
     <string name="delete">Delete</string>
-    <string name="select_all">Choose all</string>
+    <string name="select_all">All</string>
     <string name="cancel">Cancel</string>
     <string name="search_light">Search</string>
     <string name="input_groupAdress">Please enter a group name</string>
@@ -698,4 +698,9 @@
     <string name="login_password">Log in with a password</string>
     <string name="account_after_login">Automatically register an account after login</string>
     <string name="online_upgrade">Upgrade</string>
+
+    <string name="tips">Tips</string>
+    <string name="create_now">create now</string>
+    <string name="tips_message">You do not have a group yet, are you creating it?</string>
+    <string name="add_group">Add group</string>
 </resources>
