@@ -36,7 +36,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_sensor.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -57,7 +59,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private var scanDisposable: Disposable? = null
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
 
-    private var isSupportInstallOldDevice=false
+    private var isSupportInstallOldDevice = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,20 +91,20 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initListener() {
         progressBtn.onClick {
             mRetryConnectCount = 0
-            isSupportInstallOldDevice=false
-            progressOldBtn.progress=0
+            isSupportInstallOldDevice = false
+            progressOldBtn.progress = 0
             startScan()
         }
 
         progressOldBtn.onClick {
             mRetryConnectCount = 0
-            isSupportInstallOldDevice=true
-            progressBtn.progress=0
+            isSupportInstallOldDevice = true
+            progressBtn.progress = 0
             startScan()
         }
     }
 
-    private fun getScanFilters(): MutableList<ScanFilter>{
+    private fun getScanFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
 
         scanFilters.add(ScanFilter.Builder()
@@ -111,10 +113,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                         byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
                 .build())
         scanFilters.add(ScanFilter.Builder()
-                        .setManufacturerData(Constant.VENDOR_ID,
-                                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NIGHT_LIGHT.toByte()),
-                                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
-                        .build())
+                .setManufacturerData(Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NIGHT_LIGHT.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
         return scanFilters
     }
 
@@ -135,11 +137,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     } else {
                         params.setMeshName(mesh.factoryName)
                     }
-                    if(!AppUtils.isExynosSoc()){
+                    if (!AppUtils.isExynosSoc()) {
                         params.setScanFilters(getScanFilters())
                     }
                     //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                    if(isSupportInstallOldDevice){
+                    if (isSupportInstallOldDevice) {
                         params.setMeshName(mesh.name)
                         params.setOutOfMeshName(mesh.name)
                     }
@@ -163,10 +165,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 }.start()
 
                 LogUtils.d("pir开始扫描")
-                if(isSupportInstallOldDevice){
+                if (isSupportInstallOldDevice) {
                     progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                     progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                }else{
+                } else {
                     progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                     progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
                 }
@@ -269,11 +271,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun onLeScanTimeout() {
         LogUtils.d("onLeScanTimeout")
-        GlobalScope.launch(Dispatchers.Main){
-            if(isSupportInstallOldDevice){
+        GlobalScope.launch(Dispatchers.Main) {
+            if (isSupportInstallOldDevice) {
                 progressOldBtn.progress = -1   //控件显示Error状态
                 progressOldBtn.text = getString(R.string.not_find_pir)
-            }else{
+            } else {
                 progressBtn.progress = -1   //控件显示Error状态
                 progressBtn.text = getString(R.string.not_find_pir)
             }
@@ -308,7 +310,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         val pwd: String
         if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
             pwd = mesh.factoryPassword.toString()
-        }else{
+        } else {
             pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName)
                     .substring(0, 16)
         }
@@ -322,15 +324,15 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         scanDisposable?.dispose()
-        if(isSupportInstallOldDevice){
+        if (isSupportInstallOldDevice) {
             progressOldBtn.progress = 100  //进度控件显示成完成状态
-        }else{
+        } else {
             progressBtn.progress = 100  //进度控件显示成完成状态
         }
 
         if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
             startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
-        }else if(mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT){
+        } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
             startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!)
         }
     }
@@ -341,10 +343,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         TelinkLightService.Instance().idleMode(true)
 
         LogUtils.d("showConnectFailed")
-        if(isSupportInstallOldDevice){
+        if (isSupportInstallOldDevice) {
             progressOldBtn.progress = -1    //控件显示Error状态
             progressOldBtn.text = getString(R.string.connect_failed)
-        }else{
+        } else {
             progressBtn.progress = -1    //控件显示Error状态
             progressBtn.text = getString(R.string.connect_failed)
         }
@@ -376,7 +378,9 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        if (TelinkLightService.Instance() != null){
+            TelinkLightService.Instance().idleMode(true)
+        }
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -397,19 +401,19 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
         val MAX_RSSI = 81
         when (leScanEvent.args.productUUID) {
-            DeviceType.SENSOR,DeviceType.NIGHT_LIGHT -> {
-                if(leScanEvent.args.rssi<MAX_RSSI){
+            DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
+                if (leScanEvent.args.rssi < MAX_RSSI) {
                     scanDisposable?.dispose()
                     LeBluetooth.getInstance().stopScan()
                     mDeviceInfo = leScanEvent.args
                     connect()
-                    if(isSupportInstallOldDevice){
+                    if (isSupportInstallOldDevice) {
                         progressOldBtn.text = getString(R.string.connecting)
-                    }else{
+                    } else {
                         progressBtn.text = getString(R.string.connecting)
                     }
 
-                }else{
+                } else {
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }
             }

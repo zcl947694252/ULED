@@ -703,4 +703,7 @@
     <string name="create_now">create now</string>
     <string name="tips_message">You do not have a group yet, are you creating it?</string>
     <string name="add_group">Add group</string>
+
+    <string name="total">Total</string>
+    <string name="piece">piece</string>
 </resources>

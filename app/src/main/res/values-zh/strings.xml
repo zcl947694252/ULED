@@ -639,4 +639,6 @@
     <string name="tips">提示</string>
     <string name="create_now">立即创建</string>
     <string name="tips_message">您还有没有组，是否创建？</string>
+    <string name="total">总共</string>
+    <string name="piece">个</string>
     </resources>

@@ -210,12 +210,20 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
         val blueadapter = BluetoothAdapter.getDefaultAdapter()
         if (blueadapter?.isEnabled == false) {
-           bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+            if(bluetooth_image!=null){
+                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+            }
+
         }else{
            if (TelinkLightApplication.getInstance().connectDevice == null) {
-               bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+               if(bluetooth_image!=null){
+                   bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+               }
                 }else{
-               bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+               if(bluetooth_image!=null){
+                   bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+               }
+
                 }
         }
     }
@@ -285,19 +293,27 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
             when (action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                    if(bluetooth_image!=null) {
+                        bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                    }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                    if(bluetooth_image!=null){
+                        bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                    }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
                     val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
                     when (blueState) {
                         BluetoothAdapter.STATE_OFF -> {
+                            if(bluetooth_image!=null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                            }
                         }
                         BluetoothAdapter.STATE_ON -> {
+                            if(bluetooth_image!=null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                            }
                         }
                     }
                 }

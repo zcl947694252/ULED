@@ -3,13 +3,13 @@ package com.dadoutek.uled.group
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -60,14 +60,18 @@ import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main22.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
+import org.jetbrains.anko.appcompat.v7.navigationIconResource
 import org.jetbrains.anko.support.v4.onPageChangeListener
 import org.jetbrains.anko.support.v4.viewPager
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
@@ -120,6 +124,25 @@ class GroupListFragment : BaseFragment() {
 
     private var deviceNameAdapter: GroupNameAdapter? = null
 
+    private var totalNum: TextView? = null
+
+    private var btnOn: ImageView? = null
+
+    private var btnOff: ImageView? = null
+
+    private var btnSet: ImageView? = null
+
+    private lateinit var allGroup: DbGroup
+
+    private var cwLightGroup: String? = null
+
+    private var isDelete = false
+
+    private lateinit var localBroadcastManager: LocalBroadcastManager
+
+    private lateinit var br: BroadcastReceiver
+
+    private var isFirst: Boolean = false
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
 //    private var curtain_btn: TextView? = null
@@ -129,7 +152,39 @@ class GroupListFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
         setHasOptionsMenu(true)
+        localBroadcastManager = LocalBroadcastManager
+                .getInstance(this!!.mContext!!)
+        val intentFilter = IntentFilter()
+        intentFilter.addAction("showPro")
+        br = object : BroadcastReceiver() {
 
+            override fun onReceive(context: Context, intent: Intent) {
+                cwLightGroup = intent.getStringExtra("is_delete")
+                if (cwLightGroup == "true") {
+                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                    toolbar!!.title = ""
+                    setBack()
+                }
+            }
+        }
+        localBroadcastManager.registerReceiver(br, intentFilter)
+    }
+
+    private fun setBack() {
+        toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar!!.setNavigationOnClickListener {
+            val intent = Intent("back")
+            intent.putExtra("back", "true")
+            LocalBroadcastManager.getInstance(this!!.mContext!!)
+                    .sendBroadcast(intent)
+            toolbar!!.setTitle(R.string.group_title)
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+            toolbar!!.navigationIcon = null
+            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -201,8 +256,11 @@ class GroupListFragment : BaseFragment() {
         toolbar = view.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_title)
 
+        val btn_delete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
+//        btn_delete.visibility = View.VISIBLE
+
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+//        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
             isGuide = false
             if (dialog_pop?.visibility == View.GONE) {
@@ -214,7 +272,12 @@ class GroupListFragment : BaseFragment() {
 
         setHasOptionsMenu(true)
 
+        btnOn = view.findViewById(R.id.btn_on)
+        btnOff = view.findViewById(R.id.btn_off)
+        btnSet = view.findViewById(R.id.btn_set)
+
         deviceRecyclerView = view.findViewById(R.id.recyclerView_name)
+        totalNum = view.findViewById(R.id.total_num)
 
         install_device = view.findViewById(R.id.install_device)
         create_group = view.findViewById(R.id.create_group)
@@ -222,13 +285,37 @@ class GroupListFragment : BaseFragment() {
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
+        btnOn?.setOnClickListener(onClick)
+        btnOff?.setOnClickListener(onClick)
+        btnSet?.setOnClickListener(onClick)
+        btn_delete.setOnClickListener(onClick)
 
         return view
     }
 
+    fun isDelete(delete: Boolean) {
+        if (delete) {
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
+        } else {
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+        }
+
+    }
+
+    @SuppressLint("SetTextI18n")
     private fun initData() {
         this.mApplication = activity!!.application as TelinkLightApplication
         gpList = DBUtils.getgroupListWithType(activity!!)
+
+
+        var cwNum = DBUtils.getAllNormalLight().size
+        var rgbNum = DBUtils.getAllRGBLight().size
+
+        if (cwNum != 0 || rgbNum != 0) {
+            totalNum?.text = getString(R.string.total) + (cwNum + rgbNum) + getString(R.string.piece)
+        } else {
+            totalNum?.text = getString(R.string.total) + (0) + getString(R.string.piece)
+        }
 
         deviceName = ArrayList()
         var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light),
@@ -249,11 +336,16 @@ class GroupListFragment : BaseFragment() {
         deviceRecyclerView!!.layoutManager = layoutManager
         deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
         deviceRecyclerView!!.setAdapter(deviceNameAdapter)
+//        updateData(0, true)
+//        updateData(1, false)
+//        updateData(2, false)
+//        updateData(3, false)
+//        deviceNameAdapter?.notifyDataSetChanged()
 
         showList = ArrayList()
         showList = gpList
 
-        var allGroup = DBUtils.getAllGroupsOrderByIndex()
+        allGroup = DBUtils.getGroupByName(getString(R.string.allLight))
 
 //        val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -297,43 +389,77 @@ class GroupListFragment : BaseFragment() {
         relayFragment = RelayFragmentList()
 
         val fragments: List<Fragment> = listOf(cwLightFragment, rgbLightFragment, curtianFragment, relayFragment)
-        val vpAdapter = ViewPagerAdapter(activity?.supportFragmentManager, fragments)
+        val vpAdapter = ViewPagerAdapter(childFragmentManager, fragments)
         viewPager?.adapter = vpAdapter
 
-        viewPager?.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
+        viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(p0: Int) {
+//                Log.e("TAG_ScrollStateChanged",p0.toString())
             }
 
             override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-                if(p0==0){
-                    updateData(0,true)
-                    updateData(1,false)
-                    updateData(2,false)
-                    updateData(3,false)
-                }else if(p0==1){
-                    updateData(0,false)
-                    updateData(1,true)
-                    updateData(2,false)
-                    updateData(3,false)
-                }else if(p0==2){
-                    updateData(2,true)
-                    updateData(1,false)
-                    updateData(0,false)
-                    updateData(3,false)
-                }else if(p0==3){
-                    updateData(3,true)
-                    updateData(0,false)
-                    updateData(1,false)
-                    updateData(2,false)
+//                Log.e("TAG_p0",p0.toString())
+                if (!isFirst) {
+                    updateData(0, true)
+                    updateData(1, false)
+                    updateData(2, false)
+                    updateData(3, false)
+                    isFirst=true
+                    deviceNameAdapter?.notifyDataSetChanged()
                 }
-                deviceNameAdapter?.notifyDataSetChanged()
             }
 
             override fun onPageSelected(p0: Int) {
+                Log.e("TAG_Selected", p0.toString())
+                if (p0 == 0) {
+                    val intent = Intent("switch")
+                    intent.putExtra("switch", "true")
+                    mContext?.let {
+                        LocalBroadcastManager.getInstance(it)
+                                .sendBroadcast(intent)
+                    }
+                    updateData(0, true)
+                    updateData(1, false)
+                    updateData(2, false)
+                    updateData(3, false)
+                } else if (p0 == 1) {
+                    val intent = Intent("switch")
+                    intent.putExtra("switch", "true")
+                    mContext?.let {
+                        LocalBroadcastManager.getInstance(it)
+                                .sendBroadcast(intent)
+                    }
+                    updateData(0, false)
+                    updateData(1, true)
+                    updateData(2, false)
+                    updateData(3, false)
+                } else if (p0 == 2) {
+                    val intent = Intent("switch")
+                    intent.putExtra("switch", "true")
+                    mContext?.let {
+                        LocalBroadcastManager.getInstance(it)
+                                .sendBroadcast(intent)
+                    }
+                    updateData(2, true)
+                    updateData(1, false)
+                    updateData(0, false)
+                    updateData(3, false)
+                } else if (p0 == 3) {
+                    val intent = Intent("switch")
+                    intent.putExtra("switch", "true")
+                    mContext?.let {
+                        LocalBroadcastManager.getInstance(it)
+                                .sendBroadcast(intent)
+                    }
+                    updateData(3, true)
+                    updateData(0, false)
+                    updateData(1, false)
+                    updateData(2, false)
+                }
+                deviceNameAdapter?.notifyDataSetChanged()
             }
         })
     }
-
 
 
     private val onRecyclerviewItemClickListener = OnRecyclerviewItemClickListener { v, position ->
@@ -341,18 +467,14 @@ class GroupListFragment : BaseFragment() {
         for (i in deviceName!!.indices.reversed()) {
             if (i != position && deviceName!!.get(i).checked) {
                 updateData(i, false)
-                Log.e("TAG_false",position.toString())
             } else if (i == position && !deviceName!!.get(i).checked) {
                 updateData(i, true)
-                Log.e("TAG_text",position.toString())
             } else if (i == position && deviceName!!.get(i).checked) {
                 updateData(i, true)
-                Log.e("TAG_position", position.toString())
             }
         }
 
         viewPager?.currentItem = position
-        Log.e("TAG_ITEM",position.toString())
 
 
         deviceNameAdapter?.notifyDataSetChanged()
@@ -403,6 +525,18 @@ class GroupListFragment : BaseFragment() {
             showList = gpList
 
             deviceName = ArrayList()
+
+            isFirst=false
+
+            var cwNum = DBUtils.getAllNormalLight().size
+            var rgbNum = DBUtils.getAllRGBLight().size
+
+            if (cwNum != 0 || rgbNum != 0) {
+                totalNum?.text = getString(R.string.total) + (cwNum + rgbNum) + getString(R.string.piece)
+            } else {
+                totalNum?.text = getString(R.string.total) + (0) + getString(R.string.piece)
+            }
+
             var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light),
                     TelinkLightApplication.getInstance().getString(R.string.rgb_light),
                     TelinkLightApplication.getInstance().getString(R.string.curtain),
@@ -415,6 +549,14 @@ class GroupListFragment : BaseFragment() {
             }
 
             initBottomNavigation()
+
+
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+            toolbar!!.navigationIcon = null
+            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            allGroup = DBUtils.getGroupByName(getString(R.string.allLight))
+            toolbar!!.setTitle(R.string.group_title)
 
             val layoutManager = LinearLayoutManager(activity)
             layoutManager.orientation = LinearLayoutManager.HORIZONTAL
@@ -535,6 +677,56 @@ class GroupListFragment : BaseFragment() {
                         startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
                     }
                 }
+            }
+
+            R.id.btn_on -> {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    checkConnect()
+                } else {
+                    val dstAddr = this.allGroup.meshAddr
+                    Commander.openOrCloseLights(dstAddr, true)
+                    updateLights(true, this.allGroup)
+                }
+            }
+
+            R.id.btn_off -> {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    checkConnect()
+                } else {
+                    val dstAddr = this.allGroup.meshAddr
+                    Commander.openOrCloseLights(dstAddr, false)
+                    updateLights(false, this.allGroup)
+                }
+            }
+
+            R.id.btn_set -> {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    checkConnect()
+                } else {
+                    intent = Intent(mContext, NormalSettingActivity::class.java)
+                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                    intent.putExtra("group", allGroup)
+                    startActivityForResult(intent, 2)
+                }
+            }
+
+            R.id.img_function2 -> {
+//                val intent = Intent("delete")
+//                intent.putExtra("delete", "true")
+//                LocalBroadcastManager.getInstance(this!!.mContext!!)
+//                        .sendBroadcast(intent)
+                android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                      val intent = Intent("delete")
+                       intent.putExtra("delete", "true")
+                       LocalBroadcastManager.getInstance(this!!.mContext!!)
+                        .sendBroadcast(intent)
+                        }
+                        .setNegativeButton(R.string.btn_cancel, null)
+                        .show()
             }
         }
     }
@@ -708,5 +900,10 @@ class GroupListFragment : BaseFragment() {
         if (!isGuide || GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)) {
             dialog_pop?.visibility = View.GONE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        localBroadcastManager.unregisterReceiver(br)
     }
 }

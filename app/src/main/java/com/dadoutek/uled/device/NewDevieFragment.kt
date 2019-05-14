@@ -83,13 +83,33 @@ class NewDevieFragment :BaseFragment(){
         return view
     }
 
+//    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+////        if (isVisibleToUser) {
+////            val act = activity as MainActivity?
+////            act?.addEventListeners()
+//////            refreshView()
+////            initOnLayoutListener()
+////        }
+////    }
+
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
             act?.addEventListeners()
-//            refreshView()
             initOnLayoutListener()
+            if (Constant.isCreat) {
+                refreshAndMoveBottom()
+                Constant.isCreat = false
+            } else {
+                refreshView()
+            }
+
         }
+    }
+
+    private fun refreshAndMoveBottom() {
+        refreshView()
+//        recyclerView?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun initOnLayoutListener() {
@@ -219,7 +239,6 @@ class NewDevieFragment :BaseFragment(){
             allDeviceList = ArrayList()
             val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView = view?.findViewById<RecyclerView>(R.id.deviceTypeList)
             recyclerView!!.layoutManager = GridLayoutManager(this.activity,2)
             newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item,deviceTypeList!!)
 

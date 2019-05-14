@@ -32,36 +32,63 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view_groups"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
+                android:layout_height="50dp"
                 android:layout_alignParentStart="true"
                 android:layout_toLeftOf="@id/add_group_layout"
                 android:scrollbars="vertical" />
 
             <LinearLayout
                 android:id="@+id/add_group_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="45dp"
+                android:layout_height="50dp"
                 android:layout_alignParentRight="true"
-                android:layout_marginEnd="10dp"
+                android:background="@drawable/add_device_group"
+                android:elevation="5dp"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ic_group_add_black_48dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_str_group" />
+                    android:background="@drawable/icon_add"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    />
             </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/add_group_relativeLayout"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="50dp">
+
+            <ImageView
+                android:id="@+id/imageView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_add"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="140dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/imageView8"
+                android:layout_marginLeft="20dp"
+                android:textSize="15sp"
+                android:textColor="@color/black_three"
+                android:text="@string/create_group" />
+
         </RelativeLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/primary" />
+            android:background="#eeeeee" />
+
     </LinearLayout>
 
 

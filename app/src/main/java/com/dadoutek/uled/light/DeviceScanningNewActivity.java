@@ -1257,7 +1257,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(R.string.not_grouped);
 
-            holder.icon.setImageResource(R.drawable.icon_light_on);
+            holder.icon.setImageResource(R.drawable.icon_device_open);
 
             holder.selected.setChecked(light.selected);
 
