@@ -36,6 +36,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
@@ -278,7 +279,7 @@ class RGBLightFragmentList: BaseFragment() {
 
                 R.id.btn_set -> {
                     if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                        intent = Intent(mContext, NormalSettingActivity::class.java)
+                        intent = Intent(mContext, RGBSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", currentLight)
                         startActivityForResult(intent, 2)
@@ -288,6 +289,7 @@ class RGBLightFragmentList: BaseFragment() {
                 R.id.group_name -> {
                     intent = Intent(mContext, LightsOfGroupActivity::class.java)
                     intent.putExtra("group", currentLight)
+                    intent.putExtra("light","rgb_light")
                     startActivityForResult(intent, 2)
                 }
 

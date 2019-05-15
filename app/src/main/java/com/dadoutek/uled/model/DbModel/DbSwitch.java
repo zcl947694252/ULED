@@ -2,6 +2,7 @@ package com.dadoutek.uled.model.DbModel;
 
 import com.dadoutek.uled.R;
 import com.google.gson.annotations.Expose;
+import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
@@ -166,5 +167,16 @@ public class DbSwitch implements Serializable {
 
     public void setConnectionStatus(int connectionStatus) {
         this.connectionStatus = connectionStatus;
+    }
+
+    public void updateIcon() {
+
+        if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
+            this.icon = R.drawable.icon_light_offline;
+        } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
+            this.icon = R.drawable.curtain_off;
+        } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
+            this.icon = R.drawable.icon_switch;
+        }
     }
 }

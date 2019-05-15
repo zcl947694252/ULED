@@ -149,9 +149,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 //        recyclerView!!.addItemDecoration(decoration)
 //        //添加Item变化动画
 //        recyclerView!!.itemAnimator = DefaultItemAnimator()
-        adapter = SensorDeviceDetailsAdapter(R.layout.device_detail_adapter, sensorData)
+        adapter = SensorDeviceDetailsAdapter(R.layout.sensor_detail_adapter, sensorData)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
+
 
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)

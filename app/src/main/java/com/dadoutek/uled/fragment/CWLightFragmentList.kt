@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,8 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemLongClickListener
+import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
+import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.connector.ConnectorOfGroupActivity
@@ -252,7 +255,7 @@ class CWLightFragmentList : BaseFragment() {
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
 
-
+//        setMove(recyclerView!!)
     }
 
     var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
@@ -304,6 +307,7 @@ class CWLightFragmentList : BaseFragment() {
                 R.id.group_name -> {
                     intent = Intent(mContext, LightsOfGroupActivity::class.java)
                     intent.putExtra("group", currentLight)
+                    intent.putExtra("light","cw_light")
                     startActivityForResult(intent, 2)
                 }
 
@@ -353,6 +357,12 @@ class CWLightFragmentList : BaseFragment() {
                         }
                     } else {
                         lightList = DBUtils.getLightByGroupID(group.id)
+                    }
+
+                    if(isOpen){
+                        group.connectionStatus =ConnectionStatus.ON.value
+                    }else{
+                        group.connectionStatus = ConnectionStatus.OFF.value
                     }
 
                     for (dbLight: DbLight in lightList) {
@@ -467,6 +477,7 @@ class CWLightFragmentList : BaseFragment() {
             groupAdapter!!.onItemChildClickListener = onItemChildClickListener
             groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
             groupAdapter!!.bindToRecyclerView(recyclerView)
+//            setMove(recyclerView!!)
         }
     }
 
@@ -533,5 +544,65 @@ class CWLightFragmentList : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         localBroadcastManager.unregisterReceiver(br)
+    }
+
+    private fun setMove(recyclerViewChild: RecyclerView) {
+        var startPos=0
+        var endPos=0
+        val list = groupAdapter!!.data
+        val onItemDragListener = object : OnItemDragListener {
+            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+
+                startPos=pos
+                endPos=0
+
+                com.dadoutek.uled.util.LogUtils.d("indexchange--"+"--start:"+pos)
+            }
+
+            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
+                                          target: RecyclerView.ViewHolder, to: Int) {
+            }
+
+            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+                //                viewHolder.getItemId();
+                endPos=pos
+                com.dadoutek.uled.util.LogUtils.d("indexchange--"+"--end:"+pos)
+
+                updateGroupList(list,startPos,endPos)
+                com.dadoutek.uled.util.LogUtils.d("indexchange--"+"--start:"+startPos+"--end:"+endPos)
+            }
+        }
+
+        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(groupAdapter)
+        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerViewChild)
+
+        groupAdapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
+        groupAdapter!!.setOnItemDragListener(onItemDragListener)
+    }
+
+    private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
+
+        var tempIndex = list[endPos].index
+
+        if(endPos<startPos){
+            for(i in endPos..startPos){
+                if(i==startPos){
+                    list[i].index=tempIndex
+                }else{
+                    list[i].index=list[i+1].index
+                }
+            }
+        }else if(endPos>startPos){
+            for(i in endPos downTo startPos){
+                if(i==startPos){
+                    list[i].index=tempIndex
+                }else{
+                    list[i].index=list[i-1].index
+                }
+            }
+        }
+
+        DBUtils.updateGroupList(list)
     }
 }

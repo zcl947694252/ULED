@@ -46,7 +46,7 @@ public class DbLight implements Serializable {
     @Transient
     public int textColor;//文字颜色
 
-    public int connectionStatus = 1;//链接状态
+    public int status = 1;//链接状态
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
@@ -56,10 +56,10 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    @Generated(hash = 111297946)
+    @Generated(hash = 1472949581)
     public DbLight(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, String macAddr, int meshUUID, int productUUID,
-            Long belongGroupId, int index, int color, int connectionStatus) {
+            Long belongGroupId, int index, int color, int status) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -71,7 +71,7 @@ public class DbLight implements Serializable {
         this.belongGroupId = belongGroupId;
         this.index = index;
         this.color = color;
-        this.connectionStatus = connectionStatus;
+        this.status = status;
     }
 
     public static long getSerialVersionUID() {
@@ -191,11 +191,11 @@ public class DbLight implements Serializable {
     }
 
     public int getConnectionStatus() {
-        return connectionStatus;
+        return status;
     }
 
     public void setConnectionStatus(int connectionStatus) {
-        this.connectionStatus = connectionStatus;
+        this.status = connectionStatus;
     }
 
     public int getIcon() {
@@ -212,12 +212,22 @@ public class DbLight implements Serializable {
 
     public void updateIcon() {
 
-        if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
+        if (this.status == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_device_down;
-        } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
+        } else if (this.status == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.icon_device_down;
-        } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
+        } else if (this.status == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_device_open;
+        }
+    }
+
+    public void updateRgbIcon(){
+        if (this.status == ConnectionStatus.OFFLINE.getValue()) {
+            this.icon = R.drawable.icon_rgblight_down;
+        } else if (this.status == ConnectionStatus.OFF.getValue()) {
+            this.icon = R.drawable.icon_rgblight_down;
+        } else if (this.status == ConnectionStatus.ON.getValue()) {
+            this.icon = R.drawable.icon_rgblight;
         }
     }
 
@@ -227,5 +237,13 @@ public class DbLight implements Serializable {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public int getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

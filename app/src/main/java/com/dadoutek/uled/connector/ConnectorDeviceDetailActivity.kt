@@ -530,6 +530,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                         ConnectorBatchGroupActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra("relayType","all_relay")
                 startActivity(intent)
             })
         }else{

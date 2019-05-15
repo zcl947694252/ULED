@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -140,6 +141,10 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     ConstraintLayout topView;
     @BindView(R.id.scanPb)
     MaterialProgressBar scanPb;
+    @BindView(R.id.add_group_relativeLayout)
+    RelativeLayout add_relativeLayout;
+    @BindView(R.id.add_group)
+    RelativeLayout add_group;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -685,8 +690,15 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        if (groups.size() > 0) {
+            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+            add_relativeLayout.setVisibility(View.GONE);
+            add_group.setVisibility(View.VISIBLE);
+        } else {
+            add_relativeLayout.setVisibility(View.VISIBLE);
+            add_group.setVisibility(View.GONE);
+        }
         disableEventListenerInGrouping();
 
         initOnLayoutListener();
@@ -822,7 +834,10 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 groups.get(i).checked = false;
             }
         }
-
+        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        add_relativeLayout.setVisibility(View.GONE);
+        add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
@@ -1046,6 +1061,8 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         this.groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
         this.btnLog = findViewById(R.id.btn_log);
         this.btnScan = (Button) this.findViewById(R.id.btn_scan);
+        this.add_group = (RelativeLayout) this.findViewById(R.id.add_group);
+        this.add_relativeLayout = (RelativeLayout) this.findViewById(R.id.add_group_relativeLayout);
         this.btnScan.setEnabled(false);
         this.btnScan.setBackgroundResource(R.color.gray);
         deviceListView = this.findViewById(R.id.list_devices);
@@ -1062,6 +1079,10 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         tvStopScan.setText(R.string.stop_scan);
         tvStopScan.setOnClickListener(onClick);
         tvStopScan.setVisibility(View.GONE);
+
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
     }
 
     private View.OnClickListener onClick = v -> {
@@ -1236,7 +1257,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(R.string.not_grouped);
             if(light.getProductUUID()==DeviceType.SMART_CURTAIN){
-                holder.icon.setImageResource(R.drawable.curtain_on);
+                holder.icon.setImageResource(R.drawable.icon_curtain);
             }
             else{
                 holder.icon.setImageResource(R.drawable.icon_light_on);

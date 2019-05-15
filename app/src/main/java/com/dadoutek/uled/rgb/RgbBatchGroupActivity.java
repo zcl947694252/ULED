@@ -147,6 +147,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     private Disposable mTimer;
     private int mRetryCount = 0;
 
+    private String lightType;
+
+    private String groupLight;
+
     //当前所选组index
     private int currentGroupIndex = -1;
 
@@ -929,9 +933,19 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
-        List <DbLight> list=DBUtils.INSTANCE.getAllRGBLight();
-        this.adapter = new DeviceListAdapter(list,this);
-        nowLightList.addAll(list);
+//        List <DbLight> list=DBUtils.INSTANCE.getAllRGBLight();
+//        this.adapter = new DeviceListAdapter(list,this);
+//        nowLightList.addAll(list);
+
+        if(lightType.equals("all_light")){
+            List<DbLight> list = DBUtils.INSTANCE.getAllNormalLight();
+            this.adapter = new DeviceListAdapter(list, this);
+            nowLightList.addAll(list);
+        }else if(lightType.equals("group_light")){
+            ArrayList<DbLight> list =DBUtils.INSTANCE.getLightByGroupID(Integer.parseInt(groupLight));
+            this.adapter = new DeviceListAdapter(list, this);
+            nowLightList.addAll(list);
+        }
 
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
@@ -981,6 +995,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        lightType = intent.getStringExtra("lightType");
+        if(lightType.equals("group_light")){
+            groupLight = intent.getStringExtra("group_id");
+        }
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();

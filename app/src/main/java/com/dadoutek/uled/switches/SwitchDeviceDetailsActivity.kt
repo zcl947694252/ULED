@@ -179,9 +179,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
-//        for (i in switchData?.indices!!) {
-////            switchData!![i].updateIcon()
-//        }
+        for (i in switchData?.indices!!) {
+            switchData!![i].updateIcon()
+        }
 //        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
 //        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
 //            if (dialog?.visibility == View.GONE) {

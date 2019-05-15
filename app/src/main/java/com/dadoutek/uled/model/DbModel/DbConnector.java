@@ -175,11 +175,11 @@ public class DbConnector implements Serializable {
     public void updateIcon() {
 
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_light_offline;
+            this.icon = R.drawable.icon_controller;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.rely_no;
+            this.icon = R.drawable.icon_controller;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.rely_yes;
+            this.icon = R.drawable.icon_controller_open;
         }
     }
     public boolean getOpen() {

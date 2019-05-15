@@ -176,6 +176,7 @@
         android:id="@+id/clThirdPartyLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/edit_user_phone_or_email"
         app:layout_constraintStart_toStartOf="@+id/textView"

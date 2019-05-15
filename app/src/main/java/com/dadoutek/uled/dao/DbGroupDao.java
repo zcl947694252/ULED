@@ -33,6 +33,7 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         public final static Property DeviceType = new Property(6, Long.class, "deviceType", false, "DEVICE_TYPE");
         public final static Property Index = new Property(7, int.class, "index", false, "INDEX");
         public final static Property Color = new Property(8, int.class, "color", false, "COLOR");
+        public final static Property Status = new Property(9, int.class, "status", false, "STATUS");
     }
 
 
@@ -56,7 +57,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 5: belongRegionId
                 "\"DEVICE_TYPE\" INTEGER," + // 6: deviceType
                 "\"INDEX\" INTEGER NOT NULL ," + // 7: index
-                "\"COLOR\" INTEGER NOT NULL );"); // 8: color
+                "\"COLOR\" INTEGER NOT NULL ," + // 8: color
+                "\"STATUS\" INTEGER NOT NULL );"); // 9: status
     }
 
     /** Drops the underlying database table. */
@@ -89,6 +91,7 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         }
         stmt.bindLong(8, entity.getIndex());
         stmt.bindLong(9, entity.getColor());
+        stmt.bindLong(10, entity.getStatus());
     }
 
     @Override
@@ -115,6 +118,7 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         }
         stmt.bindLong(8, entity.getIndex());
         stmt.bindLong(9, entity.getColor());
+        stmt.bindLong(10, entity.getStatus());
     }
 
     @Override
@@ -133,7 +137,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
             cursor.getInt(offset + 5), // belongRegionId
             cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // deviceType
             cursor.getInt(offset + 7), // index
-            cursor.getInt(offset + 8) // color
+            cursor.getInt(offset + 8), // color
+            cursor.getInt(offset + 9) // status
         );
         return entity;
     }
@@ -149,6 +154,7 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         entity.setDeviceType(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
         entity.setIndex(cursor.getInt(offset + 7));
         entity.setColor(cursor.getInt(offset + 8));
+        entity.setStatus(cursor.getInt(offset + 9));
      }
     
     @Override

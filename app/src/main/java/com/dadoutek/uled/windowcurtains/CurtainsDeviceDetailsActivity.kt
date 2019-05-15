@@ -176,6 +176,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                         CurtainBatchGroupActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                 intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra("curtain","all_curtain")
                 startActivity(intent)
             })
         }else {

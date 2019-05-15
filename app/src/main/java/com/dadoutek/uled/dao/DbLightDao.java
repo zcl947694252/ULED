@@ -35,7 +35,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property BelongGroupId = new Property(8, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
         public final static Property Index = new Property(9, int.class, "index", false, "INDEX");
         public final static Property Color = new Property(10, int.class, "color", false, "COLOR");
-        public final static Property ConnectionStatus = new Property(11, int.class, "connectionStatus", false, "CONNECTION_STATUS");
+        public final static Property Status = new Property(11, int.class, "status", false, "STATUS");
     }
 
 
@@ -62,7 +62,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"BELONG_GROUP_ID\" INTEGER," + // 8: belongGroupId
                 "\"INDEX\" INTEGER NOT NULL ," + // 9: index
                 "\"COLOR\" INTEGER NOT NULL ," + // 10: color
-                "\"CONNECTION_STATUS\" INTEGER NOT NULL );"); // 11: connectionStatus
+                "\"STATUS\" INTEGER NOT NULL );"); // 11: status
     }
 
     /** Drops the underlying database table. */
@@ -101,7 +101,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         }
         stmt.bindLong(10, entity.getIndex());
         stmt.bindLong(11, entity.getColor());
-        stmt.bindLong(12, entity.getConnectionStatus());
+        stmt.bindLong(12, entity.getStatus());
     }
 
     @Override
@@ -134,7 +134,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         }
         stmt.bindLong(10, entity.getIndex());
         stmt.bindLong(11, entity.getColor());
-        stmt.bindLong(12, entity.getConnectionStatus());
+        stmt.bindLong(12, entity.getStatus());
     }
 
     @Override
@@ -156,7 +156,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8), // belongGroupId
             cursor.getInt(offset + 9), // index
             cursor.getInt(offset + 10), // color
-            cursor.getInt(offset + 11) // connectionStatus
+            cursor.getInt(offset + 11) // status
         );
         return entity;
     }
@@ -174,7 +174,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setBelongGroupId(cursor.isNull(offset + 8) ? null : cursor.getLong(offset + 8));
         entity.setIndex(cursor.getInt(offset + 9));
         entity.setColor(cursor.getInt(offset + 10));
-        entity.setConnectionStatus(cursor.getInt(offset + 11));
+        entity.setStatus(cursor.getInt(offset + 11));
      }
     
     @Override

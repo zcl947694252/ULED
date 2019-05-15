@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -123,6 +124,10 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     ConstraintLayout topView;
     @BindView(R.id.scanPb)
     MaterialProgressBar scanPb;
+    @BindView(R.id.add_group_relativeLayout)
+    RelativeLayout add_relativeLayout;
+    @BindView(R.id.add_group)
+    RelativeLayout add_group;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -145,6 +150,10 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private List<DbGroup> groups;
+
+    private String curtainType;
+
+    private String groupCurtain;
 
     private Disposable mTimer;
     private int mRetryCount = 0;
@@ -614,8 +623,15 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        if (groups.size() > 0) {
+            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+            add_relativeLayout.setVisibility(View.GONE);
+            add_group.setVisibility(View.VISIBLE);
+        } else {
+            add_relativeLayout.setVisibility(View.VISIBLE);
+            add_group.setVisibility(View.GONE);
+        }
         disableEventListenerInGrouping();
 
         initOnLayoutListener();
@@ -730,6 +746,10 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
             }
         }
 
+        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        add_relativeLayout.setVisibility(View.GONE);
+        add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
@@ -941,12 +961,18 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         this.groupingCompleted = findViewById(R.id.grouping_completed);
         this.groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
         this.btnLog = findViewById(R.id.btn_log);
+        this.add_group = (RelativeLayout) this.findViewById(R.id.add_group);
+        this.add_relativeLayout = (RelativeLayout) this.findViewById(R.id.add_group_relativeLayout);
         this.btnScan = (Button) this.findViewById(R.id.btn_scan);
         this.btnScan.setEnabled(false);
         this.btnScan.setBackgroundResource(R.color.gray);
         deviceListView = this.findViewById(R.id.list_devices);
         deviceListView.setAdapter(this.adapter);
         this.updateList = new ArrayList<>();
+
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
 
         startGrouping();
     }
@@ -1124,7 +1150,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if(light.getProductUUID()== DeviceType.SMART_CONNECTOR){
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_controller_open);
             }
             else{
                 holder.icon.setImageResource(R.drawable.icon_light_on);

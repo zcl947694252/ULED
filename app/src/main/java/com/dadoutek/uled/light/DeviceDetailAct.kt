@@ -185,9 +185,20 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
-        for (i in lightsData?.indices!!) {
-            lightsData!![i].updateIcon()
-        }
+            when(type){
+                Constant.INSTALL_NORMAL_LIGHT -> {
+                    for (i in lightsData?.indices!!) {
+                        lightsData!![i].updateIcon()
+                    }
+                }
+
+                Constant.INSTALL_RGB_LIGHT -> {
+                    for (i in lightsData?.indices!!) {
+                        lightsData!![i].updateRgbIcon()
+                    }
+                }
+            }
+
 
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
@@ -498,7 +509,16 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
 
-            currentLight!!.updateIcon()
+            when(type){
+                Constant.INSTALL_NORMAL_LIGHT -> {
+                    currentLight!!.updateIcon()
+                }
+
+                Constant.INSTALL_RGB_LIGHT -> {
+                    currentLight!!.updateRgbIcon()
+                }
+            }
+//            currentLight!!.updateIcon()
             DBUtils.updateLight(currentLight!!)
             runOnUiThread {
                 adapter?.notifyDataSetChanged()
@@ -562,6 +582,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                                 BatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        intent.putExtra("lightType","all_light")
                         startActivity(intent)
                     })
                 } else {
@@ -592,6 +613,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                                 RgbBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        intent.putExtra("lightType","all_light")
                         startActivity(intent)
                     })
                 } else {

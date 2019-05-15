@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.connector.ConnectorBatchGroupActivity;
 import com.dadoutek.uled.connector.ScanningConnectorActivity;
+import com.dadoutek.uled.group.BatchGroupActivity;
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
@@ -46,6 +48,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -122,6 +125,10 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     ConstraintLayout topView;
     @BindView(R.id.scanPb)
     MaterialProgressBar scanPb;
+    @BindView(R.id.add_group_relativeLayout)
+    RelativeLayout add_relativeLayout;
+    @BindView(R.id.add_group)
+    RelativeLayout add_group;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -147,6 +154,10 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private Disposable mTimer;
     private int mRetryCount = 0;
+
+    private String curtainType;
+
+    private String groupCurtain;
 
     //当前所选组index
     private int currentGroupIndex = -1;
@@ -613,8 +624,16 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        if (groups.size() > 0) {
+            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+            add_relativeLayout.setVisibility(View.GONE);
+            add_group.setVisibility(View.VISIBLE);
+        } else {
+            add_relativeLayout.setVisibility(View.VISIBLE);
+            add_group.setVisibility(View.GONE);
+        }
+
         disableEventListenerInGrouping();
 
         initOnLayoutListener();
@@ -728,7 +747,10 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 groups.get(i).checked = false;
             }
         }
-
+        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        add_relativeLayout.setVisibility(View.GONE);
+        add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
@@ -930,22 +952,37 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
-        List <DbCurtain> list = DBUtils.INSTANCE.getAllCurtains();
-        this.adapter = new DeviceListAdapter(list,this);
-        nowLightList.addAll(list);
+//        List <DbCurtain> list = DBUtils.INSTANCE.getAllCurtains();
+////        this.adapter = new DeviceListAdapter(list,this);
+////        nowLightList.addAll(list);
 
+        if(curtainType.equals("all_curtain")){
+            List<DbCurtain> list = DBUtils.INSTANCE.getAllCurtain();
+            this.adapter = new DeviceListAdapter(list, this);
+            nowLightList.addAll(list);
+        }else if(curtainType.equals("group_curtain")){
+            ArrayList<DbCurtain> list =DBUtils.INSTANCE.getCurtainByGroupID(Integer.parseInt(groupCurtain));
+            this.adapter = new DeviceListAdapter(list, this);
+            nowLightList.addAll(list);
+        }
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
         this.btnAddGroups = findViewById(R.id.btn_add_groups);
         this.groupingCompleted = findViewById(R.id.grouping_completed);
+        this.add_relativeLayout = (RelativeLayout) this.findViewById(R.id.add_group_relativeLayout);
         this.groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
         this.btnLog = findViewById(R.id.btn_log);
+        this.add_group = (RelativeLayout) this.findViewById(R.id.add_group);
         this.btnScan = (Button) this.findViewById(R.id.btn_scan);
         this.btnScan.setEnabled(false);
         this.btnScan.setBackgroundResource(R.color.gray);
         deviceListView = this.findViewById(R.id.list_devices);
         deviceListView.setAdapter(this.adapter);
         this.updateList = new ArrayList<>();
+
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
 
         startGrouping();
     }
@@ -982,6 +1019,10 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        curtainType = intent.getStringExtra("curtainType");
+        if(curtainType.equals("group_curtain")){
+            groupCurtain = intent.getStringExtra("group_id");
+        }
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
@@ -1123,7 +1164,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if(light.getProductUUID()== DeviceType.SMART_CURTAIN){
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_curtain);
             }
             else{
                 holder.icon.setImageResource(R.drawable.icon_light_on);

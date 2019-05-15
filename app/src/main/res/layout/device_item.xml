@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:textSize="17sp"
-        android:text="1234"
+        android:text=""
         android:textColor="@color/black_three"
         app:layout_constraintEnd_toEndOf="@+id/img_icon"
         app:layout_constraintStart_toStartOf="@+id/img_icon"

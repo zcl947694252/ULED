@@ -25,6 +25,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.connector.ConnectorOfGroupActivity
+import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
@@ -277,7 +279,7 @@ class RelayFragmentList: BaseFragment() {
 
                 R.id.btn_set -> {
                     if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                        intent = Intent(mContext, NormalSettingActivity::class.java)
+                        intent = Intent(mContext, ConnectorSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", currentLight)
                         startActivityForResult(intent, 2)
@@ -285,7 +287,7 @@ class RelayFragmentList: BaseFragment() {
                 }
 
                 R.id.group_name -> {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                    intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
                     intent.putExtra("group", currentLight)
                     startActivityForResult(intent, 2)
                 }

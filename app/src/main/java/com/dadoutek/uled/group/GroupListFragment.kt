@@ -143,6 +143,8 @@ class GroupListFragment : BaseFragment() {
     private lateinit var br: BroadcastReceiver
 
     private var isFirst: Boolean = false
+
+    private var allLightText: TextView? = null
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
 //    private var curtain_btn: TextView? = null
@@ -256,6 +258,7 @@ class GroupListFragment : BaseFragment() {
         toolbar = view.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.group_title)
 
+        allLightText = view.findViewById(R.id.textView6)
         val btn_delete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 //        btn_delete.visibility = View.VISIBLE
 
@@ -289,6 +292,7 @@ class GroupListFragment : BaseFragment() {
         btnOff?.setOnClickListener(onClick)
         btnSet?.setOnClickListener(onClick)
         btn_delete.setOnClickListener(onClick)
+        allLightText?.setOnClickListener(onClick)
 
         return view
     }
@@ -404,7 +408,7 @@ class GroupListFragment : BaseFragment() {
                     updateData(1, false)
                     updateData(2, false)
                     updateData(3, false)
-                    isFirst=true
+                    isFirst = true
                     deviceNameAdapter?.notifyDataSetChanged()
                 }
             }
@@ -526,7 +530,7 @@ class GroupListFragment : BaseFragment() {
 
             deviceName = ArrayList()
 
-            isFirst=false
+            isFirst = false
 
             var cwNum = DBUtils.getAllNormalLight().size
             var rgbNum = DBUtils.getAllRGBLight().size
@@ -720,13 +724,16 @@ class GroupListFragment : BaseFragment() {
 //                        .sendBroadcast(intent)
                 android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                      val intent = Intent("delete")
-                       intent.putExtra("delete", "true")
-                       LocalBroadcastManager.getInstance(this!!.mContext!!)
-                        .sendBroadcast(intent)
+                            val intent = Intent("delete")
+                            intent.putExtra("delete", "true")
+                            LocalBroadcastManager.getInstance(this!!.mContext!!)
+                                    .sendBroadcast(intent)
                         }
                         .setNegativeButton(R.string.btn_cancel, null)
                         .show()
+            }
+            R.id.textView6 -> {
+                Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
             }
         }
     }
