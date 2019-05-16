@@ -45,17 +45,26 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
 //                }
             }
 
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && num == 0) {
+                gpSet.setBackgroundResource(R.drawable.btn_rec_black)
+            }else if(group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL){
+                gpSet.setBackgroundResource(R.drawable.btn_rec_black)
+            }
+            else {
+                gpSet.setBackgroundResource(R.drawable.btn_rec_blue)
+            }
+
             if(group.isSelected){
                 helper.setChecked(R.id.selected_group_curtain,true)
             }else{
                 helper.setChecked(R.id.selected_group_curtain,false)
             }
 
-            if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                gpSet.setBackgroundResource(R.drawable.btn_rec_black)
-            }else{
-                gpSet.setBackgroundResource(R.drawable.btn_rec_blue)
-            }
+//            if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
+//                gpSet.setBackgroundResource(R.drawable.btn_rec_black)
+//            }else{
+//                gpSet.setBackgroundResource(R.drawable.btn_rec_blue)
+//            }
 //            if(group.name==TelinkLightApplication.getInstance().getString(R.string.curtain)){
 //                helper.setVisible(R.id.btn_off,false)
 //                helper.setVisible(R.id.btn_on,false)

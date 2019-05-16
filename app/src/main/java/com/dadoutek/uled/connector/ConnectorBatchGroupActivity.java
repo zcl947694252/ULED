@@ -151,9 +151,9 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     private GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private List<DbGroup> groups;
 
-    private String curtainType;
+    private String relayType;
 
-    private String groupCurtain;
+    private String groupRelay;
 
     private Disposable mTimer;
     private int mRetryCount = 0;
@@ -623,15 +623,32 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        if (groups.size() > 0) {
-            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        if(relayType.equals("group_relay")){
             add_relativeLayout.setVisibility(View.GONE);
-            add_group.setVisibility(View.VISIBLE);
-        } else {
-            add_relativeLayout.setVisibility(View.VISIBLE);
             add_group.setVisibility(View.GONE);
+            groupsBottom.setVisibility(View.GONE);
+        }else{
+            groupsBottom.setVisibility(View.VISIBLE);
+            if (groups.size() > 0) {
+                groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+                recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+                add_relativeLayout.setVisibility(View.GONE);
+                add_group.setVisibility(View.VISIBLE);
+            } else {
+                add_relativeLayout.setVisibility(View.VISIBLE);
+                add_group.setVisibility(View.GONE);
+            }
         }
+
+//        if (groups.size() > 0) {
+//            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+//            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+//            add_relativeLayout.setVisibility(View.GONE);
+//            add_group.setVisibility(View.VISIBLE);
+//        } else {
+//            add_relativeLayout.setVisibility(View.VISIBLE);
+//            add_group.setVisibility(View.GONE);
+//        }
         disableEventListenerInGrouping();
 
         initOnLayoutListener();
@@ -983,16 +1000,36 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.batch_group);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+        if(relayType.equals("group_relay")){
+            toolbar.setTitle(groupRelay);
+            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+            toolbar.setOnMenuItemClickListener(this);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }else{
+            toolbar.setTitle(R.string.batch_group);
+            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+            toolbar.setOnMenuItemClickListener(this);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
+//        toolbar.setTitle(R.string.batch_group);
+//        setSupportActionBar(toolbar);
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_grouping_select_all, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -1009,6 +1046,10 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        relayType = intent.getStringExtra("relayType");
+        if(relayType.equals("group_relay")){
+            groupRelay = intent.getStringExtra("relay_group_name");
+        }
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
@@ -1026,22 +1067,58 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
             }
         }
 
-        if (groups.size() > 1) {
-            for (int i = 0; i < groups.size(); i++) {
-                if (i == groups.size() - 1) {
-                    groups.get(i).checked = true;
-                    currentGroupIndex = i;
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
-                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-                } else {
-                    groups.get(i).checked = false;
+        if(relayType.equals("group_relay")){
+            if (groups.size() > 1) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (groups.get(i).getName().equals(groupRelay)) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
                 }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
             }
-            initHasGroup = true;
-        } else {
-            initHasGroup = false;
-            currentGroupIndex = -1;
+        }else {
+            if (groups.size() > 1) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (i ==0) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
+                }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
+            }
         }
+
+//        if (groups.size() > 1) {
+//            for (int i = 0; i < groups.size(); i++) {
+//                if (i == groups.size() - 1) {
+//                    groups.get(i).checked = true;
+//                    currentGroupIndex = i;
+//                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+//                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+//                } else {
+//                    groups.get(i).checked = false;
+//                }
+//            }
+//            initHasGroup = true;
+//        } else {
+//            initHasGroup = false;
+//            currentGroupIndex = -1;
+//        }
     }
 
     @Override

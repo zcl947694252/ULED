@@ -148,6 +148,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_curtains_device_details)
+        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        inflater = this.layoutInflater
     }
 
     override fun onResume() {
@@ -163,35 +165,73 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         showList = ArrayList()
 //        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
         showList = gpList
-        if(curtain.size>0){
-            toolbar!!.tv_function1.visibility=View.VISIBLE
-            recycleView.visibility=View.VISIBLE
-            no_device_relativeLayout.visibility=View.GONE
-            var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.setOnClickListener(View.OnClickListener {
-                val intent = Intent(this,
-                        CurtainBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                intent.putExtra("curtain","all_curtain")
-                startActivity(intent)
-            })
-        }else {
-            recycleView.visibility=View.GONE
-            no_device_relativeLayout.visibility=View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                if (dialog_curtain?.visibility == View.GONE) {
-                    showPopupMenu()
-                } else {
+        when(type){
+           Constant.INSTALL_CURTAIN -> {
+               if(curtain.size>0){
+                   toolbar!!.tv_function1.visibility=View.VISIBLE
+                   recycleView.visibility=View.VISIBLE
+                   no_device_relativeLayout.visibility=View.GONE
+                   var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+                   toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                   toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
+                   batchGroup.setText(R.string.batch_group)
+                   batchGroup.setOnClickListener(View.OnClickListener {
+                       val intent = Intent(this,
+                               CurtainBatchGroupActivity::class.java)
+                       intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                       intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                       intent.putExtra("curtain","all_curtain")
+                       startActivity(intent)
+                   })
+               }else {
+                   recycleView.visibility=View.GONE
+                   no_device_relativeLayout.visibility=View.VISIBLE
+                   toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
+                   toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                   toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                       if (dialog_curtain?.visibility == View.GONE) {
+                           showPopupMenu()
+                       } else {
 //                            hidePopupMenu()
+                       }
+                   }
+               }
+           }
+        Constant.INSTALL_CURTAIN_OF -> {
+            if(curtain.size>0){
+                toolbar!!.tv_function1.visibility=View.VISIBLE
+                recycleView.visibility=View.VISIBLE
+                no_device_relativeLayout.visibility=View.GONE
+                var cwLightGroup=this.intent.getStringExtra("curtain_name")
+                var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+                toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
+                batchGroup.setText(R.string.batch_group)
+                batchGroup.setOnClickListener(View.OnClickListener {
+                    val intent = Intent(this,
+                            CurtainBatchGroupActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent.putExtra("curtain","group_curtain")
+                    intent.putExtra("curtain_group_name",cwLightGroup)
+                    startActivity(intent)
+                })
+            }else {
+                recycleView.visibility=View.GONE
+                no_device_relativeLayout.visibility=View.VISIBLE
+                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
+                toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                    if (dialog_curtain?.visibility == View.GONE) {
+                        showPopupMenu()
+                    } else {
+//                            hidePopupMenu()
+                    }
                 }
             }
         }
+        }
+
     }
 
     private fun showPopupMenu() {

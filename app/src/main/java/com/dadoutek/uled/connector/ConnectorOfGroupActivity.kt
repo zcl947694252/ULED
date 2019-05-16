@@ -148,10 +148,10 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-        intent = Intent(this, ScanningConnectorActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-        startActivityForResult(intent, 0)
+        intent = Intent(this, ConnectorDeviceDetailActivity::class.java)
+        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RELAY_OF)
+        intent.putExtra("relay_name",group.name)
+        startActivity(intent)
     }
 
     private fun initOnLayoutListener() {
@@ -331,23 +331,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE
-            var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.setOnClickListener(View.OnClickListener {
-                val intent = Intent(this,
-                        ConnectorBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                intent.putExtra("relayType","group_relay")
-                intent.putExtra("relay_id",group.id.toString())
-                startActivity(intent)
-            })
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 

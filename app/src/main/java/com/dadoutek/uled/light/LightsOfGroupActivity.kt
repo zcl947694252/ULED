@@ -167,16 +167,16 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     private fun addDevice() {
-        if (strLight == "cw_light") {
-            intent = Intent(this, DeviceScanningNewActivity::class.java)
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-            intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
-            startActivityForResult(intent, 0)
-        } else if (strLight == "rgb_light"){
-            intent = Intent(this, DeviceScanningNewActivity::class.java)
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-            intent.putExtra(Constant.TYPE_VIEW,Constant.RGB_LIGHT_KEY)
-            startActivityForResult(intent, 0)
+        if(strLight=="cw_light"){
+                val intent = Intent(this, DeviceDetailAct::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_LIGHT_OF_CW)
+                intent.putExtra("cw_light_name",group.name)
+                startActivity(intent)
+        }else if(strLight == "rgb_light"){
+                val intent = Intent(this, DeviceDetailAct::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_LIGHT_OF_RGB)
+                intent.putExtra("rgb_light_name",group.name)
+                startActivity(intent)
         }
     }
 
@@ -347,38 +347,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE
-            if(strLight=="cw_light"){
-                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                batchGroup.setText(R.string.batch_group)
-                batchGroup.setOnClickListener(View.OnClickListener {
-                    val intent = Intent(this,
-                            BatchGroupActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                    intent.putExtra("lightType","group_light")
-                    intent.putExtra("group_id",group.id.toString())
-                    startActivity(intent)
-                })
-            }else if(strLight == "rgb_light"){
-                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-                toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-                batchGroup.setText(R.string.batch_group)
-                batchGroup.setOnClickListener(View.OnClickListener {
-                    val intent = Intent(this,
-                            RgbBatchGroupActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                    intent.putExtra("lightType","group_light")
-                    intent.putExtra("group_id",group.id.toString())
-                    startActivity(intent)
-            })
-            }
-
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 

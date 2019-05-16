@@ -24,7 +24,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
         if (group != null) {
             var gpImageView = helper.getView<ImageView>(R.id.btn_on)
             var gpSet = helper.getView<ImageView>(R.id.btn_set)
-            var num =DBUtils.getLightByGroupID(group.id).size
+            var num = DBUtils.getLightByGroupID(group.id).size
 
             val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
             if (isDelete) {
@@ -33,11 +33,24 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                 deleteIcon.visibility = View.GONE
             }
 
-            if(num==0){
-                helper.setText(R.id.group_num,TelinkLightApplication.getInstance().getString(R.string.total)+0+TelinkLightApplication.getInstance().getString(R.string.piece))
-            }else{
-                helper.setText(R.id.group_num,TelinkLightApplication.getInstance().getString(R.string.total)+num+TelinkLightApplication.getInstance().getString(R.string.piece))
+            if (num == 0) {
+                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece))
+            } else {
+                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + num + TelinkLightApplication.getInstance().getString(R.string.piece))
             }
+
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && num == 0) {
+                gpImageView.setImageResource(R.drawable.icon_open_group_no)
+                gpSet.setImageResource(R.drawable.icon_device_group)
+            }else if(group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL){
+                gpImageView.setImageResource(R.drawable.icon_open_group_no)
+                gpSet.setImageResource(R.drawable.icon_device_group)
+            }
+            else {
+                gpImageView.setImageResource(R.drawable.icon_open_group)
+                gpSet.setImageResource(R.drawable.icon_setting_group)
+            }
+
             if (group.textColor == 0)
                 group.textColor = mContext.resources
                         .getColor(R.color.black)
@@ -51,19 +64,19 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
 //                }
             }
 
-            if(group.isSelected){
-                helper.setChecked(R.id.selected_group,true)
-            }else{
-                helper.setChecked(R.id.selected_group,false)
+            if (group.isSelected) {
+                helper.setChecked(R.id.selected_group, true)
+            } else {
+                helper.setChecked(R.id.selected_group, false)
             }
 
-            if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                  gpImageView.setImageResource(R.drawable.icon_open_group_no)
-                  gpSet.setImageResource(R.drawable.icon_device_group)
-            }else{
-                gpImageView.setImageResource(R.drawable.icon_open_group)
-                gpSet.setImageResource(R.drawable.icon_setting_group)
-            }
+//            if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
+//                gpImageView.setImageResource(R.drawable.icon_open_group_no)
+//                gpSet.setImageResource(R.drawable.icon_device_group)
+//            } else {
+//                gpImageView.setImageResource(R.drawable.icon_open_group)
+//                gpSet.setImageResource(R.drawable.icon_setting_group)
+//            }
 //            if(group.name==TelinkLightApplication.getInstance().getString(R.string.curtain)){
 //                helper.setVisible(R.id.btn_off,false)
 //                helper.setVisible(R.id.btn_on,false)

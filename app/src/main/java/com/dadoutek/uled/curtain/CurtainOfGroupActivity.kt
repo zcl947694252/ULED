@@ -47,6 +47,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.dadoutek.uled.windowcurtains.CurtainBatchGroupActivity
+import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -178,10 +179,10 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     }
 
     private fun addDevice() {
-        intent = Intent(this, CurtainScanningNewActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-        startActivityForResult(intent, 0)
+        intent = Intent(this, CurtainsDeviceDetailsActivity::class.java)
+        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
+        intent.putExtra("curtain_name",group.name)
+        startActivity(intent)
     }
 
     private fun initToolbar() {
@@ -295,22 +296,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.setOnClickListener(View.OnClickListener {
-                val intent = Intent(this,
-                        CurtainBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                intent.putExtra("curtainType","group_curtain")
-                intent.putExtra("group_id",group.id.toString())
-                startActivity(intent)
-            })
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 

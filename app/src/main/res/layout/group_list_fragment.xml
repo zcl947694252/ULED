@@ -36,7 +36,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="60dp"
             android:background="@drawable/add_device_bt"
-            android:text="@string/add_group"
+            android:text="@string/add_groups"
             android:textColor="@color/blue_background"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"

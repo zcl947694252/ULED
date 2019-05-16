@@ -52,7 +52,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import org.jetbrains.anko.support.v4.runOnUiThread
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class CurtainFragmentList : BaseFragment() {
 
@@ -236,6 +238,10 @@ class CurtainFragmentList : BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
+        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            return@Comparator o1.name.compareTo(o2.name)
+        })
+
         this.groupAdapter = CurtainGroupListAdapter(R.layout.curtain_list_adapter, groupList, isDelete)
         val decoration = DividerItemDecoration(activity,
                 DividerItemDecoration
@@ -281,7 +287,7 @@ class CurtainFragmentList : BaseFragment() {
             when (view!!.getId()) {
 
                 R.id.btn_set -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CURTAIN && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                         intent = Intent(mContext, WindowCurtainsActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", currentLight)
@@ -442,6 +448,9 @@ class CurtainFragmentList : BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
+            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+                return@Comparator o1.name.compareTo(o2.name)
+            })
             this.groupAdapter = CurtainGroupListAdapter(R.layout.curtain_list_adapter, groupList, isDelete)
             val decoration = DividerItemDecoration(activity,
                     DividerItemDecoration

@@ -35,7 +35,7 @@
             android:id="@+id/add_device_btn"
             android:layout_width="140dp"
             android:layout_height="38dp"
-            android:text="@string/device_scan_add"
+            android:text="@string/device_scan_scan"
             android:background="@drawable/add_device_bt"
             android:textColor="@color/blue_background"
             android:textSize="18sp"

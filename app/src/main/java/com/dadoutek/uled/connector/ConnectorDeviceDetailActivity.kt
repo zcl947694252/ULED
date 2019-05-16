@@ -517,32 +517,70 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     private fun initDate() {
         lightsData = DBUtils.getAllConnctor()
 
-        if(lightsData.size>0){
-            toolbar!!.tv_function1.visibility=View.VISIBLE
-            recycleView.visibility=View.VISIBLE
-            no_device_relativeLayout.visibility=View.GONE
-            var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-            batchGroup.setText(R.string.batch_group)
-            batchGroup.setOnClickListener(View.OnClickListener {
-                val intent = Intent(this,
-                        ConnectorBatchGroupActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-                intent.putExtra("relayType","all_relay")
-                startActivity(intent)
-            })
-        }else{
-            recycleView.visibility=View.GONE
-            no_device_relativeLayout.visibility=View.VISIBLE
-            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                if (dialog_relay?.visibility == View.GONE) {
-                    showPopupMenu()
-                } else {
+        when(type){
+            Constant.INSTALL_CONNECTOR -> {
+                if(lightsData.size>0){
+                    toolbar!!.tv_function1.visibility=View.VISIBLE
+                    recycleView.visibility=View.VISIBLE
+                    no_device_relativeLayout.visibility=View.GONE
+                    var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                    batchGroup.setText(R.string.batch_group)
+                    batchGroup.setOnClickListener(View.OnClickListener {
+                        val intent = Intent(this,
+                                ConnectorBatchGroupActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        intent.putExtra("relayType","all_relay")
+                        startActivity(intent)
+                    })
+                }else{
+                    recycleView.visibility=View.GONE
+                    no_device_relativeLayout.visibility=View.VISIBLE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                        if (dialog_relay?.visibility == View.GONE) {
+                            showPopupMenu()
+                        } else {
 //                            hidePopupMenu()
+                        }
+                    }
+                }
+            }
+
+            Constant.INSTALL_RELAY_OF ->{
+                if(lightsData.size>0){
+                    toolbar!!.tv_function1.visibility=View.VISIBLE
+                    recycleView.visibility=View.VISIBLE
+                    no_device_relativeLayout.visibility=View.GONE
+                    var relayGroup=this.intent.getStringExtra("relay_name")
+                    var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                    batchGroup.setText(R.string.batch_group)
+                    batchGroup.setOnClickListener(View.OnClickListener {
+                        val intent = Intent(this,
+                                ConnectorBatchGroupActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        intent.putExtra("relayType","group_relay")
+                        intent.putExtra("relay_group_name",relayGroup)
+                        startActivity(intent)
+                    })
+                }else{
+                    recycleView.visibility=View.GONE
+                    no_device_relativeLayout.visibility=View.VISIBLE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+                        if (dialog_relay?.visibility == View.GONE) {
+                            showPopupMenu()
+                        } else {
+//                            hidePopupMenu()
+                        }
+                    }
                 }
             }
         }

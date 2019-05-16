@@ -60,7 +60,9 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import org.jetbrains.anko.support.v4.runOnUiThread
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class CWLightFragmentList : BaseFragment() {
 
@@ -243,6 +245,10 @@ class CWLightFragmentList : BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
+        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            return@Comparator o1.name.compareTo(o2.name)
+        })
+
         this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         val decoration = DividerItemDecoration(activity,
                 DividerItemDecoration
@@ -296,7 +302,7 @@ class CWLightFragmentList : BaseFragment() {
                 }
 
                 R.id.btn_set -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                         intent = Intent(mContext, NormalSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", currentLight)
@@ -307,7 +313,7 @@ class CWLightFragmentList : BaseFragment() {
                 R.id.group_name -> {
                     intent = Intent(mContext, LightsOfGroupActivity::class.java)
                     intent.putExtra("group", currentLight)
-                    intent.putExtra("light","cw_light")
+                    intent.putExtra("light", "cw_light")
                     startActivityForResult(intent, 2)
                 }
 
@@ -359,9 +365,9 @@ class CWLightFragmentList : BaseFragment() {
                         lightList = DBUtils.getLightByGroupID(group.id)
                     }
 
-                    if(isOpen){
-                        group.connectionStatus =ConnectionStatus.ON.value
-                    }else{
+                    if (isOpen) {
+                        group.connectionStatus = ConnectionStatus.ON.value
+                    } else {
                         group.connectionStatus = ConnectionStatus.OFF.value
                     }
 
@@ -466,6 +472,9 @@ class CWLightFragmentList : BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
+            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+                return@Comparator o1.name.compareTo(o2.name)
+            })
             this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
             val decoration = DividerItemDecoration(activity,
                     DividerItemDecoration
@@ -547,16 +556,16 @@ class CWLightFragmentList : BaseFragment() {
     }
 
     private fun setMove(recyclerViewChild: RecyclerView) {
-        var startPos=0
-        var endPos=0
+        var startPos = 0
+        var endPos = 0
         val list = groupAdapter!!.data
         val onItemDragListener = object : OnItemDragListener {
             override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
 
-                startPos=pos
-                endPos=0
+                startPos = pos
+                endPos = 0
 
-                com.dadoutek.uled.util.LogUtils.d("indexchange--"+"--start:"+pos)
+                com.dadoutek.uled.util.LogUtils.d("indexchange--" + "--start:" + pos)
             }
 
             override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
@@ -565,11 +574,11 @@ class CWLightFragmentList : BaseFragment() {
 
             override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
                 //                viewHolder.getItemId();
-                endPos=pos
-                com.dadoutek.uled.util.LogUtils.d("indexchange--"+"--end:"+pos)
+                endPos = pos
+                com.dadoutek.uled.util.LogUtils.d("indexchange--" + "--end:" + pos)
 
-                updateGroupList(list,startPos,endPos)
-                com.dadoutek.uled.util.LogUtils.d("indexchange--"+"--start:"+startPos+"--end:"+endPos)
+                updateGroupList(list, startPos, endPos)
+                com.dadoutek.uled.util.LogUtils.d("indexchange--" + "--start:" + startPos + "--end:" + endPos)
             }
         }
 
@@ -585,20 +594,20 @@ class CWLightFragmentList : BaseFragment() {
 
         var tempIndex = list[endPos].index
 
-        if(endPos<startPos){
-            for(i in endPos..startPos){
-                if(i==startPos){
-                    list[i].index=tempIndex
-                }else{
-                    list[i].index=list[i+1].index
+        if (endPos < startPos) {
+            for (i in endPos..startPos) {
+                if (i == startPos) {
+                    list[i].index = tempIndex
+                } else {
+                    list[i].index = list[i + 1].index
                 }
             }
-        }else if(endPos>startPos){
-            for(i in endPos downTo startPos){
-                if(i==startPos){
-                    list[i].index=tempIndex
-                }else{
-                    list[i].index=list[i-1].index
+        } else if (endPos > startPos) {
+            for (i in endPos downTo startPos) {
+                if (i == startPos) {
+                    list[i].index = tempIndex
+                } else {
+                    list[i].index = list[i - 1].index
                 }
             }
         }

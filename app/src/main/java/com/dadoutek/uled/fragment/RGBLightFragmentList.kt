@@ -45,7 +45,9 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.support.v4.runOnUiThread
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class RGBLightFragmentList: BaseFragment() {
 
@@ -228,6 +230,10 @@ class RGBLightFragmentList: BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
+        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            return@Comparator o1.name.compareTo(o2.name)
+        })
+
         this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         val decoration = DividerItemDecoration(activity,
                 DividerItemDecoration
@@ -278,7 +284,7 @@ class RGBLightFragmentList: BaseFragment() {
                 }
 
                 R.id.btn_set -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                         intent = Intent(mContext, RGBSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                         intent.putExtra("group", currentLight)
@@ -442,6 +448,9 @@ class RGBLightFragmentList: BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
+            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+                return@Comparator o1.name.compareTo(o2.name)
+            })
             this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
             val decoration = DividerItemDecoration(activity,
                     DividerItemDecoration

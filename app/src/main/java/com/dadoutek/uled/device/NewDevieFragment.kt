@@ -301,7 +301,7 @@ class NewDevieFragment :BaseFragment(){
                 }
                 Constant.INSTALL_CONNECTOR->{
                     intent= Intent(activity,ConnectorDeviceDetailActivity::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN)
+                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CONNECTOR)
                 }
             }
             startActivityForResult(intent, Activity.RESULT_OK)

@@ -624,14 +624,22 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        if (groups.size() > 0) {
-            groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
-            recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        if(curtainType.equals("group_curtain")){
             add_relativeLayout.setVisibility(View.GONE);
-            add_group.setVisibility(View.VISIBLE);
-        } else {
-            add_relativeLayout.setVisibility(View.VISIBLE);
             add_group.setVisibility(View.GONE);
+            groupsBottom.setVisibility(View.GONE);
+        }else {
+            groupsBottom.setVisibility(View.VISIBLE);
+
+            if (groups.size() > 0) {
+                groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+                recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+                add_relativeLayout.setVisibility(View.GONE);
+                add_group.setVisibility(View.VISIBLE);
+            } else {
+                add_relativeLayout.setVisibility(View.VISIBLE);
+                add_group.setVisibility(View.GONE);
+            }
         }
 
         disableEventListenerInGrouping();
@@ -952,19 +960,19 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
-//        List <DbCurtain> list = DBUtils.INSTANCE.getAllCurtains();
-////        this.adapter = new DeviceListAdapter(list,this);
-////        nowLightList.addAll(list);
+        List <DbCurtain> list = DBUtils.INSTANCE.getAllCurtains();
+        this.adapter = new DeviceListAdapter(list,this);
+        nowLightList.addAll(list);
 
-        if(curtainType.equals("all_curtain")){
-            List<DbCurtain> list = DBUtils.INSTANCE.getAllCurtain();
-            this.adapter = new DeviceListAdapter(list, this);
-            nowLightList.addAll(list);
-        }else if(curtainType.equals("group_curtain")){
-            ArrayList<DbCurtain> list =DBUtils.INSTANCE.getCurtainByGroupID(Integer.parseInt(groupCurtain));
-            this.adapter = new DeviceListAdapter(list, this);
-            nowLightList.addAll(list);
-        }
+//        if(curtainType.equals("all_curtain")){
+//            List<DbCurtain> list = DBUtils.INSTANCE.getAllCurtain();
+//            this.adapter = new DeviceListAdapter(list, this);
+//            nowLightList.addAll(list);
+//        }else if(curtainType.equals("group_curtain")){
+//            ArrayList<DbCurtain> list =DBUtils.INSTANCE.getCurtainByGroupID(Integer.parseInt(groupCurtain));
+//            this.adapter = new DeviceListAdapter(list, this);
+//            nowLightList.addAll(list);
+//        }
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
         this.btnAddGroups = findViewById(R.id.btn_add_groups);
@@ -993,16 +1001,36 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.batch_group);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+//        toolbar.setTitle(R.string.batch_group);
+//        setSupportActionBar(toolbar);
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
+        if(curtainType.equals("group_curtain")){
+            toolbar.setTitle(groupCurtain);
+            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+            toolbar.setOnMenuItemClickListener(this);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }else{
+            toolbar.setTitle(R.string.batch_group);
+            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+            toolbar.setOnMenuItemClickListener(this);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_grouping_select_all, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -1019,9 +1047,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
-        curtainType = intent.getStringExtra("curtainType");
+        curtainType = intent.getStringExtra("curtain");
         if(curtainType.equals("group_curtain")){
-            groupCurtain = intent.getStringExtra("group_id");
+            groupCurtain = intent.getStringExtra("curtain_group_name");
         }
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
@@ -1040,22 +1068,58 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             }
         }
 
-        if (groups.size() > 1) {
-            for (int i = 0; i < groups.size(); i++) {
-                if (i == groups.size() - 1) {
-                    groups.get(i).checked = true;
-                    currentGroupIndex = i;
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
-                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-                } else {
-                    groups.get(i).checked = false;
+        if(curtainType.equals("group_curtain")){
+            if (groups.size() > 1) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (groups.get(i).getName().equals(groupCurtain)) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
                 }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
             }
-            initHasGroup = true;
-        } else {
-            initHasGroup = false;
-            currentGroupIndex = -1;
+        }else {
+            if (groups.size() > 1) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (i ==0) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
+                }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
+            }
         }
+
+//        if (groups.size() > 1) {
+//            for (int i = 0; i < groups.size(); i++) {
+//                if (i == groups.size() - 1) {
+//                    groups.get(i).checked = true;
+//                    currentGroupIndex = i;
+//                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+//                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+//                } else {
+//                    groups.get(i).checked = false;
+//                }
+//            }
+//            initHasGroup = true;
+//        } else {
+//            initHasGroup = false;
+//            currentGroupIndex = -1;
+//        }
     }
 
     @Override
