@@ -280,10 +280,10 @@ class CurtainFragmentList : BaseFragment() {
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
         var intent: Intent
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
-            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-            checkConnect()
-        } else {
+//        if (TelinkLightApplication.getInstance().connectDevice == null) {
+//            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+//            checkConnect()
+//        } else {
             when (view!!.getId()) {
 
                 R.id.btn_set -> {
@@ -308,7 +308,7 @@ class CurtainFragmentList : BaseFragment() {
                         currentLight.isSelected = true
                     }
                 }
-            }
+//            }
         }
     }
 

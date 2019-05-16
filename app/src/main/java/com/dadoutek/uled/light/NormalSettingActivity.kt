@@ -727,22 +727,56 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        intent.putExtra("group", group)
 //        startActivity(intent)
 //        this?.finish()
-        editTitle.visibility = View.VISIBLE
-        titleCenterName.visibility = View.GONE
-        editTitle?.setFocusableInTouchMode(true)
-        editTitle?.setFocusable(true)
-        editTitle?.requestFocus()
-        editTitle.setSelection(editTitle.getText().toString().length)
-        tvRename.visibility = View.VISIBLE
-        tvRename.setText(android.R.string.ok)
-        tvRename.setOnClickListener {
-            saveName()
-            tvRename.visibility = View.GONE
-        }
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
-        editTitle?.setOnEditorActionListener(this)
+//        editTitle.visibility = View.VISIBLE
+//        titleCenterName.visibility = View.GONE
+//        editTitle?.setFocusableInTouchMode(true)
+//        editTitle?.setFocusable(true)
+//        editTitle?.requestFocus()
+//        editTitle.setSelection(editTitle.getText().toString().length)
+//        tvRename.visibility = View.VISIBLE
+//        tvRename.setText(android.R.string.ok)
+//        tvRename.setOnClickListener {
+//            saveName()
+//            tvRename.visibility = View.GONE
+//        }
+//        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
+//        editTitle?.setOnEditorActionListener(this)
+        val textGp = EditText(this)
+        textGp.setText(group?.name)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.setSelection(textGp.getText().toString().length)
+        android.app.AlertDialog.Builder(this@NormalSettingActivity)
+                .setTitle(R.string.rename)
+                .setView(textGp)
+
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                    // 获取输入框的内容
+                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+                    } else {
+                        var name = textGp.text.toString().trim { it <= ' ' }
+                        var canSave = true
+                        val groups = DBUtils.allGroups
+                        for (i in groups.indices) {
+                            if (groups[i].name == name) {
+                                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                canSave = false
+                                break
+                            }
+                        }
+
+                        if (canSave) {
+                            group?.name = textGp.text.toString().trim { it <= ' ' }
+                            DBUtils.updateGroup(group!!)
+                            toolbar.title = group?.name
+                            dialog.dismiss()
+                        }
+                    }
+                }
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
+
 
     /**
      * 删除组，并且把组里的灯的组也都删除。
@@ -1034,6 +1068,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             currentShowPageGroup = true
 //            show_light_btn.visibility=View.GONE
 //            show_group_btn.visibility=View.VISIBLE
+//            initToolbarGroup()
             initDataGroup()
             initViewGroup()
         } else {
@@ -1044,6 +1079,15 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             initViewLight()
             getVersion()
         }
+    }
+
+    private fun initToolbarGroup() {
+        toolbar.title = ""
+        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 
 
@@ -1088,15 +1132,17 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun initViewGroup() {
-        editTitle.visibility = View.GONE
-        titleCenterName.visibility = View.VISIBLE
+//        editTitle.visibility = View.GONE
+//        titleCenterName.visibility = View.VISIBLE
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
-                editTitle!!.setText(getString(R.string.allLight))
-                titleCenterName!!.text = getString(R.string.allLight)
+//                editTitle!!.setText(getString(R.string.allLight))
+////                titleCenterName!!.text = getString(R.string.allLight)
+                toolbar.title = getString(R.string.allLight)
             } else {
-                editTitle!!.setText(group!!.name)
-                titleCenterName!!.text = group!!.name
+//                editTitle!!.setText(group!!.name)
+//                titleCenterName!!.text = group!!.name
+//                toolbar.title = group!!.name
             }
         }
 
@@ -1220,7 +1266,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     //所有灯控分组暂标为系统默认分组不做修改处理
     private fun checkGroupIsSystemGroup() {
         if (group!!.meshAddr != 0xFFFF) {
-            toolbar.title = ""
+            toolbar.title = group!!.name
             setSupportActionBar(toolbar)
             supportActionBar!!.setDisplayHomeAsUpEnabled(true)
             val actionBar = supportActionBar
@@ -1321,11 +1367,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
-        textTitle!!.text = ""
-        editTitle!!.setText(light?.name)
-        editTitle!!.visibility = View.GONE
-        titleCenterName.visibility = View.VISIBLE
-        titleCenterName.setText(light?.name)
+//        textTitle!!.text = ""
+//        editTitle!!.setText(light?.name)
+//        editTitle!!.visibility = View.GONE
+//        titleCenterName.visibility = View.VISIBLE
+//        titleCenterName.setText(light?.name)
+         toolbar.title =light?.name
 
         mRxPermission = RxPermissions(this)
         brightness_btn.setOnClickListener(this.clickListener)
@@ -1466,6 +1513,29 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 //        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
 //        editTitle?.setOnEditorActionListener(this)
+
+
+//        val textGp = EditText(this)
+//        StringUtils.initEditTextFilter(textGp)
+//        textGp.setText(light?.name)
+//        textGp.setSelection(textGp.getText().toString().length)
+//        android.app.AlertDialog.Builder(this@NormalSettingActivity)
+//                .setTitle(R.string.rename)
+//                .setView(textGp)
+//
+//                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+//                    // 获取输入框的内容
+//                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+//                        ToastUtils.showShort(getString(R.string.rename_tip_check))
+//                    } else {
+//                        light?.name = textGp.text.toString().trim { it <= ' ' }
+//                        DBUtils.updateLight(light!!)
+//                        titleCenterName.setText(light?.name)
+//                        dialog.dismiss()
+//                    }
+//                }
+//                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)
@@ -1479,9 +1549,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
-                        light?.name = textGp.text.toString().trim { it <= ' ' }
+                        light?.name=textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateLight(light!!)
-                        titleCenterName.setText(light?.name)
+                        toolbar.title=light?.name
                         dialog.dismiss()
                     }
                 }

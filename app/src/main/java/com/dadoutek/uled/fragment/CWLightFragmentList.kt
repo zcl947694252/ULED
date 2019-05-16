@@ -287,10 +287,10 @@ class CWLightFragmentList : BaseFragment() {
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
         var intent: Intent
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
-            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-            checkConnect()
-        } else {
+//        if (TelinkLightApplication.getInstance().connectDevice == null) {
+//            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+//            checkConnect()
+//        } else {
             when (view!!.getId()) {
                 R.id.btn_on -> {
                     Commander.openOrCloseLights(dstAddr, true)
@@ -327,7 +327,7 @@ class CWLightFragmentList : BaseFragment() {
                     }
                 }
             }
-        }
+//        }
     }
 
     private fun checkConnect() {
