@@ -161,13 +161,37 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     private fun initData() {
         gpList = DBUtils.getgroupListWithType(this!!)
 
-        curtain=DBUtils.getAllCurtains()
+//        curtain=DBUtils.getAllCurtains()
         showList = ArrayList()
 //        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
         showList = gpList
         when(type){
            Constant.INSTALL_CURTAIN -> {
-               if(curtain.size>0){
+               var all_light_data = DBUtils.getAllCurtains()
+               if (all_light_data.size > 0) {
+                   var list_group : java.util.ArrayList<DbCurtain> = ArrayList()
+                   var no_group : java.util.ArrayList<DbCurtain> = ArrayList()
+                   for(i in all_light_data.indices){
+                       if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                           no_group.add(all_light_data[i])
+                       }else{
+                           list_group.add(all_light_data[i])
+                       }
+                   }
+
+                   curtain= ArrayList()
+
+                   if(no_group.size>0){
+                       for(i in no_group.indices){
+                           curtain.add(no_group[i])
+                       }
+                   }
+
+                   if(list_group.size>0){
+                       for(i in list_group.indices){
+                           curtain.add(list_group[i])
+                       }
+                   }
                    toolbar!!.tv_function1.visibility=View.VISIBLE
                    recycleView.visibility=View.VISIBLE
                    no_device_relativeLayout.visibility=View.GONE
@@ -198,7 +222,31 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                }
            }
         Constant.INSTALL_CURTAIN_OF -> {
-            if(curtain.size>0){
+            var all_light_data = DBUtils.getAllCurtains()
+            if (all_light_data.size > 0) {
+                var list_group : ArrayList<DbCurtain> = ArrayList()
+                var no_group : ArrayList<DbCurtain> = ArrayList()
+                for(i in all_light_data.indices){
+                    if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                        no_group.add(all_light_data[i])
+                    }else{
+                        list_group.add(all_light_data[i])
+                    }
+                }
+
+                curtain= ArrayList()
+
+                if(no_group.size>0){
+                    for(i in no_group.indices){
+                        curtain.add(no_group[i])
+                    }
+                }
+
+                if(list_group.size>0){
+                    for(i in list_group.indices){
+                        curtain.add(list_group[i])
+                    }
+                }
                 toolbar!!.tv_function1.visibility=View.VISIBLE
                 recycleView.visibility=View.VISIBLE
                 no_device_relativeLayout.visibility=View.GONE

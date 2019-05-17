@@ -41,14 +41,14 @@ public class DbConnector implements Serializable {
     @Transient
     public int textColor;//文字颜色
 
-    public int connectionStatus = 1;//链接状态
+    public int status = 1;//链接状态
     @Expose(serialize = false, deserialize = false)
     @Transient
     public int icon = R.drawable.icon_light_on;//灯状态显示图
-    @Generated(hash = 1133379460)
+    @Generated(hash = 1722784662)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
-            int index, int color, int connectionStatus) {
+            int index, int color, int status) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -59,7 +59,7 @@ public class DbConnector implements Serializable {
         this.belongGroupId = belongGroupId;
         this.index = index;
         this.color = color;
-        this.connectionStatus = connectionStatus;
+        this.status = status;
     }
     @Generated(hash = 1212725637)
     public DbConnector() {
@@ -120,10 +120,10 @@ public class DbConnector implements Serializable {
         this.color = color;
     }
     public int getConnectionStatus() {
-        return this.connectionStatus;
+        return this.status;
     }
     public void setConnectionStatus(int connectionStatus) {
-        this.connectionStatus = connectionStatus;
+        this.status = connectionStatus;
     }
 
     public static long getSerialVersionUID() {
@@ -174,11 +174,11 @@ public class DbConnector implements Serializable {
 
     public void updateIcon() {
 
-        if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
+        if (this.status == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_controller;
-        } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
+        } else if (this.status == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.icon_controller;
-        } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
+        } else if (this.status == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_controller_open;
         }
     }
@@ -187,5 +187,11 @@ public class DbConnector implements Serializable {
     }
     public void setOpen(boolean open) {
         this.open = open;
+    }
+    public int getStatus() {
+        return this.status;
+    }
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

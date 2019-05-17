@@ -308,6 +308,13 @@ class RGBLightFragmentList: BaseFragment() {
                         Log.e("TAG", "取消")
                     }
                 }
+
+                R.id.item_layout -> {
+                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                    intent.putExtra("group", currentLight)
+                    intent.putExtra("light","rgb_light")
+                    startActivityForResult(intent, 2)
+                }
             }
 //        }
     }
@@ -393,7 +400,7 @@ class RGBLightFragmentList: BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_LIGHT_RGB, activity!!)
                         refreshAndMoveBottom()
                         dialog.dismiss()
                     }

@@ -238,7 +238,7 @@ class CurtainFragmentList : BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
-        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+        Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
         })
 
@@ -284,30 +284,36 @@ class CurtainFragmentList : BaseFragment() {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
-            when (view!!.getId()) {
+        when (view!!.getId()) {
 
-                R.id.btn_set -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CURTAIN && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                        intent = Intent(mContext, WindowCurtainsActivity::class.java)
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent.putExtra("group", currentLight)
-                        startActivityForResult(intent, 2)
-                    }
-                }
-
-                R.id.group_name -> {
-                    intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+            R.id.btn_set -> {
+                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CURTAIN && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                    intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                     intent.putExtra("group", currentLight)
                     startActivityForResult(intent, 2)
                 }
+            }
 
-                R.id.selected_group -> {
-                    if (currentLight.isSelected) {
-                        currentLight.isSelected = false
-                    } else {
-                        currentLight.isSelected = true
-                    }
+            R.id.group_name -> {
+                intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                intent.putExtra("group", currentLight)
+                startActivityForResult(intent, 2)
+            }
+
+            R.id.selected_group -> {
+                if (currentLight.isSelected) {
+                    currentLight.isSelected = false
+                } else {
+                    currentLight.isSelected = true
                 }
+            }
+
+            R.id.item_layout -> {
+                intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                intent.putExtra("group", currentLight)
+                startActivityForResult(intent, 2)
+            }
 //            }
         }
     }
@@ -393,7 +399,7 @@ class CurtainFragmentList : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_CURTAIN, activity!!)
                         refreshAndMoveBottom()
                         dialog.dismiss()
                     }
@@ -448,7 +454,7 @@ class CurtainFragmentList : BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
-            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
                 return@Comparator o1.name.compareTo(o2.name)
             })
             this.groupAdapter = CurtainGroupListAdapter(R.layout.curtain_list_adapter, groupList, isDelete)

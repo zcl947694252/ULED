@@ -172,9 +172,9 @@ public class DbSwitch implements Serializable {
     public void updateIcon() {
 
         if (this.connectionStatus == ConnectionStatus.OFFLINE.getValue()) {
-            this.icon = R.drawable.icon_light_offline;
+            this.icon = R.drawable.icon_switch;
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
-            this.icon = R.drawable.curtain_off;
+            this.icon = R.drawable.icon_switch;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_switch;
         }

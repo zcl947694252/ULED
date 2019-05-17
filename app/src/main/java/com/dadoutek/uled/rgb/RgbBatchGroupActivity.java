@@ -960,18 +960,33 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
         List <DbLight> list=DBUtils.INSTANCE.getAllRGBLight();
-        this.adapter = new DeviceListAdapter(list,this);
-        nowLightList.addAll(list);
+        List<DbLight> no_list = new ArrayList<>();
+        List<DbLight> group_list = new ArrayList<>();
+        List<DbLight> all_light =new ArrayList<>();
 
-//        if(lightType.equals("all_light")){
-//            List<DbLight> list = DBUtils.INSTANCE.getAllNormalLight();
-//            this.adapter = new DeviceListAdapter(list, this);
-//            nowLightList.addAll(list);
-//        }else if(lightType.equals("group_light")){
-//            ArrayList<DbLight> list =DBUtils.INSTANCE.getLightByGroupID(Integer.parseInt(groupLight));
-//            this.adapter = new DeviceListAdapter(list, this);
-//            nowLightList.addAll(list);
-//        }
+        for (int i = 0; i < list.size(); i++) {
+            if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.getInstance().getString(R.string.not_grouped))) {
+                no_list.add(list.get(i));
+            } else {
+                group_list.add(list.get(i));
+            }
+        }
+
+        if (no_list.size() > 0) {
+            for (int i = 0; i < no_list.size(); i++){
+                all_light.add(no_list.get(i));
+            }
+        }
+
+        if(group_list.size()>0){
+            for (int i = 0; i < group_list.size(); i++){
+                all_light.add(group_list.get(i));
+            }
+        }
+        this.adapter = new DeviceListAdapter(all_light,this);
+        nowLightList.addAll(all_light);
+
+
 
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
@@ -1069,7 +1084,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         }
 
         if(lightType.equals("rgb_light")){
-            if (groups.size() > 1) {
+            if (groups.size() > 0) {
                 for (int i = 0; i < groups.size(); i++) {
                     if (groups.get(i).getName().equals(groupLight)) {
                         groups.get(i).checked = true;
@@ -1086,7 +1101,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 currentGroupIndex = -1;
             }
         }else {
-            if (groups.size() > 1) {
+            if (groups.size() > 0) {
                 for (int i = 0; i < groups.size(); i++) {
                     if (i ==0) {
                         groups.get(i).checked = true;

@@ -182,6 +182,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //        recyclerView!!.addItemDecoration(decoration)
         //添加Item变化动画
         recycleView!!.itemAnimator = DefaultItemAnimator()
+
+
+
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
@@ -569,8 +572,31 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun initDate() {
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
-                lightsData = DBUtils.getAllNormalLight()
-                if (lightsData.size > 0) {
+                var all_light_data = DBUtils.getAllNormalLight()
+                if (all_light_data.size > 0) {
+                    var list_group :ArrayList<DbLight> = ArrayList()
+                    var no_group :ArrayList<DbLight> = ArrayList()
+                    for(i in all_light_data.indices){
+                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                            no_group.add(all_light_data[i])
+                        }else{
+                            list_group.add(all_light_data[i])
+                        }
+                    }
+
+                    lightsData= ArrayList()
+
+                    if(no_group.size>0){
+                        for(i in no_group.indices){
+                            lightsData.add(no_group[i])
+                        }
+                    }
+
+                    if(list_group.size>0){
+                        for(i in list_group.indices){
+                            lightsData.add(list_group[i])
+                        }
+                    }
                     toolbar!!.tv_function1.visibility = View.VISIBLE
                     recycleView.visibility = View.VISIBLE
                     no_device_relativeLayout.visibility = View.GONE
@@ -601,8 +627,31 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 }
             }
             Constant.INSTALL_RGB_LIGHT -> {
-                lightsData = DBUtils.getAllRGBLight()
-                if (lightsData.size > 0) {
+                var all_light_data = DBUtils.getAllRGBLight()
+                if (all_light_data.size > 0) {
+                    var list_group :ArrayList<DbLight> = ArrayList()
+                    var no_group :ArrayList<DbLight> = ArrayList()
+                    for(i in all_light_data.indices){
+                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                            no_group.add(all_light_data[i])
+                        }else{
+                            list_group.add(all_light_data[i])
+                        }
+                    }
+
+                    lightsData= ArrayList()
+
+                    if(no_group.size>0){
+                        for(i in no_group.indices){
+                            lightsData.add(no_group[i])
+                        }
+                    }
+
+                    if(list_group.size>0){
+                        for(i in list_group.indices){
+                            lightsData.add(list_group[i])
+                        }
+                    }
                     toolbar!!.tv_function1.visibility = View.VISIBLE
                     recycleView.visibility = View.VISIBLE
                     no_device_relativeLayout.visibility = View.GONE
@@ -631,8 +680,31 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 }
             }
             Constant.INSTALL_LIGHT_OF_CW -> {
-                lightsData = DBUtils.getAllNormalLight()
-                if (lightsData.size > 0) {
+                var all_light_data = DBUtils.getAllNormalLight()
+                if (all_light_data.size > 0) {
+                    var list_group :ArrayList<DbLight> = ArrayList()
+                    var no_group :ArrayList<DbLight> = ArrayList()
+                    for(i in all_light_data.indices){
+                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                            no_group.add(all_light_data[i])
+                        }else{
+                            list_group.add(all_light_data[i])
+                        }
+                    }
+
+                    lightsData= ArrayList()
+
+                    if(no_group.size>0){
+                        for(i in no_group.indices){
+                            lightsData.add(no_group[i])
+                        }
+                    }
+
+                    if(list_group.size>0){
+                        for(i in list_group.indices){
+                            lightsData.add(list_group[i])
+                        }
+                    }
                     var cwLightGroup=this.intent.getStringExtra("cw_light_name")
                     toolbar!!.tv_function1.visibility = View.VISIBLE
                     recycleView.visibility = View.VISIBLE
@@ -666,8 +738,31 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             }
 
             Constant.INSTALL_LIGHT_OF_RGB -> {
-                lightsData = DBUtils.getAllRGBLight()
-                if (lightsData.size > 0) {
+                var all_light_data = DBUtils.getAllRGBLight()
+                if (all_light_data.size > 0) {
+                    var list_group :ArrayList<DbLight> = ArrayList()
+                    var no_group :ArrayList<DbLight> = ArrayList()
+                    for(i in all_light_data.indices){
+                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                            no_group.add(all_light_data[i])
+                        }else{
+                            list_group.add(all_light_data[i])
+                        }
+                    }
+
+                    lightsData= ArrayList()
+
+                    if(no_group.size>0){
+                        for(i in no_group.indices){
+                            lightsData.add(no_group[i])
+                        }
+                    }
+
+                    if(list_group.size>0){
+                        for(i in list_group.indices){
+                            lightsData.add(list_group[i])
+                        }
+                    }
                     var rgbLightGroup=this.intent.getStringExtra("rgb_light_name")
                     toolbar!!.tv_function1.visibility = View.VISIBLE
                     recycleView.visibility = View.VISIBLE

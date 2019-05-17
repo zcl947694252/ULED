@@ -316,7 +316,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
             }
         }
 
-        diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 5)
+        diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 4)
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter!!.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
@@ -550,7 +550,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>,View.OnTo
             }
         }
 
-        diy_color_recycler_list_view?.layoutManager = GridLayoutManager(this, 5) as RecyclerView.LayoutManager?
+        diy_color_recycler_list_view?.layoutManager = GridLayoutManager(this, 4) as RecyclerView.LayoutManager?
         colorSelectDiyRecyclerViewAdapter = ColorSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter?.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener

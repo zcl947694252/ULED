@@ -88,6 +88,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                     .addOnClickListener(R.id.btn_set)
                     .addOnClickListener(R.id.group_name)
                     .addOnClickListener(R.id.selected_group)
+                    .addOnClickListener(R.id.item_layout)
 //                    .addOnClickListener(R.id.add_group)
         }
 

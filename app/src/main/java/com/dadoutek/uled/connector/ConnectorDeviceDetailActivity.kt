@@ -515,11 +515,34 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun initDate() {
-        lightsData = DBUtils.getAllConnctor()
-
+//        lightsData = DBUtils.getAllConnctor()
         when(type){
             Constant.INSTALL_CONNECTOR -> {
-                if(lightsData.size>0){
+                var all_light_data = DBUtils.getAllConnctor()
+                if (all_light_data.size > 0) {
+                    var list_group : ArrayList<DbConnector> = ArrayList()
+                    var no_group : ArrayList<DbConnector> = ArrayList()
+                    for(i in all_light_data.indices){
+                        if(StringUtils.getConnectorName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                            no_group.add(all_light_data[i])
+                        }else{
+                            list_group.add(all_light_data[i])
+                        }
+                    }
+
+                    lightsData= ArrayList()
+
+                    if(no_group.size>0){
+                        for(i in no_group.indices){
+                            lightsData.add(no_group[i])
+                        }
+                    }
+
+                    if(list_group.size>0){
+                        for(i in list_group.indices){
+                            lightsData.add(list_group[i])
+                        }
+                    }
                     toolbar!!.tv_function1.visibility=View.VISIBLE
                     recycleView.visibility=View.VISIBLE
                     no_device_relativeLayout.visibility=View.GONE
@@ -551,7 +574,31 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
             }
 
             Constant.INSTALL_RELAY_OF ->{
-                if(lightsData.size>0){
+                var all_light_data = DBUtils.getAllConnctor()
+                if (all_light_data.size > 0) {
+                    var list_group : ArrayList<DbConnector> = ArrayList()
+                    var no_group : ArrayList<DbConnector> = ArrayList()
+                    for(i in all_light_data.indices){
+                        if(StringUtils.getConnectorName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                            no_group.add(all_light_data[i])
+                        }else{
+                            list_group.add(all_light_data[i])
+                        }
+                    }
+
+                    lightsData= ArrayList()
+
+                    if(no_group.size>0){
+                        for(i in no_group.indices){
+                            lightsData.add(no_group[i])
+                        }
+                    }
+
+                    if(list_group.size>0){
+                        for(i in list_group.indices){
+                            lightsData.add(list_group[i])
+                        }
+                    }
                     toolbar!!.tv_function1.visibility=View.VISIBLE
                     recycleView.visibility=View.VISIBLE
                     no_device_relativeLayout.visibility=View.GONE

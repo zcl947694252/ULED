@@ -307,6 +307,12 @@ class RelayFragmentList: BaseFragment() {
                         Log.e("TAG", "取消")
                     }
                 }
+
+                R.id.item_layout -> {
+                    intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                    intent.putExtra("group", currentLight)
+                    startActivityForResult(intent, 2)
+                }
             }
 //        }
     }
@@ -392,7 +398,7 @@ class RelayFragmentList: BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_CONNECTOR, activity!!)
                         refreshAndMoveBottom()
                         dialog.dismiss()
                     }

@@ -165,21 +165,21 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun initListener() {
-        KeyboardUtils.registerSoftInputChangedListener(this, KeyboardUtils.OnSoftInputChangedListener {
-            if (it > 0) {
-                if (clThirdPartyLogin.visibility == View.VISIBLE)
-                    clThirdPartyLogin.visibility = View.GONE        //Dismiss third party login if keyboard is show.
-
-            } else {
-                if (clThirdPartyLogin.visibility == View.GONE) {
-                    GlobalScope.launch(Dispatchers.Main) {
-//                        delay(20)
-                        clThirdPartyLogin.visibility = View.VISIBLE     //Display third party login if keyboard isn't show.
-                    }
-
-                }
-            }
-        })
+//        KeyboardUtils.registerSoftInputChangedListener(this, KeyboardUtils.OnSoftInputChangedListener {
+//            if (it > 0) {
+//                if (clThirdPartyLogin.visibility == View.VISIBLE)
+//                    clThirdPartyLogin.visibility = View.GONE        //Dismiss third party login if keyboard is show.
+//
+//            } else {
+//                if (clThirdPartyLogin.visibility == View.GONE) {
+//                    GlobalScope.launch(Dispatchers.Main) {
+////                        delay(20)
+//                        clThirdPartyLogin.visibility = View.VISIBLE     //Display third party login if keyboard isn't show.
+//                    }
+//
+//                }
+//            }
+//        })
 
 
         btn_login.setOnClickListener(this)

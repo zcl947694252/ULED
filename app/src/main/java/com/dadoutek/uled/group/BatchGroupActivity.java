@@ -615,7 +615,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private void setUpGroup() {
-        builder=new AlertDialog.Builder(this);
+        builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.tips);
         builder.setMessage(R.string.tips_message);
 
@@ -634,12 +634,12 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         });
         //设置对话框是可取消的
         builder.setCancelable(false);
-        AlertDialog dialog=builder.create();
+        AlertDialog dialog = builder.create();
         dialog.show();
 
-        Button btn=dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        Button btn = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
         btn.setTextColor(Color.parseColor("#18B4ED"));
-        Button bn=dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        Button bn = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
         bn.setTextColor(Color.parseColor("#333333"));
 //        TextView tvTitle = Objects.requireNonNull(dialog.getWindow()).findViewById(R.id.alertTitle);
 //        tvTitle.setTextColor(Color.GREEN);
@@ -686,11 +686,11 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
 
-        if(lightType.equals("cw_light")){
+        if (lightType.equals("cw_light")) {
             add_relativeLayout.setVisibility(View.GONE);
             add_group.setVisibility(View.GONE);
             groupsBottom.setVisibility(View.GONE);
-        }else{
+        } else {
             groupsBottom.setVisibility(View.VISIBLE);
             if (groups.size() > 0) {
                 groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
@@ -1025,8 +1025,32 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
         List<DbLight> list = DBUtils.INSTANCE.getAllNormalLight();
-        this.adapter = new DeviceListAdapter(list, this);
-        nowLightList.addAll(list);
+        List<DbLight> no_list = new ArrayList<>();
+        List<DbLight> group_list = new ArrayList<>();
+        List<DbLight> all_light =new ArrayList<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.getInstance().getString(R.string.not_grouped))) {
+                no_list.add(list.get(i));
+            } else {
+                group_list.add(list.get(i));
+            }
+        }
+
+        if (no_list.size() > 0) {
+            for (int i = 0; i < no_list.size(); i++){
+                all_light.add(no_list.get(i));
+            }
+        }
+
+        if(group_list.size()>0){
+            for (int i = 0; i < group_list.size(); i++){
+                all_light.add(group_list.get(i));
+            }
+        }
+
+        this.adapter = new DeviceListAdapter(all_light, this);
+        nowLightList.addAll(all_light);
 
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
@@ -1056,7 +1080,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-        if(lightType.equals("cw_light")){
+        if (lightType.equals("cw_light")) {
             toolbar.setTitle(groupLight);
             toolbar.inflateMenu(R.menu.menu_grouping_select_all);
             toolbar.setOnMenuItemClickListener(this);
@@ -1065,7 +1089,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
-        }else{
+        } else {
             toolbar.setTitle(R.string.batch_group);
             toolbar.inflateMenu(R.menu.menu_grouping_select_all);
             toolbar.setOnMenuItemClickListener(this);
@@ -1097,61 +1121,61 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
-        if(lightType.equals("cw_light")){
+        if (lightType.equals("cw_light")) {
             groupLight = intent.getStringExtra("cw_light_group_name");
         }
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();
-            if (groups == null) {
-                groups = new ArrayList<>();
-                List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
+        if (groups == null) {
+            groups = new ArrayList<>();
+            List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
 
-                if (scanCURTAIN) {
-                    for (int i = 0; i < list.size(); i++) {
-                        if (OtherUtils.isNormalGroup(list.get(i))) {
-                            groups.add(list.get(i));
-                        }
+            if (scanCURTAIN) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (OtherUtils.isNormalGroup(list.get(i))) {
+                        groups.add(list.get(i));
                     }
                 }
             }
+        }
 
-            if(lightType.equals("cw_light")){
-                if (groups.size() > 1) {
-                    for (int i = 0; i < groups.size(); i++) {
-                        if (groups.get(i).getName().equals(groupLight)) {
-                            groups.get(i).checked = true;
-                            currentGroupIndex = i;
-                            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
-                                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-                        } else {
-                            groups.get(i).checked = false;
-                        }
+        if (lightType.equals("cw_light")) {
+            if (groups.size() > 0) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (groups.get(i).getName().equals(groupLight)) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
                     }
-                    initHasGroup = true;
-                } else {
-                    initHasGroup = false;
-                    currentGroupIndex = -1;
                 }
-            }else {
-                if (groups.size() > 1) {
-                    for (int i = 0; i < groups.size(); i++) {
-                        if (i ==0) {
-                            groups.get(i).checked = true;
-                            currentGroupIndex = i;
-                            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
-                                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-                        } else {
-                            groups.get(i).checked = false;
-                        }
-                    }
-                    initHasGroup = true;
-                } else {
-                    initHasGroup = false;
-                    currentGroupIndex = -1;
-                }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
             }
+        } else {
+            if (groups.size() > 0) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (i == 0) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
+                }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
+            }
+        }
     }
 
     @Override
