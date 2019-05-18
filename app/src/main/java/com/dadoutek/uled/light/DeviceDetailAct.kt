@@ -185,6 +185,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
 
 
+
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.bindToRecyclerView(recycleView)
@@ -570,6 +571,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun initDate() {
+        lightsData= ArrayList()
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 var all_light_data = DBUtils.getAllNormalLight()
@@ -583,8 +585,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             list_group.add(all_light_data[i])
                         }
                     }
-
-                    lightsData= ArrayList()
 
                     if(no_group.size>0){
                         for(i in no_group.indices){
@@ -639,7 +639,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
 
-                    lightsData= ArrayList()
 
                     if(no_group.size>0){
                         for(i in no_group.indices){
@@ -692,7 +691,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
 
-                    lightsData= ArrayList()
 
                     if(no_group.size>0){
                         for(i in no_group.indices){
@@ -750,7 +748,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
 
-                    lightsData= ArrayList()
 
                     if(no_group.size>0){
                         for(i in no_group.indices){

@@ -165,6 +165,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         showList = ArrayList()
 //        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
         showList = gpList
+
+        curtain= ArrayList()
         when(type){
            Constant.INSTALL_CURTAIN -> {
                var all_light_data = DBUtils.getAllCurtains()
@@ -178,8 +180,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                            list_group.add(all_light_data[i])
                        }
                    }
-
-                   curtain= ArrayList()
 
                    if(no_group.size>0){
                        for(i in no_group.indices){
@@ -233,8 +233,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                         list_group.add(all_light_data[i])
                     }
                 }
-
-                curtain= ArrayList()
 
                 if(no_group.size>0){
                     for(i in no_group.indices){

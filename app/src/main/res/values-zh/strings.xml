@@ -65,7 +65,7 @@
 
     <!-- DeviceSchema Setting -->
     <string name="device_setting_header">灯设置</string>
-    <string name="device_setting_brightness">亮度:%1$s</string>
+    <string name="device_setting_brightness">亮度:</string>
     <string name="device_setting_color">颜色</string>
     <string name="device_setting_temperature">色温:%1$s</string>
     <string name="device_setting_music">音乐</string>
@@ -486,7 +486,7 @@
     <string name="scene_name_show">场景:%1$s</string>
     <string name="name_can_not_null">名字不能为空</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
-    <string name="w_bright">白光亮度:%1$s</string>
+    <string name="w_bright">白光亮度:</string>
     <string name="light_light">小夜灯</string>
     <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
     <string name="light_light_title">小夜灯</string>
@@ -641,4 +641,6 @@
     <string name="tips_message">您还有没有组，是否创建？</string>
     <string name="total">总共</string>
     <string name="piece">个</string>
+    <string name="gradient_mode">渐变模式</string>
+    <string name="color_mode">颜色模式</string>
     </resources>

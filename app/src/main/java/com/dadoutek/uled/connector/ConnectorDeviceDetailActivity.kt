@@ -516,6 +516,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
     private fun initDate() {
 //        lightsData = DBUtils.getAllConnctor()
+        lightsData= ArrayList()
         when(type){
             Constant.INSTALL_CONNECTOR -> {
                 var all_light_data = DBUtils.getAllConnctor()
@@ -530,7 +531,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                         }
                     }
 
-                    lightsData= ArrayList()
 
                     if(no_group.size>0){
                         for(i in no_group.indices){
@@ -585,8 +585,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                             list_group.add(all_light_data[i])
                         }
                     }
-
-                    lightsData= ArrayList()
 
                     if(no_group.size>0){
                         for(i in no_group.indices){

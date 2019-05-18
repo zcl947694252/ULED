@@ -24,6 +24,7 @@ class ColorSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemColorPr
 
         helper.addOnClickListener(R.id.btn_diy_preset)
                 .addOnLongClickListener(R.id.btn_diy_preset)
+                .setText(R.id.diy_preset, if (item.brightness == -1) "" else item.brightness.toString() + "%")
                 //                .setText(R.id.btn_diy_preset, (item.getBrightness()==-1?"":item.getBrightness()+ "%"))
 //                .setBackgroundColor(R.id.btn_diy_preset, -0x1000000 or item.color)
     }

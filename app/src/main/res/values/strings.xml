@@ -73,7 +73,7 @@
 
     <!-- DeviceSchema Setting -->
     <string name="device_setting_header">Light Setting</string>
-    <string name="device_setting_brightness">Brightness:%1$s</string>
+    <string name="device_setting_brightness">Brightness:</string>
     <string name="device_setting_color">Color</string>
     <string name="device_setting_temperature">Color Temperature:%1$s</string>
     <string name="device_setting_music">Music</string>
@@ -537,7 +537,7 @@
     <string name="unnamed">Unnamed</string>
     <string name="stop_scan">Stop scan</string>
     <string name="sure_delete">Confirm deleting this scene？</string>
-    <string name="w_bright">White Brightness:%1$s</string>
+    <string name="w_bright">White Brightness:</string>
     <string name="light_light">Light light</string>
     <string name="light_light_tip">Please switch the night light to the configuration mode first.</string>
     <string name="light_light_title">Night light</string>
@@ -706,4 +706,7 @@
 
     <string name="total">Total</string>
     <string name="piece">piece</string>
+
+    <string name="gradient_mode">Gradient mode</string>
+    <string name="color_mode">Color mode</string>
 </resources>
