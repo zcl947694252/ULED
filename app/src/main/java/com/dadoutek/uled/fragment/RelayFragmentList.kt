@@ -273,7 +273,7 @@ class RelayFragmentList: BaseFragment() {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
-            when (view!!.getId()) {
+            when (view!!.id) {
                 R.id.btn_on -> {
                     Commander.openOrCloseLights(dstAddr, true)
                     updateLights(true, currentLight)

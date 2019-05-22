@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,160 +11,280 @@
         android:id="@+id/topView"
         layout="@layout/toolbar"/>
 
-            <LinearLayout
-                android:id="@+id/btn_mode_top"
+            <!--<ScrollView-->
+            <!--android:id="@+id/scroll_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:background="@color/white"-->
+            <!--android:scrollbars="none"-->
+            <!--app:layout_constraintBottom_toTopOf="@+id/bottomBar"-->
+            <!--app:layout_constraintTop_toTopOf="parent">-->
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/bottom_view"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:visibility="visible"
-                android:layout_marginTop="8dp"
-                app:layout_constraintTop_toBottomOf="@id/topView"
+                android:layout_height="42dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/topView"
                 >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/divider"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/normal_rgb"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/color_mode"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="42dp"
+                    android:background="#eeeeee"
+                    app:layout_constraintEnd_toEndOf="@+id/dynamic_rgb"
+                    app:layout_constraintStart_toStartOf="@+id/normal_rgb"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/dynamic_rgb"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/gradient_mode"
+                    android:textColor="@android:color/holo_blue_light"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/normal_rgb"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+
+            <View
+                android:id="@+id/view7"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#eeeeee"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/bottom_view" />
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/view12"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view7">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/mode_preset_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
                 <TextView
                     android:id="@+id/buildInButton"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
                     android:text="@string/mode_preset"
-                    android:textColor="@color/white"
-                    android:gravity="center"
-                    android:background="@color/primary"
-                    android:layout_marginEnd="1dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    />
+                    android:textColor="@color/black_three"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/buildInButton_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/icon_unselected_rgb"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/buildInButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </android.support.constraint.ConstraintLayout>
+
+            <View
+                android:id="@+id/view8"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#eeeeee"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mode_preset_layout" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/layoutModePreset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view8">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/builtInModeRecycleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </android.support.constraint.ConstraintLayout>
+
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/mode_diy_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutModePreset">
+
+
                 <TextView
                     android:id="@+id/diyButton"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
                     android:text="@string/mode_diy"
-                    android:gravity="center"
-                    android:layout_marginStart="1dp"
-                    android:background="@color/white"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    />
-            </LinearLayout>
+                    android:textColor="@color/black_three"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/layoutModeDiy"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/bottom_view"
-        app:layout_constraintStart_toStartOf="@id/btn_mode_top"
-        app:layout_constraintEnd_toEndOf="@id/btn_mode_top"
-        app:layout_constraintTop_toBottomOf="@id/btn_mode_top"
-        >
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/builtDiyModeRecycleView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/btnAdd"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-
-        </android.support.v7.widget.RecyclerView>
-
-        <Button
-            android:id="@+id/btnAdd"
-            android:text="@string/add"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="@id/builtDiyModeRecycleView"
-            app:layout_constraintEnd_toEndOf="@id/builtDiyModeRecycleView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-    </android.support.constraint.ConstraintLayout>
-
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/layoutModePreset"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/bottom_view"
-        app:layout_constraintStart_toStartOf="@id/btn_mode_top"
-        app:layout_constraintEnd_toEndOf="@id/btn_mode_top"
-        app:layout_constraintTop_toBottomOf="@id/btn_mode_top"
-        >
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/builtInModeRecycleView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/sbSpeed"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-
-        </android.support.v7.widget.RecyclerView>
-
-        <SeekBar
-            android:id="@+id/sbSpeed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/tvSpeed"
-            app:layout_constraintStart_toStartOf="@id/builtInModeRecycleView"
-            app:layout_constraintEnd_toEndOf="@id/builtInModeRecycleView"
-            android:layout_marginTop="8dp"
-            android:max="100"
-            android:padding="5dp"
-            android:progress="10" />
-
-        <TextView
-            android:id="@+id/tvSpeed"
-            android:text="@string/speed_text"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="@id/builtInModeRecycleView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
-    </android.support.constraint.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/diyButton_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/icon_unselected_rgb"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/diyButton"
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/bottom_view"
+            </android.support.constraint.ConstraintLayout>
+
+            <View
+                android:id="@+id/view9"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#eeeeee"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/mode_diy_layout" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/layoutModeDiy"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/view9">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/builtDiyModeRecycleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </android.support.v7.widget.RecyclerView>
+
+            </android.support.constraint.ConstraintLayout>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/btnAdd"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutModeDiy">
+
+
+                <ImageView
+                    android:id="@+id/imageView10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_add_group"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.39"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:text="@string/mode_diy"
+                    android:textColor="@color/blue_background"
+                    android:textSize="17sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView10"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </android.support.constraint.ConstraintLayout>
+
+            <View
+                android:id="@+id/view10"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#eeeeee"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btnAdd" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+
+    <View
+        android:id="@+id/view12"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="1dp"
+        android:background="#00000000"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        tools:layout_editor_absoluteX="65dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/divider"/>
-        <TextView
-            android:id="@+id/normal_rgb"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="RGB"
-            android:textSize="16sp"
-            android:textColor="@android:color/darker_gray"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/dynamic_rgb"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="动态RGB"
-            android:textColor="@android:color/holo_blue_light"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/normal_rgb"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

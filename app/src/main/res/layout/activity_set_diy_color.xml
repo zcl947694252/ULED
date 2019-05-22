@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,111 +11,193 @@
     <include layout="@layout/toolbar" android:id="@+id/topView"/>
     
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/mode_name_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="70dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         app:layout_constraintTop_toBottomOf="@id/topView"
-        app:layout_constraintBottom_toBottomOf="parent"
         >
+
         <TextView
             android:id="@+id/nameTitle"
-            android:text="名称"
-            android:layout_marginTop="10dp"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/primary"
+            android:text="@string/mode_name"
+            android:textSize="18sp"
+            android:textColor="@color/black_three"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <EditText
             android:id="@+id/editName"
-            app:layout_constraintTop_toBottomOf="@id/nameTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
+            android:layout_marginEnd="24dp"
+            android:background="@null"
+            android:hint="@string/please_mode_name"
             android:maxLines="1"
-            />
+            android:singleLine="true"
+            android:textColor="@color/black_three"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/imageView11"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_01"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="#eeeeee"
+        app:layout_constraintTop_toBottomOf="@id/mode_name_layout"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/diy_action_tip"
+            android:textSize="15sp"
+            android:layout_marginStart="9dp"
+            android:textColor="@color/black_nine"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.constraint.ConstraintLayout>
+    
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_02"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/layout_01">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/selectColorRecyclerView"
             android:layout_width="320dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="140dp"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_height="160dp"
-            app:layout_constraintTop_toBottomOf="@id/editName"
-            android:layout_marginTop="15dp"
-            >
-        </android.support.v7.widget.RecyclerView>
-
-        <TextView
-            android:id="@+id/tip"
-            android:textSize="15sp"
-            android:text="@string/diy_action_tip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/selectColorRecyclerView"
-            android:layout_marginTop="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent"/>
 
-        <RadioGroup
-            android:id="@+id/typeSelect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/tip"
-            android:layout_marginTop="15dp"
-            android:visibility="gone"
-            >
-            <RadioButton
-                android:text="@string/str_gradient"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                />
-            <RadioButton
-                android:text="@string/str_jump"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                />
-            <RadioButton
-                android:text="@string/str_strobe"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                />
-        </RadioGroup>
+    </android.support.constraint.ConstraintLayout>
+    
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_03"
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_02"
+        android:layout_marginTop="20dp"
+        android:background="#eeeeee"
+        android:layout_height="35dp">
 
         <TextView
             android:id="@+id/tvSpeed"
-            android:text="@string/tv_speed"
-            android:textSize="15sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/typeSelect"
-            android:layout_marginTop="15dp"
+            android:text="@string/speed_regulation"
+            android:textSize="15sp"
+            android:layout_marginStart="9dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
 
         <SeekBar
             android:id="@+id/sbSpeed"
-            app:layout_constraintTop_toBottomOf="@id/tvSpeed"
+            app:layout_constraintTop_toBottomOf="@id/layout_03"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:max="100"
             android:progress="50"
+            style="@style/SeekBarStyle"
             />
 
-        <Button
-            android:id="@+id/saveNode"
-            android:text="@string/save"
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sbSpeed">
+
+        <ImageView
+            android:id="@+id/speed_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:background="@drawable/add_enabled"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="15dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/speed_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="100%"
+            android:textColor="@color/black_three"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/speed_add"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/speed_less"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/less_enabled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/speed_num"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
     </android.support.constraint.ConstraintLayout>
+
+    <Button
+        android:id="@+id/saveNode"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="38dp"
+        android:layout_marginEnd="38dp"
+        android:text="@string/save"
+        android:background="@drawable/btn_rec_blue_bt"
+        android:textColor="@color/black_three"
+        android:textSize="18sp"
+        android:elevation="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/sbSpeed" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toBottomOf="@+id/saveNode"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
 
 </android.support.constraint.ConstraintLayout>

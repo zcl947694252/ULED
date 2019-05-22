@@ -12,9 +12,12 @@ import java.io.Serializable;
 import java.util.List;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Transient;
+
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbColorNodeDao;
 import com.dadoutek.uled.dao.DbDiyGradientDao;
+import com.google.gson.annotations.Expose;
 
 @Entity
 public class DbDiyGradient implements Parcelable {
@@ -28,6 +31,10 @@ public class DbDiyGradient implements Parcelable {
     private int index;
 
     private Long belongRegionId;
+
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean selected;//选择状态
 
     @ToMany(referencedJoinProperty = "belongDynamicChangeId")
     private List<DbColorNode> colorNodes;
@@ -210,5 +217,13 @@ public class DbDiyGradient implements Parcelable {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

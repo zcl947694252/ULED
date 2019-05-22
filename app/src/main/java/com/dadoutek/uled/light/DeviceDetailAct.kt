@@ -668,6 +668,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                         if (dialog_device?.visibility == View.GONE) {
@@ -779,6 +780,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
+                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                         if (dialog_device?.visibility == View.GONE) {

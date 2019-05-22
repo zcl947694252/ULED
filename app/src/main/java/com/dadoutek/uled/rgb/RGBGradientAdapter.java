@@ -21,7 +21,10 @@ public class RGBGradientAdapter extends BaseItemDraggableAdapter<ItemRgbGradient
     @Override
     protected void convert(BaseViewHolder helper, ItemRgbGradient item) {
             helper.setText(R.id.modeName,item.getName())
-                    .addOnClickListener(R.id.modeName);
+                    .addOnClickListener(R.id.modeName)
+                    .addOnClickListener(R.id.gradient_mode_on)
+                    .addOnClickListener(R.id.gradient_mode_off)
+                    .addOnClickListener(R.id.gradient_mode_set);
         }
 
     }

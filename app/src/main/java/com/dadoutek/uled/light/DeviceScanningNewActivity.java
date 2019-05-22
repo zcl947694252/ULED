@@ -1093,6 +1093,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         tvStopScan.setText(R.string.stop_scan);
         tvStopScan.setOnClickListener(onClick);
         tvStopScan.setVisibility(View.GONE);
+
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
     }
 
     private View.OnClickListener onClick = v -> {

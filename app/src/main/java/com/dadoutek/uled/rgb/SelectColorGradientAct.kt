@@ -5,9 +5,12 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
@@ -24,6 +27,19 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_b
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_g
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_picker
+import kotlinx.android.synthetic.main.activity_select_color_gradient.color_r
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_add
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_less
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_num
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_add
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_less
+import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_num
+import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import top.defaults.colorpicker.ColorObserver
 import java.util.ArrayList
@@ -32,6 +48,11 @@ import javax.xml.transform.Result
 class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
     private var colorNode:DbColorNode?=null
     private var stopTracking = false
+
+    internal var downTime: Long = 0//Button被按下时的时间
+    internal var thisTime: Long = 0//while每次循环时的时间
+    internal var onBtnTouch = false//Button是否被按下
+    internal var tvValue = 0//TextView中的值
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,14 +79,54 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
             false
         }
 
+        sb_w_bright_add!!.setOnTouchListener { v, event ->
+            addWhiteBright(event)
+            true
+        }
+        sb_w_bright_less!!.setOnTouchListener { v, event ->
+            lessWhiteBright(event)
+            true
+        }
+        sbBrightness_add.setOnTouchListener { v, event ->
+            addBrightness(event)
+            true
+        }
+        sbBrightness_less.setOnTouchListener { v, event ->
+            lessBrightness(event)
+            true
+        }
+
         sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
         if(colorNode!!.rgbw==-1){
             sbBrightness.progress=100
             colorNode!!.brightness=100
             sb_w_bright.progress=0
-            tv_brightness_rgb.text = getString(R.string.device_setting_brightness,100)
-            tv_brightness_w.text = getString(R.string.w_bright,0)
+            sbBrightness_num.text =100.toString()+"%"
+            sb_w_bright_num.text = 0.toString()+"%"
+
+            if (sbBrightness!!.progress >= 100) {
+                sbBrightness_add.isEnabled = false
+                sbBrightness_less.isEnabled = true
+            } else if (sbBrightness!!.progress <= 0) {
+                sbBrightness_less.isEnabled = false
+                sbBrightness_add.isEnabled = true
+            } else {
+                sbBrightness_less.isEnabled = true
+                sbBrightness_add.isEnabled = true
+            }
+
+
+            if (sb_w_bright.progress >= 100) {
+                sb_w_bright_add.isEnabled = false
+                sb_w_bright_less.isEnabled = true
+            } else if (sb_w_bright.progress <= 0) {
+                sb_w_bright_less.isEnabled = false
+                sb_w_bright_add.isEnabled = true
+            } else {
+                sb_w_bright_less.isEnabled = true
+                sb_w_bright_add.isEnabled = true
+            }
         }else{
 
             var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
@@ -76,8 +137,31 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
             sbBrightness.progress=colorNode!!.brightness
             sb_w_bright.progress=w
-            tv_brightness_rgb.text = getString(R.string.device_setting_brightness,colorNode!!.brightness)
-            tv_brightness_w.text = getString(R.string.w_bright,w)
+            sbBrightness_num.text = colorNode!!.brightness.toString()+"%"
+            sb_w_bright_num.text = w.toString()+"%"
+
+            if (sbBrightness!!.progress >= 100) {
+                sbBrightness_add.isEnabled = false
+                sbBrightness_less.isEnabled = true
+            } else if (sbBrightness!!.progress <= 0) {
+                sbBrightness_less.isEnabled = false
+                sbBrightness_add.isEnabled = true
+            } else {
+                sbBrightness_less.isEnabled = true
+                sbBrightness_add.isEnabled = true
+            }
+
+
+            if (sb_w_bright.progress >= 100) {
+                sb_w_bright_add.isEnabled = false
+                sb_w_bright_less.isEnabled = true
+            } else if (sb_w_bright.progress <= 0) {
+                sb_w_bright_less.isEnabled = false
+                sb_w_bright_add.isEnabled = true
+            } else {
+                sb_w_bright_less.isEnabled = true
+                sb_w_bright_add.isEnabled = true
+            }
 
             color_r.text = r.toString()
             color_g.text = g.toString()
@@ -190,9 +274,9 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
         private fun onValueChangeView(view: View, progress: Int, immediate: Boolean){
             if (view === sbBrightness) {
-                tv_brightness_rgb.text = getString(R.string.device_setting_brightness, progress.toString() + "")
+                sbBrightness_num.text = progress.toString() + "%"
             } else if (view === sb_w_bright) {
-                tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")
+                sb_w_bright_num.text =  progress.toString() + "%"
             }
         }
 
@@ -207,12 +291,34 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
 
+                if (progress >= 100) {
+                    sbBrightness_add.isEnabled = false
+                    sbBrightness_less.isEnabled = true
+                } else if (progress <= 0) {
+                    sbBrightness_less.isEnabled = false
+                    sbBrightness_add.isEnabled = true
+                } else {
+                    sbBrightness_less.isEnabled = true
+                    sbBrightness_add.isEnabled = true
+                }
+
                 colorNode!!.brightness = progress
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
             } else if (view == sb_w_bright) {
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(progress.toByte())
                 var color = colorNode!!.rgbw
+
+                if (progress >= 100) {
+                    sb_w_bright_add.isEnabled = false
+                    sb_w_bright_less.isEnabled = true
+                } else if (progress <= 0) {
+                    sb_w_bright_less.isEnabled = false
+                    sb_w_bright_add.isEnabled = true
+                } else {
+                    sb_w_bright_add.isEnabled = true
+                    sb_w_bright_less.isEnabled = true
+                }
 
                 val red = (color!! and 0xff0000) shr 16
                 val green = (color and 0x00ff00) shr 8
@@ -221,6 +327,245 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 
                 colorNode?.rgbw = (w shl 24) or (red shl 16) or (green shl 8) or blue
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+            }
+        }
+    }
+    private fun lessBrightness(event: MotionEvent?) {
+        if (event!!.action == MotionEvent.ACTION_DOWN) {
+            //                    tvValue = Integer.parseInt(textView.getText().toString());
+            downTime = System.currentTimeMillis()
+            onBtnTouch = true
+            val t = object : Thread() {
+                override fun run() {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = handler_brightness_less.obtainMessage()
+                            msg.arg1 = tvValue
+                            handler_brightness_less.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                Thread.sleep(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
+
+                        }
+                    }
+                }
+            }
+            t.start()
+        } else if (event.action == MotionEvent.ACTION_UP) {
+            onBtnTouch = false
+            if (thisTime - downTime < 500) {
+                tvValue++
+                val msg = handler_brightness_less.obtainMessage()
+                msg.arg1 = tvValue
+                handler_brightness_less.sendMessage(msg)
+            }
+        } else if (event.action == MotionEvent.ACTION_CANCEL) {
+            onBtnTouch = false
+        }
+    }
+
+    private fun addBrightness(event: MotionEvent?) {
+        if (event!!.action == MotionEvent.ACTION_DOWN) {
+            //                    tvValue = Integer.parseInt(textView.getText().toString());
+            downTime = System.currentTimeMillis()
+            onBtnTouch = true
+            val t = object : Thread() {
+                override fun run() {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = handler_brightness_add.obtainMessage()
+                            msg.arg1 = tvValue
+                            handler_brightness_add.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                Thread.sleep(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
+
+                        }
+                    }
+                }
+            }
+            t.start()
+        } else if (event.action == MotionEvent.ACTION_UP) {
+            onBtnTouch = false
+            if (thisTime - downTime < 500) {
+                tvValue++
+                val msg = handler_brightness_add.obtainMessage()
+                msg.arg1 = tvValue
+                handler_brightness_add.sendMessage(msg)
+            }
+        } else if (event.action == MotionEvent.ACTION_CANCEL) {
+            onBtnTouch = false
+        }
+    }
+
+    private fun lessWhiteBright(event: MotionEvent?) {
+        if (event!!.action == MotionEvent.ACTION_DOWN) {
+            //                    tvValue = Integer.parseInt(textView.getText().toString());
+            downTime = System.currentTimeMillis()
+            onBtnTouch = true
+            val t = object : Thread() {
+                override fun run() {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = handler_less.obtainMessage()
+                            msg.arg1 = tvValue
+                            handler_less.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                Thread.sleep(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
+
+                        }
+                    }
+                }
+            }
+            t.start()
+        } else if (event.action == MotionEvent.ACTION_UP) {
+            onBtnTouch = false
+            if (thisTime - downTime < 500) {
+                tvValue++
+                val msg = handler_less.obtainMessage()
+                msg.arg1 = tvValue
+                handler_less.sendMessage(msg)
+            }
+        } else if (event.action == MotionEvent.ACTION_CANCEL) {
+            onBtnTouch = false
+        }
+    }
+
+    private fun addWhiteBright(event: MotionEvent?) {
+        if (event!!.action == MotionEvent.ACTION_DOWN) {
+            //                    tvValue = Integer.parseInt(textView.getText().toString());
+            downTime = System.currentTimeMillis()
+            onBtnTouch = true
+            val t = object : Thread() {
+                override fun run() {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = handler.obtainMessage()
+                            msg.arg1 = tvValue
+                            handler.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                Thread.sleep(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
+
+                        }
+                    }
+                }
+            }
+            t.start()
+        } else if (event.action == MotionEvent.ACTION_UP) {
+            onBtnTouch = false
+            if (thisTime - downTime < 500) {
+                tvValue++
+                val msg = handler.obtainMessage()
+                msg.arg1 = tvValue
+                handler.sendMessage(msg)
+            }
+        } else if (event.action == MotionEvent.ACTION_CANCEL) {
+            onBtnTouch = false
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private val handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            sb_w_bright.progress++
+            if (sb_w_bright.progress > 100) {
+                sb_w_bright_add.isEnabled = false
+                stopTracking = false
+                onBtnTouch = false
+            } else if (sb_w_bright.progress == 100) {
+                sb_w_bright_add.isEnabled = false
+                sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                stopTracking = false
+                onBtnTouch = false
+            } else {
+                sb_w_bright_add.isEnabled = true
+                stopTracking = true
+            }
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private val handler_brightness_add = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            sbBrightness.progress++
+            if (sbBrightness.progress > 100) {
+                sbBrightness_add.isEnabled = false
+                stopTracking = false
+                onBtnTouch = false
+            } else if (sbBrightness.progress == 100) {
+                sbBrightness_add.isEnabled = false
+                sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                stopTracking = false
+                onBtnTouch = false
+            } else {
+                sbBrightness_add.isEnabled = true
+                stopTracking = true
+            }
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private val handler_brightness_less = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            sbBrightness.progress--
+            if (sbBrightness.progress < 0) {
+                sbBrightness_less.isEnabled = false
+                stopTracking = false
+                onBtnTouch = false
+            } else if (sbBrightness.progress ==0) {
+                sbBrightness_less.isEnabled = false
+                sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                stopTracking = false
+                onBtnTouch = false
+            } else {
+                sbBrightness_less.isEnabled = true
+                stopTracking = true
+            }
+        }
+    }
+
+    @SuppressLint("HandlerLeak")
+    private val handler_less = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            sb_w_bright.progress--
+            if (sb_w_bright.progress < 0) {
+                sb_w_bright_less.isEnabled = false
+                stopTracking = false
+                onBtnTouch = false
+            } else if (sb_w_bright.progress == 0) {
+                sb_w_bright_less.isEnabled = false
+                sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                stopTracking = false
+                onBtnTouch = false
+            } else {
+                sb_w_bright_less.isEnabled = true
+                stopTracking = true
             }
         }
     }

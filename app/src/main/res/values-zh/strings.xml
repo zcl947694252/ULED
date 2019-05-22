@@ -504,14 +504,14 @@
     <string name="get_update_file">获取升级包...</string>
     <string name="firware_version">固件版本号:%1$s</string>
     <string name="mode_preset">内置模式</string>
-    <string name="mode_diy">自定义</string>
+    <string name="mode_diy">自定义模式</string>
     <string name="please_check_group">请选择分组:</string>
     <string name="tv_speed">速度:%1$s</string>
     <string name="str_gradient">渐变</string>
     <string name="str_jump">跳变</string>
     <string name="str_strobe">频闪</string>
     <string name="save">保存</string>
-    <string name="diy_action_tip">*点击按钮修改颜色,长按删除颜色</string>
+    <string name="diy_action_tip">点击按钮修改颜色,长按删除颜色</string>
     <string name="color_check">颜色选择</string>
     <string name="name_not_null_tip">名称不可以为空</string>
     <string name="mode_str">模式</string>
@@ -643,4 +643,13 @@
     <string name="piece">个</string>
     <string name="gradient_mode">渐变模式</string>
     <string name="color_mode">颜色模式</string>
+    
+    <string name="stop_model">停</string>
+    <string name="white_light_regulation">白光调节:</string>
+    <string name="bright_regulation">亮度调节:</string>
+    <string name="mode_name">模式名称:</string>
+    <string name="please_mode_name">请输入模式名称:</string>
+    <string name="no_color">暂无</string>
+    <string name="speed_regulation">速度调节:</string>
+    <string name="delete_model">确定删除此模式吗？</string>
     </resources>
