@@ -717,4 +717,6 @@
     <string name="no_color">No</string>
     <string name="speed_regulation">Speed regulation:</string>
     <string name="delete_model">Are you sure you want to delete this mode?</string>
+
+    <string name="choose_color">choose color:</string>
 </resources>

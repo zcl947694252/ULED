@@ -39,14 +39,13 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                 helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + num + TelinkLightApplication.getInstance().getString(R.string.piece))
             }
 
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && num == 0) {
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && num == 0 || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && num == 0 || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR && num == 0) {
                 gpImageView.setImageResource(R.drawable.icon_open_group_no)
                 gpSet.setImageResource(R.drawable.icon_device_group)
-            }else if(group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL){
+            } else if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
                 gpImageView.setImageResource(R.drawable.icon_open_group_no)
                 gpSet.setImageResource(R.drawable.icon_device_group)
-            }
-            else {
+            } else {
                 gpImageView.setImageResource(R.drawable.icon_open_group)
                 gpSet.setImageResource(R.drawable.icon_setting_group)
             }

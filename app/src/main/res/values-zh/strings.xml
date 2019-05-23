@@ -652,4 +652,5 @@
     <string name="no_color">暂无</string>
     <string name="speed_regulation">速度调节:</string>
     <string name="delete_model">确定删除此模式吗？</string>
+    <string name="choose_color">选择颜色:</string>
     </resources>

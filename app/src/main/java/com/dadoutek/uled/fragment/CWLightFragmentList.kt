@@ -102,6 +102,8 @@ class CWLightFragmentList : BaseFragment() {
 
     private var addNewGroup: Button? = null
 
+    private var layout :ConstraintLayout? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
@@ -186,6 +188,7 @@ class CWLightFragmentList : BaseFragment() {
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
+        layout = view.findViewById(R.id.layout)
         return view
     }
 
