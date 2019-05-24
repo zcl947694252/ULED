@@ -191,7 +191,7 @@
     <string name="scene_edit">修改</string>
     <string name="create_scene">添加场景</string>
     <string name="edit_scene">修改场景</string>
-    <string name="tv_scene_name">场景名：</string>
+    <string name="tv_scene_name">场景名称：</string>
     <string name="plaese_input_scene_name">请输入场景名称</string>
     <string name="scene_tip">最少添加一个组</string>
     <string name="scene_name">场景</string>
@@ -653,4 +653,5 @@
     <string name="speed_regulation">速度调节:</string>
     <string name="delete_model">确定删除此模式吗？</string>
     <string name="choose_color">选择颜色:</string>
+    <string name="group_list">分组列表</string>
     </resources>

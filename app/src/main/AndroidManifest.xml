@@ -253,7 +253,8 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".othersview.SelectColorAct"
-            android:screenOrientation="portrait" />
+            android:theme="@style/MyDialogStyleBottom"
+            />
         <activity
             android:name=".light.ConfigNightlightActivity"
             android:screenOrientation="portrait" />

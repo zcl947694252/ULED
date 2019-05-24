@@ -29,14 +29,23 @@ public class DbSceneActions {
 
     private int deviceType;
 
+    private int circleOne;
+
+    private int circleTwo;
+
+    private int circleThree;
+
+    private int circleFour;
+
     @Generated(hash = 885919265)
     public DbSceneActions() {
     }
 
-    @Generated(hash = 1303864798)
+    @Generated(hash = 285814307)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
             int colorTemperature, int brightness, int color, boolean isOn,
-            int deviceType) {
+            int deviceType, int circleOne, int circleTwo, int circleThree,
+            int circleFour) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
@@ -45,6 +54,10 @@ public class DbSceneActions {
         this.color = color;
         this.isOn = isOn;
         this.deviceType = deviceType;
+        this.circleOne = circleOne;
+        this.circleTwo = circleTwo;
+        this.circleThree = circleThree;
+        this.circleFour = circleFour;
     }
 
     public Long getId() {
@@ -109,5 +122,37 @@ public class DbSceneActions {
 
     public void setDeviceType(int deviceType) {
         this.deviceType = deviceType;
+    }
+
+    public int getCircleOne() {
+        return this.circleOne;
+    }
+
+    public void setCircleOne(int circleOne) {
+        this.circleOne = circleOne;
+    }
+
+    public int getCircleTwo() {
+        return this.circleTwo;
+    }
+
+    public void setCircleTwo(int circleTwo) {
+        this.circleTwo = circleTwo;
+    }
+
+    public int getCircleThree() {
+        return this.circleThree;
+    }
+
+    public void setCircleThree(int circleThree) {
+        this.circleThree = circleThree;
+    }
+
+    public int getCircleFour() {
+        return this.circleFour;
+    }
+
+    public void setCircleFour(int circleFour) {
+        this.circleFour = circleFour;
     }
 }

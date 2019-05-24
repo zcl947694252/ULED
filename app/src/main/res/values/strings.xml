@@ -719,4 +719,5 @@
     <string name="delete_model">Are you sure you want to delete this mode?</string>
 
     <string name="choose_color">choose color:</string>
+    <string name="group_list">Group list</string>
 </resources>

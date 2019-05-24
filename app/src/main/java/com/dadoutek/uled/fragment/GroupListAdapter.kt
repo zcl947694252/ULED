@@ -22,9 +22,22 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
     override fun convert(helper: BaseViewHolder, group: DbGroup?) {
 
         if (group != null) {
+            var lightNum = 0
+            var relayNum = 0
+            var curtianNum = 0
             var gpImageView = helper.getView<ImageView>(R.id.btn_on)
             var gpSet = helper.getView<ImageView>(R.id.btn_set)
-            var num = DBUtils.getLightByGroupID(group.id).size
+            if(group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL ||group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB){
+                lightNum = DBUtils.getLightByGroupID(group.id).size
+            }
+
+            if(group.deviceType == Constant.DEVICE_TYPE_CURTAIN){
+                curtianNum = DBUtils.getConnectorByGroupID(group.id).size
+            }
+
+            if(group.deviceType == Constant.DEVICE_TYPE_CONNECTOR){
+                relayNum = DBUtils.getConnectorByGroupID(group.id).size
+            }
 
             val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
             if (isDelete) {
@@ -33,13 +46,28 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                 deleteIcon.visibility = View.GONE
             }
 
-            if (num == 0) {
-                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece))
-            } else {
-                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + num + TelinkLightApplication.getInstance().getString(R.string.piece))
+            if(group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB){
+                if (lightNum == 0) {
+                    helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece))
+                } else {
+                    helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + lightNum + TelinkLightApplication.getInstance().getString(R.string.piece))
+                }
+            }else if(group.deviceType == Constant.DEVICE_TYPE_CONNECTOR){
+                if (relayNum == 0) {
+                    helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece))
+                } else {
+                    helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) +  relayNum + TelinkLightApplication.getInstance().getString(R.string.piece))
+                }
+            }else if(group.deviceType == Constant.DEVICE_TYPE_CURTAIN){
+                if (curtianNum == 0) {
+                    helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece))
+                } else {
+                    helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) +  curtianNum + TelinkLightApplication.getInstance().getString(R.string.piece))
+                }
             }
 
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && num == 0 || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && num == 0 || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR && num == 0) {
+
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && lightNum == 0 || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && lightNum == 0 || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR && relayNum == 0 ||group.deviceType == Constant.DEVICE_TYPE_CURTAIN && curtianNum == 0) {
                 gpImageView.setImageResource(R.drawable.icon_open_group_no)
                 gpSet.setImageResource(R.drawable.icon_device_group)
             } else if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {

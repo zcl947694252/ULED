@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.view.LayoutInflater
@@ -46,6 +47,7 @@ import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import com.chad.library.adapter.base.BaseQuickAdapter.OnItemLongClickListener
 
 import java.util.ArrayList
 
@@ -95,11 +97,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-            if (view.getId() == R.id.scene_delete) {
+//            if (view.getId() == R.id.scene_delete) {
                 //                dataManager.deleteScene(scenesListData.get(position));
-                showDeleteDialog(adapter, position)
+//                showDeleteDialog(adapter, position)
                 //            refreshData();
-            } else if (view.getId() == R.id.scene_edit) {
+//            } else
+            if (view.getId() == R.id.scene_edit) {
                 //                setScene(scenesListData.get(position).getId());
                 val scene = scenesListData!![position]
                 val intent = Intent(activity, NewSceneSetAct::class.java)
@@ -209,7 +212,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btn_add = toolbar!!.findViewById<ImageView>(R.id.img_function1)
         val btn_delete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
-        btn_add.visibility = View.VISIBLE
+//        btn_add.visibility = View.VISIBLE
         btn_delete.visibility = View.VISIBLE
 
         btn_add.setOnClickListener(this)
@@ -282,6 +285,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun initData() {
         telinkLightApplication = this.activity!!.application as TelinkLightApplication
         scenesListData = DBUtils.sceneList
+
+        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+        toolbar!!.navigationIcon = null
+        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.setTitle(R.string.scene_name)
     }
 
     private fun initView() {
@@ -309,9 +318,41 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
         adaper!!.setOnItemClickListener(onItemClickListener)
         adaper!!.setOnItemChildClickListener(onItemChildClickListener)
+        adaper!!.onItemLongClickListener = onItemChildLongClickListener
         adaper!!.bindToRecyclerView(recyclerView)
 
+        isDelete = false
+        adaper!!.changeState(isDelete)
+        adaper!!.notifyDataSetChanged()
+
 //        add_scenes!!.setOnClickListener(this)
+    }
+
+    var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
+        isDelete = true
+        adaper!!.changeState(isDelete)
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
+        toolbar!!.title = ""
+        setBack()
+        adaper!!.notifyDataSetChanged()
+//        refreshData()
+        return@OnItemLongClickListener true
+    }
+
+    private fun setBack() {
+        toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar!!.setNavigationOnClickListener {
+            toolbar!!.setTitle(R.string.scene_name)
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+            toolbar!!.navigationIcon = null
+            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            isDelete = false
+            adaper!!.changeState(isDelete)
+            adaper!!.notifyDataSetChanged()
+        }
     }
 
     private fun showDeleteDialog(adapter: BaseQuickAdapter<*, *>, position: Int) {
@@ -320,6 +361,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
             deleteScene(position)
             adapter.notifyItemRemoved(position)
+            refreshData()
         }
         builder.setNegativeButton(activity!!.getString(R.string.cancel)) { dialog, which -> }
         val dialog = builder.show()
@@ -392,13 +434,57 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             //            initView();
             //            showLoadingDialog("ss");
             refreshAllData()
+            refreshView()
             initOnLayoutListener(1)
         } else {
             if (activity != null) {
                 //                initOnLayoutListener(2);
+                refreshView()
             }
         }
 
+    }
+
+    private fun refreshView() {
+        if (activity != null) {
+            scenesListData = DBUtils.sceneList
+            if (scenesListData!!.size > 0) {
+                recyclerView!!.visibility = View.VISIBLE
+                no_scene!!.visibility = View.GONE
+                addNewScene!!.visibility = View.VISIBLE
+            } else {
+                recyclerView!!.visibility = View.GONE
+                no_scene!!.visibility = View.VISIBLE
+                addNewScene!!.visibility = View.GONE
+            }
+            val layoutmanager = LinearLayoutManager(activity)
+            layoutmanager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView!!.layoutManager = layoutmanager
+            //添加分割线
+            val decoration = DividerItemDecoration(activity!!,
+                    DividerItemDecoration
+                            .VERTICAL)
+            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+                    .divider)))
+            recyclerView!!.addItemDecoration(decoration)
+            //添加Item变化动画
+            recyclerView!!.itemAnimator = DefaultItemAnimator()
+            adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
+            adaper!!.setOnItemClickListener(onItemClickListener)
+            adaper!!.setOnItemChildClickListener(onItemChildClickListener)
+            adaper!!.onItemLongClickListener = onItemChildLongClickListener
+            adaper!!.bindToRecyclerView(recyclerView)
+
+            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+            toolbar!!.navigationIcon = null
+            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            toolbar!!.setTitle(R.string.scene_name)
+
+            isDelete = false
+            adaper!!.changeState(isDelete)
+            adaper!!.notifyDataSetChanged()
+        }
     }
 
     private fun refreshAllData() {
@@ -435,6 +521,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             adaper!!.setNewData(scenesListData)
             diffResult.dispatchUpdatesTo(adaper!!)
         }
+
     }
 
     private fun loadData(): MutableList<DbScene> {
@@ -445,16 +532,16 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_delete -> {
-                if (isDelete) {
-                    isDelete = false
-                } else {
-                    isDelete = true
-                }
-
-                adaper!!.changeState(isDelete)
-                refreshData()
-            }
+//            R.id.menu_delete -> {
+////                if (isDelete) {
+////                    isDelete = false
+////                } else {
+////                    isDelete = true
+////                }
+////
+////                adaper!!.changeState(isDelete)
+////                refreshData()
+////            }
             R.id.menu_install -> if (!SharedPreferencesUtils.getConnectState(activity)) {
                 //                    return;
             } else {
@@ -473,14 +560,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun onClick(v: View) {
         when (v.id) {
             R.id.img_function2 -> {
-                if (isDelete) {
-                    isDelete = false
-                } else {
-                    isDelete = true
-                }
-
-                adaper!!.changeState(isDelete)
-                refreshData()
+//                if (isDelete) {
+//                    isDelete = false
+//                } else {
+//                    isDelete = true
+//                }
+//
+//                adaper!!.changeState(isDelete)
+//                refreshData()
             }
             R.id.img_function1 -> {
                 isGuide = false

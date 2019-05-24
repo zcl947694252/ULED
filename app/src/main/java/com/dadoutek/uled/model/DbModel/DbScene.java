@@ -13,8 +13,11 @@ import java.util.List;
 import com.dadoutek.uled.dao.DbSceneActionsDao;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Transient;
+
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbSceneDao;
+import com.google.gson.annotations.Expose;
 
 /**
  * Created by hejiajun on 2018/5/5.
@@ -35,6 +38,10 @@ public class DbScene implements Parcelable{
 
     @ToMany(referencedJoinProperty = "belongSceneId")
     private List<DbSceneActions> actions;
+
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean selected;//选择状态
 
     protected DbScene(Parcel in) {
         if (in.readByte() == 0) {
@@ -208,5 +215,13 @@ public class DbScene implements Parcelable{
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

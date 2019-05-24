@@ -1005,14 +1005,26 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             presetColors?.get(position)!!.color = light!!.color
             presetColors?.get(position)!!.brightness = light!!.brightness
         }
-        val textView = adapter.getViewByPosition(position, R.id.diy_preset) as TextView?
-        try {
-            textView!!.text = group!!.brightness.toString() + "%"
-            textView.setBackgroundColor(0xff000000.toInt() or group!!.color)
-            SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
+        if(currentShowGroupSetPage){
+            try {
+//                textView!!.text = group!!.brightness.toString() + "%"
+                textView?.setChecked(true,0xff000000.toInt() or group!!.color)
+                SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }else{
+            try {
+//                textView!!.text = group!!.brightness.toString() + "%"
+                textView?.setChecked(true,0xff000000.toInt() or light!!.color)
+                SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+
+
         true
     }
 

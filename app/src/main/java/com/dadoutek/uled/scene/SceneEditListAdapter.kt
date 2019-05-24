@@ -2,6 +2,8 @@ package com.dadoutek.uled.scene
 
 import android.content.Context
 import android.view.View
+import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
 
@@ -22,19 +24,25 @@ import java.util.Objects
 class SceneEditListAdapter(layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        val tvState = helper.getView<TextView>(R.id.group_check_state)
+        val tvState = helper.getView<ImageView>(R.id.scene_delete)
          helper.setText(R.id.group_name,item.name)
         if (item.isChecked) {
-            tvState.text = mContext.getString(R.string.selected)
-            tvState.setTextColor(mContext.resources.getColor(R.color.white))
-            tvState.setBackgroundColor(mContext.resources.getColor(R.color.primary))
+//            tvState.text = mContext.getString(R.string.selected)
+//            tvState.setTextColor(mContext.resources.getColor(R.color.white))
+//            tvState.setBackgroundColor(mContext.resources.getColor(R.color.primary))
+//            tvState.isEnabled = false
+            helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_selected)
         } else {
-            tvState.text = mContext.getString(R.string.unSelect)
-            tvState.setBackgroundColor(mContext.resources.getColor(R.color.white))
+//            tvState.text = mContext.getString(R.string.unSelect)
+//            tvState.setBackgroundColor(mContext.resources.getColor(R.color.white))
             if(item.enableCheck){
-                tvState.setTextColor(mContext.resources.getColor(R.color.primary))
+//                tvState.setTextColor(mContext.resources.getColor(R.color.primary))
+//                tvState.isEnabled = true
+                helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_unselected)
             }else{
-                tvState.setTextColor(mContext.resources.getColor(R.color.gray))
+//                tvState.setTextColor(mContext.resources.getColor(R.color.gray))
+//                tvState.isEnabled = false
+                helper.setImageResource(R.id.scene_delete,R.drawable.icon_checkbox_unselected)
             }
         }
     }

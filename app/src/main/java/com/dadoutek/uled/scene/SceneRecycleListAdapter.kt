@@ -54,6 +54,12 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
                 deleteIcon.visibility = View.GONE
             }
 
+            if (scene.isSelected) {
+                helper.setChecked(R.id.scene_delete, true)
+            } else {
+                helper.setChecked(R.id.scene_delete, false)
+            }
+
             helper.setText(R.id.scene_name, scene.name)
                     .addOnClickListener(R.id.scene_delete)
                     .addOnClickListener(R.id.scene_edit)

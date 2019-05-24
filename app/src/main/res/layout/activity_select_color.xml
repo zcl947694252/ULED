@@ -1,17 +1,32 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
+    android:background="@android:color/white">
 
-    <include layout="@layout/toolbar" />
+    <!--<include layout="@layout/toolbar" />-->
 
     <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="400dp"
         android:background="@color/white"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="50dp"
+            android:layout_height="20dp"
+            android:text="@string/btn_sure"
+            android:background="@null"
+            android:textSize="15sp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black_three"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/ll_r"
@@ -94,16 +109,15 @@
             android:id="@+id/color_picker"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:gravity="center"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginTop="32dp"
+            android:gravity="center"
+            app:enableBrightness="false"
+            app:layout_constraintBottom_toTopOf="@+id/tip"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/tip"
-            app:enableBrightness="false"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/tip"
@@ -113,9 +127,10 @@
             android:orientation="vertical"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"
+            android:paddingBottom="24dp"
             android:visibility="visible"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/brightness">
+            app:layout_constraintBottom_toTopOf="@+id/brightness"
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:layout_width="match_parent"
@@ -127,10 +142,11 @@
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/diy_color_recycler_list_view"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="5dp" />
+                />
 
         </LinearLayout>
 
@@ -140,10 +156,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="visible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            >
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@+id/tv_brightness_w"
@@ -151,23 +166,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:padding="5dp"
-                android:text="@string/w_bright" />
+                android:text="@string/w_bright"
+                android:visibility="gone" />
 
             <SeekBar
                 android:id="@+id/sb_w_bright"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
+                android:visibility="gone"
                 android:padding="6dp" />
-
-            <Button
-                android:id="@+id/btn_save"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="15dp"
-                android:text="@string/btn_sure"
-                />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

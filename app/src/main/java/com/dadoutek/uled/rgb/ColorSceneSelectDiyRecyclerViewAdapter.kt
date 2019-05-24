@@ -1,5 +1,6 @@
 package com.dadoutek.uled.rgb
 
+import android.graphics.drawable.GradientDrawable
 import android.widget.TextView
 
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -12,9 +13,14 @@ import com.dadoutek.uled.util.Dot
  * Created by hejiajun on 2018/3/28.
  */
 
-class ColorSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemColorPreset>?) : BaseQuickAdapter<ItemColorPreset, BaseViewHolder>(layoutResId, data) {
+class ColorSceneSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemColorPreset>?) : BaseQuickAdapter<ItemColorPreset, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: ItemColorPreset) {
+//        helper.addOnClickListener(R.id.btn_diy_preset)
+//                .addOnLongClickListener(R.id.btn_diy_preset)
+//                .setText(R.id.diy_preset, "")
+//                .setBackgroundColor(R.id.btn_diy_preset, -0x1000000 or item.color)
+
 
         var doc = helper.getView<Dot>(R.id.btn_diy_preset)
 
@@ -25,7 +31,5 @@ class ColorSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemColorPr
         helper.addOnClickListener(R.id.btn_diy_preset)
                 .addOnLongClickListener(R.id.btn_diy_preset)
                 .setText(R.id.diy_preset, if (item.brightness == -1) "" else item.brightness.toString() + "%")
-                //                .setText(R.id.btn_diy_preset, (item.getBrightness()==-1?"":item.getBrightness()+ "%"))
-//                .setBackgroundColor(R.id.btn_diy_preset, -0x1000000 or item.color)
     }
 }

@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black_ee"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include layout="@layout/toolbar" android:id="@+id/top_title"/>
@@ -19,6 +20,7 @@
 
         <TextView
             android:id="@+id/tv_scene_name"
+            android:visibility="gone"
             android:text="@string/scene_name_show"
             android:textColor="@color/primary"
             android:layout_width="match_parent"
@@ -31,11 +33,11 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView_group_list_view"
             android:layout_width="match_parent"
-            android:background="@drawable/btn_rectangle_all"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
+            android:elevation="20dp"
             />
     </LinearLayout>
 
@@ -50,18 +52,18 @@
         >
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
+            android:background="@color/white"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:textSize="16sp"
                 android:text="@string/tv_scene_name"
+                android:textSize="18sp"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/black_three"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -70,63 +72,59 @@
                 android:id="@+id/edit_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="18dp"
                 android:hint="@string/plaese_input_scene_name"
+                android:textColorHint="#c8c8c8"
                 android:lines="1"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:maxLength="16"
-                android:textSize="16sp"
+                android:textSize="18sp"
+                android:background="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_sure_edit"
-                app:layout_constraintStart_toEndOf="@+id/textView"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <ImageView
                 android:id="@+id/btn_sure_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@android:string/ok"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/icon_arrow"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </android.support.constraint.ConstraintLayout>
 
         <TextView
-            android:text="@string/please_check_group_tip"
-            android:textSize="16sp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:text="@string/group_list"
+            android:textSize="15sp"
+            android:textColor="@color/black_nine"
+            android:layout_marginStart="10dp"
             android:layout_width="match_parent"
             android:gravity="center_vertical"
-            android:background="@color/primary"
-            android:paddingStart="10dp"
             android:layout_height="40dp" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerView_select_group_list_view"
                 android:layout_width="match_parent"
-                android:background="@drawable/btn_rectangle_all"
                 android:layout_height="match_parent"
-                android:layout_margin="8dp"
+                android:background="@color/white"
+                android:elevation="10dp"
                  />
     </LinearLayout>
 
     <Button
         android:id="@+id/confirm"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="44dp"
         android:layout_alignParentBottom="true"
         android:background="@drawable/btn_rec_blue_bt"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginStart="38dp"
+        android:textColor="@color/black_three"
+        android:textSize="18sp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:foreground="?android:attr/selectableItemBackground"
         android:text="@string/btn_sure" />

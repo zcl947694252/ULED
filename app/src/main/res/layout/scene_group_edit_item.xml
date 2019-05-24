@@ -7,7 +7,7 @@
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         >
 
     <TextView
@@ -17,22 +17,19 @@
         android:text="group1"
         android:textColor="@color/black"
         android:layout_centerVertical="true"
-        android:textSize="16sp"
+        android:textSize="18sp"
+        android:layout_marginStart="10dp"
         />
 
-    <TextView
-        android:id="@+id/group_check_state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:text="选中"
-        android:padding="3dp"
-        android:background="@color/primary"
-        android:textColor="@color/white"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        />
+        <ImageView
+            android:id="@+id/scene_delete"
+            android:src="@drawable/icon_checkbox_unselected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            />
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

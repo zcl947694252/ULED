@@ -35,6 +35,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         public final static Property Color = new Property(5, int.class, "color", false, "COLOR");
         public final static Property IsOn = new Property(6, boolean.class, "isOn", false, "IS_ON");
         public final static Property DeviceType = new Property(7, int.class, "deviceType", false, "DEVICE_TYPE");
+        public final static Property CircleOne = new Property(8, int.class, "circleOne", false, "CIRCLE_ONE");
+        public final static Property CircleTwo = new Property(9, int.class, "circleTwo", false, "CIRCLE_TWO");
+        public final static Property CircleThree = new Property(10, int.class, "circleThree", false, "CIRCLE_THREE");
+        public final static Property CircleFour = new Property(11, int.class, "circleFour", false, "CIRCLE_FOUR");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -58,7 +62,11 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
                 "\"BRIGHTNESS\" INTEGER NOT NULL ," + // 4: brightness
                 "\"COLOR\" INTEGER NOT NULL ," + // 5: color
                 "\"IS_ON\" INTEGER NOT NULL ," + // 6: isOn
-                "\"DEVICE_TYPE\" INTEGER NOT NULL );"); // 7: deviceType
+                "\"DEVICE_TYPE\" INTEGER NOT NULL ," + // 7: deviceType
+                "\"CIRCLE_ONE\" INTEGER NOT NULL ," + // 8: circleOne
+                "\"CIRCLE_TWO\" INTEGER NOT NULL ," + // 9: circleTwo
+                "\"CIRCLE_THREE\" INTEGER NOT NULL ," + // 10: circleThree
+                "\"CIRCLE_FOUR\" INTEGER NOT NULL );"); // 11: circleFour
     }
 
     /** Drops the underlying database table. */
@@ -82,6 +90,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(6, entity.getColor());
         stmt.bindLong(7, entity.getIsOn() ? 1L: 0L);
         stmt.bindLong(8, entity.getDeviceType());
+        stmt.bindLong(9, entity.getCircleOne());
+        stmt.bindLong(10, entity.getCircleTwo());
+        stmt.bindLong(11, entity.getCircleThree());
+        stmt.bindLong(12, entity.getCircleFour());
     }
 
     @Override
@@ -99,6 +111,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         stmt.bindLong(6, entity.getColor());
         stmt.bindLong(7, entity.getIsOn() ? 1L: 0L);
         stmt.bindLong(8, entity.getDeviceType());
+        stmt.bindLong(9, entity.getCircleOne());
+        stmt.bindLong(10, entity.getCircleTwo());
+        stmt.bindLong(11, entity.getCircleThree());
+        stmt.bindLong(12, entity.getCircleFour());
     }
 
     @Override
@@ -116,7 +132,11 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
             cursor.getInt(offset + 4), // brightness
             cursor.getInt(offset + 5), // color
             cursor.getShort(offset + 6) != 0, // isOn
-            cursor.getInt(offset + 7) // deviceType
+            cursor.getInt(offset + 7), // deviceType
+            cursor.getInt(offset + 8), // circleOne
+            cursor.getInt(offset + 9), // circleTwo
+            cursor.getInt(offset + 10), // circleThree
+            cursor.getInt(offset + 11) // circleFour
         );
         return entity;
     }
@@ -131,6 +151,10 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         entity.setColor(cursor.getInt(offset + 5));
         entity.setIsOn(cursor.getShort(offset + 6) != 0);
         entity.setDeviceType(cursor.getInt(offset + 7));
+        entity.setCircleOne(cursor.getInt(offset + 8));
+        entity.setCircleTwo(cursor.getInt(offset + 9));
+        entity.setCircleThree(cursor.getInt(offset + 10));
+        entity.setCircleFour(cursor.getInt(offset + 11));
      }
     
     @Override
