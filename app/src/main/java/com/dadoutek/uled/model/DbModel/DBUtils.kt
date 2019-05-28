@@ -313,6 +313,11 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
+    fun getActionBySwitchId(id: Long): ArrayList<DbSwitch> {
+        val query = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.BelongGroupId.eq(id)).build()
+        return ArrayList(query.list())
+    }
+
     fun getActionsBySceneId(id: Long): ArrayList<DbSceneActions> {
         val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
         return ArrayList(query.list())
