@@ -68,6 +68,8 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                 } else {
                     helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + curtianNum + TelinkLightApplication.getInstance().getString(R.string.piece))
                 }
+            }else if(group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL){
+                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece))
             }
 
 

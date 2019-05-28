@@ -240,6 +240,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun initType() {
+        ll_r.setOnClickListener(this.clickListener)
+        ll_g.setOnClickListener(this.clickListener)
+        ll_b.setOnClickListener(this.clickListener)
         val type = intent.getStringExtra(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
@@ -303,6 +306,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
         dynamic_rgb!!.setOnClickListener(this.clickListener)
+//        ll_r.setOnClickListener(this.clickListener)
+//        ll_g.setOnClickListener(this.clickListener)
+//        ll_b.setOnClickListener(this.clickListener)
 //        sbBrightness_add!!.setOnClickListener(this.clickListener)
 //        sbBrightness_less!!.setOnClickListener(this.clickListener)
 //        sb_w_bright_add!!.setOnClickListener(this.clickListener)
@@ -602,7 +608,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 sbBrightness_less.isEnabled = false
                 stopTracking = false
                 onBtnTouch = false
-            } else if (sbBrightness.progress ==0) {
+            } else if (sbBrightness.progress == 0) {
                 sbBrightness_less.isEnabled = false
                 sbBrightness_num.text = sbBrightness.progress.toString() + "%"
                 stopTracking = false
@@ -675,6 +681,41 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             R.id.btn_remove -> remove()
             R.id.dynamic_rgb -> toRGBGradientView()
             R.id.tvRename -> renameLight()
+            R.id.ll_r -> {
+                var r = Color.red(light?.color ?: 0)
+                var g = Color.green(light?.color ?: 0)
+                var b = Color.blue(light?.color ?: 0)
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, r.toString(), g.toString(), b.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    color_r.text = red
+                    color_g.text = green
+                    color_b.text = blue
+                })
+                dialog.show()
+            }
+
+            R.id.ll_g -> {
+                var r = Color.red(light?.color ?: 0)
+                var g = Color.green(light?.color ?: 0)
+                var b = Color.blue(light?.color ?: 0)
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, r.toString(), g.toString(), b.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    color_r.text = red
+                    color_g.text = green
+                    color_b.text = blue
+                })
+                dialog.show()
+            }
+
+            R.id.ll_b -> {
+                var r = Color.red(light?.color ?: 0)
+                var g = Color.green(light?.color ?: 0)
+                var b = Color.blue(light?.color ?: 0)
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, r.toString(), g.toString(), b.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    color_r.text = red
+                    color_g.text = green
+                    color_b.text = blue
+                })
+                dialog.show()
+            }
 //            R.id.sbBrightness_add -> addBrightness()
 //            R.id.sbBrightness_less -> lessBrightness()
 //            R.id.sb_w_bright_add -> addWhiteBright()
@@ -1006,18 +1047,18 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             presetColors?.get(position)!!.brightness = light!!.brightness
         }
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
-        if(currentShowGroupSetPage){
+        if (currentShowGroupSetPage) {
             try {
 //                textView!!.text = group!!.brightness.toString() + "%"
-                textView?.setChecked(true,0xff000000.toInt() or group!!.color)
+                textView?.setChecked(true, 0xff000000.toInt() or group!!.color)
                 SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }else{
+        } else {
             try {
 //                textView!!.text = group!!.brightness.toString() + "%"
-                textView?.setChecked(true,0xff000000.toInt() or light!!.color)
+                textView?.setChecked(true, 0xff000000.toInt() or light!!.color)
                 SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
             } catch (e: Exception) {
                 e.printStackTrace()

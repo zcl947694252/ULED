@@ -828,6 +828,13 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
+    fun updateSwicth(switch: DbSwitch){
+        DaoSessionInstance.getInstance().dbSwitchDao.update(switch)
+        recordingChange(switch.id,
+                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                Constant.DB_UPDATE)
+    }
+
     fun updateConnector(connector: DbConnector) {
         DaoSessionInstance.getInstance().dbConnectorDao.update(connector)
         recordingChange(connector.id,

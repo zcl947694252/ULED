@@ -24,6 +24,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.curtain.CurtainScanningNewActivity
@@ -43,12 +44,16 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LeScanParameters
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -60,6 +65,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -67,6 +73,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
+import org.jetbrains.anko.startActivity
 import java.lang.Exception
 import java.text.ParsePosition
 import java.util.*
@@ -80,8 +87,129 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
 
-    override fun performed(event: Event<String>?) {
+    private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
 
+    private var isSupportInstallOldDevice=true
+
+    override fun performed(event: Event<String>?) {
+        when (event?.type) {
+            LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
+//            LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout()
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+//            LeScanEvent.LE_SCAN_COMPLETED -> this.onLeScanTimeout()
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+//                onErrorReport(info)
+            }
+
+//            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
+//            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
+        }
+    }
+
+    private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
+        val deviceInfo = deviceEvent.args
+        mDeviceMeshName = deviceInfo.meshName
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                onLogin()
+                stopConnectTimer()
+                com.blankj.utilcode.util.LogUtils.d("connected22")
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+//                onLoginFailed()
+
+                GlobalScope.launch(Dispatchers.Main) {
+//                    if (!mIsInited){
+//                        onInited()
+//                    }
+                }
+            }
+
+            LightAdapter.STATUS_CONNECTED -> {
+//                connectDisposable?.dispose()
+
+                login()
+                com.blankj.utilcode.util.LogUtils.d("connected11")
+            }
+        }
+
+    }
+
+    private fun stopConnectTimer() {
+        mConnectDisposal?.dispose()
+    }
+
+    private fun onLogin() {
+        TelinkLightService.Instance().enableNotification()
+        mApplication!!.removeEventListener(this)
+//        connectDisposable?.dispose()
+        mScanTimeoutDisposal?.dispose()
+//        scanDisposable?.dispose()
+//        if(isOTA){
+//        if(isSupportInstallOldDevice){
+//            progressOldBtn.progress = 100  //进度控件显示成完成状态
+//        }else{
+//            progressBtn.progress = 100  //进度控件显示成完成状态
+//        }
+//        }
+//        else{
+//            otaBtn.progress=100
+//        }
+
+
+//        if(isOTA){
+        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "true","switch" to currentSwitch)
+        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+        }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+        }
+//        }
+//        else {
+//            getVersion()
+//        }
+    }
+
+    private fun onLeScan(leScanEvent: LeScanEvent) {
+        val mesh = this.mApplication!!.mesh
+        val meshAddress = Constant.SWITCH_PIR_ADDRESS
+        val deviceInfo: DeviceInfo = leScanEvent.args
+
+        if (meshAddress == -1) {
+
+            return
+        }
+
+        when (leScanEvent.args.productUUID) {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,DeviceType.SMART_CURTAIN_SWITCH -> {
+                val MAX_RSSI = 81
+                if (leScanEvent.args.rssi < MAX_RSSI) {
+
+                    if (bestRSSIDevice != null) {
+                        //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                        if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
+                            com.dadoutek.uled.util.LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                            bestRSSIDevice = deviceInfo
+                        }
+                    } else {
+                        com.dadoutek.uled.util.LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                        bestRSSIDevice = deviceInfo
+                    }
+
+//                    scanDisposable?.dispose()
+//                    LeBluetooth.getInstance().stopScan()
+//                    bestRSSIDevice = leScanEvent.args
+////                params.setUpdateDeviceList(bestRSSIDevice)
+//                    connect()
+//                    progressBtn.text = getString(R.string.connecting)
+                } else {
+                    ToastUtils.showLong(getString(R.string.rssi_low))
+                }
+            }
+        }
     }
 
     private lateinit var switchData: MutableList<DbSwitch>
@@ -131,9 +259,12 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private var installId = 0
 
+    private var currentSwitch: DbSwitch ?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_device_details)
+        this.mApplication = this.application as TelinkLightApplication
 //        initData()
 //        initView()
     }
@@ -228,43 +359,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //            adapter!!.notifyItemChanged(position)
             showPopupWindow(view, position)
 
-//            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
-//                    .setPositiveButton(android.R.string.ok) { dialog, which ->
-//                        DBUtils.deleteSwitch(currentLight!!)
-//                         notifyData()
-//                        Toast.makeText(this@SwitchDeviceDetailsActivity,R.string.delete_switch_success,Toast.LENGTH_LONG).show()
-//                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
-//                            val opcode = Opcode.KICK_OUT
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.getMeshAddr(), null)
-//                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentLight!!.getMeshAddr())) {
-//                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-//                            }
-//                            if (mConnectDevice != null) {
-//                                Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-//                                Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.getMeshAddr())
-//                                if (currentLight?.meshAddr == mConnectDevice?.meshAddress) {
-//                                    Log.d("NBA","=====")
-////                                    scanPb.visibility = View.VISIBLE
-//                                    Thread {
-//                                        //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-//                                        Thread.sleep(2500)
-//                                        if (this@SwitchDeviceDetailsActivity == null ||
-//                                                this@SwitchDeviceDetailsActivity .isDestroyed ||
-//                                                this@SwitchDeviceDetailsActivity .isFinishing || !acitivityIsAlive) {
-//                                        } else {
-//                                            autoConnect()
-//                                        }
-//                                    }.start()
-//                                }
-//                            }
-//
-//
-//                        } else {
-//                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
-//                        }
-//                    }
-//                    .setNegativeButton(R.string.btn_cancel, null)
-//                    .show()
         }
     }
 
@@ -281,19 +375,23 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         var delete = views.findViewById<TextView>(R.id.deleteBtn)
 
         group.setOnClickListener(View.OnClickListener {
-
+            popupWindow.dismiss()
+            currentSwitch = switchData.get(position)
             val item = DBUtils.getActionBySwitchId(switchData[position].belongGroupId)
-            val items = DBUtils.getGroupByMesh(item[position].meshAddr)
-            if (items != null){
-                Log.e("TAG_GROUP", items!!.name)
+            var gpName = ""
+            for (i in item.indices) {
+                val item = DBUtils.getGroupByMesh(item[i].controlGroupAddr)
+
+                if (item != null) {
+                    gpName = item.name
+                }
             }
 
             val alertDialog = android.app.AlertDialog.Builder(this)
                     .setTitle(getString(R.string.tips))
-                    .setMessage(getString(R.string.empty_cache_tip))
+                    .setMessage(getString(R.string.empty_cache_tip)+gpName)
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                        //                        TelinkLightService.Instance().idleMode(true)
-//                        clearData()
+                        startScanSwitch()
                     }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> }.create()
             alertDialog.show()
             val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
@@ -347,6 +445,160 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     .show()
         })
 
+    }
+
+    @SuppressLint("CheckResult")
+    private fun startScanSwitch() {
+        showLoadingDialog(getString(R.string.connecting))
+        LeBluetooth.getInstance().stopScan()
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
+            if (granted) {
+
+                bestRSSIDevice = null   //扫描前置空信号最好设备。
+                TelinkLightService.Instance().idleMode(true)
+                val mesh = mApplication!!.mesh
+                //扫描参数
+                val params = LeScanParameters.create()
+                if (BuildConfig.DEBUG) {
+                    params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                } else {
+                    params.setMeshName(mesh.factoryName)
+                }
+
+                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                    params.setScanFilters(getScanFilters())
+                }
+                //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
+                if(isSupportInstallOldDevice){
+                    params.setMeshName(mesh.name)
+                    params.setOutOfMeshName(mesh.name)
+                }
+                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                params.setScanMode(false)
+
+                this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
+                this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+
+
+                startCheckRSSITimerSwitch()
+                TelinkLightService.Instance()?.startScan(params)
+
+//                if(isOTA){
+//                if(isSupportInstallOldDevice){
+//                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+//                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+//                }else{
+//                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+//                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+//                }
+//                }
+//                else {
+//                    otaBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+//                    otaBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+//                }
+
+
+//                scanDisposable?.dispose()
+//                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
+//                        .SECONDS)
+//                        .subscribe {
+//                            onLeScanTimeout()
+//                        }
+
+            } else {
+
+            }
+        }
+    }
+
+    private fun startCheckRSSITimerSwitch() {
+        mScanTimeoutDisposal?.dispose()
+        val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND
+        Observable.intervalRange(1, periodCount, SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND, 1,
+                TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<Long?> {
+                    override fun onComplete() {
+                        com.dadoutek.uled.util.LogUtils.d("onLeScanTimeout()")
+                        onLeScanTimeout()
+                    }
+
+                    override fun onSubscribe(d: Disposable) {
+                        mScanTimeoutDisposal = d
+                    }
+
+                    override fun onNext(t: Long) {
+                        if (bestRSSIDevice != null) {
+                            mScanTimeoutDisposal?.dispose()
+                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                            connectSwitch(bestRSSIDevice!!.macAddress)
+                        }
+                    }
+
+                    override fun onError(e: Throwable) {
+                        Log.d("SawTest", "error = $e")
+
+                    }
+                })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun connectSwitch(macAddress: String?) {
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN)
+                .subscribe {
+                    if (it) {
+                        //授予了权限
+                        if (TelinkLightService.Instance() != null) {
+//                            progressBar?.visibility = View.VISIBLE
+                            mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this@SwitchDeviceDetailsActivity)
+                            mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this@SwitchDeviceDetailsActivity)
+                            TelinkLightService.Instance().connect(macAddress, CONNECT_TIMEOUT)
+                            startConnectTimer()
+
+//                            if(isOTA){
+//                            if(isSupportInstallOldDevice){
+//                                progressOldBtn.text = getString(R.string.connecting)
+//                            }else{
+//                                progressBtn.text = getString(R.string.connecting)
+//                            }
+//                            }
+//                            else{
+//                                otaBtn.text = getString(R.string.connecting)
+//                            }
+                        }
+                    } else {
+                        //没有授予权限
+//                        DialogUtils.showNoBlePermissionDialog(this, { connect(macAddress) }, { finish() })
+                    }
+                }
+    }
+
+    private fun getScanFilters(): MutableList<ScanFilter> {
+        val scanFilters = ArrayList<ScanFilter>()
+
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        scanFilters.add(ScanFilter.Builder()
+                .setManufacturerData(Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte()))
+                .build())
+        return scanFilters
     }
 
 //    private fun showPopupWindow(view) {
@@ -496,6 +748,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
 
     private fun onLeScanTimeout() {
+        hideLoadingDialog()
         LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {

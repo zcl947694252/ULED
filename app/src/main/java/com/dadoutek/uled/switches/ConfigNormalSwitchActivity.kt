@@ -81,6 +81,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var isGlassSwitch=false
 
+    private var groupName: String? = null
+
+    private var switchDate: DbSwitch?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_group)
@@ -355,7 +359,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            saveSwitch()
+                            if(groupName!=null && groupName=="true"){
+                                  updateSwitch()
+                            }else {
+                                saveSwitch()
+                            }
                             TelinkLightService.Instance().idleMode(true)
                             TelinkLightService.Instance().disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -391,6 +399,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //        }
     }
 
+    private fun updateSwitch() {
+        switchDate!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+        DBUtils.updateSwicth(switchDate!!)
+    }
+
     private fun saveSwitch(){
         var newMeshAdress: Int
 //            var dbSwitch:DbSwitch=DbSwitch()
@@ -400,9 +413,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         DBUtils.saveSwitch(dbSwitch,false)
         dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
         dbSwitch.macAddr=mDeviceInfo.macAddress
-        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+        dbSwitch.meshAddr=mDeviceInfo.meshAddress
         dbSwitch.productUUID=mDeviceInfo.productUUID
         dbSwitch!!.index=dbSwitch.id.toInt()
+        dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
         dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
 //            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
@@ -475,6 +489,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initView() {
         mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
+        groupName = intent.getStringExtra("group")
+        if(groupName!=null && groupName == "true"){
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+        }
         val mesh = mApplication.mesh
 //        val dataManager = DataManager(this, mesh.name, mesh.password)
         mGroupArrayList = ArrayList<DbGroup>()
