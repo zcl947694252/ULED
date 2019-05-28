@@ -92,6 +92,7 @@
             android:text="B"
             android:textColor="@color/black_three"
             android:textSize="17sp"
+            android:maxLength="3"
             app:layout_constraintBottom_toBottomOf="@+id/textView21"
             app:layout_constraintEnd_toStartOf="@+id/rgb_blue"
             app:layout_constraintTop_toTopOf="@+id/textView21" />
@@ -106,7 +107,6 @@
             android:textColor="@color/black_three"
             android:inputType="number"
             android:textSize="17sp"
-            android:maxLength="3"
             app:layout_constraintBottom_toBottomOf="@+id/textView21"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/textView21" />
