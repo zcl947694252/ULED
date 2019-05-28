@@ -22,6 +22,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
+import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseFragment : Fragment() {
@@ -78,13 +80,24 @@ open class BaseFragment : Fragment() {
         if (blueadapter?.isEnabled == false) {
             if(toolbar!=null){
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                    dialog.show()
+                })
             }
         }else{
             if(toolbar!=null){
                 if (TelinkLightApplication.getInstance().connectDevice == null) {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                        var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                        dialog.show()
+                    })
                 }else{
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                 }
             }
         }
@@ -100,11 +113,17 @@ open class BaseFragment : Fragment() {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
                     if (toolbar != null) {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                     }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
                     if (toolbar != null) {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                            var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                            dialog.show()
+                        })
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
@@ -113,11 +132,17 @@ open class BaseFragment : Fragment() {
                         BluetoothAdapter.STATE_OFF -> {
                             if (toolbar != null) {
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                                    dialog.show()
+                                })
                             }
                         }
                         BluetoothAdapter.STATE_ON -> {
                             if (toolbar != null) {
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                             }
                         }
                     }

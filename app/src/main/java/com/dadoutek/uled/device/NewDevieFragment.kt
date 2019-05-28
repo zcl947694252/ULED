@@ -212,7 +212,7 @@ class NewDevieFragment :BaseFragment(){
 //                .divider)))
 //        //添加分割线
 //        recyclerView?.addItemDecoration(decoration)
-        recyclerView?.addItemDecoration(SpaceItemDecoration(32))
+//        recyclerView?.addItemDecoration(SpaceItemDecoration(32))
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
         newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)

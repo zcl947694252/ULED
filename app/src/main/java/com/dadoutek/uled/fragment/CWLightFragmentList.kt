@@ -102,7 +102,7 @@ class CWLightFragmentList : BaseFragment() {
 
     private var addNewGroup: Button? = null
 
-    private var layout :ConstraintLayout? = null
+    private var layout: ConstraintLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,12 +114,14 @@ class CWLightFragmentList : BaseFragment() {
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
         intentFilter.addAction("switch")
+        intentFilter.addAction("switch_here")
         br = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val str = intent.getStringExtra("delete")
                 val switch = intent.getStringExtra("switch")
+                val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
                     groupAdapter!!.changeState(isDelete)
@@ -162,6 +164,21 @@ class CWLightFragmentList : BaseFragment() {
                         }
                     }
                 }
+
+                if(lightStatus=="on"){
+                    for(i in groupList.indices){
+                        groupList[i].status = 1
+                        DBUtils.updateGroup(groupList[i])
+                        groupAdapter!!.notifyDataSetChanged()
+                    }
+                } else if(lightStatus == "false"){
+                    for(i in groupList.indices){
+                        groupList[i].status = 2
+                        DBUtils.updateGroup(groupList[i])
+                        groupAdapter!!.notifyDataSetChanged()
+                    }
+                }
+
             }
         }
         localBroadcastManager.registerReceiver(br, intentFilter)
@@ -248,7 +265,7 @@ class CWLightFragmentList : BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
-        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+        Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
         })
 
@@ -294,49 +311,55 @@ class CWLightFragmentList : BaseFragment() {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
-            when (view!!.getId()) {
-                R.id.btn_on -> {
-                    Commander.openOrCloseLights(dstAddr, true)
-                    updateLights(true, currentLight)
-                }
-                R.id.btn_off -> {
-                    Commander.openOrCloseLights(dstAddr, false)
-                    updateLights(false, currentLight)
-                }
+        when (view!!.getId()) {
+            R.id.btn_on -> {
+                Commander.openOrCloseLights(dstAddr, true)
+                updateLights(true, currentLight)
+                currentLight.status=1
+                groupAdapter!!.notifyItemChanged(position)
+                DBUtils.updateGroup(currentLight)
+            }
+            R.id.btn_off -> {
+                Commander.openOrCloseLights(dstAddr, false)
+                updateLights(false, currentLight)
+                currentLight.status=2
+                groupAdapter!!.notifyItemChanged(position)
+                DBUtils.updateGroup(currentLight)
+            }
 
-                R.id.btn_set -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                        intent = Intent(mContext, NormalSettingActivity::class.java)
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent.putExtra("group", currentLight)
-                        startActivityForResult(intent, 2)
-                    }
-                }
-
-                R.id.group_name -> {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
+            R.id.btn_set -> {
+                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                    intent = Intent(mContext, NormalSettingActivity::class.java)
+                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                     intent.putExtra("group", currentLight)
-                    intent.putExtra("light", "cw_light")
-                    startActivityForResult(intent, 2)
-                }
-
-                R.id.selected_group -> {
-                    if (currentLight.isSelected) {
-                        currentLight.isSelected = false
-                        Log.e("TAG", "确定")
-                    } else {
-                        currentLight.isSelected = true
-                        Log.e("TAG", "取消")
-                    }
-                }
-
-                R.id.item_layout -> {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                    intent.putExtra("group", currentLight)
-                    intent.putExtra("light", "cw_light")
                     startActivityForResult(intent, 2)
                 }
             }
+
+            R.id.group_name -> {
+                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                intent.putExtra("group", currentLight)
+                intent.putExtra("light", "cw_light")
+                startActivityForResult(intent, 2)
+            }
+
+            R.id.selected_group -> {
+                if (currentLight.isSelected) {
+                    currentLight.isSelected = false
+                    Log.e("TAG", "确定")
+                } else {
+                    currentLight.isSelected = true
+                    Log.e("TAG", "取消")
+                }
+            }
+
+            R.id.item_layout -> {
+                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                intent.putExtra("group", currentLight)
+                intent.putExtra("light", "cw_light")
+                startActivityForResult(intent, 2)
+            }
+        }
 //        }
     }
 
@@ -373,12 +396,6 @@ class CWLightFragmentList : BaseFragment() {
                         }
                     } else {
                         lightList = DBUtils.getLightByGroupID(group.id)
-                    }
-
-                    if (isOpen) {
-                        group.connectionStatus = ConnectionStatus.ON.value
-                    } else {
-                        group.connectionStatus = ConnectionStatus.OFF.value
                     }
 
                     for (dbLight: DbLight in lightList) {
@@ -482,7 +499,7 @@ class CWLightFragmentList : BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
-            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
                 return@Comparator o1.name.compareTo(o2.name)
             })
             this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)

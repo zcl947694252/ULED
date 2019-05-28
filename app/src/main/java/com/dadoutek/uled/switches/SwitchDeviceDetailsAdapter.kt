@@ -10,6 +10,7 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
 
     override fun convert(helper: BaseViewHolder, scene: DbSwitch) {
         if (scene != null) {
+
             helper.setText(R.id.name, scene.name)
             helper.setImageResource(R.id.img_light, R.drawable.icon_switch)
             helper.addOnClickListener(R.id.tv_setting)

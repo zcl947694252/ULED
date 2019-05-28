@@ -139,6 +139,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     @SuppressLint("ResourceAsColor")
     private fun setTemperature() {
+        adjustment.text = getString(R.string.color_temperature_adjustment)
         if (currentShowPageGroup) {
             temperature_btn.setImageResource(R.drawable.icon_btn)
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
@@ -225,6 +226,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     @SuppressLint("ResourceAsColor")
     private fun setBrightness() {
+        adjustment.text = getString(R.string.brightness_adjustment)
         if (currentShowPageGroup) {
             brightness_btn.setImageResource(R.drawable.icon_btn)
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))

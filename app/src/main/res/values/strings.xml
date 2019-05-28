@@ -720,4 +720,14 @@
 
     <string name="choose_color">choose color:</string>
     <string name="group_list">Group list</string>
+    <string name="bluetooth">Bluetooth connection failed？There may be some problems：</string>
+    <string name="one_tip">1.Bluetooth is off.</string>
+    <string name="two_tip">2.No device was found nearby.</string>
+    <string name="three_tip">3.System bluetooth failure.</string>
+    <string name="four_tip">4.The positioning function is not turned on in android 6.0.</string>
+    <string name="five_tip">5.The above problem is still not solved, restart APP.</string>
+    <string name="open_it">Open it</string>
+    <string name="restart_it">Restart it</string>
+    <string name="i_see">I see</string>
+    <string name="switch_grouping">cut group</string>
 </resources>

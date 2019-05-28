@@ -97,12 +97,14 @@ class RGBLightFragmentList: BaseFragment() {
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
         intentFilter.addAction("switch")
+        intentFilter.addAction("switch_here")
         br = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val str = intent.getStringExtra("delete")
                 val switch = intent.getStringExtra("switch")
+                val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
                     groupAdapter!!.changeState(isDelete)
@@ -143,6 +145,20 @@ class RGBLightFragmentList: BaseFragment() {
                         if (groupList[i].isSelected) {
                             groupList[i].isSelected = false
                         }
+                    }
+                }
+
+                if(lightStatus=="on"){
+                    for(i in groupList.indices){
+                        groupList[i].status = 1
+                        DBUtils.updateGroup(groupList[i])
+                        groupAdapter!!.notifyDataSetChanged()
+                    }
+                } else if(lightStatus == "false"){
+                    for(i in groupList.indices){
+                        groupList[i].status = 2
+                        DBUtils.updateGroup(groupList[i])
+                        groupAdapter!!.notifyDataSetChanged()
                     }
                 }
             }
@@ -277,10 +293,16 @@ class RGBLightFragmentList: BaseFragment() {
                 R.id.btn_on -> {
                     Commander.openOrCloseLights(dstAddr, true)
                     updateLights(true, currentLight)
+                    currentLight.status=1
+                    groupAdapter!!.notifyItemChanged(position)
+                    DBUtils.updateGroup(currentLight)
                 }
                 R.id.btn_off -> {
                     Commander.openOrCloseLights(dstAddr, false)
                     updateLights(false, currentLight)
+                    currentLight.status=1
+                    groupAdapter!!.notifyItemChanged(position)
+                    DBUtils.updateGroup(currentLight)
                 }
 
                 R.id.btn_set -> {

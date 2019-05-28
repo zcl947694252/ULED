@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -97,11 +98,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-//            if (view.getId() == R.id.scene_delete) {
-                //                dataManager.deleteScene(scenesListData.get(position));
-//                showDeleteDialog(adapter, position)
-                //            refreshData();
-//            } else
+            if (view.getId() == R.id.scene_delete) {
+                scenesListData!![position].isSelected = !scenesListData!![position].isSelected
+            } else
             if (view.getId() == R.id.scene_edit) {
                 //                setScene(scenesListData.get(position).getId());
                 val scene = scenesListData!![position]
@@ -323,6 +322,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
         isDelete = false
         adaper!!.changeState(isDelete)
+        for (i in scenesListData!!.indices) {
+            if (scenesListData!![i].isSelected) {
+                scenesListData!![i].isSelected = false
+            }
+        }
         adaper!!.notifyDataSetChanged()
 
 //        add_scenes!!.setOnClickListener(this)
@@ -351,17 +355,45 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             isDelete = false
             adaper!!.changeState(isDelete)
+            for (i in scenesListData!!.indices) {
+                if (scenesListData!![i].isSelected) {
+                    scenesListData!![i].isSelected = false
+                }
+            }
             adaper!!.notifyDataSetChanged()
         }
     }
 
-    private fun showDeleteDialog(adapter: BaseQuickAdapter<*, *>, position: Int) {
+    private fun showDeleteDialog() {
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-            deleteScene(position)
-            adapter.notifyItemRemoved(position)
-            refreshData()
+//            deleteScene(position)
+//            adapter.notifyItemRemoved(position)
+//            refreshData()
+            Log.e("TAG_SIZE",scenesListData!!.size.toString())
+            for(i in scenesListData!!.indices){
+                if(scenesListData!![i].isSelected){
+                    val opcode = Opcode.SCENE_ADD_OR_DEL
+                    val params: ByteArray
+                    if (scenesListData!!.size > 0) {
+                        val id = scenesListData!![i].id!!
+                        val list = DBUtils.getActionsBySceneId(id)
+                        params = byteArrayOf(0x00, id.toByte())
+                        Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
+                        DBUtils.deleteSceneActionsList(list)
+                        DBUtils.deleteScene(scenesListData!![i])
+//                        scenesListData!!.removeAt(position)
+                    }
+//                    startDeleteGradientCmd(diyGradientList!![i].id)
+//                    DBUtils.deleteGradient(diyGradientList!![i])
+//                    DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+                }
+            }
+            refreshView()
+//              scenesListData = DBUtils.sceneList
+//              adapter.setNewData(scenesListData)
+//            adaper!!.setNewData(scenesListData )
         }
         builder.setNegativeButton(activity!!.getString(R.string.cancel)) { dialog, which -> }
         val dialog = builder.show()
@@ -483,6 +515,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
             isDelete = false
             adaper!!.changeState(isDelete)
+            for (i in scenesListData!!.indices) {
+                if (scenesListData!![i].isSelected) {
+                    scenesListData!![i].isSelected = false
+                }
+            }
             adaper!!.notifyDataSetChanged()
         }
     }
@@ -560,6 +597,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun onClick(v: View) {
         when (v.id) {
             R.id.img_function2 -> {
+                showDeleteDialog()
 //                if (isDelete) {
 //                    isDelete = false
 //                } else {

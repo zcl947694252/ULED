@@ -145,6 +145,10 @@ class GroupListFragment : BaseFragment() {
     private var isFirst: Boolean = false
 
     private var allLightText: TextView? = null
+
+    private var onText: TextView? = null
+
+    private var offText: TextView? = null
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
 //    private var curtain_btn: TextView? = null
@@ -278,6 +282,9 @@ class GroupListFragment : BaseFragment() {
         btnOn = view.findViewById(R.id.btn_on)
         btnOff = view.findViewById(R.id.btn_off)
         btnSet = view.findViewById(R.id.btn_set)
+        onText = view.findViewById(R.id.textView8)
+        offText = view.findViewById(R.id.textView11)
+
 
         deviceRecyclerView = view.findViewById(R.id.recyclerView_name)
         totalNum = view.findViewById(R.id.total_num)
@@ -350,6 +357,18 @@ class GroupListFragment : BaseFragment() {
         showList = gpList
 
         allGroup = DBUtils.getGroupByName(getString(R.string.allLight))
+
+        if (allGroup.status == 1) {
+            btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
+            btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
+            onText!!.setTextColor(resources.getColor(R.color.white))
+            offText!!.setTextColor(resources.getColor(R.color.black_nine))
+        } else if (allGroup.status == 2) {
+            btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
+            btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
+            onText!!.setTextColor(resources.getColor(R.color.black_nine))
+            offText!!.setTextColor(resources.getColor(R.color.white))
+        }
 
 //        val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -690,7 +709,15 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     val dstAddr = this.allGroup.meshAddr
                     Commander.openOrCloseLights(dstAddr, true)
+                    btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
+                    btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
+                    onText!!.setTextColor(resources.getColor(R.color.white))
+                    offText!!.setTextColor(resources.getColor(R.color.black_nine))
                     updateLights(true, this.allGroup)
+                    val intent = Intent("switch_here")
+                    intent.putExtra("switch_here", "on")
+                    LocalBroadcastManager.getInstance(this!!.mContext!!)
+                            .sendBroadcast(intent)
                 }
             }
 
@@ -701,7 +728,15 @@ class GroupListFragment : BaseFragment() {
                 } else {
                     val dstAddr = this.allGroup.meshAddr
                     Commander.openOrCloseLights(dstAddr, false)
+                    btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
+                    btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
+                    onText!!.setTextColor(resources.getColor(R.color.black_nine))
+                    offText!!.setTextColor(resources.getColor(R.color.white))
                     updateLights(false, this.allGroup)
+                    val intent = Intent("switch_here")
+                    intent.putExtra("switch_here", "false")
+                    LocalBroadcastManager.getInstance(this!!.mContext!!)
+                            .sendBroadcast(intent)
                 }
             }
 
@@ -798,6 +833,12 @@ class GroupListFragment : BaseFragment() {
                         }
                     } else {
                         lightList = DBUtils.getLightByGroupID(group.id)
+                    }
+
+                    if (isOpen) {
+                        group.status = 1
+                    } else {
+                        group.status = 2
                     }
 
                     for (dbLight: DbLight in lightList) {

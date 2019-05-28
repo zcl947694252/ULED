@@ -4,7 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.le.ScanFilter
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -14,7 +16,9 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
@@ -66,6 +70,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import java.lang.Exception
+import java.text.ParsePosition
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -220,21 +225,99 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         currentLight = switchData?.get(position)
         positionCurrent = position
         if (view.id == R.id.tv_setting) {
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+//            this!!.switchData!![position].isSelected = true
+//            adapter!!.notifyItemChanged(position)
+            showPopupWindow(view,position)
+
+//            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+//                    .setPositiveButton(android.R.string.ok) { dialog, which ->
+//                        DBUtils.deleteSwitch(currentLight!!)
+//                         notifyData()
+//                        Toast.makeText(this@SwitchDeviceDetailsActivity,R.string.delete_switch_success,Toast.LENGTH_LONG).show()
+//                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+//                            val opcode = Opcode.KICK_OUT
+//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.getMeshAddr(), null)
+//                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentLight!!.getMeshAddr())) {
+//                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+//                            }
+//                            if (mConnectDevice != null) {
+//                                Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+//                                Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.getMeshAddr())
+//                                if (currentLight?.meshAddr == mConnectDevice?.meshAddress) {
+//                                    Log.d("NBA","=====")
+////                                    scanPb.visibility = View.VISIBLE
+//                                    Thread {
+//                                        //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+//                                        Thread.sleep(2500)
+//                                        if (this@SwitchDeviceDetailsActivity == null ||
+//                                                this@SwitchDeviceDetailsActivity .isDestroyed ||
+//                                                this@SwitchDeviceDetailsActivity .isFinishing || !acitivityIsAlive) {
+//                                        } else {
+//                                            autoConnect()
+//                                        }
+//                                    }.start()
+//                                }
+//                            }
+//
+//
+//                        } else {
+//                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
+//                        }
+//                    }
+//                    .setNegativeButton(R.string.btn_cancel, null)
+//                    .show()
+        }
+    }
+
+    private fun showPopupWindow(view: View?,position: Int) {
+        var views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch,null)
+        var set = view!!.findViewById<ImageView>(R.id.tv_setting)
+        var popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        popupWindow.contentView = views
+        popupWindow.isFocusable = true
+        popupWindow.showAsDropDown(set)
+
+        var group = views.findViewById<TextView>(R.id.switch_group)
+        var ota = views.findViewById<TextView>(R.id.ota)
+        var delete = views.findViewById<TextView>(R.id.deleteBtn)
+
+        group.setOnClickListener(View.OnClickListener {
+            val item = DBUtils.getGroupByMesh(switchData[position].meshAddr)
+            val alertDialog = android.app.AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.tips))
+                    .setMessage(getString(R.string.empty_cache_tip))
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+//                        TelinkLightService.Instance().idleMode(true)
+//                        clearData()
+                    }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> }.create()
+            alertDialog.show()
+            val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            btn.setTextColor(Color.parseColor("#18B4ED"))
+
+        })
+
+        ota.setOnClickListener(View.OnClickListener {
+
+        })
+
+        delete.setOnClickListener(View.OnClickListener {
+            popupWindow.dismiss()
+           var deleteSwitch = switchData?.get(position)
+           AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                     .setPositiveButton(android.R.string.ok) { dialog, which ->
-                        DBUtils.deleteSwitch(currentLight!!)
+                        DBUtils.deleteSwitch(deleteSwitch!!)
                          notifyData()
                         Toast.makeText(this@SwitchDeviceDetailsActivity,R.string.delete_switch_success,Toast.LENGTH_LONG).show()
                         if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                             val opcode = Opcode.KICK_OUT
-                            TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.getMeshAddr(), null)
-                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentLight!!.getMeshAddr())) {
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, deleteSwitch!!.getMeshAddr(), null)
+                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch!!.getMeshAddr())) {
                                 TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                             }
                             if (mConnectDevice != null) {
                                 Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
                                 Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.getMeshAddr())
-                                if (currentLight?.meshAddr == mConnectDevice?.meshAddress) {
+                                if (deleteSwitch?.meshAddr == mConnectDevice?.meshAddress) {
                                     Log.d("NBA","=====")
 //                                    scanPb.visibility = View.VISIBLE
                                     Thread {
@@ -257,8 +340,27 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
-        }
+        })
+
     }
+
+//    private fun showPopupWindow(view) {
+//        var view = LayoutInflater.from(this).inflate(R.layout.popwindown_switch,null)
+//        var popupWindow = PopupWindow()
+//        popupWindow.contentView = view
+//        popupWindow.isFocusable = true
+////        popupWindow.showAsDropDown(R.id.tv_setting)
+//
+////                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+////        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+////        recyclerView.setLayoutManager(linearLayoutManager);
+////        ScoreTeamAdapter scoreTeamAdapter = new ScoreTeamAdapter(yearList);
+////        recyclerView.setAdapter(scoreTeamAdapter);
+////        popupWindow = new PopupWindow(main_layout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+////        popupWindow.setContentView(view);
+////        popupWindow.setFocusable(true);
+////        popupWindow.showAsDropDown(bselect);
+//    }
 
     fun autoConnect() {
         //检查是否支持蓝牙设备

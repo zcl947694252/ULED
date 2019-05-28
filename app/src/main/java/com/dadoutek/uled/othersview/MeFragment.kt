@@ -209,16 +209,27 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         if (blueadapter?.isEnabled == false) {
             if(bluetooth_image!=null){
                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                bluetooth_image.isEnabled = true
+                bluetooth_image.setOnClickListener(View.OnClickListener {
+                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                    dialog.show()
+                })
             }
 
         }else{
            if (TelinkLightApplication.getInstance().connectDevice == null) {
                if(bluetooth_image!=null){
                    bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                   bluetooth_image.isEnabled = true
+                   bluetooth_image.setOnClickListener(View.OnClickListener {
+                       var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                       dialog.show()
+                   })
                }
                 }else{
                if(bluetooth_image!=null){
                    bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                   bluetooth_image.isEnabled = false
                }
 
                 }
@@ -292,11 +303,17 @@ class MeFragment : BaseFragment(),View.OnClickListener {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
                     if(bluetooth_image!=null) {
                         bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                        bluetooth_image.isEnabled = false
                     }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
                     if(bluetooth_image!=null){
                         bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                        bluetooth_image.isEnabled = true
+                        bluetooth_image.setOnClickListener(View.OnClickListener {
+                            var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                            dialog.show()
+                        })
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
@@ -305,11 +322,17 @@ class MeFragment : BaseFragment(),View.OnClickListener {
                         BluetoothAdapter.STATE_OFF -> {
                             if(bluetooth_image!=null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                                bluetooth_image.isEnabled = true
+                                bluetooth_image.setOnClickListener(View.OnClickListener {
+                                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                                    dialog.show()
+                                })
                             }
                         }
                         BluetoothAdapter.STATE_ON -> {
                             if(bluetooth_image!=null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                                bluetooth_image.isEnabled = false
                             }
                         }
                     }

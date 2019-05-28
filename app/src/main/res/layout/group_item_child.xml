@@ -89,12 +89,12 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginEnd="6dp"
-            android:background="@drawable/icon_down_group"
             app:layout_constraintBottom_toBottomOf="@+id/btn_on"
             app:layout_constraintEnd_toStartOf="@+id/view3"
             app:layout_constraintTop_toTopOf="@+id/btn_on" />
 
         <TextView
+            android:id="@+id/textView11"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/group_list_off"
