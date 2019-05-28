@@ -699,18 +699,18 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             Commander.getDeviceVersion(light!!.meshAddr, { s ->
                 localVersion = s
                 if (txtTitle != null) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+//                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                         txtTitle!!.visibility = View.VISIBLE
                         txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
                         light!!.version = localVersion
                         tvOta!!.visibility = View.VISIBLE
-                    } else {
-                        txtTitle!!.visibility = View.VISIBLE
-                        txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
-                        light!!.version = localVersion
-                        tvOta!!.visibility = View.GONE
+//                    } else {
+//                        txtTitle!!.visibility = View.VISIBLE
+//                        txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
+//                        light!!.version = localVersion
+//                        tvOta!!.visibility = View.GONE
                     }
-                }
+//                }
                 null
             }, {
                 if (txtTitle != null) {
