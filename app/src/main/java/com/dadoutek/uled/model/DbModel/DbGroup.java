@@ -46,6 +46,10 @@ public class DbGroup implements Serializable{
 
     public int status = 1;//链接状态
 
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean isSeek = true;
+
 
     @Generated(hash = 1966413977)
     public DbGroup() {
@@ -133,6 +137,14 @@ public class DbGroup implements Serializable{
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public boolean isSeek() {
+        return isSeek;
+    }
+
+    public void setSeek(boolean seek) {
+        isSeek = seek;
     }
 
     public boolean isSelected() {

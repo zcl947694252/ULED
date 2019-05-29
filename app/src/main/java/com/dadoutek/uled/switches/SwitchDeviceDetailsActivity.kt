@@ -89,7 +89,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
 
-    private var isSupportInstallOldDevice=true
+    private var isSupportInstallOldDevice = true
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {
@@ -120,7 +120,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //                onLoginFailed()
 
                 GlobalScope.launch(Dispatchers.Main) {
-//                    if (!mIsInited){
+                    //                    if (!mIsInited){
 //                        onInited()
 //                    }
                 }
@@ -145,6 +145,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         mApplication!!.removeEventListener(this)
 //        connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
+        hideLoadingDialog()
 //        scanDisposable?.dispose()
 //        if(isOTA){
 //        if(isSupportInstallOldDevice){
@@ -161,10 +162,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //        if(isOTA){
         if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                 bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!,"group" to "true","switch" to currentSwitch)
+            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
         } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
             startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
-        }else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
             startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
         }
 //        }
@@ -184,7 +185,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         }
 
         when (leScanEvent.args.productUUID) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,DeviceType.SMART_CURTAIN_SWITCH -> {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
                 val MAX_RSSI = 81
                 if (leScanEvent.args.rssi < MAX_RSSI) {
 
@@ -259,7 +260,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private var installId = 0
 
-    private var currentSwitch: DbSwitch ?= null
+    private var currentSwitch: DbSwitch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -377,26 +378,30 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         group.setOnClickListener(View.OnClickListener {
             popupWindow.dismiss()
             currentSwitch = switchData.get(position)
-            val item = DBUtils.getActionBySwitchId(switchData[position].belongGroupId)
             var gpName = ""
-            for (i in item.indices) {
-                val item = DBUtils.getGroupByMesh(item[i].controlGroupAddr)
+            if (currentSwitch != null){
+                val item = DBUtils.getActionBySwitchId(currentSwitch!!.belongGroupId)
+                for (i in item.indices) {
+                    val item = DBUtils.getGroupByMesh(item[i].controlGroupAddr)
 
-                if (item != null) {
-                    gpName = item.name
+                    if (item != null) {
+                        gpName = item.name
+                    }
                 }
             }
 
+
             val alertDialog = android.app.AlertDialog.Builder(this)
                     .setTitle(getString(R.string.tips))
-                    .setMessage(getString(R.string.empty_cache_tip)+gpName)
+                    .setMessage(getString(R.string.switch_current) + gpName + getString(R.string.switch_group_switch))
                     .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                         startScanSwitch()
                     }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> }.create()
             alertDialog.show()
             val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
             btn.setTextColor(Color.parseColor("#18B4ED"))
-
+            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+            cancelBtn.setTextColor(Color.parseColor("#333333"))
         })
 
         ota.setOnClickListener(View.OnClickListener {
@@ -470,7 +475,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     params.setScanFilters(getScanFilters())
                 }
                 //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                if(isSupportInstallOldDevice){
+                if (isSupportInstallOldDevice) {
                     params.setMeshName(mesh.name)
                     params.setOutOfMeshName(mesh.name)
                 }
@@ -750,6 +755,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun onLeScanTimeout() {
         hideLoadingDialog()
         LogUtils.d("onErrorReport: onLeScanTimeout")
+        ToastUtil.showToast(this, getString(R.string.not_found_switch))
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance().idleMode(true)

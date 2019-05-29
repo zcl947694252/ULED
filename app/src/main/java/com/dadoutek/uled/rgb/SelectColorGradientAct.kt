@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.SeekBar
 import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
@@ -24,6 +25,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
@@ -45,15 +47,19 @@ import top.defaults.colorpicker.ColorObserver
 import java.util.ArrayList
 import javax.xml.transform.Result
 
-class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
-    private var colorNode:DbColorNode?=null
+class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
+    private var colorNode: DbColorNode? = null
     private var stopTracking = false
 
     internal var downTime: Long = 0//Button被按下时的时间
     internal var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
     internal var tvValue = 0//TextView中的值
-    
+
+    private var redColor: Int? = null
+    private var greenColor: Int? = null
+    private var blueColor: Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_color_gradient)
@@ -64,7 +70,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
     private fun initData() {
         colorNode = intent.getSerializableExtra(Constant.COLOR_NODE_KEY) as? DbColorNode
     }
-    
+
     @SuppressLint("ClickableViewAccessibility", "StringFormatMatches")
     private fun initView() {
         toolbar.title = getString(R.string.color_check)
@@ -98,12 +104,15 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
 
         sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
-        if(colorNode!!.rgbw==-1){
-            sbBrightness.progress=100
-            colorNode!!.brightness=100
-            sb_w_bright.progress=0
-            sbBrightness_num.text =100.toString()+"%"
-            sb_w_bright_num.text = 0.toString()+"%"
+        ll_r_r.setOnClickListener(this)
+        ll_g_g.setOnClickListener(this)
+        ll_b_b.setOnClickListener(this)
+        if (colorNode!!.rgbw == -1) {
+            sbBrightness.progress = 100
+            colorNode!!.brightness = 100
+            sb_w_bright.progress = 0
+            sbBrightness_num.text = 100.toString() + "%"
+            sb_w_bright_num.text = 0.toString() + "%"
 
             if (sbBrightness!!.progress >= 100) {
                 sbBrightness_add.isEnabled = false
@@ -127,18 +136,18 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 sb_w_bright_less.isEnabled = true
                 sb_w_bright_add.isEnabled = true
             }
-        }else{
+        } else {
 
             var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
-            var r=Color.red(colorNode?.rgbw!!)
-            var g=Color.green(colorNode?.rgbw!!)
-            var b=Color.blue(colorNode?.rgbw!!)
-            color_picker.setInitialColor((colorNode?.rgbw?:0 and 0xffffff) or 0xff000000.toInt())
+            var r = Color.red(colorNode?.rgbw!!)
+            var g = Color.green(colorNode?.rgbw!!)
+            var b = Color.blue(colorNode?.rgbw!!)
+            color_picker.setInitialColor((colorNode?.rgbw ?: 0 and 0xffffff) or 0xff000000.toInt())
 
-            sbBrightness.progress=colorNode!!.brightness
-            sb_w_bright.progress=w
-            sbBrightness_num.text = colorNode!!.brightness.toString()+"%"
-            sb_w_bright_num.text = w.toString()+"%"
+            sbBrightness.progress = colorNode!!.brightness
+            sb_w_bright.progress = w
+            sbBrightness_num.text = colorNode!!.brightness.toString() + "%"
+            sb_w_bright_num.text = w.toString() + "%"
 
             if (sbBrightness!!.progress >= 100) {
                 sbBrightness_add.isEnabled = false
@@ -169,6 +178,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         }
 
         btn_save.setOnClickListener(this)
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -177,19 +187,145 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         }
         return super.onOptionsItemSelected(item)
     }
-    
+
     override fun onClick(v: View?) {
-       when(v?.id){
-           R.id.btn_save->{
-               doFinish()
-           }
-       }
+        when (v?.id) {
+            R.id.btn_save -> {
+                doFinish()
+            }
+
+            R.id.ll_r_r -> {
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
+                })
+                dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+            }
+
+            R.id.ll_g_g -> {
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
+                })
+                dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+            }
+
+            R.id.ll_b_b -> {
+
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
+                })
+                dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+
+            }
+        }
     }
-    
-    private fun doFinish(){
-        var intent= Intent()
-        intent.putExtra("color",colorNode)
-        setResult(Activity.RESULT_OK,intent)
+
+    private fun setColorPicker() {
+        val r = redColor!!
+        val g = greenColor!!
+        val b = blueColor!!
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
+        var w = sb_w_bright.progress
+//
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+//        val color = presetColors?.get(position)?.color
+//        var brightness = light!!.brightness
+        var ws = (color!! and 0xff000000.toInt()) shr 24
+        val red = (color!! and 0xff0000) shr 16
+        val green = (color and 0x00ff00) shr 8
+        val blue = color and 0x0000ff
+
+        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
+        val showBrightness = w
+        var showW = ws
+        Thread {
+
+            try {
+
+                if (w!! > Constant.MAX_VALUE) {
+                    w = Constant.MAX_VALUE
+                }
+                if (ws > Constant.MAX_VALUE) {
+                    ws = Constant.MAX_VALUE
+                }
+                if (ws == -1) {
+                    ws = 0
+                    showW = 0
+                }
+
+                var addr = 0
+//                if (currentShowGroupSetPage) {
+//                    addr = group?.meshAddr!!
+//                } else {
+//                    addr = light?.meshAddr!!
+//                }
+
+                val opcode = Opcode.SET_TEMPERATURE
+
+                val paramsW: ByteArray = byteArrayOf(ws.toByte())
+                val params: ByteArray = byteArrayOf(w!!.toByte())
+
+//                Thread.sleep(80)
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+
+                Thread.sleep(80)
+                changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+
+//                if (currentShowGroupSetPage) {
+//                    group?.brightness = showBrightness!!
+//                    group?.color = color
+//                } else {
+//                    light?.brightness = showBrightness!!
+//                    light?.color = color
+//                }
+
+//                LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }.start()
+
+//        sbBrightness?.progress = showBrightness!!
+//        sb_w_bright_num.text = showBrightness.toString() + "%"
+//        if (w != -1) {
+//            sb_w_bright_num.text = showW.toString() + "%"
+//            sb_w_bright.progress = showW
+//        } else {
+//            sb_w_bright_num.text = "0%"
+//            sb_w_bright.progress = 0
+//        }
+//        scrollView?.setBackgroundColor(color)
+
+        colorNode!!.rgbw = color
+
+        color_r?.text = red.toString()
+        color_g?.text = green.toString()
+        color_b?.text = blue.toString()
+    }
+
+    private fun doFinish() {
+        var intent = Intent()
+        intent.putExtra("color", colorNode)
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
@@ -217,7 +353,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         color_g?.text = g.toString()
         color_b?.text = b.toString()
 
-        colorNode!!.rgbw=color
+        colorNode!!.rgbw = color
     }
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
@@ -235,9 +371,9 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
         Log.d("RGBCOLOR", logStr)
 
         if (isOnceSet) {
-            for(i in 0..3){
-            Thread.sleep(50)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+            for (i in 0..3) {
+                Thread.sleep(50)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
             }
         } else {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
@@ -272,11 +408,11 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
             }
         }
 
-        private fun onValueChangeView(view: View, progress: Int, immediate: Boolean){
+        private fun onValueChangeView(view: View, progress: Int, immediate: Boolean) {
             if (view === sbBrightness) {
                 sbBrightness_num.text = progress.toString() + "%"
             } else if (view === sb_w_bright) {
-                sb_w_bright_num.text =  progress.toString() + "%"
+                sb_w_bright_num.text = progress.toString() + "%"
             }
         }
 
@@ -324,12 +460,13 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 val green = (color and 0x00ff00) shr 8
                 val blue = color and 0x0000ff
                 val w = progress
-                
+
                 colorNode?.rgbw = (w shl 24) or (red shl 16) or (green shl 8) or blue
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
             }
         }
     }
+
     private fun lessBrightness(event: MotionEvent?) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
             //                    tvValue = Integer.parseInt(textView.getText().toString());
@@ -537,7 +674,7 @@ class SelectColorGradientAct:TelinkBaseActivity(),View.OnClickListener {
                 sbBrightness_less.isEnabled = false
                 stopTracking = false
                 onBtnTouch = false
-            } else if (sbBrightness.progress ==0) {
+            } else if (sbBrightness.progress == 0) {
                 sbBrightness_less.isEnabled = false
                 sbBrightness_num.text = sbBrightness.progress.toString() + "%"
                 stopTracking = false

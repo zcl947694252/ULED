@@ -85,6 +85,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bottomBar">
 
+
+        <top.defaults.colorpicker.ColorPickerView
+            android:id="@+id/color_picker"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            app:enableBrightness="false"
+            app:layout_constraintBottom_toTopOf="@+id/brightness"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <LinearLayout
             android:id="@+id/ll_r"
             android:layout_width="wrap_content"
@@ -161,18 +174,6 @@
                 android:text="100"
                 android:textColor="@color/white" />
         </LinearLayout>
-
-        <top.defaults.colorpicker.ColorPickerView
-            android:id="@+id/color_picker"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            app:enableBrightness="false"
-            app:layout_constraintBottom_toTopOf="@+id/brightness"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/brightness"

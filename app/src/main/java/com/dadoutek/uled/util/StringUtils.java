@@ -244,10 +244,15 @@ public class StringUtils {
                 break;
             case DeviceType.SMART_CURTAIN_SWITCH:
                 startStr = "窗帘开关";
+                break;
             case DeviceType.NIGHT_LIGHT:
                 startStr = "小夜灯";
+                break;
             case DeviceType.SENSOR:
                 startStr = "传感器";
+                break;
+            case DeviceType.NORMAL_SWITCH2:
+                startStr = "普通开关";
                 break;
         }
 

@@ -21,7 +21,6 @@ class ColorSceneSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemCo
 //                .setText(R.id.diy_preset, "")
 //                .setBackgroundColor(R.id.btn_diy_preset, -0x1000000 or item.color)
 
-
         var doc = helper.getView<Dot>(R.id.btn_diy_preset)
 
 //        doc.setBackgroundColor(item.color)
@@ -31,5 +30,16 @@ class ColorSceneSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemCo
         helper.addOnClickListener(R.id.btn_diy_preset)
                 .addOnLongClickListener(R.id.btn_diy_preset)
                 .setText(R.id.diy_preset, if (item.brightness == -1) "" else item.brightness.toString() + "%")
+
+//
+//        var doc = helper.getView<Dot>(R.id.btn_diy_preset)
+//
+////        doc.setBackgroundColor(item.color)
+//
+//        doc.setChecked(true,0xff000000.toInt() or item.color)
+//
+//        helper.addOnClickListener(R.id.btn_diy_preset)
+//                .addOnLongClickListener(R.id.btn_diy_preset)
+//                .setText(R.id.diy_preset, if (item.brightness == -1) "" else item.brightness.toString() + "%")
     }
 }

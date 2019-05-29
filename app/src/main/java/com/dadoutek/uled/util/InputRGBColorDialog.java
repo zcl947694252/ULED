@@ -1,13 +1,16 @@
 package com.dadoutek.uled.util;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.dadoutek.uled.R;
 
@@ -31,6 +34,8 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
 
     private RGBColorListener listener;
 
+    private Context mContext;
+
 
     public InputRGBColorDialog(Context context, int style, String red, String green, String blue, RGBColorListener mListener) {
         super(context, style);
@@ -38,6 +43,7 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
         this.greenStr = green;
         this.blueStr = blue;
         this.listener = mListener;
+        this.mContext = context;
 
     }
 
@@ -50,6 +56,8 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
         greenEditText = (EditText) findViewById(R.id.rgb_green);
         blueEditText = (EditText) findViewById(R.id.rgb_blue);
 
+
+
         okBtn = (ConstraintLayout) findViewById(R.id.okBtn);
         cancelBtn = (ConstraintLayout) findViewById(R.id.cancelBtn);
 
@@ -61,6 +69,7 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
         cancelBtn.setOnClickListener(this);
     }
 
+    @SuppressLint("ShowToast")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -69,19 +78,39 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
                 String green = greenEditText.getText().toString().trim();
                 String blue = blueEditText.getText().toString().trim();
 
-                if (red == null) {
+                if(red.equals("")){
+                    ToastUtil.showToast(mContext,mContext.getString(R.string.cannot_rgb_null));
                     return;
                 }
 
-                if (green == null) {
+                if(green.equals("")){
+                    ToastUtil.showToast(mContext,mContext.getString(R.string.cannot_rgb_null));
                     return;
                 }
 
-                if (blue == null) {
+                if(blue.equals("")){
+                    ToastUtil.showToast(mContext,mContext.getString(R.string.cannot_rgb_null));
+                    return;
+                }
+
+                if(Integer.parseInt(red) >255){
+                    ToastUtil.showToast(mContext,mContext.getString(R.string.rgb_max));
+                    return;
+                }
+
+                if(Integer.parseInt(green) >255){
+                    ToastUtil.showToast(mContext,mContext.getString(R.string.rgb_max));
+                    return;
+                }
+
+                if(Integer.parseInt(blue) >255){
+                    ToastUtil.showToast(mContext,mContext.getString(R.string.rgb_max));
                     return;
                 }
 
                 listener.RGBColorFinished(red,green,blue);
+                dismiss();
+                break;
 
             case R.id.cancelBtn:
                 dismiss();
@@ -94,5 +123,19 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
 
     public interface RGBColorListener {
         void RGBColorFinished(String red, String green, String blue);
+    }
+
+    public void showKeyboard() {
+        if(redEditText!=null){
+            //设置可获得焦点
+            redEditText.setFocusable(true);
+            redEditText.setFocusableInTouchMode(true);
+            //请求获得焦点
+            redEditText.requestFocus();
+            //调用系统输入法
+            InputMethodManager inputManager = (InputMethodManager) redEditText
+                    .getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.showSoftInput(redEditText, 0);
+        }
     }
 }

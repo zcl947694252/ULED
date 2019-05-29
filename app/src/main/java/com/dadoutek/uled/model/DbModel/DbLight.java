@@ -46,6 +46,10 @@ public class DbLight implements Serializable {
     @Transient
     public int textColor;//文字颜色
 
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean isSeek = true;//选择色温还是亮度
+
     public int status = 1;//链接状态
     @Expose(serialize = false, deserialize = false)
     @Transient
@@ -245,5 +249,13 @@ public class DbLight implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public void setSeek(boolean seek) {
+        this.isSeek = seek;
+    }
+
+    public boolean isSeek() {
+        return isSeek;
     }
 }

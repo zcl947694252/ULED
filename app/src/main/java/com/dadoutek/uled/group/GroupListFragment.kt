@@ -149,6 +149,9 @@ class GroupListFragment : BaseFragment() {
     private var onText: TextView? = null
 
     private var offText: TextView? = null
+
+    private var fragmentPosition = 0
+
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
 //    private var curtain_btn: TextView? = null
@@ -415,6 +418,33 @@ class GroupListFragment : BaseFragment() {
         val vpAdapter = ViewPagerAdapter(childFragmentManager, fragments)
         viewPager?.adapter = vpAdapter
 
+        viewPager?.currentItem = fragmentPosition
+        if(fragmentPosition == 0){
+            updateData(0, true)
+            updateData(1, false)
+            updateData(2, false)
+            updateData(3, false)
+            deviceNameAdapter?.notifyDataSetChanged()
+        }else if(fragmentPosition == 1){
+            updateData(0, false)
+            updateData(1, true)
+            updateData(2, false)
+            updateData(3, false)
+            deviceNameAdapter?.notifyDataSetChanged()
+        }else if(fragmentPosition == 2){
+            updateData(0, false)
+            updateData(1, false)
+            updateData(2, true)
+            updateData(3, false)
+            deviceNameAdapter?.notifyDataSetChanged()
+        }else if(fragmentPosition == 3){
+            updateData(0, false)
+            updateData(1, false)
+            updateData(2, false)
+            updateData(3, true)
+            deviceNameAdapter?.notifyDataSetChanged()
+        }
+
         viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(p0: Int) {
 //                Log.e("TAG_ScrollStateChanged",p0.toString())
@@ -422,14 +452,15 @@ class GroupListFragment : BaseFragment() {
 
             override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
 //                Log.e("TAG_p0",p0.toString())
-                if (!isFirst) {
-                    updateData(0, true)
-                    updateData(1, false)
-                    updateData(2, false)
-                    updateData(3, false)
-                    isFirst = true
-                    deviceNameAdapter?.notifyDataSetChanged()
-                }
+//                if (!isFirst) {
+//                    updateData(0, true)
+//                    updateData(1, false)
+//                    updateData(2, false)
+//                    updateData(3, false)
+//                    isFirst = true
+//                    fragmentPosition = 0
+//                    deviceNameAdapter?.notifyDataSetChanged()
+//                }
             }
 
             override fun onPageSelected(p0: Int) {
@@ -441,6 +472,7 @@ class GroupListFragment : BaseFragment() {
                         LocalBroadcastManager.getInstance(it)
                                 .sendBroadcast(intent)
                     }
+                    fragmentPosition = 0
                     updateData(0, true)
                     updateData(1, false)
                     updateData(2, false)
@@ -452,6 +484,7 @@ class GroupListFragment : BaseFragment() {
                         LocalBroadcastManager.getInstance(it)
                                 .sendBroadcast(intent)
                     }
+                    fragmentPosition = 1
                     updateData(0, false)
                     updateData(1, true)
                     updateData(2, false)
@@ -467,6 +500,7 @@ class GroupListFragment : BaseFragment() {
                     updateData(1, false)
                     updateData(0, false)
                     updateData(3, false)
+                    fragmentPosition = 2
                 } else if (p0 == 3) {
                     val intent = Intent("switch")
                     intent.putExtra("switch", "true")
@@ -474,6 +508,7 @@ class GroupListFragment : BaseFragment() {
                         LocalBroadcastManager.getInstance(it)
                                 .sendBroadcast(intent)
                     }
+                    fragmentPosition = 3
                     updateData(3, true)
                     updateData(0, false)
                     updateData(1, false)
@@ -498,7 +533,7 @@ class GroupListFragment : BaseFragment() {
         }
 
         viewPager?.currentItem = position
-
+        fragmentPosition = position
 
         deviceNameAdapter?.notifyDataSetChanged()
 //        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
@@ -571,8 +606,6 @@ class GroupListFragment : BaseFragment() {
                 deviceName!!.add(device)
             }
 
-            initBottomNavigation()
-
 
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.navigationIcon = null
@@ -586,6 +619,8 @@ class GroupListFragment : BaseFragment() {
             deviceRecyclerView!!.layoutManager = layoutManager
             deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
             deviceRecyclerView!!.setAdapter(deviceNameAdapter)
+
+            initBottomNavigation()
 
 //            val layoutmanager = LinearLayoutManager(activity)
 ////            layoutmanager.orientation = LinearLayoutManager.VERTICAL

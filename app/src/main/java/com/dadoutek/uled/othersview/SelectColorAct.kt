@@ -8,10 +8,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
-import android.view.Gravity
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.SeekBar
 import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
@@ -21,12 +18,27 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter
+import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
+import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
 import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color.*
+import kotlinx.android.synthetic.main.activity_select_color.btn_save
+import kotlinx.android.synthetic.main.activity_select_color.color_b
+import kotlinx.android.synthetic.main.activity_select_color.color_g
+import kotlinx.android.synthetic.main.activity_select_color.color_picker
+import kotlinx.android.synthetic.main.activity_select_color.color_r
+import kotlinx.android.synthetic.main.activity_select_color.diy_color_recycler_list_view
+import kotlinx.android.synthetic.main.activity_select_color.ll_b
+import kotlinx.android.synthetic.main.activity_select_color.ll_g
+import kotlinx.android.synthetic.main.activity_select_color.ll_r
+import kotlinx.android.synthetic.main.activity_select_color.sb_w_bright
+import kotlinx.android.synthetic.main.activity_select_color.tv_brightness_w
+import kotlinx.android.synthetic.main.activity_select_color_gradient.*
+import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import top.defaults.colorpicker.ColorObserver
 import java.util.ArrayList
@@ -39,6 +51,10 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var stopTracking = false
     private var wValue = 0
     private var num = 0
+
+    private var redColor: Int? = null
+    private var greenColor: Int? = null
+    private var blueColor: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +84,10 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             false
         }
 
+        ll_r.setOnClickListener(this)
+        ll_b.setOnClickListener(this)
+        ll_g.setOnClickListener(this)
+
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = ArrayList()
@@ -78,11 +98,18 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
+//        diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 4)
+//        colorSelectDiyRecyclerViewAdapter = ColorSceneSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
+//        colorSelectDiyRecyclerViewAdapter!!.onItemChildClickListener = diyOnItemChildClickListener
+//        colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
+//        colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
+
         diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 4)
         colorSelectDiyRecyclerViewAdapter = ColorSceneSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter!!.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
+
 
 //        var w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
 //        var r = Color.red(itemGroup?.color!!)
@@ -127,7 +154,132 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             R.id.btn_save -> {
                 doFinish()
             }
+
+            R.id.ll_r -> {
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
+                })
+                dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+            }
+
+            R.id.ll_g -> {
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
+                })
+                dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+            }
+
+            R.id.ll_b -> {
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
+                })
+                dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+
+            }
         }
+    }
+
+    private fun setColorPicker() {
+        val r = redColor!!
+        val g = greenColor!!
+        val b = blueColor!!
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
+        var w = sb_w_bright.progress
+//
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+//        val color = presetColors?.get(position)?.color
+//        var brightness = light!!.brightness
+        var ws = (color!! and 0xff000000.toInt()) shr 24
+        val red = (color!! and 0xff0000) shr 16
+        val green = (color and 0x00ff00) shr 8
+        val blue = color and 0x0000ff
+
+        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
+        val showBrightness = w
+        var showW = ws
+        Thread {
+
+            try {
+
+                if (w!! > Constant.MAX_VALUE) {
+                    w = Constant.MAX_VALUE
+                }
+                if (ws > Constant.MAX_VALUE) {
+                    ws = Constant.MAX_VALUE
+                }
+                if (ws == -1) {
+                    ws = 0
+                    showW = 0
+                }
+
+                var addr = 0
+//                if (currentShowGroupSetPage) {
+//                    addr = group?.meshAddr!!
+//                } else {
+//                    addr = light?.meshAddr!!
+//                }
+
+                val opcode = Opcode.SET_TEMPERATURE
+
+                val paramsW: ByteArray = byteArrayOf(ws.toByte())
+                val params: ByteArray = byteArrayOf(w!!.toByte())
+
+//                Thread.sleep(80)
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+
+                Thread.sleep(80)
+                changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+
+//                if (currentShowGroupSetPage) {
+//                    group?.brightness = showBrightness!!
+//                    group?.color = color
+//                } else {
+//                    light?.brightness = showBrightness!!
+//                    light?.color = color
+//                }
+
+//                LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }.start()
+
+//        sbBrightness?.progress = showBrightness!!
+//        sb_w_bright_num.text = showBrightness.toString() + "%"
+//        if (w != -1) {
+//            sb_w_bright_num.text = showW.toString() + "%"
+//            sb_w_bright.progress = showW
+//        } else {
+//            sb_w_bright_num.text = "0%"
+//            sb_w_bright.progress = 0
+//        }
+//        scrollView?.setBackgroundColor(color)
+
+        itemGroup!!.color = color
+
+        color_r?.text = red.toString()
+        color_g?.text = green.toString()
+        color_b?.text = blue.toString()
     }
 
     private fun doFinish() {

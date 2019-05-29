@@ -148,6 +148,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             var light_current = DBUtils.getGroupByID(group!!.id)
             if (light_current != null) {
                 light_sbBrightness?.progress = light_current.colorTemperature
+                light_current.isSeek = false
                 tv_Brightness.text = light_current.colorTemperature.toString() + "%"
                 Log.e("TAG_SET_C", light_current.colorTemperature.toString())
                 if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
@@ -188,6 +189,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             var light_current = DBUtils.getLightByID(light!!.id)
             if (light_current != null) {
                 light_sbBrightness?.progress = light_current.colorTemperature
+                light_current.isSeek = false
                 tv_Brightness.text = light_current.colorTemperature.toString() + "%"
                 Log.e("TAG_SET_C", light_current.colorTemperature.toString())
 
@@ -236,6 +238,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             var light_current = DBUtils.getGroupByID(group!!.id)
             if (light_current != null) {
                 light_sbBrightness?.progress = light_current.brightness
+                light_current.isSeek = true
                 tv_Brightness.text = light_current.brightness.toString() + "%"
                 Log.e("TAG_SET_B", light_current.brightness.toString())
                 if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
@@ -272,6 +275,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             var light_current = DBUtils.getLightByID(light!!.id)
             if (light_current != null) {
                 light_sbBrightness?.progress = light_current.brightness
+                light_current.isSeek = true
                 tv_Brightness.text = light_current.brightness.toString() + "%"
                 Log.e("TAG_SET_B", light_current.brightness.toString())
                 if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
@@ -1209,30 +1213,29 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         light_switch.setOnClickListener(this.clickListener)
         temperature_btn.setOnClickListener(this.clickListener)
 
-        brightness_btn.setImageResource(R.drawable.icon_btn)
-        brightness_text.setTextColor(resources.getColor(R.color.blue_background))
-        temperature_btn.setImageResource(R.drawable.icon_unselected)
-        temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+
+        if(group!!.isSeek){
+            adjustment.text = getString(R.string.brightness_adjustment)
+            brightness_btn.setImageResource(R.drawable.icon_btn)
+            brightness_text.setTextColor(resources.getColor(R.color.blue_background))
+            temperature_btn.setImageResource(R.drawable.icon_unselected)
+            temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+            light_sbBrightness?.progress = group!!.brightness
+            tv_Brightness.text = group!!.brightness.toString() + "%"
+        }else{
+            adjustment.text = getString(R.string.color_temperature_adjustment)
+            temperature_btn.setImageResource(R.drawable.icon_btn)
+            temperature_text.setTextColor(resources.getColor(R.color.blue_background))
+            brightness_btn.setImageResource(R.drawable.icon_unselected)
+            brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+            light_sbBrightness?.progress = group!!.colorTemperature
+            tv_Brightness.text = group!!.colorTemperature.toString() + "%"
+        }
+
+
 //        light_sbBrightness?.progress = light!!.brightness
         var light_current = DBUtils.getGroupByID(group!!.id)
-        if (light_current != null) {
-            light_sbBrightness?.progress = light_current.brightness
-            tv_Brightness.text = light_current.brightness.toString() + "%"
-            Log.e("TAG_SET_B", light_current.brightness.toString())
-            if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
-                device_light_add.setImageResource(R.drawable.icon_puls_no)
-                device_light_minus.setImageResource(R.drawable.icon_minus_no)
-            }
-            val opcode: Byte
-            var params: ByteArray
-            opcode = Opcode.SET_TEMPERATURE
-            params = byteArrayOf(0x05, light_current.colorTemperature.toByte())
 
-
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
-        }
-        isBrightness = true
-        clickNum = 1
 
         this.light_sbBrightness?.max = 100
         if (group!!.connectionStatus == ConnectionStatus.OFF.value) {
@@ -1462,22 +1465,27 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         light_switch.setOnClickListener(this.clickListener)
         temperature_btn.setOnClickListener(this.clickListener)
 
-        brightness_btn.setImageResource(R.drawable.icon_btn)
-        brightness_text.setTextColor(resources.getColor(R.color.blue_background))
-        temperature_btn.setImageResource(R.drawable.icon_unselected)
-        temperature_text.setTextColor(resources.getColor(R.color.black_nine))
-//        light_sbBrightness?.progress = light!!.brightness
+        if(light!!.isSeek){
+            adjustment.text = getString(R.string.brightness_adjustment)
+            brightness_btn.setImageResource(R.drawable.icon_btn)
+            brightness_text.setTextColor(resources.getColor(R.color.blue_background))
+            temperature_btn.setImageResource(R.drawable.icon_unselected)
+            temperature_text.setTextColor(resources.getColor(R.color.black_nine))
 
-        light_sbBrightness?.progress = light!!.brightness
-        tv_Brightness.text = light!!.brightness.toString() + "%"
-        Log.e("TAG_SET_B", light!!.brightness.toString())
-        val opcode: Byte
-        var params: ByteArray
-        opcode = Opcode.SET_TEMPERATURE
-        params = byteArrayOf(0x05, light!!.colorTemperature.toByte())
+            light_sbBrightness?.progress = light!!.brightness
+            tv_Brightness.text = light!!.brightness.toString() + "%"
+        }else{
+            adjustment.text = getString(R.string.color_temperature_adjustment)
+            temperature_btn.setImageResource(R.drawable.icon_btn)
+            temperature_text.setTextColor(resources.getColor(R.color.blue_background))
+            brightness_btn.setImageResource(R.drawable.icon_unselected)
+            brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+
+            light_sbBrightness?.progress = light!!.colorTemperature
+            tv_Brightness.text = light!!.colorTemperature.toString() + "%"
+        }
 
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.meshAddr, params)
 
         isBrightness = true
         clickNum = 1

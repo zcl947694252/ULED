@@ -192,7 +192,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                 DividerItemDecoration
                         .VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .black_ee)))
+                .divider)))
         //添加分割线
         builtInModeRecycleView?.addItemDecoration(decoration)
         rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
@@ -444,6 +444,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         diyGradientList = DBUtils.diyGradientList
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList,isDelete)
         isDelete = false
         rgbDiyGradientAdapter!!.changeState(isDelete)
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE

@@ -33,7 +33,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".user.VerificationCodeActivity"></activity>
+        <activity android:name=".user.VerificationCodeActivity"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".switches.OTASwitchActivity"
             android:screenOrientation="portrait" />

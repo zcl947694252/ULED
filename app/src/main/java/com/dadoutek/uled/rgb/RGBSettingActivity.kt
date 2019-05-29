@@ -3,11 +3,13 @@ package com.dadoutek.uled.rgb
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.os.SystemClock
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
@@ -17,6 +19,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -87,6 +90,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     internal var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
     internal var tvValue = 0//TextView中的值
+
+    private var redColor: Int? = null
+    private var greenColor: Int? = null
+    private var blueColor: Int? = null
 
     fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
@@ -240,9 +247,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun initType() {
-        ll_r.setOnClickListener(this.clickListener)
-        ll_g.setOnClickListener(this.clickListener)
-        ll_b.setOnClickListener(this.clickListener)
         val type = intent.getStringExtra(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
             currentShowGroupSetPage = true
@@ -306,9 +310,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
         dynamic_rgb!!.setOnClickListener(this.clickListener)
-//        ll_r.setOnClickListener(this.clickListener)
-//        ll_g.setOnClickListener(this.clickListener)
-//        ll_b.setOnClickListener(this.clickListener)
+        ll_r.setOnClickListener(this.clickListener)
+        ll_g.setOnClickListener(this.clickListener)
+        ll_b.setOnClickListener(this.clickListener)
 //        sbBrightness_add!!.setOnClickListener(this.clickListener)
 //        sbBrightness_less!!.setOnClickListener(this.clickListener)
 //        sb_w_bright_add!!.setOnClickListener(this.clickListener)
@@ -682,45 +686,131 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             R.id.dynamic_rgb -> toRGBGradientView()
             R.id.tvRename -> renameLight()
             R.id.ll_r -> {
-                var r = Color.red(light?.color ?: 0)
-                var g = Color.green(light?.color ?: 0)
-                var b = Color.blue(light?.color ?: 0)
-                var dialog = InputRGBColorDialog(this, R.style.Dialog, r.toString(), g.toString(), b.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
-                    color_r.text = red
-                    color_g.text = green
-                    color_b.text = blue
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
                 })
                 dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+
             }
 
             R.id.ll_g -> {
-                var r = Color.red(light?.color ?: 0)
-                var g = Color.green(light?.color ?: 0)
-                var b = Color.blue(light?.color ?: 0)
-                var dialog = InputRGBColorDialog(this, R.style.Dialog, r.toString(), g.toString(), b.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
-                    color_r.text = red
-                    color_g.text = green
-                    color_b.text = blue
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
+
                 })
                 dialog.show()
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+
             }
 
             R.id.ll_b -> {
-                var r = Color.red(light?.color ?: 0)
-                var g = Color.green(light?.color ?: 0)
-                var b = Color.blue(light?.color ?: 0)
-                var dialog = InputRGBColorDialog(this, R.style.Dialog, r.toString(), g.toString(), b.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
-                    color_r.text = red
-                    color_g.text = green
-                    color_b.text = blue
+                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                    redColor = red.toInt()
+                    greenColor = green.toInt()
+                    blueColor = blue.toInt()
+
+                    setColorPicker()
                 })
                 dialog.show()
+
+                dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+
             }
-//            R.id.sbBrightness_add -> addBrightness()
-//            R.id.sbBrightness_less -> lessBrightness()
-//            R.id.sb_w_bright_add -> addWhiteBright()
-//            R.id.sb_w_bright_less -> lessWhiteBright()
         }
+    }
+
+    private fun setColorPicker() {
+        val r = redColor!!
+        val g = greenColor!!
+        val b = blueColor!!
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
+        var w = sb_w_bright.progress
+//
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+//        val color = presetColors?.get(position)?.color
+//        var brightness = light!!.brightness
+        var ws = (color!! and 0xff000000.toInt()) shr 24
+        val red = (color!! and 0xff0000) shr 16
+        val green = (color and 0x00ff00) shr 8
+        val blue = color and 0x0000ff
+
+        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
+        val showBrightness = w
+        var showW = ws
+        Thread {
+
+            try {
+
+                if (w!! > Constant.MAX_VALUE) {
+                    w = Constant.MAX_VALUE
+                }
+                if (ws > Constant.MAX_VALUE) {
+                    ws = Constant.MAX_VALUE
+                }
+                if (ws == -1) {
+                    ws = 0
+                    showW = 0
+                }
+
+                var addr = 0
+                if (currentShowGroupSetPage) {
+                    addr = group?.meshAddr!!
+                } else {
+                    addr = light?.meshAddr!!
+                }
+
+                val opcode: Byte = Opcode.SET_LUM
+                val opcodeW: Byte = Opcode.SET_W_LUM
+
+                val paramsW: ByteArray = byteArrayOf(ws.toByte())
+                val params: ByteArray = byteArrayOf(w!!.toByte())
+                TelinkLightService.Instance().sendCommandNoResponse(opcodeW, addr!!, paramsW)
+
+                Thread.sleep(80)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+
+                Thread.sleep(80)
+                changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+
+                if (currentShowGroupSetPage) {
+                    group?.brightness = showBrightness!!
+                    group?.color = color
+                } else {
+                    light?.brightness = showBrightness!!
+                    light?.color = color
+                }
+
+                LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }.start()
+
+        sbBrightness?.progress = showBrightness!!
+        sb_w_bright_num.text = showBrightness.toString() + "%"
+        if (w != -1) {
+            sb_w_bright_num.text = showW.toString() + "%"
+            sb_w_bright.progress = showW
+        } else {
+            sb_w_bright_num.text = "0%"
+            sb_w_bright.progress = 0
+        }
+//        scrollView?.setBackgroundColor(color)
+        color_r?.text = red.toString()
+        color_g?.text = green.toString()
+        color_b?.text = blue.toString()
     }
 
 
@@ -894,6 +984,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_picker.isEnabled = true
 
         dynamic_rgb.setOnClickListener(this.clickListener)
+        ll_r.setOnClickListener(this.clickListener)
+        ll_g.setOnClickListener(this.clickListener)
+        ll_b.setOnClickListener(this.clickListener)
 //        sbBrightness_add!!.setOnTouchListener { v, event ->
 //
 //            true
@@ -940,6 +1033,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         sbBrightness!!.progress = group!!.brightness
         sbBrightness_num.text = group!!.brightness.toString() + "%"
 
+        if (sbBrightness!!.progress >= 100) {
+            sbBrightness_add.isEnabled = false
+            sbBrightness_less.isEnabled = true
+        } else if (sbBrightness!!.progress <= 0) {
+            sbBrightness_less.isEnabled = false
+            sbBrightness_add.isEnabled = true
+        } else {
+            sbBrightness_less.isEnabled = true
+            sbBrightness_add.isEnabled = true
+        }
+
         var w = ((group?.color ?: 0) and 0xff000000.toInt()) shr 24
         var r = Color.red(group?.color ?: 0)
         var g = Color.green(group?.color ?: 0)
@@ -953,6 +1057,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_r.text = r.toString()
         color_g.text = g.toString()
         color_b.text = b.toString()
+
+        if (sb_w_bright.progress >= 100) {
+            sb_w_bright_add.isEnabled = false
+            sb_w_bright_less.isEnabled = true
+        } else if (sb_w_bright.progress <= 0) {
+            sb_w_bright_less.isEnabled = false
+            sb_w_bright_add.isEnabled = true
+        } else {
+            sb_w_bright_less.isEnabled = true
+            sb_w_bright_add.isEnabled = true
+        }
 
         sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
@@ -1036,6 +1151,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_g?.text = green.toString()
         color_b?.text = blue.toString()
     }
+
 
     @SuppressLint("SetTextI18n")
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
@@ -1281,6 +1397,37 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }.start()
     }
 
+    private val colorObservers = ColorObserver { color, fromUser ->
+        val r = redColor!!
+        val g = greenColor!!
+        val b = blueColor!!
+        color_r?.text = r.toString()
+        color_g?.text = g.toString()
+        color_b?.text = b.toString()
+        val w = sb_w_bright.progress
+
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+//        val color =
+        var fromUser = true
+        Log.d("", "onColorSelected: " + Integer.toHexString(color))
+        if (fromUser) {
+//            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
+            if (r == 0 && g == 0 && b == 0) {
+            } else {
+                Thread {
+                    if (currentShowGroupSetPage) {
+                        group?.color = color
+                    } else {
+                        light?.color = color
+                    }
+
+                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
+
+                }.start()
+            }
+        }
+    }
+
     private val colorObserver = ColorObserver { color, fromUser ->
         val r = Color.red(color)
         val g = Color.green(color)
@@ -1309,6 +1456,68 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 }.start()
             }
         }
+//                val r = Color.red(color)
+//        val g = Color.green(color)
+//        val b = Color.blue(color)
+//        color_r?.text = r.toString()
+//        color_g?.text = g.toString()
+//        color_b?.text = b.toString()
+//        val w = sb_w_bright.progress
+//
+//        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+//        val color =
+//        Log.d("", "onColorSelected: " + Integer.toHexString(color))
+//        if (isColor) {
+//            val r = Color.red(color)
+//            val g = Color.green(color)
+//            val b = Color.blue(color)
+//            color_r?.text = r.toString()
+//            color_g?.text = g.toString()
+//            color_b?.text = b.toString()
+//            val w = sb_w_bright.progress
+//
+//            val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+////            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
+//            if (r == 0 && g == 0 && b == 0) {
+//            } else {
+//                Thread {
+//                    if (currentShowGroupSetPage) {
+//                        group?.color = color
+//                    } else {
+//                        light?.color = color
+//                    }
+//
+//                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
+//
+//                }.start()
+//            }
+//        } else {
+//            if (redColor != null) {
+//                val r = redColor!!
+//                val g = greenColor!!
+//                val b = blueColor!!
+//                color_r?.text = r.toString()
+//                color_g?.text = g.toString()
+//                color_b?.text = b.toString()
+//                val w = sb_w_bright.progress
+//
+//                val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
+//
+//                if (r == 0 && g == 0 && b == 0) {
+//                } else {
+//                    Thread {
+//                        if (currentShowGroupSetPage) {
+//                            group?.color = color
+//                        } else {
+//                            light?.color = color
+//                        }
+//
+//                        changeColor(r.toByte(), g.toByte(), b.toByte(), false)
+//
+//                    }.start()
+//                }
+//            }
+//        }
     }
 
     private val colorEnvelopeListener = ColorEnvelopeListener { envelope, fromUser ->
@@ -1343,6 +1552,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         } else {
             TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
         }
+
+//        color_picker.setInitialColor((light?.color ?: 0
+//        and 0xffffff) or 0xff000000.toInt())
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理

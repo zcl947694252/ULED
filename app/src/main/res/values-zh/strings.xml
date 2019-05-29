@@ -665,4 +665,8 @@
     <string name="i_see">我知道了</string>
     <string name="switch_grouping">切换分组</string>
     <string name="please_rgb">请输入RGB值</string>
+    <string name="cannot_rgb_null">RGB值不能为空</string>
+    <string name="rgb_max">RGB值不能大于255</string>
+    <string name="switch_current">此开关当前已控制</string>
+    <string name="switch_group_switch">是否切换分组？</string>
 </resources>

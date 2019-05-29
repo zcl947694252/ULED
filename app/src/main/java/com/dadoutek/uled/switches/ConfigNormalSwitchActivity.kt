@@ -401,6 +401,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun updateSwitch() {
         switchDate!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+        switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
         DBUtils.updateSwicth(switchDate!!)
     }
 

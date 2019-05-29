@@ -1,196 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <android.support.constraint.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="300dp"
-        android:layout_height="160dp"
-        android:layout_marginStart="56dp"
-        android:layout_marginEnd="56dp"
-        android:background="@drawable/bg_dialog"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="300dp"
+    android:layout_height="160dp"
+    android:layout_gravity="center"
+    android:background="@drawable/bg_dialog"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.499">
+
+
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="输入RGB值"
+        android:textColor="@color/blue_background"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/textView19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="28dp"
+        android:text="R"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+    <EditText
+        android:id="@+id/rgb_red"
+        android:layout_width="49dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="12dp"
+        android:background="@drawable/black_rgb_color"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView19"
+        app:layout_constraintStart_toEndOf="@+id/textView19"
+        app:layout_constraintTop_toTopOf="@+id/textView19" />
+
+
+    <TextView
+        android:id="@+id/textView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="G"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView19"
+        app:layout_constraintStart_toEndOf="@+id/rgb_red"
+        app:layout_constraintTop_toTopOf="@+id/textView19" />
+
+
+    <EditText
+        android:id="@+id/rgb_green"
+        android:layout_width="49dp"
+        android:layout_height="20dp"
+        android:background="@drawable/black_rgb_color"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView21"
+        app:layout_constraintEnd_toStartOf="@+id/textView22"
+        app:layout_constraintHorizontal_bias="0.25"
+        app:layout_constraintStart_toEndOf="@+id/textView21"
+        app:layout_constraintTop_toTopOf="@+id/textView21" />
+
+    <TextView
+        android:id="@+id/textView22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:maxLength="3"
+        android:text="B"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView21"
+        app:layout_constraintEnd_toStartOf="@+id/rgb_blue"
+        app:layout_constraintTop_toTopOf="@+id/textView21" />
+
+
+    <EditText
+        android:id="@+id/rgb_blue"
+        android:layout_width="49dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/black_rgb_color"
+        android:inputType="number"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView21"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/textView21" />
+
+
+    <View
+        android:id="@+id/view11"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="32dp"
+        android:background="@color/black_ee"
+        app:layout_constraintTop_toBottomOf="@+id/textView21" />
+
+
+    <View
+        android:id="@+id/view13"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/black_ee"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.499">
+        app:layout_constraintTop_toBottomOf="@+id/view11" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/cancelBtn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/view13"
+        app:layout_constraintEnd_toStartOf="@+id/view13"
+        app:layout_constraintStart_toStartOf="@+id/view11"
+        app:layout_constraintTop_toBottomOf="@+id/view11">
 
 
         <TextView
-            android:id="@+id/textView14"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:text="输入RGB值"
-            android:textColor="@color/blue_background"
-            android:textSize="17sp"
+            android:text="@string/cancel"
+            android:textColor="@color/black_three"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
 
-        <TextView
-            android:id="@+id/textView19"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="9dp"
-            android:layout_marginTop="28dp"
-            android:text="R"
-            android:textColor="@color/black_three"
-            android:textSize="17sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+    </android.support.constraint.ConstraintLayout>
 
-        <EditText
-            android:id="@+id/rgb_red"
-            android:layout_width="49dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="12dp"
-            android:background="@drawable/black_rgb_color"
-            android:textColor="@color/black_three"
-            android:textSize="17sp"
-            android:inputType="number"
-            android:maxLength="3"
-            app:layout_constraintBottom_toBottomOf="@+id/textView19"
-            app:layout_constraintStart_toEndOf="@+id/textView19"
-            app:layout_constraintTop_toTopOf="@+id/textView19" />
 
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/okBtn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/view11"
+        app:layout_constraintStart_toEndOf="@+id/view13"
+        app:layout_constraintTop_toBottomOf="@+id/view11">
 
         <TextView
-            android:id="@+id/textView21"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:text="G"
-            android:textColor="@color/black_three"
-            android:textSize="17sp"
-            app:layout_constraintBottom_toBottomOf="@+id/textView19"
-            app:layout_constraintStart_toEndOf="@+id/rgb_red"
-            app:layout_constraintTop_toTopOf="@+id/textView19" />
-
-
-        <EditText
-            android:id="@+id/rgb_green"
-            android:layout_width="49dp"
-            android:layout_height="20dp"
-            android:background="@drawable/black_rgb_color"
-            android:textColor="@color/black_three"
-            android:textSize="17sp"
-            android:inputType="number"
-            android:maxLength="3"
-            app:layout_constraintBottom_toBottomOf="@+id/textView21"
-            app:layout_constraintEnd_toStartOf="@+id/textView22"
-            app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toEndOf="@+id/textView21"
-            app:layout_constraintTop_toTopOf="@+id/textView21" />
-
-        <TextView
-            android:id="@+id/textView22"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:text="B"
-            android:textColor="@color/black_three"
-            android:textSize="17sp"
-            android:maxLength="3"
-            app:layout_constraintBottom_toBottomOf="@+id/textView21"
-            app:layout_constraintEnd_toStartOf="@+id/rgb_blue"
-            app:layout_constraintTop_toTopOf="@+id/textView21" />
-
-
-        <EditText
-            android:id="@+id/rgb_blue"
-            android:layout_width="49dp"
-            android:layout_height="20dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/black_rgb_color"
-            android:textColor="@color/black_three"
-            android:inputType="number"
-            android:textSize="17sp"
-            app:layout_constraintBottom_toBottomOf="@+id/textView21"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView21" />
-
-
-        <View
-            android:id="@+id/view11"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="32dp"
-            android:background="@color/black_ee"
-            app:layout_constraintTop_toBottomOf="@+id/textView21" />
-
-
-        <View
-            android:id="@+id/view13"
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="8dp"
-            android:background="@color/black_ee"
+            android:text="@string/btn_ok"
+            android:textColor="@color/blue_background"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view11" />
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/cancelBtn"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/view13"
-            app:layout_constraintEnd_toStartOf="@+id/view13"
-            app:layout_constraintStart_toStartOf="@+id/view11"
-            app:layout_constraintTop_toBottomOf="@+id/view11">
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/cancel"
-                android:textColor="@color/black_three"
-                android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-        </android.support.constraint.ConstraintLayout>
-
-
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/okBtn"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/view11"
-            app:layout_constraintStart_toEndOf="@+id/view13"
-            app:layout_constraintTop_toBottomOf="@+id/view11">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/btn_ok"
-                android:textColor="@color/blue_background"
-                android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-        </android.support.constraint.ConstraintLayout>
-
-
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/cancel"-->
-            <!--android:textColor="@color/black_three"-->
-            <!--android:textSize="15sp"-->
-            <!--app:layout_constraintBottom_toBottomOf="@+id/view13"-->
-            <!--app:layout_constraintEnd_toStartOf="@+id/view13"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/view11" />-->
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </android.support.constraint.ConstraintLayout>
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="@string/cancel"-->
+    <!--android:textColor="@color/black_three"-->
+    <!--android:textSize="15sp"-->
+    <!--app:layout_constraintBottom_toBottomOf="@+id/view13"-->
+    <!--app:layout_constraintEnd_toStartOf="@+id/view13"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/view11" />-->
+
+
+</android.support.constraint.ConstraintLayout>
