@@ -277,10 +277,16 @@ class RelayFragmentList: BaseFragment() {
                 R.id.btn_on -> {
                     Commander.openOrCloseLights(dstAddr, true)
                     updateLights(true, currentLight)
+                    currentLight.status=1
+                    groupAdapter!!.notifyItemChanged(position)
+                    DBUtils.updateGroup(currentLight)
                 }
                 R.id.btn_off -> {
                     Commander.openOrCloseLights(dstAddr, false)
                     updateLights(false, currentLight)
+                    currentLight.status=2
+                    groupAdapter!!.notifyItemChanged(position)
+                    DBUtils.updateGroup(currentLight)
                 }
 
                 R.id.btn_set -> {

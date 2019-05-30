@@ -135,24 +135,24 @@ open class TelinkBaseActivity : AppCompatActivity() {
         val blueadapter = BluetoothAdapter.getDefaultAdapter()
         if (blueadapter?.isEnabled == false) {
             showOpenBluetoothDialog(ActivityUtils.getTopActivity())
+//            retryConnect()
             if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
                     var dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
                     dialog.show()
-                    retryConnect()
                 })
             }
         } else {
             if (toolbar != null) {
                 if (TelinkLightApplication.getInstance().connectDevice == null) {
+//                    retryConnect()
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
                         var dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
                         dialog.show()
-                        retryConnect()
                     })
                 } else {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
@@ -238,13 +238,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
+//                    retryConnect()
                     if (toolbar != null) {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
                             var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
                             dialog.show()
-                            retryConnect()
                         })
                     }
                 }
@@ -252,13 +252,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
                     when (blueState) {
                         BluetoothAdapter.STATE_OFF -> {
+//                            retryConnect()
                             if (toolbar != null) {
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
                                     var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
                                     dialog.show()
-                                    retryConnect()
                                 })
                             }
                         }
@@ -277,10 +277,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
-                startScan()
-            else
-                login()
+            if(TelinkLightService.Instance().adapter.mLightCtrl.currentLight!=null){
+                if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+                    startScan()
+                else
+                    login()
+            }
         } else {
             TelinkLightService.Instance().idleMode(true)
             startScan()
@@ -409,7 +411,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    retryConnect()
+//                    retryConnect()
                 }
     }
 

@@ -132,7 +132,7 @@ class GroupListFragment : BaseFragment() {
 
     private var btnSet: ImageView? = null
 
-    private lateinit var allGroup: DbGroup
+    private  var allGroup: DbGroup? = null
 
     private var cwLightGroup: String? = null
 
@@ -359,19 +359,23 @@ class GroupListFragment : BaseFragment() {
         showList = ArrayList()
         showList = gpList
 
-        allGroup = DBUtils.getGroupByName(getString(R.string.allLight))
+        allGroup = DBUtils.getGroupByMesh(0xFFFF)
 
-        if (allGroup.status == 1) {
-            btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
-            btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
-            onText!!.setTextColor(resources.getColor(R.color.white))
-            offText!!.setTextColor(resources.getColor(R.color.black_nine))
-        } else if (allGroup.status == 2) {
-            btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
-            btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
-            onText!!.setTextColor(resources.getColor(R.color.black_nine))
-            offText!!.setTextColor(resources.getColor(R.color.white))
+        if(allGroup!=null){
+            if (allGroup!!.status == 1) {
+                btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
+                btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
+                onText!!.setTextColor(resources.getColor(R.color.white))
+                offText!!.setTextColor(resources.getColor(R.color.black_nine))
+            } else if (allGroup!!.status == 2) {
+                btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
+                btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
+                onText!!.setTextColor(resources.getColor(R.color.black_nine))
+                offText!!.setTextColor(resources.getColor(R.color.white))
+            }
         }
+
+
 
 //        val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
@@ -611,7 +615,7 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.navigationIcon = null
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            allGroup = DBUtils.getGroupByName(getString(R.string.allLight))
+            allGroup = DBUtils.getGroupByMesh(0xFFFF)
             toolbar!!.setTitle(R.string.group_title)
 
             val layoutManager = LinearLayoutManager(activity)
@@ -742,13 +746,13 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
-                    val dstAddr = this.allGroup.meshAddr
+                    val dstAddr = this.allGroup!!.meshAddr
                     Commander.openOrCloseLights(dstAddr, true)
                     btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
                     btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
                     onText!!.setTextColor(resources.getColor(R.color.white))
                     offText!!.setTextColor(resources.getColor(R.color.black_nine))
-                    updateLights(true, this.allGroup)
+                    updateLights(true, this.allGroup!!)
                     val intent = Intent("switch_here")
                     intent.putExtra("switch_here", "on")
                     LocalBroadcastManager.getInstance(this!!.mContext!!)
@@ -761,13 +765,13 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
-                    val dstAddr = this.allGroup.meshAddr
+                    val dstAddr = this.allGroup!!.meshAddr
                     Commander.openOrCloseLights(dstAddr, false)
                     btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
                     btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
                     onText!!.setTextColor(resources.getColor(R.color.black_nine))
                     offText!!.setTextColor(resources.getColor(R.color.white))
-                    updateLights(false, this.allGroup)
+                    updateLights(false, this.allGroup!!)
                     val intent = Intent("switch_here")
                     intent.putExtra("switch_here", "false")
                     LocalBroadcastManager.getInstance(this!!.mContext!!)

@@ -201,6 +201,18 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     lightsData!![i].updateRgbIcon()
                 }
             }
+
+            Constant.INSTALL_LIGHT_OF_CW -> {
+                for (i in lightsData?.indices!!) {
+                    lightsData!![i].updateIcon()
+                }
+            }
+
+            Constant.INSTALL_LIGHT_OF_RGB -> {
+                for (i in lightsData?.indices!!) {
+                    lightsData!![i].updateRgbIcon()
+                }
+            }
         }
 
 

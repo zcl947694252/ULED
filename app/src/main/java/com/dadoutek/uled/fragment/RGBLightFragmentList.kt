@@ -300,7 +300,7 @@ class RGBLightFragmentList: BaseFragment() {
                 R.id.btn_off -> {
                     Commander.openOrCloseLights(dstAddr, false)
                     updateLights(false, currentLight)
-                    currentLight.status=1
+                    currentLight.status=2
                     groupAdapter!!.notifyItemChanged(position)
                     DBUtils.updateGroup(currentLight)
                 }

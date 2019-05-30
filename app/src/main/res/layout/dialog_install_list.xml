@@ -47,21 +47,34 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#eeeeee"
-        app:layout_constraintBottom_toTopOf="@+id/install_device_recyclerView"
+        app:layout_constraintBottom_toTopOf="@+id/layout"
         app:layout_constraintEnd_toEndOf="@+id/text"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/text" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/install_device_recyclerView"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout"
         android:layout_width="0dp"
         android:layout_height="475dp"
-        android:layout_marginTop="8dp"
-        android:background="#ffffff"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text" />
+        app:layout_constraintTop_toBottomOf="@+id/text">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/install_device_recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="475dp"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </android.support.constraint.ConstraintLayout>
+
 
     <!--<ScrollView-->
         <!--android:layout_width="match_parent"-->
