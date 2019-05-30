@@ -42,38 +42,25 @@
             app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
 
-    <View
-        android:id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#eeeeee"
-        app:layout_constraintBottom_toTopOf="@+id/layout"
-        app:layout_constraintEnd_toEndOf="@+id/text"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/text" />
+    <!--<View-->
+        <!--android:id="@+id/view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1dp"-->
+        <!--android:background="#eeeeee"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/text"-->
+        <!--app:layout_constraintEnd_toEndOf="@+id/text"-->
+        <!--app:layout_constraintStart_toStartOf="@+id/text" />-->
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/layout"
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/install_device_recyclerView"
         android:layout_width="0dp"
         android:layout_height="475dp"
+        android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text">
+        app:layout_constraintTop_toBottomOf="@+id/text" />
 
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/install_device_recyclerView"
-            android:layout_width="0dp"
-            android:layout_height="475dp"
-            android:background="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-    </android.support.constraint.ConstraintLayout>
 
 
     <!--<ScrollView-->
