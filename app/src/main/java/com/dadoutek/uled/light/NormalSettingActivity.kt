@@ -1214,7 +1214,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         temperature_btn.setOnClickListener(this.clickListener)
 
 
-        if(group!!.isSeek){
+        if (group!!.isSeek) {
             adjustment.text = getString(R.string.brightness_adjustment)
             brightness_btn.setImageResource(R.drawable.icon_btn)
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
@@ -1222,7 +1222,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
             light_sbBrightness?.progress = group!!.brightness
             tv_Brightness.text = group!!.brightness.toString() + "%"
-        }else{
+            clickNum = 1
+        } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
             temperature_btn.setImageResource(R.drawable.icon_btn)
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
@@ -1230,6 +1231,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
             light_sbBrightness?.progress = group!!.colorTemperature
             tv_Brightness.text = group!!.colorTemperature.toString() + "%"
+            clickNum = 1
         }
 
 
@@ -1465,7 +1467,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         light_switch.setOnClickListener(this.clickListener)
         temperature_btn.setOnClickListener(this.clickListener)
 
-        if(light!!.isSeek){
+        if (light!!.isSeek) {
             adjustment.text = getString(R.string.brightness_adjustment)
             brightness_btn.setImageResource(R.drawable.icon_btn)
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
@@ -1474,7 +1476,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
             light_sbBrightness?.progress = light!!.brightness
             tv_Brightness.text = light!!.brightness.toString() + "%"
-        }else{
+
+            clickNum = 1
+        } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
             temperature_btn.setImageResource(R.drawable.icon_btn)
             temperature_text.setTextColor(resources.getColor(R.color.blue_background))
@@ -1483,6 +1487,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
             light_sbBrightness?.progress = light!!.colorTemperature
             tv_Brightness.text = light!!.colorTemperature.toString() + "%"
+
+            clickNum = 1
         }
 
 

@@ -310,13 +310,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>,CallbackLinkMai
         install_device_recyclerView?.layoutManager = layoutManager
         install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
-                val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
-        //添加分割线
-        install_device_recyclerView?.addItemDecoration(decoration)
+//                val decoration = DividerItemDecoration(this,
+//                DividerItemDecoration
+//                        .VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+//                .divider)))
+//        //添加分割线
+//        install_device_recyclerView?.addItemDecoration(decoration)
 
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
