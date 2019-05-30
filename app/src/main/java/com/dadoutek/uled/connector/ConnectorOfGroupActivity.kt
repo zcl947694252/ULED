@@ -152,6 +152,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RELAY_OF)
         intent.putExtra("relay_name",group.name)
         startActivity(intent)
+        finish()
     }
 
     private fun initOnLayoutListener() {

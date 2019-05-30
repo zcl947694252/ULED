@@ -453,6 +453,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         toolbar!!.title = getString(R.string.dynamic_gradient)
         rgbDiyGradientAdapter!!.notifyDataSetChanged()
         setDate()
+        isDiyMode = true
         changeToDiyPage()
     }
 

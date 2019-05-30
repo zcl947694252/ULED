@@ -496,9 +496,10 @@
                     />
 
                 <TextView
+                    android:id="@+id/tvLightVersionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="关于"
+                    android:text="@string/light_version"
                     android:textColor="@color/black_e"
                     android:textSize="13sp"
                     android:layout_centerVertical="true"
@@ -506,20 +507,16 @@
                     />
 
                 <TextView
-                    android:layout_alignParentBottom="true"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/background_color"
-                    />
-
-                <ImageView
+                    android:id="@+id/appVersion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/icon_arrow"
+                    android:text="1.0.0"
+                    android:textColor="@color/primary"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="23dp"
                     android:layout_centerVertical="true"
-                    />
+                    android:textSize="13sp" />
+
             </RelativeLayout>
 
             <!--<RelativeLayout-->
@@ -577,45 +574,45 @@
 
             <!--</LinearLayout>-->
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/btn_rectangle_bottom"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:visibility="gone"
-                >
-                <TextView
-                    android:id="@+id/tvLightVersionText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/light_version"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="10dp"
-                    />
+            <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="50dp"-->
+                <!--android:background="@drawable/btn_rectangle_bottom"-->
+                <!--android:layout_marginStart="10dp"-->
+                <!--android:layout_marginEnd="10dp"-->
+                <!--android:visibility="gone"-->
+                <!--&gt;-->
+                <!--<TextView-->
+                    <!--android:id="@+id/tvLightVersionText"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@string/light_version"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--android:textSize="16sp"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_marginStart="10dp"-->
+                    <!--/>-->
 
-                <TextView
-                    android:id="@+id/tvLightVersion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="1dp"
-                    android:text="1.0.0"
-                    android:layout_toEndOf="@+id/tvLightVersionText"
-                    android:textColor="@color/primary"
-                    android:layout_centerVertical="true"
-                    android:textSize="18sp" />
+                <!--<TextView-->
+                    <!--android:id="@+id/tvLightVersion"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginStart="1dp"-->
+                    <!--android:text="1.0.0"-->
+                    <!--android:layout_toEndOf="@+id/tvLightVersionText"-->
+                    <!--android:textColor="@color/primary"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:textSize="18sp" />-->
 
-                <TextView
-                    android:background="@drawable/icon_right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="10dp"
-                    />
-            </RelativeLayout>
+                <!--<TextView-->
+                    <!--android:background="@drawable/icon_right"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentEnd="true"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_marginEnd="10dp"-->
+                    <!--/>-->
+            <!--</RelativeLayout>-->
 
             <Button
                 android:id="@+id/exitLogin"

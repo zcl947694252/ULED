@@ -905,9 +905,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 adapter?.notifyDataSetChanged()
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
-//            LightAdapter.STATUS_LOGOUT -> {
-//                retryConnect()
-//            }
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
             LightAdapter.STATUS_CONNECTING -> {
                 Log.d("connectting", "444")
                 scanPb.visibility = View.VISIBLE

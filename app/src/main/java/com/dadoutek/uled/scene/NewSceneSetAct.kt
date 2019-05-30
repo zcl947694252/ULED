@@ -38,6 +38,8 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var currentPageIsEdit = false
@@ -130,7 +132,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                lazyLoad()
+//                lazyLoad()
             }
         })
     }
@@ -411,6 +413,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         edit_data_view_layout.visibility = View.VISIBLE
         tv_function1.visibility = View.GONE
         edit_name.setSelection(edit_name.text.length)
+
+        edit_name!!.isFocusable = true
+        edit_name.isFocusableInTouchMode = true
+        edit_name.requestFocus()
+        val timer = Timer()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputManager.showSoftInput(edit_name, 0)
+            }
+        }, 200)
 
         initChangeState()
 

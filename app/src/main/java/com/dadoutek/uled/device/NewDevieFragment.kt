@@ -83,6 +83,11 @@ class NewDevieFragment :BaseFragment(){
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshView()
+    }
+
 //    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
 ////        if (isVisibleToUser) {
 ////            val act = activity as MainActivity?

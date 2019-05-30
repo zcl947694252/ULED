@@ -59,6 +59,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.sbBrightness
+import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -91,6 +92,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     internal var tvValue = 0//TextView中的值
 
     private var clickNum = 0
+
+    private var isSwitch: Boolean = false
 
     private val clickListener = OnClickListener { v ->
         when (v.id) {
@@ -140,171 +143,179 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     @SuppressLint("ResourceAsColor")
     private fun setTemperature() {
         adjustment.text = getString(R.string.color_temperature_adjustment)
-        if (currentShowPageGroup) {
-            temperature_btn.setImageResource(R.drawable.icon_btn)
-            temperature_text.setTextColor(resources.getColor(R.color.blue_background))
-            brightness_btn.setImageResource(R.drawable.icon_unselected)
-            brightness_text.setTextColor(resources.getColor(R.color.black_nine))
-            var light_current = DBUtils.getGroupByID(group!!.id)
-            if (light_current != null) {
-                light_sbBrightness?.progress = light_current.colorTemperature
-                light_current.isSeek = false
-                tv_Brightness.text = light_current.colorTemperature.toString() + "%"
-                Log.e("TAG_SET_C", light_current.colorTemperature.toString())
-                if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    device_light_add.setImageResource(R.drawable.icon_puls_no)
-                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                } else {
-                    if (light_current.colorTemperature <= 0) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
-                    } else if (light_current.colorTemperature >= 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                    } else {
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
+            if (currentShowPageGroup) {
+                temperature_btn.setImageResource(R.drawable.icon_btn)
+                temperature_text.setTextColor(resources.getColor(R.color.blue_background))
+                brightness_btn.setImageResource(R.drawable.icon_unselected)
+                brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+                if(isSwitch) {
+                    var light_current = DBUtils.getGroupByID(group!!.id)
+                    if (light_current != null) {
+                        light_sbBrightness?.progress = light_current.colorTemperature
+                        light_current.isSeek = false
+                        tv_Brightness.text = light_current.colorTemperature.toString() + "%"
+                        Log.e("TAG_SET_C", light_current.colorTemperature.toString())
+                        if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            device_light_add.setImageResource(R.drawable.icon_puls_no)
+                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                        } else {
+                            if (light_current.colorTemperature <= 0) {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            } else if (light_current.colorTemperature >= 100) {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            } else {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+
+                        }
+                        val opcode: Byte
+                        var params: ByteArray
+                        opcode = Opcode.SET_LUM
+                        params = byteArrayOf(light_current.brightness.toByte())
+
+                        if (light_current.brightness > Constant.MAX_VALUE) {
+                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+                        } else {
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+                        }
                     }
-
+                    isBrightness = false
+                    clickNum = 1
                 }
-                val opcode: Byte
-                var params: ByteArray
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(light_current.brightness.toByte())
+            } else {
+                temperature_btn.setImageResource(R.drawable.icon_btn)
+                temperature_text.setTextColor(resources.getColor(R.color.blue_background))
+                brightness_btn.setImageResource(R.drawable.icon_unselected)
+                brightness_text.setTextColor(resources.getColor(R.color.black_nine))
+                if(isSwitch) {
+                    var light_current = DBUtils.getLightByID(light!!.id)
+                    if (light_current != null) {
+                        light_sbBrightness?.progress = light_current.colorTemperature
+                        light_current.isSeek = false
+                        tv_Brightness.text = light_current.colorTemperature.toString() + "%"
+                        Log.e("TAG_SET_C", light_current.colorTemperature.toString())
 
-                if (light_current.brightness > Constant.MAX_VALUE) {
-                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
-                } else {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+                        if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            device_light_add.setImageResource(R.drawable.icon_puls_no)
+                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                        } else {
+                            if (light_current.colorTemperature <= 0) {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            } else if (light_current.colorTemperature >= 100) {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            } else {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                        }
+
+                        val opcode: Byte
+                        var params: ByteArray
+                        opcode = Opcode.SET_LUM
+                        params = byteArrayOf(light_current.brightness.toByte())
+
+                        if (light_current.brightness > Constant.MAX_VALUE) {
+                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+                        } else {
+                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+                        }
+                    }
+                    isBrightness = false
+                    clickNum = 1
                 }
             }
-            isBrightness = false
-            clickNum = 1
-        } else {
-            temperature_btn.setImageResource(R.drawable.icon_btn)
-            temperature_text.setTextColor(resources.getColor(R.color.blue_background))
-            brightness_btn.setImageResource(R.drawable.icon_unselected)
-            brightness_text.setTextColor(resources.getColor(R.color.black_nine))
-            var light_current = DBUtils.getLightByID(light!!.id)
-            if (light_current != null) {
-                light_sbBrightness?.progress = light_current.colorTemperature
-                light_current.isSeek = false
-                tv_Brightness.text = light_current.colorTemperature.toString() + "%"
-                Log.e("TAG_SET_C", light_current.colorTemperature.toString())
-
-                if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    device_light_add.setImageResource(R.drawable.icon_puls_no)
-                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                } else {
-                    if (light_current.colorTemperature <= 0) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
-                    } else if (light_current.colorTemperature >= 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                    } else {
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
-                    }
-                }
-
-                val opcode: Byte
-                var params: ByteArray
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(light_current.brightness.toByte())
-
-                if (light_current.brightness > Constant.MAX_VALUE) {
-                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
-                } else {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
-                }
-            }
-            isBrightness = false
-            clickNum = 1
-        }
     }
 
     @SuppressLint("ResourceAsColor")
     private fun setBrightness() {
         adjustment.text = getString(R.string.brightness_adjustment)
-        if (currentShowPageGroup) {
-            brightness_btn.setImageResource(R.drawable.icon_btn)
-            brightness_text.setTextColor(resources.getColor(R.color.blue_background))
-            temperature_btn.setImageResource(R.drawable.icon_unselected)
-            temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+            if (currentShowPageGroup) {
+                brightness_btn.setImageResource(R.drawable.icon_btn)
+                brightness_text.setTextColor(resources.getColor(R.color.blue_background))
+                temperature_btn.setImageResource(R.drawable.icon_unselected)
+                temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+                if(isSwitch) {
 //        light_sbBrightness?.progress = light!!.brightness
-            var light_current = DBUtils.getGroupByID(group!!.id)
-            if (light_current != null) {
-                light_sbBrightness?.progress = light_current.brightness
-                light_current.isSeek = true
-                tv_Brightness.text = light_current.brightness.toString() + "%"
-                Log.e("TAG_SET_B", light_current.brightness.toString())
-                if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    device_light_add.setImageResource(R.drawable.icon_puls_no)
-                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                } else {
-                    if (light_current.brightness <= 0) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
-                    } else if (light_current.brightness >= 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                    } else {
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
+                    var light_current = DBUtils.getGroupByID(group!!.id)
+                    if (light_current != null) {
+                        light_sbBrightness?.progress = light_current.brightness
+                        light_current.isSeek = true
+                        tv_Brightness.text = light_current.brightness.toString() + "%"
+                        Log.e("TAG_SET_B", light_current.brightness.toString())
+                        if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            device_light_add.setImageResource(R.drawable.icon_puls_no)
+                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                        } else {
+                            if (light_current.brightness <= 0) {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            } else if (light_current.brightness >= 100) {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            } else {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                        }
+                        val opcode: Byte
+                        var params: ByteArray
+                        opcode = Opcode.SET_TEMPERATURE
+                        params = byteArrayOf(0x05, light_current.colorTemperature.toByte())
+
+
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
                     }
+                    isBrightness = true
+                    clickNum = 1
                 }
-                val opcode: Byte
-                var params: ByteArray
-                opcode = Opcode.SET_TEMPERATURE
-                params = byteArrayOf(0x05, light_current.colorTemperature.toByte())
-
-
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
-            }
-            isBrightness = true
-            clickNum = 1
-        } else {
-            brightness_btn.setImageResource(R.drawable.icon_btn)
-            brightness_text.setTextColor(resources.getColor(R.color.blue_background))
-            temperature_btn.setImageResource(R.drawable.icon_unselected)
-            temperature_text.setTextColor(resources.getColor(R.color.black_nine))
+            } else {
+                brightness_btn.setImageResource(R.drawable.icon_btn)
+                brightness_text.setTextColor(resources.getColor(R.color.blue_background))
+                temperature_btn.setImageResource(R.drawable.icon_unselected)
+                temperature_text.setTextColor(resources.getColor(R.color.black_nine))
 //        light_sbBrightness?.progress = light!!.brightness
-            var light_current = DBUtils.getLightByID(light!!.id)
-            if (light_current != null) {
-                light_sbBrightness?.progress = light_current.brightness
-                light_current.isSeek = true
-                tv_Brightness.text = light_current.brightness.toString() + "%"
-                Log.e("TAG_SET_B", light_current.brightness.toString())
-                if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    device_light_add.setImageResource(R.drawable.icon_puls_no)
-                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                } else {
-                    if (light_current.brightness <= 0) {
-                        device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
-                    } else if (light_current.brightness >= 100) {
-                        device_light_add.setImageResource(R.drawable.icon_puls_no)
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                    } else {
-                        device_light_minus.setImageResource(R.drawable.icon_minus)
-                        device_light_add.setImageResource(R.drawable.icon_puls)
+                if (isSwitch) {
+                    var light_current = DBUtils.getLightByID(light!!.id)
+                    if (light_current != null) {
+                        light_sbBrightness?.progress = light_current.brightness
+                        light_current.isSeek = true
+                        tv_Brightness.text = light_current.brightness.toString() + "%"
+                        Log.e("TAG_SET_B", light_current.brightness.toString())
+                        if (light_current!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            device_light_add.setImageResource(R.drawable.icon_puls_no)
+                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                        } else {
+                            if (light_current.brightness <= 0) {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            } else if (light_current.brightness >= 100) {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            } else {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                        }
+
+                        val opcode: Byte
+                        var params: ByteArray
+                        opcode = Opcode.SET_TEMPERATURE
+                        params = byteArrayOf(0x05, light_current.colorTemperature.toByte())
+
+
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
                     }
+                    isBrightness = true
+                    clickNum = 1
                 }
-
-                val opcode: Byte
-                var params: ByteArray
-                opcode = Opcode.SET_TEMPERATURE
-                params = byteArrayOf(0x05, light_current.colorTemperature.toByte())
-
-
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
             }
-            isBrightness = true
-            clickNum = 1
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -314,6 +325,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             if (light_current != null) {
                 if (light_current.connectionStatus == ConnectionStatus.OFF.value) {
                     Commander.openOrCloseLights(light_current.meshAddr, true)
+                    isSwitch = true
                     light_switch.setImageResource(R.drawable.icon_light_open)
                     light_image.setImageResource(R.drawable.icon_light)
                     light_current.connectionStatus = ConnectionStatus.ON.value
@@ -433,6 +445,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     device_light_add.setOnTouchListener { v, event -> false }
                     device_light_minus.setOnTouchListener { v, event -> false }
+                    isSwitch = false
                 }
                 DBUtils.updateGroup(light_current)
             }
@@ -440,6 +453,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             var light_current = DBUtils.getLightByID(light!!.id)
             if (light_current != null) {
                 if (light_current.connectionStatus == ConnectionStatus.OFF.value) {
+                    isSwitch = true
                     Commander.openOrCloseLights(light_current.meshAddr, true)
                     light_switch.setImageResource(R.drawable.icon_light_open)
                     light_image.setImageResource(R.drawable.icon_light)
@@ -549,6 +563,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         true
                     }
                 } else {
+                    isSwitch = false
                     Commander.openOrCloseLights(light_current.meshAddr, false)
                     light_current.connectionStatus = ConnectionStatus.OFF.value
                     light_switch.setImageResource(R.drawable.icon_light_close)
@@ -1429,7 +1444,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun updateOTA() {
-        if (textTitle.text != null) {
+        if (textTitle.text != null && textTitle.text!="version") {
             checkPermission()
         }
     }
@@ -1506,7 +1521,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness.isEnabled = false
             device_light_add.setOnTouchListener { v, event -> false }
             device_light_minus.setOnTouchListener { v, event -> false }
+            isSwitch = false
         } else {
+            isSwitch = true
             light_image.setImageResource(R.drawable.icon_light)
             light_switch.setImageResource(R.drawable.icon_light_open)
             light_sbBrightness!!.setOnTouchListener { v, event -> false }

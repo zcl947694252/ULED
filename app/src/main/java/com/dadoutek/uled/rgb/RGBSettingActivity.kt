@@ -839,7 +839,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun updateOTA() {
-        if (lightVersion.text != null) {
+        if (lightVersion.text != null && lightVersion.text!=" ") {
             checkPermission()
         }
     }

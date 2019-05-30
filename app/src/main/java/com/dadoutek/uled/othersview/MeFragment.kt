@@ -255,7 +255,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         chearCache?.setOnClickListener(this)
         updateIte?.setOnClickListener(this)
         copyDataBase?.setOnClickListener(this)
-//        appVersion?.setOnClickListener(this)
+        appVersion?.setOnClickListener(this)
         exitLogin?.setOnClickListener(this)
         oneClickBackup?.setOnClickListener(this)
         oneClickReset?.setOnClickListener(this)
@@ -267,7 +267,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     private fun initView(view: View) {
 //        toolbar.title=getString(R.string.fragment_name_me)
         val versionName = AppUtils.getVersionName(activity!!)
-//        appVersion!!.text = versionName
+        appVersion!!.text = versionName
         //暂时屏蔽
         updateIte!!.visibility = View.GONE
         if (SharedPreferencesUtils.isDeveloperModel()) {
@@ -380,7 +380,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             R.id.chearCache -> emptyTheCache()
             R.id.updateIte -> ToastUtils.showShort(R.string.wait_develop)
             R.id.copyDataBase -> verifyStoragePermissions(activity)
-//            R.id.appVersion -> developerMode()
+            R.id.appVersion -> developerMode()
             R.id.exitLogin -> exitLogin()
             R.id.oneClickBackup -> checkNetworkAndSync(activity)
             R.id.oneClickReset -> showSureResetDialogByApp()

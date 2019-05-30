@@ -183,6 +183,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
         intent.putExtra("curtain_name",group.name)
         startActivity(intent)
+        finish()
     }
 
     private fun initToolbar() {
@@ -844,6 +845,11 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 Log.d("connectting", "444")
                 scanPb.visibility = View.VISIBLE
             }
+
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
+
             LightAdapter.STATUS_CONNECTED -> {
                 if (!TelinkLightService.Instance().isLogin)
                     login()

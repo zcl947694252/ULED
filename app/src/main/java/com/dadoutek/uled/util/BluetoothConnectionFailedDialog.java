@@ -72,7 +72,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                 break;
 
             case R.id.open_location:
-                intent = new Intent(ACTION_BLUETOOTH_SETTINGS);
+                intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 mContenxt.startActivity(intent);
                 break;
 

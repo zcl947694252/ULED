@@ -393,6 +393,12 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
+        for(int i =0;i<nowLightList.size();i++){
+            if(nowLightList.get(i).selected){
+                nowLightList.get(i).selected = false;
+            }
+        }
+
         finish();
     }
 

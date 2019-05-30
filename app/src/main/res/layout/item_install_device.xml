@@ -18,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
     <View
         android:id="@+id/view2"
         android:layout_width="match_parent"
@@ -47,5 +48,6 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/view2"
         app:layout_constraintStart_toStartOf="@+id/view2" />
+
 
 </android.support.constraint.ConstraintLayout>

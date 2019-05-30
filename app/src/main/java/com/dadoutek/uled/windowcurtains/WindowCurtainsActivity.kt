@@ -499,7 +499,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun updateOTA() {
-        if(versionText.text!=null){
+        if(versionText.text!=null && versionText.text!= " "){
             checkPermission()
         }
     }

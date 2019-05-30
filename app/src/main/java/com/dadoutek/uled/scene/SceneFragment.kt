@@ -469,10 +469,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             refreshView()
             initOnLayoutListener(1)
         } else {
-            if (activity != null) {
                 //                initOnLayoutListener(2);
                 refreshView()
-            }
         }
 
     }

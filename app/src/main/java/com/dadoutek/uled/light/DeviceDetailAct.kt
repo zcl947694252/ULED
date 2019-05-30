@@ -2,9 +2,11 @@ package com.dadoutek.uled.light
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.le.ScanFilter
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
 import android.hardware.Sensor
 import android.hardware.usb.UsbDevice.getDeviceName
@@ -36,6 +38,7 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.LightGroupingActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
@@ -50,12 +53,10 @@ import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
-import com.telink.bluetooth.event.DeviceEvent
-import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.ConnectionStatus
+import com.telink.bluetooth.TelinkLog
+import com.telink.bluetooth.event.*
+import com.telink.bluetooth.light.*
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.LeScanParameters
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -77,6 +78,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.inputMethodManager
@@ -147,8 +149,213 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
 
-    override fun performed(event: Event<String>?) {
+    private var connectMeshAddress: Int = 0
 
+    private var lastOffset: Int = 0//距离
+
+    private var lastPosition: Int = 0//第几个item
+
+    private var sharedPreferences: SharedPreferences? = null
+
+    override fun onPostResume() {
+        super.onPostResume()
+        addListeners()
+    }
+
+
+
+    private fun addListeners() {
+        addScanListeners()
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    override fun performed(event: Event<String>) {
+        when (event.type) {
+            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
+//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
+//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
+            NotificationEvent.GET_ALARM -> {
+            }
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
+            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
+            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
+//            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
+            }
+        }
+    }
+
+    private fun onServiceConnected(event: ServiceEvent) {
+//        LogUtils.d("onServiceConnected")
+    }
+
+    private fun onServiceDisconnected(event: ServiceEvent) {
+        LogUtils.d("onServiceDisconnected")
+        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+    }
+
+    private fun isSwitch(uuid: Int): Boolean {
+        return when (uuid) {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
+                LogUtils.d("This is switch")
+                true
+            }
+            else -> {
+                false
+
+            }
+        }
+    }
+
+    private fun onErrorReport(info: ErrorReportInfo) {
+//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+        if (bestRSSIDevice != null) {
+            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
+        }
+        when (info.stateCode) {
+            ErrorReportEvent.STATE_SCAN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                        LogUtils.d("蓝牙未开启")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        LogUtils.d("无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        LogUtils.d("未扫到目标设备")
+                    }
+                }
+
+            }
+            ErrorReportEvent.STATE_CONNECT -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        LogUtils.d("未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        LogUtils.d("未建立物理连接")
+                    }
+                }
+                retryConnect()
+
+            }
+            ErrorReportEvent.STATE_LOGIN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        LogUtils.d("value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        LogUtils.d("read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        LogUtils.d("write login data 没有收到response")
+                    }
+                }
+                retryConnect()
+
+            }
+        }
+    }
+
+    /**
+     * 处理扫描事件
+     *
+     * @param event
+     */
+    @Synchronized
+    private fun onLeScan(event: LeScanEvent) {
+        val mesh = this.mApplication?.mesh
+        val meshAddress = mesh?.generateMeshAddr()
+        val deviceInfo: DeviceInfo = event.args
+
+        Thread {
+            val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
+            if (dbLight != null && dbLight.macAddr == "0") {
+                dbLight.macAddr = deviceInfo.macAddress
+                DBUtils.updateLight(dbLight)
+            }
+        }.start()
+
+        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
+//            connect(deviceInfo.macAddress)
+            if (bestRSSIDevice != null) {
+                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
+                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    bestRSSIDevice = deviceInfo
+                }
+            } else {
+                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                bestRSSIDevice = deviceInfo
+            }
+
+        }
+
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+
+        val deviceInfo = event.args
+
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+
+                TelinkLightService.Instance().enableNotification()
+                TelinkLightService.Instance().updateNotification()
+                GlobalScope.launch(Dispatchers.Main) {
+                    stopConnectTimer()
+                    if (progressBar?.visibility != View.GONE)
+                        progressBar?.visibility = View.GONE
+                    delay(300)
+                }
+
+                val connectDevice = this.mApplication?.connectDevice
+                if (connectDevice != null) {
+                    this.connectMeshAddress = connectDevice.meshAddress
+                }
+
+//                scanPb.visibility = View.GONE
+//                adapter?.notifyDataSetChanged()
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
+            LightAdapter.STATUS_CONNECTING -> {
+                Log.d("connectting", "444")
+//                scanPb.visibility = View.VISIBLE
+            }
+            LightAdapter.STATUS_CONNECTED -> {
+                if (!TelinkLightService.Instance().isLogin)
+                    login()
+            }
+            LightAdapter.STATUS_ERROR_N -> onNError(event)
+        }
+    }
+
+    private fun stopConnectTimer() {
+        mConnectDisposal?.dispose()
+    }
+
+    private fun onNError(event: DeviceEvent) {
+
+//        ToastUtils.showLong(getString(R.string.connect_fail))
+        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLog.d("DeviceScanningActivity#onNError")
+
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
+        builder.setNegativeButton("confirm") { dialog, _ -> dialog.dismiss() }
+        builder.setCancelable(false)
+        builder.show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,6 +363,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         setContentView(R.layout.activity_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
+//        this.mApplication = this.application as TelinkLightApplication
 //        initDate()
 //        initView()
     }
@@ -166,6 +374,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         inflater = this.layoutInflater
         initDate()
         initView()
+        scrollToPosition()
     }
 
     private fun initView() {
@@ -184,7 +393,20 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         recycleView!!.itemAnimator = DefaultItemAnimator()
 
 
+        recycleView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
 
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (recyclerView.layoutManager != null) {
+
+                    getPositionAndOffset()
+
+                }
+
+            }
+
+        })
 
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
@@ -579,33 +801,45 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
                 startActivityForResult(intent, 0)
             }
+            Constant.INSTALL_LIGHT_OF_CW -> {
+                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+                startActivityForResult(intent, 0)
+            }
+            Constant.INSTALL_LIGHT_OF_RGB -> {
+                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
+                startActivityForResult(intent, 0)
+            }
         }
     }
 
     private fun initDate() {
-        lightsData= ArrayList()
+        lightsData = ArrayList()
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 var all_light_data = DBUtils.getAllNormalLight()
                 if (all_light_data.size > 0) {
-                    var list_group :ArrayList<DbLight> = ArrayList()
-                    var no_group :ArrayList<DbLight> = ArrayList()
-                    for(i in all_light_data.indices){
-                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                    var list_group: ArrayList<DbLight> = ArrayList()
+                    var no_group: ArrayList<DbLight> = ArrayList()
+                    for (i in all_light_data.indices) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
-                        }else{
+                        } else {
                             list_group.add(all_light_data[i])
                         }
                     }
 
-                    if(no_group.size>0){
-                        for(i in no_group.indices){
+                    if (no_group.size > 0) {
+                        for (i in no_group.indices) {
                             lightsData.add(no_group[i])
                         }
                     }
 
-                    if(list_group.size>0){
-                        for(i in list_group.indices){
+                    if (list_group.size > 0) {
+                        for (i in list_group.indices) {
                             lightsData.add(list_group[i])
                         }
                     }
@@ -641,25 +875,25 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             Constant.INSTALL_RGB_LIGHT -> {
                 var all_light_data = DBUtils.getAllRGBLight()
                 if (all_light_data.size > 0) {
-                    var list_group :ArrayList<DbLight> = ArrayList()
-                    var no_group :ArrayList<DbLight> = ArrayList()
-                    for(i in all_light_data.indices){
-                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                    var list_group: ArrayList<DbLight> = ArrayList()
+                    var no_group: ArrayList<DbLight> = ArrayList()
+                    for (i in all_light_data.indices) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
-                        }else{
+                        } else {
                             list_group.add(all_light_data[i])
                         }
                     }
 
 
-                    if(no_group.size>0){
-                        for(i in no_group.indices){
+                    if (no_group.size > 0) {
+                        for (i in no_group.indices) {
                             lightsData.add(no_group[i])
                         }
                     }
 
-                    if(list_group.size>0){
-                        for(i in list_group.indices){
+                    if (list_group.size > 0) {
+                        for (i in list_group.indices) {
                             lightsData.add(list_group[i])
                         }
                     }
@@ -694,29 +928,29 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             Constant.INSTALL_LIGHT_OF_CW -> {
                 var all_light_data = DBUtils.getAllNormalLight()
                 if (all_light_data.size > 0) {
-                    var list_group :ArrayList<DbLight> = ArrayList()
-                    var no_group :ArrayList<DbLight> = ArrayList()
-                    for(i in all_light_data.indices){
-                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                    var list_group: ArrayList<DbLight> = ArrayList()
+                    var no_group: ArrayList<DbLight> = ArrayList()
+                    for (i in all_light_data.indices) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
-                        }else{
+                        } else {
                             list_group.add(all_light_data[i])
                         }
                     }
 
 
-                    if(no_group.size>0){
-                        for(i in no_group.indices){
+                    if (no_group.size > 0) {
+                        for (i in no_group.indices) {
                             lightsData.add(no_group[i])
                         }
                     }
 
-                    if(list_group.size>0){
-                        for(i in list_group.indices){
+                    if (list_group.size > 0) {
+                        for (i in list_group.indices) {
                             lightsData.add(list_group[i])
                         }
                     }
-                    var cwLightGroup=this.intent.getStringExtra("cw_light_name")
+                    var cwLightGroup = this.intent.getStringExtra("cw_light_name")
                     toolbar!!.tv_function1.visibility = View.VISIBLE
                     recycleView.visibility = View.VISIBLE
                     no_device_relativeLayout.visibility = View.GONE
@@ -730,7 +964,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "cw_light")
-                        intent.putExtra("cw_light_group_name",cwLightGroup)
+                        intent.putExtra("cw_light_group_name", cwLightGroup)
                         startActivity(intent)
                     })
                 } else {
@@ -751,29 +985,29 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             Constant.INSTALL_LIGHT_OF_RGB -> {
                 var all_light_data = DBUtils.getAllRGBLight()
                 if (all_light_data.size > 0) {
-                    var list_group :ArrayList<DbLight> = ArrayList()
-                    var no_group :ArrayList<DbLight> = ArrayList()
-                    for(i in all_light_data.indices){
-                        if(StringUtils.getLightName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                    var list_group: ArrayList<DbLight> = ArrayList()
+                    var no_group: ArrayList<DbLight> = ArrayList()
+                    for (i in all_light_data.indices) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
-                        }else{
+                        } else {
                             list_group.add(all_light_data[i])
                         }
                     }
 
 
-                    if(no_group.size>0){
-                        for(i in no_group.indices){
+                    if (no_group.size > 0) {
+                        for (i in no_group.indices) {
                             lightsData.add(no_group[i])
                         }
                     }
 
-                    if(list_group.size>0){
-                        for(i in list_group.indices){
+                    if (list_group.size > 0) {
+                        for (i in list_group.indices) {
                             lightsData.add(list_group[i])
                         }
                     }
-                    var rgbLightGroup=this.intent.getStringExtra("rgb_light_name")
+                    var rgbLightGroup = this.intent.getStringExtra("rgb_light_name")
                     toolbar!!.tv_function1.visibility = View.VISIBLE
                     recycleView.visibility = View.VISIBLE
                     no_device_relativeLayout.visibility = View.GONE
@@ -786,7 +1020,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "rgb_light")
-                        intent.putExtra("rgb_light_group_name",rgbLightGroup)
+                        intent.putExtra("rgb_light_group_name", rgbLightGroup)
                         startActivity(intent)
                     })
                 } else {
@@ -956,7 +1190,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
-                            scanPb?.visibility = View.GONE
+//                            scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
@@ -1111,11 +1345,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 login()
         } else {
             TelinkLightService.Instance().idleMode(true)
-            if (!scanPb.isShown) {
-                retryConnectCount = 0
-                connectFailedDeviceMacList.clear()
-                startScan()
-            }
+//            if (!scanPb.isShown) {
+//                retryConnectCount = 0
+//                connectFailedDeviceMacList.clear()
+//                startScan()
+//            }
 
         }
     }
@@ -1144,6 +1378,70 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //        }
 
     }
+
+    private fun getPositionAndOffset() {
+
+        val layoutManager = recycleView!!.layoutManager as LinearLayoutManager?
+
+        //获取可视的第一个view
+
+        val topView = layoutManager!!.getChildAt(0)
+
+        if (topView != null) {
+
+            //获取与该view的顶部的偏移量
+
+            lastOffset = topView.top
+
+            //得到该View的数组位置
+
+            lastPosition = layoutManager.getPosition(topView)
+
+            sharedPreferences = getSharedPreferences("key", Activity.MODE_PRIVATE)
+
+            val editor = sharedPreferences!!.edit()
+
+            editor.putInt("lastOffset", lastOffset)
+
+            editor.putInt("lastPosition", lastPosition)
+
+            editor.commit()
+
+        }
+
+    }
+
+    override fun onPause() {
+
+        super.onPause()
+
+        getPositionAndOffset()
+
+    }
+
+
+    /**
+     *
+     * 让RecyclerView滚动到指定位置
+     *
+     */
+
+    private fun scrollToPosition() {
+
+        sharedPreferences = getSharedPreferences("key", Activity.MODE_PRIVATE)
+
+        lastOffset = sharedPreferences!!.getInt("lastOffset", 0)
+
+        lastPosition = sharedPreferences!!.getInt("lastPosition", 0)
+
+        if (recycleView!!.layoutManager != null && lastPosition >= 0) {
+
+            (recycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
+
+        }
+
+    }
+
 
 }
 

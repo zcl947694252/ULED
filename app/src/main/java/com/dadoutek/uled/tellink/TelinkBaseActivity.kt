@@ -41,15 +41,18 @@ import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.bluetooth.event.LeScanEvent
+import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LeScanParameters
+import com.telink.util.Event
+import com.telink.util.EventListener
 import com.telink.util.Strings
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.toolbar
@@ -70,6 +73,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     private var mReceive: BluetoothStateBroadcastReceive? = null
 
+    private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
+
     private var retryConnectCount = 0
 
     private var mApplication: TelinkLightApplication? = null
@@ -77,6 +82,10 @@ open class TelinkBaseActivity : AppCompatActivity() {
     private var mScanTimeoutDisposal: Disposable? = null
 
     private var mConnectDisposal: Disposable? = null
+
+    private var acitivityIsAlive = true
+
+    private var mScanDisposal: Disposable? = null
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -238,8 +247,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-//                    retryConnect()
                     if (toolbar != null) {
+//                        retryConnect()
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
@@ -252,8 +261,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
                     when (blueState) {
                         BluetoothAdapter.STATE_OFF -> {
-//                            retryConnect()
                             if (toolbar != null) {
+//                                retryConnect()
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
@@ -274,61 +283,125 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+//    private fun retryConnect() {
+//        if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
+//            retryConnectCount++
+//            if(TelinkLightService.Instance().adapter.mLightCtrl.currentLight!=null){
+//                if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+//                    startScan()
+//                else
+//                    login()
+//            }
+//        } else {
+//            TelinkLightService.Instance().idleMode(true)
+//            startScan()
+//
+//        }
+//    }
+
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if(TelinkLightService.Instance().adapter.mLightCtrl.currentLight!=null){
-                if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
-                    startScan()
-                else
-                    login()
-            }
+            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+                startScan()
+            else
+                login()
         } else {
             TelinkLightService.Instance().idleMode(true)
-            startScan()
+            if (!scanPb.isShown) {
+                retryConnectCount = 0
+                connectFailedDeviceMacList.clear()
+                startScan()
+            }
 
         }
     }
 
+//    @SuppressLint("CheckResult")
+//    private fun startScan() {
+//        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+//                Manifest.permission.BLUETOOTH_ADMIN)
+//                .subscribeOn(Schedulers.io())
+//                .subscribe {
+//                    if (it) {
+//                        TelinkLightService.Instance().idleMode(true)
+//                        bestRSSIDevice = null   //扫描前置空信号最好设备。
+//                        //扫描参数
+//                        val account = DBUtils.lastUser?.account
+//
+//                        val scanFilters = ArrayList<ScanFilter>()
+//                        val scanFilter = ScanFilter.Builder()
+//                                .setDeviceName(account)
+//                                .build()
+//                        scanFilters.add(scanFilter)
+//
+//                        val params = LeScanParameters.create()
+//                        if (!AppUtils.isExynosSoc()) {
+//                            params.setScanFilters(scanFilters)
+//                        }
+//                        params.setMeshName(account)
+//                        params.setOutOfMeshName(account)
+//                        params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+//                        params.setScanMode(false)
+//
+//                        addScanListeners()
+//                        TelinkLightService.Instance().startScan(params)
+//                        startCheckRSSITimer()
+//
+//                    } else {
+//                        //没有授予权限
+//                        DialogUtils.showNoBlePermissionDialog(this, {
+//                            retryConnectCount = 0
+//                            startScan()
+//                        }, { finish() })
+//                    }
+//                }
+//    }
+
     @SuppressLint("CheckResult")
     private fun startScan() {
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribeOn(Schedulers.io())
-                .subscribe {
-                    if (it) {
-                        TelinkLightService.Instance().idleMode(true)
-                        bestRSSIDevice = null   //扫描前置空信号最好设备。
-                        //扫描参数
-                        val account = DBUtils.lastUser?.account
+        //当App在前台时，才进行扫描。
+            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
+                LogUtils.d("startScanLight_LightOfGroup")
+                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                        Manifest.permission.BLUETOOTH_ADMIN)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe {
+                            if (it) {
+                                TelinkLightService.Instance().idleMode(true)
+                                bestRSSIDevice = null   //扫描前置空信号最好设备。
+                                //扫描参数
+                                val account = DBUtils.lastUser?.account
 
-                        val scanFilters = ArrayList<ScanFilter>()
-                        val scanFilter = ScanFilter.Builder()
-                                .setDeviceName(account)
-                                .build()
-                        scanFilters.add(scanFilter)
+                                val scanFilters = java.util.ArrayList<ScanFilter>()
+                                val scanFilter = ScanFilter.Builder()
+                                        .setDeviceName(account)
+                                        .build()
+                                scanFilters.add(scanFilter)
 
-                        val params = LeScanParameters.create()
-                        if (!AppUtils.isExynosSoc()) {
-                            params.setScanFilters(scanFilters)
+                                val params = LeScanParameters.create()
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                    params.setScanFilters(scanFilters)
+                                }
+                                params.setMeshName(account)
+                                params.setOutOfMeshName(account)
+                                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                                params.setScanMode(false)
+
+                                addScanListeners()
+                                TelinkLightService.Instance().startScan(params)
+                                startCheckRSSITimer()
+
+
+                            } else {
+                                //没有授予权限
+                                DialogUtils.showNoBlePermissionDialog(this, {
+                                    retryConnectCount = 0
+                                    startScan()
+                                }, { finish() })
+                            }
                         }
-                        params.setMeshName(account)
-                        params.setOutOfMeshName(account)
-                        params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                        params.setScanMode(false)
-
-                        addScanListeners()
-                        TelinkLightService.Instance().startScan(params)
-                        startCheckRSSITimer()
-
-                    } else {
-                        //没有授予权限
-                        DialogUtils.showNoBlePermissionDialog(this, {
-                            retryConnectCount = 0
-                            startScan()
-                        }, { finish() })
-                    }
-                }
+            }
     }
 
     private fun addScanListeners() {
