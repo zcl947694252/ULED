@@ -379,7 +379,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             popupWindow.dismiss()
             currentSwitch = switchData.get(position)
             var gpName = ""
-            if (currentSwitch != null){
+            if (currentSwitch!!.belongGroupId != null){
                 val item = DBUtils.getActionBySwitchId(currentSwitch!!.belongGroupId)
                 for (i in item.indices) {
                     val item = DBUtils.getGroupByMesh(item[i].controlGroupAddr)

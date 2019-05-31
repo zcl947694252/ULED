@@ -17,6 +17,7 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
+import com.telink.bluetooth.light.ConnectionStatus
 import kotlin.math.log
 
 class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDelete: Boolean) : BaseItemDraggableAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
@@ -89,12 +90,12 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
             }
 
             if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB ) {
-                if (group.status == 1) {
+                if (group.connectionStatus == ConnectionStatus.ON.value) {
                     gpImageView.setImageResource(R.drawable.icon_open_group)
                     gpOff.setImageResource(R.drawable.icon_down_group)
                     gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
                     gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
-                }else if(group.status==2){
+                }else if(group.connectionStatus == ConnectionStatus.OFF.value){
                     gpImageView.setImageResource(R.drawable.icon_down_group)
                     gpOff.setImageResource(R.drawable.icon_open_group)
                     gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
@@ -138,7 +139,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                     .addOnClickListener(R.id.btn_on)
                     .addOnClickListener(R.id.btn_off)
                     .addOnClickListener(R.id.btn_set)
-                    .addOnClickListener(R.id.group_name)
+//                    .addOnClickListener(R.id.group_name)
                     .addOnClickListener(R.id.selected_group)
                     .addOnClickListener(R.id.item_layout)
 //                    .addOnClickListener(R.id.add_group)

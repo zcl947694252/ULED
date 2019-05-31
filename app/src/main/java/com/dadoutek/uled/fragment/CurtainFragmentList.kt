@@ -94,6 +94,10 @@ class CurtainFragmentList : BaseFragment() {
 
     private var addNewGroup: Button? = null
 
+    private var isDeleteTrue: Boolean = true
+
+    private var isLong: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
@@ -112,6 +116,7 @@ class CurtainFragmentList : BaseFragment() {
                 val switch = intent.getStringExtra("switch")
                 if (key == "true") {
                     isDelete = false
+                    isLong = true
                     groupAdapter!!.changeState(isDelete)
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
@@ -159,11 +164,14 @@ class CurtainFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        isDeleteTrue = false
         refreshView()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        isDeleteTrue = true
+        isLong = true
         val view = getView(inflater)
         this.initData()
         return view
@@ -193,9 +201,13 @@ class CurtainFragmentList : BaseFragment() {
             val act = activity as MainActivity?
             act?.addEventListeners()
             if (Constant.isCreat) {
+                isDeleteTrue = true
+                isLong = true
                 refreshAndMoveBottom()
                 Constant.isCreat = false
             } else {
+                isDeleteTrue = true
+                isLong = true
                 refreshView()
             }
 
@@ -260,6 +272,7 @@ class CurtainFragmentList : BaseFragment() {
     var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         if (!isDelete) {
             isDelete = true
+            isLong = false
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
             this!!.activity?.let {
@@ -287,19 +300,21 @@ class CurtainFragmentList : BaseFragment() {
         when (view!!.getId()) {
 
             R.id.btn_set -> {
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CURTAIN && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                    intent = Intent(mContext, WindowCurtainsActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                    intent.putExtra("group", currentLight)
-                    startActivityForResult(intent, 2)
+                if(isLong) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CURTAIN && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                        intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                        intent.putExtra("group", currentLight)
+                        startActivityForResult(intent, 2)
+                    }
                 }
             }
 
-            R.id.group_name -> {
-                intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                intent.putExtra("group", currentLight)
-                startActivityForResult(intent, 2)
-            }
+//            R.id.group_name -> {
+//                intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+//                intent.putExtra("group", currentLight)
+//                startActivityForResult(intent, 2)
+//            }
 
             R.id.selected_group -> {
                 if (currentLight.isSelected) {
@@ -310,9 +325,11 @@ class CurtainFragmentList : BaseFragment() {
             }
 
             R.id.item_layout -> {
-                intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                intent.putExtra("group", currentLight)
-                startActivityForResult(intent, 2)
+                if (isLong) {
+                    intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                    intent.putExtra("group", currentLight)
+                    startActivityForResult(intent, 2)
+                }
             }
 //            }
         }
@@ -439,7 +456,11 @@ class CurtainFragmentList : BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
-            isDelete = false
+
+            if(isDeleteTrue){
+                isDelete = false
+            }
+
             for (i in groupList.indices) {
                 if (groupList[i].isSelected) {
                     groupList[i].isSelected = false

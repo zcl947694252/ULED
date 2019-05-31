@@ -362,12 +362,12 @@ class GroupListFragment : BaseFragment() {
         allGroup = DBUtils.getGroupByMesh(0xFFFF)
 
         if(allGroup!=null){
-            if (allGroup!!.status == 1) {
+            if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
                 btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
                 btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
                 onText!!.setTextColor(resources.getColor(R.color.white))
                 offText!!.setTextColor(resources.getColor(R.color.black_nine))
-            } else if (allGroup!!.status == 2) {
+            } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
                 btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
                 btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
                 onText!!.setTextColor(resources.getColor(R.color.black_nine))
@@ -875,9 +875,11 @@ class GroupListFragment : BaseFragment() {
                     }
 
                     if (isOpen) {
-                        group.status = 1
+                        group.connectionStatus = ConnectionStatus.ON.value
+                        DBUtils.updateGroup(group)
                     } else {
-                        group.status = 2
+                        group.connectionStatus = ConnectionStatus.OFF.value
+                        DBUtils.updateGroup(group)
                     }
 
                     for (dbLight: DbLight in lightList) {

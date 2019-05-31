@@ -363,7 +363,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         setContentView(R.layout.activity_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
-//        this.mApplication = this.application as TelinkLightApplication
+        this.mApplication = this.application as TelinkLightApplication
 //        initDate()
 //        initView()
     }
@@ -1056,6 +1056,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onDestroy()
         canBeRefresh = false
         acitivityIsAlive = false
+        mScanDisposal?.dispose()
     }
 
     private fun filter(groupName: String?, isSearch: Boolean) {
@@ -1441,7 +1442,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         }
 
     }
-
 
 }
 

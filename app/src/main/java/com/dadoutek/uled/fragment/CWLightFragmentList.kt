@@ -104,6 +104,10 @@ class CWLightFragmentList : BaseFragment() {
 
     private var layout: ConstraintLayout? = null
 
+    private var isDeleteTrue: Boolean = true
+
+    private var isLong: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
@@ -124,6 +128,7 @@ class CWLightFragmentList : BaseFragment() {
                 val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
+                    isLong = true
                     groupAdapter!!.changeState(isDelete)
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
@@ -165,15 +170,15 @@ class CWLightFragmentList : BaseFragment() {
                     }
                 }
 
-                if(lightStatus=="on"){
-                    for(i in groupList.indices){
-                        groupList[i].status = 1
+                if (lightStatus == "on") {
+                    for (i in groupList.indices) {
+                        groupList[i].connectionStatus = ConnectionStatus.ON.value
                         DBUtils.updateGroup(groupList[i])
                         groupAdapter!!.notifyDataSetChanged()
                     }
-                } else if(lightStatus == "false"){
-                    for(i in groupList.indices){
-                        groupList[i].status = 2
+                } else if (lightStatus == "false") {
+                    for (i in groupList.indices) {
+                        groupList[i].connectionStatus = ConnectionStatus.OFF.value
                         DBUtils.updateGroup(groupList[i])
                         groupAdapter!!.notifyDataSetChanged()
                     }
@@ -185,11 +190,14 @@ class CWLightFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        isDeleteTrue = false
         refreshView()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        isDeleteTrue = true
+        isLong = true
         val view = getView(inflater)
         this.initData()
         return view
@@ -220,9 +228,13 @@ class CWLightFragmentList : BaseFragment() {
             val act = activity as MainActivity?
             act?.addEventListeners()
             if (Constant.isCreat) {
+                isDeleteTrue = true
+                isLong = true
                 refreshAndMoveBottom()
                 Constant.isCreat = false
             } else {
+                isDeleteTrue = true
+                isLong =  true
                 refreshView()
             }
 
@@ -287,6 +299,7 @@ class CWLightFragmentList : BaseFragment() {
     var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
         if (!isDelete) {
             isDelete = true
+            isLong = false
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
             this!!.activity?.let {
@@ -313,51 +326,57 @@ class CWLightFragmentList : BaseFragment() {
 //        } else {
         when (view!!.getId()) {
             R.id.btn_on -> {
-                Commander.openOrCloseLights(dstAddr, true)
-                updateLights(true, currentLight)
-                currentLight.status=1
-                groupAdapter!!.notifyItemChanged(position)
-                DBUtils.updateGroup(currentLight)
+                if(isLong){
+                    Commander.openOrCloseLights(dstAddr, true)
+                    currentLight.connectionStatus = ConnectionStatus.ON.value
+                    DBUtils.updateGroup(currentLight)
+                    groupAdapter!!.notifyItemChanged(position)
+                    updateLights(true, currentLight)
+                }
             }
             R.id.btn_off -> {
-                Commander.openOrCloseLights(dstAddr, false)
-                updateLights(false, currentLight)
-                currentLight.status=2
-                groupAdapter!!.notifyItemChanged(position)
-                DBUtils.updateGroup(currentLight)
-            }
-
-            R.id.btn_set -> {
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                    intent = Intent(mContext, NormalSettingActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                    intent.putExtra("group", currentLight)
-                    startActivityForResult(intent, 2)
+                if(isLong){
+                    Commander.openOrCloseLights(dstAddr, false)
+                    currentLight.connectionStatus = ConnectionStatus.OFF.value
+                    DBUtils.updateGroup(currentLight)
+                    groupAdapter!!.notifyItemChanged(position)
+                    updateLights(false, currentLight)
                 }
             }
 
-            R.id.group_name -> {
-                intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                intent.putExtra("group", currentLight)
-                intent.putExtra("light", "cw_light")
-                startActivityForResult(intent, 2)
+            R.id.btn_set -> {
+                if(isLong){
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                        intent = Intent(mContext, NormalSettingActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                        intent.putExtra("group", currentLight)
+                        startActivityForResult(intent, 2)
+                    }
+                }
             }
+
+//            R.id.group_name -> {
+//                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+//                intent.putExtra("group", currentLight)
+//                intent.putExtra("light", "cw_light")
+//                startActivityForResult(intent, 2)
+//            }
 
             R.id.selected_group -> {
                 if (currentLight.isSelected) {
                     currentLight.isSelected = false
-                    Log.e("TAG", "确定")
                 } else {
                     currentLight.isSelected = true
-                    Log.e("TAG", "取消")
                 }
             }
 
             R.id.item_layout -> {
-                intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                intent.putExtra("group", currentLight)
-                intent.putExtra("light", "cw_light")
-                startActivityForResult(intent, 2)
+                if(isLong){
+                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                    intent.putExtra("group", currentLight)
+                    intent.putExtra("light", "cw_light")
+                    startActivityForResult(intent, 2)
+                }
             }
         }
 //        }
@@ -397,6 +416,7 @@ class CWLightFragmentList : BaseFragment() {
                     } else {
                         lightList = DBUtils.getLightByGroupID(group.id)
                     }
+
 
                     for (dbLight: DbLight in lightList) {
                         if (isOpen) {
@@ -484,7 +504,9 @@ class CWLightFragmentList : BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
-            isDelete = false
+            if(isDeleteTrue){
+                isDelete = false
+            }
             for (i in groupList.indices) {
                 if (groupList[i].isSelected) {
                     groupList[i].isSelected = false

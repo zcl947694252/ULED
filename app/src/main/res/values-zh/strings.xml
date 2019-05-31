@@ -356,7 +356,7 @@
     <string name="button3">按键3</string>
     <string name="button4">按键4</string>
     <string name="update_group_tip">检测到分组变动,如需场景对该灯生效,请前往场景页更新场景！</string>
-    <string name="light_version">版本号：</string>
+    <string name="light_version">版本号</string>
     <string name="error_tip">部分数据同步失败</string>
     <string name="sync_error_contant">同步出错</string>
     <string name="change_account">切换账号</string>

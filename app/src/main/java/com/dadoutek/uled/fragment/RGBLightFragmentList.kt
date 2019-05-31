@@ -49,7 +49,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class RGBLightFragmentList: BaseFragment() {
+class RGBLightFragmentList : BaseFragment() {
 
     private var inflater: LayoutInflater? = null
 
@@ -87,6 +87,10 @@ class RGBLightFragmentList: BaseFragment() {
 
     private var addNewGroup: Button? = null
 
+    private var isDeleteTrue: Boolean = true
+
+    private var isLong: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
@@ -107,6 +111,7 @@ class RGBLightFragmentList: BaseFragment() {
                 val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
+                    isLong = true
                     groupAdapter!!.changeState(isDelete)
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
@@ -115,16 +120,16 @@ class RGBLightFragmentList: BaseFragment() {
                     }
                     refreshData()
                 }
-                if(str == "true"){
+                if (str == "true") {
                     deleteList = ArrayList()
 //                    Log.e("TAG_delete","删除")
-                    for(i in groupList.indices){
-                        if(groupList[i].isSelected){
+                    for (i in groupList.indices) {
+                        if (groupList[i].isSelected) {
                             deleteList.add(groupList[i])
                         }
                     }
 
-                    for( j in deleteList.indices){
+                    for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
@@ -140,7 +145,7 @@ class RGBLightFragmentList: BaseFragment() {
                     Log.e("TAG_DELETE", deleteList.size.toString())
                 }
 
-                if(switch=="true"){
+                if (switch == "true") {
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
                             groupList[i].isSelected = false
@@ -148,15 +153,15 @@ class RGBLightFragmentList: BaseFragment() {
                     }
                 }
 
-                if(lightStatus=="on"){
-                    for(i in groupList.indices){
-                        groupList[i].status = 1
+                if (lightStatus == "on") {
+                    for (i in groupList.indices) {
+                        groupList[i].connectionStatus = ConnectionStatus.ON.value
                         DBUtils.updateGroup(groupList[i])
                         groupAdapter!!.notifyDataSetChanged()
                     }
-                } else if(lightStatus == "false"){
-                    for(i in groupList.indices){
-                        groupList[i].status = 2
+                } else if (lightStatus == "false") {
+                    for (i in groupList.indices) {
+                        groupList[i].connectionStatus = ConnectionStatus.OFF.value
                         DBUtils.updateGroup(groupList[i])
                         groupAdapter!!.notifyDataSetChanged()
                     }
@@ -167,11 +172,14 @@ class RGBLightFragmentList: BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        isDeleteTrue = false
         refreshView()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        isDeleteTrue = true
+        isLong = true
         val view = getView(inflater)
         this.initData()
         return view
@@ -201,9 +209,13 @@ class RGBLightFragmentList: BaseFragment() {
             val act = activity as MainActivity?
             act?.addEventListeners()
             if (Constant.isCreat) {
+                isDeleteTrue = true
+                isLong = true
                 refreshAndMoveBottom()
                 Constant.isCreat = false
             } else {
+                isDeleteTrue = true
+                isLong = true
                 refreshView()
             }
 
@@ -246,7 +258,7 @@ class RGBLightFragmentList: BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
-        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+        Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
         })
 
@@ -262,9 +274,11 @@ class RGBLightFragmentList: BaseFragment() {
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
     }
+
     var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         if (!isDelete) {
             isDelete = true
+            isLong = false
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
             this!!.activity?.let {
@@ -289,23 +303,28 @@ class RGBLightFragmentList: BaseFragment() {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
-            when (view!!.getId()) {
-                R.id.btn_on -> {
+        when (view!!.getId()) {
+            R.id.btn_on -> {
+                if (isLong) {
                     Commander.openOrCloseLights(dstAddr, true)
+                    currentLight.connectionStatus = ConnectionStatus.ON.value
+                    DBUtils.updateGroup(currentLight)
+                    groupAdapter!!.notifyItemChanged(position)
                     updateLights(true, currentLight)
-                    currentLight.status=1
-                    groupAdapter!!.notifyItemChanged(position)
-                    DBUtils.updateGroup(currentLight)
                 }
-                R.id.btn_off -> {
+            }
+            R.id.btn_off -> {
+                if (isLong) {
                     Commander.openOrCloseLights(dstAddr, false)
-                    updateLights(false, currentLight)
-                    currentLight.status=2
-                    groupAdapter!!.notifyItemChanged(position)
+                    currentLight.connectionStatus = ConnectionStatus.OFF.value
                     DBUtils.updateGroup(currentLight)
+                    groupAdapter!!.notifyItemChanged(position)
+                    updateLights(false, currentLight)
                 }
+            }
 
-                R.id.btn_set -> {
+            R.id.btn_set -> {
+                if(isLong) {
                     if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                         intent = Intent(mContext, RGBSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
@@ -313,31 +332,32 @@ class RGBLightFragmentList: BaseFragment() {
                         startActivityForResult(intent, 2)
                     }
                 }
+            }
 
-                R.id.group_name -> {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                    intent.putExtra("group", currentLight)
-                    intent.putExtra("light","rgb_light")
-                    startActivityForResult(intent, 2)
-                }
+            /*R.id.group_name -> {
+                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                intent.putExtra("group", currentLight)
+                intent.putExtra("light", "rgb_light")
+                startActivityForResult(intent, 2)
+            }*/
 
-                R.id.selected_group -> {
-                    if (currentLight.isSelected) {
-                        currentLight.isSelected = false
-                        Log.e("TAG", "确定")
-                    } else {
-                        currentLight.isSelected = true
-                        Log.e("TAG", "取消")
-                    }
-                }
-
-                R.id.item_layout -> {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                    intent.putExtra("group", currentLight)
-                    intent.putExtra("light","rgb_light")
-                    startActivityForResult(intent, 2)
+            R.id.selected_group -> {
+                if (currentLight.isSelected) {
+                    currentLight.isSelected = false
+                    Log.e("TAG", "确定")
+                } else {
+                    currentLight.isSelected = true
+                    Log.e("TAG", "取消")
                 }
             }
+
+            R.id.item_layout -> {
+                intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                intent.putExtra("group", currentLight)
+                intent.putExtra("light", "rgb_light")
+                startActivityForResult(intent, 2)
+            }
+        }
 //        }
     }
 
@@ -462,7 +482,10 @@ class RGBLightFragmentList: BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
-            isDelete = false
+
+            if(isDeleteTrue){
+                isDelete = false
+            }
             for (i in groupList.indices) {
                 if (groupList[i].isSelected) {
                     groupList[i].isSelected = false
@@ -477,7 +500,7 @@ class RGBLightFragmentList: BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
-            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
                 return@Comparator o1.name.compareTo(o2.name)
             })
             this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)

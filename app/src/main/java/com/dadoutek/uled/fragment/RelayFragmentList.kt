@@ -49,7 +49,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
-class RelayFragmentList: BaseFragment() {
+class RelayFragmentList : BaseFragment() {
 
     private var inflater: LayoutInflater? = null
 
@@ -87,6 +87,10 @@ class RelayFragmentList: BaseFragment() {
 
     private var addNewGroup: Button? = null
 
+    private var isDeleteTrue: Boolean = true
+
+    private var isLong: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
@@ -97,14 +101,17 @@ class RelayFragmentList: BaseFragment() {
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
         intentFilter.addAction("switch")
+        intentFilter.addAction("switch_here")
         br = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val str = intent.getStringExtra("delete")
                 val switch = intent.getStringExtra("switch")
+                val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
+                    isLong = true
                     groupAdapter!!.changeState(isDelete)
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
@@ -113,16 +120,16 @@ class RelayFragmentList: BaseFragment() {
                     }
                     refreshData()
                 }
-                if(str == "true"){
+                if (str == "true") {
                     deleteList = ArrayList()
 //                    Log.e("TAG_delete","删除")
-                    for(i in groupList.indices){
-                        if(groupList[i].isSelected){
+                    for (i in groupList.indices) {
+                        if (groupList[i].isSelected) {
                             deleteList.add(groupList[i])
                         }
                     }
 
-                    for( j in deleteList.indices){
+                    for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
@@ -138,11 +145,25 @@ class RelayFragmentList: BaseFragment() {
                     Log.e("TAG_DELETE", deleteList.size.toString())
                 }
 
-                if(switch=="true"){
+                if (switch == "true") {
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
                             groupList[i].isSelected = false
                         }
+                    }
+                }
+
+                if (lightStatus == "on") {
+                    for (i in groupList.indices) {
+                        groupList[i].connectionStatus = ConnectionStatus.ON.value
+                        DBUtils.updateGroup(groupList[i])
+                        groupAdapter!!.notifyDataSetChanged()
+                    }
+                } else if (lightStatus == "false") {
+                    for (i in groupList.indices) {
+                        groupList[i].connectionStatus = ConnectionStatus.OFF.value
+                        DBUtils.updateGroup(groupList[i])
+                        groupAdapter!!.notifyDataSetChanged()
                     }
                 }
             }
@@ -151,11 +172,14 @@ class RelayFragmentList: BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        isDeleteTrue = false
         refreshView()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        isDeleteTrue = true
+        isLong = true
         val view = getView(inflater)
         this.initData()
         return view
@@ -185,9 +209,13 @@ class RelayFragmentList: BaseFragment() {
             val act = activity as MainActivity?
             act?.addEventListeners()
             if (Constant.isCreat) {
+                isDeleteTrue = true
+                isLong = true
                 refreshAndMoveBottom()
                 Constant.isCreat = false
             } else {
+                isDeleteTrue = true
+                isLong = true
                 refreshView()
             }
 
@@ -230,7 +258,7 @@ class RelayFragmentList: BaseFragment() {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
 
-        Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+        Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
         })
 
@@ -246,8 +274,10 @@ class RelayFragmentList: BaseFragment() {
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
     }
+
     var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         if (!isDelete) {
+            isLong = false
             isDelete = true
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
@@ -273,53 +303,70 @@ class RelayFragmentList: BaseFragment() {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
-            when (view!!.id) {
-                R.id.btn_on -> {
+        when (view!!.id) {
+            R.id.btn_on -> {
+//                    Commander.openOrCloseLights(dstAddr, true)
+//                    updateLights(true, currentLight)
+//                    currentLight.status=1
+//                    groupAdapter!!.notifyItemChanged(position)
+//                    DBUtils.updateGroup(currentLight)
+
+                if (isLong) {
                     Commander.openOrCloseLights(dstAddr, true)
+                    currentLight.connectionStatus = ConnectionStatus.ON.value
+                    DBUtils.updateGroup(currentLight)
+                    groupAdapter!!.notifyItemChanged(position)
                     updateLights(true, currentLight)
-                    currentLight.status=1
-                    groupAdapter!!.notifyItemChanged(position)
-                    DBUtils.updateGroup(currentLight)
                 }
-                R.id.btn_off -> {
+            }
+            R.id.btn_off -> {
+//                    Commander.openOrCloseLights(dstAddr, false)
+//                    updateLights(false, currentLight)
+//                    currentLight.status=2
+//                    groupAdapter!!.notifyItemChanged(position)
+//                    DBUtils.updateGroup(currentLight)
+                if (isLong) {
                     Commander.openOrCloseLights(dstAddr, false)
-                    updateLights(false, currentLight)
-                    currentLight.status=2
-                    groupAdapter!!.notifyItemChanged(position)
+                    currentLight.connectionStatus = ConnectionStatus.OFF.value
                     DBUtils.updateGroup(currentLight)
+                    groupAdapter!!.notifyItemChanged(position)
+                    updateLights(false, currentLight)
                 }
+            }
 
-                R.id.btn_set -> {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CONNECTOR && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                        intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent.putExtra("group", currentLight)
-                        startActivityForResult(intent, 2)
-                    }
-                }
-
-                R.id.group_name -> {
-                    intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+            R.id.btn_set -> {
+                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CONNECTOR && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                    intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                     intent.putExtra("group", currentLight)
                     startActivityForResult(intent, 2)
                 }
+            }
 
-                R.id.selected_group -> {
-                    if (currentLight.isSelected) {
-                        currentLight.isSelected = false
-                        Log.e("TAG", "确定")
-                    } else {
-                        currentLight.isSelected = true
-                        Log.e("TAG", "取消")
-                    }
+//                R.id.group_name -> {
+//                    intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+//                    intent.putExtra("group", currentLight)
+//                    startActivityForResult(intent, 2)
+//                }
+
+            R.id.selected_group -> {
+                if (currentLight.isSelected) {
+                    currentLight.isSelected = false
+                    Log.e("TAG", "确定")
+                } else {
+                    currentLight.isSelected = true
+                    Log.e("TAG", "取消")
                 }
+            }
 
-                R.id.item_layout -> {
+            R.id.item_layout -> {
+                if (isLong) {
                     intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
                     intent.putExtra("group", currentLight)
                     startActivityForResult(intent, 2)
                 }
             }
+        }
 //        }
     }
 
@@ -444,7 +491,11 @@ class RelayFragmentList: BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
-            isDelete = false
+
+            if (isDeleteTrue) {
+                isDelete = false
+            }
+
             for (i in groupList.indices) {
                 if (groupList[i].isSelected) {
                     groupList[i].isSelected = false
@@ -459,7 +510,7 @@ class RelayFragmentList: BaseFragment() {
             layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView!!.layoutManager = layoutmanager
 
-            Collections.sort(groupList,kotlin.Comparator { o1, o2 ->
+            Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
                 return@Comparator o1.name.compareTo(o2.name)
             })
 

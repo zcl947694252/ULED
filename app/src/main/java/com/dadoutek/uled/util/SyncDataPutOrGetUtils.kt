@@ -109,243 +109,245 @@ class SyncDataPutOrGetUtils {
                                      token: String, id: Long): Observable<String>? {
             var result: Observable<String>?
 //            val token = "1"
-            when (tableName) {
-                "DB_GROUP" -> {
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val group = DBUtils.getGroupByID(changeId)
-                            return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
-                        }
-                        Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
-                        Constant.DB_UPDATE -> {
-                            val group = DBUtils.getGroupByID(changeId)
-                            if(group!=null){
-//                                return GroupMdodel.update(token, changeId.toInt(),
-//                                        group!!.name, group.brightness, group.colorTemperature, group.color,id)
+            if(changeId!=null) {
+                when (tableName) {
+                    "DB_GROUP" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val group = DBUtils.getGroupByID(changeId)
                                 return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
                             }
+                            Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
+                            Constant.DB_UPDATE -> {
+                                val group = DBUtils.getGroupByID(changeId)
+                                if (group != null) {
+//                                return GroupMdodel.update(token, changeId.toInt(),
+//                                        group!!.name, group.brightness, group.colorTemperature, group.color,id)
+                                    return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
+                                }
+                            }
                         }
                     }
-                }
-                "DB_LIGHT" -> {
+                    "DB_LIGHT" -> {
 
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val light = DBUtils.getLightByID(changeId)
-                            return LightModel.add(token, light!!, id, changeId)
-                        }
-                        Constant.DB_DELETE -> {
-                            return LightModel.delete(token,
-                                    id, changeId.toInt())
-                        }
-                        Constant.DB_UPDATE -> {
-                            val light = DBUtils.getLightByID(changeId)
-                            if(light!=null){
-                                return LightModel.update(token,light,
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val light = DBUtils.getLightByID(changeId)
+                                return LightModel.add(token, light!!, id, changeId)
+                            }
+                            Constant.DB_DELETE -> {
+                                return LightModel.delete(token,
                                         id, changeId.toInt())
                             }
+                            Constant.DB_UPDATE -> {
+                                val light = DBUtils.getLightByID(changeId)
+                                if (light != null) {
+                                    return LightModel.update(token, light,
+                                            id, changeId.toInt())
+                                }
+                            }
                         }
                     }
-                }
 
-                "DB_CONNECTOR"->{
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val light = DBUtils.getConnectorByID(changeId)
-                            return ConnectorModel.add(token, light!!, id, changeId)
-                        }
-                        Constant.DB_DELETE -> {
-                            return ConnectorModel.delete(token,
-                                    id, changeId.toInt())
-                        }
-                        Constant.DB_UPDATE -> {
-                            val light = DBUtils.getConnectorByID(changeId)
-                            if(light!=null){
-                                return ConnectorModel.update(token,light,
+                    "DB_CONNECTOR" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val light = DBUtils.getConnectorByID(changeId)
+                                return ConnectorModel.add(token, light!!, id, changeId)
+                            }
+                            Constant.DB_DELETE -> {
+                                return ConnectorModel.delete(token,
                                         id, changeId.toInt())
                             }
-                        }
-                    }
-                }
-
-                "DB_SWITCH" -> {
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val switch = DBUtils.getSwitchByID(changeId)
-                            return SwitchMdodel.add(token, switch!!, id, changeId)
-                        }
-                        Constant.DB_DELETE -> {
-                            return SwitchMdodel.delete(token,
-                                    id, changeId.toInt())
-                        }
-                        Constant.DB_UPDATE -> {
-                            val switch = DBUtils.getSwitchByID(changeId)
-                            if(switch!=null){
-                                return SwitchMdodel.update(token,
-                                        switch,changeId.toInt(),id)
+                            Constant.DB_UPDATE -> {
+                                val light = DBUtils.getConnectorByID(changeId)
+                                if (light != null) {
+                                    return ConnectorModel.update(token, light,
+                                            id, changeId.toInt())
+                                }
                             }
                         }
                     }
-                }
-                "DB_SENSOR" -> {
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val sensor = DBUtils.getSensorByID(changeId)
-                            return SensorMdodel.add(token, sensor!!, id, changeId)
-                        }
-                        Constant.DB_DELETE -> {
-                            return SensorMdodel.delete(token,
-                                    id, changeId.toInt())
-                        }
-                        Constant.DB_UPDATE -> {
-                            val sensor = DBUtils.getSensorByID(changeId)
-                            if(sensor!=null){
-                                return SensorMdodel.update(token,
-                                        sensor,changeId.toInt(),id)
+
+                    "DB_SWITCH" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val switch = DBUtils.getSwitchByID(changeId)
+                                return SwitchMdodel.add(token, switch!!, id, changeId)
+                            }
+                            Constant.DB_DELETE -> {
+                                return SwitchMdodel.delete(token,
+                                        id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                val switch = DBUtils.getSwitchByID(changeId)
+                                if (switch != null) {
+                                    return SwitchMdodel.update(token,
+                                            switch, changeId.toInt(), id)
+                                }
                             }
                         }
                     }
-                }
-                "DB_CURTAIN" -> {
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val curtain = DBUtils.getCurtainByID(changeId)
-                            return CurtainMdodel.add(token, curtain!!, id, changeId)
-                        }
-                        Constant.DB_DELETE -> {
-                            return CurtainMdodel.delete(token,
-                                    id, changeId.toInt())
-                        }
-                        Constant.DB_UPDATE -> {
-                            val curtain = DBUtils.getCurtainByID(changeId)
-                            if(curtain!=null){
-                                return CurtainMdodel.update(token,
-                                        curtain,changeId.toInt(),id)
+                    "DB_SENSOR" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val sensor = DBUtils.getSensorByID(changeId)
+                                return SensorMdodel.add(token, sensor!!, id, changeId)
+                            }
+                            Constant.DB_DELETE -> {
+                                return SensorMdodel.delete(token,
+                                        id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                val sensor = DBUtils.getSensorByID(changeId)
+                                if (sensor != null) {
+                                    return SensorMdodel.update(token,
+                                            sensor, changeId.toInt(), id)
+                                }
                             }
                         }
                     }
-                }
-                "DB_REGION" -> {
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val region = DBUtils.getRegionByID(changeId)
-                            return RegionModel.add(token, region, id, changeId)
-                        }
-                        Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(),
-                                id)
-                        Constant.DB_UPDATE -> {
-                            val region = DBUtils.getRegionByID(changeId)
-                            return RegionModel.update(token,
-                                    changeId.toInt(), region, id)
-                        }
-                    }
-                }
-                "DB_SCENE" -> {
-                    val scene = DBUtils.getSceneByID(changeId)
-
-                    lateinit var postInfoStr: String
-                    var bodyScene: RequestBody? = null
-                    if (scene != null && type != Constant.DB_DELETE) {
-                        val body: DbSceneBody = DbSceneBody()
-                        val gson: Gson = Gson()
-                        body.name = scene.name
-                        body.belongRegionId = scene.belongRegionId
-                        body.actions = DBUtils.getActionsBySceneId(changeId)
-
-                        postInfoStr = gson.toJson(body)
-
-                        bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
-                    }
-
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val scene = DBUtils.getSceneByID(changeId)
-                            LogUtils.d("scene_add--id=="+changeId)
-                            if(bodyScene!=null){
-                                return SceneModel.add(token, bodyScene
-                                        , id, changeId)
+                    "DB_CURTAIN" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val curtain = DBUtils.getCurtainByID(changeId)
+                                return CurtainMdodel.add(token, curtain!!, id, changeId)
+                            }
+                            Constant.DB_DELETE -> {
+                                return CurtainMdodel.delete(token,
+                                        id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                val curtain = DBUtils.getCurtainByID(changeId)
+                                if (curtain != null) {
+                                    return CurtainMdodel.update(token,
+                                            curtain, changeId.toInt(), id)
+                                }
                             }
                         }
-                        Constant.DB_DELETE -> {
-                            LogUtils.d("scene_delete--id=="+changeId)
-                            return SceneModel.delete(token,
-                                    changeId.toInt(), id)
-                        }
-                        Constant.DB_UPDATE -> {
-                            LogUtils.d("scene_update--id=="+changeId)
-                            if(bodyScene!=null){
-                                return SceneModel.update(token, changeId.toInt(), bodyScene, id)
+                    }
+                    "DB_REGION" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val region = DBUtils.getRegionByID(changeId)
+                                return RegionModel.add(token, region, id, changeId)
+                            }
+                            Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(),
+                                    id)
+                            Constant.DB_UPDATE -> {
+                                val region = DBUtils.getRegionByID(changeId)
+                                return RegionModel.update(token,
+                                        changeId.toInt(), region, id)
                             }
                         }
-
                     }
-                }
+                    "DB_SCENE" -> {
+                        val scene = DBUtils.getSceneByID(changeId)
 
-                "DB_DIY_GRADIENT" -> {
-                    val gradient = DBUtils.getGradientByID(changeId)
+                        lateinit var postInfoStr: String
+                        var bodyScene: RequestBody? = null
+                        if (scene != null && type != Constant.DB_DELETE) {
+                            val body: DbSceneBody = DbSceneBody()
+                            val gson: Gson = Gson()
+                            body.name = scene.name
+                            body.belongRegionId = scene.belongRegionId
+                            body.actions = DBUtils.getActionsBySceneId(changeId)
 
-                    lateinit var postInfoStr: String
-                    var bodyGradient: RequestBody? = null
-                    if (gradient != null && type != Constant.DB_DELETE) {
-                        val body: DbGradientBody = DbGradientBody()
-                        val gson: Gson = Gson()
-                        body.name = gradient.name
-                        body.type = gradient.type
-                        body.speed = gradient.speed
-                        body.belongRegionId = gradient.belongRegionId
-                        body.colorNodes = DBUtils.getColorNodeListByDynamicModeId(changeId)
+                            postInfoStr = gson.toJson(body)
 
-                        postInfoStr = gson.toJson(body)
+                            bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                        }
 
-                        bodyGradient = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
-                    }
-
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
-                            LogUtils.d("scene_add--id=="+changeId)
-                            if(bodyGradient!=null){
-                                return GradientModel.add(token, bodyGradient
-                                        , id, changeId)
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val scene = DBUtils.getSceneByID(changeId)
+                                LogUtils.d("scene_add--id==" + changeId)
+                                if (bodyScene != null) {
+                                    return SceneModel.add(token, bodyScene
+                                            , id, changeId)
+                                }
                             }
-                        }
-                        Constant.DB_DELETE -> {
-                            LogUtils.d("scene_delete--id=="+changeId)
-                           val body=DbDeleteGradientBody()
-                            body.idList=ArrayList()
-                            body.idList.add(changeId.toInt())
-                            return GradientModel.delete(token,
-                                    body, id)
-                        }
-                        Constant.DB_UPDATE -> {
-                            LogUtils.d("scene_update--id=="+changeId)
-                            if(bodyGradient!=null){
-                                return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
+                            Constant.DB_DELETE -> {
+                                LogUtils.d("scene_delete--id==" + changeId)
+                                return SceneModel.delete(token,
+                                        changeId.toInt(), id)
                             }
+                            Constant.DB_UPDATE -> {
+                                LogUtils.d("scene_update--id==" + changeId)
+                                if (bodyScene != null) {
+                                    return SceneModel.update(token, changeId.toInt(), bodyScene, id)
+                                }
+                            }
+
                         }
-
-                    }
-                }
-
-                "DB_USER" -> {
-                    val user = DBUtils.getUserByID(changeId)
-
-                    if (user == null && type != Constant.DELETEING) {
-                        Log.d("用户数据出错", "")
                     }
 
-                    when (type) {
-                        Constant.DB_ADD -> {
-                            //注册时已经添加
-                            return null
-                        }
-                        Constant.DB_DELETE -> {
-                            //无用户删除操作
-                            return null
-                        }
-                        Constant.DB_UPDATE ->
-                            return AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")
+                    "DB_DIY_GRADIENT" -> {
+                        val gradient = DBUtils.getGradientByID(changeId)
 
+                        lateinit var postInfoStr: String
+                        var bodyGradient: RequestBody? = null
+                        if (gradient != null && type != Constant.DB_DELETE) {
+                            val body: DbGradientBody = DbGradientBody()
+                            val gson: Gson = Gson()
+                            body.name = gradient.name
+                            body.type = gradient.type
+                            body.speed = gradient.speed
+                            body.belongRegionId = gradient.belongRegionId
+                            body.colorNodes = DBUtils.getColorNodeListByDynamicModeId(changeId)
+
+                            postInfoStr = gson.toJson(body)
+
+                            bodyGradient = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                        }
+
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
+                                LogUtils.d("scene_add--id==" + changeId)
+                                if (bodyGradient != null) {
+                                    return GradientModel.add(token, bodyGradient
+                                            , id, changeId)
+                                }
+                            }
+                            Constant.DB_DELETE -> {
+                                LogUtils.d("scene_delete--id==" + changeId)
+                                val body = DbDeleteGradientBody()
+                                body.idList = ArrayList()
+                                body.idList.add(changeId.toInt())
+                                return GradientModel.delete(token,
+                                        body, id)
+                            }
+                            Constant.DB_UPDATE -> {
+                                LogUtils.d("scene_update--id==" + changeId)
+                                if (bodyGradient != null) {
+                                    return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
+                                }
+                            }
+
+                        }
+                    }
+
+                    "DB_USER" -> {
+                        val user = DBUtils.getUserByID(changeId)
+
+                        if (user == null && type != Constant.DELETEING) {
+                            Log.d("用户数据出错", "")
+                        }
+
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                //注册时已经添加
+                                return null
+                            }
+                            Constant.DB_DELETE -> {
+                                //无用户删除操作
+                                return null
+                            }
+                            Constant.DB_UPDATE ->
+                                return AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")
+
+                        }
                     }
                 }
             }
@@ -475,6 +477,7 @@ class SyncDataPutOrGetUtils {
                     }
             )
         }
+
 
         internal var syncCallbackSY: SyncCallback = object : SyncCallback {
 

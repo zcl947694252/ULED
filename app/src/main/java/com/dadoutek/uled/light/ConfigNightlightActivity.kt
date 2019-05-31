@@ -7,6 +7,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -330,9 +331,10 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
         val timeL: Byte = (selectTime and 0xff).toByte()
         var mode= getModeValue()
+        Log.e("TAG",tiet_Delay.toString())
         val paramBytes = byteArrayOf(
                 switchMode.toByte(), 0x00,0x00,
-                tiet_Delay.toString().toInt().toByte(),
+                til_Delay.toString().toInt().toByte(),
                 tietMinimumBrightness.text.toString().toInt().toByte(),
                 0x00,
                 mode.toByte()

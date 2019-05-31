@@ -1190,6 +1190,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         public ImageView icon;
         public TextView txtName;
         public CheckBox selected;
+        public TextView lightName;
     }
 
     final class DeviceListAdapter extends BaseAdapter {
@@ -1229,12 +1230,14 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             TextView txtName = (TextView) convertView
                     .findViewById(R.id.txt_name);
             CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
+            TextView lightName = (TextView) convertView.findViewById(R.id.light_name);
 
             holder = new DeviceItemHolder();
 
             holder.icon = icon;
             holder.txtName = txtName;
             holder.selected = selected;
+            holder.lightName = lightName;
 
             convertView.setTag(holder);
 
@@ -1243,14 +1246,14 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if(light.getProductUUID()== DeviceType.LIGHT_RGB){
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_rgblight);
             }
             else{
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_rgblight_down);
             }
 
             holder.selected.setChecked(light.selected);
-
+            holder.lightName.setText(light.getName());
             holder.txtName.setText(getDeviceName(light));
             holder.icon.setVisibility(View.VISIBLE);
             holder.selected.setVisibility(View.VISIBLE);
