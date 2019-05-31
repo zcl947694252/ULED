@@ -503,7 +503,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
 //            group.checked = false
-            if(OtherUtils.isNormalGroup(group)){
+            if(OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group)){
                 group.checked = false
                 mGroupArrayList.add(group)
             }
