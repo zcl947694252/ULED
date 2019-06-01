@@ -76,7 +76,7 @@ import java.util.*
  * Created by hejiajun on 2018/5/15.
  */
 
-private const val MIN_CLICK_DELAY_TIME = 2000
+private const val MIN_CLICK_DELAY_TIME = 1000
 
 class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private var dbUser: DbUser? = null

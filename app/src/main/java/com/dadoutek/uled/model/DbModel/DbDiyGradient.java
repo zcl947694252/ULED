@@ -38,7 +38,7 @@ public class DbDiyGradient implements Parcelable {
 
     @Expose(serialize = false, deserialize = false)
     @Transient
-    public boolean select = true;//开停状态
+    public boolean select = false;//开停状态
 
     @ToMany(referencedJoinProperty = "belongDynamicChangeId")
     private List<DbColorNode> colorNodes;

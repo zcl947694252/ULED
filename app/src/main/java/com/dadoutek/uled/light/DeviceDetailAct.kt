@@ -364,7 +364,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         setContentView(R.layout.activity_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
-        this.mApplication = this.application as TelinkLightApplication
+//        this.mApplication = this.application as TelinkLightApplication
 //        initDate()
 //        initView()
     }
@@ -461,10 +461,10 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
         add_device_btn.setOnClickListener(this)
-        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
+//        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+//        toolbar.setNavigationOnClickListener {
+//            finish()
+//        }
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"

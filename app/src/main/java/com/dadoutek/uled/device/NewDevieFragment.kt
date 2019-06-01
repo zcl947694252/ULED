@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.*
 import android.view.LayoutInflater
@@ -436,6 +437,7 @@ class NewDevieFragment :BaseFragment(){
     override fun onDetach() {
         super.onDetach()
         callbackLinkMainActAndFragment = null
+
     }
 
     private fun showInstallDeviceList() {
