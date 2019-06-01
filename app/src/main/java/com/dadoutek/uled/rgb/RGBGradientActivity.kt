@@ -203,7 +203,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanager
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList,isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
 //        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
 //            mDetector?.onTouchEvent(event)
@@ -276,21 +276,21 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
         batchGroup.setOnClickListener(View.OnClickListener {
 
-        val builder:AlertDialog.Builder=AlertDialog.Builder(this)
-        builder.setMessage(getString(R.string.delete_model))
-        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-            for(i in diyGradientList!!.indices){
-                if(diyGradientList!![i].isSelected){
-                    startDeleteGradientCmd(diyGradientList!![i].id)
-                    DBUtils.deleteGradient(diyGradientList!![i])
-                    DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setMessage(getString(R.string.delete_model))
+            builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+                for (i in diyGradientList!!.indices) {
+                    if (diyGradientList!![i].isSelected) {
+                        startDeleteGradientCmd(diyGradientList!![i].id)
+                        DBUtils.deleteGradient(diyGradientList!![i])
+                        DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+                    }
                 }
+                diyGradientList = DBUtils.diyGradientList
+                rgbDiyGradientAdapter!!.setNewData(diyGradientList)
             }
-            diyGradientList = DBUtils.diyGradientList
-            rgbDiyGradientAdapter!!.setNewData(diyGradientList)
-        }
-        builder.setNeutralButton(R.string.cancel) { dialog, which -> }
-        builder.create().show()
+            builder.setNeutralButton(R.string.cancel) { dialog, which -> }
+            builder.create().show()
         })
 
 
@@ -320,12 +320,27 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 }.start()
                 diyPosition = position
+
+                diyGradientList!![position].select = true
+
+                for (i in diyGradientList!!.indices) {
+                    if (i != position) {
+                        if (diyGradientList!![i].select) {
+                            diyGradientList!![i].select = false
+                            DBUtils.updateGradient(diyGradientList!![i])
+                        }
+                    }
+                }
+                rgbDiyGradientAdapter!!.notifyDataSetChanged()
             }
 
             R.id.diy_mode_off -> {
-                if(diyPosition == position){
-                    Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed, successCallback = {}, failedCallback = {})
-                }
+
+                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed, successCallback = {}, failedCallback = {})
+                diyGradientList!![position].select = false
+                rgbDiyGradientAdapter!!.notifyItemChanged(position)
+                DBUtils.updateGradient(diyGradientList!![position])
+
             }
 
             R.id.diy_mode_set -> {
@@ -399,21 +414,35 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                             positionState = position + 1
                             Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
                         }
+                buildInModeList!![position].select = true
+
+                for (i in buildInModeList!!.indices) {
+                    if (i != position) {
+                        if (buildInModeList!![i].select) {
+                            buildInModeList!![i].select = false
+                        }
+                    }
+                }
+                rgbGradientAdapter!!.notifyDataSetChanged()
+
+
             }
 
             R.id.gradient_mode_off -> {
-                if(positionState-1==position){
+                buildInModeList!![position].select = false
+                rgbGradientAdapter!!.notifyItemChanged(position)
+                if (positionState - 1 == position) {
                     stopGradient()
                 }
             }
 
             R.id.gradient_mode_set -> {
-                  var dialog = SpeedDialog(this,speed,R.style.Dialog,SpeedDialog.OnSpeedListener {
-                      speed = it
-                      stopGradient()
-                      Thread.sleep(200)
-                      Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
-                  })
+                var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
+                    speed = it
+                    stopGradient()
+                    Thread.sleep(200)
+                    Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                })
                 dialog.show()
             }
         }
@@ -444,7 +473,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         diyGradientList = DBUtils.diyGradientList
-        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList,isDelete)
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
         isDelete = false
         rgbDiyGradientAdapter!!.changeState(isDelete)
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
@@ -529,7 +558,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                if(isDelete){
+                if (isDelete) {
                     isDelete = false
                     rgbDiyGradientAdapter!!.changeState(isDelete)
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
@@ -538,7 +567,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     toolbar!!.title = getString(R.string.dynamic_gradient)
                     rgbDiyGradientAdapter!!.notifyDataSetChanged()
                     setDate()
-                }else{
+                } else {
                     ActivityUtils.finishToActivity(MainActivity::class.java, false,
                             true)
                 }

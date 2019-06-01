@@ -96,7 +96,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/diy_mode_on_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/group_list_on"
@@ -129,6 +129,7 @@
         app:layout_constraintTop_toTopOf="@+id/diy_mode_on" />
 
     <TextView
+        android:id="@+id/diy_mode_off_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stop_model"

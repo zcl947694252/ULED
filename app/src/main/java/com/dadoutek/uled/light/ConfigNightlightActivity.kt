@@ -334,7 +334,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         Log.e("TAG",tiet_Delay.toString())
         val paramBytes = byteArrayOf(
                 switchMode.toByte(), 0x00,0x00,
-                til_Delay.toString().toInt().toByte(),
+                tiet_Delay.text.toString().toInt().toByte(),
                 tietMinimumBrightness.text.toString().toInt().toByte(),
                 0x00,
                 mode.toByte()

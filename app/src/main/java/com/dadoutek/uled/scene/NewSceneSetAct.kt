@@ -68,6 +68,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private var seekBar: SeekBar? = null
 
+    private var isEditText: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
@@ -388,11 +390,12 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_group_list_view.layoutManager = layoutmanager
         this.sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList!!)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+//        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         recyclerView_group_list_view?.addItemDecoration(SpacesItemDecorationScene(40))
         //添加分割线
-        recyclerView_group_list_view.addItemDecoration(decoration)
+//        recyclerView_group_list_view.addItemDecoration(decoration)
+        recyclerView_group_list_view.itemAnimator!!.changeDuration = 0
         sceneGroupAdapter?.bindToRecyclerView(recyclerView_group_list_view)
 
         sceneGroupAdapter?.onItemChildClickListener = onItemChildClickListener
@@ -414,9 +417,12 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         tv_function1.visibility = View.GONE
         edit_name.setSelection(edit_name.text.length)
 
+        btn_sure_edit.setOnClickListener(this)
+
         edit_name!!.isFocusable = true
         edit_name.isFocusableInTouchMode = true
         edit_name.requestFocus()
+        edit_name.setOnClickListener(this)
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
@@ -483,6 +489,29 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.tv_function1 -> changeEditView()
             R.id.confirm -> save()
+            R.id.btn_sure_edit ->{
+                if(isEditText){
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    val v = window.peekDecorView()
+                    if (null != v) {
+                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                    isEditText = false
+                }else{
+                    val timer = Timer()
+                    timer.schedule(object : TimerTask() {
+                        override fun run() {
+                            val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            inputManager.showSoftInput(edit_name, 0)
+                        }
+                    }, 200)
+                    isEditText = true
+                }
+            }
+
+//            R.id.edit_name -> {
+//                isEditText = false
+//            }
         }
     }
 

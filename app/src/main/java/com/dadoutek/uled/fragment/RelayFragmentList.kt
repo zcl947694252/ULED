@@ -32,6 +32,7 @@ import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
@@ -131,8 +132,8 @@ class RelayFragmentList : BaseFragment() {
 
                     for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
-
-                        deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
+                        Thread.sleep(300)
+                        deleteGroup(DBUtils.getConnectorByGroupID(deleteList[j].id), deleteList[j]!!,
                                 successCallback = {
                                     hideLoadingDialog()
                                     setResult(Constant.RESULT_OK)
@@ -335,11 +336,13 @@ class RelayFragmentList : BaseFragment() {
             }
 
             R.id.btn_set -> {
-                if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CONNECTOR && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                    intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                    intent.putExtra("group", currentLight)
-                    startActivityForResult(intent, 2)
+                if(isLong) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CONNECTOR && DBUtils.getConnectorByGroupID(currentLight.id).size != 0)) {
+                        intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                        intent.putExtra("group", currentLight)
+                        startActivityForResult(intent, 2)
+                    }
                 }
             }
 
@@ -393,25 +396,25 @@ class RelayFragmentList : BaseFragment() {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
                 .subscribe {
-                    var lightList: MutableList<DbLight> = ArrayList()
+                    var lightList: MutableList<DbConnector> = ArrayList()
 
                     if (group.meshAddr == 0xffff) {
                         //            lightList = DBUtils.getAllLight();
                         val list = DBUtils.groupList
                         for (j in list.indices) {
-                            lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+                            lightList.addAll(DBUtils.getConnectorByGroupID(list[j].id))
                         }
                     } else {
-                        lightList = DBUtils.getLightByGroupID(group.id)
+                        lightList = DBUtils.getConnectorByGroupID(group.id)
                     }
 
-                    for (dbLight: DbLight in lightList) {
+                    for (dbLight: DbConnector in lightList) {
                         if (isOpen) {
                             dbLight.connectionStatus = ConnectionStatus.ON.value
                         } else {
                             dbLight.connectionStatus = ConnectionStatus.OFF.value
                         }
-                        DBUtils.updateLightLocal(dbLight)
+                        DBUtils.updateConnector(dbLight)
                     }
                 }
     }
@@ -531,7 +534,7 @@ class RelayFragmentList : BaseFragment() {
     /**
      * 删除组，并且把组里的灯的组也都删除。
      */
-    private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
+    private fun deleteGroup(lights: MutableList<DbConnector>, group: DbGroup, retryCount: Int = 0,
                             successCallback: () -> Unit, failedCallback: () -> Unit) {
         Thread {
             if (lights.count() != 0) {
@@ -542,7 +545,7 @@ class RelayFragmentList : BaseFragment() {
                     Commander.deleteGroup(lightMeshAddr,
                             successCallback = {
                                 light.belongGroupId = DBUtils.groupNull!!.id
-                                DBUtils.updateLight(light)
+                                DBUtils.updateConnector(light)
                                 lights.remove(light)
                                 //修改分组成功后删除场景信息。
                                 deleteAllSceneByLightAddr(light.meshAddr)

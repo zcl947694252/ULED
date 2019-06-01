@@ -19,9 +19,6 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.LeBluetooth
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 
 import java.util.regex.Matcher
@@ -35,15 +32,21 @@ import android.content.IntentFilter
 import android.util.Log
 import android.widget.ImageView
 import com.blankj.utilcode.util.LogUtils
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.DialogUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LeScanParameters
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -55,6 +58,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.*
 import org.jetbrains.anko.toolbar
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
@@ -63,7 +67,197 @@ private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
-open class TelinkBaseActivity : AppCompatActivity() {
+open class TelinkBaseActivity : AppCompatActivity()  {
+
+    private var connectMeshAddress: Int = 0
+
+
+//    override fun performed(event: Event<String>) {
+//        when (event.type) {
+//            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
+////            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
+////            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+////            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
+//            NotificationEvent.GET_ALARM -> {
+//            }
+//            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+////            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
+//            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
+//            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
+////            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
+//            ErrorReportEvent.ERROR_REPORT -> {
+//                val info = (event as ErrorReportEvent).args
+//                onErrorReport(info)
+//            }
+//        }
+//    }
+
+    private fun onErrorReport(info: ErrorReportInfo) {
+//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+        if (bestRSSIDevice != null) {
+            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
+        }
+        when (info.stateCode) {
+            ErrorReportEvent.STATE_SCAN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                    }
+                }
+
+            }
+            ErrorReportEvent.STATE_CONNECT -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                    }
+                }
+                retryConnect()
+
+            }
+            ErrorReportEvent.STATE_LOGIN -> {
+                when (info.errorCode) {
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                    }
+                }
+                retryConnect()
+
+            }
+        }
+    }
+
+    private fun onServiceConnected(event: ServiceEvent) {
+//        LogUtils.d("onServiceConnected")
+    }
+
+    private fun onServiceDisconnected(event: ServiceEvent) {
+        com.dadoutek.uled.util.LogUtils.d("onServiceDisconnected")
+        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+
+        val deviceInfo = event.args
+
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+
+                TelinkLightService.Instance().enableNotification()
+                TelinkLightService.Instance().updateNotification()
+                GlobalScope.launch(Dispatchers.Main) {
+                    stopConnectTimer()
+                    if (progressBar?.visibility != View.GONE)
+                        progressBar?.visibility = View.GONE
+                    delay(300)
+                }
+
+                val connectDevice = this.mApplication?.connectDevice
+                if (connectDevice != null) {
+                    this.connectMeshAddress = connectDevice.meshAddress
+                }
+
+//                scanPb.visibility = View.GONE
+//                adapter?.notifyDataSetChanged()
+                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
+            LightAdapter.STATUS_CONNECTING -> {
+                Log.d("connectting", "444")
+//                scanPb.visibility = View.VISIBLE
+            }
+            LightAdapter.STATUS_CONNECTED -> {
+                if (!TelinkLightService.Instance().isLogin)
+                    login()
+            }
+            LightAdapter.STATUS_ERROR_N -> onNError(event)
+        }
+    }
+
+    private fun onNError(event: DeviceEvent) {
+
+//        ToastUtils.showLong(getString(R.string.connect_fail))
+        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLog.d("DeviceScanningActivity#onNError")
+
+        val builder = android.support.v7.app.AlertDialog.Builder(this)
+        builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
+        builder.setNegativeButton("confirm") { dialog, _ -> dialog.dismiss() }
+        builder.setCancelable(false)
+        builder.show()
+    }
+
+    /**
+     * 处理扫描事件
+     *
+     * @param event
+     */
+    @Synchronized
+    private fun onLeScan(event: LeScanEvent) {
+        val mesh = this.mApplication?.mesh
+        val meshAddress = mesh?.generateMeshAddr()
+        val deviceInfo: DeviceInfo = event.args
+
+        Thread {
+            val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
+            if (dbLight != null && dbLight.macAddr == "0") {
+                dbLight.macAddr = deviceInfo.macAddress
+                DBUtils.updateLight(dbLight)
+            }
+        }.start()
+
+        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
+//            connect(deviceInfo.macAddress)
+            if (bestRSSIDevice != null) {
+                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
+                    com.dadoutek.uled.util.LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    bestRSSIDevice = deviceInfo
+                }
+            } else {
+                com.dadoutek.uled.util.LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                bestRSSIDevice = deviceInfo
+            }
+
+        }
+
+    }
+
+    private fun stopConnectTimer() {
+        mConnectDisposal?.dispose()
+    }
+
+    private fun isSwitch(uuid: Int): Boolean {
+        return when (uuid) {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
+                com.dadoutek.uled.util.LogUtils.d("This is switch")
+                true
+            }
+            else -> {
+                false
+
+            }
+        }
+    }
 
     protected var toast: Toast? = null
     protected var foreground = false
@@ -95,6 +289,18 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.mApplication = this.application as TelinkLightApplication
         registerBluetoothReceiver()
     }
+
+//    fun addEventListeners() {
+//        // 监听各种事件
+//        addScanListeners()
+//        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
+////        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
+//        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+//        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
+////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
+//        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+//    }
 
     override fun onStart() {
         super.onStart()
@@ -177,6 +383,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast!!.cancel()
         this.toast = null
         unregisterBluetoothReceiver()
+        mScanDisposal?.dispose()
     }
 
     fun showToast(s: CharSequence) {

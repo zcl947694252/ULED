@@ -377,6 +377,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     val opcode = Opcode.SCENE_ADD_OR_DEL
                     val params: ByteArray
                     if (scenesListData!!.size > 0) {
+                        Thread.sleep(300)
                         val id = scenesListData!![i].id!!
                         val list = DBUtils.getActionsBySceneId(id)
                         params = byteArrayOf(0x00, id.toByte())
@@ -481,7 +482,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (scenesListData!!.size > 0) {
                 recyclerView!!.visibility = View.VISIBLE
                 no_scene!!.visibility = View.GONE
-                addNewScene!!.visibility = View.VISIBLE
+                if(addNewScene!=null){
+                    addNewScene!!.visibility = View.VISIBLE
+                }
             } else {
                 recyclerView!!.visibility = View.GONE
                 no_scene!!.visibility = View.VISIBLE

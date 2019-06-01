@@ -849,6 +849,10 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
     }
 
+    fun updateRelayLocal(relay: DbConnector){
+        DaoSessionInstance.getInstance().dbConnectorDao.update(relay)
+    }
+
 
 
     fun updateScene(scene: DbScene) {

@@ -148,7 +148,7 @@ class CWLightFragmentList : BaseFragment() {
 
                     for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
-
+                        Thread.sleep(300)
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
                                 successCallback = {
                                     hideLoadingDialog()

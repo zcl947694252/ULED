@@ -101,6 +101,18 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                     gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
                     gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
                 }
+            }else if(group.deviceType == Constant.DEVICE_TYPE_CONNECTOR){
+                if (group.connectionStatus == ConnectionStatus.ON.value) {
+                    gpImageView.setImageResource(R.drawable.icon_open_group)
+                    gpOff.setImageResource(R.drawable.icon_down_group)
+                    gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
+                    gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
+                }else if(group.connectionStatus == ConnectionStatus.OFF.value){
+                    gpImageView.setImageResource(R.drawable.icon_down_group)
+                    gpOff.setImageResource(R.drawable.icon_open_group)
+                    gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
+                    gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
+                }
             }
 
 
@@ -135,15 +147,15 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
 //                helper.setVisible(R.id.btn_on,false)
 //            }
             helper.setTextColor(R.id.txt_name, group.textColor)
-                    .addOnClickListener(R.id.txt_name)
-                    .addOnClickListener(R.id.btn_on)
-                    .addOnClickListener(R.id.btn_off)
-                    .addOnClickListener(R.id.btn_set)
+//                    .addOnClickListener(R.id.txt_name)
+                .addOnClickListener(R.id.btn_on)
+                .addOnClickListener(R.id.btn_off)
+                .addOnClickListener(R.id.btn_set)
 //                    .addOnClickListener(R.id.group_name)
-                    .addOnClickListener(R.id.selected_group)
-                    .addOnClickListener(R.id.item_layout)
+                .addOnClickListener(R.id.selected_group)
+                .addOnClickListener(R.id.item_layout)
 //                    .addOnClickListener(R.id.add_group)
-        }
+    }
 
     }
 

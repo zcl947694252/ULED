@@ -76,6 +76,8 @@ import java.util.*
  * Created by hejiajun on 2018/5/15.
  */
 
+private const val MIN_CLICK_DELAY_TIME = 2000
+
 class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private var dbUser: DbUser? = null
     private var phone: String? = null
@@ -94,6 +96,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private var phoneEdit: EditText? = null
 
     private var passwordEdit: EditText? = null
+
+    private var lastClickTime: Long = 0
+
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -211,7 +216,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.btn_login -> login()
+            R.id.btn_login -> {
+                val currentTime = Calendar.getInstance().timeInMillis
+                if (currentTime - lastClickTime > MIN_CLICK_DELAY_TIME) {
+                    lastClickTime = currentTime
+                    //做你需要的点击事件
+                    //            doClick();
+                                login()
+                }
+            }
             R.id.btn_register -> {
                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")

@@ -173,7 +173,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         }
                         val opcode: Byte
                         var params: ByteArray
-                        opcode = Opcode.SET_LUM
+                        opcode = Opcode.SET_TEMPERATURE
                         params = byteArrayOf(light_current.brightness.toByte())
 
                         if (light_current.brightness > Constant.MAX_VALUE) {
@@ -217,7 +217,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
                         val opcode: Byte
                         var params: ByteArray
-                        opcode = Opcode.SET_LUM
+                        opcode = Opcode.SET_TEMPERATURE
                         params = byteArrayOf(light_current.brightness.toByte())
 
                         if (light_current.brightness > Constant.MAX_VALUE) {
@@ -1238,6 +1238,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness?.progress = group!!.brightness
             tv_Brightness.text = group!!.brightness.toString() + "%"
             clickNum = 1
+            isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
             temperature_btn.setImageResource(R.drawable.icon_btn)
@@ -1247,6 +1248,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness?.progress = group!!.colorTemperature
             tv_Brightness.text = group!!.colorTemperature.toString() + "%"
             clickNum = 1
+            isBrightness = false
         }
 
 
@@ -1493,6 +1495,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             tv_Brightness.text = light!!.brightness.toString() + "%"
 
             clickNum = 1
+            isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
             temperature_btn.setImageResource(R.drawable.icon_btn)
@@ -1504,6 +1507,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             tv_Brightness.text = light!!.colorTemperature.toString() + "%"
 
             clickNum = 1
+            isBrightness = false
         }
 
 

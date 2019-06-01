@@ -4,11 +4,14 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
+import com.dadoutek.uled.tellink.TelinkLightApplication
 
 class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,internal var isDelete: Boolean) : BaseQuickAdapter<DbDiyGradient, BaseViewHolder>(layoutResId, data) {
 
@@ -20,6 +23,10 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,interna
     override fun convert(helper: BaseViewHolder, item: DbDiyGradient) {
 //        val colorListRecyclerView=helper.getView<RecyclerView>(R.id.diy_show_color_recyclerView)
 
+        var gpOn = helper.getView<ImageView>(R.id.diy_mode_on)
+        var gpOff = helper.getView<ImageView>(R.id.diy_mode_off)
+        var gpOnText = helper.getView<TextView>(R.id.diy_mode_on_text)
+        var gpOffText = helper.getView<TextView>(R.id.diy_mode_off_text)
 
         val deleteIcon = helper.getView<CheckBox>(R.id.diy_selected)
         if (isDelete) {
@@ -32,6 +39,19 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,interna
             helper.setChecked(R.id.diy_selected, true)
         } else {
             helper.setChecked(R.id.diy_selected, false)
+        }
+
+
+        if(item.select){
+            gpOn.setImageResource(R.drawable.icon_open_group)
+            gpOff.setImageResource(R.drawable.icon_down_group)
+            gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
+            gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
+        }else{
+            gpOn.setImageResource(R.drawable.icon_down_group)
+            gpOff.setImageResource(R.drawable.icon_open_group)
+            gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
+            gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
         }
 
 

@@ -19,6 +19,7 @@ import android.support.v7.widget.*
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -374,7 +375,22 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         inflater = this.layoutInflater
         initDate()
         initView()
+        initToolbar()
         scrollToPosition()
+    }
+
+
+    private fun initToolbar() {
+        setSupportActionBar(toolbar)
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun initView() {

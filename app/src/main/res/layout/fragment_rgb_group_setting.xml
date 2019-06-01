@@ -193,7 +193,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="15sp"
                 android:textColor="@color/black_three"
-                android:text="@string/w_bright" />
+                android:text="@string/white_light_regulation" />
 
             <SeekBar
                 android:layout_marginTop="4dp"
@@ -253,7 +253,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="15sp"
                 android:textColor="@color/black_three"
-                android:text="@string/device_setting_brightness" />
+                android:text="@string/bright_regulation" />
 
             <SeekBar
                 android:layout_marginTop="4dp"
