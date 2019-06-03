@@ -729,7 +729,7 @@
     <string name="open_it">Open it</string>
     <string name="restart_it">Restart it</string>
     <string name="i_see">I see</string>
-    <string name="switch_grouping">cut group</string>
+    <string name="switch_grouping">Afresh set</string>
     <string name="please_rgb">Please enter RGB value</string>
     <string name="cannot_rgb_null">RGB values cannot be null</string>
     <string name="rgb_max">RGB value should not be greater than 255</string>

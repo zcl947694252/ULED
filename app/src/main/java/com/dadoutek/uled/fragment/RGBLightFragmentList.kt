@@ -251,6 +251,11 @@ class RGBLightFragmentList : BaseFragment() {
             viewLineRecycler?.visibility = View.GONE
         }
 
+        val intent = Intent("switch_fragment")
+        intent.putExtra("switch_fragment", "true")
+        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                .sendBroadcast(intent)
+
         addGroupBtn?.setOnClickListener(onClick)
         addNewGroup?.setOnClickListener(onClick)
 
@@ -485,6 +490,10 @@ class RGBLightFragmentList : BaseFragment() {
 
             if(isDeleteTrue){
                 isDelete = false
+                val intent = Intent("switch_fragment")
+                intent.putExtra("switch_fragment", "true")
+                LocalBroadcastManager.getInstance(this!!.mContext!!)
+                        .sendBroadcast(intent)
             }
             for (i in groupList.indices) {
                 if (groupList[i].isSelected) {

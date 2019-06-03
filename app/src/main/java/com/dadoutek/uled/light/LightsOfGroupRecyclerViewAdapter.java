@@ -64,7 +64,7 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
         if(item.getColor()==0||item.getColor()==0xffffff){
             tvRgbColor.setVisibility(View.GONE);
         }else{
-            tvRgbColor.setVisibility(View.VISIBLE);
+            tvRgbColor.setVisibility(View.GONE);
             myGrad.setColor(0Xff000000|item.getColor());
         }
 

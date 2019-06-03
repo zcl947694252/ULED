@@ -132,9 +132,11 @@ class GroupListFragment : BaseFragment() {
 
     private var btnSet: ImageView? = null
 
-    private  var allGroup: DbGroup? = null
+    private var allGroup: DbGroup? = null
 
     private var cwLightGroup: String? = null
+
+    private var switchFragment: String? = null
 
     private var isDelete = false
 
@@ -165,16 +167,25 @@ class GroupListFragment : BaseFragment() {
                 .getInstance(this!!.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("showPro")
+        intentFilter.addAction("switch_fragment")
         br = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 cwLightGroup = intent.getStringExtra("is_delete")
+                switchFragment = intent.getStringExtra("switch_fragment")
                 if (cwLightGroup == "true") {
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     toolbar!!.title = ""
                     setBack()
+                }
+                if (switchFragment == "true") {
+                    toolbar!!.setTitle(R.string.group_title)
+                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+                    toolbar!!.navigationIcon = null
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                 }
             }
         }
@@ -356,12 +367,14 @@ class GroupListFragment : BaseFragment() {
 //        updateData(3, false)
 //        deviceNameAdapter?.notifyDataSetChanged()
 
+        deviceRecyclerView!!.addItemDecoration(SpaceItemDecoration(130))
+
         showList = ArrayList()
         showList = gpList
 
         allGroup = DBUtils.getGroupByMesh(0xFFFF)
 
-        if(allGroup!=null){
+        if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
                 btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
                 btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
@@ -374,7 +387,6 @@ class GroupListFragment : BaseFragment() {
                 offText!!.setTextColor(resources.getColor(R.color.white))
             }
         }
-
 
 
 //        val layoutmanager = LinearLayoutManager(activity)
@@ -423,25 +435,25 @@ class GroupListFragment : BaseFragment() {
         viewPager?.adapter = vpAdapter
 
         viewPager?.currentItem = fragmentPosition
-        if(fragmentPosition == 0){
+        if (fragmentPosition == 0) {
             updateData(0, true)
             updateData(1, false)
             updateData(2, false)
             updateData(3, false)
             deviceNameAdapter?.notifyDataSetChanged()
-        }else if(fragmentPosition == 1){
+        } else if (fragmentPosition == 1) {
             updateData(0, false)
             updateData(1, true)
             updateData(2, false)
             updateData(3, false)
             deviceNameAdapter?.notifyDataSetChanged()
-        }else if(fragmentPosition == 2){
+        } else if (fragmentPosition == 2) {
             updateData(0, false)
             updateData(1, false)
             updateData(2, true)
             updateData(3, false)
             deviceNameAdapter?.notifyDataSetChanged()
-        }else if(fragmentPosition == 3){
+        } else if (fragmentPosition == 3) {
             updateData(0, false)
             updateData(1, false)
             updateData(2, false)

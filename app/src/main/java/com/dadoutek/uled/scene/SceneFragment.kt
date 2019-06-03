@@ -101,14 +101,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (view.getId() == R.id.scene_delete) {
                 scenesListData!![position].isSelected = !scenesListData!![position].isSelected
             } else
-            if (view.getId() == R.id.scene_edit) {
-                //                setScene(scenesListData.get(position).getId());
-                val scene = scenesListData!![position]
-                val intent = Intent(activity, NewSceneSetAct::class.java)
-                intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
-                intent.putExtra(Constant.IS_CHANGE_SCENE, true)
-                startActivityForResult(intent, 3)
-            }
+                if (view.getId() == R.id.scene_edit) {
+                    //                setScene(scenesListData.get(position).getId());
+                    val scene = scenesListData!![position]
+                    val intent = Intent(activity, NewSceneSetAct::class.java)
+                    intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
+                    intent.putExtra(Constant.IS_CHANGE_SCENE, true)
+                    startActivityForResult(intent, 3)
+                }
         }
     }
 
@@ -368,12 +368,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-//            deleteScene(position)
+            //            deleteScene(position)
 //            adapter.notifyItemRemoved(position)
 //            refreshData()
-            Log.e("TAG_SIZE",scenesListData!!.size.toString())
-            for(i in scenesListData!!.indices){
-                if(scenesListData!![i].isSelected){
+            Log.e("TAG_SIZE", scenesListData!!.size.toString())
+            for (i in scenesListData!!.indices) {
+                if (scenesListData!![i].isSelected) {
                     val opcode = Opcode.SCENE_ADD_OR_DEL
                     val params: ByteArray
                     if (scenesListData!!.size > 0) {
@@ -470,8 +470,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             refreshView()
             initOnLayoutListener(1)
         } else {
-                //                initOnLayoutListener(2);
-                refreshView()
+            //                initOnLayoutListener(2);
+            refreshView()
         }
 
     }
@@ -480,15 +480,17 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (activity != null) {
             scenesListData = DBUtils.sceneList
             if (scenesListData!!.size > 0) {
-                recyclerView!!.visibility = View.VISIBLE
-                no_scene!!.visibility = View.GONE
-                if(addNewScene!=null){
+                if (recyclerView != null) {
+                    recyclerView!!.visibility = View.VISIBLE
+                    no_scene!!.visibility = View.GONE
                     addNewScene!!.visibility = View.VISIBLE
                 }
             } else {
-                recyclerView!!.visibility = View.GONE
-                no_scene!!.visibility = View.VISIBLE
-                addNewScene!!.visibility = View.GONE
+                if(recyclerView!=null){
+                    recyclerView!!.visibility = View.GONE
+                    no_scene!!.visibility = View.VISIBLE
+                    addNewScene!!.visibility = View.GONE
+                }
             }
             val layoutmanager = LinearLayoutManager(activity)
             layoutmanager.orientation = LinearLayoutManager.VERTICAL

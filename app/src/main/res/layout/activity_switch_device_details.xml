@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".switches.SwitchDeviceDetailsActivity">
 
     <include
@@ -12,6 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
+
 
     <RelativeLayout
         android:id="@+id/no_device_relativeLayout"
@@ -29,15 +31,9 @@
 
         <Button
             android:id="@+id/add_device_btn"
-            android:layout_width="140dp"
-            android:layout_height="38dp"
+            style="@style/ButtonStyle"
             android:text="@string/device_scan_scan"
-            android:background="@drawable/add_device_bt"
-            android:textColor="@color/blue_background"
-            android:textSize="18sp"
-            android:layout_centerHorizontal="true"
             android:layout_below="@id/image_no_device"
-            android:layout_marginTop="72dp"
             />
     </RelativeLayout>
 

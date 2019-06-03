@@ -163,7 +163,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
             startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
         } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
         } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
             startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
         }
@@ -377,30 +377,33 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         group.setOnClickListener(View.OnClickListener {
             popupWindow.dismiss()
             currentSwitch = switchData.get(position)
-            var gpName = ""
-            if (currentSwitch!!.belongGroupId != null){
-                val item = DBUtils.getActionBySwitchId(currentSwitch!!.belongGroupId)
-                for (i in item.indices) {
-                    val item = DBUtils.getGroupByMesh(item[i].controlGroupAddr)
+//            var gpName = ""
+//            if (currentSwitch!!.belongGroupId != null){
+//                val item = DBUtils.getActionBySwitchId(currentSwitch!!.belongGroupId)
+//                for (i in item.indices) {
+//                    val item = DBUtils.getGroupByMesh(item[i].controlGroupAddr)
+//
+//                    if (item != null) {
+//                        gpName = item.name
+//                    }
+//                }
+//            }
 
-                    if (item != null) {
-                        gpName = item.name
-                    }
-                }
+
+//            val alertDialog = android.app.AlertDialog.Builder(this)
+//                    .setTitle(getString(R.string.tips))
+//                    .setMessage(getString(R.string.switch_current) + gpName + getString(R.string.switch_group_switch))
+//                    .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+            if (currentSwitch != null) {
+                startScanSwitch()
             }
 
-
-            val alertDialog = android.app.AlertDialog.Builder(this)
-                    .setTitle(getString(R.string.tips))
-                    .setMessage(getString(R.string.switch_current) + gpName + getString(R.string.switch_group_switch))
-                    .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                        startScanSwitch()
-                    }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> }.create()
-            alertDialog.show()
-            val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            btn.setTextColor(Color.parseColor("#18B4ED"))
-            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-            cancelBtn.setTextColor(Color.parseColor("#333333"))
+//                    }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> }.create()
+//            alertDialog.show()
+//            val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+//            btn.setTextColor(Color.parseColor("#18B4ED"))
+//            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+//            cancelBtn.setTextColor(Color.parseColor("#333333"))
         })
 
         ota.setOnClickListener(View.OnClickListener {

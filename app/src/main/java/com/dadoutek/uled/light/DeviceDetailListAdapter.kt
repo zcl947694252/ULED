@@ -38,7 +38,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
             if (scene.getColor() == 0 || scene.getColor() == 0xffffff) {
                 tvRgbColor.visibility = View.GONE
             } else {
-                tvRgbColor.visibility = View.VISIBLE
+                tvRgbColor.visibility = View.GONE
                 myGrad.setColor(-0x1000000 or scene.getColor())
             }
 

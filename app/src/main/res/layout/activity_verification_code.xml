@@ -10,7 +10,7 @@
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/underline_bg"
+        android:src="@drawable/login_bg"
         app:layout_constraintBottom_toBottomOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView" />
@@ -84,6 +84,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
+        android:textColorHint="@color/black_ee"
         android:hint="@string/please_phone_number"
         android:inputType="phone"
         android:maxLength="16"
@@ -123,6 +124,7 @@
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
+        android:textColorHint="@color/black_ee"
         android:hint="@string/please_code"
         android:inputType="phone"
         android:maxLength="16"
@@ -135,14 +137,9 @@
 
     <Button
         android:id="@+id/btn_send_verification"
-        android:layout_width="80dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="4dp"
-        android:background="@drawable/get_code_btn"
+        style="@style/VerificationButtonStyle"
         android:text="@string/get_verification_code"
         android:textColor="@color/blue_background"
-        android:textSize="13sp"
-        android:elevation="10dp"
         app:layout_constraintEnd_toEndOf="@+id/edit_verification"
         app:layout_constraintTop_toTopOf="@+id/edit_verification" />
 

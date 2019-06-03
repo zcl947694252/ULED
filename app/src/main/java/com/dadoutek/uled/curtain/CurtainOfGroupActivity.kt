@@ -297,9 +297,22 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE
+            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+            batchGroup.setText(R.string.batch_group)
+            batchGroup.setOnClickListener(View.OnClickListener {
+                val intent = Intent(this,
+                        CurtainBatchGroupActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra("curtain", "curtain_group")
+                intent.putExtra("group",group.id.toInt())
+                startActivity(intent)
+            })
         } else {
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 

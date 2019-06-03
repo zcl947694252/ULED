@@ -38,15 +38,8 @@
 
         <Button
             android:id="@+id/light_add_device_btn"
-            android:layout_width="140dp"
-            android:layout_height="40dp"
-            android:layout_below="@id/image_no_device"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/add_device_bt"
+            style="@style/ButtonStyle"
             android:text="@string/device_scan_add"
-            android:textColor="@color/blue_background"
-            android:textSize="18sp"
-            android:layout_marginTop="84dp"
             app:layout_constraintEnd_toEndOf="@+id/image_no_device"
             app:layout_constraintStart_toStartOf="@+id/image_no_device"
             app:layout_constraintTop_toBottomOf="@+id/image_no_device" />

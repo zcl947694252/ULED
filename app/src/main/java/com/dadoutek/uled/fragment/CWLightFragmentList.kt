@@ -270,6 +270,11 @@ class CWLightFragmentList : BaseFragment() {
             viewLineRecycler?.visibility = View.GONE
         }
 
+        val intent = Intent("switch_fragment")
+        intent.putExtra("switch_fragment", "true")
+        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                .sendBroadcast(intent)
+
         addGroupBtn?.setOnClickListener(onClick)
         addNewGroup?.setOnClickListener(onClick)
 
@@ -493,6 +498,7 @@ class CWLightFragmentList : BaseFragment() {
                 }
             }
 
+
             if (groupList.size > 0) {
                 no_group?.visibility = View.GONE
                 recyclerView?.visibility = View.VISIBLE
@@ -504,8 +510,13 @@ class CWLightFragmentList : BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
+
             if(isDeleteTrue){
                 isDelete = false
+                val intent = Intent("switch_fragment")
+                intent.putExtra("switch_fragment", "true")
+                LocalBroadcastManager.getInstance(this!!.mContext!!)
+                        .sendBroadcast(intent)
             }
             for (i in groupList.indices) {
                 if (groupList[i].isSelected) {

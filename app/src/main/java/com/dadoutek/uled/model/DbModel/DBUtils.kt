@@ -341,7 +341,10 @@ object DBUtils {
 
     fun getGroupNameByID(id: Long?): String {
         val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
-        return group.name
+        if(group!=null){
+            return group.name
+        }
+        return  "null"
     }
 
 

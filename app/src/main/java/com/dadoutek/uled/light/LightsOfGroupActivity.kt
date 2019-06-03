@@ -34,6 +34,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.connector.ConnectorBatchGroupActivity
 import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -167,16 +168,16 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     }
 
     private fun addDevice() {
-        if(strLight=="cw_light"){
-                val intent = Intent(this, DeviceDetailAct::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_LIGHT_OF_CW)
-                intent.putExtra("cw_light_name",group.name)
-                startActivity(intent)
-        }else if(strLight == "rgb_light"){
-                val intent = Intent(this, DeviceDetailAct::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_LIGHT_OF_RGB)
-                intent.putExtra("rgb_light_name",group.name)
-                startActivity(intent)
+        if (strLight == "cw_light") {
+            val intent = Intent(this, DeviceDetailAct::class.java)
+            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_CW)
+            intent.putExtra("cw_light_name", group.name)
+            startActivity(intent)
+        } else if (strLight == "rgb_light") {
+            val intent = Intent(this, DeviceDetailAct::class.java)
+            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_RGB)
+            intent.putExtra("rgb_light_name", group.name)
+            startActivity(intent)
         }
     }
 
@@ -347,7 +348,35 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light.visibility = View.GONE
+            if (strLight == "cw_light") {
+                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                batchGroup.setText(R.string.batch_group)
+                batchGroup.setOnClickListener(View.OnClickListener {
+                    val intent = Intent(this,
+                            BatchGroupActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent.putExtra("lightType", "cw_light_group")
+                    intent.putExtra("group",group.id.toInt())
+                    startActivity(intent)
+                })
+            } else if(strLight == "rgb_light"){
+                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                batchGroup.setText(R.string.batch_group)
+                batchGroup.setOnClickListener(View.OnClickListener {
+                    val intent = Intent(this,
+                            BatchGroupActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent.putExtra("lightType", "rgb_light_group")
+                    intent.putExtra("group",group)
+                    startActivity(intent)
+                })
+            }
         } else {
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
             recycler_view_lights.visibility = View.GONE
             no_light.visibility = View.VISIBLE
         }
@@ -457,11 +486,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recyclerView)
-        if(strLight=="cw_light"){
+        if (strLight == "cw_light") {
             for (i in lightList.indices) {
                 lightList[i].updateIcon()
             }
-        }else if(strLight=="rgb_light"){
+        } else if (strLight == "rgb_light") {
             for (i in lightList.indices) {
                 lightList[i].updateRgbIcon()
             }
@@ -497,9 +526,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
 
-            if(strLight=="cw_light"){
+            if (strLight == "cw_light") {
                 currentLight!!.updateIcon()
-            }else if(strLight=="rgb_light"){
+            } else if (strLight == "rgb_light") {
                 currentLight!!.updateRgbIcon()
             }
 //            currentLight!!.updateIcon()

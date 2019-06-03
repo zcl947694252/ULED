@@ -663,7 +663,7 @@
     <string name="open_it">去开启</string>
     <string name="restart_it">去重启</string>
     <string name="i_see">我知道了</string>
-    <string name="switch_grouping">切换分组</string>
+    <string name="switch_grouping">重新配置</string>
     <string name="please_rgb">请输入RGB值</string>
     <string name="cannot_rgb_null">RGB值不能为空</string>
     <string name="rgb_max">RGB值不能大于255</string>

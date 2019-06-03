@@ -33,15 +33,9 @@
 
         <Button
             android:id="@+id/add_device_btn"
-            android:layout_width="140dp"
-            android:layout_height="38dp"
             android:text="@string/device_scan_scan"
-            android:background="@drawable/add_device_bt"
-            android:textColor="@color/blue_background"
-            android:textSize="18sp"
-            android:layout_centerHorizontal="true"
+            style="@style/ButtonStyle"
             android:layout_below="@id/image_no_device"
-            android:layout_marginTop="72dp"
             />
     </RelativeLayout>
 

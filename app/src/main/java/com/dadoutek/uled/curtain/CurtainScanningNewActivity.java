@@ -1119,8 +1119,9 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
-        allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
-
+        if(DBUtils.INSTANCE.getGroupByMesh(0xffff)!=null){
+            allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        }
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();
         if (groups == null) {

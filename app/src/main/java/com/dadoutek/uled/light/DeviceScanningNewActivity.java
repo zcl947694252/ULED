@@ -1133,7 +1133,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false);
-        allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        if(DBUtils.INSTANCE.getGroupByMesh(0xffff)!=null){
+            allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        }
         type=intent.getStringExtra(Constant.TYPE_VIEW);
 
         this.mApplication = (TelinkLightApplication) this.getApplication();

@@ -44,15 +44,9 @@
 
     <Button
         android:id="@+id/scene_edit"
-        android:layout_width="50dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="15dp"
-        android:gravity="center"
+        style="@style/ButtonBluStyle"
         android:singleLine="true"
         android:text="@string/setting"
-        android:textColor="@color/white"
-        android:textSize="15sp"
-        android:background="@drawable/btn_rec_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -167,6 +167,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private List<DbGroup> groups;
 
+    private int selectGroupId;
+
     private Disposable mTimer;
     private int mRetryCount = 0;
 
@@ -1055,8 +1057,19 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             }
         }
 
-        this.adapter = new DeviceListAdapter(all_light, this);
-        nowLightList.addAll(all_light);
+        if(lightType.equals("cw_light_group")){
+           List<DbLight> cwLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
+            this.adapter = new DeviceListAdapter(cwLightGroup, this);
+            nowLightList.addAll(cwLightGroup);
+        }else if(lightType.equals("rgb_light_group")){
+            List<DbLight> rgbLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
+            this.adapter = new DeviceListAdapter(rgbLightGroup, this);
+            nowLightList.addAll(rgbLightGroup);
+        }else {
+            this.adapter = new DeviceListAdapter(all_light, this);
+            nowLightList.addAll(all_light);
+        }
+
 
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
@@ -1129,8 +1142,15 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         lightType = intent.getStringExtra("lightType");
         if (lightType.equals("cw_light")) {
             groupLight = intent.getStringExtra("cw_light_group_name");
+        }else if(lightType.equals("cw_light_group")){
+            selectGroupId = intent.getIntExtra("group",0);
+        }else if(lightType.equals("rgb_light_group")){
+            selectGroupId = intent.getIntExtra("group",0);
         }
-        allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+
+        if(DBUtils.INSTANCE.getGroupByMesh(0xffff)!=null){
+            allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
+        }
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
         nowLightList = new ArrayList<>();
@@ -1337,7 +1357,10 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private String getDeviceName(DbLight light) {
         if (light.getBelongGroupId() != allLightId) {
-            return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
+            if(light.getBelongGroupId()!=null){
+                return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
+            }
+            return getString(R.string.not_grouped);
         } else {
             return getString(R.string.not_grouped);
         }
