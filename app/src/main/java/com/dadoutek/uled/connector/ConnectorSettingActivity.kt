@@ -125,6 +125,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             R.id.btnOTA -> {
                 if(txtTitle.text.toString()!=null && txtTitle.text.toString() !=""){
                     checkPermission()
+                }else{
+                    Toast.makeText(this,R.string.number_no,Toast.LENGTH_LONG).show()
                 }
             }
         }

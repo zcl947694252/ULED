@@ -364,7 +364,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         setContentView(R.layout.activity_device_detail)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
-//        this.mApplication = this.application as TelinkLightApplication
+        this.mApplication = this.application as TelinkLightApplication
 //        initDate()
 //        initView()
     }
@@ -1240,11 +1240,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
                 LogUtils.d("startScanLight_LightOfGroup")
-                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                        Manifest.permission.BLUETOOTH_ADMIN)
-                        .subscribeOn(Schedulers.io())
-                        .subscribe {
-                            if (it) {
+//                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+//                        Manifest.permission.BLUETOOTH_ADMIN)
+//                        .subscribeOn(Schedulers.io())
+//                        .subscribe {
+//                            if (it) {
                                 TelinkLightService.Instance().idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
@@ -1269,14 +1269,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                                 TelinkLightService.Instance().startScan(params)
                                 startCheckRSSITimer()
 
-                            } else {
-                                //没有授予权限
-                                DialogUtils.showNoBlePermissionDialog(this, {
-                                    retryConnectCount = 0
-                                    startScan()
-                                }, { finish() })
-                            }
-                        }
+//                            } else {
+//                                //没有授予权限
+//                                DialogUtils.showNoBlePermissionDialog(this, {
+//                                    retryConnectCount = 0
+//                                    startScan()
+//                                }, { finish() })
+//                            }
+//                        }
             }
     }
 

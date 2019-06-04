@@ -138,7 +138,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         actionBar?.setDisplayHomeAsUpEnabled(true)
 //        btnStopGradient.visibility = View.VISIBLE
 //        btnStopGradient.setOnClickListener(this)
-        normal_rgb.setOnClickListener(this)
+//        normal_rgb.setOnClickListener(this)
     }
 
     private fun initData() {
@@ -424,16 +424,12 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
                 rgbGradientAdapter!!.notifyDataSetChanged()
-
-
             }
 
             R.id.gradient_mode_off -> {
                 buildInModeList!![position].select = false
                 rgbGradientAdapter!!.notifyItemChanged(position)
-                if (positionState - 1 == position) {
-                    stopGradient()
-                }
+                stopGradient()
             }
 
             R.id.gradient_mode_set -> {

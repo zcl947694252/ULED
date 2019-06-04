@@ -59,7 +59,65 @@
     <!--</RelativeLayout>-->
 
     <include layout="@layout/toolbar"/>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <include layout="@layout/fragment_rgb_group_setting" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/divider"/>
+        <TextView
+            android:id="@+id/normal_rgb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/color_mode"
+            android:textColor="@android:color/holo_blue_light"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="42dp"
+            android:background="#eeeeee"
+            app:layout_constraintEnd_toEndOf="@+id/dynamic_rgb"
+            app:layout_constraintStart_toStartOf="@+id/normal_rgb"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/dynamic_rgb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/gradient_mode"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/normal_rgb"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+    <include layout="@layout/fragment_rgb_group_setting"
+        android:id="@+id/rgb_set"
+        />
+
+    <include layout="@layout/activity_rgb_gradient"
+        android:id="@+id/rgb_diy"
+        android:visibility="gone"
+        />
 
 </LinearLayout>

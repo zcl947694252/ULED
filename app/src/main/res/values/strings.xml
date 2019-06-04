@@ -735,4 +735,5 @@
     <string name="rgb_max">RGB value should not be greater than 255</string>
     <string name="switch_current">This switch is currently controlled</string>
     <string name="switch_group_switch">whether to switch groups？</string>
+    <string name="number_no">Version number not obtained</string>
 </resources>

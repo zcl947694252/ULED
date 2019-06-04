@@ -56,6 +56,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.sbBrightness
@@ -71,6 +72,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
     var fromWhere: String? = null
+    private var updateLightDisposal: Disposable? = null
     private val dialog: AlertDialog? = null
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
@@ -318,6 +320,34 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             }
     }
 
+    private fun updateLights(isOpen: Boolean, group: DbGroup) {
+        updateLightDisposal?.dispose()
+        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+                .subscribe {
+                    var lightList: MutableList<DbLight> = ArrayList()
+
+                    if (group.meshAddr == 0xffff) {
+                        //            lightList = DBUtils.getAllLight();
+                        val list = DBUtils.groupList
+                        for (j in list.indices) {
+                            lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
+                        }
+                    } else {
+                        lightList = DBUtils.getLightByGroupID(group.id)
+                    }
+
+
+                    for (dbLight: DbLight in lightList) {
+                        if (isOpen) {
+                            dbLight.connectionStatus = ConnectionStatus.ON.value
+                        } else {
+                            dbLight.connectionStatus = ConnectionStatus.OFF.value
+                        }
+                        DBUtils.updateLightLocal(dbLight)
+                    }
+                }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun lightSwitch() {
         if (currentShowPageGroup) {
@@ -354,6 +384,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             device_light_add.setImageResource(R.drawable.icon_puls)
                         }
                     }
+                    DBUtils.updateGroup(light_current)
+                    updateLights(true, light_current)
 
                     device_light_add.setOnTouchListener { v, event ->
                         if (event.action == MotionEvent.ACTION_DOWN) {
@@ -446,8 +478,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     device_light_add.setOnTouchListener { v, event -> false }
                     device_light_minus.setOnTouchListener { v, event -> false }
                     isSwitch = false
+                    DBUtils.updateGroup(light_current)
+                    updateLights(false, light_current)
                 }
-                DBUtils.updateGroup(light_current)
             }
         } else {
             var light_current = DBUtils.getLightByID(light!!.id)
@@ -1448,6 +1481,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun updateOTA() {
         if (textTitle.text != null && textTitle.text!="version") {
             checkPermission()
+        }else{
+            Toast.makeText(this,R.string.number_no,Toast.LENGTH_LONG).show()
         }
     }
 
