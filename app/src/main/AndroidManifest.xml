@@ -33,9 +33,10 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".user.VerificationCodeActivity"
-            android:screenOrientation="portrait"
-            />
+        <activity android:name=".othersview.InstructionsForUsActivity"></activity>
+        <activity
+            android:name=".user.VerificationCodeActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".switches.OTASwitchActivity"
             android:screenOrientation="portrait" />
@@ -123,8 +124,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".light.NormalSettingActivity"
-            android:screenOrientation="portrait"
-            /> <!-- <activity -->
+            android:screenOrientation="portrait" /> <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
         <!-- android:label="@string/activity_device_scanning_label" -->
         <!-- android:screenOrientation="portrait" -->
@@ -255,8 +255,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".othersview.SelectColorAct"
-            android:theme="@style/MyDialogStyleBottom"
-            />
+            android:theme="@style/MyDialogStyleBottom" />
         <activity
             android:name=".light.ConfigNightlightActivity"
             android:screenOrientation="portrait" />

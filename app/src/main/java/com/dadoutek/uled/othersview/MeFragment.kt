@@ -262,6 +262,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         constantQuestion?.setOnClickListener(this)
 //        showGuideAgain?.setOnClickListener(this)
         resetAllGroup?.setOnClickListener(this)
+        instructions?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -387,6 +388,10 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.resetAllGroup -> gotoResetAllGroup()
+            R.id.instructions ->{
+                var intent = Intent(activity,InstructionsForUsActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
