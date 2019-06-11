@@ -110,9 +110,6 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                 }).start();
                 break;
 
-            case 19:
-                DbDeleteGroupDao.createTable(db, true);
-                break;
         }
     }
 }
