@@ -76,7 +76,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -686,6 +685,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
+                            if (TelinkApplication.getInstance()?.connectDevice == null)
                                 startScan()
                             }
                             break
@@ -721,7 +721,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
                         val account = DBUtils.lastUser?.account
-
                         val scanFilters = ArrayList<ScanFilter>()
                         val scanFilter = ScanFilter.Builder()
                                 .setDeviceName(account)
@@ -739,7 +738,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                         addScanListeners()
                         TelinkLightService.Instance().startScan(params)
-                        startCheckRSSITimer()
+//                        startCheckRSSITimer()
 
                         if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
                             mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
@@ -798,7 +797,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
                         LogUtils.d("onLeScanTimeout()")
-                        onLeScanTimeout()
+                        retryConnect();
+//                        onLeScanTimeout()
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -849,11 +849,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true) {
+                com.blankj.utilcode.util.LogUtils.d("reconnect")
                 startScan()
+            }
             else
                 login()
         } else {
+            com.blankj.utilcode.util.LogUtils.d("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
             if (mNotFoundSnackBar?.isShown != true) {
                 mNotFoundSnackBar = indefiniteSnackbar(root,
@@ -1058,10 +1061,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
+/*    */
     /**
      * 扫描不到任何设备了
      * （扫描结束）
-     */
+     *//*
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
@@ -1077,7 +1081,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //            retryConnect()
 //        }
 
-    }
+    }*/
 
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
@@ -1111,18 +1115,22 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
         }.start()
 
-        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
+        if (!isSwitch(deviceInfo.productUUID)) {
+//        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
 //            connect(deviceInfo.macAddress)
-            if (bestRSSIDevice != null) {
-                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
-                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
-                    bestRSSIDevice = deviceInfo
-                }
-            } else {
-                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
-                bestRSSIDevice = deviceInfo
-            }
+//            if (bestRSSIDevice != null) {
+//                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+//                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
+//                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+//                    bestRSSIDevice = deviceInfo
+//                }
+//            } else {
+//                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+//                bestRSSIDevice = deviceInfo
+//            }
+
+            bestRSSIDevice = deviceInfo
+            connect(bestRSSIDevice!!.macAddress)
 
         }
 
@@ -1138,7 +1146,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun onErrorReport(info: ErrorReportInfo) {
 //        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
         if (bestRSSIDevice != null) {
-            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
+//            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
         }
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
@@ -1164,7 +1172,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         LogUtils.d("未建立物理连接")
                     }
                 }
-                retryConnect()
+//                retryConnect()
 
             }
             ErrorReportEvent.STATE_LOGIN -> {
@@ -1179,7 +1187,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         LogUtils.d("write login data 没有收到response")
                     }
                 }
-                retryConnect()
+//                retryConnect()
 
             }
         }

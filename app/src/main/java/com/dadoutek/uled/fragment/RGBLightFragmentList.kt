@@ -366,6 +366,7 @@ class RGBLightFragmentList : BaseFragment() {
 //        }
     }
 
+/*
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getInstance().connectDevice == null) {
@@ -379,6 +380,7 @@ class RGBLightFragmentList : BaseFragment() {
             e.printStackTrace()
         }
     }
+*/
 
     override fun onStop() {
         super.onStop()

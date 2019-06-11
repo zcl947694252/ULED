@@ -378,6 +378,7 @@ class RelayFragmentList : BaseFragment() {
 //        }
     }
 
+/*
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getInstance().connectDevice == null) {
@@ -391,6 +392,7 @@ class RelayFragmentList : BaseFragment() {
             e.printStackTrace()
         }
     }
+*/
 
     override fun onStop() {
         super.onStop()

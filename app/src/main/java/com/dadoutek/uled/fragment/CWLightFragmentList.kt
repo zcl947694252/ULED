@@ -387,6 +387,7 @@ class CWLightFragmentList : BaseFragment() {
 //        }
     }
 
+/*
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getInstance().connectDevice == null) {
@@ -400,6 +401,7 @@ class CWLightFragmentList : BaseFragment() {
             e.printStackTrace()
         }
     }
+*/
 
     override fun onStop() {
         super.onStop()

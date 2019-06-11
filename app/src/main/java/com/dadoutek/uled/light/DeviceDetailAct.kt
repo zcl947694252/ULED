@@ -1267,7 +1267,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
                 addScanListeners()
                 TelinkLightService.Instance().startScan(params)
-                startCheckRSSITimer()
+//                startCheckRSSITimer()
 
 //                            } else {
 //                                //没有授予权限
@@ -1386,12 +1386,12 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-        TelinkLightService.Instance().idleMode(true)
-        LeBluetooth.getInstance().stopScan()
-        startScan()
+//        TelinkLightService.Instance().idleMode(true)
+//        LeBluetooth.getInstance().stopScan()
+//        startScan()
 //        }
 //        } else {
-//            retryConnect()
+            retryConnect()
 //        }
 
     }

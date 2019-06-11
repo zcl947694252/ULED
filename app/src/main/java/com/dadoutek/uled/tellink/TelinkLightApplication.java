@@ -59,7 +59,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 
         Utils.init(this);
         if (!AppUtils.isAppDebug()) {
-            LogUtils.getConfig().setLogSwitch(false);
+//            LogUtils.getConfig().setLogSwitch(false);
 //            LogUtils.getConfig().setLog2FileSwitch(false);
         }else{
 //            LogUtils.getConfig().setLog2FileSwitch(true);

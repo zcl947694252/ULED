@@ -337,6 +337,7 @@ class CurtainFragmentList : BaseFragment() {
         }
     }
 
+/*
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getInstance().connectDevice == null) {
@@ -350,6 +351,7 @@ class CurtainFragmentList : BaseFragment() {
             e.printStackTrace()
         }
     }
+*/
 
     override fun onStop() {
         super.onStop()
