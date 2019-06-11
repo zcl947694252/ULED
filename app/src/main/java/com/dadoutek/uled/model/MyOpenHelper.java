@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.dadoutek.uled.dao.DaoMaster;
+import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbColorNodeDao;
 import com.dadoutek.uled.dao.DbConnectorDao;
 import com.dadoutek.uled.dao.DbCurtainDao;
@@ -25,6 +26,7 @@ import com.dadoutek.uled.model.DbModel.DbDiyGradient;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbScene;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.util.MigrationHelper;
 
 import org.greenrobot.greendao.database.Database;
@@ -35,6 +37,12 @@ import java.util.List;
 import java.util.Map;
 
 public class MyOpenHelper extends DaoMaster.OpenHelper {
+
+    private static DaoMaster daoMaster;
+    private static DaoSession daoSession;
+    public static final String DBNAME = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+            Constant.DB_NAME_KEY, "uled") + ".db";
+
     MyOpenHelper(Context context, String name) {
         super(context, name);
     }
@@ -42,10 +50,10 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
     @Override
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
 
-        if(oldVersion < newVersion){
-            MigrationHelper.migrate(db,DbRegionDao.class,DbGroupDao.class,
-                    DbLightDao.class,DbDataChangeDao.class,DbDeleteGroupDao.class,
-                    DbSceneDao.class,DbSceneActionsDao.class,DbUserDao.class,DbDiyGradientDao.class,
+        if (oldVersion < newVersion) {
+            MigrationHelper.migrate(db, DbRegionDao.class, DbGroupDao.class,
+                    DbLightDao.class, DbDataChangeDao.class, DbDeleteGroupDao.class,
+                    DbSceneDao.class, DbSceneActionsDao.class, DbUserDao.class, DbDiyGradientDao.class,
                     DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class, DbConnectorDao.class);
         }
 
@@ -60,32 +68,32 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                     try {
                         Thread.sleep(3000);
 
-                        Map<Long,Integer> map = new HashMap<>();
-                        List<DbLight> lights= DBUtils.INSTANCE.getAllLight();
-                        List<DbGroup> groups= DBUtils.INSTANCE.getAllGroups();
+                        Map<Long, Integer> map = new HashMap<>();
+                        List<DbLight> lights = DBUtils.INSTANCE.getAllLight();
+                        List<DbGroup> groups = DBUtils.INSTANCE.getAllGroups();
 
-                        for(int i=0;i<groups.size();i++){
-                            DbGroup group=groups.get(i);
-                            if(group.getMeshAddr()==0xffff){
+                        for (int i = 0; i < groups.size(); i++) {
+                            DbGroup group = groups.get(i);
+                            if (group.getMeshAddr() == 0xffff) {
                                 group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT_ALL);
-                            }else{
+                            } else {
                                 group.setDeviceType(Constant.DEVICE_TYPE_DEFAULT);
                             }
 
                             DBUtils.INSTANCE.updateGroup(group);
                         }
 
-                        for(int k=0;k<lights.size();k++){
-                            map.put(lights.get(k).getBelongGroupId(),lights.get(k).getProductUUID());
+                        for (int k = 0; k < lights.size(); k++) {
+                            map.put(lights.get(k).getBelongGroupId(), lights.get(k).getProductUUID());
                         }
 
-                        for (Map.Entry<Long,Integer> entry : map.entrySet()) {
-                            Long id=entry.getKey();
-                            int uuid=entry.getValue();
+                        for (Map.Entry<Long, Integer> entry : map.entrySet()) {
+                            Long id = entry.getKey();
+                            int uuid = entry.getValue();
 
-                            DbGroup group=DBUtils.INSTANCE.getGroupByID(id);
+                            DbGroup group = DBUtils.INSTANCE.getGroupByID(id);
 
-                            if(group.getMeshAddr()!=0xffff){
+                            if (group.getMeshAddr() != 0xffff) {
                                 group.setDeviceType((long) uuid);
                                 DBUtils.INSTANCE.updateGroup(group);
                             }
@@ -95,6 +103,10 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                         e.printStackTrace();
                     }
                 }).start();
+                break;
+
+            case 19:
+                DbDeleteGroupDao.createTable(db, true);
                 break;
         }
     }
