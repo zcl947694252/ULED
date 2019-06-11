@@ -62,7 +62,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                     }, DbRegionDao.class, DbGroupDao.class,
                     DbLightDao.class, DbDataChangeDao.class, DbDeleteGroupDao.class,
                     DbSceneDao.class, DbSceneActionsDao.class, DbUserDao.class, DbDiyGradientDao.class,
-                    DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class, DbConnectorDao.class);
+                    DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class);
         }
 
         switch (oldVersion) {
