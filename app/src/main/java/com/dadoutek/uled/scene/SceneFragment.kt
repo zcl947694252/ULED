@@ -49,8 +49,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemLongClickListener
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/2.
@@ -197,6 +196,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+        val timer = Timer()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                val inputManager = textGp.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputManager.showSoftInput(textGp, 0)
+            }
+        }, 200)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

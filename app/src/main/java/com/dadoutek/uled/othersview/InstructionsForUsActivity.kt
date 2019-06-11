@@ -1,6 +1,7 @@
 package com.dadoutek.uled.othersview
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
@@ -35,7 +36,12 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
         webSettings.saveFormData = true
         webSettings.setGeolocationEnabled(true)
         webSettings.domStorageEnabled = true
-        webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html")
+        if(isZh(this)){
+            webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html")
+        }else{
+            webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html?lang=1")
+        }
+
         //设置Web视图
         webView!!.webViewClient = webViewClient()
     }
@@ -57,5 +63,11 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
         }
         finish()//结束退出程序
         return false
+    }
+
+    private   fun isZh(context: Context): Boolean {
+        val locale = context.resources.configuration.locale
+        val language = locale.language
+        return language.endsWith("zh")
     }
 }

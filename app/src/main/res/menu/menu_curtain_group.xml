@@ -20,9 +20,15 @@
         android:orderInCategory="2"
         app:showAsAction="never" />
 
+    <!--<item-->
+        <!--android:id="@+id/toolbar_restart"-->
+        <!--android:title="@string/restart"-->
+        <!--android:orderInCategory="2"-->
+        <!--app:showAsAction="never" />-->
+
     <item
-        android:id="@+id/toolbar_restart"
-        android:title="@string/restart"
+        android:id="@+id/toolbar_slow_up"
+        android:title="@string/slow_up_the_cache"
         android:orderInCategory="2"
         app:showAsAction="never" />
 
@@ -35,11 +41,6 @@
     <item
         android:id="@+id/toolbar_software_restart"
         android:title="@string/software_restart"
-        android:orderInCategory="2"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/toolbar_slow_up"
-        android:title="@string/slow_up_the_cache"
         android:orderInCategory="2"
         app:showAsAction="never" />
 

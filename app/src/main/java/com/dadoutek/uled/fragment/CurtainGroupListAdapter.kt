@@ -18,7 +18,7 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
 
         if (group != null) {
             var gpSet = helper.getView<Button>(R.id.btn_set)
-            var num = DBUtils.getLightByGroupID(group.id).size
+            var num = DBUtils.getCurtainByGroupID(group.id).size
 
             val deleteIcon = helper.getView<CheckBox>(R.id.selected_group_curtain)
             if (isDelete) {

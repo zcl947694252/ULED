@@ -173,7 +173,14 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.light_add_device_btn -> {
-                addDevice()
+                if(DBUtils.getAllCurtains().size ==0){
+                    intent = Intent(this, CurtainScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    startActivityForResult(intent, 0)
+                }else{
+                    addDevice()
+                }
             }
         }
     }
@@ -258,11 +265,11 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     override fun onResume() {
         super.onResume()
-        initToolbar()
-        initParameter()
-        initData()
-        initView()
-        initOnLayoutListener()
+//        initToolbar()
+//        initParameter()
+//        initData()
+//        initView()
+//        initOnLayoutListener()
     }
 
     override fun onStop() {
@@ -420,6 +427,12 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         adapter!!.bindToRecyclerView(recycler_view_lights)
         for (i in curtainList.indices) {
             curtainList[i].updateIcon()
+        }
+
+        if(DBUtils.getAllCurtains().size==0){
+            light_add_device_btn.text = getString(R.string.device_scan_scan)
+        }else{
+            light_add_device_btn.text = getString(R.string.add_device)
         }
     }
 

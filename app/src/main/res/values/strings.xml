@@ -647,7 +647,7 @@
     <string name="curtain_fail_tip">There is a curtain grouped failed, please check and try again!</string>
 
     <string name="hand_recovery">Hand recovery</string>
-    <string name="software_restart">Software restart</string>
+    <string name="software_restart">Device restart</string>
     <string name="slow_up_the_cache">Slow up the cache</string>
 
     <string name="slow_up_the_cache_cancel">cancel slow up the cache</string>
@@ -656,7 +656,7 @@
 
     <string name="delete_user">Make sure to delete the phone number？</string>
 
-    <string name="connector">Bluetooth Connector</string>
+    <string name="connector">Relay</string>
 
 
     <string name="scan_connector_num">Total: %1$s connector are currently scanned</string>
@@ -736,4 +736,6 @@
     <string name="switch_current">This switch is currently controlled</string>
     <string name="switch_group_switch">whether to switch groups？</string>
     <string name="number_no">Version number not obtained</string>
+    <string name="instructions_for_use">Instructions for use</string>
+    <string name="account_management">Account management</string>
 </resources>

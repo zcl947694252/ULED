@@ -76,6 +76,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -435,7 +436,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             if (clickRgb) {
                 guide3 = install_device_recyclerView.getChildAt(1)
             } else {
-                guide3 = install_device_recyclerView.getChildAt(0)
+//                guide3 = install_device_recyclerView.getChildAt(0)
+                guide3 = install_device_recyclerView.layoutManager!!.findViewByPosition(0)
             }
 
             return GuideUtils.guideBuilder(this, installDialog!!.window.decorView, GuideUtils.GUIDE_START_INSTALL_DEVICE_NOW)

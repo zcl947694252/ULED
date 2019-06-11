@@ -593,7 +593,7 @@
     <string name="selected_curtain_tip">至少选择一个窗帘进行分组</string>
     <string name="curtain_fail_tip">有窗帘分组失败，请检查并重试！</string>
     <string name="hand_recovery">手拉恢复</string>
-    <string name="software_restart">软件重启</string>
+    <string name="software_restart">设备重启</string>
     <string name="slow_up_the_cache">缓起缓停</string>
     <string name="slow_up_the_cache_cancel">取消缓起缓停</string>
 
@@ -670,4 +670,6 @@
     <string name="switch_current">此开关当前已控制</string>
     <string name="switch_group_switch">是否切换分组？</string>
     <string name="number_no">未获得版本号</string>
+    <string name="instructions_for_use">使用说明</string>
+    <string name="account_management">账号管理</string>
 </resources>

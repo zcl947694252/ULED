@@ -66,7 +66,11 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_connector_of_group.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
+import kotlinx.android.synthetic.main.activity_lights_of_group.no_light
+import kotlinx.android.synthetic.main.activity_lights_of_group.recycler_view_lights
+import kotlinx.android.synthetic.main.activity_lights_of_group.scanPb
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -141,8 +145,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.light_add_device_btn -> {
-                addDevice()
+            R.id.light_add_device_btns -> {
+                if(DBUtils.getAllConnctor().size == 0){
+                    intent = Intent(this, ScanningConnectorActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    startActivityForResult(intent, 0)
+                }else{
+                    addDevice()
+                }
             }
         }
     }
@@ -448,7 +459,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
-        light_add_device_btn.setOnClickListener(this)
+        light_add_device_btns.setOnClickListener(this)
         recyclerView=findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
@@ -457,6 +468,12 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         adapter!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {
             lightList[i].updateIcon()
+        }
+
+        if(DBUtils.getAllConnctor().size == 0){
+            light_add_device_btns.text = getString(R.string.device_scan_scan)
+        }else{
+            light_add_device_btns.text = getString(R.string.add_device)
         }
     }
 

@@ -355,6 +355,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@color/white"
+                android:visibility="gone"
                 android:foreground="?android:attr/selectableItemBackground"
                 >
 
@@ -369,7 +370,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="账号管理"
+                    android:text="@string/account_management"
                     android:textColor="@color/black_e"
                     android:textSize="13sp"
                     android:layout_centerVertical="true"
@@ -413,7 +414,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="使用说明"
+                    android:text="@string/instructions_for_use"
                     android:textColor="@color/black_e"
                     android:textSize="13sp"
                     android:layout_centerVertical="true"

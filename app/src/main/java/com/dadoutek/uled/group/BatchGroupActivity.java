@@ -279,30 +279,32 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private void startBlink(DbLight light) {
 //        int dstAddress = light.getMeshAddr();
         DbGroup group;
-        DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId());
-        if (groupOfTheLight == null)
-            group = groups.get(0);
-        else
-            group = groupOfTheLight;
-        int groupAddress = group.getMeshAddr();
-        Log.d("Saw", "startBlink groupAddresss = " + groupAddress);
-        int dstAddress = light.getMeshAddr();
-        byte opcode = (byte) Opcode.SET_GROUP;
-        byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
-                (byte) (groupAddress >> 8 & 0xFF)};
-        params[0] = 0x01;
+        if(light.getBelongGroupId()!=null) {
+            DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId());
+            if (groupOfTheLight == null)
+                group = groups.get(0);
+            else
+                group = groupOfTheLight;
+            int groupAddress = group.getMeshAddr();
+            Log.d("Saw", "startBlink groupAddresss = " + groupAddress);
+            int dstAddress = light.getMeshAddr();
+            byte opcode = (byte) Opcode.SET_GROUP;
+            byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
+                    (byte) (groupAddress >> 8 & 0xFF)};
+            params[0] = 0x01;
 
-        if (mBlinkDisposables.get(dstAddress) != null) {
-            mBlinkDisposables.get(dstAddress).dispose();
+            if (mBlinkDisposables.get(dstAddress) != null) {
+                mBlinkDisposables.get(dstAddress).dispose();
+            }
+
+            //每隔1s发一次，就是为了让灯一直闪.
+            mBlinkDisposables.put(dstAddress, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aLong -> {
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+                    }));
         }
-
-        //每隔1s发一次，就是为了让灯一直闪.
-        mBlinkDisposables.put(dstAddress, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-                }));
     }
 
     private void stopBlink(DbLight light) {
@@ -511,6 +513,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 updateGroupResult(dbLight, dbGroup);
                 if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
                     ToastUtils.showLong("断开连接");
+                    hideLoadingDialog();
                 } else {
                     if (index + 1 > selectLights.size() - 1)
                         completeGroup(selectLights);
@@ -1356,8 +1359,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private String getDeviceName(DbLight light) {
-        if (light.getBelongGroupId() != allLightId) {
-            if(light.getBelongGroupId()!=null){
+        if (light.getBelongGroupId()!=null) {
+            if(light.getBelongGroupId() != allLightId){
                 return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
             }
             return getString(R.string.not_grouped);

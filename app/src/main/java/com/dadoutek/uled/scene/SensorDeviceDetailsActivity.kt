@@ -475,7 +475,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         DBUtils.deleteSensor(currentLight!!)
                         notifyData()
                         Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+//                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                             val opcode = Opcode.KICK_OUT
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.getMeshAddr(), null)
                             if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentLight!!.getMeshAddr())) {
@@ -500,10 +500,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                 }
                             }
 
-
-                        } else {
-                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
-                        }
+//
+//                        } else {
+//                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
+//                        }
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()

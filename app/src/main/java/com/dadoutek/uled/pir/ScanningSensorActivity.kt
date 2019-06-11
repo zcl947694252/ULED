@@ -330,11 +330,20 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             progressBtn.progress = 100  //进度控件显示成完成状态
         }
 
-        if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
-            startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
-        } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-            startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!)
+        if(isSupportInstallOldDevice){
+            if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+                startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
+            } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
+                startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!,"update" to "1")
+            }
+        }else{
+            if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+                startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
+            } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
+                startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!,"update" to "0")
+            }
         }
+
     }
 
 

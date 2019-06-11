@@ -15,6 +15,7 @@ import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -374,6 +375,7 @@ class GroupListFragment : BaseFragment() {
 
         allGroup = DBUtils.getGroupByMesh(0xFFFF)
 
+
         if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
                 btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
@@ -584,6 +586,13 @@ class GroupListFragment : BaseFragment() {
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+        val timer = Timer()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                val inputManager = textGp.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputManager.showSoftInput(textGp, 0)
+            }
+        }, 200)
     }
 
     private fun refreshAndMoveBottom() {
@@ -758,17 +767,19 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
-                    val dstAddr = this.allGroup!!.meshAddr
-                    Commander.openOrCloseLights(dstAddr, true)
-                    btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
-                    btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
-                    onText!!.setTextColor(resources.getColor(R.color.white))
-                    offText!!.setTextColor(resources.getColor(R.color.black_nine))
-                    updateLights(true, this.allGroup!!)
-                    val intent = Intent("switch_here")
-                    intent.putExtra("switch_here", "on")
-                    LocalBroadcastManager.getInstance(this!!.mContext!!)
-                            .sendBroadcast(intent)
+                    if (allGroup != null) {
+                        val dstAddr = this.allGroup!!.meshAddr
+                        Commander.openOrCloseLights(dstAddr, true)
+                        btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
+                        btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
+                        onText!!.setTextColor(resources.getColor(R.color.white))
+                        offText!!.setTextColor(resources.getColor(R.color.black_nine))
+                        updateLights(true, this.allGroup!!)
+                        val intent = Intent("switch_here")
+                        intent.putExtra("switch_here", "on")
+                        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                                .sendBroadcast(intent)
+                    }
                 }
             }
 
@@ -777,17 +788,19 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
-                    val dstAddr = this.allGroup!!.meshAddr
-                    Commander.openOrCloseLights(dstAddr, false)
-                    btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
-                    btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
-                    onText!!.setTextColor(resources.getColor(R.color.black_nine))
-                    offText!!.setTextColor(resources.getColor(R.color.white))
-                    updateLights(false, this.allGroup!!)
-                    val intent = Intent("switch_here")
-                    intent.putExtra("switch_here", "false")
-                    LocalBroadcastManager.getInstance(this!!.mContext!!)
-                            .sendBroadcast(intent)
+                    if (allGroup != null) {
+                        val dstAddr = this.allGroup!!.meshAddr
+                        Commander.openOrCloseLights(dstAddr, false)
+                        btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
+                        btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
+                        onText!!.setTextColor(resources.getColor(R.color.black_nine))
+                        offText!!.setTextColor(resources.getColor(R.color.white))
+                        updateLights(false, this.allGroup!!)
+                        val intent = Intent("switch_here")
+                        intent.putExtra("switch_here", "false")
+                        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                                .sendBroadcast(intent)
+                    }
                 }
             }
 

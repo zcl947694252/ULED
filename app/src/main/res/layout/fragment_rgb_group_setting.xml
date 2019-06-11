@@ -310,7 +310,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:id="@+id/tip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -346,7 +346,7 @@
             android:textColor="@color/black_nine"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="2dp"
             app:layout_constraintStart_toStartOf="parent" />
 
     </android.support.constraint.ConstraintLayout>

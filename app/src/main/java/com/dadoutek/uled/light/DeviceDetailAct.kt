@@ -164,7 +164,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
 
-
     private fun addListeners() {
         addScanListeners()
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -173,23 +172,23 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     override fun performed(event: Event<String>) {
-        when (event.type) {
-            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
-//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
-            }
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
-            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
-            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
-//            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
-            ErrorReportEvent.ERROR_REPORT -> {
-                val info = (event as ErrorReportEvent).args
-                onErrorReport(info)
-            }
-        }
+//        when (event.type) {
+////            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
+////            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
+////            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+////            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
+////            NotificationEvent.GET_ALARM -> {
+////            }
+//            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+////            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
+////            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
+////            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
+////            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
+//            ErrorReportEvent.ERROR_REPORT -> {
+//                val info = (event as ErrorReportEvent).args
+//                onErrorReport(info)
+//            }
+//        }
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
@@ -1108,43 +1107,44 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     fun notifyData() {
-        val mOldDatas: MutableList<DbLight>? = lightsData
-        val mNewDatas: MutableList<DbLight>? = getNewData()
-        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                (newItemPosition)?.id) ?: false
-            }
+        if (lightsData.size > 0) {
+            val mOldDatas: MutableList<DbLight>? = lightsData
+            val mNewDatas: MutableList<DbLight>? = getNewData()
+            val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
+                    (newItemPosition)?.id) ?: false
+                }
 
-            override fun getOldListSize(): Int {
-                return mOldDatas?.size ?: 0
-            }
+                override fun getOldListSize(): Int {
+                    return mOldDatas?.size ?: 0
+                }
 
-            override fun getNewListSize(): Int {
-                return mNewDatas?.size ?: 0
-            }
+                override fun getNewListSize(): Int {
+                    return mNewDatas?.size ?: 0
+                }
 
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas?.get(oldItemPosition)
-                val beanNew = mNewDatas?.get(newItemPosition)
-                return if (!beanOld?.name.equals(beanNew?.name)) {
-                    return false//如果有内容不同，就返回false
-                } else true
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                    val beanOld = mOldDatas?.get(oldItemPosition)
+                    val beanNew = mNewDatas?.get(newItemPosition)
+                    return if (!beanOld?.name.equals(beanNew?.name)) {
+                        return false//如果有内容不同，就返回false
+                    } else true
 
+                }
+            }, true)
+            adaper?.let { diffResult.dispatchUpdatesTo(it) }
+            lightsData = mNewDatas!!
+            when (type) {
+                Constant.INSTALL_NORMAL_LIGHT -> {
+                    toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
+                }
+                Constant.INSTALL_RGB_LIGHT -> {
+                    toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
+                }
             }
-        }, true)
-        adaper?.let { diffResult.dispatchUpdatesTo(it) }
-        lightsData = mNewDatas!!
-        when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> {
-                toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
-            }
-            Constant.INSTALL_RGB_LIGHT -> {
-                toolbar.title = getString(R.string.rgb_light) + " (" + lightsData.size + ")"
-            }
+            adaper!!.setNewData(lightsData)
         }
-        adaper!!.setNewData(lightsData)
-
     }
 
     private fun getNewData(): MutableList<DbLight> {
@@ -1179,7 +1179,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    var root = this@DeviceDetailAct.findViewById<LinearLayout>(R.id.root)
+                    var root = this@DeviceDetailAct.findViewById<RelativeLayout>(R.id.root)
                     root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
@@ -1207,7 +1207,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
-//                            scanPb?.visibility = View.GONE
+                            //                            scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
@@ -1245,29 +1245,29 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //                        .subscribeOn(Schedulers.io())
 //                        .subscribe {
 //                            if (it) {
-                                TelinkLightService.Instance().idleMode(true)
-                                bestRSSIDevice = null   //扫描前置空信号最好设备。
-                                //扫描参数
-                                val account = DBUtils.lastUser?.account
+                TelinkLightService.Instance().idleMode(true)
+                bestRSSIDevice = null   //扫描前置空信号最好设备。
+                //扫描参数
+                val account = DBUtils.lastUser?.account
 
-                                val scanFilters = java.util.ArrayList<ScanFilter>()
-                                val scanFilter = ScanFilter.Builder()
-                                        .setDeviceName(account)
-                                        .build()
-                                scanFilters.add(scanFilter)
+                val scanFilters = java.util.ArrayList<ScanFilter>()
+                val scanFilter = ScanFilter.Builder()
+                        .setDeviceName(account)
+                        .build()
+                scanFilters.add(scanFilter)
 
-                                val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
-                                    params.setScanFilters(scanFilters)
-                                }
-                                params.setMeshName(account)
-                                params.setOutOfMeshName(account)
-                                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                                params.setScanMode(false)
+                val params = LeScanParameters.create()
+                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                    params.setScanFilters(scanFilters)
+                }
+                params.setMeshName(account)
+                params.setOutOfMeshName(account)
+                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                params.setScanMode(false)
 
-                                addScanListeners()
-                                TelinkLightService.Instance().startScan(params)
-                                startCheckRSSITimer()
+                addScanListeners()
+                TelinkLightService.Instance().startScan(params)
+                startCheckRSSITimer()
 
 //                            } else {
 //                                //没有授予权限

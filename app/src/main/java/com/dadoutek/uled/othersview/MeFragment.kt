@@ -503,7 +503,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
         if(meshAdre.isEmpty()){
             hideLoadingDialog()
-            ToastUtils.showLong(R.string.successful_resumption)
+//            ToastUtils.showLong(R.string.successful_resumption)
         }
     }
 

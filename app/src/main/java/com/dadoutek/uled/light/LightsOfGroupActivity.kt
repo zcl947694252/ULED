@@ -162,7 +162,25 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.light_add_device_btn -> {
-                addDevice()
+                if (strLight == "cw_light") {
+                    if (DBUtils.getAllNormalLight().size == 0) {
+                        intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+                        startActivityForResult(intent, 0)
+                    } else {
+                        addDevice()
+                    }
+                } else if (strLight == "rgb_light") {
+                    if (DBUtils.getAllRGBLight().size == 0) {
+                        intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
+                        startActivityForResult(intent, 0)
+                    } else {
+                        addDevice()
+                    }
+                }
             }
         }
     }
@@ -358,10 +376,10 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                     intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                     intent.putExtra("lightType", "cw_light_group")
-                    intent.putExtra("group",group.id.toInt())
+                    intent.putExtra("group", group.id.toInt())
                     startActivity(intent)
                 })
-            } else if(strLight == "rgb_light"){
+            } else if (strLight == "rgb_light") {
                 var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                 toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                 batchGroup.setText(R.string.batch_group)
@@ -371,7 +389,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                     intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                     intent.putExtra("lightType", "rgb_light_group")
-                    intent.putExtra("group",group)
+                    intent.putExtra("group", group)
                     startActivity(intent)
                 })
             }
@@ -496,6 +514,25 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             }
         }
 
+        if (strLight == "cw_light") {
+            if (DBUtils.getAllNormalLight().size == 0) {
+                light_add_device_btn.text = getString(R.string.device_scan_scan)
+            } else {
+                light_add_device_btn.text = getString(R.string.add_device)
+            }
+        } else if (strLight == "rgb_light") {
+            if (DBUtils.getAllRGBLight().size == 0) {
+                light_add_device_btn.text = getString(R.string.device_scan_scan)
+            } else {
+                light_add_device_btn.text = getString(R.string.add_device)
+            }
+        }
+
+//        if(DBUtils.allLight.isNotEmpty()){
+//            light_add_device_btn.text = getString(R.string.device_scan_scan)
+//        }else{
+//            light_add_device_btn.text = getString(R.string.add_device)
+//        }
     }
 
 

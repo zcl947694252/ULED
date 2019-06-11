@@ -92,7 +92,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
     private lateinit var otaButton: Button
 
-    private lateinit var versionText: TextView
+//    private lateinit var versionText: TextView
 
     private val mDisposable = CompositeDisposable()
 
@@ -127,7 +127,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             initToolGroupBar()
         } else {
             currentShowGroupSetPage = false
-            versionText = findViewById(R.id.versionText)
+//            versionText = findViewById(R.id.versionText)
             initToolbar()
             initMeshDresData()
             getVersion()
@@ -149,19 +149,34 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(curtain!!.meshAddr, { s ->
                 localVersion = s
-                if (versionText != null) {
-                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                        versionText.text = resources.getString(R.string.firmware_version, localVersion)
-                        curtain!!.version = localVersion
-                        this.versionText.visibility = View.VISIBLE
+                if(localVersion!=""){
+                    if (versionText != null) {
+                        if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
+                            curtain!!.version = localVersion
+                            this.versionText.visibility = View.VISIBLE
 //                        tvOta!!.visibility = View.VISIBLE
-                    } else {
-                        versionText.text = resources.getString(R.string.firmware_version, localVersion)
-                        curtain!!.version = localVersion
-                        this.versionText.visibility = View.VISIBLE
+                        } else {
+                            versionText.text = resources.getString(R.string.firmware_version, localVersion)
+                            curtain!!.version = localVersion
+                            this.versionText.visibility = View.VISIBLE
 //                        tvOta!!.visibility = View.GONE
+                        }
                     }
                 }
+//                if (versionText != null) {
+//                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+//                        versionText.text = resources.getString(R.string.firmware_version, localVersion)
+//                        curtain!!.version = localVersion
+//                        this.versionText.visibility = View.VISIBLE
+////                        tvOta!!.visibility = View.VISIBLE
+//                    } else {
+//                        versionText.text = resources.getString(R.string.firmware_version, localVersion)
+//                        curtain!!.version = localVersion
+//                        this.versionText.visibility = View.VISIBLE
+////                        tvOta!!.visibility = View.GONE
+//                    }
+//                }
                 null
             }, {
                 if (txtTitle != null) {
@@ -252,9 +267,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
             R.id.toolbar_hand_recovery -> {
                 handRecovery()
             }
-            R.id.toolbar_restart -> {
-                clickRestart()
-            }
+//            R.id.toolbar_restart -> {
+//                clickRestart()
+//            }
             R.id.toolbar_software_restart -> {
                 sofwareRestart()
             }

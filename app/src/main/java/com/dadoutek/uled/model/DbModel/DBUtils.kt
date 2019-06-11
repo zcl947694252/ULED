@@ -856,7 +856,12 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbConnectorDao.update(relay)
     }
 
-
+    fun updateSensor(sensor: DbSensor) {
+        DaoSessionInstance.getInstance().dbSensorDao.update(sensor)
+        recordingChange(sensor.id,
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_UPDATE)
+    }
 
     fun updateScene(scene: DbScene) {
         DaoSessionInstance.getInstance().dbSceneDao.update(scene)

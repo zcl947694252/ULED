@@ -726,7 +726,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 null
             }, {
                 if (txtTitle != null) {
-                    txtTitle!!.visibility = View.GONE
+//                    txtTitle!!.visibility = View.GONE
 //                    tvOta!!.visibility = View.GONE
                 }
                 null
