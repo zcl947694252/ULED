@@ -62,7 +62,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 //            LogUtils.getConfig().setLogSwitch(false);
 //            LogUtils.getConfig().setLog2FileSwitch(false);
         }else{
-//            LogUtils.getConfig().setLog2FileSwitch(true);
+            LogUtils.getConfig().setLog2FileSwitch(true);
             //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
         }
 //        registerBluetoothReceiver();

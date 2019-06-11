@@ -2,6 +2,9 @@ package com.dadoutek.uled.model;
 
 import android.content.Context;
 
+import android.database.sqlite.SQLiteDatabase;
+
+
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbColorNodeDao;
@@ -43,7 +46,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
 
 
     @Override
-    public void onUpgrade(Database db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         if (oldVersion < newVersion) {
             MigrationHelper.migrate(db, new MigrationHelper.ReCreateAllTableListener(){
@@ -64,7 +67,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
 
         switch (oldVersion) {
             case 1:
-                DbDeleteGroupDao.createTable(db, true);
+//                DbDeleteGroupDao.createTable(db, true);
                 break;
             case 9:
                 //由于新增devicetype对象，进行老用户数据兼容
