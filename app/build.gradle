@@ -117,6 +117,7 @@ dependencies {
     implementation 'com.github.dmytrodanylyk.android-process-button:library:1.0.4'
     implementation 'com.kyleduo.switchbutton:library:2.0.0'
     implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'io.github.yuweiguocn:GreenDaoUpgradeHelper:v2.2.1'
     // add library
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'

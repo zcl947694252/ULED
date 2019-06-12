@@ -1,7 +1,6 @@
 package com.dadoutek.uled.model;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DaoSession;
@@ -20,18 +19,13 @@ import com.dadoutek.uled.dao.DbSensorDao;
 import com.dadoutek.uled.dao.DbSwitchDao;
 import com.dadoutek.uled.dao.DbUserDao;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbColorNode;
-import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbDiyGradient;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DbModel.DbScene;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.util.MigrationHelper;
+import com.github.yuweiguocn.library.greendao.MigrationHelper;
 
 import org.greenrobot.greendao.database.Database;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +41,22 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
         super(context, name);
     }
 
+
     @Override
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
 
         if (oldVersion < newVersion) {
-            MigrationHelper.migrate(db, DbRegionDao.class, DbGroupDao.class,
+            MigrationHelper.migrate(db, new MigrationHelper.ReCreateAllTableListener(){
+                        @Override
+                        public void onCreateAllTables(Database db, boolean ifNotExists) {
+                            DaoMaster.createAllTables(db, ifNotExists);
+                        }
+
+                        @Override
+                        public void onDropAllTables(Database db, boolean ifExists) {
+                            DaoMaster.dropAllTables(db, ifExists);
+                        }
+                    }, DbRegionDao.class, DbGroupDao.class,
                     DbLightDao.class, DbDataChangeDao.class, DbDeleteGroupDao.class,
                     DbSceneDao.class, DbSceneActionsDao.class, DbUserDao.class, DbDiyGradientDao.class,
                     DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class, DbConnectorDao.class);

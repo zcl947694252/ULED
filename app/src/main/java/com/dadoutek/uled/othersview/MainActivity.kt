@@ -776,7 +776,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         if (TelinkLightService.Instance() != null) {
                             progressBar?.visibility = View.VISIBLE
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-                            startConnectTimer()
+//                            startConnectTimer()
 
                             if (mConnectSnackBar?.isShown != true)
                                 mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
