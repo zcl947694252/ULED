@@ -468,6 +468,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
 //                        finish();
                             doFinish();
+                            if(mBlinkDisposables.size()>0){
+                                for (int i = 0; i < mBlinkDisposables.size(); i++) {
+                                    Disposable disposable = mBlinkDisposables.get(i);
+                                    if (disposable != null)
+                                        disposable.dispose();
+                                }
+                            }
                         })
                         .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
                         }))
