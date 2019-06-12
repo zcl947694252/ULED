@@ -939,6 +939,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             }
             LightAdapter.STATUS_LOGOUT -> {
                 LogUtils.d("status logout")
+                LogUtils.d("STATUS_LOGOUT")
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTED -> {

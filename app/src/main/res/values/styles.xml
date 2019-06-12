@@ -141,7 +141,7 @@
 
     <style name="SeekBarStyle">
         <item name="android:splitTrack">false</item>
-        <item name="android:maxHeight">11dp</item>
+        <item name="android:maxHeight">9dp</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:progressDrawable">@drawable/light_switch_set</item>
         <item name="android:thumb">@drawable/seekbar_thumb_check</item>

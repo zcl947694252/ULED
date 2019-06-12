@@ -172,23 +172,23 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     override fun performed(event: Event<String>) {
-//        when (event.type) {
-////            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-////            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-////            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
-////            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-////            NotificationEvent.GET_ALARM -> {
-////            }
-//            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-////            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
-////            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
-////            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
-////            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
-//            ErrorReportEvent.ERROR_REPORT -> {
-//                val info = (event as ErrorReportEvent).args
-//                onErrorReport(info)
-//            }
-//        }
+        when (event.type) {
+            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
+            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
+            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
+            NotificationEvent.GET_ALARM -> {
+            }
+            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
+            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
+            ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
+//            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                onErrorReport(info)
+            }
+        }
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
@@ -1267,7 +1267,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
                 addScanListeners()
                 TelinkLightService.Instance().startScan(params)
-//                startCheckRSSITimer()
+                startCheckRSSITimer()
 
 //                            } else {
 //                                //没有授予权限

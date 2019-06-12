@@ -205,7 +205,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             transformView()
         }
 
-        recyclerView=findViewById(R.id.list_phone)
+        linearLayout_1.setOnClickListener(this)
+
+        recyclerView = findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
         if (info != null && !info.isEmpty()) {
             val messge = info.split("-")
@@ -222,7 +224,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                     lastClickTime = currentTime
                     //做你需要的点击事件
                     //            doClick();
-                                login()
+                    login()
                 }
             }
             R.id.btn_register -> {
@@ -234,12 +236,27 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.date_phone -> phoneList()
             R.id.eye_btn -> eyePassword()
             R.id.sms_password_login -> verificationCode()
+            R.id.linearLayout_1 -> {
+                list_phone.visibility = View.GONE
+                edit_user_password.visibility = View.VISIBLE
+                btn_login.visibility = View.VISIBLE
+                btn_register.visibility = View.VISIBLE
+                forget_password.visibility = View.VISIBLE
+                eye_btn.visibility = View.VISIBLE
+                sms_password_login.visibility = View.VISIBLE
+                third_party_text.visibility = View.VISIBLE
+                qq_btn.visibility = View.VISIBLE
+                google_btn.visibility = View.VISIBLE
+                facebook_btn.visibility = View.VISIBLE
+                isPhone = true
+                date_phone.setImageResource(R.drawable.icon_down)
+            }
         }
     }
 
     private fun verificationCode() {
-         val intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
-         startActivity(intent)
+        val intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
+        startActivity(intent)
     }
 
     private fun eyePassword() {

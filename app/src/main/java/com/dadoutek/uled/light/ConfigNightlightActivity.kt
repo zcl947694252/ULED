@@ -386,7 +386,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             R.id.spDelay -> {
                 val time = getTime(spDelay.selectedItem as String)
                 if (position > 4) {
-                    selectTime = time
+                    selectTime = time*60
                     modeDelayUnit = MODE_DELAY_UNIT_MINUTE
                 } else {
                     selectTime = time

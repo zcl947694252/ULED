@@ -198,7 +198,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private long allLightId = 0;
 
     private String type;
-    private boolean mIsExiting = false;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -278,7 +277,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void startBlink(DbLight light) {
 //        int dstAddress = light.getMeshAddr();
         DbGroup group;
-        if (light != null) {
+        if(light!=null) {
             DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId());
             if (groupOfTheLight == null)
                 group = groups.get(0);
@@ -424,17 +423,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-        if (TelinkLightService.Instance().isLogin()){
-            mIsExiting = true;
-            TelinkLightService.Instance().idleMode(true);
-            showLoadingDialog(getString(R.string.stopping));
-        } else {
-            if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
-                ActivityUtils.finishToActivity(MainActivity.class, false, true);
-            else {
-                ActivityUtils.startActivity(MainActivity.class);
-                finish();
-            }
+        if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
+            ActivityUtils.finishToActivity(MainActivity.class, false, true);
+        else {
+            ActivityUtils.startActivity(MainActivity.class);
+            finish();
         }
     }
 
@@ -467,14 +460,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         .setPositiveButton(android.R.string.ok, (dialog, which) -> {
 //                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
 //                        finish();
-                            doFinish();
-                            if(mBlinkDisposables.size()>0){
-                                for (int i = 0; i < mBlinkDisposables.size(); i++) {
-                                    Disposable disposable = mBlinkDisposables.get(i);
-                                    if (disposable != null)
-                                        disposable.dispose();
+                            if (getCurrentSelectLights().size() > 0) {
+                                for (int i = 0; i < getCurrentSelectLights().size(); i++) {
+                                    //让选中的灯停下来别再发闪的命令了。
+                                    stopBlink(getCurrentSelectLights().get(i));
                                 }
                             }
+                            doFinish();
                         })
                         .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
                         }))
@@ -643,8 +635,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
 //                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
 //                        finish();
-
-                            doFinish();
+                        doFinish();
                     })
                     .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
                     }))
@@ -1735,9 +1726,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 break;
             case LightAdapter.STATUS_LOGOUT:
                 isLoginSuccess = false;
-                if (mIsExiting) {
-                    doFinish();
-                }
                 break;
 //                case LightAdapter.STATUS_CONNECTED:
 //                    if(startConnect){

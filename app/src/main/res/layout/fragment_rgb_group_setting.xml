@@ -180,7 +180,7 @@
             android:id="@+id/brightness"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:orientation="vertical"
             android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
@@ -347,6 +347,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="2dp"
+            android:textSize="11sp"
             app:layout_constraintStart_toStartOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
