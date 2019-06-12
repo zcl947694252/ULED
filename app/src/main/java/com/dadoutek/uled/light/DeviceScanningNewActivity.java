@@ -436,7 +436,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 finish();
             }
         }
-
     }
 
     @Override
@@ -1199,6 +1198,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //            autoConnect();
 //            mConnectTimer = createConnectTimeout();
 //        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (int i = 0; i < mBlinkDisposables.size(); i++) {
+            mBlinkDisposables.get(i).dispose();
+        }
     }
 
     // 如果没有网络，则弹出网络设置对话框

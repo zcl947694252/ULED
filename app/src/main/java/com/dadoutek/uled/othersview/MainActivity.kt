@@ -30,8 +30,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.app.hubert.guide.core.Controller
-import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -142,10 +142,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         TelinkLightService.Instance().idleMode(true)
                         retryConnectCount = 0
                         startScan()
-                        LogUtil.d("STATE_ON")
                     }
                     BluetoothAdapter.STATE_OFF -> {
-                        LogUtil.d("STATE_OFF")
                     }
                 }
             }
@@ -381,6 +379,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
                             intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
                             startActivityForResult(intent, 0)
+
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
@@ -418,6 +417,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         }
                     }
                 }
+
+                installDialog?.dismiss()
             }
             R.id.btnBack -> {
                 installDialog?.dismiss()
@@ -826,7 +827,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
-        com.blankj.utilcode.util.LogUtils.d("start Login")
+        LogUtils.d("start Login")
     }
 
     private fun onNError(event: DeviceEvent) {
@@ -852,13 +853,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true) {
-                com.blankj.utilcode.util.LogUtils.d("reconnect")
+                LogUtils.d("reconnect")
                 startScan()
-            }
-            else
+            } else
                 login()
         } else {
-            com.blankj.utilcode.util.LogUtils.d("exceed max retry time, show connection error")
+            LogUtils.d("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
             if (mNotFoundSnackBar?.isShown != true) {
                 mNotFoundSnackBar = indefiniteSnackbar(root,
@@ -938,6 +938,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
             }
             LightAdapter.STATUS_LOGOUT -> {
+                LogUtils.d("status logout")
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTED -> {
@@ -989,7 +990,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbLight()
-                        com.blankj.utilcode.util.LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
+                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0xff || (productUUID and 0xff) == 0x04) {
                             dbLightNew?.productUUID = 0x04
                         } else if ((productUUID and 0xff) == 0x06) {
@@ -1134,7 +1135,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             TelinkLightService.Instance().idleMode(false)
             bestRSSIDevice = deviceInfo
             connect(bestRSSIDevice!!.macAddress)
-            com.blankj.utilcode.util.LogUtils.d("connect(bestRSSIDevice!!.macAddress)");
+            LogUtils.d("connect(bestRSSIDevice!!.macAddress)");
 
         }
 
@@ -1216,14 +1217,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
             val secondTime = System.currentTimeMillis()
-            var isDelete =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DELETE, false)
-            if(isDelete){
+            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DELETE, false)
+            if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")
                 LocalBroadcastManager.getInstance(this)
                         .sendBroadcast(intent)
                 return true
-            }else{
+            } else {
                 if (secondTime - firstTime > 2000) {
                     Toast.makeText(this@MainActivity, R.string.click_double_exit, Toast.LENGTH_SHORT).show()
                     firstTime = secondTime

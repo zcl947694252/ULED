@@ -151,7 +151,8 @@ public class Peripheral extends BluetoothGattCallback {
                 this.mConnState.set(CONN_STATE_IDLE);
                 TelinkLog.d("Peripheral# gatt NULL onDisconnect:" + this.getDeviceName() + " -- "
                         + this.getMacAddress());
-                this.onDisconnect();
+//                this.onDisconnect();
+                this.disconnect();
             }
 //            else{
 //                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
@@ -161,7 +162,6 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public void disconnect() {
-
         if (this.mConnState.get() != CONN_STATE_CONNECTING && this.mConnState.get() != CONN_STATE_CONNECTED)
             return;
 
