@@ -56,11 +56,12 @@
             <!--app:layout_constraintTop_toTopOf="@+id/tvDelayUnit" />-->
 
             <TextView
-                android:id="@+id/tvDelayUnit"
+                android:id="@+id/tvDelayUnits"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/delay_unit"
                 android:textSize="18sp"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -70,18 +71,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="252dp"
                 android:entries="@array/delay_unit"
-                app:layout_constraintBottom_toBottomOf="@+id/tvDelayUnit"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/tvDelayUnits"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvDelayUnit"
+                app:layout_constraintTop_toTopOf="@+id/tvDelayUnits"
                 app:layout_constraintVertical_bias="1.0" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/til_Delay"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/tvDelayUnit"
-                app:layout_constraintTop_toBottomOf="@+id/tvDelayUnit">
+                app:layout_constraintStart_toStartOf="@+id/tvDelayUnits"
+                app:layout_constraintTop_toBottomOf="@+id/tvDelayUnits">
 
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/tiet_Delay"
@@ -89,6 +92,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/delay_minute"
                     android:inputType="number"
+                    android:visibility="gone"
                     android:maxLength="2" />
             </android.support.design.widget.TextInputLayout>
 
@@ -99,16 +103,14 @@
                 android:text="@string/delay_time"
                 android:textSize="18sp"
                 android:layout_marginTop="20dp"
-                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvDelayUnit" />
+                app:layout_constraintTop_toBottomOf="@+id/til_Delay" />
 
             <Spinner
                 android:id="@+id/spDelay"
                 android:layout_width="148dp"
-                android:layout_height="14dp"
+                android:layout_height="24dp"
                 android:entries="@array/delay_unit"
-                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@+id/tvDelay"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -125,7 +127,7 @@
                 android:visibility="visible"
                 android:layout_marginTop="20dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/til_Delay" />
+                app:layout_constraintTop_toBottomOf="@+id/tvDelay" />
 
             <Spinner
                 android:id="@+id/spSwitchMode"

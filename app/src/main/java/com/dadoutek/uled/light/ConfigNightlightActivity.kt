@@ -257,6 +257,12 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
 //                            spTrigger_lux.visibility = View.VISIBLE
                             sp_SwitchMode.visibility = View.VISIBLE
                             tv_SwitchMode.visibility = View.VISIBLE
+                            tvDelay.visibility = View.GONE
+                            spDelay.visibility = View.GONE
+                            tvDelayUnits.visibility = View.VISIBLE
+                            sp_DelayUnit.visibility = View.VISIBLE
+                            til_Delay.visibility = View.VISIBLE
+                            tiet_Delay.visibility = View.VISIBLE
                         }
                     },
                     failedCallback = {
@@ -422,10 +428,10 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             R.id.sp_DelayUnit -> {
                 if (position == 0) {
                     til_Delay.hint = getString(R.string.delay_minute)
-                    modeDelayUnit = 1
+                    modeDelayUnit = MODE_DELAY_UNIT_MINUTE
                 } else {
                     til_Delay.hint = getString(R.string.delay_seconds)
-                    modeDelayUnit = 0
+                    modeDelayUnit = MODE_DELAY_UNIT_SECONDS
                 }
             }
         }
