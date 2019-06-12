@@ -826,6 +826,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
+        com.blankj.utilcode.util.LogUtils.d("start Login")
     }
 
     private fun onNError(event: DeviceEvent) {
@@ -1130,8 +1131,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //                bestRSSIDevice = deviceInfo
 //            }
 
+            TelinkLightService.Instance().idleMode(false)
             bestRSSIDevice = deviceInfo
             connect(bestRSSIDevice!!.macAddress)
+            com.blankj.utilcode.util.LogUtils.d("connect(bestRSSIDevice!!.macAddress)");
 
         }
 
