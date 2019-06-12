@@ -46,7 +46,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
 
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(Database db, int oldVersion, int newVersion) {
 
         if (oldVersion < newVersion) {
             MigrationHelper.migrate(db, new MigrationHelper.ReCreateAllTableListener(){
@@ -62,12 +62,12 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                     }, DbRegionDao.class, DbGroupDao.class,
                     DbLightDao.class, DbDataChangeDao.class, DbDeleteGroupDao.class,
                     DbSceneDao.class, DbSceneActionsDao.class, DbUserDao.class, DbDiyGradientDao.class,
-                    DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class);
+                    DbColorNodeDao.class, DbSwitchDao.class, DbSensorDao.class, DbCurtainDao.class,DbConnectorDao.class);
         }
 
         switch (oldVersion) {
             case 1:
-//                DbDeleteGroupDao.createTable(db, true);
+                DbDeleteGroupDao.createTable(db, true);
                 break;
             case 9:
                 //由于新增devicetype对象，进行老用户数据兼容

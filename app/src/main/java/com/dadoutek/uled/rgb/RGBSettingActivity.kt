@@ -1165,7 +1165,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             try {
 
                 if (w!! > Constant.MAX_VALUE) {
-                    w = Constant.MAX_VALUE
+                    w = 100
                 }
                 if (ws > Constant.MAX_VALUE) {
                     ws = Constant.MAX_VALUE

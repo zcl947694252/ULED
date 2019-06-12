@@ -104,6 +104,9 @@ public class Constant implements Serializable {
     //用户登录此版本
     public static String USER_LOGIN = "USER_LOGIN";
 
+    //用户在删除模式
+    public static String IS_DELETE = "IS_DELETE";
+
     //开发者模式
     public static String DEVELOPER_MODEL = "DEVELOPER_MODEL";
 

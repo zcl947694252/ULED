@@ -65,6 +65,12 @@ public class SharedPreferencesUtils {
                 Constant.USER_LOGIN, model);
     }
 
+    //true表示用户在删除模式
+    public static void setDelete(boolean model) {
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
+                Constant.IS_DELETE, model);
+    }
+
     //true表示处于开发者模式，false标书用户模式
     public static void setDeveloperModel(boolean model) {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),

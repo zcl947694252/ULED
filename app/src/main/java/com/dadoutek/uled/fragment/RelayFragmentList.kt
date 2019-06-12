@@ -40,6 +40,7 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
@@ -285,6 +286,7 @@ class RelayFragmentList : BaseFragment() {
         if (!isDelete) {
             isLong = false
             isDelete = true
+            SharedPreferencesUtils.setDelete(true)
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
             this!!.activity?.let {
@@ -501,6 +503,8 @@ class RelayFragmentList : BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
+
+            SharedPreferencesUtils.setDelete(false)
 
             if (isDeleteTrue) {
                 isDelete = false

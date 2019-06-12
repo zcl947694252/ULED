@@ -16,6 +16,7 @@ import android.os.PersistableBundle
 import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -685,8 +686,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
-                            if (TelinkApplication.getInstance()?.connectDevice == null)
-                                startScan()
+                                if (TelinkApplication.getInstance()?.connectDevice == null)
+                                    startScan()
                             }
                             break
                         }
@@ -1212,13 +1213,22 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
             val secondTime = System.currentTimeMillis()
-            if (secondTime - firstTime > 2000) {
-                Toast.makeText(this@MainActivity, R.string.click_double_exit, Toast.LENGTH_SHORT).show()
-                firstTime = secondTime
+            var isDelete =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DELETE, false)
+            if(isDelete){
+                val intent = Intent("isDelete")
+                intent.putExtra("isDelete", "true")
+                LocalBroadcastManager.getInstance(this)
+                        .sendBroadcast(intent)
                 return true
-            } else {
+            }else{
+                if (secondTime - firstTime > 2000) {
+                    Toast.makeText(this@MainActivity, R.string.click_double_exit, Toast.LENGTH_SHORT).show()
+                    firstTime = secondTime
+                    return true
+                } else {
 //                System.exit(0)
-                ActivityUtils.finishAllActivities(true)
+                    ActivityUtils.finishAllActivities(true)
+                }
             }
         }
         return super.onKeyDown(keyCode, event)

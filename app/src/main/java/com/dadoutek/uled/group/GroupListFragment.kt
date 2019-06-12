@@ -155,6 +155,8 @@ class GroupListFragment : BaseFragment() {
 
     private var fragmentPosition = 0
 
+    private var delete: String ?= null
+
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
 //    private var curtain_btn: TextView? = null
@@ -169,11 +171,13 @@ class GroupListFragment : BaseFragment() {
         val intentFilter = IntentFilter()
         intentFilter.addAction("showPro")
         intentFilter.addAction("switch_fragment")
+        intentFilter.addAction("isDelete")
         br = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 cwLightGroup = intent.getStringExtra("is_delete")
                 switchFragment = intent.getStringExtra("switch_fragment")
+                delete = intent.getStringExtra("isDelete")
                 if (cwLightGroup == "true") {
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
@@ -187,6 +191,18 @@ class GroupListFragment : BaseFragment() {
                     toolbar!!.navigationIcon = null
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                }
+                if(delete == "true"){
+                    toolbar!!.setTitle(R.string.group_title)
+                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+                    toolbar!!.navigationIcon = null
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                    SharedPreferencesUtils.setDelete(false)
+                    val intent = Intent("back")
+                    intent.putExtra("back", "true")
+                    LocalBroadcastManager.getInstance(context)
+                            .sendBroadcast(intent)
                 }
             }
         }
@@ -205,6 +221,7 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.navigationIcon = null
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+            SharedPreferencesUtils.setDelete(false)
         }
     }
 
@@ -638,6 +655,7 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             allGroup = DBUtils.getGroupByMesh(0xFFFF)
             toolbar!!.setTitle(R.string.group_title)
+            SharedPreferencesUtils.setDelete(false)
 
             val layoutManager = LinearLayoutManager(activity)
             layoutManager.orientation = LinearLayoutManager.HORIZONTAL

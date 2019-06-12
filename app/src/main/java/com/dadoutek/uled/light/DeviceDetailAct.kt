@@ -1391,7 +1391,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //        startScan()
 //        }
 //        } else {
-            retryConnect()
+        retryConnect()
 //        }
 
     }
@@ -1460,4 +1460,3 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
 }
-

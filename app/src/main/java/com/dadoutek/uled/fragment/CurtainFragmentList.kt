@@ -41,6 +41,7 @@ import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.telink.bluetooth.light.ConnectionStatus
@@ -275,6 +276,7 @@ class CurtainFragmentList : BaseFragment() {
         if (!isDelete) {
             isDelete = true
             isLong = false
+            SharedPreferencesUtils.setDelete(true)
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
             this!!.activity?.let {
@@ -460,6 +462,8 @@ class CurtainFragmentList : BaseFragment() {
                 addGroupBtn?.visibility = View.GONE
                 viewLine?.visibility = View.GONE
             }
+
+            SharedPreferencesUtils.setDelete(false)
 
             if(isDeleteTrue){
                 isDelete = false

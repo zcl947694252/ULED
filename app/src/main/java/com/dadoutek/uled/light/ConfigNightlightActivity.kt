@@ -422,10 +422,10 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             R.id.sp_DelayUnit -> {
                 if (position == 0) {
                     til_Delay.hint = getString(R.string.delay_minute)
-                    modeDelayUnit = MODE_DELAY_UNIT_MINUTE
+                    modeDelayUnit = 1
                 } else {
                     til_Delay.hint = getString(R.string.delay_seconds)
-                    modeDelayUnit = MODE_DELAY_UNIT_SECONDS
+                    modeDelayUnit = 0
                 }
             }
         }
