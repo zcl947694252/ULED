@@ -741,6 +741,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         addScanListeners()
                         TelinkLightService.Instance().startScan(params)
 //                        startCheckRSSITimer()
+                        startScanTimeout()
+
 
                         if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
                             mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
@@ -777,6 +779,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
                             progressBar?.visibility = View.VISIBLE
+                            mScanTimeoutDisposal?.dispose()
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
 //                            startConnectTimer()
 
@@ -791,6 +794,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
     }
 
+    private fun startScanTimeout(){
+        mScanTimeoutDisposal?.dispose()
+        mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
+                .subscribe {
+                    TelinkLightService.Instance()?.idleMode(false)      //use this stop scan
+                    onLeScanTimeout()
+                }
+    }
+
+
     private fun startCheckRSSITimer() {
         mScanTimeoutDisposal?.dispose()
         val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND
@@ -800,7 +813,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     override fun onComplete() {
                         LogUtils.d("onLeScanTimeout()")
                         retryConnect();
-//                        onLeScanTimeout()
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -905,8 +917,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun addScanListeners() {
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
     }
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
@@ -1153,7 +1165,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             TelinkLightService.Instance().idleMode(false)
             bestRSSIDevice = deviceInfo
             connect(bestRSSIDevice!!.macAddress)
-            LogUtils.d("connect(bestRSSIDevice!!.macAddress)");
+            LogUtils.d("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}");
 
         }
 
