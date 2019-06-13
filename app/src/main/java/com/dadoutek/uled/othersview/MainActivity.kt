@@ -1064,12 +1064,29 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
+//    private fun onLeScanTimeout() {
+//        com.dadoutek.uled.util.LogUtils.d("onErrorReport: onLeScanTimeout")
+////        if (mConnectSnackBar) {
+////        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+//        TelinkLightService.Instance().idleMode(true)
+//        LeBluetooth.getInstance().stopScan()
+//        startScan()
+////        }
+////        } else {
+////        retryConnect()
+////        TelinkLightService.Instance().idleMode(true)
+////        LeBluetooth.getInstance().stopScan()
+////        startScan()
+////        }
+//
+//    }
+
 
 /*    */
     /**
      * 扫描不到任何设备了
      * （扫描结束）
-     *//*
+     */
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
@@ -1085,7 +1102,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //            retryConnect()
 //        }
 
-    }*/
+    }
 
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {

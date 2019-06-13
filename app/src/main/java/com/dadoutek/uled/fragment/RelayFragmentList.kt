@@ -193,7 +193,7 @@ class RelayFragmentList : BaseFragment() {
         groupMesher = ArrayList()
         no_group = view.findViewById(R.id.no_group)
         recyclerView = view.findViewById(R.id.group_recyclerView)
-        addGroupBtn = view.findViewById(R.id.add_group_btn)
+//        addGroupBtn = view.findViewById(R.id.add_group_btn)
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
@@ -277,6 +277,15 @@ class RelayFragmentList : BaseFragment() {
                 .divider)))
         //添加分割线
         recyclerView?.addItemDecoration(decoration)
+        var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+        lin.setOnClickListener(View.OnClickListener {
+            if (TelinkLightApplication.getInstance().connectDevice == null) {
+                ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+            } else {
+                addNewGroup()
+            }
+        })
+        groupAdapter!!.addFooterView(lin)
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
@@ -433,13 +442,13 @@ class RelayFragmentList : BaseFragment() {
 //        val controller=guide2()
 //            controller?.remove()
         when (it.id) {
-            R.id.add_group_btn -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                } else {
-                    addNewGroup()
-                }
-            }
+//            R.id.add_group_btn -> {
+//                if (TelinkLightApplication.getInstance().connectDevice == null) {
+//                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+//                } else {
+//                    addNewGroup()
+//                }
+//            }
             R.id.add_device_btn -> {
                 addNewGroup()
             }
@@ -540,6 +549,15 @@ class RelayFragmentList : BaseFragment() {
                     .divider)))
             //添加分割线
             recyclerView?.addItemDecoration(decoration)
+            var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+            lin.setOnClickListener(View.OnClickListener {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                } else {
+                    addNewGroup()
+                }
+            })
+            groupAdapter!!.addFooterView(lin)
             groupAdapter!!.onItemChildClickListener = onItemChildClickListener
             groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
             groupAdapter!!.bindToRecyclerView(recyclerView)

@@ -23,6 +23,7 @@ import com.dadoutek.uled.model.DaoSessionUser;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.service.SendLightsInfo;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
@@ -49,6 +50,8 @@ public final class TelinkLightApplication extends TelinkApplication {
     private static DaoSession daoSession;
     private Object Toolbar;
 
+    private Intent intent;
+
     @SuppressLint("SdCardPath")
     @Override
     public void onCreate() {
@@ -72,6 +75,10 @@ public final class TelinkLightApplication extends TelinkApplication {
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+
+//        intent = new Intent(this,SendLightsInfo.class);
+//        startService(intent);
+
     }
 
 //    private void registerBluetoothReceiver(){
@@ -124,6 +131,7 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void doDestroy() {
         TelinkLog.onDestroy();
         super.doDestroy();
+//        stopService(intent);
 //        unregisterBluetoothReceiver();
     }
 

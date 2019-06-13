@@ -2004,7 +2004,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         }
 
                         Log.e("TAG", progress.toString())
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+//                        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
                         if (isStopTracking) {
                             if (currentShowPageGroup) {
                                 var group_current = DBUtils.getGroupByID(group!!.id)

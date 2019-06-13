@@ -210,7 +210,7 @@ class CWLightFragmentList : BaseFragment() {
         val view = inflater.inflate(R.layout.group_list_fragment, null)
         no_group = view.findViewById(R.id.no_group)
         recyclerView = view.findViewById(R.id.group_recyclerView)
-        addGroupBtn = view.findViewById(R.id.add_group_btn)
+//        addGroupBtn = view.findViewById(R.id.add_group_btn)
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
@@ -235,7 +235,7 @@ class CWLightFragmentList : BaseFragment() {
                 Constant.isCreat = false
             } else {
                 isDeleteTrue = true
-                isLong =  true
+                isLong = true
                 refreshView()
             }
 
@@ -295,6 +295,15 @@ class CWLightFragmentList : BaseFragment() {
                 .divider)))
         //添加分割线
         recyclerView?.addItemDecoration(decoration)
+        var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+        lin.setOnClickListener(View.OnClickListener {
+            if (TelinkLightApplication.getInstance().connectDevice == null) {
+                ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+            } else {
+                addNewGroup()
+            }
+        })
+        groupAdapter!!.addFooterView(lin)
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
@@ -333,7 +342,7 @@ class CWLightFragmentList : BaseFragment() {
 //        } else {
         when (view!!.getId()) {
             R.id.btn_on -> {
-                if(isLong){
+                if (isLong) {
                     Commander.openOrCloseLights(dstAddr, true)
                     currentLight.connectionStatus = ConnectionStatus.ON.value
                     DBUtils.updateGroup(currentLight)
@@ -342,7 +351,7 @@ class CWLightFragmentList : BaseFragment() {
                 }
             }
             R.id.btn_off -> {
-                if(isLong){
+                if (isLong) {
                     Commander.openOrCloseLights(dstAddr, false)
                     currentLight.connectionStatus = ConnectionStatus.OFF.value
                     DBUtils.updateGroup(currentLight)
@@ -352,7 +361,7 @@ class CWLightFragmentList : BaseFragment() {
             }
 
             R.id.btn_set -> {
-                if(isLong){
+                if (isLong) {
                     if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                         intent = Intent(mContext, NormalSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
@@ -378,7 +387,7 @@ class CWLightFragmentList : BaseFragment() {
             }
 
             R.id.item_layout -> {
-                if(isLong){
+                if (isLong) {
                     intent = Intent(mContext, LightsOfGroupActivity::class.java)
                     intent.putExtra("group", currentLight)
                     intent.putExtra("light", "cw_light")
@@ -443,13 +452,13 @@ class CWLightFragmentList : BaseFragment() {
 //        val controller=guide2()
 //            controller?.remove()
         when (it.id) {
-            R.id.add_group_btn -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                } else {
-                    addNewGroup()
-                }
-            }
+//            R.id.add_group_btn -> {
+//                if (TelinkLightApplication.getInstance().connectDevice == null) {
+//                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+//                } else {
+//                    addNewGroup()
+//                }
+//            }
             R.id.add_device_btn -> {
                 addNewGroup()
             }
@@ -517,7 +526,7 @@ class CWLightFragmentList : BaseFragment() {
 
             SharedPreferencesUtils.setDelete(false)
 
-            if(isDeleteTrue){
+            if (isDeleteTrue) {
                 isDelete = false
                 val intent = Intent("switch_fragment")
                 intent.putExtra("switch_fragment", "true")
@@ -549,6 +558,15 @@ class CWLightFragmentList : BaseFragment() {
                     .divider)))
             //添加分割线
             recyclerView?.addItemDecoration(decoration)
+            var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+            lin.setOnClickListener(View.OnClickListener {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                } else {
+                    addNewGroup()
+                }
+            })
+            groupAdapter!!.addFooterView(lin)
             groupAdapter!!.onItemChildClickListener = onItemChildClickListener
             groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
             groupAdapter!!.bindToRecyclerView(recyclerView)

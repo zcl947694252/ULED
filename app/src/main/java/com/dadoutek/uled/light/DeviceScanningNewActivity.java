@@ -918,6 +918,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                     try {
                         Thread.sleep(300);
                         TelinkLightService.Instance().autoConnect(connectParams);
+                        LogUtils.d("autoConnect");
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -1198,13 +1199,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //        }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        for (int i = 0; i < mBlinkDisposables.size(); i++) {
-            mBlinkDisposables.get(i).dispose();
-        }
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        for (int i = 0; i < mBlinkDisposables.size(); i++) {
+//            mBlinkDisposables.get(i).dispose();
+//        }
+//    }
 
     // 如果没有网络，则弹出网络设置对话框
     public void checkNetworkAndSync() {

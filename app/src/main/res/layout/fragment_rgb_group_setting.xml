@@ -197,7 +197,7 @@
                 android:text="@string/white_light_regulation" />
 
             <SeekBar
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:id="@+id/sb_w_bright"
                 style="@style/SeekBarStyle"
                 android:layout_width="match_parent"
@@ -247,7 +247,7 @@
             </android.support.constraint.ConstraintLayout>
 
             <TextView
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:id="@+id/tv_brightness_rgb"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -257,7 +257,7 @@
                 android:text="@string/bright_regulation" />
 
             <SeekBar
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:id="@+id/sbBrightness"
                 style="@style/SeekBarStyle"
                 android:layout_width="match_parent"
@@ -330,7 +330,7 @@
                 android:textSize="15dp" />
 
             <android.support.v7.widget.RecyclerView
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="8dp"
                 android:id="@+id/diy_color_recycler_list_view"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
@@ -346,7 +346,6 @@
             android:textColor="@color/black_nine"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="2dp"
             android:textSize="11sp"
             app:layout_constraintStart_toStartOf="parent" />
 

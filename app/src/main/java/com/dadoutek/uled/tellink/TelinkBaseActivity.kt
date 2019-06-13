@@ -92,55 +92,55 @@ open class TelinkBaseActivity : AppCompatActivity()  {
 //        }
 //    }
 
-    private fun onErrorReport(info: ErrorReportInfo) {
-//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
-        if (bestRSSIDevice != null) {
-            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
-        }
-        when (info.stateCode) {
-            ErrorReportEvent.STATE_SCAN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
-                    }
-                }
-
-            }
-            ErrorReportEvent.STATE_CONNECT -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
-                    }
-                }
-                retryConnect()
-
-            }
-            ErrorReportEvent.STATE_LOGIN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
-                    }
-                }
-                retryConnect()
-
-            }
-        }
-    }
+//    private fun onErrorReport(info: ErrorReportInfo) {
+////        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+//        if (bestRSSIDevice != null) {
+//            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
+//        }
+//        when (info.stateCode) {
+//            ErrorReportEvent.STATE_SCAN -> {
+//                when (info.errorCode) {
+//                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+//                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+//                    }
+//                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+//                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+//                    }
+//                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+//                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+//                    }
+//                }
+//
+//            }
+//            ErrorReportEvent.STATE_CONNECT -> {
+//                when (info.errorCode) {
+//                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+//                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+//                    }
+//                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+//                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+//                    }
+//                }
+//                retryConnect()
+//
+//            }
+//            ErrorReportEvent.STATE_LOGIN -> {
+//                when (info.errorCode) {
+//                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+//                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+//                    }
+//                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+//                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+//                    }
+//                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+//                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+//                    }
+//                }
+//                retryConnect()
+//
+//            }
+//        }
+//    }
 
     private fun onServiceConnected(event: ServiceEvent) {
 //        LogUtils.d("onServiceConnected")
@@ -151,45 +151,45 @@ open class TelinkBaseActivity : AppCompatActivity()  {
         TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
     }
 
-    private fun onDeviceStatusChanged(event: DeviceEvent) {
-
-        val deviceInfo = event.args
-
-        when (deviceInfo.status) {
-            LightAdapter.STATUS_LOGIN -> {
-
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
-                GlobalScope.launch(Dispatchers.Main) {
-                    stopConnectTimer()
-                    if (progressBar?.visibility != View.GONE)
-                        progressBar?.visibility = View.GONE
-                    delay(300)
-                }
-
-                val connectDevice = this.mApplication?.connectDevice
-                if (connectDevice != null) {
-                    this.connectMeshAddress = connectDevice.meshAddress
-                }
-
-//                scanPb.visibility = View.GONE
-//                adapter?.notifyDataSetChanged()
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
-            }
-            LightAdapter.STATUS_LOGOUT -> {
-                retryConnect()
-            }
-            LightAdapter.STATUS_CONNECTING -> {
-                Log.d("connectting", "444")
-//                scanPb.visibility = View.VISIBLE
-            }
-            LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
-                    login()
-            }
-            LightAdapter.STATUS_ERROR_N -> onNError(event)
-        }
-    }
+//    private fun onDeviceStatusChanged(event: DeviceEvent) {
+//
+//        val deviceInfo = event.args
+//
+//        when (deviceInfo.status) {
+//            LightAdapter.STATUS_LOGIN -> {
+//
+//                TelinkLightService.Instance().enableNotification()
+//                TelinkLightService.Instance().updateNotification()
+//                GlobalScope.launch(Dispatchers.Main) {
+//                    stopConnectTimer()
+//                    if (progressBar?.visibility != View.GONE)
+//                        progressBar?.visibility = View.GONE
+//                    delay(300)
+//                }
+//
+//                val connectDevice = this.mApplication?.connectDevice
+//                if (connectDevice != null) {
+//                    this.connectMeshAddress = connectDevice.meshAddress
+//                }
+//
+////                scanPb.visibility = View.GONE
+////                adapter?.notifyDataSetChanged()
+//                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+//            }
+//            LightAdapter.STATUS_LOGOUT -> {
+//                retryConnect()
+//            }
+//            LightAdapter.STATUS_CONNECTING -> {
+//                Log.d("connectting", "444")
+////                scanPb.visibility = View.VISIBLE
+//            }
+//            LightAdapter.STATUS_CONNECTED -> {
+//                if (!TelinkLightService.Instance().isLogin)
+//                    login()
+//            }
+//            LightAdapter.STATUS_ERROR_N -> onNError(event)
+//        }
+//    }
 
     private fun onNError(event: DeviceEvent) {
 
@@ -506,23 +506,23 @@ open class TelinkBaseActivity : AppCompatActivity()  {
 //        }
 //    }
 
-    private fun retryConnect() {
-        if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
-            retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
-                startScan()
-            else
-                login()
-        } else {
-            TelinkLightService.Instance().idleMode(true)
-            if (!scanPb.isShown) {
-                retryConnectCount = 0
-                connectFailedDeviceMacList.clear()
-                startScan()
-            }
-
-        }
-    }
+//    private fun retryConnect() {
+//        if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
+//            retryConnectCount++
+//            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+//                startScan()
+//            else
+//                login()
+//        } else {
+//            TelinkLightService.Instance().idleMode(true)
+//            if (!scanPb.isShown) {
+//                retryConnectCount = 0
+//                connectFailedDeviceMacList.clear()
+//                startScan()
+//            }
+//
+//        }
+//    }
 
 //    @SuppressLint("CheckResult")
 //    private fun startScan() {
@@ -565,135 +565,135 @@ open class TelinkBaseActivity : AppCompatActivity()  {
 //                }
 //    }
 
-    @SuppressLint("CheckResult")
-    private fun startScan() {
-        //当App在前台时，才进行扫描。
-            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-                LogUtils.d("startScanLight_LightOfGroup")
-                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                        Manifest.permission.BLUETOOTH_ADMIN)
-                        .subscribeOn(Schedulers.io())
-                        .subscribe {
-                            if (it) {
-                                TelinkLightService.Instance().idleMode(true)
-                                bestRSSIDevice = null   //扫描前置空信号最好设备。
-                                //扫描参数
-                                val account = DBUtils.lastUser?.account
+//    @SuppressLint("CheckResult")
+//    private fun startScan() {
+//        //当App在前台时，才进行扫描。
+//            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
+//                LogUtils.d("startScanLight_LightOfGroup")
+//                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+//                        Manifest.permission.BLUETOOTH_ADMIN)
+//                        .subscribeOn(Schedulers.io())
+//                        .subscribe {
+//                            if (it) {
+//                                TelinkLightService.Instance().idleMode(true)
+//                                bestRSSIDevice = null   //扫描前置空信号最好设备。
+//                                //扫描参数
+//                                val account = DBUtils.lastUser?.account
+//
+//                                val scanFilters = java.util.ArrayList<ScanFilter>()
+//                                val scanFilter = ScanFilter.Builder()
+//                                        .setDeviceName(account)
+//                                        .build()
+//                                scanFilters.add(scanFilter)
+//
+//                                val params = LeScanParameters.create()
+//                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+//                                    params.setScanFilters(scanFilters)
+//                                }
+//                                params.setMeshName(account)
+//                                params.setOutOfMeshName(account)
+//                                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+//                                params.setScanMode(false)
+//
+//                                addScanListeners()
+//                                TelinkLightService.Instance().startScan(params)
+//                                startCheckRSSITimer()
+//
+//
+//                            } else {
+//                                //没有授予权限
+//                                DialogUtils.showNoBlePermissionDialog(this, {
+//                                    retryConnectCount = 0
+//                                    startScan()
+//                                }, { finish() })
+//                            }
+//                        }
+//            }
+//    }
 
-                                val scanFilters = java.util.ArrayList<ScanFilter>()
-                                val scanFilter = ScanFilter.Builder()
-                                        .setDeviceName(account)
-                                        .build()
-                                scanFilters.add(scanFilter)
+//    private fun addScanListeners() {
+////        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
+////        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+////        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+//    }
+//
+//    private fun login() {
+//        val account = DBUtils.lastUser?.account
+//        val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
+//        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+//                , Strings.stringToBytes(pwd, 16))
+//    }
 
-                                val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
-                                    params.setScanFilters(scanFilters)
-                                }
-                                params.setMeshName(account)
-                                params.setOutOfMeshName(account)
-                                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                                params.setScanMode(false)
+//    private fun startCheckRSSITimer() {
+//        mScanTimeoutDisposal?.dispose()
+//        val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND
+//        Observable.intervalRange(1, periodCount, SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND, 1,
+//                TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+//                .subscribe(object : Observer<Long?> {
+//                    override fun onComplete() {
+//                        LogUtils.d("onLeScanTimeout()")
+//                        onLeScanTimeout()
+//                    }
+//
+//                    override fun onSubscribe(d: Disposable) {
+//                        mScanTimeoutDisposal = d
+//                    }
+//
+//                    override fun onNext(t: Long) {
+//                        if (bestRSSIDevice != null) {
+//                            mScanTimeoutDisposal?.dispose()
+//                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+//                            connect(bestRSSIDevice!!.macAddress)
+//                        }
+//                    }
+//
+//                    override fun onError(e: Throwable) {
+//                        Log.d("SawTest", "error = $e")
+//
+//                    }
+//                })
+//    }
 
-                                addScanListeners()
-                                TelinkLightService.Instance().startScan(params)
-                                startCheckRSSITimer()
-
-
-                            } else {
-                                //没有授予权限
-                                DialogUtils.showNoBlePermissionDialog(this, {
-                                    retryConnectCount = 0
-                                    startScan()
-                                }, { finish() })
-                            }
-                        }
-            }
-    }
-
-    private fun addScanListeners() {
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-    }
-
-    private fun login() {
-        val account = DBUtils.lastUser?.account
-        val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
-                , Strings.stringToBytes(pwd, 16))
-    }
-
-    private fun startCheckRSSITimer() {
-        mScanTimeoutDisposal?.dispose()
-        val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND
-        Observable.intervalRange(1, periodCount, SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND, 1,
-                TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Long?> {
-                    override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
-                        onLeScanTimeout()
-                    }
-
-                    override fun onSubscribe(d: Disposable) {
-                        mScanTimeoutDisposal = d
-                    }
-
-                    override fun onNext(t: Long) {
-                        if (bestRSSIDevice != null) {
-                            mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
-                            connect(bestRSSIDevice!!.macAddress)
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        Log.d("SawTest", "error = $e")
-
-                    }
-                })
-    }
-
-    private fun onLeScanTimeout() {
-        com.dadoutek.uled.util.LogUtils.d("onErrorReport: onLeScanTimeout")
-//        if (mConnectSnackBar) {
-        startScan()
-    }
+//    fun onLeScanTimeout() {
+//        com.dadoutek.uled.util.LogUtils.d("onErrorReport: onLeScanTimeout")
+////        if (mConnectSnackBar) {
+//        startScan()
+//    }
 //        } else {
 //            retryConnect()
 //        }
 
-    @SuppressLint("CheckResult")
-    private fun connect(mac: String) {
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe {
-                    if (it) {
-                        //授予了权限
-                        if (TelinkLightService.Instance() != null) {
-                            progressBar?.visibility = View.VISIBLE
-                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-                            startConnectTimer()
-
-                        }
-                    } else {
-                        //没有授予权限
-                        DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
-                    }
-                }
-
-
-    }
-
-    private fun startConnectTimer() {
-        mConnectDisposal?.dispose()
-        mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-//                    retryConnect()
-                }
-    }
+//    @SuppressLint("CheckResult")
+//    private fun connect(mac: String) {
+//        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+//                Manifest.permission.BLUETOOTH_ADMIN)
+//                .subscribe {
+//                    if (it) {
+//                        //授予了权限
+//                        if (TelinkLightService.Instance() != null) {
+//                            progressBar?.visibility = View.VISIBLE
+//                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+//                            startConnectTimer()
+//
+//                        }
+//                    } else {
+//                        //没有授予权限
+//                        DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
+//                    }
+//                }
+//
+//
+//    }
+//
+//    private fun startConnectTimer() {
+//        mConnectDisposal?.dispose()
+//        mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe {
+////                    retryConnect()
+//                }
+//    }
 
 }
 

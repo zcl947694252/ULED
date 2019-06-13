@@ -174,8 +174,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
+//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
 //            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
             NotificationEvent.GET_ALARM -> {
             }
@@ -1072,6 +1072,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
+        if (TelinkLightApplication.getInstance().connectDevice == null) {
+            TelinkLightService.Instance().idleMode(true)
+            LeBluetooth.getInstance().stopScan()
+        }
+//        this.mApplication?.removeEventListener(this)
     }
 
     private fun filter(groupName: String?, isSearch: Boolean) {
@@ -1327,7 +1332,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             if (TelinkLightService.Instance() != null) {
                                 progressBar?.visibility = View.VISIBLE
                                 TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-                                startConnectTimer()
+//                                startConnectTimer()
                             }
                         } else {
                             //没有授予权限
@@ -1363,9 +1368,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         } else {
             TelinkLightService.Instance().idleMode(true)
 //            if (!scanPb.isShown) {
-//                retryConnectCount = 0
-//                connectFailedDeviceMacList.clear()
-//                startScan()
+                retryConnectCount = 0
+                connectFailedDeviceMacList.clear()
+                startScan()
 //            }
 
         }
@@ -1378,6 +1383,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 , Strings.stringToBytes(pwd, 16))
     }
 
+
+
     /**
      * 扫描不到任何设备了
      * （扫描结束）
@@ -1386,14 +1393,24 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+        TelinkLightService.Instance().idleMode(true)
+        LeBluetooth.getInstance().stopScan()
+        startScan()
+//        }
+//        } else {
+//        retryConnect()
 //        TelinkLightService.Instance().idleMode(true)
 //        LeBluetooth.getInstance().stopScan()
 //        startScan()
 //        }
-//        } else {
-        retryConnect()
-//        }
 
+    }
+
+    override fun onStop() {
+        super.onStop()
+        this.mApplication!!.removeEventListener(this)
+        if (TelinkLightService.Instance() != null)
+            TelinkLightService.Instance().disableAutoRefreshNotify()
     }
 
     private fun getPositionAndOffset() {
@@ -1433,6 +1450,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onPause()
 
         getPositionAndOffset()
+        mScanTimeoutDisposal?.dispose()
+        mConnectDisposal?.dispose()
+        mNotFoundSnackBar?.dismiss()
+        //移除事件
+        this.mApplication?.removeEventListener(this)
+        stopConnectTimer()
+        mCheckRssiDisposal?.dispose()
 
     }
 
