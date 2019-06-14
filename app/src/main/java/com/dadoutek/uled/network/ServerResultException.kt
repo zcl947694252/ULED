@@ -41,6 +41,9 @@ object ServerResultException {
                 //当前最新版本
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.the_last_version))
             }
+            NetworkStatusCode.ERROR_NO_PASSOWRD->{
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.no_password))
+            }
             else -> {
                 throw RuntimeException(response.message)
             }

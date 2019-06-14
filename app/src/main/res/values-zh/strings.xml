@@ -606,7 +606,7 @@
     <string name="title_connector_lights_num">已扫到 %1$d 个蓝牙接收器</string>
     <string name="title_connector_lights_num_total">扫描完毕(已扫到%1$d个蓝牙接收器)</string>
     <string name="have_connector_no_group_tip">还有链接器没有分组，请完成分组操作</string>
-    <string name="grouping_connector_wait_tip">当前有%1$s个链接器正在分组，请稍候！</string>
+    <string name="grouping_connector_wait_tip">当前有%1$s个蓝牙接收器正在分组，请稍候！</string>
     <string name="selected_connector_tip">至少选择一个链接器进行分组</string>
     <string name="connector_fail_tip">有链接器分组失败，请检查并重试！</string>
 
@@ -673,4 +673,5 @@
     <string name="number_no">未获得版本号</string>
     <string name="instructions_for_use">使用说明</string>
     <string name="account_management">账号管理</string>
+    <string name="no_password">当前账号未创建密码,请使用短信登录</string>
 </resources>

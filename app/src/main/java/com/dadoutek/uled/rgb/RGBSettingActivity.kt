@@ -156,7 +156,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
 
-                    if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                    if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.meshAddr, null)
                         DBUtils.deleteLight(light!!)
@@ -1252,8 +1252,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private fun updateOTA() {
         if (lightVersion.text != null && lightVersion.text != " ") {
             checkPermission()
-        }else{
-            Toast.makeText(this,R.string.number_no,Toast.LENGTH_LONG).show()
+        } else {
+            Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
 

@@ -739,4 +739,5 @@
     <string name="number_no">Version number not obtained</string>
     <string name="instructions_for_use">Instructions for use</string>
     <string name="account_management">Account management</string>
+    <string name="no_password">The current account has not created a password. Please log in using SMS.</string>
 </resources>
