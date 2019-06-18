@@ -60,7 +60,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var groupName: String? = null
 
-    private var switchDate: DbSwitch?= null
+    private var switchDate: DbSwitch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,9 +167,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     .setTitle(R.string.install_success)
                     .setMessage(R.string.tip_config_switch_success)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        if(groupName!=null && groupName=="true"){
+                        if ((groupName != null && groupName == "true") || (groupName != null && groupName == "false")) {
                             updateSwitch()
-                        }else {
+                        } else {
                             saveSwitch()
                         }
 //                        saveSwitch()
@@ -184,13 +184,25 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun updateSwitch() {
-        switchDate!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-        switchDate!!.controlSceneId = getControlScene()
-        switchDate!!.macAddr = mDeviceInfo.macAddress
-        switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
-        switchDate!!.productUUID = mDeviceInfo.productUUID
+        if (groupName == "false") {
+            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            if (dbSwitch != null) {
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+                dbSwitch.controlSceneId = getControlScene()
+                dbSwitch.macAddr = mDeviceInfo.macAddress
+                dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
+                dbSwitch.productUUID = mDeviceInfo.productUUID
+                DBUtils.updateSwicth(dbSwitch)
+            }
+        } else {
+            switchDate!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            switchDate!!.controlSceneId = getControlScene()
+            switchDate!!.macAddr = mDeviceInfo.macAddress
+            switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            switchDate!!.productUUID = mDeviceInfo.productUUID
 
-        DBUtils.updateSwicth(switchDate!!)
+            DBUtils.updateSwicth(switchDate!!)
+        }
     }
 
     private fun saveSwitch() {
@@ -474,7 +486,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         groupName = intent.getStringExtra("group")
-        if(groupName!=null && groupName == "true"){
+        if (groupName != null && groupName == "true") {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
         mSwitchList = ArrayList()

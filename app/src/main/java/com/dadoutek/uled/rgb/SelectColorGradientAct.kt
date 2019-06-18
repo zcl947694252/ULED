@@ -60,6 +60,8 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private var greenColor: Int? = null
     private var blueColor: Int? = null
 
+    private var isColor: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_color_gradient)
@@ -191,6 +193,10 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_save -> {
+//                redColor = color_r.text.toString().toInt()
+//                greenColor = color_g.text.toString().toInt()
+//                blueColor = color_b.text.toString().toInt()
+//                setColorPicker()
                 doFinish()
             }
 
@@ -199,9 +205,8 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     redColor = red.toInt()
                     greenColor = green.toInt()
                     blueColor = blue.toInt()
-
                     setColorPicker()
-
+                    isColor = true
                 })
                 dialog.show()
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
@@ -214,7 +219,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     blueColor = blue.toInt()
 
                     setColorPicker()
-
+                    isColor = true
                 })
                 dialog.show()
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
@@ -228,7 +233,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     blueColor = blue.toInt()
 
                     setColorPicker()
-
+                    isColor = true
                 })
                 dialog.show()
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
@@ -330,10 +335,10 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private val colorObserver = ColorObserver { color, fromUser ->
+        isColor = true
         val r = Color.red(color)
         val g = Color.green(color)
         val b = Color.blue(color)
-
         val w = sb_w_bright.progress
 
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b

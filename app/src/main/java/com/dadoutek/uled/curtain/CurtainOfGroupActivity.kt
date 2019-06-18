@@ -315,6 +315,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 intent.putExtra("curtain", "curtain_group")
                 intent.putExtra("group",group.id.toInt())
                 startActivity(intent)
+                finish()
             })
         } else {
             recycler_view_lights.visibility = View.GONE

@@ -109,6 +109,7 @@ class CWLightFragmentList : BaseFragment() {
 
     private var isLong: Boolean = true
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
@@ -147,12 +148,11 @@ class CWLightFragmentList : BaseFragment() {
                         }
                     }
 
+//                    showLoadingDialog(getString(R.string.deleting))
                     for (j in deleteList.indices) {
-                        showLoadingDialog(getString(R.string.deleting))
                         Thread.sleep(300)
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
                                 successCallback = {
-                                    hideLoadingDialog()
                                     setResult(Constant.RESULT_OK)
                                 },
                                 failedCallback = {
@@ -191,6 +191,11 @@ class CWLightFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+//        hideLoadingDialog()
+        val intent = Intent("delete_true")
+        intent.putExtra("delete_true", "true")
+        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                .sendBroadcast(intent)
         isDeleteTrue = false
         refreshView()
     }
@@ -484,6 +489,7 @@ class CWLightFragmentList : BaseFragment() {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_LIGHT_NORMAL, activity!!)
                         refreshAndMoveBottom()
+                        isLong = true
                         dialog.dismiss()
                     }
                 }

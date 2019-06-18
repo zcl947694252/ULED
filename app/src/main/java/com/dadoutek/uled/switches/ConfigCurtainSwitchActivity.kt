@@ -66,6 +66,10 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
     private var isGlassSwitch=false
 
+    private var groupName: String? = null
+
+    private var switchDate: DbSwitch?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_group)
@@ -326,7 +330,11 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            saveSwitch()
+                            if((groupName!=null && groupName=="true") || (groupName!=null && groupName=="false")){
+                                updateSwitch()
+                            }else {
+                                saveSwitch()
+                            }
                             TelinkLightService.Instance().idleMode(true)
                             TelinkLightService.Instance().disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -335,26 +343,44 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             }
         }catch (e:Exception){
             e.printStackTrace()
-        }finally {
-            //确认配置成功后,添加开关到服务器
-//            var dbSwitch: DbSwitch = DbSwitch()
-            var dbSwitch: DbSwitch?=DbSwitch()
-            DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        }
+//        finally {
+//            //确认配置成功后,添加开关到服务器
+////            var dbSwitch: DbSwitch = DbSwitch()
+//            var dbSwitch: DbSwitch?=DbSwitch()
 //            DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-            dbSwitch.macAddr=mDeviceInfo.macAddress
-            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-            dbSwitch.productUUID=mDeviceInfo.productUUID
-            dbSwitch.index=dbSwitch.id.toInt()
-            dbSwitch.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+////            DBUtils.saveSwitch(dbSwitch,false)
+//            dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+//            dbSwitch.macAddr=mDeviceInfo.macAddress
+//            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+//            dbSwitch.productUUID=mDeviceInfo.productUUID
+//            dbSwitch.index=dbSwitch.id.toInt()
+//            dbSwitch.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//
+////            dbSwitch= DBUtils.getSwitchByID(dbSwitch.index.toLong())!!
+//            DBUtils.saveSwitch(dbSwitch,false)
+//            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+//            recordingChange(dbSwitch!!.id,
+//                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+//                    Constant.DB_ADD)
+//        }
+    }
 
-//            dbSwitch= DBUtils.getSwitchByID(dbSwitch.index.toLong())!!
-            DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            recordingChange(dbSwitch!!.id,
-                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                    Constant.DB_ADD)
+    private fun updateSwitch() {
+        if (groupName == "false") {
+            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            if (dbSwitch != null) {
+                dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+                dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
+                DBUtils.updateSwicth(dbSwitch)
+            }
+        } else {
+            switchDate!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+            switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            switchDate!!.meshAddr=Constant.SWITCH_PIR_ADDRESS
+            DBUtils.updateSwicth(switchDate!!)
         }
     }
 
@@ -438,6 +464,10 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun initView() {
         mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
+        groupName = intent.getStringExtra("group")
+        if(groupName!=null && groupName == "true"){
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+        }
         val mesh = mApplication.mesh
 //        val dataManager = DataManager(this, mesh.name, mesh.password)
         mGroupArrayList = ArrayList<DbGroup>()

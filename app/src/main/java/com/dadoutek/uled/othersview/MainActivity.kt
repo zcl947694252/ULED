@@ -794,7 +794,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
     }
 
-    private fun startScanTimeout(){
+    private fun startScanTimeout() {
         mScanTimeoutDisposal?.dispose()
         mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
                 .subscribe {
@@ -892,6 +892,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (info != null) {
             when (info.reserve) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> return true
+                else -> return false
+            }
+        }
+        return true
+    }
+
+    private fun checkIsRelay(info: OnlineStatusNotificationParser.DeviceNotificationInfo?): Boolean {
+        if (info != null) {
+            when (info.reserve) {
+                DeviceType.SMART_CONNECTOR -> return true
                 else -> return false
             }
         }
@@ -1000,6 +1010,21 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //                        DBUtils.updateLightLocal(dbLight)
 //                    }.start()
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                } else if (checkIsRelay(notificationInfo)) {
+                    val dbLight = DBUtils.getRelyByMeshAddr(meshAddress)
+                    if (dbLight != null) {
+                        dbLight.connectionStatus = connectionStatus.value
+                        dbLight.updateIcon()
+//                    if ((productUUID and 0xff) == 0xff && dbLight.productUUID == 0xff) {
+//                        dbLight.productUUID = 0x04
+//                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+data[3]+"-"+(data[3].toInt() and 0xff))
+//                        com.blankj.utilcode.util.LogUtils.d("light_mesh_1:" + (productUUID and 0xff))
+//                    }
+//                    Thread {
+//                        DBUtils.updateLightLocal(dbLight)
+//                    }.start()
+                        runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                    }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbLight()

@@ -54,7 +54,7 @@ public class Dot extends View {
     public void setChecked(boolean checked,int color) {
         if (checked) {
             if(color == -1){
-                mPaint.setColor(getResources().getColor(R.color.text_red));
+                mPaint.setColor(getResources().getColor(R.color.white));
             }else{
                 mPaint.setColor(color);
             }

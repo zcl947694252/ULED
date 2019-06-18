@@ -77,6 +77,12 @@ public class SharedPreferencesUtils {
                 Constant.IS_DEVELOPER_MODE, model);
     }
 
+    //开关状态是否是所有组
+    public static void setAllLightModel(boolean model){
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),
+                Constant.IS_ALL_LIGHT_MODE, model);
+    }
+
     //true表示处于已连接，false表示未连接
     public static void setBluetoothState(boolean model) {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(),

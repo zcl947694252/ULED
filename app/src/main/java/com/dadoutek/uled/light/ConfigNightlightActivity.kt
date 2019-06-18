@@ -129,7 +129,14 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
 
-        showCheckListData = DBUtils.allGroups
+        var lightGroup = DBUtils.allGroups
+
+        for(i in lightGroup.indices){
+            if(lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN){
+                showCheckListData!!.add(lightGroup[i])
+            }
+        }
+
         if (showGroupList!!.size != 0) {
             for (i in showCheckListData!!.indices) {
                 for (j in showGroupList!!.indices) {

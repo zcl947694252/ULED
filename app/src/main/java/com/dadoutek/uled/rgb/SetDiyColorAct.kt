@@ -2,6 +2,7 @@ package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.SeekBar
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -74,6 +76,16 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         rgbDiyColorListAdapter?.onItemLongClickListener = onItemLongClickListener
         sbSpeed.setOnSeekBarChangeListener(barChangeListener)
 
+        editName.setSelection(editName.text.toString().length)
+
+        set_diy_color.setOnClickListener(View.OnClickListener {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            val v = window.peekDecorView()
+            if (null != v) {
+                imm.hideSoftInputFromWindow(v.windowToken, 0)
+            }
+        })
+
         speed_add.setOnTouchListener { v, event ->
             addSpeed(event)
             true
@@ -87,6 +99,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         if (isChange) {
             toolbar.title = getString(R.string.update_gradient)
             editName.setText(diyGradient?.name)
+            editName.setSelection(editName.text.toString().length)
             sbSpeed.progress = diyGradient?.speed!!
             speed_num.text = diyGradient?.speed.toString()!! + "%"
             if (sbSpeed.progress >= 100) {
@@ -112,6 +125,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
             toolbar.title = getString(R.string.add_gradient)
             editName.setText(DBUtils.getDefaultModeName())
+            editName.setSelection(editName.text.toString().length)
             sbSpeed.progress = 50
             speed_num.text = 50.toString() + "%"
         }

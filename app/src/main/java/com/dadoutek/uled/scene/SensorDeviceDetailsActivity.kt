@@ -478,9 +478,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                             val opcode = Opcode.KICK_OUT
                             TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.getMeshAddr(), null)
-                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentLight!!.getMeshAddr())) {
-                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                            }
+//                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentLight!!.getMeshAddr())) {
+////                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+////                            }
                             if (mConnectDevice != null) {
                                 Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
                                 Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.getMeshAddr())

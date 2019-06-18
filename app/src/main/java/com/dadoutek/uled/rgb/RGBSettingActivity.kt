@@ -412,6 +412,46 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
+        val layoutmanager = LinearLayoutManager(this)
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        builtInModeRecycleView!!.layoutManager = layoutmanager
+        this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
+        builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
+//        builtInModeRecycleView?.setOnTouchListener { v, event ->
+////            mDetector?.onTouchEvent(event)
+//            false
+//        }
+        val decoration = DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)))
+        //添加分割线
+        builtInModeRecycleView?.addItemDecoration(decoration)
+        rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
+        rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
+
+        val layoutmanagers = LinearLayoutManager(this)
+        layoutmanagers.orientation = LinearLayoutManager.VERTICAL
+        builtDiyModeRecycleView!!.layoutManager = layoutmanagers
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
+//        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
+//            mDetector?.onTouchEvent(event)
+//            false
+//        }
+        val decorations = DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL)
+        decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                .black_ee)))
+        //添加分割线
+        builtDiyModeRecycleView?.addItemDecoration(decorations)
+        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
+        rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
+        rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
+
+
         sbBrightness!!.progress = light!!.brightness
         sbBrightness_num!!.text = light!!.brightness.toString() + "%"
 
@@ -862,12 +902,26 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     }
                 }
                 rgbGradientAdapter!!.notifyDataSetChanged()
+
+                for (i in diyGradientList!!.indices) {
+                    diyGradientList!![i].select = false
+                    DBUtils.updateGradient(diyGradientList!![i])
+                }
+                rgbDiyGradientAdapter!!.notifyDataSetChanged()
             }
 
             R.id.gradient_mode_off -> {
-                buildInModeList!![position].select = false
-                rgbGradientAdapter!!.notifyItemChanged(position)
+                for (i in buildInModeList!!.indices) {
+                    buildInModeList!![i].select = false
+                }
+                rgbGradientAdapter!!.notifyDataSetChanged()
                 stopGradient()
+
+                for (i in diyGradientList!!.indices) {
+                    diyGradientList!![i].select = false
+                    DBUtils.updateGradient(diyGradientList!![i])
+                }
+                rgbDiyGradientAdapter!!.notifyDataSetChanged()
             }
 
             R.id.gradient_mode_set -> {
@@ -891,7 +945,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         rgbDiyGradientAdapter!!.changeState(isDelete)
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
         toolbar!!.title = getString(R.string.dynamic_gradient)
         rgbDiyGradientAdapter!!.notifyDataSetChanged()
         setDate()
@@ -982,6 +1035,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     }
                 }
                 rgbDiyGradientAdapter!!.notifyDataSetChanged()
+
+                for (i in buildInModeList!!.indices) {
+                    buildInModeList!![i].select = false
+                }
+                rgbGradientAdapter!!.notifyDataSetChanged()
             }
 
             R.id.diy_mode_off -> {
@@ -990,6 +1048,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 diyGradientList!![position].select = false
                 rgbDiyGradientAdapter!!.notifyItemChanged(position)
                 DBUtils.updateGradient(diyGradientList!![position])
+
+                for (i in buildInModeList!!.indices) {
+                    buildInModeList!![i].select = false
+                }
+                rgbGradientAdapter!!.notifyDataSetChanged()
 
             }
 
@@ -1020,7 +1083,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         rgbDiyGradientAdapter!!.notifyDataSetChanged()
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         toolbar!!.title = ""
 
         deleteDiyGradient()
@@ -1114,7 +1176,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             setDate()
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             isDiyMode = false
             changeToDiyPage()
         } else {
@@ -1127,13 +1188,14 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             dynamic_rgb.setTextColor(resources.getColor(R.color.black_nine))
             normal_rgb.setTextColor(resources.getColor(R.color.blue_background))
             toolbar.title = light?.name
-            isDelete = false
-            rgbDiyGradientAdapter!!.changeState(isDelete)
-            rgbDiyGradientAdapter!!.notifyDataSetChanged()
-            setDate()
+            if (isDelete) {
+                isDelete = false
+                rgbDiyGradientAdapter!!.changeState(isDelete)
+                rgbDiyGradientAdapter!!.notifyDataSetChanged()
+                setDate()
+            }
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
             isDiyMode = false
             changeToDiyPage()
         }
@@ -1147,7 +1209,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_r?.text = r.toString()
         color_g?.text = g.toString()
         color_b?.text = b.toString()
-        var w = sb_w_bright.progress
+        var w = 50
 //
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 //        val color = presetColors?.get(position)?.color
@@ -1165,7 +1227,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             try {
 
                 if (w!! > Constant.MAX_VALUE) {
-                    w = 100
+                    w = Constant.MAX_VALUE
                 }
                 if (ws > Constant.MAX_VALUE) {
                     ws = Constant.MAX_VALUE
@@ -1267,7 +1329,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     setDate()
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                     if (currentShowGroupSetPage) {
                         if (group != null) {
                             if (group!!.meshAddr == 0xffff) {

@@ -461,6 +461,17 @@ object DBUtils {
         } else null
     }
 
+    fun getSwitchByMesAddr(meshAddr: Int): DbSwitch? {
+        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().
+                where(DbSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return if (dbLightList.size > 0) {
+            //            for(int i=0;i<dbLightList.size();i++){
+            ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
+            //            }
+            dbLightList[0]
+        } else null
+    }
+
     fun getSensorByMacAddr(macAddr: String): DbSensor? {
         val dbLightList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().
                 where(DbSwitchDao.Properties.MacAddr.eq(macAddr)).list()

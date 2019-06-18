@@ -117,7 +117,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
-
+                retryConnect()
                 GlobalScope.launch(Dispatchers.Main) {
                     //                    if (!mIsInited){
 //                        onInited()
@@ -159,13 +159,19 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
 
 //        if(isOTA){
-        if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-            startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-        } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
+        if(currentSwitch!=null){
+            if(currentSwitch!!.macAddr == bestRSSIDevice!!.macAddress)
+            if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                    bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                finish()
+            } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                finish()
+            } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                finish()
+            }
         }
 //        }
 //        else {
@@ -306,6 +312,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun initView() {
+//        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val layoutmanager = LinearLayoutManager(this)
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
@@ -722,6 +729,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     private fun startCheckRSSITimer() {

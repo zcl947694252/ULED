@@ -155,7 +155,9 @@ class GroupListFragment : BaseFragment() {
 
     private var fragmentPosition = 0
 
-    private var delete: String ?= null
+    private var delete: String? = null
+
+    private var deleteComplete: String? =null
 
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
@@ -172,12 +174,14 @@ class GroupListFragment : BaseFragment() {
         intentFilter.addAction("showPro")
         intentFilter.addAction("switch_fragment")
         intentFilter.addAction("isDelete")
+        intentFilter.addAction("delete_true")
         br = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 cwLightGroup = intent.getStringExtra("is_delete")
                 switchFragment = intent.getStringExtra("switch_fragment")
                 delete = intent.getStringExtra("isDelete")
+                deleteComplete = intent.getStringExtra("delete_true")
                 if (cwLightGroup == "true") {
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
@@ -192,7 +196,7 @@ class GroupListFragment : BaseFragment() {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
                 }
-                if(delete == "true"){
+                if (delete == "true") {
                     toolbar!!.setTitle(R.string.group_title)
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                     toolbar!!.navigationIcon = null
@@ -203,6 +207,10 @@ class GroupListFragment : BaseFragment() {
                     intent.putExtra("back", "true")
                     LocalBroadcastManager.getInstance(context)
                             .sendBroadcast(intent)
+                }
+
+                if(deleteComplete == "true"){
+                    hideLoadingDialog()
                 }
             }
         }
@@ -663,6 +671,30 @@ class GroupListFragment : BaseFragment() {
             deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
             deviceRecyclerView!!.setAdapter(deviceNameAdapter)
 
+            if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
+                btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
+                btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
+                onText!!.setTextColor(resources.getColor(R.color.white))
+                offText!!.setTextColor(resources.getColor(R.color.black_nine))
+                if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                    val intent = Intent("switch_here")
+                    intent.putExtra("switch_here", "on")
+                    LocalBroadcastManager.getInstance(this!!.mContext!!)
+                            .sendBroadcast(intent)
+                }
+            } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
+                btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
+                btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
+                onText!!.setTextColor(resources.getColor(R.color.black_nine))
+                offText!!.setTextColor(resources.getColor(R.color.white))
+                if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                    val intent = Intent("switch_here")
+                    intent.putExtra("switch_here", "false")
+                    LocalBroadcastManager.getInstance(this!!.mContext!!)
+                            .sendBroadcast(intent)
+                }
+            }
+
             initBottomNavigation()
 
 //            val layoutmanager = LinearLayoutManager(activity)
@@ -839,15 +871,31 @@ class GroupListFragment : BaseFragment() {
 //                intent.putExtra("delete", "true")
 //                LocalBroadcastManager.getInstance(this!!.mContext!!)
 //                        .sendBroadcast(intent)
-                android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            val intent = Intent("delete")
-                            intent.putExtra("delete", "true")
-                            LocalBroadcastManager.getInstance(this!!.mContext!!)
-                                    .sendBroadcast(intent)
+                var deleteList : ArrayList<DbGroup>?=null
+                deleteList = ArrayList()
+
+                var listLight = DBUtils.getAllGroupsOrderByIndex()
+
+                if(listLight.size>0){
+                    for(i in listLight.indices){
+                        if(listLight[i].isSelected){
+                            deleteList.add(listLight[i])
                         }
-                        .setNegativeButton(R.string.btn_cancel, null)
-                        .show()
+                    }
+                }
+
+                if(deleteList.size>0){
+                    android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
+                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                val intent = Intent("delete")
+                                intent.putExtra("delete", "true")
+                                LocalBroadcastManager.getInstance(this!!.mContext!!)
+                                        .sendBroadcast(intent)
+                                showLoadingDialog(getString(R.string.deleting))
+                            }
+                            .setNegativeButton(R.string.btn_cancel, null)
+                            .show()
+                }
             }
             R.id.textView6 -> {
                 Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()

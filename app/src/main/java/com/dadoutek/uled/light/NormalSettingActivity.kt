@@ -364,6 +364,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun lightSwitch() {
         if (currentShowPageGroup) {
             var light_current = DBUtils.getGroupByID(group!!.id)
+            if(group!!.id.toInt() ==1){
+                SharedPreferencesUtils.setAllLightModel(true)
+            }else{
+                SharedPreferencesUtils.setAllLightModel(false)
+            }
             if (light_current != null) {
                 if (light_current.connectionStatus == ConnectionStatus.OFF.value) {
                     Commander.openOrCloseLights(light_current.meshAddr, true)
@@ -1161,7 +1166,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         .subscribe { aLong ->
                             com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
                             showLoadingDialog(getString(R.string.connect_failed))
-                            finish()
+//                            finish()
                         }
             }
         }

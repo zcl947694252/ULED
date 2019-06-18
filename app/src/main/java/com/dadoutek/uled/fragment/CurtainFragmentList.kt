@@ -162,6 +162,10 @@ class CurtainFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        val intent = Intent("delete_true")
+        intent.putExtra("delete_true", "true")
+        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                .sendBroadcast(intent)
         isDeleteTrue = false
         refreshView()
     }
@@ -433,6 +437,7 @@ class CurtainFragmentList : BaseFragment() {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_CURTAIN, activity!!)
                         refreshAndMoveBottom()
+                        isLong = true
                         dialog.dismiss()
                     }
                 }

@@ -92,6 +92,9 @@ public class Constant implements Serializable {
     //是否是开发者模式
     public static String IS_DEVELOPER_MODE = "IS_DEVELOPER_MODE";
 
+    //是否是所有组
+    public static String IS_ALL_LIGHT_MODE = "IS_ALL_LIGHT_MODE";
+
     //是否重置引导显示
     public static String IS_SHOWGUIDE_AGAIN = "IS_DEVELOPER_MODE";
 

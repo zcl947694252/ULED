@@ -359,7 +359,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            if(groupName!=null && groupName=="true"){
+                            if((groupName!=null && groupName=="true") || (groupName!=null && groupName=="false")){
                                   updateSwitch()
                             }else {
                                 saveSwitch()
@@ -400,9 +400,18 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun updateSwitch() {
-        switchDate!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-        switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-        DBUtils.updateSwicth(switchDate!!)
+        if(groupName =="false"){
+            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            if(dbSwitch!=null){
+                dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+                DBUtils.updateSwicth(dbSwitch)
+            }
+        }else{
+            switchDate!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            DBUtils.updateSwicth(switchDate!!)
+        }
     }
 
     private fun saveSwitch(){
