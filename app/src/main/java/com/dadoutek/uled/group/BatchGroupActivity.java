@@ -564,7 +564,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 if (light.getBelongGroupId() != allLightId) {
                     nowLightList.get(i).hasGroup = true;
                     nowLightList.get(i).setBelongGroupId(group.getId());
-                    nowLightList.get(i).setName(getString(R.string.unnamed));
+                    nowLightList.get(i).setName(light.getName());
                     DBUtils.INSTANCE.updateLight(light);
                 } else {
                     nowLightList.get(i).hasGroup = false;

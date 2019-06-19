@@ -49,9 +49,13 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
     //Web视图
     private inner class webViewClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-            view.loadUrl(url)
-            return true
+            loadurlLocalMethod(view, url)
+            return false
         }
+    }
+
+    fun loadurlLocalMethod(webView: WebView, url: String) {
+        Thread(Runnable { webView.loadUrl(url) })
     }
 
     override//设置回退

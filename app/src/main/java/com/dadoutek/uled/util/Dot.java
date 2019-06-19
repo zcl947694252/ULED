@@ -48,6 +48,7 @@ public class Dot extends View {
         int width = getWidth();
         int height = getHeight();
         int radius = Math.min(width, height) / 2;
+        mPaint.setShadowLayer(45, 0, 0, getContext().getResources().getColor(R.color.color_000000));
         canvas.drawCircle(width / 2, height / 2, radius, mPaint);
     }
 

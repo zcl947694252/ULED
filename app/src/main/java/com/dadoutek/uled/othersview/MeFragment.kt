@@ -580,9 +580,9 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             mHints[mHints.size - 1] = SystemClock.uptimeMillis()
             if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
                 ToastUtils.showLong(R.string.developer_mode_close)
-                copyDataBase!!.visibility = View.GONE
-                chearCache!!.visibility = View.GONE
-                resetAllGroup.visibility = View.GONE
+//                copyDataBase!!.visibility = View.GONE
+//                chearCache!!.visibility = View.GONE
+//                resetAllGroup.visibility = View.GONE
                 //开发者模式启动时启动LOG日志
                 LogUtils.getConfig().setLog2FileSwitch(false)
                 LogUtils.getConfig().setDir(LOG_PATH_DIR)
@@ -595,9 +595,9 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             mHints[mHints.size - 1] = SystemClock.uptimeMillis()
             if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
                 ToastUtils.showLong(R.string.developer_mode)
-                copyDataBase!!.visibility = View.VISIBLE
-                chearCache!!.visibility = View.VISIBLE
-                resetAllGroup.visibility=View.VISIBLE
+//                copyDataBase!!.visibility = View.VISIBLE
+//                chearCache!!.visibility = View.VISIBLE
+//                resetAllGroup.visibility=View.VISIBLE
                 //开发者模式启动时启动LOG日志
                 LogUtils.getConfig().setLog2FileSwitch(true)
                 LogUtils.getConfig().setDir(LOG_PATH_DIR)

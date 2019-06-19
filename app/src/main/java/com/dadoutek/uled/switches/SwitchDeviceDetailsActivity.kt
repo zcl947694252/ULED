@@ -376,14 +376,39 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         popupWindow.contentView = views
         popupWindow.isFocusable = true
         popupWindow.showAsDropDown(set)
+        currentSwitch = switchData.get(position)
 
         var group = views.findViewById<TextView>(R.id.switch_group)
         var ota = views.findViewById<TextView>(R.id.ota)
         var delete = views.findViewById<TextView>(R.id.deleteBtn)
+        var rename = views.findViewById<TextView>(R.id.rename)
+
+        rename.setOnClickListener(View.OnClickListener {
+            val textGp = EditText(this)
+            StringUtils.initEditTextFilter(textGp)
+            textGp.setText(currentSwitch?.name)
+            textGp.setSelection(textGp.getText().toString().length)
+            android.app.AlertDialog.Builder(this@SwitchDeviceDetailsActivity)
+                    .setTitle(R.string.rename)
+                    .setView(textGp)
+
+                    .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                        // 获取输入框的内容
+                        if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                            ToastUtils.showShort(getString(R.string.rename_tip_check))
+                        } else {
+                            currentSwitch?.name = textGp.text.toString().trim { it <= ' ' }
+                            DBUtils.updateSwicth(currentSwitch!!)
+//                            toolbar.title = light?.name
+                            adapter!!.notifyDataSetChanged()
+                            dialog.dismiss()
+                        }
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+        })
 
         group.setOnClickListener(View.OnClickListener {
             popupWindow.dismiss()
-            currentSwitch = switchData.get(position)
 //            var gpName = ""
 //            if (currentSwitch!!.belongGroupId != null){
 //                val item = DBUtils.getActionBySwitchId(currentSwitch!!.belongGroupId)

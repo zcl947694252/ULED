@@ -697,6 +697,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             tvFile.setText(getString(R.string.select_file, mPath));
             SharedPreferencesUtils.saveUpdateFilePath(mPath);
             btn_start_update.setVisibility(View.VISIBLE);
+            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
         }
     }
 

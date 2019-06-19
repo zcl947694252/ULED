@@ -64,6 +64,8 @@ class SceneGroupAdapter
         addTemperatureCW = helper.getView(R.id.temperature_add)
         var docOne = helper.getView<Dot>(R.id.dot_one)
 
+        var dot = helper.getView<Dot>(R.id.dot_s)
+
         sbBrightnessRGB = helper.getView(R.id.sbBrightness)
         sbWhiteLightRGB = helper.getView(R.id.sb_w_bright)
         addBrightnessRGB = helper.getView(R.id.sbBrightness_add)
@@ -75,6 +77,9 @@ class SceneGroupAdapter
             TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
         else
             (0xff0000 shl 8) or (item.color and 0xffffff))
+
+        dot.setChecked(true, TelinkLightApplication.getInstance().resources.getColor(R.color.color_000000))
+
 
 //        docTwo.setChecked(true, if (item.twoCircle == 0)
 //            TelinkLightApplication.getInstance().resources.getColor(R.color.primary)

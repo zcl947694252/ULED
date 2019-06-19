@@ -545,7 +545,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 if (light.getBelongGroupId() != allLightId) {
                     nowLightList.get(i).hasGroup = true;
                     nowLightList.get(i).setBelongGroupId(group.getId());
-                    nowLightList.get(i).setName(getString(R.string.unnamed));
+                    nowLightList.get(i).setName(light.getName());
                     DBUtils.INSTANCE.updateConnector(light);
                 } else {
                     nowLightList.get(i).hasGroup = false;

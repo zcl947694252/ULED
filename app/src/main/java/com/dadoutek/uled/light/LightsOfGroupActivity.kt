@@ -389,7 +389,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                     intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                     intent.putExtra("lightType", "rgb_light_group")
-                    intent.putExtra("group", group)
+                    intent.putExtra("group", group.id.toInt())
                     startActivity(intent)
                 })
             }
@@ -680,7 +680,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     fun autoConnect() {
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
-            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {

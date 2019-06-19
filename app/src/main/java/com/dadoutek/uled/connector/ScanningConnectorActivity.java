@@ -942,7 +942,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
             @Override
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                lazyLoad();
+//                lazyLoad();
             }
         });
     }
