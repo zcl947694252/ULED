@@ -47,6 +47,7 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.network.NetworkFactory
@@ -909,6 +910,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         return true
     }
 
+    private fun checkIsCurtain(info: OnlineStatusNotificationParser.DeviceNotificationInfo?): Boolean {
+        if (info != null) {
+            when (info.reserve) {
+                DeviceType.SMART_CURTAIN -> return true
+                else -> return false
+            }
+        }
+        return true
+    }
+
     override fun onStop() {
         super.onStop()
         if (TelinkLightService.Instance() != null)
@@ -1002,14 +1013,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-//                    if ((productUUID and 0xff) == 0xff && dbLight.productUUID == 0xff) {
-//                        dbLight.productUUID = 0x04
-//                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+data[3]+"-"+(data[3].toInt() and 0xff))
-//                        com.blankj.utilcode.util.LogUtils.d("light_mesh_1:" + (productUUID and 0xff))
-//                    }
-//                    Thread {
-//                        DBUtils.updateLightLocal(dbLight)
-//                    }.start()
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
@@ -1029,28 +1032,17 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.meshAddr = meshAddress
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
-//                        Thread {
                         DBUtils.saveLight(dbLightNew, false)
-//                            errorCheck(meshAddress)
-//                        }.start()
                         com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
 
-            if(checkIsRelay(notificationInfo)){
+            if (checkIsRelay(notificationInfo)) {
                 val dbLight = DBUtils.getRelyByMeshAddr(meshAddress)
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-//                    if ((productUUID and 0xff) == 0xff && dbLight.productUUID == 0xff) {
-//                        dbLight.productUUID = 0x04
-//                            com.blankj.utilcode.util.LogUtils.d("light_mesh_1:"+data[3]+"-"+(data[3].toInt() and 0xff))
-//                        com.blankj.utilcode.util.LogUtils.d("light_mesh_1:" + (productUUID and 0xff))
-//                    }
-//                    Thread {
-//                        DBUtils.updateLightLocal(dbLight)
-//                    }.start()
                     runOnUiThread { deviceFragment.notifyDataSetChanged() }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
@@ -1066,10 +1058,32 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.meshAddr = meshAddress
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
-//                        Thread {
                         DBUtils.saveConnector(dbLightNew, false)
-//                            errorCheck(meshAddress)
-//                        }.start()
+                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                    }
+                }
+            }
+
+            if (checkIsCurtain(notificationInfo)) {
+                val dbLight = DBUtils.getCurtainByMeshAddr(meshAddress)
+                if (dbLight != null) {
+                    dbLight.connectionStatus = connectionStatus.value
+                    dbLight.updateIcon()
+                    runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                } else {
+                    if (connectionStatus != ConnectionStatus.OFFLINE) {
+                        val dbLightNew = DbCurtain()
+                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
+                        if ((productUUID and 0xff) == 0x10) {
+                            dbLightNew?.productUUID = 0x10
+                        }
+                        dbLightNew.setConnectionStatus(connectionStatus.value)
+                        dbLightNew.updateIcon()
+                        dbLightNew.belongGroupId = DBUtils.groupNull?.id
+                        dbLightNew.meshAddr = meshAddress
+                        dbLightNew.name = getString(R.string.unnamed)
+                        dbLightNew.macAddr = "0"
+                        DBUtils.saveCurtain(dbLightNew, false)
                         com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }

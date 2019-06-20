@@ -194,7 +194,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
 
-                    if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                    if ( TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null &&TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.getMeshAddr(), null)
                         DBUtils.deleteConnector(light!!)

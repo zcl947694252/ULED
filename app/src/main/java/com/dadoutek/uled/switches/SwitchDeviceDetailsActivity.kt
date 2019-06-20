@@ -160,18 +160,22 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
 //        if(isOTA){
         if(currentSwitch!=null){
-            if(currentSwitch!!.macAddr == bestRSSIDevice!!.macAddress)
-            if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
-                    bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
-                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-                finish()
-            } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
-                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-                finish()
-            } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
-                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
-                finish()
+            if(currentSwitch!!.macAddr == bestRSSIDevice!!.macAddress){
+                if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
+                        bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    finish()
+                } else if (bestRSSIDevice?.productUUID == DeviceType.SCENE_SWITCH) {
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    finish()
+                } else if (bestRSSIDevice?.productUUID == DeviceType.SMART_CURTAIN_SWITCH) {
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
+                    finish()
+                }
+            }else{
+                Toast.makeText(this,R.string.not_found_switch,Toast.LENGTH_LONG).show()
             }
+
         }
 //        }
 //        else {

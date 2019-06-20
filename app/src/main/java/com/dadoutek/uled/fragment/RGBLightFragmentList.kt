@@ -141,6 +141,10 @@ class RGBLightFragmentList : BaseFragment() {
                                 failedCallback = {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    val intent = Intent("delete_true")
+                                    intent.putExtra("delete_true", "true")
+                                    LocalBroadcastManager.getInstance(context)
+                                            .sendBroadcast(intent)
                                 })
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
@@ -326,30 +330,36 @@ class RGBLightFragmentList : BaseFragment() {
         when (view!!.getId()) {
             R.id.btn_on -> {
                 if (isLong) {
-                    Commander.openOrCloseLights(dstAddr, true)
-                    currentLight.connectionStatus = ConnectionStatus.ON.value
-                    DBUtils.updateGroup(currentLight)
-                    groupAdapter!!.notifyItemChanged(position)
-                    updateLights(true, currentLight)
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, true)
+                        currentLight.connectionStatus = ConnectionStatus.ON.value
+                        DBUtils.updateGroup(currentLight)
+                        groupAdapter!!.notifyItemChanged(position)
+                        updateLights(true, currentLight)
+                    }
                 }
             }
             R.id.btn_off -> {
                 if (isLong) {
+                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL){
                     Commander.openOrCloseLights(dstAddr, false)
                     currentLight.connectionStatus = ConnectionStatus.OFF.value
                     DBUtils.updateGroup(currentLight)
                     groupAdapter!!.notifyItemChanged(position)
                     updateLights(false, currentLight)
-                }
+                }}
+
             }
 
             R.id.btn_set -> {
                 if(isLong) {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                        intent = Intent(mContext, RGBSettingActivity::class.java)
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent.putExtra("group", currentLight)
-                        startActivityForResult(intent, 2)
+                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                            intent = Intent(mContext, RGBSettingActivity::class.java)
+                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                            intent.putExtra("group", currentLight)
+                            startActivityForResult(intent, 2)
+                        }
                     }
                 }
             }
@@ -506,10 +516,10 @@ class RGBLightFragmentList : BaseFragment() {
                 viewLine?.visibility = View.GONE
             }
 
-            SharedPreferencesUtils.setDelete(false)
 
             if(isDeleteTrue){
                 isDelete = false
+                SharedPreferencesUtils.setDelete(false)
                 val intent = Intent("switch_fragment")
                 intent.putExtra("switch_fragment", "true")
                 LocalBroadcastManager.getInstance(this!!.mContext!!)

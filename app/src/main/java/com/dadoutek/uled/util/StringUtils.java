@@ -269,7 +269,7 @@ public class StringUtils {
         //开关上限暂时设置到1000方便取名
         int MaxSwitchCount=1000;
         for(int i=0;i<MaxSwitchCount;i++){
-            String name = startStr + i;
+            String name = startStr ;
             if(swtitchNames.contains(name)){
                 continue;
             }else {

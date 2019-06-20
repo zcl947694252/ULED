@@ -216,7 +216,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun onErrorReport(info: ErrorReportInfo) {
 //        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
         if (bestRSSIDevice != null) {
-            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
+//            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
         }
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
@@ -334,6 +334,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             LightAdapter.STATUS_CONNECTED -> {
                 if (!TelinkLightService.Instance().isLogin)
                     login()
+                hideLoadingDialog()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)
         }
@@ -350,6 +351,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
         TelinkLightService.Instance().idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
+
 
         val builder = AlertDialog.Builder(this)
         builder.setMessage("当前环境:Android7.0!连接重试:" + " 3次失败!")
@@ -1250,6 +1252,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //                        .subscribeOn(Schedulers.io())
 //                        .subscribe {
 //                            if (it) {
+//                showLoadingDialog(getString(R.string.connecting))
+                ToastUtil.showToast(this,getString(R.string.connecting))
                 TelinkLightService.Instance().idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数
@@ -1272,6 +1276,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
                 addScanListeners()
                 TelinkLightService.Instance().startScan(params)
+//                startScanTimeout()
                 startCheckRSSITimer()
 
 //                            } else {
@@ -1283,6 +1288,15 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //                            }
 //                        }
             }
+    }
+
+    private fun startScanTimeout() {
+        mScanTimeoutDisposal?.dispose()
+        mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
+                .subscribe {
+                    TelinkLightService.Instance()?.idleMode(false)      //use this stop scan
+                    onLeScanTimeout()
+                }
     }
 
     private fun addScanListeners() {
@@ -1381,6 +1395,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
+        ToastUtil.showToast(this,getString(R.string.connect_success))
+        hideLoadingDialog()
     }
 
 
@@ -1391,6 +1407,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
      */
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
+//        hideLoadingDialog()
+//        ToastUtil.showToast(this,getString(R.string.connect_failed))
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance().idleMode(true)
@@ -1453,6 +1471,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
         mNotFoundSnackBar?.dismiss()
+        mScanTimeoutDisposal?.dispose()
         //移除事件
         this.mApplication?.removeEventListener(this)
         stopConnectTimer()

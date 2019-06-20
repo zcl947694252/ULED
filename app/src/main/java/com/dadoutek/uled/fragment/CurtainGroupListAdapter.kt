@@ -70,7 +70,7 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
 //                helper.setVisible(R.id.btn_on,false)
 //            }
             helper.setTextColor(R.id.txt_name, group.textColor)
-                    .addOnClickListener(R.id.txt_name)
+//                    .addOnClickListener(R.id.txt_name)
                     .addOnClickListener(R.id.btn_set)
                     .addOnClickListener(R.id.selected_group_curtain)
                     .addOnClickListener(R.id.item_layout)

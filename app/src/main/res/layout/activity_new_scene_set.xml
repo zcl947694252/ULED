@@ -72,29 +72,29 @@
                 android:id="@+id/edit_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="18dp"
+                android:layout_marginEnd="20dp"
+                android:background="@null"
                 android:hint="@string/plaese_input_scene_name"
-                android:textColorHint="#c8c8c8"
                 android:lines="1"
+                android:maxLength="16"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:maxLength="16"
+                android:textColorHint="#c8c8c8"
                 android:textSize="18sp"
-                android:background="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btn_sure_edit"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/btn_sure_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/icon_arrow"
-                android:padding="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <!--<ImageView-->
+                <!--android:id="@+id/btn_sure_edit"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginEnd="10dp"-->
+                <!--android:src="@drawable/icon_arrow"-->
+                <!--android:padding="5dp"-->
+                <!--app:layout_constraintBottom_toBottomOf="parent"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"-->
+                <!--app:layout_constraintTop_toTopOf="parent" />-->
         </android.support.constraint.ConstraintLayout>
 
         <TextView

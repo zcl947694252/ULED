@@ -887,11 +887,11 @@ class GroupListFragment : BaseFragment() {
                 if(deleteList.size>0){
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
                             .setPositiveButton(android.R.string.ok) { _, _ ->
+                                showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")
                                 intent.putExtra("delete", "true")
                                 LocalBroadcastManager.getInstance(this!!.mContext!!)
                                         .sendBroadcast(intent)
-                                showLoadingDialog(getString(R.string.deleting))
                             }
                             .setNegativeButton(R.string.btn_cancel, null)
                             .show()

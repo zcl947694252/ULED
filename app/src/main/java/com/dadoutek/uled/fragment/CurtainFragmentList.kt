@@ -143,6 +143,10 @@ class CurtainFragmentList : BaseFragment() {
                                 failedCallback = {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    val intent = Intent("delete_true")
+                                    intent.putExtra("delete_true", "true")
+                                    LocalBroadcastManager.getInstance(context)
+                                            .sendBroadcast(intent)
                                 })
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
@@ -477,10 +481,10 @@ class CurtainFragmentList : BaseFragment() {
                 viewLine?.visibility = View.GONE
             }
 
-            SharedPreferencesUtils.setDelete(false)
 
             if(isDeleteTrue){
                 isDelete = false
+                SharedPreferencesUtils.setDelete(false)
                 val intent = Intent("switch_fragment")
                 intent.putExtra("switch_fragment", "true")
                 LocalBroadcastManager.getInstance(this!!.mContext!!)

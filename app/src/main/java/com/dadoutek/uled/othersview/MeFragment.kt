@@ -271,15 +271,15 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         appVersion!!.text = versionName
         //暂时屏蔽
         updateIte!!.visibility = View.GONE
-        if (SharedPreferencesUtils.isDeveloperModel()) {
-            copyDataBase!!.visibility = View.VISIBLE
-            chearCache!!.visibility = View.VISIBLE
-            resetAllGroup.visibility=View.VISIBLE
-        } else {
-            copyDataBase!!.visibility = View.GONE
-            chearCache!!.visibility = View.VISIBLE
-            resetAllGroup.visibility=View.GONE
-        }
+//        if (SharedPreferencesUtils.isDeveloperModel()) {
+//            copyDataBase!!.visibility = View.VISIBLE
+//            chearCache!!.visibility = View.VISIBLE
+//            resetAllGroup.visibility=View.VISIBLE
+//        } else {
+//            copyDataBase!!.visibility = View.GONE
+//            chearCache!!.visibility = View.VISIBLE
+//            resetAllGroup.visibility=View.GONE
+//        }
 
         userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
         userName!!.text = DBUtils.lastUser!!.phone

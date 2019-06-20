@@ -40,10 +40,7 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -1165,7 +1162,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
                             com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
-                            showLoadingDialog(getString(R.string.connect_failed))
+//                            showLoadingDialog(getString(R.string.connecting))
+                            ToastUtil.showToast(this,getString(R.string.connecting))
 //                            finish()
                         }
             }

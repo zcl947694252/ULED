@@ -187,14 +187,27 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun addDevice() {
         if (strLight == "cw_light") {
-            val intent = Intent(this, DeviceDetailAct::class.java)
-            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_CW)
-            intent.putExtra("cw_light_name", group.name)
+//            val intent = Intent(this, DeviceDetailAct::class.java)
+//            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_CW)
+//            intent.putExtra("cw_light_name", group.name)
+            val intent = Intent(this,
+                    BatchGroupActivity::class.java)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+            intent.putExtra("lightType", "cw_light")
+            intent.putExtra("cw_light_group_name", group.name)
             startActivity(intent)
         } else if (strLight == "rgb_light") {
-            val intent = Intent(this, DeviceDetailAct::class.java)
-            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_RGB)
-            intent.putExtra("rgb_light_name", group.name)
+//            val intent = Intent(this, DeviceDetailAct::class.java)
+//            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_RGB)
+//            intent.putExtra("rgb_light_name", group.name)
+            val intent = Intent(this,
+                    RgbBatchGroupActivity::class.java)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+            intent.putExtra("lightType", "rgb_light")
+            intent.putExtra("rgb_light_group_name", group.name)
+//            startActivity(intent)
             startActivity(intent)
         }
     }

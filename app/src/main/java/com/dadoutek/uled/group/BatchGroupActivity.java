@@ -936,7 +936,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             @Override
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                lazyLoad();
+//                lazyLoad();
             }
         });
     }
@@ -1187,10 +1187,36 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 initHasGroup = false;
                 currentGroupIndex = -1;
             }
+        }else if(lightType.equals("rgb_light_group")){
+            List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
+            groups.clear();
+            if (scanCURTAIN) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (OtherUtils.isRGBGroup(list.get(i))) {
+                        groups.add(list.get(i));
+                    }
+                }
+            }
+            if (groups.size() > 0) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (groups.get(i).getName().equals(groupLight)) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
+                }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
+            }
         } else {
             if (groups.size() > 0) {
                 for (int i = 0; i < groups.size(); i++) {
-                    if (i == 0) {
+                    if (i == groups.size() - 1) {
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),

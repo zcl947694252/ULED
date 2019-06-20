@@ -186,9 +186,15 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     }
 
     private fun addDevice() {
-        intent = Intent(this, CurtainsDeviceDetailsActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
-        intent.putExtra("curtain_name",group.name)
+//        intent = Intent(this, CurtainsDeviceDetailsActivity::class.java)
+//        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
+//        intent.putExtra("curtain_name",group.name)
+        val intent = Intent(this,
+                CurtainBatchGroupActivity::class.java)
+        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent.putExtra("curtain","group_curtain")
+        intent.putExtra("curtain_group_name",group.name)
         startActivity(intent)
         finish()
     }

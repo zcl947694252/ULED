@@ -13,6 +13,7 @@ import android.os.Message
 import android.os.SystemClock
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
 import android.support.v7.widget.Toolbar
@@ -22,6 +23,7 @@ import android.view.*
 import android.view.View.OnClickListener
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -74,6 +76,7 @@ import top.defaults.colorpicker.ColorObserver
 import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener {
 
@@ -98,6 +101,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
     private var currentShowGroupSetPage = true
+
+    private var isExitGradient = false
 
     private var isDiyMode = true
 
@@ -948,6 +953,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         toolbar!!.title = getString(R.string.dynamic_gradient)
         rgbDiyGradientAdapter!!.notifyDataSetChanged()
         setDate()
+        isExitGradient = false
         isDiyMode = true
         changeToDiyPage()
     }
@@ -1073,6 +1079,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         isDelete = true
+        isExitGradient = true
         rgbDiyGradientAdapter!!.changeState(isDelete)
         refreshData()
         return@OnItemLongClickListener true
@@ -1093,21 +1100,34 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
         batchGroup.setOnClickListener(View.OnClickListener {
 
-            val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
-            builder.setMessage(getString(R.string.delete_model))
-            builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-                for (i in diyGradientList!!.indices) {
-                    if (diyGradientList!![i].isSelected) {
-                        startDeleteGradientCmd(diyGradientList!![i].id)
-                        DBUtils.deleteGradient(diyGradientList!![i])
-                        DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
-                    }
-                }
-                diyGradientList = DBUtils.diyGradientList
-                rgbDiyGradientAdapter!!.setNewData(diyGradientList)
+            var listSize: ArrayList<DbDiyGradient>?=null
+            listSize = ArrayList()
+
+            for(i in diyGradientList!!.indices){
+               if(diyGradientList!![i].isSelected){
+                   listSize.add(diyGradientList!![i])
+               }
             }
-            builder.setNeutralButton(R.string.cancel) { dialog, which -> }
-            builder.create().show()
+
+            if(listSize.size>0){
+                val builder: android.app.AlertDialog.Builder = android.app.AlertDialog.Builder(this)
+                builder.setMessage(getString(R.string.delete_model))
+                builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+                    showLoadingDialog(resources.getString(R.string.delete))
+                    for (i in diyGradientList!!.indices) {
+                        if (diyGradientList!![i].isSelected) {
+                            startDeleteGradientCmd(diyGradientList!![i].id)
+                            DBUtils.deleteGradient(diyGradientList!![i])
+                            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+                        }
+                    }
+                    diyGradientList = DBUtils.diyGradientList
+                    rgbDiyGradientAdapter!!.setNewData(diyGradientList)
+                    hideLoadingDialog()
+                }
+                builder.setNeutralButton(R.string.cancel) { dialog, which -> }
+                builder.create().show()
+            }
         })
 
 
@@ -1170,10 +1190,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     toolbar.title = group?.name
                 }
             }
-            isDelete = false
-            rgbDiyGradientAdapter!!.changeState(isDelete)
-            rgbDiyGradientAdapter!!.notifyDataSetChanged()
-            setDate()
+
+            if(isDelete){
+                isDelete = false
+                rgbDiyGradientAdapter!!.changeState(isDelete)
+                rgbDiyGradientAdapter!!.notifyDataSetChanged()
+                setDate()
+            }
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
             isDiyMode = false
@@ -1329,16 +1352,17 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     setDate()
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+                    isExitGradient = false
                     if (currentShowGroupSetPage) {
                         if (group != null) {
                             if (group!!.meshAddr == 0xffff) {
                                 toolbar.title = getString(R.string.allLight)
                             } else {
-                                toolbar.title = group?.name
+                                toolbar!!.title = getString(R.string.dynamic_gradient)
                             }
                         }
                     } else {
-                        toolbar.title = light?.name
+                        toolbar!!.title = getString(R.string.dynamic_gradient)
                     }
                 } else {
                     finish()
@@ -1497,6 +1521,45 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }
 
         diyGradientList = DBUtils.diyGradientList
+
+        val layoutmanager = LinearLayoutManager(this)
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        builtInModeRecycleView!!.layoutManager = layoutmanager
+        this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
+        builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
+//        builtInModeRecycleView?.setOnTouchListener { v, event ->
+////            mDetector?.onTouchEvent(event)
+//            false
+//        }
+        val decoration = DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                .divider)))
+        //添加分割线
+        builtInModeRecycleView?.addItemDecoration(decoration)
+        rgbGradientAdapter!!.onItemChildClickListener = onItemChildClickListener
+        rgbGradientAdapter!!.bindToRecyclerView(builtInModeRecycleView)
+
+        val layoutmanagers = LinearLayoutManager(this)
+        layoutmanagers.orientation = LinearLayoutManager.VERTICAL
+        builtDiyModeRecycleView!!.layoutManager = layoutmanagers
+        this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
+        builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
+//        builtDiyModeRecycleView?.setOnTouchListener { v, event ->
+//            mDetector?.onTouchEvent(event)
+//            false
+//        }
+        val decorations = DividerItemDecoration(this,
+                DividerItemDecoration
+                        .VERTICAL)
+        decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
+                .black_ee)))
+        //添加分割线
+        builtDiyModeRecycleView?.addItemDecoration(decorations)
+        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
+        rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
+        rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
 
 //        sbBrightness_add!!.setOnTouchListener { v, event ->
 //
@@ -1748,8 +1811,19 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            setResult(Constant.RESULT_OK)
-            finish()
+            if(isExitGradient){
+                isExitGradient = false
+                isDelete = false
+                rgbDiyGradientAdapter!!.changeState(isDelete)
+                rgbDiyGradientAdapter!!.notifyDataSetChanged()
+                setDate()
+                toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+                toolbar!!.title = getString(R.string.dynamic_gradient)
+            }else{
+                setResult(Constant.RESULT_OK)
+                finish()
+            }
             return false
         } else {
             return super.onKeyDown(keyCode, event)
@@ -2218,4 +2292,29 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
+
+//    private var firstTime: Long = 0
+//    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+//        if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
+//            val secondTime = System.currentTimeMillis()
+//            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DELETE, false)
+//            if (isDelete) {
+//                val intent = Intent("isDelete")
+//                intent.putExtra("isDelete", "true")
+//                LocalBroadcastManager.getInstance(this)
+//                        .sendBroadcast(intent)
+//                return true
+//            } else {
+//                if (secondTime - firstTime > 2000) {
+//                    Toast.makeText(this@MainActivity, R.string.click_double_exit, Toast.LENGTH_SHORT).show()
+//                    firstTime = secondTime
+//                    return true
+//                } else {
+////                System.exit(0)
+//                    ActivityUtils.finishAllActivities(true)
+//                }
+//            }
+//        }
+//        return super.onKeyDown(keyCode, event)
+//    }
 }

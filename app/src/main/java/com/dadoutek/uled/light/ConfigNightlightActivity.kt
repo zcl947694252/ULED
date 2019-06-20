@@ -129,13 +129,15 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
 
-        var lightGroup = DBUtils.allGroups
-
-        for(i in lightGroup.indices){
-            if(lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN){
-                showCheckListData!!.add(lightGroup[i])
-            }
-        }
+//        var lightGroup = DBUtils.allGroups
+//
+//        showCheckListData!!.clear()
+//
+//        for(i in lightGroup.indices){
+//            if(lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN){
+//                showCheckListData!!.add(lightGroup[i])
+//            }
+//        }
 
         if (showGroupList!!.size != 0) {
             for (i in showCheckListData!!.indices) {
@@ -291,6 +293,17 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         isUpdate = intent.getStringExtra("update")
         showCheckListData = DBUtils.allGroups
+
+        var lightGroup = DBUtils.allGroups
+
+        showCheckListData!!.clear()
+
+        for(i in lightGroup.indices){
+            if(lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN){
+                showCheckListData!!.add(lightGroup[i])
+            }
+        }
+
         for (i in showCheckListData!!.indices) {
             showCheckListData!![i].checked = false
         }

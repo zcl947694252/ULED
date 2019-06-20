@@ -30,12 +30,14 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
         //加载需要显示的网页
         //支持自动适配
         webSettings.useWideViewPort = true
+        webSettings.javaScriptCanOpenWindowsAutomatically = true
         webSettings.loadWithOverviewMode = true
         webSettings.setSupportZoom(true)  //支持放大缩小
         webSettings.allowFileAccess = true // 允许访问文件
         webSettings.saveFormData = true
         webSettings.setGeolocationEnabled(true)
         webSettings.domStorageEnabled = true
+        webView!!.clearCache(true)
         if(isZh(this)){
             webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html")
         }else{
@@ -43,20 +45,20 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
         }
 
         //设置Web视图
-        webView!!.webViewClient = webViewClient()
+//        webView!!.webViewClient = webViewClient()
     }
 
     //Web视图
     private inner class webViewClient : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-            loadurlLocalMethod(view, url)
+            view.loadUrl(url)
             return false
         }
     }
 
-    fun loadurlLocalMethod(webView: WebView, url: String) {
-        Thread(Runnable { webView.loadUrl(url) })
-    }
+//    fun loadurlLocalMethod(webView: WebView, url: String) {
+//        Thread(Runnable { webView.loadUrl(url) })
+//    }
 
     override//设置回退
     //覆盖Activity类的onKeyDown(int keyCoder,KeyEvent event)方法

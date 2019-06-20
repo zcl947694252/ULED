@@ -159,9 +159,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-        intent = Intent(this, ConnectorDeviceDetailActivity::class.java)
-        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RELAY_OF)
-        intent.putExtra("relay_name",group.name)
+//        intent = Intent(this, ConnectorDeviceDetailActivity::class.java)
+//        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RELAY_OF)
+//        intent.putExtra("relay_name",group.name)
+        val intent = Intent(this,
+                ConnectorBatchGroupActivity::class.java)
+        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent.putExtra("relayType","group_relay")
+        intent.putExtra("relay_group_name",group.name)
         startActivity(intent)
         finish()
     }

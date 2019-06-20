@@ -93,7 +93,7 @@
             <top.defaults.colorpicker.ColorPickerView
                 android:id="@+id/color_picker"
                 android:layout_width="wrap_content"
-                android:layout_height="225dp"
+                android:layout_height="280dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 app:enableBrightness="false"
@@ -107,7 +107,6 @@
                 android:id="@+id/brightness"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:orientation="vertical"
                 android:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -150,22 +149,22 @@
                         android:id="@+id/sb_w_bright_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
                         android:text="100%"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/sb_w_bright_add"
+                        app:layout_constraintStart_toEndOf="@+id/sb_w_bright_less"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageView
                         android:id="@+id/sb_w_bright_less"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="100dp"
                         android:background="@drawable/less_enabled"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/sb_w_bright_num"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -208,22 +207,22 @@
                         android:id="@+id/sbBrightness_num"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
                         android:text="100%"
                         android:textColor="@color/black_three"
                         android:textSize="15sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/sbBrightness_add"
+                        app:layout_constraintStart_toEndOf="@+id/sbBrightness_less"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <ImageView
                         android:id="@+id/sbBrightness_less"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
+                        android:layout_marginEnd="100dp"
                         android:background="@drawable/less_enabled"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/sbBrightness_num"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -235,7 +234,7 @@
                     android:layout_height="44dp"
                     android:layout_marginStart="38dp"
                     android:layout_marginEnd="38dp"
-                    android:layout_marginTop="50dp"
+                    android:layout_marginTop="30dp"
                     android:textColor="@color/black_three"
                     android:textSize="18sp"
                     android:background="@drawable/btn_rec_blue_bt"

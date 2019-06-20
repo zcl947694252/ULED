@@ -193,6 +193,21 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
+            }else{
+                var newMeshAdress: Int
+                var dbSwitch: DbSwitch? = DbSwitch()
+                DBUtils.saveSwitch(dbSwitch, false)
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+                dbSwitch!!.controlSceneId = getControlScene()
+                dbSwitch!!.macAddr = mDeviceInfo.macAddress
+                dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+                dbSwitch!!.productUUID = mDeviceInfo.productUUID
+                dbSwitch!!.index = dbSwitch.id.toInt()
+                DBUtils.saveSwitch(dbSwitch, false)
+                dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                DBUtils.recordingChange(dbSwitch!!.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
             }
         } else {
             switchDate!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
@@ -207,34 +222,35 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun saveSwitch() {
         //确认配置成功后,添加开关到服务器
-        var newMeshAdress: Int
-        var dbSwitch: DbSwitch? = DbSwitch()
-        DBUtils.saveSwitch(dbSwitch, false)
-        dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-        dbSwitch!!.controlSceneId = getControlScene()
-        dbSwitch!!.macAddr = mDeviceInfo.macAddress
-        dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
-        dbSwitch!!.productUUID = mDeviceInfo.productUUID
-        dbSwitch!!.index = dbSwitch.id.toInt()
-//        dbSwitch!!.index=dbSwitch.id.toInt()
-//           dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-//             newMeshAdress=groupAdress
-//            dbSwitch!!.controlSceneId=getControlScene()
-//            dbSwitch!!.macAddr=mDeviceInfo.macAddress
-//            dbSwitch!!.meshAddr=Constant.SWITCH_PIR_ADDRESS
-//            dbSwitch!!.productUUID=mDeviceInfo.productUUID
-        DBUtils.saveSwitch(dbSwitch, false)
-        dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-//        dbSwitch!!.index=dbSwitch.id.toInt()
-//            dbSwitch!!.name= StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-//
-//          dbSwitch= DBUtils.getSwitchByID(dbSwitch.id.toLong())!!
-//          dbSwitch= DBUtils.getSwitchByMeshAddr(mDeviceInfo.macAddress)!!
 
-//          DBUtils.saveSwitch(dbSwitch,false)
-        DBUtils.recordingChange(dbSwitch!!.id,
-                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                Constant.DB_ADD)
+        var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+        if (switch != null) {
+            var dbSwitch: DbSwitch? = DbSwitch()
+            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            dbSwitch!!.controlSceneId = getControlScene()
+            dbSwitch!!.macAddr = mDeviceInfo.macAddress
+            dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            dbSwitch!!.productUUID = mDeviceInfo.productUUID
+            dbSwitch!!.index=switch.id.toInt()
+            dbSwitch.id = switch.id
+            DBUtils.updateSwicth(dbSwitch)
+        } else {
+            var newMeshAdress: Int
+            var dbSwitch: DbSwitch? = DbSwitch()
+            DBUtils.saveSwitch(dbSwitch, false)
+            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            dbSwitch!!.controlSceneId = getControlScene()
+            dbSwitch!!.macAddr = mDeviceInfo.macAddress
+            dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            dbSwitch!!.productUUID = mDeviceInfo.productUUID
+            dbSwitch!!.index = dbSwitch.id.toInt()
+            DBUtils.saveSwitch(dbSwitch, false)
+            dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            DBUtils.recordingChange(dbSwitch!!.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                    Constant.DB_ADD)
+        }
+
     }
 
     private fun getControlScene(): String? {

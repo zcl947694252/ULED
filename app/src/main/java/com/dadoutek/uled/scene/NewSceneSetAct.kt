@@ -415,9 +415,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
         tv_function1.visibility = View.GONE
-        edit_name.setSelection(edit_name.text.length)
+        edit_name.setSelection(edit_name.text.toString().length)
 
-        btn_sure_edit.setOnClickListener(this)
+//        btn_sure_edit.setOnClickListener(this)
 
         edit_name!!.isFocusable = true
         edit_name.isFocusableInTouchMode = true
@@ -489,25 +489,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.tv_function1 -> changeEditView()
             R.id.confirm -> save()
-            R.id.btn_sure_edit ->{
-                if(isEditText){
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    val v = window.peekDecorView()
-                    if (null != v) {
-                        imm.hideSoftInputFromWindow(v.windowToken, 0)
-                    }
-                    isEditText = false
-                }else{
-                    val timer = Timer()
-                    timer.schedule(object : TimerTask() {
-                        override fun run() {
-                            val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            inputManager.showSoftInput(edit_name, 0)
-                        }
-                    }, 200)
-                    isEditText = true
-                }
-            }
+//            R.id.btn_sure_edit ->{
+//                if(isEditText){
+//                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//                    val v = window.peekDecorView()
+//                    if (null != v) {
+//                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+//                    }
+//                    isEditText = false
+//                }else{
+//                    val timer = Timer()
+//                    timer.schedule(object : TimerTask() {
+//                        override fun run() {
+//                            val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//                            inputManager.showSoftInput(edit_name, 0)
+//                        }
+//                    }, 200)
+//                    isEditText = true
+//                }
+//            }
 
 //            R.id.edit_name -> {
 //                isEditText = false
@@ -654,6 +654,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
+//                    sceneActions.brightness = itemGroups.get(i).temperature
+//                    sceneActions.colorTemperature = itemGroups.get(i).brightness
                     sceneActions.groupAddr = itemGroups.get(i).groupAress
                     sceneActions.setColor(itemGroups.get(i).color)
 
@@ -803,6 +805,8 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
+//                    sceneActions.brightness = itemGroups.get(i).temperature
+//                    sceneActions.colorTemperature = itemGroups.get(i).brightness
                     sceneActions.groupAddr = itemGroups.get(i).groupAress
                     sceneActions.setColor(itemGroups.get(i).color)
                     sceneActions.deviceType = 0x04

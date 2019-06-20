@@ -373,30 +373,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }catch (e:Exception){
             e.printStackTrace()
         }
-//        finally {
-//            //确认配置成功后,添加开关到服务器
-//            var newMeshAdress: Int
-////            var dbSwitch:DbSwitch=DbSwitch()
-//            newMeshAdress=groupAdress
-////            DBUtils.saveSwitch(dbSwitch,false)
-//            var dbSwitch: DbSwitch?=DbSwitch()
-////            DBUtils.saveSwitch(dbSwitch,false)
-//            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-//            dbSwitch.macAddr=mDeviceInfo.macAddress
-//            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-//            dbSwitch.productUUID=mDeviceInfo.productUUID
-////            dbSwitch!!.index=dbSwitch.id.toInt()
-//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-//
-////            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
-//            DBUtils.saveSwitch(dbSwitch,false)
-//            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-//            dbSwitch!!.index=dbSwitch.id.toInt()
-//            recordingChange(dbSwitch!!.id,
-//                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-//                    Constant.DB_ADD)
-//
-//        }
     }
 
     private fun updateSwitch() {
@@ -406,6 +382,22 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
                 dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
                 DBUtils.updateSwicth(dbSwitch)
+            }else{
+                var dbSwitch: DbSwitch?=DbSwitch()
+                DBUtils.saveSwitch(dbSwitch,false)
+                dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.macAddr=mDeviceInfo.macAddress
+                dbSwitch.meshAddr=mDeviceInfo.meshAddress
+                dbSwitch.productUUID=mDeviceInfo.productUUID
+                dbSwitch!!.index=dbSwitch.id.toInt()
+                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+                dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
+                DBUtils.saveSwitch(dbSwitch,false)
+                dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                recordingChange(dbSwitch!!.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
             }
         }else{
             switchDate!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
@@ -419,24 +411,35 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //            var dbSwitch:DbSwitch=DbSwitch()
         newMeshAdress=groupAdress
 //            DBUtils.saveSwitch(dbSwitch,false)
-        var dbSwitch: DbSwitch?=DbSwitch()
-        DBUtils.saveSwitch(dbSwitch,false)
-        dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-        dbSwitch.macAddr=mDeviceInfo.macAddress
-        dbSwitch.meshAddr=mDeviceInfo.meshAddress
-        dbSwitch.productUUID=mDeviceInfo.productUUID
-        dbSwitch!!.index=dbSwitch.id.toInt()
-        dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-        dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+        if(switch!=null){
+            var dbSwitch: DbSwitch?=DbSwitch()
+            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            dbSwitch.macAddr=mDeviceInfo.macAddress
+            dbSwitch.meshAddr=mDeviceInfo.meshAddress
+            dbSwitch.productUUID=mDeviceInfo.productUUID
+            dbSwitch!!.index=switch.id.toInt()
+            dbSwitch.id = switch.id
+            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            DBUtils.updateSwicth(dbSwitch)
+        }else{
+            var dbSwitch: DbSwitch?=DbSwitch()
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch.macAddr=mDeviceInfo.macAddress
+            dbSwitch.meshAddr=mDeviceInfo.meshAddress
+            dbSwitch.productUUID=mDeviceInfo.productUUID
+            dbSwitch!!.index=dbSwitch.id.toInt()
+            dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
-//            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
-        DBUtils.saveSwitch(dbSwitch,false)
-        dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-//        dbSwitch!!.index=dbSwitch.id.toInt()
-        recordingChange(dbSwitch!!.id,
-                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                Constant.DB_ADD)
-
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            recordingChange(dbSwitch!!.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                    Constant.DB_ADD)
+        }
     }
 
     private var mConnectingSnackBar: Snackbar? = null

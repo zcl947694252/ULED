@@ -142,6 +142,10 @@ class RelayFragmentList : BaseFragment() {
                                 failedCallback = {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
+                                    val intent = Intent("delete_true")
+                                    intent.putExtra("delete_true", "true")
+                                    LocalBroadcastManager.getInstance(context)
+                                            .sendBroadcast(intent)
                                 })
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
@@ -333,11 +337,13 @@ class RelayFragmentList : BaseFragment() {
 //                    DBUtils.updateGroup(currentLight)
 
                 if (isLong) {
-                    Commander.openOrCloseLights(dstAddr, true)
-                    currentLight.connectionStatus = ConnectionStatus.ON.value
-                    DBUtils.updateGroup(currentLight)
-                    groupAdapter!!.notifyItemChanged(position)
-                    updateLights(true, currentLight)
+                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, true)
+                        currentLight.connectionStatus = ConnectionStatus.ON.value
+                        DBUtils.updateGroup(currentLight)
+                        groupAdapter!!.notifyItemChanged(position)
+                        updateLights(true, currentLight)
+                    }
                 }
             }
             R.id.btn_off -> {
@@ -347,11 +353,13 @@ class RelayFragmentList : BaseFragment() {
 //                    groupAdapter!!.notifyItemChanged(position)
 //                    DBUtils.updateGroup(currentLight)
                 if (isLong) {
-                    Commander.openOrCloseLights(dstAddr, false)
-                    currentLight.connectionStatus = ConnectionStatus.OFF.value
-                    DBUtils.updateGroup(currentLight)
-                    groupAdapter!!.notifyItemChanged(position)
-                    updateLights(false, currentLight)
+                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, false)
+                        currentLight.connectionStatus = ConnectionStatus.OFF.value
+                        DBUtils.updateGroup(currentLight)
+                        groupAdapter!!.notifyItemChanged(position)
+                        updateLights(false, currentLight)
+                    }
                 }
             }
 
@@ -518,10 +526,10 @@ class RelayFragmentList : BaseFragment() {
                 viewLine?.visibility = View.GONE
             }
 
-            SharedPreferencesUtils.setDelete(false)
 
             if (isDeleteTrue) {
                 isDelete = false
+                SharedPreferencesUtils.setDelete(false)
                 val intent = Intent("switch_fragment")
                 intent.putExtra("switch_fragment", "true")
                 LocalBroadcastManager.getInstance(this!!.mContext!!)

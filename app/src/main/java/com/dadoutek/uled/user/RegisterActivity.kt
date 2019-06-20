@@ -96,16 +96,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         SMSSDK.registerEventHandler(eventHandler)
     }
 
-//    private fun initToolbar() {
-//        toolbar.setBackgroundResource(R.color.white)
-//        if (isChangePwd) {
-//            toolbar.title = getString(R.string.update_password)
-//        } else {
-//            toolbar.title = getString(R.string.user_register)
-//        }
-//        toolbar.setNavigationIcon(R.drawable.icon_return)
-//        toolbar.setNavigationOnClickListener { finish() }
-//    }
 
     override fun onClick(v: View?) {
         when (v!!.id) {
@@ -228,12 +218,12 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
-                            if(JsonUtil.isBadJson(a.toString())){
+//                            if(JsonUtil.isBadJson(a.toString())){
                                 val jsonObject = JSONObject(a.localizedMessage)
                                 val message = jsonObject.opt("detail").toString()
                                 ToastUtils.showLong(message)
                                 hideLoadingDialog()
-                            }
+//                            }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
