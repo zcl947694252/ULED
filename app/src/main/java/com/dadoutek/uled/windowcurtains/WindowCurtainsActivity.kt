@@ -147,6 +147,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private fun getVersion() {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
+            Log.e("TAG",curtain!!.meshAddr.toString())
             Commander.getDeviceVersion(curtain!!.meshAddr, { s ->
                 localVersion = s
                 if(localVersion!=""){
@@ -186,7 +187,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 null
             })
         } else {
-            dstAdress = 0
+//            dstAdress = 0
+
         }
     }
 
@@ -465,11 +467,28 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
             if (curtain!!.status!= null) {
                 if (curtain!!.status == 0) {
-                    pauseWindow()
+//                    pauseWindow()
+                    pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
+                    closeBtn.setImageResource(R.drawable.icon_curtain_close)
+                    closeText.setTextColor(Color.parseColor("#333333"))
+                    openBtn.setImageResource(R.drawable.icon_curtain_close)
+                    openText.setTextColor(Color.parseColor("#333333"))
                 } else if (curtain!!.status == 1) {
-                    offWindow()
+//                    offWindow()
+                    curtainImage.setImageResource(R.drawable.curtain_close)
+                    pauseBtn.setImageResource(R.drawable.icon_suspend)
+                    closeBtn.setImageResource(R.drawable.icon_open_yes)
+                    closeText.setTextColor(Color.parseColor("#0080EA"))
+                    openBtn.setImageResource(R.drawable.icon_curtain_close)
+                    openText.setTextColor(Color.parseColor("#333333"))
                 } else if (curtain!!.status == 2) {
-                    openWindow()
+//                    openWindow()
+                    curtainImage.setImageResource(R.drawable.curtain)
+                    pauseBtn.setImageResource(R.drawable.icon_suspend)
+                    openBtn.setImageResource(R.drawable.icon_open_yes)
+                    openText.setTextColor(Color.parseColor("#0080EA"))
+                    closeBtn.setImageResource(R.drawable.icon_curtain_close)
+                    closeText.setTextColor(Color.parseColor("#333333"))
                 }
             }
 

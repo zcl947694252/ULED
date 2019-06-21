@@ -474,7 +474,7 @@ object DBUtils {
 
     fun getSensorByMacAddr(macAddr: String): DbSensor? {
         val dbLightList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().
-                where(DbSwitchDao.Properties.MacAddr.eq(macAddr)).list()
+                where(DbSensorDao.Properties.MacAddr.eq(macAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
