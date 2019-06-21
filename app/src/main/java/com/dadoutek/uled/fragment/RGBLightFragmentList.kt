@@ -177,6 +177,7 @@ class RGBLightFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        Thread.sleep(500)
         val intent = Intent("delete_true")
         intent.putExtra("delete_true", "true")
         LocalBroadcastManager.getInstance(this!!.mContext!!)

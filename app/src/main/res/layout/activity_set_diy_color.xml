@@ -94,7 +94,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/selectColorRecyclerView"
             android:layout_width="320dp"
-            android:layout_height="140dp"
+            android:layout_height="160dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

@@ -178,6 +178,7 @@ class RelayFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
+        Thread.sleep(300)
         val intent = Intent("delete_true")
         intent.putExtra("delete_true", "true")
         LocalBroadcastManager.getInstance(this!!.mContext!!)

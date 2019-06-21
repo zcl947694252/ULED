@@ -61,7 +61,7 @@ public class StringUtils {
             String regexStr = "[`~\\\\!()+=|{}':;',\\[\\].<>/?~！￥……（）——+|{}【】‘；：”“’。，、？]";
             Pattern pattern = Pattern.compile(regexStr);
             Matcher matcher = pattern.matcher(source.toString());
-            if (matcher.matches()||compileExChar(source.toString())) {
+            if (matcher.matches() || compileExChar(source.toString())) {
                 return "";
             } else {
                 return null;
@@ -69,7 +69,7 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(50)});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter, new InputFilter.LengthFilter(50)});
     }
 
     public static void initEditTextFilterForRegister(EditText editText) {
@@ -89,7 +89,7 @@ public class StringUtils {
             String regexStr = "[`~\\\\!()+=|{}':;',\\[\\].<>/?~！￥……（）——+|{}【】‘；：”“’。，、？\\s+]";
             Pattern pattern = Pattern.compile(regexStr);
             Matcher matcher = pattern.matcher(source.toString());
-            if (matcher.matches()||compileExChar(source.toString())) {
+            if (matcher.matches() || compileExChar(source.toString())) {
                 return "";
             } else {
                 return null;
@@ -97,30 +97,32 @@ public class StringUtils {
 
         };
 
-        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter,new InputFilter.LengthFilter(50)});
+        editText.setFilters(new InputFilter[]{emojiFilter, specialCharFilter, new InputFilter.LengthFilter(50)});
     }
 
     /**
      * 解析URL地址
-     * @param url 传入地址
+     *
+     * @param url     传入地址
      * @param content 返回内容，传入0返回固件类型灯或者控制器，传入1返回版本号（L-2.0.8-L208.bin）
      * @return
      */
-    public static String versionResolutionURL(String url,int content){
-        String[] parts=shift(url,"/");
-        String versionPart=parts[parts.length-1];
-        return versionResolution(versionPart,content);
+    public static String versionResolutionURL(String url, int content) {
+        String[] parts = shift(url, "/");
+        String versionPart = parts[parts.length - 1];
+        return versionResolution(versionPart, content);
     }
 
     /**
      * 解析URL地址
+     *
      * @param versionPart 传入版本
-     * @param content 返回内容，传入0返回固件类型灯或者控制器，传入1返回版本号（L-2.0.8-L208.bin）
+     * @param content     返回内容，传入0返回固件类型灯或者控制器，传入1返回版本号（L-2.0.8-L208.bin）
      * @return
      */
-    public static String versionResolution(String versionPart,int content){
-        String[] versionContent=shift(versionPart,"-");
-        switch (content){
+    public static String versionResolution(String versionPart, int content) {
+        String[] versionContent = shift(versionPart, "-");
+        switch (content) {
             case 0:
                 return versionContent[0];
 //                String type=versionContent[0];
@@ -130,22 +132,22 @@ public class StringUtils {
 //                    return Constant.FIRMWARE_TYPE_CONTROLLER;
 //                }
             case 1:
-                String numVersion=versionContent[1].replaceAll("\\.","").replaceAll("bin","");
-                if(isNumeric(numVersion)){
+                String numVersion = versionContent[1].replaceAll("\\.", "").replaceAll("bin", "");
+                if (isNumeric(numVersion)) {
                     return numVersion;
-                }else{
+                } else {
                     return "-1";
                 }
             case 2:
-                return versionPart.replaceAll("\\.bin","");
+                return versionPart.replaceAll("\\.bin", "");
         }
         return "";
     }
 
-    public static boolean isNumeric(String str){
+    public static boolean isNumeric(String str) {
         Pattern pattern = Pattern.compile("[0-9]*");
         Matcher isNum = pattern.matcher(str);
-        if( !isNum.matches() ){
+        if (!isNum.matches()) {
             return false;
         }
         return true;
@@ -175,31 +177,31 @@ public class StringUtils {
     }
 
     public static String getLightName(DbLight light) {
-        if(light.getBelongGroupId()!=null){
-            if(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId())==null){
+        if (light.getBelongGroupId() != null) {
+            if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()) == null) {
                 return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
             }
 
             //如果当前灯没分组  显示未分组
-            if(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getMeshAddr()==0xffff){
+            if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getMeshAddr() == 0xffff) {
                 return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
-            }else{
+            } else {
                 return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
             }
-        }else{
+        } else {
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
         }
     }
 
-    public static String getConnectorName(DbConnector connector){
-        if(DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId())==null){
+    public static String getConnectorName(DbConnector connector) {
+        if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()) == null) {
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
         }
 
         //如果当前灯没分组  显示未分组
-        if(DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getMeshAddr()==0xffff){
+        if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getMeshAddr() == 0xffff) {
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
-        }else{
+        } else {
             return DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getName();
         }
 
@@ -207,20 +209,20 @@ public class StringUtils {
 
     public static String getCurtainName(DbCurtain curtain) {
 
-        if(DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId())==null){
+        if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()) == null) {
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
         }
 
         //如果当前灯没分组  显示未分组
-        if(DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getMeshAddr()==0xffff){
+        if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getMeshAddr() == 0xffff) {
             return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
-        }else{
+        } else {
             return DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getName();
         }
     }
 
-    public static String getInstallDescribe(int type, Context context){
-        switch (type){
+    public static String getInstallDescribe(int type, Context context) {
+        switch (type) {
             case Constant.INSTALL_NORMAL_LIGHT:
             case Constant.INSTALL_RGB_LIGHT:
                 return context.getString(R.string.guide_tip_reset_light);
@@ -236,9 +238,9 @@ public class StringUtils {
         return "";
     }
 
-    public static String getSwitchPirDefaultName(int productUUID){
+    public static String getSwitchPirDefaultName(int productUUID) {
         String startStr = "";
-        switch (productUUID){
+        switch (productUUID) {
             case DeviceType.NORMAL_SWITCH:
                 startStr = "普通开关";
                 break;
@@ -262,17 +264,17 @@ public class StringUtils {
         List<DbSwitch> swtitches = DBUtils.INSTANCE.getSwtitchesByProductUUID(productUUID);
         List<String> swtitchNames = new ArrayList();
 
-        for(int i=0;i<swtitches.size();i++){
+        for (int i = 0; i < swtitches.size(); i++) {
             swtitchNames.add(swtitches.get(i).getName());
         }
 
         //开关上限暂时设置到1000方便取名
-        int MaxSwitchCount=1000;
-        for(int i=0;i<MaxSwitchCount;i++){
-            String name = startStr ;
-            if(swtitchNames.contains(name)){
+        int MaxSwitchCount = 1000;
+        for (int i = 0; i < MaxSwitchCount; i++) {
+            String name = startStr + i;
+            if (swtitchNames.contains(name)) {
                 continue;
-            }else {
+            } else {
                 return name;
             }
         }

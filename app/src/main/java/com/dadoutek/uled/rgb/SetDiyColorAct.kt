@@ -76,6 +76,19 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         rgbDiyColorListAdapter?.onItemLongClickListener = onItemLongClickListener
         sbSpeed.setOnSeekBarChangeListener(barChangeListener)
 
+        selectColorRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if(newState == RecyclerView.SCROLL_STATE_DRAGGING){
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    val v = window.peekDecorView()
+                    if (null != v) {
+                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                }
+            }
+        })
+
         editName.setSelection(editName.text.toString().length)
 
 //        set_diy_color.setOnTouchListener(View.OnTouchListener(){

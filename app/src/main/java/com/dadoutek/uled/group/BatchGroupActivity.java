@@ -1199,7 +1199,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             }
             if (groups.size() > 0) {
                 for (int i = 0; i < groups.size(); i++) {
-                    if (groups.get(i).getName().equals(groupLight)) {
+                    if (i == groups.size() - 1) {
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
