@@ -6,13 +6,21 @@ import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -154,7 +162,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
     private long TIME_OUT_SENDDATA = 10;
-    private boolean OTA_IS_HAVEN_START=false;
+    private boolean OTA_IS_HAVEN_START = false;
 
     private Handler delayHandler = new Handler();
     @SuppressLint("HandlerLeak")
@@ -201,21 +209,21 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     };
 
-    private BroadcastReceiver mReceiver = new  BroadcastReceiver() {
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-                        String action = intent.getAction();
-            if (BluetoothAdapter.ACTION_STATE_CHANGED .equals(action) ) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
 
                 switch (state) {
-                    case BluetoothAdapter.STATE_ON:{
+                    case BluetoothAdapter.STATE_ON: {
                         log("蓝牙打开");
                         TelinkLightService.Instance().idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
                     }
-                    case BluetoothAdapter.STATE_OFF:{
+                    case BluetoothAdapter.STATE_OFF: {
                         log("蓝牙关闭");
                         ToastUtils.showLong(R.string.tip_phone_ble_off);
                         TelinkLightService.Instance().idleMode(true);
@@ -310,7 +318,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     }
 
-        private void initToolbar() {
+    private void initToolbar() {
         toolbar.setTitle(R.string.ota_update_title);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -319,7 +327,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     }
 
-        @Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -693,13 +701,106 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-            mPath = data.getStringExtra("path");
+            Uri uri = data.getData();
+            mPath = getPath(this, uri);
+//            mPath = data.getStringExtra("path");
             tvFile.setText(getString(R.string.select_file, mPath));
             SharedPreferencesUtils.saveUpdateFilePath(mPath);
             btn_start_update.setVisibility(View.VISIBLE);
             server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
         }
     }
+
+    public String getPath(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{split[1]};
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    public boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    public boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    public boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    public String getDataColumn(Context context, Uri uri, String selection,
+                                String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {column};
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
 
 /*    private float getVersionValue(String version) {
         return Float.valueOf(version.substring(1));
@@ -716,7 +817,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void chooseFile() {
-        startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
+//        startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //intent.setType(“image/*”);//选择图片
+        //intent.setType(“audio/*”); //选择音频
+        //intent.setType(“video/*”); //选择视频 （mp4 3gp 是android支持的视频格式）
+        //intent.setType(“video/*;image/*”);//同时选择视频和图片
+        intent.setType("*/*");//无类型限制
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
     }
 
     private boolean hasLight(int meshAddress) {
@@ -758,7 +867,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         List<ScanFilter> scanFilters = new ArrayList<>();
         ScanFilter.Builder scanFilterBuilder = new ScanFilter.Builder();
         scanFilterBuilder.setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount());
-        if(dbLight.getMacAddr().length()>16){
+        if (dbLight.getMacAddr().length() > 16) {
             scanFilterBuilder.setDeviceAddress(dbLight.getMacAddr());
         }
         ScanFilter scanFilter = scanFilterBuilder.build();
@@ -766,12 +875,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
-        if(!AppUtils.isExynosSoc()){
+        if (!AppUtils.isExynosSoc()) {
             params.setScanFilters(scanFilters);
         }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
-        if(dbLight.getMacAddr().length()>16){
+        if (dbLight.getMacAddr().length() > 16) {
             params.setScanMac(dbLight.getMacAddr());
         }
         TelinkLightService.Instance().startScan(params);
@@ -780,18 +889,19 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     Disposable mScanDisposal;
+
     @SuppressLint("CheckResult")
-    private void startScanTimer(){
+    private void startScanTimer() {
         if (mScanDisposal != null) {
             mScanDisposal.dispose();
         }
-            mScanDisposal=Observable.timer(TIME_OUT_SCAN,TimeUnit.SECONDS).subscribe(aLong -> {
-                    onScanTimeout();
-            });
+        mScanDisposal = Observable.timer(TIME_OUT_SCAN, TimeUnit.SECONDS).subscribe(aLong -> {
+            onScanTimeout();
+        });
     }
 
     private void stopScanTimer() {
-        if(mScanDisposal!=null){
+        if (mScanDisposal != null) {
             mScanDisposal.dispose();
         }
     }
@@ -808,7 +918,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         visibleHandler.obtainMessage(View.GONE, otaProgress).sendToTarget();
 
         if (TelinkLightApplication.getApp().getConnectDevice() != null) {
-            OTA_IS_HAVEN_START=true;
+            OTA_IS_HAVEN_START = true;
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             startScan();
@@ -870,7 +980,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 if (!connectStart) {
                     LeBluetooth.getInstance().stopScan();
                     connectDevice(deviceInfo.macAddress);
-                    connectRetryCount=1;
+                    connectRetryCount = 1;
 //                    startConnectTimer();
                 }
                 connectStart = true;
@@ -900,11 +1010,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             LeBluetooth.getInstance().stopScan();
             stopConnectTimer();
 //            addEventListener();
-            if(OTA_IS_HAVEN_START){
+            if (OTA_IS_HAVEN_START) {
                 btn_start_update.setVisibility(View.GONE);
                 btn_start_update.setClickable(false);
                 TelinkLightApplication.getApp().removeEventListener(this);
-            }else{
+            } else {
                 btn_start_update.setText(getString(R.string.re_upgrade));
                 btn_start_update.setVisibility(View.VISIBLE);
                 btn_start_update.setClickable(true);
