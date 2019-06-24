@@ -157,7 +157,7 @@ class GroupListFragment : BaseFragment() {
 
     private var delete: String? = null
 
-    private var deleteComplete: String? =null
+    private var deleteComplete: String? = null
 
 //    private var cw_light_btn: TextView? = null
 //    private var rgb_light_btn: TextView? = null
@@ -209,7 +209,7 @@ class GroupListFragment : BaseFragment() {
                             .sendBroadcast(intent)
                 }
 
-                if(deleteComplete == "true"){
+                if (deleteComplete == "true") {
                     hideLoadingDialog()
                 }
             }
@@ -671,27 +671,29 @@ class GroupListFragment : BaseFragment() {
             deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
             deviceRecyclerView!!.setAdapter(deviceNameAdapter)
 
-            if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
-                btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
-                btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
-                onText!!.setTextColor(resources.getColor(R.color.white))
-                offText!!.setTextColor(resources.getColor(R.color.black_nine))
-                if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
-                    val intent = Intent("switch_here")
-                    intent.putExtra("switch_here", "on")
-                    LocalBroadcastManager.getInstance(this!!.mContext!!)
-                            .sendBroadcast(intent)
-                }
-            } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
-                btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
-                btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
-                onText!!.setTextColor(resources.getColor(R.color.black_nine))
-                offText!!.setTextColor(resources.getColor(R.color.white))
-                if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
-                    val intent = Intent("switch_here")
-                    intent.putExtra("switch_here", "false")
-                    LocalBroadcastManager.getInstance(this!!.mContext!!)
-                            .sendBroadcast(intent)
+            if (allGroup != null) {
+                if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
+                    btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
+                    btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
+                    onText!!.setTextColor(resources.getColor(R.color.white))
+                    offText!!.setTextColor(resources.getColor(R.color.black_nine))
+                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                        val intent = Intent("switch_here")
+                        intent.putExtra("switch_here", "on")
+                        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                                .sendBroadcast(intent)
+                    }
+                } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
+                    btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
+                    btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
+                    onText!!.setTextColor(resources.getColor(R.color.black_nine))
+                    offText!!.setTextColor(resources.getColor(R.color.white))
+                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                        val intent = Intent("switch_here")
+                        intent.putExtra("switch_here", "false")
+                        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                                .sendBroadcast(intent)
+                    }
                 }
             }
 
@@ -871,20 +873,20 @@ class GroupListFragment : BaseFragment() {
 //                intent.putExtra("delete", "true")
 //                LocalBroadcastManager.getInstance(this!!.mContext!!)
 //                        .sendBroadcast(intent)
-                var deleteList : ArrayList<DbGroup>?=null
+                var deleteList: ArrayList<DbGroup>? = null
                 deleteList = ArrayList()
 
                 var listLight = DBUtils.getAllGroupsOrderByIndex()
 
-                if(listLight.size>0){
-                    for(i in listLight.indices){
-                        if(listLight[i].isSelected){
+                if (listLight.size > 0) {
+                    for (i in listLight.indices) {
+                        if (listLight[i].isSelected) {
                             deleteList.add(listLight[i])
                         }
                     }
                 }
 
-                if(deleteList.size>0){
+                if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 showLoadingDialog(getString(R.string.deleting))

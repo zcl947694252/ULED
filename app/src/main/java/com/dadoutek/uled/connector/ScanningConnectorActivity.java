@@ -35,6 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -146,6 +147,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     RelativeLayout add_relativeLayout;
     @BindView(R.id.add_group)
     RelativeLayout add_group;
+    @BindView(R.id.lottieAnimationView)
+    LottieAnimationView animationView;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -315,6 +318,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
 //        });
 //        scanPb.setVisibility(View.GONE);
         showToast(getString(R.string.scan_end));
+        animationView.cancelAnimation();
+        animationView.setVisibility(View.GONE);
         doFinish();
     }
 
@@ -391,7 +396,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
-
+                animationView.cancelAnimation();
+                animationView.setVisibility(View.GONE);
             }
         });
 
@@ -876,6 +882,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
+                animationView.cancelAnimation();
+                animationView.setVisibility(View.GONE);
 //                LeBluetooth.getInstance().stopScan();
 //                TelinkLightService.Instance().idleMode(true);
 
@@ -1054,6 +1062,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         this.adapter = new DeviceListAdapter();
 
         groupsBottom = findViewById(R.id.groups_bottom);
+        animationView = findViewById(R.id.lottieAnimationView);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
         this.btnAddGroups = findViewById(R.id.btn_add_groups);
         this.groupingCompleted = findViewById(R.id.grouping_completed);
@@ -1085,6 +1094,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     }
 
     private View.OnClickListener onClick = v -> {
+        animationView.cancelAnimation();
+        animationView.setVisibility(View.GONE);
         stopTimer();
         onLeScanTimeout();
     };
@@ -1440,6 +1451,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         Manifest.permission.BLUETOOTH_ADMIN).subscribe(granted -> {
                     if (granted) {
                         startTimer();
+                        animationView.playAnimation();
+                        animationView.setVisibility(View.VISIBLE);
                         if (grouping) {
 //                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
                             LogUtils.d("Grouping");
@@ -1477,7 +1490,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME);
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
                         params.setScanMode(true);
-                        scanPb.setVisibility(View.VISIBLE);
+                        scanPb.setVisibility(View.GONE);
                         mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io())
                                 .subscribe(aLong -> {
                                     TelinkLightService.Instance().startScan(params);

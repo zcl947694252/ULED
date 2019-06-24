@@ -159,8 +159,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
 
 //        if(isOTA){
-        if(currentSwitch!=null){
-            if(currentSwitch!!.macAddr == bestRSSIDevice!!.macAddress){
+        if (currentSwitch != null && bestRSSIDevice != null) {
+            if (currentSwitch!!.macAddr == bestRSSIDevice!!.macAddress) {
                 if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                         bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
                     startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
@@ -172,8 +172,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)
                     finish()
                 }
-            }else{
-                Toast.makeText(this,R.string.not_found_switch,Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, R.string.not_found_switch, Toast.LENGTH_LONG).show()
             }
 
         }
@@ -455,29 +455,29 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         notifyData()
                         Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
 //                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
-                            val opcode = Opcode.KICK_OUT
-                            TelinkLightService.Instance().sendCommandNoResponse(opcode, deleteSwitch!!.getMeshAddr(), null)
-                            if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch!!.getMeshAddr())) {
-                                TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
-                            }
-                            if (mConnectDevice != null) {
-                                Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
-                                Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.getMeshAddr())
-                                if (deleteSwitch?.meshAddr == mConnectDevice?.meshAddress) {
-                                    Log.d("NBA", "=====")
+                        val opcode = Opcode.KICK_OUT
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, deleteSwitch!!.getMeshAddr(), null)
+                        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch!!.getMeshAddr())) {
+                            TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
+                        }
+                        if (mConnectDevice != null) {
+                            Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+                            Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.getMeshAddr())
+                            if (deleteSwitch?.meshAddr == mConnectDevice?.meshAddress) {
+                                Log.d("NBA", "=====")
 //                                    scanPb.visibility = View.VISIBLE
-                                    Thread {
-                                        //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-                                        Thread.sleep(2500)
-                                        if (this@SwitchDeviceDetailsActivity == null ||
-                                                this@SwitchDeviceDetailsActivity.isDestroyed ||
-                                                this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                        } else {
-                                            autoConnect()
-                                        }
-                                    }.start()
-                                }
+                                Thread {
+                                    //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+                                    Thread.sleep(2500)
+                                    if (this@SwitchDeviceDetailsActivity == null ||
+                                            this@SwitchDeviceDetailsActivity.isDestroyed ||
+                                            this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
+                                    } else {
+                                        autoConnect()
+                                    }
+                                }.start()
                             }
+                        }
 
 
 //                        } else {

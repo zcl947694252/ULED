@@ -137,6 +137,7 @@ dependencies {
     implementation 'com.ccx1:EHorizontalSelectedView:1.0.0'
     implementation 'com.github.warkiz.widget:indicatorseekbar:2.1.2'
     implementation 'org.greenrobot:eventbus:3.0.0'
+    implementation 'com.airbnb.android:lottie:2.7.0'
 //    implementation 'com.github.wanglu1209:WPopup:lastReleases'
 //    implementation 'actionsheet:1.0.3'
 }
