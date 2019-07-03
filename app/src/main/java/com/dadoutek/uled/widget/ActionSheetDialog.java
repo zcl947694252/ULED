@@ -78,7 +78,7 @@ public class ActionSheetDialog extends AlertDialog {
         return super.getButton(whichButton);
     }
 
-    public static class ActionSheetBuilder extends AlertDialog.Builder {
+    public static class ActionSheetBuilder extends Builder {
         private Context mContext;
         private String mTitle;
         private String mMessage;

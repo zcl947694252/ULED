@@ -1,4 +1,4 @@
-//package com.dadoutek.uled.activity;
+package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //
 //import android.Manifest;
 //import android.annotation.SuppressLint;

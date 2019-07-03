@@ -498,23 +498,26 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     addNewScene!!.visibility = View.GONE
                 }
             }
-            val layoutmanager = LinearLayoutManager(activity)
-            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView!!.layoutManager = layoutmanager
-            //添加分割线
-            val decoration = DividerItemDecoration(activity!!,
-                    DividerItemDecoration
-                            .VERTICAL)
-            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                    .divider)))
-            recyclerView!!.addItemDecoration(decoration)
-            //添加Item变化动画
-            recyclerView!!.itemAnimator = DefaultItemAnimator()
-            adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
-            adaper!!.setOnItemClickListener(onItemClickListener)
-            adaper!!.setOnItemChildClickListener(onItemChildClickListener)
-            adaper!!.onItemLongClickListener = onItemChildLongClickListener
-            adaper!!.bindToRecyclerView(recyclerView)
+
+            if(recyclerView!=null){
+                val layoutmanager = LinearLayoutManager(activity)
+                layoutmanager.orientation = LinearLayoutManager.VERTICAL
+                recyclerView!!.layoutManager = layoutmanager
+                //添加分割线
+                val decoration = DividerItemDecoration(activity!!,
+                        DividerItemDecoration
+                                .VERTICAL)
+                decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+                        .divider)))
+                recyclerView!!.addItemDecoration(decoration)
+                //添加Item变化动画
+                recyclerView!!.itemAnimator = DefaultItemAnimator()
+                adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
+                adaper!!.setOnItemClickListener(onItemClickListener)
+                adaper!!.setOnItemChildClickListener(onItemChildClickListener)
+                adaper!!.onItemLongClickListener = onItemChildLongClickListener
+                adaper!!.bindToRecyclerView(recyclerView)
+            }
 
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
             toolbar!!.navigationIcon = null

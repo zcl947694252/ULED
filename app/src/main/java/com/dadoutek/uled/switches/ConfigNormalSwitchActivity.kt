@@ -391,7 +391,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.productUUID=mDeviceInfo.productUUID
                 dbSwitch!!.index=dbSwitch.id.toInt()
                 dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-                dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//                dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
                 DBUtils.saveSwitch(dbSwitch,false)
                 dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
@@ -421,7 +421,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch.productUUID=mDeviceInfo.productUUID
             dbSwitch!!.index=switch.id.toInt()
             dbSwitch.id = switch.id
-            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             DBUtils.updateSwicth(dbSwitch)
         }else{
             var dbSwitch: DbSwitch?=DbSwitch()
@@ -432,7 +432,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch.productUUID=mDeviceInfo.productUUID
             dbSwitch!!.index=dbSwitch.id.toInt()
             dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
-            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
             DBUtils.saveSwitch(dbSwitch,false)
             dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)

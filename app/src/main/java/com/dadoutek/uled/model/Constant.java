@@ -197,6 +197,11 @@ public class Constant implements Serializable {
     public static String TYPE_CURTAIN = "TYPE_CURTAIN";
     public static String TYPE_VIEW = "TYPE_VIEW";
     public static String TYPE_VIEW_ADDRESS = "TYPE_VIEW_ADDRESS";
+    public static String TYPE_USER = "TYPE_USER";
+    public static String TYPE_REGISTER = "TYPE_REGISTER";
+    public static String TYPE_FORGET_PASSWORD = "TYPE_FORGET_PASSWORD";
+    public static String TYPE_VERIFICATION_CODE = "TYPE_VERIFICATION_CODE";
+    public static String TYPE_LOGIN = "TYPE_LOGIN";
 
     //导航页标签
     public static String TAG_GroupListFragment = "GroupListFragment";

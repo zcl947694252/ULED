@@ -650,23 +650,30 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.deviceType = 0x05
                     sceneActions.isOn = itemGroups.get(i).isNo
                     DBUtils.saveSceneActions(sceneActions)
-                } else {
+                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
-//                    sceneActions.brightness = itemGroups.get(i).temperature
-//                    sceneActions.colorTemperature = itemGroups.get(i).brightness
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+
+                    sceneActions.deviceType = 0x06
+
+                    DBUtils.saveSceneActions(sceneActions)
+                }else{
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
                     sceneActions.groupAddr = itemGroups.get(i).groupAress
                     sceneActions.setColor(itemGroups.get(i).color)
 
                     sceneActions.deviceType = 0x04
-
                     DBUtils.saveSceneActions(sceneActions)
                 }
-                sceneActions.belongSceneId = idAction
-                sceneActions.brightness = itemGroups.get(i).brightness
-                sceneActions.setColor(itemGroups.get(i).color)
-                sceneActions.colorTemperature = itemGroups.get(i).temperature
+//                sceneActions.belongSceneId = idAction
+//                sceneActions.brightness = itemGroups.get(i).brightness
+//                sceneActions.setColor(itemGroups.get(i).color)
+//                sceneActions.colorTemperature = itemGroups.get(i).temperature
                 //            if (isSave) {//选择的组里面包含了所有组，用户仍然确定了保存,只保存所有组
                 //                sceneActions.setGroupAddr(0xFFFF);
                 //                DBUtils.saveSceneActions(sceneActions);
@@ -728,7 +735,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
-                } else {
+                } else if(type == 0x06){
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }else {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
@@ -801,7 +811,17 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.isOn = itemGroups.get(i).isNo
 
                     DBUtils.saveSceneActions(sceneActions)
-                } else {
+                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                    sceneActions.belongSceneId = idAction
+                    sceneActions.brightness = itemGroups.get(i).brightness
+                    sceneActions.colorTemperature = itemGroups.get(i).temperature
+                    sceneActions.groupAddr = itemGroups.get(i).groupAress
+                    sceneActions.setColor(itemGroups.get(i).color)
+
+                    sceneActions.deviceType = 0x06
+
+                    DBUtils.saveSceneActions(sceneActions)
+                }else {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
@@ -878,6 +898,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
+            }else if(type == 0x06){
+                params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
             } else {
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)

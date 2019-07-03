@@ -740,4 +740,15 @@
     <string name="instructions_for_use">Instructions for use</string>
     <string name="account_management">Account management</string>
     <string name="no_password">The current account has not created a password. Please log in using SMS.</string>
+    <string name="account_already_exist">Account already exists</string>
+    <string name="enter_confirmation_code">Verification code</string>
+    <string name="send_code">Verification code sent to</string>
+    <string name="follow_the_steps">Follow the steps to retrieve your password.</string>
+    <string name="reacquire">Reacquire</string>
+    <string name="account_after_login_two">Automatically register an account after login</string>
+    <string name="next">Next</string>
+    <string name="enter_password">Enter password</string>
+    <string name="please_your_password">Please enter your login password</string>
+    <string name="password_you_set_again">Please confirm the login password you set again.</string>
+    <string name="password_you_set">Please enter the login password you set.</string>
 </resources>

@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.ToastUtils
 
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
@@ -141,10 +142,17 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun passwordLogin() {
         val intent = Intent(this@VerificationCodeActivity, LoginActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun login() {
-        verificationLogin()
+//        verificationLogin()
+        verificationCode()
+        var intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
+        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
+        intent.putExtra("country_code",countryCode)
+        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+        startActivity(intent)
     }
 
     val eventHandler = object : EventHandler() {

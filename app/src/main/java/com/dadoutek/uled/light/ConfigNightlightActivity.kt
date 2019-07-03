@@ -262,8 +262,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                         var version = tvPSVersion.text.toString()
                         var num = version.substring(2, 3)
                         if (num.toDouble() >= 3.0) {
-//                            tv_TriggerLux.visibility = View.VISIBLE
-//                            spTrigger_lux.visibility = View.VISIBLE
+                            tv_TriggerLux.visibility = View.VISIBLE
+                            spTrigger_lux.visibility = View.VISIBLE
                             sp_SwitchMode.visibility = View.VISIBLE
                             tv_SwitchMode.visibility = View.VISIBLE
                             tvDelay.visibility = View.GONE
@@ -272,6 +272,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                             sp_DelayUnit.visibility = View.VISIBLE
                             til_Delay.visibility = View.VISIBLE
                             tiet_Delay.visibility = View.VISIBLE
+                            tilMinimum_Brightness.visibility = View.VISIBLE
+                            tietMinimumBrightness.visibility = View.VISIBLE
                         }
                     },
                     failedCallback = {

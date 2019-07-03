@@ -364,7 +364,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
-                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
@@ -392,21 +392,21 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
-            dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             dbSwitch!!.index=switch.id.toInt()
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         }else{
             var dbSwitch: DbSwitch? = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 //            DBUtils.saveSwitch(dbSwitch,false)
-            dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
             dbSwitch.macAddr = mDeviceInfo.macAddress
             dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch.productUUID = mDeviceInfo.productUUID
             dbSwitch.index = dbSwitch.id.toInt()
-            dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)

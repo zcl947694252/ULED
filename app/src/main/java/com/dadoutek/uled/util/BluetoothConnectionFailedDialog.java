@@ -102,7 +102,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
 
     private void checkNetworkAndSync(Context mContenxt) {
         if (!NetWorkUtils.isNetworkAvalible(mContenxt)) {
-            new AlertDialog.Builder(mContenxt)
+            new Builder(mContenxt)
                     .setTitle(R.string.network_tip_title)
                     .setMessage(R.string.net_disconnect_tip_message)
                     .setPositiveButton(R.string.btn_ok, new OnClickListener() {
@@ -145,7 +145,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
 
         public void error(String msg) {
             if (isClickExlogin) {
-                new AlertDialog.Builder(mContenxt)
+                new Builder(mContenxt)
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(R.string.btn_ok, new OnClickListener() {

@@ -312,7 +312,7 @@
     <string name="net_disconnect_tip_message">当前没有可以使用的网络，请检查网络！</string>
     <string name="devoloping">开发中——敬请期待！</string>
     <string name="regetCount">重新获取(%1$d)</string>
-    <string name="reget">重新获取</string>
+    <string name="reget">重新获取验证码</string>
     <string name="manager_verification">管理员权限验证</string>
     <string name="manager_phone_error">管理员手机号错误</string>
     <string name="answer_app">常见问题</string>
@@ -674,4 +674,15 @@
     <string name="instructions_for_use">使用说明</string>
     <string name="account_management">账号管理</string>
     <string name="no_password">当前账号未创建密码,请使用短信登录</string>
+    <string name="account_already_exist">账号已存在</string>
+    <string name="enter_confirmation_code">输入验证码</string>
+    <string name="send_code">验证码已发送至</string>
+    <string name="follow_the_steps">按步骤操作即可找回密码</string>
+    <string name="reacquire">后可重新发送</string>
+    <string name="account_after_login_two">登录后自动注册账号</string>
+    <string name="next">下一步</string>
+    <string name="enter_password">输入密码</string>
+    <string name="please_your_password">请输入您的登陆密码</string>
+    <string name="password_you_set_again">请再次确认您设置的登录密码</string>
+    <string name="password_you_set">请输入您设置的登录密码</string>
 </resources>

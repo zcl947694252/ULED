@@ -1032,7 +1032,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            DeviceResetGroupActivity.DeviceItemHolder holder;
+            DeviceItemHolder holder;
 
             convertView = inflater.inflate(R.layout.device_item, null);
             ImageView icon = (ImageView) convertView

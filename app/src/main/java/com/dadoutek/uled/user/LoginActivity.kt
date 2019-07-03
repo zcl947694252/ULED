@@ -257,6 +257,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun verificationCode() {
         val intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     private fun eyePassword() {

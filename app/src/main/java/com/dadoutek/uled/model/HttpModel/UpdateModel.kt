@@ -17,4 +17,14 @@ object UpdateModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun isRegister(phone:String): Observable<Any>? {
+        return NetworkFactory.getApi()
+                .isRegister(phone)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }

@@ -197,7 +197,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 var newMeshAdress: Int
                 var dbSwitch: DbSwitch? = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
                 dbSwitch!!.controlSceneId = getControlScene()
                 dbSwitch!!.macAddr = mDeviceInfo.macAddress
                 dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -210,7 +210,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         Constant.DB_ADD)
             }
         } else {
-            switchDate!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            switchDate!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             switchDate!!.controlSceneId = getControlScene()
             switchDate!!.macAddr = mDeviceInfo.macAddress
             switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -226,7 +226,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
         if (switch != null) {
             var dbSwitch: DbSwitch? = DbSwitch()
-            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             dbSwitch!!.controlSceneId = getControlScene()
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
             dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -238,7 +238,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             var newMeshAdress: Int
             var dbSwitch: DbSwitch? = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             dbSwitch!!.controlSceneId = getControlScene()
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
             dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS

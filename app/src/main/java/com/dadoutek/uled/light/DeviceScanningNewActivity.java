@@ -114,7 +114,6 @@ import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 /**
  * Created by hejiajun on 2018/5/21.
  */
-
 public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     @BindView(R.id.toolbar)
@@ -920,6 +919,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
+
                 animationView.setVisibility(View.GONE);
 //                LeBluetooth.getInstance().stopScan();
 //                TelinkLightService.Instance().idleMode(true);
@@ -946,7 +946,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         e.printStackTrace();
                     }
                 }).start();
-//                connectDevice(bestRssiDevice.macAddress);
+                connectDevice(bestRssiDevice.macAddress);
+//                startScanTimeout();
             }
 
             //刷新Notify参数
@@ -956,6 +957,37 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             //开启自动刷新Notify
             TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
         }
+    }
+
+    private void startScanTimeout() {
+        Observable.timer(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Long>() {
+                            Disposable disposable;
+
+                            @Override
+                            public void onSubscribe(Disposable d) {
+                                disposable = d;
+                            }
+
+                            //updateMesh超时时间 50*200=10S
+                                @Override
+                                public void onNext(Long aLong) {
+//                                TelinkLightService.Instance().idleMode(false) ;     //use this stop scan
+                                    onLeScanTimeout();
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
     }
 
     private static final int TIME_OUT_CONNECT = 15;
@@ -1289,7 +1321,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
 //    @Override
-//    protected void onDestroy() {
+//    protected void onDestroy() {.
 //        super.onDestroy();
 //        for (int i = 0; i < mBlinkDisposables.size(); i++) {
 //            mBlinkDisposables.get(i).dispose();
@@ -1364,7 +1396,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
-            DeviceScanningNewActivity.DeviceItemHolder holder;
+            DeviceItemHolder holder;
 
             convertView = inflater.inflate(R.layout.device_item, null);
             ImageView icon = (ImageView) convertView

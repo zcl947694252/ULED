@@ -7,6 +7,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">#18B4ED</item>
+        <item name="colorControlNormal">@color/black_ee</item>
         <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:textColorSecondary">@color/secondary_text</item>
@@ -234,4 +235,22 @@
     <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">16sp</item>
     </style>
+
+    <declare-styleable name="VerCodeInputView">
+
+        <attr name="box" format="integer" />
+        <attr name="inputPadding" format="dimension"/>
+        <attr name="child_v_padding" format="dimension"/>
+        <attr name="inputWidth" format="dimension"/>
+        <attr name="child_height" format="dimension"/>
+        <attr name="padding" format="dimension"/>
+        <attr name="box_bg_focus" format="reference"/>
+        <attr name="box_bg_normal" format="reference"/>
+        <attr name="inputType" format="string"/>
+        <attr name="inputNum" format="integer"/>
+        <attr name="inputBg" format="reference"/>
+        <attr name="inputTxtColor" format="color|reference" />
+        <!--输入框文字大小-->
+        <attr name="inputTxtSize" format="dimension|reference" />
+    </declare-styleable>
 </resources>

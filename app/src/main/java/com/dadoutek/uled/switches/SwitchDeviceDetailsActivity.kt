@@ -388,6 +388,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         var rename = views.findViewById<TextView>(R.id.rename)
 
         rename.setOnClickListener(View.OnClickListener {
+            popupWindow.dismiss()
             val textGp = EditText(this)
             StringUtils.initEditTextFilter(textGp)
             textGp.setText(currentSwitch?.name)

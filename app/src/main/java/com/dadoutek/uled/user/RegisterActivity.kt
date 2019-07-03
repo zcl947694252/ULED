@@ -10,6 +10,7 @@ import android.os.Looper
 import android.os.Message
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -23,6 +24,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkFactory.md5
@@ -37,6 +39,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.hbb20.CCPCountry.setDialogTitle
 import com.hbb20.CountryCodePicker
+import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -45,6 +48,7 @@ import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_register.edit_user_password
 import kotlinx.android.synthetic.main.toolbar.*
+import org.json.JSONException
 import java.util.HashMap
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
@@ -165,8 +169,29 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
-            showLoadingDialog(getString(R.string.get_code_ing))
-            SMSSDK.getVerificationCode(countryCode, phoneNum)
+//            showLoadingDialog(getString(R.string.get_code_ing))
+            UpdateModel.isRegister(phoneNum)!!.subscribe(object : NetworkObserver<Any>() {
+                override fun onNext(s: Any) {
+                    val jsonObject = s.toString()
+                    Log.e("TAG_REGISTER", jsonObject)
+                    try {
+                        if (jsonObject == "true") {
+                            hideLoadingDialog()
+                            ToastUtil.showToast(this@RegisterActivity, getString(R.string.account_already_exist))
+                        } else {
+                            SMSSDK.getVerificationCode(countryCode, phoneNum)
+                        }
+
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    ToastUtils.showLong(R.string.get_server_version_fail)
+                }
+            })
         }
     }
 
@@ -219,10 +244,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
 //                            if(JsonUtil.isBadJson(a.toString())){
-                                val jsonObject = JSONObject(a.localizedMessage)
-                                val message = jsonObject.opt("detail").toString()
-                                ToastUtils.showLong(message)
-                                hideLoadingDialog()
+                            val jsonObject = JSONObject(a.localizedMessage)
+                            val message = jsonObject.opt("detail").toString()
+                            ToastUtils.showLong(message)
+                            hideLoadingDialog()
 //                            }
                         } else {
                             val a = (data as Throwable)

@@ -195,8 +195,8 @@ public interface RequestInterface {
     //添加渐变
     @POST("dynamic-change/add/{did}")
     Observable<Response<String>> addGradient(@Header("token") String token,
-                                          @Body RequestBody body,
-                                          @Path("did") int did);
+                                             @Body RequestBody body,
+                                             @Path("did") int did);
 
     //获取渐变列表
     @GET("dynamic-change/list")
@@ -205,8 +205,8 @@ public interface RequestInterface {
     //更新渐变
     @POST("dynamic-change/add/{did}")
     Observable<Response<String>> updateGradient(@Header("token") String token,
-                                             @Path("did") int did,
-                                             @Body RequestBody body);
+                                                @Path("did") int did,
+                                                @Body RequestBody body);
 
     //删除渐变
     @HTTP(method = "DELETE",path = "dynamic-change/remove",hasBody = true)
@@ -233,7 +233,7 @@ public interface RequestInterface {
 
     //获取下载链接
     @GET("api/ext/soybean/download/bin/{l1}/{l2}")
-    Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1,@Path("l2") int l2);
+    Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1, @Path("l2") int l2);
 
     //获取下载链接
     @GET("bin/download")
@@ -242,8 +242,8 @@ public interface RequestInterface {
     //添加开关
     @POST("switch/add/{lid}")
     Observable<Response<String>> addSwitch(@Header("token") String token,
-                                          @Body DbSwitchChild dbSwitch,
-                                          @Path("lid") int lid);
+                                           @Body DbSwitchChild dbSwitch,
+                                           @Path("lid") int lid);
 
     //获取开关列表
     @GET("switch/list")
@@ -252,15 +252,15 @@ public interface RequestInterface {
     //更新开关
     @POST("switch/add/{lid}")
     Observable<Response<String>> updateSwitch(@Header("token") String token,
-                                             @Path("lid") int lid,
-                                             @Body DbSwitchChild dbSwitch
+                                              @Path("lid") int lid,
+                                              @Body DbSwitchChild dbSwitch
     );
 
     //删除开关
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("switch/remove/{lid}")
     Observable<Response<String>> deleteSwitch(@Header("token") String token,
-                                             @Path("lid") int lid);
+                                              @Path("lid") int lid);
 
     //添加传感器
     @POST("sensor/add/{lid}")
@@ -288,8 +288,8 @@ public interface RequestInterface {
     //添加连接器
     @POST("relay/add/{lid}")
     Observable<Response<String>> addRely(@Header("token") String token,
-                                           @Body DbConnector dbConnector,
-                                           @Path("lid") int lid);
+                                         @Body DbConnector dbConnector,
+                                         @Path("lid") int lid);
 
     //获取连接器列表
     @GET("relay/list")
@@ -298,15 +298,15 @@ public interface RequestInterface {
     //更新连接器
     @POST("relay/add/{lid}")
     Observable<Response<String>> updateRely(@Header("token") String token,
-                                              @Path("lid") int lid,
-                                              @Body DbConnector dbConnector
+                                            @Path("lid") int lid,
+                                            @Body DbConnector dbConnector
     );
 
     //删除连接器
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("relay/remove/{lid}")
     Observable<Response<String>> deleteRely(@Header("token") String token,
-                                              @Path("lid") int lid);
+                                            @Path("lid") int lid);
 
     //添加窗帘
     @POST("curtain/add/{lid}")
@@ -335,4 +335,7 @@ public interface RequestInterface {
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)
     Observable<Response<Object>> isAvailavle(@Query("platform") int device,
                                              @Query("currentVersion") String version);
+
+    @GET("auth/isRegister")
+    Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);
 }

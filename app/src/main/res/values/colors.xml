@@ -31,4 +31,5 @@
     <color name="black_ee">#eeeeee</color>
     <color name="text_red">#ff0000</color>
     <color name="color_000000">#c8c8c8</color>
+    <color name="transparent">#00000000</color>
 </resources>
