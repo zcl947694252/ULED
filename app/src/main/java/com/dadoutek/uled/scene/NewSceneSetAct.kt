@@ -810,6 +810,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.deviceType = 0x05
                     sceneActions.isOn = itemGroups.get(i).isNo
 
+                    nameList.add(itemGroups.get(i).groupAress)
                     DBUtils.saveSceneActions(sceneActions)
                 } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
                     sceneActions.belongSceneId = idAction
@@ -819,7 +820,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.setColor(itemGroups.get(i).color)
 
                     sceneActions.deviceType = 0x06
-
+                    nameList.add(itemGroups.get(i).groupAress)
                     DBUtils.saveSceneActions(sceneActions)
                 }else {
                     sceneActions.belongSceneId = idAction

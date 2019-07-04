@@ -67,6 +67,7 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
+import com.rxjava.rxlife.RxLife;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -266,14 +267,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 this.updateList.remove(nowLightList.get(j));
                 nowLightList.get(j).selected = false;
                 stopBlink(nowLightList.get(j));
-            if ((!isSelectLight()) && isAllLightsGrouped()) {
-                btnAddGroups.setText(R.string.complete);
+                if ((!isSelectLight()) && isAllLightsGrouped()) {
+                    btnAddGroups.setText(R.string.complete);
+                }
             }
-        }
 
-        this.adapter.notifyDataSetChanged();
+            this.adapter.notifyDataSetChanged();
+        }
     }
-}
 
     private boolean hasGroup() {
         if (groups.size() == -1) {
@@ -370,9 +371,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
 
     private Disposable createConnectTimeout() {
-        return Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        return Observable.timer(20, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-//                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();
                     mConnectTimer = null;
                 });
@@ -397,7 +398,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         autoConnect();
         //倒计时10s，出问题了就超时。
         mConnectTimer = createConnectTimeout();
-
 
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText(R.string.start_group_bt);
@@ -792,18 +792,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_select_all:
-                    if (isSelectAll) {
-                        isSelectAll = false;
-                        item.setTitle(R.string.select_all);
-                    } else {
-                        isSelectAll = true;
-                        item.setTitle(R.string.cancel);
-                    }
-                    isSelectAll();
-                    break;
-            }
+        switch (item.getItemId()) {
+            case R.id.menu_select_all:
+                if (isSelectAll) {
+                    isSelectAll = false;
+                    item.setTitle(R.string.select_all);
+                } else {
+                    isSelectAll = true;
+                    item.setTitle(R.string.cancel);
+                }
+                isSelectAll();
+                break;
+        }
         return false;
     }
 
@@ -946,7 +946,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                         e.printStackTrace();
                     }
                 }).start();
-                connectDevice(bestRssiDevice.macAddress);
+//                connectDevice(bestRssiDevice.macAddress);
 //                startScanTimeout();
             }
 
@@ -960,34 +960,43 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void startScanTimeout() {
-        Observable.timer(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .subscribe(
-                        new Observer<Long>() {
-                            Disposable disposable;
+//        Observable.timer(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+//                .subscribe(
+//                        new Observer<Long>() {
+//                            Disposable disposable;
+//
+//                            @Override
+//                            public void onSubscribe(Disposable d) {
+//                                disposable = d;
+//                            }
+//
+//                            //updateMesh超时时间 50*200=10S
+//                                @Override
+//                                public void onNext(Long aLong) {
+////                                TelinkLightService.Instance().idleMode(false) ;     //use this stop scan
+//                                    onLeScanTimeout();
+//                                }
+//
+//                                @Override
+//                                public void onError(Throwable e) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//
+//                            }
+//                        }
+//                );
+        Observable.timer(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS)
+                .as(RxLife.as(this))
+                .subscribe(aLong -> {
+                    LeScanTimeOut();
+                });
+    }
 
-                            @Override
-                            public void onSubscribe(Disposable d) {
-                                disposable = d;
-                            }
-
-                            //updateMesh超时时间 50*200=10S
-                                @Override
-                                public void onNext(Long aLong) {
-//                                TelinkLightService.Instance().idleMode(false) ;     //use this stop scan
-                                    onLeScanTimeout();
-                                }
-
-                                @Override
-                                public void onError(Throwable e) {
-
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        }
-                );
+    private void LeScanTimeOut() {
+        hideLoadingDialog();
     }
 
     private static final int TIME_OUT_CONNECT = 15;
