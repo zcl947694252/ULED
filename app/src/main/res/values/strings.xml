@@ -751,4 +751,11 @@
     <string name="please_your_password">Please enter your login password</string>
     <string name="password_you_set_again">Please confirm the login password you set again.</string>
     <string name="password_you_set">Please enter the login password you set.</string>
+    <string name="equipment_quantity">Equipment Quantity：</string>
+    <string name="use_the_works">Use Network</string>
+    <string name="delete_network">Delete Network</string>
+    <string name="share_network">Share Network</string>
+    <string name="update_name">Update Name</string>
+    <string name="current_account">Current account</string>
+    <string name="all">All</string>
 </resources>

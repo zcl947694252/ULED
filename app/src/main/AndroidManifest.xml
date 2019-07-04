@@ -33,8 +33,9 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".user.EnterPasswordActivity"/>
-        <activity android:name=".user.AgainEnterPasswordActivity"/>
+        <activity android:name=".othersview.NetworkActivity"></activity>
+        <activity android:name=".user.EnterPasswordActivity" />
+        <activity android:name=".user.AgainEnterPasswordActivity" />
         <activity
             android:name=".othersview.InstructionsForUsActivity"
             android:screenOrientation="portrait" />

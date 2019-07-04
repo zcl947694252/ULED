@@ -698,7 +698,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
-                            scanPb?.visibility = View.GONE
+//                            scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
@@ -856,11 +856,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 login()
         } else {
             TelinkLightService.Instance().idleMode(true)
-            if (!scanPb.isShown) {
+//            if (!scanPb.isShown) {
                 retryConnectCount = 0
                 connectFailedDeviceMacList.clear()
                 startScan()
-            }
+//            }
 
         }
     }

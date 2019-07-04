@@ -685,4 +685,11 @@
     <string name="please_your_password">请输入您的登陆密码</string>
     <string name="password_you_set_again">请再次确认您设置的登录密码</string>
     <string name="password_you_set">请输入您设置的登录密码</string>
+    <string name="equipment_quantity">设备数量：</string>
+    <string name="use_the_works">使用网络</string>
+    <string name="delete_network">删除网络</string>
+    <string name="share_network">分享网络</string>
+    <string name="update_name">修改名称</string>
+    <string name="current_account">当前账号</string>
+    <string name="all">全部</string>
 </resources>
