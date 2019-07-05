@@ -73,6 +73,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     private val MODE_SWITCH_MODE_GRADIENT = 4
 
     private var isUpdate: String? = null
+
+    private var triggerLux: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_light_light)
@@ -89,6 +91,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         spSwitchMode.onItemSelectedListener = this
         sp_SwitchMode.onItemSelectedListener = this
         sp_DelayUnit.onItemSelectedListener = this
+        spTrigger_lux.onItemSelectedListener = this
         secondsList = resources.getStringArray(R.array.light_light_time_list)
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, secondsList)
         spDelay.adapter = adapter
@@ -300,8 +303,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
 
         showCheckListData!!.clear()
 
-        for(i in lightGroup.indices){
-            if(lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN){
+        for (i in lightGroup.indices) {
+            if (lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN) {
                 showCheckListData!!.add(lightGroup[i])
             }
         }
@@ -367,7 +370,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                 switchMode.toByte(), 0x00, 0x00,
                 tiet_Delay.text.toString().toInt().toByte(),
                 tietMinimumBrightness.text.toString().toInt().toByte(),
-                0x00,
+                triggerLux.toByte(),
                 mode.toByte()
         )
         val paramBytesGroup: ByteArray
@@ -408,7 +411,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             R.id.spDelay -> {
                 val time = getTime(spDelay.selectedItem as String)
                 if (position > 4) {
-                    selectTime = time*60
+                    selectTime = time * 60
                     modeDelayUnit = MODE_DELAY_UNIT_MINUTE
                 } else {
                     selectTime = time
@@ -454,6 +457,23 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                 } else {
                     til_Delay.hint = getString(R.string.delay_seconds)
                     modeDelayUnit = MODE_DELAY_UNIT_SECONDS
+                }
+            }
+
+            R.id.spTrigger_lux -> {
+                when (position) {
+                    0 -> {
+                        triggerLux = 0
+                    }
+                    1 -> {
+                        triggerLux = 2
+                    }
+                    2 -> {
+                        triggerLux = 10
+                    }
+                    3 -> {
+                        triggerLux = 50
+                    }
                 }
             }
         }
