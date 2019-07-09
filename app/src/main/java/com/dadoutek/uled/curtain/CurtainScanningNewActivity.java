@@ -352,7 +352,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
 
     private Disposable createConnectTimeout() {
-        return Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        return Observable.timer(20, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
 //                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();
@@ -903,7 +903,8 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 //连接，如断开会自动重连
                 new Thread(() -> {
                     try {
-                        Thread.sleep(300);
+
+                        Thread.sleep(200);
                         TelinkLightService.Instance().autoConnect(connectParams);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
