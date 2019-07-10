@@ -356,6 +356,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 .subscribe(aLong -> {
 //                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();
+                    TelinkLightService.Instance().idleMode(true);
                     mConnectTimer = null;
                 });
     }
