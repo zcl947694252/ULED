@@ -352,7 +352,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
 
     private Disposable createConnectTimeout() {
-        return Observable.timer(20, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        return Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
 //                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();

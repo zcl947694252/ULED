@@ -30,6 +30,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         public final static Property InstallMesh = new Property(3, String.class, "installMesh", false, "INSTALL_MESH");
         public final static Property InstallMeshPwd = new Property(4, String.class, "installMeshPwd", false, "INSTALL_MESH_PWD");
         public final static Property BelongAccount = new Property(5, String.class, "belongAccount", false, "BELONG_ACCOUNT");
+        public final static Property Name = new Property(6, String.class, "name", false, "NAME");
     }
 
 
@@ -50,7 +51,8 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
                 "\"CONTROL_MESH_PWD\" TEXT," + // 2: controlMeshPwd
                 "\"INSTALL_MESH\" TEXT," + // 3: installMesh
                 "\"INSTALL_MESH_PWD\" TEXT," + // 4: installMeshPwd
-                "\"BELONG_ACCOUNT\" TEXT);"); // 5: belongAccount
+                "\"BELONG_ACCOUNT\" TEXT," + // 5: belongAccount
+                "\"NAME\" TEXT);"); // 6: name
     }
 
     /** Drops the underlying database table. */
@@ -92,6 +94,11 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         if (belongAccount != null) {
             stmt.bindString(6, belongAccount);
         }
+ 
+        String name = entity.getName();
+        if (name != null) {
+            stmt.bindString(7, name);
+        }
     }
 
     @Override
@@ -127,6 +134,11 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         if (belongAccount != null) {
             stmt.bindString(6, belongAccount);
         }
+ 
+        String name = entity.getName();
+        if (name != null) {
+            stmt.bindString(7, name);
+        }
     }
 
     @Override
@@ -142,7 +154,8 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // controlMeshPwd
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // installMesh
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // installMeshPwd
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5) // belongAccount
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // belongAccount
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6) // name
         );
         return entity;
     }
@@ -155,6 +168,7 @@ public class DbRegionDao extends AbstractDao<DbRegion, Long> {
         entity.setInstallMesh(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setInstallMeshPwd(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
         entity.setBelongAccount(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setName(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
      }
     
     @Override

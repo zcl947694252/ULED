@@ -63,7 +63,7 @@ import kotlinx.android.synthetic.main.toolbar.*
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment : BaseFragment(),View.OnClickListener {
+class MeFragment : BaseFragment(), View.OnClickListener {
     private var inflater: LayoutInflater? = null
 
     private var mApplication: TelinkLightApplication? = null
@@ -207,32 +207,32 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
         val blueadapter = BluetoothAdapter.getDefaultAdapter()
         if (blueadapter?.isEnabled == false) {
-            if(bluetooth_image!=null){
+            if (bluetooth_image != null) {
                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                 bluetooth_image.isEnabled = true
                 bluetooth_image.setOnClickListener(View.OnClickListener {
-                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                    var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                     dialog.show()
                 })
             }
 
-        }else{
-           if (TelinkLightApplication.getInstance().connectDevice == null) {
-               if(bluetooth_image!=null){
-                   bluetooth_image.setImageResource(R.drawable.bluetooth_no)
-                   bluetooth_image.isEnabled = true
-                   bluetooth_image.setOnClickListener(View.OnClickListener {
-                       var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
-                       dialog.show()
-                   })
-               }
-                }else{
-               if(bluetooth_image!=null){
-                   bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
-                   bluetooth_image.isEnabled = false
-               }
-
+        } else {
+            if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (bluetooth_image != null) {
+                    bluetooth_image.setImageResource(R.drawable.bluetooth_no)
+                    bluetooth_image.isEnabled = true
+                    bluetooth_image.setOnClickListener(View.OnClickListener {
+                        var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
+                        dialog.show()
+                    })
                 }
+            } else {
+                if (bluetooth_image != null) {
+                    bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                    bluetooth_image.isEnabled = false
+                }
+
+            }
         }
     }
 
@@ -251,7 +251,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         }
     }
 
-    fun initClick(){
+    fun initClick() {
         chearCache?.setOnClickListener(this)
         updateIte?.setOnClickListener(this)
         copyDataBase?.setOnClickListener(this)
@@ -302,17 +302,17 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
             when (action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
-                    if(bluetooth_image!=null) {
+                    if (bluetooth_image != null) {
                         bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
                         bluetooth_image.isEnabled = false
                     }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
-                    if(bluetooth_image!=null){
+                    if (bluetooth_image != null) {
                         bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                         bluetooth_image.isEnabled = true
                         bluetooth_image.setOnClickListener(View.OnClickListener {
-                            var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                            var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                             dialog.show()
                         })
                     }
@@ -321,17 +321,17 @@ class MeFragment : BaseFragment(),View.OnClickListener {
                     val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
                     when (blueState) {
                         BluetoothAdapter.STATE_OFF -> {
-                            if(bluetooth_image!=null) {
+                            if (bluetooth_image != null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                                 bluetooth_image.isEnabled = true
                                 bluetooth_image.setOnClickListener(View.OnClickListener {
-                                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                                    var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                                     dialog.show()
                                 })
                             }
                         }
                         BluetoothAdapter.STATE_ON -> {
-                            if(bluetooth_image!=null) {
+                            if (bluetooth_image != null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
                                 bluetooth_image.isEnabled = false
                             }
@@ -388,8 +388,8 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.resetAllGroup -> gotoResetAllGroup()
-            R.id.instructions ->{
-                var intent = Intent(activity,InstructionsForUsActivity::class.java)
+            R.id.instructions -> {
+                var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
             }
         }
@@ -400,20 +400,20 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     }
 
     private fun showResetSelectTypeDialog() {
-        val intent = Intent(activity,DeviceResetGroupActivity::class.java)
-        val builder:AlertDialog.Builder=AlertDialog.Builder(activity)
+        val intent = Intent(activity, DeviceResetGroupActivity::class.java)
+        val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
         builder.setMessage(getString(R.string.please_select_light_type))
         builder.setPositiveButton(R.string.rgb_light) { dialog, which ->
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,true)
-            startActivityForResult(intent,Activity.RESULT_OK)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            startActivityForResult(intent, Activity.RESULT_OK)
         }
         builder.setNeutralButton(R.string.cancel) { dialog, which ->
 
         }
         builder.setNegativeButton(R.string.normal_light) { dialog, which ->
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT,false)
-            startActivityForResult(intent,Activity.RESULT_OK)
-            Log.d("","")
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+            startActivityForResult(intent, Activity.RESULT_OK)
+            Log.d("", "")
         }
         builder.create().show()
     }
@@ -423,8 +423,8 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         builder.setTitle(getString(R.string.show_guide_again_tip))
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
         builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-           GuideUtils.resetAllGuide(activity!!)
-            activity?.bnve?.currentItem=0
+            GuideUtils.resetAllGuide(activity!!)
+            activity?.bnve?.currentItem = 0
         }
         val dialog = builder.create()
         dialog.show()
@@ -468,32 +468,32 @@ class MeFragment : BaseFragment(),View.OnClickListener {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, true)
         val lightList = allLights
-        val curtainList=allCutain
+        val curtainList = allCutain
         val relyList = allRely
-        var meshAdre= ArrayList<Int>()
-        if(lightList.size>0){
-            for(k in lightList.indices){
+        var meshAdre = ArrayList<Int>()
+        if (lightList.size > 0) {
+            for (k in lightList.indices) {
                 meshAdre.add(lightList[k].meshAddr)
             }
         }
 
-        if(curtainList.size>0){
-            for(k in curtainList.indices){
+        if (curtainList.size > 0) {
+            for (k in curtainList.indices) {
                 meshAdre.add(curtainList[k].meshAddr)
             }
         }
 
-        if(relyList.size>0){
-            for(k in relyList.indices){
+        if (relyList.size > 0) {
+            for (k in relyList.indices) {
                 meshAdre.add(relyList[k].meshAddr)
             }
         }
 
-        if(meshAdre.size>0){
+        if (meshAdre.size > 0) {
             Commander.resetLights(meshAdre, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
-                activity?.bnve?.currentItem=0
+                activity?.bnve?.currentItem = 0
                 null
             }, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
@@ -501,7 +501,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
             })
         }
 
-        if(meshAdre.isEmpty()){
+        if (meshAdre.isEmpty()) {
             hideLoadingDialog()
 //            ToastUtils.showLong(R.string.successful_resumption)
         }
@@ -553,7 +553,7 @@ class MeFragment : BaseFragment(),View.OnClickListener {
 
     private fun exitLogin() {
         isClickExlogin = true
-        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size==0 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.size == 0 && !DBUtils.dataChangeAllHaveAboutRelay) {
+        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size == 0 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.size == 0 && !DBUtils.dataChangeAllHaveAboutRelay) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                 TelinkLightService.Instance().disconnect()
@@ -569,40 +569,60 @@ class MeFragment : BaseFragment(),View.OnClickListener {
     }
 
 
-
-
     private fun developerMode() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
-        if(isBoolean){
-            //将mHints数组内的所有元素左移一个位置
-            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-            //获得当前系统已经启动的时间
-            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-                ToastUtils.showLong(R.string.developer_mode_close)
-//                copyDataBase!!.visibility = View.GONE
-//                chearCache!!.visibility = View.GONE
-//                resetAllGroup.visibility = View.GONE
-                //开发者模式启动时启动LOG日志
-                LogUtils.getConfig().setLog2FileSwitch(false)
-                LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                SharedPreferencesUtils.setDeveloperModel(false)
-            }
-        }else{
-            //将mHints数组内的所有元素左移一个位置
-            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-            //获得当前系统已经启动的时间
-            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-                ToastUtils.showLong(R.string.developer_mode)
-//                copyDataBase!!.visibility = View.VISIBLE
-//                chearCache!!.visibility = View.VISIBLE
-//                resetAllGroup.visibility=View.VISIBLE
-                //开发者模式启动时启动LOG日志
-                LogUtils.getConfig().setLog2FileSwitch(true)
-                LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                SharedPreferencesUtils.setDeveloperModel(true)
-            }
+//        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+////        if(isBoolean){
+////            //将mHints数组内的所有元素左移一个位置
+////            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+////            //获得当前系统已经启动的时间
+////            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+////            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+////                ToastUtils.showLong(R.string.developer_mode_close)
+//////                copyDataBase!!.visibility = View.GONE
+//////                chearCache!!.visibility = View.GONE
+//////                resetAllGroup.visibility = View.GONE
+////                //开发者模式启动时启动LOG日志
+////                LogUtils.getConfig().setLog2FileSwitch(false)
+////                LogUtils.getConfig().setDir(LOG_PATH_DIR)
+////                SharedPreferencesUtils.setDeveloperModel(false)
+////            }
+////        }else{
+////            //将mHints数组内的所有元素左移一个位置
+////            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+////            //获得当前系统已经启动的时间
+////            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+////            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+////                ToastUtils.showLong(R.string.developer_mode)
+//////                copyDataBase!!.visibility = View.VISIBLE
+//////                chearCache!!.visibility = View.VISIBLE
+//////                resetAllGroup.visibility=View.VISIBLE
+////                //开发者模式启动时启动LOG日志
+////                LogUtils.getConfig().setLog2FileSwitch(true)
+////                LogUtils.getConfig().setDir(LOG_PATH_DIR)
+////                SharedPreferencesUtils.setDeveloperModel(true)
+////            }
+////        }
+
+        System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
+        mHints[mHints.size - 1] = SystemClock.uptimeMillis()
+        if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
+            val alertDialog = AlertDialog.Builder(activity)
+                    .setTitle(R.string.developer_mode_on)
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .setPositiveButton(getString(R.string.open_mode)) { dialog, which ->
+                        LogUtils.getConfig().setLog2FileSwitch(true)
+                        LogUtils.getConfig().setDir(LOG_PATH_DIR)
+                        SharedPreferencesUtils.setDeveloperModel(true)
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
+                        LogUtils.getConfig().setLog2FileSwitch(false)
+                        LogUtils.getConfig().setDir(LOG_PATH_DIR)
+                        SharedPreferencesUtils.setDeveloperModel(false)
+                        dialog.dismiss()
+                    }.create()
+            alertDialog.setCancelable(false)
+            alertDialog.show()
         }
     }
 

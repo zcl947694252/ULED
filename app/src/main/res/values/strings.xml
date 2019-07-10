@@ -758,4 +758,7 @@
     <string name="update_name">Update Name</string>
     <string name="current_account">Current account</string>
     <string name="all">All</string>
+    <string name="developer_mode_on">Whether to turn developer mode on/off</string>
+    <string name="open_mode">open</string>
+    <string name="close_mode">close</string>
 </resources>

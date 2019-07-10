@@ -692,4 +692,7 @@
     <string name="update_name">修改名称</string>
     <string name="current_account">当前账号</string>
     <string name="all">全部</string>
+    <string name="developer_mode_on">是否开启/关闭开发者模式</string>
+    <string name="open_mode">开启</string>
+    <string name="close_mode">关闭</string>
 </resources>
