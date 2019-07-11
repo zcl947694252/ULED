@@ -175,7 +175,7 @@ public class Peripheral extends BluetoothGattCallback {
                 int connState = this.mConnState.get();
                 if (connState == CONN_STATE_CONNECTED) {
                     this.gatt.disconnect();
-                    this.gatt.close();
+//                    this.gatt.close();
                     this.mConnState.set(CONN_STATE_DISCONNECTING);
                 } else {
                     this.gatt.disconnect();

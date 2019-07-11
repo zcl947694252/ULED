@@ -278,7 +278,7 @@
     <string name="network_time_out">Network connection timed out, please try again.</string>
     <string name="delete_light_confirm">Confirm the light reset?</string>
     <string name="delete_group_confirm">Confirm delete this group?</string>
-    <string name="phone_or_password_can_not_be_empty">Phone number or password cannot be empty!</string>
+    <string name="phone_or_password_can_not_be_empty">Phone number cannot be empty!</string>
     <string name="reconnecting">Reconnecting…</string>
     <string name="app_version_name">Version:</string>
     <string name="group_not_change_tip">Group unchanged, determine to exit?</string>
@@ -761,4 +761,5 @@
     <string name="developer_mode_on">Whether to turn developer mode on/off</string>
     <string name="open_mode">open</string>
     <string name="close_mode">close</string>
+    <string name="password_cannot">Password cannot be empty</string>
 </resources>

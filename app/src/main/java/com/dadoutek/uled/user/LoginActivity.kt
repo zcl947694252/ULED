@@ -56,10 +56,7 @@ import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.LogUtils
-import com.dadoutek.uled.util.OtherUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.util.*
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.xiaomi.market.sdk.Log
 import com.xiaomi.market.sdk.XiaomiUpdateAgent
@@ -462,6 +459,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }
+
+//        if(!StringUtils.isTrimEmpty(phone)){
+//            val intent = Intent(this,EnterPasswordActivity::class.java)
+//            intent.putExtra(Constant.USER_TYPE,Constant.TYPE_LOGIN)
+//            intent.putExtra("phone",phone)
+//            startActivity(intent)
+//        }else{
+//            ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
+//        }
     }
 
     var isSuccess: Boolean = true

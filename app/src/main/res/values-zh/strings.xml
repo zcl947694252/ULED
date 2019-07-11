@@ -276,7 +276,7 @@
     <string name="delete_light_confirm">确定恢复出厂设置？</string>
 
     <string name="delete_group_confirm">确定删除此组吗？</string>
-    <string name="phone_or_password_can_not_be_empty">手机号或密码不能为空</string>
+    <string name="phone_or_password_can_not_be_empty">手机号不能为空</string>
     <string name="reconnecting">重连中……</string>
     <string name="app_version_name">版本:</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
@@ -695,4 +695,5 @@
     <string name="developer_mode_on">是否开启/关闭开发者模式</string>
     <string name="open_mode">开启</string>
     <string name="close_mode">关闭</string>
+    <string name="password_cannot">密码不能为空</string>
 </resources>
