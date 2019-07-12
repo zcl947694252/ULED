@@ -940,7 +940,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 //连接，如断开会自动重连
                 new Thread(() -> {
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(300);
                         TelinkLightService.Instance().autoConnect(connectParams);
                         LogUtils.d("autoConnect");
                     } catch (InterruptedException e) {

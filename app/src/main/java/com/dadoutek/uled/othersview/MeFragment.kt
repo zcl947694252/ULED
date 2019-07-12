@@ -16,14 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import com.app.hubert.guide.NewbieGuide
-import com.app.hubert.guide.core.Controller
-import com.app.hubert.guide.model.GuidePage
 
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
@@ -41,11 +33,9 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 
 import java.util.ArrayList
@@ -56,7 +46,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
-import kotlinx.android.synthetic.main.toolbar.*
 
 
 /**
@@ -263,6 +252,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 //        showGuideAgain?.setOnClickListener(this)
         resetAllGroup?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
+        region?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -390,6 +380,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             R.id.resetAllGroup -> gotoResetAllGroup()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.region -> {
+                var intent = Intent(activity, HumanBodySensorActivity::class.java)
                 startActivity(intent)
             }
         }

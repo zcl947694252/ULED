@@ -15,6 +15,7 @@ import com.dadoutek.uled.light.ConfigNightlightActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -334,13 +335,13 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
                 startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
             } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-                startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!,"update" to "1")
+                startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!,"update" to "1")
             }
         }else{
             if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
                 startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
             } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-                startActivity<ConfigNightlightActivity>("deviceInfo" to mDeviceInfo!!,"update" to "0")
+                startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!,"update" to "0")
             }
         }
 

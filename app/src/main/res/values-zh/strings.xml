@@ -696,4 +696,16 @@
     <string name="open_mode">开启</string>
     <string name="close_mode">关闭</string>
     <string name="password_cannot">密码不能为空</string>
+    <string name="any_environment">任意环境</string>
+    <string name="dark_environment">较暗环境</string>
+    <string name="very_dark_environment">很暗环境</string>
+    <string name="light_on">触发时开灯</string>
+    <string name="light_off">触发时关灯</string>
+    <string name="minute">分钟</string>
+    <string name="second">秒</string>
+    <string name="moment">瞬间</string>
+    <string name="gradient">渐变</string>
+    <string name="human_body">人体感应器</string>
+    <string name="custom_brightness">自定义亮度</string>
+    <string name="target_brightness">请输入目标亮度</string>
 </resources>

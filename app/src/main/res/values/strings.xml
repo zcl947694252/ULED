@@ -762,4 +762,23 @@
     <string name="open_mode">open</string>
     <string name="close_mode">close</string>
     <string name="password_cannot">Password cannot be empty</string>
+
+    <string name="any_environment">Any environment</string>
+    <string name="dark_environment">Dark environment</string>
+    <string name="very_dark_environment">Very dark environment</string>
+
+    <string name="light_on">Turn on </string>
+    <string name="light_off">Turn off </string>
+
+    <string name="minute">Min</string>
+    <string name="second">Sec</string>
+
+    <string name="moment">Instant</string>
+    <string name="gradient">Gradient</string>
+
+    <string name="human_body">Sensor</string>
+
+    <string name="custom_brightness">Custom brightness</string>
+
+    <string name="target_brightness">Please enter the target brightness</string>
 </resources>

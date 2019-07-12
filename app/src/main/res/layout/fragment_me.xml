@@ -523,6 +523,47 @@
 
             </RelativeLayout>
 
+
+            <RelativeLayout
+                android:id="@+id/region"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@color/white"
+                android:foreground="?android:attr/selectableItemBackground"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:src="@drawable/icon_on"
+                    android:layout_centerVertical="true"
+                    />
+
+                <TextView
+                    android:id="@+id/VersionText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/light_version"
+                    android:textColor="@color/black_e"
+                    android:textSize="13sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="38dp"
+                    />
+
+                <TextView
+                    android:id="@+id/Version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1.0.0"
+                    android:textColor="@color/primary"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="23dp"
+                    android:layout_centerVertical="true"
+                    android:textSize="13sp" />
+
+            </RelativeLayout>
+
             <!--<RelativeLayout-->
                 <!--android:id="@+id/showGuideAgain"-->
                 <!--android:layout_width="match_parent"-->

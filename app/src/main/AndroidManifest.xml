@@ -33,7 +33,11 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".othersview.NetworkActivity"></activity>
+        <activity android:name=".othersview.HumanBodySensorActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan"
+            />
+        <activity android:name=".othersview.NetworkActivity" />
         <activity android:name=".user.EnterPasswordActivity" />
         <activity android:name=".user.AgainEnterPasswordActivity" />
         <activity
