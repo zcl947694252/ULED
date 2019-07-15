@@ -789,4 +789,15 @@
     <string name="choose_group">Choose group :</string>
     <string name="brightness_cannot">Brightness cannot be zero</string>
     <string name="brightness_cannot_be_greater_than">Brightness cannot be greater than 100</string>
+    <string name="delay_time_unit">Delay time unit :</string>
+    <string name="ten_second">10s</string>
+    <string name="twenty_second">20s</string>
+    <string name="thirty_second">30s</string>
+    <string name="forty_second">40s</string>
+    <string name="fifty_second">50s</string>
+    <string name="one_minute">1min</string>
+    <string name="two_minute">2min</string>
+    <string name="three_minute">3min</string>
+    <string name="four_minute">4min</string>
+    <string name="five_minute">5min</string>
 </resources>

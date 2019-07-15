@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="任意环境"
+            android:text="@string/any_environment"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="较暗环境"
+            android:text="@string/dark_environment"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -67,7 +67,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="很暗环境"
+            android:text="@string/very_dark_environment"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="触发时开灯"
+            android:text="@string/light_on"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -40,7 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="触发时关灯"
+            android:text="@string/light_off"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -63,7 +63,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="自定义亮度"
+            android:text="@string/custom_brightness"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

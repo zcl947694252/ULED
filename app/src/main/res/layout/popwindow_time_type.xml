@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="分钟"
+            android:text="@string/minute"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -40,7 +40,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="秒"
+            android:text="@string/second"
             android:textColor="@color/black_three"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"

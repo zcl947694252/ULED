@@ -715,4 +715,15 @@
     <string name="choose_group">选&#160;&#160;&#160;择&#160;&#160;&#160;分&#160;&#160;&#160;组&#160;&#160;&#160;&#160;:</string>
     <string name="brightness_cannot">亮度不能为0</string>
     <string name="brightness_cannot_be_greater_than">亮度不能大于100</string>
+    <string name="delay_time_unit">延时时间单位</string>
+    <string name="ten_second">10秒</string>
+    <string name="twenty_second">20秒</string>
+    <string name="thirty_second">30秒</string>
+    <string name="forty_second">40秒</string>
+    <string name="fifty_second">50秒</string>
+    <string name="one_minute">1分钟</string>
+    <string name="two_minute">2分钟</string>
+    <string name="three_minute">3分钟</string>
+    <string name="four_minute">4分钟</string>
+    <string name="five_minute">5分钟</string>
 </resources>
