@@ -65,7 +65,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private val CMD_CLOSE_LIGHT = 0X00
     private val CMD_CONTROL_GROUP = 0X02
 
-    private var switchMode = 0X00
+    private var switchMode = 0X01
     lateinit var secondsList: Array<String>
     private var selectTime = 0
     private var currentPageIsEdit = false
@@ -273,12 +273,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                                 var brin = textGp.text.toString().toInt()
 
                                 if (brin == 0) {
-                                    ToastUtil.showToast(this, "亮度不能为0")
+                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot))
                                     return@setPositiveButton
                                 }
 
                                 if (brin > 100) {
-                                    ToastUtil.showToast(this, "亮度不能大于100")
+                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot_be_greater_than))
                                     return@setPositiveButton
                                 }
 

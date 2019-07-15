@@ -708,4 +708,11 @@
     <string name="human_body">人体感应器</string>
     <string name="custom_brightness">自定义亮度</string>
     <string name="target_brightness">请输入目标亮度</string>
+    <string name="triggering_conditions">触&#160;&#160;&#160;发&#160;&#160;&#160;条&#160;&#160;&#160;件&#160;&#160;&#160;:</string>
+    <string name="trigger_after">触&#160;&#160;&#160;&#160;&#160;发&#160;&#160;&#160;&#160;&#160;后&#160;&#160;&#160;&#160;&#160;&#160;:</string>
+    <string name="overtime_time">超&#160;&#160;&#160;时&#160;&#160;&#160;时&#160;&#160;&#160;间&#160;&#160;&#160;:</string>
+    <string name="light_open_mode">亮度变化方式&#160;&#160;&#160;&#160;:</string>
+    <string name="choose_group">选&#160;&#160;&#160;择&#160;&#160;&#160;分&#160;&#160;&#160;组&#160;&#160;&#160;&#160;:</string>
+    <string name="brightness_cannot">亮度不能为0</string>
+    <string name="brightness_cannot_be_greater_than">亮度不能大于100</string>
 </resources>

@@ -781,4 +781,12 @@
     <string name="custom_brightness">Custom brightness</string>
 
     <string name="target_brightness">Please enter the target brightness</string>
+
+    <string name="triggering_conditions">Triggering conditions :</string>
+    <string name="trigger_after">Trigger after :</string>
+    <string name="overtime_time">Overtime time :</string>
+    <string name="light_open_mode">Light-open mode :</string>
+    <string name="choose_group">Choose group :</string>
+    <string name="brightness_cannot">Brightness cannot be zero</string>
+    <string name="brightness_cannot_be_greater_than">Brightness cannot be greater than 100</string>
 </resources>
