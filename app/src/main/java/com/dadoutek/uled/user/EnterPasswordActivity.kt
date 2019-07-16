@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -39,7 +41,8 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_password)
-        type = intent.extras!!.getString(Constant.TYPE_USER)
+        type = intent.extras!!.getString("USER_TYPE")
+        ToastUtils.showLong(type)
         initViewType()
         initView()
     }
@@ -49,10 +52,11 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener {
             Constant.TYPE_FORGET_PASSWORD -> {
 
             }
-            Constant.TYPE_LOGIN -> {
+                Constant.TYPE_LOGIN -> {
                 dbUser = DbUser()
                 phone = intent.extras!!.getString("phone")
             }
+
             Constant.TYPE_REGISTER -> {
                 dbUser = DbUser()
                 phone = intent.extras!!.getString("phone")
@@ -84,6 +88,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener {
             }
 
             R.id.btn_login -> {
+                LogUtil.e("login phonetype="+type)
                 when (type) {
                     Constant.TYPE_LOGIN -> login()
 
@@ -121,9 +126,11 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun login() {
+        LogUtil.e("login phone="+phone)
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
+            LogUtil.e("login phone="+phone+"==="+editPassWord+"---"+dbUser!!.channel)
             AccountModel.login(phone!!, editPassWord!!, dbUser!!.channel)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
@@ -132,9 +139,10 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener {
                             SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
 //                            hideLoadingDialog()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-//                            showLoadingDialog(getString(R.string.sync_now))
+                           showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
+                            LogUtils.d("logging: " + "登录成功" + dbUser.name)
                         }
 
                         override fun onError(e: Throwable) {

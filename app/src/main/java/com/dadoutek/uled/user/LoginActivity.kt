@@ -235,11 +235,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.sms_password_login -> verificationCode()
             R.id.linearLayout_1 -> {
                 list_phone.visibility = View.GONE
-                edit_user_password.visibility = View.VISIBLE
+                edit_user_password.visibility = View.GONE
                 btn_login.visibility = View.VISIBLE
                 btn_register.visibility = View.VISIBLE
-                forget_password.visibility = View.VISIBLE
-                eye_btn.visibility = View.VISIBLE
+                forget_password.visibility = View.GONE
+                eye_btn.visibility = View.GONE
                 sms_password_login.visibility = View.VISIBLE
                 third_party_text.visibility = View.VISIBLE
                 qq_btn.visibility = View.VISIBLE
@@ -305,11 +305,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             date_phone.setImageResource(R.drawable.icon_up)
         } else {
             list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.VISIBLE
+            edit_user_password.visibility = View.GONE
             btn_login.visibility = View.VISIBLE
             btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.VISIBLE
-            eye_btn.visibility = View.VISIBLE
+            forget_password.visibility = View.GONE
+            eye_btn.visibility = View.GONE
             sms_password_login.visibility = View.VISIBLE
             third_party_text.visibility = View.VISIBLE
             qq_btn.visibility = View.VISIBLE
@@ -325,6 +325,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         if (view.id == R.id.phone_text) {
             edit_user_phone_or_email!!.setText(currentUser!!.phone)
             edit_user_password!!.setText(currentUser!!.password)
+            edit_user_password!!.visibility = View.GONE
             list_phone.visibility = View.GONE
             login()
         }
@@ -346,17 +347,18 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
             message = info.split("-")
             edit_user_phone_or_email.setText(message[0])
             edit_user_password!!.setText(message[1])
+            edit_user_password!!.visibility = View.GONE
         }
         if (currentUser!!.phone == message!![0]) {
             SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
             edit_user_phone_or_email!!.setText("")
             edit_user_password!!.setText("")
             list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.VISIBLE
+            edit_user_password.visibility = View.GONE
             btn_login.visibility = View.VISIBLE
             btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.VISIBLE
-            eye_btn.visibility = View.VISIBLE
+            forget_password.visibility = View.GONE
+            eye_btn.visibility = View.GONE
             sms_password_login.visibility = View.VISIBLE
             third_party_text.visibility = View.VISIBLE
             qq_btn.visibility = View.VISIBLE
@@ -398,10 +400,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         phoneList = (mNewDatas as ArrayList<DbUser>?)!!
         if (phoneList!!.size == 0) {
             list_phone.visibility = View.GONE
-            edit_user_password.visibility = View.VISIBLE
+            edit_user_password.visibility = View.GONE
             btn_login.visibility = View.VISIBLE
             btn_register.visibility = View.VISIBLE
-            forget_password.visibility = View.VISIBLE
+            forget_password.visibility = View.GONE
             isPhone = true
             date_phone.visibility = View.GONE
         } else {
@@ -435,7 +437,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
 
-        if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
+      /*  if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
             AccountModel.login(phone!!, editPassWord!!, dbUser!!.channel)
                     .subscribe(object : NetworkObserver<DbUser>() {
@@ -458,16 +460,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener {
                     })
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
-        }
+        }*/
 
-//        if(!StringUtils.isTrimEmpty(phone)){
-//            val intent = Intent(this,EnterPasswordActivity::class.java)
-//            intent.putExtra(Constant.USER_TYPE,Constant.TYPE_LOGIN)
-//            intent.putExtra("phone",phone)
-//            startActivity(intent)
-//        }else{
-//            ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
-//        }
+       if(!StringUtils.isTrimEmpty(phone)){
+           val intent = Intent(this,EnterPasswordActivity::class.java)
+           intent.putExtra("USER_TYPE",Constant.TYPE_LOGIN)
+           intent.putExtra("phone",phone)
+           startActivity(intent)
+       }else{
+           ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
+       }
     }
 
     var isSuccess: Boolean = true
