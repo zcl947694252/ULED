@@ -560,7 +560,7 @@
     <string name="switch_tip4">开关底部右边的指示灯会常亮</string>
     <string name="install_tip5">如果遇到问题,请尝试以下步骤复位设备:</string>
     <string name="guide_tip_reset_light">灯：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
-    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右下按键和开关键。期间蓝灯会常亮。</string>
+    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会闪烁。\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右下按键和开关键。期间蓝灯会闪烁。</string>
     <string name="guide_tip_reset_sensor">接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="guide_tip_reset_curtain">窗帘：长按窗帘底部按键5秒，指示灯常亮，松手，再长按按键，直到指示灯闪烁3次。</string>
     <string name="guide_tip_reset_relay">蓝牙接收器：长按接收器的白色按钮5秒，直至蓝牙接收器闪烁。</string>
@@ -696,9 +696,9 @@
     <string name="open_mode">开启</string>
     <string name="close_mode">关闭</string>
     <string name="password_cannot">密码不能为空</string>
-    <string name="any_environment">任意环境</string>
-    <string name="dark_environment">较暗环境</string>
-    <string name="very_dark_environment">很暗环境</string>
+    <string name="any_environment">全天</string>
+    <string name="dark_environment">白天</string>
+    <string name="very_dark_environment">夜晚</string>
     <string name="light_on">触发时开灯</string>
     <string name="light_off">触发时关灯</string>
     <string name="minute">分钟</string>

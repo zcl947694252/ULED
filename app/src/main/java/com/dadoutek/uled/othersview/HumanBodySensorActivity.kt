@@ -74,7 +74,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private var showCheckListData: MutableList<DbGroup>? = null
 
     private var modeStartUpMode = 0
-    private var modeDelayUnit = 0
+    private var modeDelayUnit = 2
     private var modeSwitchMode = 0
     private var modeTriggerCondition = 0
 
@@ -85,8 +85,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
-
-    private val MODE_START_UP_MODE_CUSTOMIZE = 3
 
     private var isFinish: Boolean = false
 
@@ -283,7 +281,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                                 }
 
                                 trigger_time_text.text = textGp.text.toString() + "%"
-                                modeStartUpMode = MODE_START_UP_MODE_CUSTOMIZE
+                                modeStartUpMode = MODE_START_UP_MODE_OPEN
                                 dialog.dismiss()
                             }
                             .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()

@@ -763,9 +763,9 @@
     <string name="close_mode">close</string>
     <string name="password_cannot">Password cannot be empty</string>
 
-    <string name="any_environment">Any environment</string>
-    <string name="dark_environment">Dark environment</string>
-    <string name="very_dark_environment">Very dark environment</string>
+    <string name="any_environment">All day</string>
+    <string name="dark_environment">Daytime</string>
+    <string name="very_dark_environment">Night</string>
 
     <string name="light_on">Turn on </string>
     <string name="light_off">Turn off </string>

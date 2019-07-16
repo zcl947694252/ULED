@@ -221,9 +221,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
-                            val jsonObject = JSONObject(a.localizedMessage)
-                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(message)
+                            a.printStackTrace()
+//                            val jsonObject = JSONObject(a.localizedMessage)
+//                            val message = jsonObject.opt("detail").toString()
+                            ToastUtils.showLong(a.message)
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
@@ -244,9 +245,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
 //                            if(JsonUtil.isBadJson(a.toString())){
-                            val jsonObject = JSONObject(a.localizedMessage)
-                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(message)
+//                            val jsonObject = JSONObject(a.localizedMessage)
+//                            val message = jsonObject.opt("detail").toString()
+                            a.printStackTrace()
+                            ToastUtils.showLong(a.message)
                             hideLoadingDialog()
 //                            }
                         } else {
