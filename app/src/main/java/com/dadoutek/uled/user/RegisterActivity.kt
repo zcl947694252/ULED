@@ -170,28 +170,28 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
 //            showLoadingDialog(getString(R.string.get_code_ing))
-            UpdateModel.isRegister(phoneNum)!!.subscribe(object : NetworkObserver<Any>() {
-                override fun onNext(s: Any) {
-                    val jsonObject = s.toString()
-                    Log.e("TAG_REGISTER", jsonObject)
-                    try {
-                        if (jsonObject == "true") {
-                            hideLoadingDialog()
-                            ToastUtil.showToast(this@RegisterActivity, getString(R.string.account_already_exist))
-                        } else {
+//            UpdateModel.isRegister(phoneNum)!!.subscribe(object : NetworkObserver<Any>() {
+//                override fun onNext(s: Any) {
+//                    val jsonObject = s.toString()
+//                    Log.e("TAG_REGISTER", jsonObject)
+//                    try {
+//                        if (jsonObject == "true") {
+//                            hideLoadingDialog()
+//                            ToastUtil.showToast(this@RegisterActivity, getString(R.string.account_already_exist))
+//                        } else {
                             SMSSDK.getVerificationCode(countryCode, phoneNum)
-                        }
+//                        }
 
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                }
-
-                override fun onError(e: Throwable) {
-                    super.onError(e)
-                    ToastUtils.showLong(R.string.get_server_version_fail)
-                }
-            })
+//                    } catch (e: JSONException) {
+//                        e.printStackTrace()
+//                    }
+//                }
+//
+//                override fun onError(e: Throwable) {
+//                    super.onError(e)
+//                    ToastUtils.showLong(R.string.get_server_version_fail)
+//                }
+//            })
         }
     }
 
