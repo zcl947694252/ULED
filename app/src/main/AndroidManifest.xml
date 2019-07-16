@@ -96,6 +96,14 @@
             android:name=".switches.SwitchDeviceDetailsActivity"
             android:screenOrientation="portrait" />
 
+
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="260b846a2a8f8" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="886a329e066cc1fba6db79e0d5a299bf" />
+
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />
