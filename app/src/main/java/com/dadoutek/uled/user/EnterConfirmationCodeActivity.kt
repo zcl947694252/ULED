@@ -31,29 +31,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
-import kotlinx.android.synthetic.main.activity_register.*
-import kotlinx.android.synthetic.main.activity_verification_code.*
-import kotlinx.android.synthetic.main.activity_verification_code.edit_verification
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
-
-
-    private var isChangePwd = false
-
     private val TIME_INTERVAL: Long = 60
-
-    private var userName: String? = null
-
     private val mCompositeDisposable = CompositeDisposable()
-
     private var countryCode: String? = null
-
-    private var areaCode: String? = null
-
     private var phone: String? = null
-
     private var type: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,23 +53,24 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private fun initViewType() {
         countryCode = this.intent.extras!!.getString("country_code")
         phone = this.intent.extras!!.getString("phone")
-        codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
-
         if (type == Constant.TYPE_VERIFICATION_CODE) {
             tv_notice.visibility = View.VISIBLE
+            codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
         } else if (type == Constant.TYPE_REGISTER) {
             tv_notice.visibility = View.GONE
+        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
+            tv_notice.visibility = View.GONE
+            codePhone.text = resources.getString(R.string.follow_the_steps)
         }
     }
 
     private fun initView() {
         verCodeInputView.setOnCompleteListener { verificationLogin() }
-        verCodeInputView.setOnCompleteListener(VerCodeInputView.OnCompleteListener {
-//            verificationLogin()
+        verCodeInputView.setOnCompleteListener {
             var code = it
             submitCode(countryCode
                     ?: "", phone!!, code.toString().trim { it <= ' ' })
-        })
+        }
         SMSSDK.registerEventHandler(eventHandler)
         refresh_code.setOnClickListener(this)
         image_return.setOnClickListener(this)
@@ -120,9 +106,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
-                            val jsonObject = JSONObject(a.localizedMessage)
-                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(message)
+                            ToastUtils.showLong(a.localizedMessage)
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
@@ -133,10 +117,18 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理验证成功的结果
-                        if (isChangePwd) {
-
-                        } else {
+                        if (type == Constant.TYPE_VERIFICATION_CODE) {
                             verificationLogin()
+                        } else if (type == Constant.TYPE_REGISTER) {
+                            val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
+                            intent.putExtra("phone", phone)
+                            intent.putExtra(Constant.USER_TYPE,Constant.TYPE_REGISTER)
+                            startActivity(intent)
+                        }else if (type == Constant.TYPE_FORGET_PASSWORD) {
+                            val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
+                            intent.putExtra(Constant.USER_TYPE,Constant.TYPE_FORGET_PASSWORD)
+                            intent.putExtra("phone", phone)
+                            startActivity(intent)
                         }
                     } else {
                         // TODO 处理错误的结果
@@ -163,10 +155,10 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         SMSSDK.submitVerificationCode(country, phone, code)
     }
 
-                @SuppressLint("SetTextI18n")
-                private fun timing() {
-                    mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
-                            .subscribeOn(Schedulers.io())
+    @SuppressLint("SetTextI18n")
+    private fun timing() {
+        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     val num = 59 - it as Long
@@ -203,30 +195,26 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
 
     private fun verificationLogin() {
-        if (type==Constant.TYPE_VERIFICATION_CODE){
-            if (!StringUtils.isTrimEmpty(phone)) {
-                showLoadingDialog(getString(R.string.logging_tip))
-                AccountModel.smsLogin(phone!!)
-                        .subscribe(object : NetworkObserver<DbUser>() {
-                            override fun onNext(dbUser: DbUser) {
-                                DBUtils.deleteLocalData()
-                                //判断是否用户是首次在这个手机登录此账号，是则同步数据
+        if (!StringUtils.isTrimEmpty(phone)) {
+            showLoadingDialog(getString(R.string.logging_tip))
+            AccountModel.smsLogin(phone!!)
+                    .subscribe(object : NetworkObserver<DbUser>() {
+                        override fun onNext(dbUser: DbUser) {
+                            DBUtils.deleteLocalData()
+                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
 //                            showLoadingDialog(getString(R.string.sync_now))
-                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                                SharedPreferencesUtils.setUserLogin(true)
-                            }
+                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                            SharedPreferencesUtils.setUserLogin(true)
+                        }
 
-                            override fun onError(e: Throwable) {
-                                super.onError(e)
-                                LogUtils.d("logging: " + "登录错误" + e.message)
-                                hideLoadingDialog()
-                            }
-                        })
-            } else {
-                Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
-            }
-        }else if (type==Constant.TYPE_REGISTER){
-            startActivity(Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java))
+                        override fun onError(e: Throwable) {
+                            super.onError(e)
+                            LogUtils.d("logging: " + "登录错误" + e.message)
+                            hideLoadingDialog()
+                        }
+                    })
+        } else {
+            Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -259,6 +247,6 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
     override fun onDestroy() {
         super.onDestroy()
-        SMSSDK.unregisterEventHandler(eventHandler);
+        SMSSDK.unregisterEventHandler(eventHandler)
     }
 }

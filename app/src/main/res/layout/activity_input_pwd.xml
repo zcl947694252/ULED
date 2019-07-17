@@ -8,7 +8,7 @@
     tools:context=".user.EnterConfirmationCodeActivity">
 
     <ImageView
-        android:id="@+id/image_return"
+        android:id="@+id/pwd_return"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
@@ -23,16 +23,16 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:src="@drawable/rectangle_login"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
-        app:layout_constraintStart_toStartOf="@+id/textView" />
+        app:layout_constraintBottom_toBottomOf="@+id/pwd_title"
+        app:layout_constraintEnd_toEndOf="@+id/pwd_title"
+        app:layout_constraintStart_toStartOf="@+id/pwd_title" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/pwd_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="46dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginTop="64dp"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:text="@string/input_pwd"
@@ -40,18 +40,18 @@
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image_return" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/pwd_notice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="16dp"
         android:text="@string/please_password"
         android:textColor="@color/black_three"
         android:textSize="15sp"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintStart_toStartOf="@+id/pwd_title"
+        app:layout_constraintTop_toBottomOf="@+id/pwd_title" />
 
     <TextView
         android:id="@+id/followSteps"
@@ -62,8 +62,8 @@
         android:textColor="@color/black_three"
         android:textSize="15sp"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintStart_toStartOf="@+id/pwd_title"
+        app:layout_constraintTop_toBottomOf="@+id/pwd_title" />
 
 
     <android.support.constraint.ConstraintLayout
@@ -94,7 +94,7 @@
         android:layout_width="337dp"
         android:layout_height="45dp"
         android:layout_marginStart="38dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="44dp"
         android:layout_marginEnd="38dp"
         android:background="@drawable/btn_rec_black_bt"
         android:gravity="center"
@@ -102,7 +102,7 @@
         android:textColor="@color/white"
         android:textSize="@dimen/sp_12"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.793"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pwd_input" />
 
@@ -111,7 +111,7 @@
         android:layout_width="326dp"
         android:layout_height="44dp"
         android:layout_marginStart="38dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="92dp"
         android:hint="@string/please_password"
         android:inputType="textPassword"
@@ -120,7 +120,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/pwd_title"
         tools:ignore="MissingConstraints" />
 
     <ImageView
@@ -128,12 +128,12 @@
         android:layout_width="50dp"
         android:layout_height="46dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="100dp"
         android:padding="10dp"
         android:src="@drawable/icon_turn"
         app:layout_constraintEnd_toEndOf="@+id/pwd_input"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/codePhone"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/pwd_title" />
 
 </android.support.constraint.ConstraintLayout>

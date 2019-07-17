@@ -318,6 +318,9 @@
         <activity
             android:name=".curtain.CurtainOfGroupActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".user.InputPwdActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

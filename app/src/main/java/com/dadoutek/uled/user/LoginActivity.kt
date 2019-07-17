@@ -385,7 +385,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         } else {
             adapter!!.setNewData(phoneList)
         }
-
     }
 
     private fun getNewData(): MutableList<DbUser> {
@@ -420,33 +419,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
        }else{
            ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
        }
-//        editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
-//
-//
-//        if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
-//            showLoadingDialog(getString(R.string.logging_tip))
-//            AccountModel.login(phone!!, editPassWord!!, dbUser!!.channel)
-//                    .subscribe(object : NetworkObserver<DbUser>() {
-//                        override fun onNext(dbUser: DbUser) {
-//                            DBUtils.deleteLocalData()
-////                            ToastUtils.showLong(R.string.login_success)
-//                            SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
-////                            hideLoadingDialog()
-//                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
-////                            showLoadingDialog(getString(R.string.sync_now))
-//                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-//                            SharedPreferencesUtils.setUserLogin(true)
-//                        }
-//
-//                        override fun onError(e: Throwable) {
-//                            super.onError(e)
-//                            LogUtils.d("logging: " + "登录错误" + e.message)
-//                            hideLoadingDialog()
-//                        }
-//                    })
-//        } else {
-//            Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
-//        }
 
         if(!StringUtils.isTrimEmpty(phone)){
             val intent = Intent(this,EnterPasswordActivity::class.java)
@@ -461,9 +433,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     var isSuccess: Boolean = true
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
-        override fun start() {
-//            showLoadingDialog(getString(R.string.tip_start_sync))
-        }
+        override fun start() {}
 
         override fun complete() {
             if (isSuccess) {

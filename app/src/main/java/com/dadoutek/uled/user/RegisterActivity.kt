@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -16,7 +13,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import butterknife.ButterKnife
-import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -90,7 +86,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             dbUser = DbUser()
             register_completed.setText(R.string.btn_ok)
         }
-        SMSSDK.registerEventHandler(eventHandler)
+//        SMSSDK.registerEventHandler(eventHandler)
     }
 
 
@@ -108,20 +104,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     intent.putExtra("country_code",countryCode)
                     intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
                     startActivity(intent)
-                  /*  if (checkIsOK()) {
-                        if (Constant.TEST_REGISTER) {
-                            showLoadingDialog(getString(R.string.registing))
-                            register()
-                        } else {
-                            if (isChangePwd) {
-                                showLoadingDialog(getString(R.string.updating_password))
-                            } else {
-                                showLoadingDialog(getString(R.string.registing))
-                            }
-                            submitCode(countryCode
-                                    ?: "", userName!!, edit_verification.text.toString().trim { it <= ' ' })
-                        }
-                    }*/
                 } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))
                 }
@@ -178,72 +160,66 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     override fun onDestroy() {
         super.onDestroy()
-        SMSSDK.unregisterEventHandler(eventHandler);
+//        SMSSDK.unregisterEventHandler(eventHandler);
     }
 
-    val eventHandler = object : EventHandler() {
-        override fun afterEvent(event: Int, result: Int, data: Any?) {
-            // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
-            val msg = Message()
-            msg.arg1 = event
-            msg.arg2 = result
-            msg.obj = data
-            Handler(Looper.getMainLooper(), Handler.Callback { msg ->
-                val event = msg.arg1
-                val result = msg.arg2
-                val data = msg.obj
-                if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
-                    if (result == SMSSDK.RESULT_COMPLETE) {
-                        // TODO 处理成功得到验证码的结果
-                        // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
-                        ToastUtils.showLong(R.string.send_message_success)
-                        timing()
-                    } else {
-                        // TODO 处理错误的结果
-                        if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-                            a.printStackTrace()
-//                            val jsonObject = JSONObject(a.localizedMessage)
-//                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(a.message)
-                        } else {
-                            val a = (data as Throwable)
-                            a.printStackTrace()
-                            ToastUtils.showLong(a.message)
-                        }
-                    }
-                    hideLoadingDialog()
-                } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
-                    if (result == SMSSDK.RESULT_COMPLETE) {
-                        // TODO 处理验证成功的结果
-                        if (isChangePwd) {
-                            startChange()
-                        } else {
-                            register()
-                        }
-                    } else {
-                        // TODO 处理错误的结果
-                        if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-//                            if(JsonUtil.isBadJson(a.toString())){
-//                            val jsonObject = JSONObject(a.localizedMessage)
-//                            val message = jsonObject.opt("detail").toString()
-                            a.printStackTrace()
-                            ToastUtils.showLong(a.message)
-                            hideLoadingDialog()
-//                            }
-                        } else {
-                            val a = (data as Throwable)
-                            a.printStackTrace()
-                            ToastUtils.showLong(a.message)
-                        }
-                    }
-                }
-                // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
-                false
-            }).sendMessage(msg)
-        }
-    }
+//    val eventHandler = object : EventHandler() {
+//        override fun afterEvent(event: Int, result: Int, data: Any?) {
+//            // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
+//            val msg = Message()
+//            msg.arg1 = event
+//            msg.arg2 = result
+//            msg.obj = data
+//            Handler(Looper.getMainLooper(), Handler.Callback { msg ->
+//                val event = msg.arg1
+//                val result = msg.arg2
+//                val data = msg.obj
+//                if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
+//                    if (result == SMSSDK.RESULT_COMPLETE) {
+//                        // TODO 处理成功,得到验证码的结果
+//                        // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
+//                        ToastUtils.showLong(R.string.send_message_success)
+//                        timing()
+//                    } else {
+//                        // TODO 处理错误的结果
+//                        if (result == SMSSDK.RESULT_ERROR) {
+//                            val a = (data as Throwable)
+//                            a.printStackTrace()
+//                            ToastUtils.showLong(a.message)
+//                        } else {
+//                            val a = (data as Throwable)
+//                            a.printStackTrace()
+//                            ToastUtils.showLong(a.message)
+//                        }
+//                    }
+//                    hideLoadingDialog()
+//                } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
+//                    if (result == SMSSDK.RESULT_COMPLETE) {
+//                        // TODO 处理验证成功的结果
+//                        if (isChangePwd) {
+//                            startChange()
+//                        } else {
+//                            register()
+//                        }
+//                    } else {
+//                        // TODO 处理错误的结果
+//                        if (result == SMSSDK.RESULT_ERROR) {
+//                            val a = (data as Throwable)
+//                            a.printStackTrace()
+//                            ToastUtils.showLong(a.message)
+//                            hideLoadingDialog()
+//                        } else {
+//                            val a = (data as Throwable)
+//                            a.printStackTrace()
+//                            ToastUtils.showLong(a.message)
+//                        }
+//                    }
+//                }
+//                // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
+//                false
+//            }).sendMessage(msg)
+//        }
+//    }
 
     @SuppressLint("SetTextI18n")
     private fun timing() {
@@ -311,11 +287,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         override fun error(msg: String) {
             LogUtils.d("GetDataError:$msg")
         }
-
     }
 
     private fun syncComplet() {
-//        ToastUtils.showLong(getString(R.string.upload_complete))
         hideLoadingDialog()
         TransformView()
     }

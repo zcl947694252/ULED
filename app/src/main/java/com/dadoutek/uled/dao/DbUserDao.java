@@ -33,6 +33,7 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         public final static Property Phone = new Property(6, String.class, "phone", false, "PHONE");
         public final static Property Token = new Property(7, String.class, "token", false, "TOKEN");
         public final static Property Password = new Property(8, String.class, "password", false, "PASSWORD");
+        public final static Property Last_region_id = new Property(9, String.class, "last_region_id", false, "LAST_REGION_ID");
     }
 
 
@@ -56,7 +57,8 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
                 "\"ACCOUNT\" TEXT," + // 5: account
                 "\"PHONE\" TEXT," + // 6: phone
                 "\"TOKEN\" TEXT," + // 7: token
-                "\"PASSWORD\" TEXT);"); // 8: password
+                "\"PASSWORD\" TEXT," + // 8: password
+                "\"LAST_REGION_ID\" TEXT);"); // 9: last_region_id
     }
 
     /** Drops the underlying database table. */
@@ -113,6 +115,11 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         if (password != null) {
             stmt.bindString(9, password);
         }
+ 
+        String last_region_id = entity.getLast_region_id();
+        if (last_region_id != null) {
+            stmt.bindString(10, last_region_id);
+        }
     }
 
     @Override
@@ -163,6 +170,11 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         if (password != null) {
             stmt.bindString(9, password);
         }
+ 
+        String last_region_id = entity.getLast_region_id();
+        if (last_region_id != null) {
+            stmt.bindString(10, last_region_id);
+        }
     }
 
     @Override
@@ -181,7 +193,8 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // account
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // phone
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // token
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // password
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // password
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9) // last_region_id
         );
         return entity;
     }
@@ -197,6 +210,7 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         entity.setPhone(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setToken(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setPassword(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setLast_region_id(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
      }
     
     @Override

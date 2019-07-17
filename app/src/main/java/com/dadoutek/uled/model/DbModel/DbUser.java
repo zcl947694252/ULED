@@ -28,9 +28,12 @@ public class DbUser {
     private String token;
     //密码
     private String password;
-    @Generated(hash = 668854198)
+    //区域id
+    private String last_region_id;
+    @Generated(hash = 1735856997)
     public DbUser(Long id, String avatar, String channel, String email, String name,
-            String account, String phone, String token, String password) {
+            String account, String phone, String token, String password,
+            String last_region_id) {
         this.id = id;
         this.avatar = avatar;
         this.channel = channel;
@@ -40,6 +43,7 @@ public class DbUser {
         this.phone = phone;
         this.token = token;
         this.password = password;
+        this.last_region_id = last_region_id;
     }
     @Generated(hash = 762027100)
     public DbUser() {
@@ -98,6 +102,10 @@ public class DbUser {
     public void setPassword(String password) {
         this.password = password;
     }
-    
-
+    public String getLast_region_id() {
+        return this.last_region_id;
+    }
+    public void setLast_region_id(String last_region_id) {
+        this.last_region_id = last_region_id;
+    }
 }

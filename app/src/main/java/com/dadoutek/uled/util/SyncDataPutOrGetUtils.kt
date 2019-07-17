@@ -101,7 +101,6 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                 }
-
             }.start()
         }
 
@@ -148,7 +147,6 @@ class SyncDataPutOrGetUtils {
                             }
                         }
                     }
-
                     "DB_CONNECTOR" -> {
                         when (type) {
                             Constant.DB_ADD -> {
