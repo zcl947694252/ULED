@@ -802,4 +802,7 @@
     <string name="five_minute">5min</string>
     <string name="auto_regist_account">login automatic registration account</string>
     <string name="input_pwd">Enter Password</string>
+
+    <string name="trigger_mode_text">Trigger mode :</string>
+    <string name="delay_time_unit_text">Delay time unit :</string>
 </resources>

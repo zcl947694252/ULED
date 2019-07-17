@@ -37,10 +37,14 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
             />
-        <activity android:name=".user.EnterConfirmationCodeActivity"/>
-        <activity android:name=".othersview.NetworkActivity" />
-        <activity android:name=".user.EnterPasswordActivity" />
-        <activity android:name=".user.AgainEnterPasswordActivity" />
+        <activity android:name=".user.EnterConfirmationCodeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".othersview.NetworkActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".user.EnterPasswordActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".user.AgainEnterPasswordActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".othersview.InstructionsForUsActivity"
             android:screenOrientation="portrait" />

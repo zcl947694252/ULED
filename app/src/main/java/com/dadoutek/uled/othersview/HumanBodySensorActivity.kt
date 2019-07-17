@@ -67,7 +67,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private var switchMode = 0X01
     lateinit var secondsList: Array<String>
-    private var selectTime = 0
+    private var selectTime = 10
     private var currentPageIsEdit = false
 
     private var showGroupList: MutableList<ItemGroup>? = null
@@ -94,8 +94,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
         initData()
-        initView()
         getVersion()
+        initView()
     }
 
     private fun initData() {
@@ -150,6 +150,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         brightness_change.setOnClickListener(this)
         choose_group.setOnClickListener(this)
         sensor_update.setOnClickListener(this)
+        time.setOnClickListener(this)
+        trigger_mode.setOnClickListener(this)
     }
 
     private fun getVersion() {
@@ -163,7 +165,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         var version = tvPSVersion.text.toString()
                         var num = version.substring(2, 3)
                         if (num.toDouble() >= 3.0) {
-
+                            isGone()
+                            isVisibility()
                         }
                     },
                     failedCallback = {
@@ -172,6 +175,24 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         } else {
             dstAdress = 0
         }
+    }
+
+    private fun isGone() {
+        constraintLayout30.visibility = View.GONE
+        view30.visibility = View.GONE
+        constraintLayout31.visibility = View.GONE
+        view31.visibility = View.GONE
+    }
+
+    private fun isVisibility() {
+        constraintLayout17.visibility = View.VISIBLE
+        view15.visibility = View.VISIBLE
+        constraintLayout18.visibility = View.VISIBLE
+        view16.visibility = View.VISIBLE
+        constraintLayout19.visibility = View.VISIBLE
+        view17.visibility = View.VISIBLE
+        constraintLayout21.visibility = View.VISIBLE
+        view18.visibility = View.VISIBLE
     }
 
     override fun onClick(v: View?) {
@@ -363,6 +384,153 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                 })
             }
 
+            R.id.time -> {
+                var views = LayoutInflater.from(this).inflate(R.layout.popwindow_choose_time, null)
+                var set = findViewById<ConstraintLayout>(R.id.time)
+                var popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                popupWindow.contentView = views
+                popupWindow.isFocusable = true
+                popupWindow.showAsDropDown(set)
+
+                var tenSec = views.findViewById<ConstraintLayout>(R.id.ten_second)
+                var twentySec = views.findViewById<ConstraintLayout>(R.id.twenty_second)
+                var thirtySec = views.findViewById<ConstraintLayout>(R.id.thirty_second)
+                var fortySec = views.findViewById<ConstraintLayout>(R.id.forty_second)
+                var fiftySec = views.findViewById<ConstraintLayout>(R.id.fifty_second)
+                var oneMin = views.findViewById<ConstraintLayout>(R.id.one_minute)
+                var twoMin = views.findViewById<ConstraintLayout>(R.id.two_minute)
+                var threeMin = views.findViewById<ConstraintLayout>(R.id.three_minute)
+                var fourMin = views.findViewById<ConstraintLayout>(R.id.four_minute)
+                var fiveMin = views.findViewById<ConstraintLayout>(R.id.five_minute)
+
+                when {
+                    time_text.text.toString() == getString(R.string.ten_second) -> {
+                        tenSec.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.twenty_second) -> {
+                        twentySec.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.thirty_second) -> {
+                        thirtySec.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.forty_second) -> {
+                        fortySec.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.fifty_second) -> {
+                        fiftySec.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.one_minute) -> {
+                        oneMin.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.two_minute) -> {
+                        twoMin.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.three_minute) -> {
+                        threeMin.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.four_minute) -> {
+                        fourMin.setBackgroundResource(R.color.blue_background)
+                    }
+                    time_text.text.toString() == getString(R.string.five_minute) -> {
+                        fiveMin.setBackgroundResource(R.color.blue_background)
+                    }
+                }
+
+                tenSec.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.ten_second)
+                    selectTime = 10
+                    popupWindow.dismiss()
+                })
+
+                twentySec.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.twenty_second)
+                    selectTime = 20
+                    popupWindow.dismiss()
+                })
+
+                thirtySec.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.thirty_second)
+                    selectTime = 30
+                    popupWindow.dismiss()
+                })
+
+                fortySec.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.forty_second)
+                    selectTime = 40
+                    popupWindow.dismiss()
+                })
+
+                fiftySec.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.fifty_second)
+                    selectTime = 50
+                    popupWindow.dismiss()
+                })
+
+                oneMin.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.one_minute)
+                    selectTime = 1*60
+                    popupWindow.dismiss()
+                })
+
+                twoMin.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.two_minute)
+                    selectTime = 2*60
+                    popupWindow.dismiss()
+                })
+
+                threeMin.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.three_minute)
+                    selectTime = 3*60
+                    popupWindow.dismiss()
+                })
+
+                fourMin.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.four_minute)
+                    selectTime = 4*50
+                    popupWindow.dismiss()
+                })
+
+                fiveMin.setOnClickListener(View.OnClickListener {
+                    time_text.text = getString(R.string.five_minute)
+                    selectTime = 5*60
+                    popupWindow.dismiss()
+                })
+            }
+
+            R.id.trigger_mode -> {
+                var views = LayoutInflater.from(this).inflate(R.layout.popwindow_trigger_mode, null)
+                var set = findViewById<ConstraintLayout>(R.id.trigger_mode)
+                var popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                popupWindow.contentView = views
+                popupWindow.isFocusable = true
+                popupWindow.showAsDropDown(set)
+
+                var turnOn = views.findViewById<ConstraintLayout>(R.id.turn_on)
+                var turnOff = views.findViewById<ConstraintLayout>(R.id.turn_off)
+
+                when{
+                    trigger_mode_text.text.toString() == getString(R.string.light_on) -> {
+                        turnOn.setBackgroundResource(R.color.blue_background)
+                    }
+
+                    trigger_mode_text.text.toString() == getString(R.string.light_off) -> {
+                        turnOff.setBackgroundResource(R.color.blue_background)
+                    }
+                }
+
+                turnOn.setOnClickListener(View.OnClickListener {
+                    trigger_mode_text.text = getString(R.string.light_on)
+                    switchMode = CMD_OPEN_LIGHT
+                    popupWindow.dismiss()
+                })
+
+                turnOff.setOnClickListener(View.OnClickListener {
+                    trigger_mode_text.text = getString(R.string.light_off)
+                    switchMode = CMD_CLOSE_LIGHT
+                    popupWindow.dismiss()
+                })
+            }
+
             R.id.choose_group -> {
                 isFinish = true
                 tv_function1.visibility = View.VISIBLE
@@ -456,65 +624,137 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun configDevice() {
-        var time = editText.text.toString()
+        var version = tvPSVersion.text.toString()
+        var num = version.substring(2, 3)
+        if(num.toDouble() >= 3.0){
+            var time = editText.text.toString()
 
-        if (time == "") {
-            ToastUtil.showToast(this, "超时时间为空")
-            return
+            if (time == "") {
+                ToastUtil.showToast(this, "超时时间为空")
+                return
+            }
+
+            if (time_type_text.text.toString() == getString(R.string.second)) {
+                if (time.toInt() < 10) {
+                    ToastUtil.showToast(this, "超时时间不能小于10秒钟")
+                    return
+                }
+
+                if (time.toInt() > 255) {
+                    ToastUtil.showToast(this, "超时时间不能大于255秒钟")
+                    return
+                }
+            } else if (time_type_text.text.toString() == getString(R.string.minute)) {
+                if (time.toInt() < 1) {
+                    ToastUtil.showToast(this, "超时时间不能小于1分钟")
+                    return
+                }
+
+                if (time.toInt() > 255) {
+                    ToastUtil.showToast(this, "超时时间不能大于255分钟")
+                    return
+                }
+            }
+
+            if (showGroupList?.size == 0) {
+                ToastUtils.showLong(getString(R.string.config_night_light_select_group))
+                return
+            }
+
+            Thread {
+                val mApplication = this.application as TelinkLightApplication
+                val mesh = mApplication.getMesh()
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    showLoadingDialog(getString(R.string.configuring_switch))
+                }
+
+                configNewlight()
+                Thread.sleep(300)
+
+                Commander.updateMeshName(
+                        successCallback = {
+                            hideLoadingDialog()
+                            configureComplete()
+                        },
+                        failedCallback = {
+                            snackbar(configPirRoot, getString(R.string.pace_fail))
+                            hideLoadingDialog()
+                        })
+
+            }.start()
+        }else{
+            if (showGroupList?.size == 0) {
+                ToastUtils.showLong(getString(R.string.config_night_light_select_group))
+                return
+            }
+
+            Thread {
+                val mApplication = this.application as TelinkLightApplication
+                val mesh = mApplication.getMesh()
+
+                GlobalScope.launch(Dispatchers.Main) {
+                    showLoadingDialog(getString(R.string.configuring_switch))
+                }
+
+                configLightlight()
+                Thread.sleep(300)
+
+                Commander.updateMeshName(
+                        successCallback = {
+                            hideLoadingDialog()
+                            configureComplete()
+                        },
+                        failedCallback = {
+                            snackbar(configPirRoot, getString(R.string.pace_fail))
+                            hideLoadingDialog()
+                        })
+
+            }.start()
+        }
+//       finish()
+    }
+
+    private fun configLightlight() {
+        val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
+
+        val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
+        val timeL: Byte = (selectTime and 0xff).toByte()
+        val paramBytes = byteArrayOf(
+                DeviceType.NIGHT_LIGHT.toByte(),
+                switchMode.toByte(), timeL, timeH
+        )
+        val paramBytesGroup: ByteArray
+        paramBytesGroup = byteArrayOf(
+                DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0
+        )
+
+        var canSendGroup = true
+        for (i in showGroupList!!.indices) {
+            if (showGroupList!![i].groupAress == 0xffff) {
+//                canSendGroup=false
+                paramBytesGroup[i + 2] = 0xFF.toByte()
+                break
+            } else {
+                val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
+                paramBytesGroup[i + 2] = groupL
+                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+            }
         }
 
-        if (time_type_text.text.toString() == getString(R.string.second)) {
-            if (time.toInt() < 10) {
-                ToastUtil.showToast(this, "超时时间不能小于10秒钟")
-                return
-            }
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                mDeviceInfo.meshAddress,
+                paramBytes)
 
-            if (time.toInt() > 255) {
-                ToastUtil.showToast(this, "超时时间不能大于255秒钟")
-                return
-            }
-        } else if (time_type_text.text.toString() == getString(R.string.minute)) {
-            if (time.toInt() < 1) {
-                ToastUtil.showToast(this, "超时时间不能小于1分钟")
-                return
-            }
+        Thread.sleep(300)
 
-            if (time.toInt() > 255) {
-                ToastUtil.showToast(this, "超时时间不能大于255分钟")
-                return
-            }
+        if (canSendGroup) {
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+                    mDeviceInfo.meshAddress,
+                    paramBytesGroup)
         }
 
-        if (showGroupList?.size == 0) {
-            ToastUtils.showLong(getString(R.string.config_night_light_select_group))
-            return
-        }
-
-        Thread {
-            val mApplication = this.application as TelinkLightApplication
-            val mesh = mApplication.getMesh()
-
-            GlobalScope.launch(Dispatchers.Main) {
-                showLoadingDialog(getString(R.string.configuring_switch))
-            }
-
-            configNewlight()
-            Thread.sleep(300)
-
-            Commander.updateMeshName(
-                    successCallback = {
-                        hideLoadingDialog()
-                        configureComplete()
-                    },
-                    failedCallback = {
-                        snackbar(configPirRoot, getString(R.string.pace_fail))
-                        hideLoadingDialog()
-                    })
-
-        }.start()
-
-
-//        finish()
+        Thread.sleep(300)
     }
 
     private fun configureComplete() {
@@ -641,7 +881,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             )
             else -> {
                 var str = trigger_time_text.text.toString()
-                var st = str.substring(0,str.indexOf("%"))
+                var st = str.substring(0, str.indexOf("%"))
                 paramBytes = byteArrayOf(
                         switchMode.toByte(), 0x00, 0x00,
                         editText.text.toString().toInt().toByte(),
