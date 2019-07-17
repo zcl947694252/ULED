@@ -3,33 +3,26 @@ package com.dadoutek.uled.user
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
-
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
-import com.dadoutek.uled.model.Response
-import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.LogUtils
@@ -37,45 +30,44 @@ import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.acitvity_phone_verification.*
-import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_verification_code.*
-import kotlinx.android.synthetic.main.activity_verification_code.btn_register
 import kotlinx.android.synthetic.main.activity_verification_code.btn_send_verification
 import kotlinx.android.synthetic.main.activity_verification_code.edit_user_phone
+import org.jetbrains.anko.toast
 import org.json.JSONObject
-import java.util.HashMap
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.activity_register.ccp as ccp1
 import kotlinx.android.synthetic.main.activity_verification_code.ccp as ccp1
 
-class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
+class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private var countryCode: String? = null
     private val mCompositeDisposable = CompositeDisposable()
     private val TIME_INTERVAL: Long = 60
     private var isChangePwd = false
+    private var type: String? = null
     private var isPhone = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verification_code)
         initView()
+
     }
 
-    private fun initView() {
 
+    private fun initView() {
         countryCode = ccp.selectedCountryCode
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         btn_register.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
         sms_login.setOnClickListener(this)
+        edit_user_phone.addTextChangedListener(this)
         password_login.setOnClickListener(this)
         SMSSDK.registerEventHandler(eventHandler)
     }
@@ -84,7 +76,13 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.btn_register -> register()
             R.id.btn_send_verification -> verificationCode()
-            R.id.sms_login -> login()
+            R.id.sms_login ->{
+                if (TextUtils.isEmpty(edit_user_phone.editableText.toString())) {
+                    toast(getString(R.string.please_phone_number))
+                    return
+                }
+            login()
+            }
             R.id.password_login -> passwordLogin()
             R.id.date_phone_list -> phoneList()
         }
@@ -300,7 +298,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun send_verification() {
         val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
-        if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
+        if (StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
             showLoadingDialog(getString(R.string.get_code_ing))
@@ -314,4 +312,14 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
         startActivity(intent)
     }
 
+    override fun afterTextChanged(p0: Editable?) {}
+
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        if (TextUtils.isEmpty(p0.toString()))
+            sms_login.background = getDrawable(R.drawable.btn_rec_black_bt)
+        else
+            sms_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+    }
 }

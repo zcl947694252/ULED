@@ -3,7 +3,6 @@ package com.dadoutek.uled.user
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,13 +22,15 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.LogUtils
+import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
-import kotlinx.android.synthetic.main.activity_verification_code.*
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -59,17 +60,19 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     private fun initViewType() {
+        countryCode = this.intent.extras!!.getString("country_code")
+        phone = this.intent.extras!!.getString("phone")
+        codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
+
         if (type == Constant.TYPE_VERIFICATION_CODE) {
-            countryCode = this.intent.extras!!.getString("country_code")
-            phone = this.intent.extras!!.getString("phone")
-            codePhone.text = resources.getString(R.string.send_code)+"+" + countryCode + phone
+            tv_notice.visibility = View.VISIBLE
+        } else if (type == Constant.TYPE_REGISTER) {
+            tv_notice.visibility = View.GONE
         }
     }
 
     private fun initView() {
-        verCodeInputView.setOnCompleteListener(VerCodeInputView.OnCompleteListener {
-            verificationLogin()
-        })
+        verCodeInputView.setOnCompleteListener { verificationLogin() }
         SMSSDK.registerEventHandler(eventHandler)
         refresh_code.setOnClickListener(this)
         image_return.setOnClickListener(this)
@@ -79,7 +82,8 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.refresh_code -> verificationCode()
-            R.id.return_image -> finish()
+
+            R.id.image_return -> finish()
         }
     }
 
@@ -173,7 +177,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     private fun send_verification() {
-        if (com.blankj.utilcode.util.StringUtils.isEmpty(phone)) {
+        if (StringUtils.isEmpty(phone)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
             showLoadingDialog(getString(R.string.get_code_ing))
@@ -183,28 +187,30 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
 
     private fun verificationLogin() {
-        if (!StringUtils.isTrimEmpty(phone)) {
-            showLoadingDialog(getString(R.string.logging_tip))
-            AccountModel.smsLogin(phone!!)
-                    .subscribe(object : NetworkObserver<DbUser>() {
-                        override fun onNext(dbUser: DbUser) {
-                            DBUtils.deleteLocalData()
-//                            ToastUtils.showLong(R.string.login_success)
-//                            hideLoadingDialog()
-                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
+        if (type==Constant.TYPE_VERIFICATION_CODE){
+            if (!StringUtils.isTrimEmpty(phone)) {
+                showLoadingDialog(getString(R.string.logging_tip))
+                AccountModel.smsLogin(phone!!)
+                        .subscribe(object : NetworkObserver<DbUser>() {
+                            override fun onNext(dbUser: DbUser) {
+                                DBUtils.deleteLocalData()
+                                //判断是否用户是首次在这个手机登录此账号，是则同步数据
 //                            showLoadingDialog(getString(R.string.sync_now))
-                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                            SharedPreferencesUtils.setUserLogin(true)
-                        }
+                                SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                                SharedPreferencesUtils.setUserLogin(true)
+                            }
 
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            LogUtils.d("logging: " + "登录错误" + e.message)
-                            hideLoadingDialog()
-                        }
-                    })
-        } else {
-            Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
+                            override fun onError(e: Throwable) {
+                                super.onError(e)
+                                LogUtils.d("logging: " + "登录错误" + e.message)
+                                hideLoadingDialog()
+                            }
+                        })
+            } else {
+                Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
+            }
+        }else if (type==Constant.TYPE_REGISTER){
+            startActivity(Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java))
         }
     }
 

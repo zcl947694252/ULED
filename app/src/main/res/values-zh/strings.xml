@@ -726,4 +726,6 @@
     <string name="three_minute">3分钟</string>
     <string name="four_minute">4分钟</string>
     <string name="five_minute">5分钟</string>
+    <string name="auto_regist_account">登录后自动注册账号</string>
+    <string name="input_pwd">输入密码</string>
 </resources>

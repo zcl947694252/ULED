@@ -800,4 +800,6 @@
     <string name="three_minute">3min</string>
     <string name="four_minute">4min</string>
     <string name="five_minute">5min</string>
+    <string name="auto_regist_account">login automatic registration account</string>
+    <string name="input_pwd">Enter Password</string>
 </resources>

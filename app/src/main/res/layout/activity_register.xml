@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -114,6 +113,7 @@
         android:hint="@string/please_code"
         android:inputType="phone"
         android:maxLength="16"
+        android:visibility="gone"
         android:maxLines="1"
         android:textColor="@color/black_three"
         android:textColorHint="@color/black_ee"
@@ -126,6 +126,7 @@
         android:id="@+id/btn_send_verification"
         style="@style/VerificationButtonStyle"
         android:text="@string/get_verification_code"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/edit_verification"
         app:layout_constraintTop_toTopOf="@+id/edit_verification" />
 
@@ -140,6 +141,7 @@
         android:inputType="textPassword"
         android:maxLength="16"
         android:maxLines="1"
+        android:visibility="gone"
         android:textColor="@color/black_three"
         android:textColorHint="@color/black_ee"
         android:textSize="16sp"
@@ -153,6 +155,7 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/dp_10"
         android:src="@drawable/icon_turn"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/edit_user_password"
         app:layout_constraintEnd_toEndOf="@+id/edit_user_password"
         app:layout_constraintTop_toTopOf="@+id/edit_user_password" />
@@ -168,6 +171,7 @@
         android:inputType="textPassword"
         android:textColorHint="@color/black_ee"
         android:maxLength="16"
+        android:visibility="gone"
         android:maxLines="1"
         android:textColor="@color/black_three"
         android:textSize="16sp"
@@ -180,6 +184,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/dp_10"
+        android:visibility="gone"
         android:src="@drawable/icon_turn"
         app:layout_constraintBottom_toBottomOf="@+id/again_password"
         app:layout_constraintEnd_toEndOf="@+id/again_password"
@@ -188,19 +193,19 @@
 
     <Button
         android:id="@+id/register_completed"
-        android:layout_width="320dp"
+        android:layout_width="300dp"
         android:layout_height="44dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/btn_rec_blue_bt"
-        android:text="@string/register_title_name"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginEnd="38dp"
+        android:background="@drawable/btn_rec_black_bt"
+        android:text="@string/next"
         android:textColor="@color/black_three"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/again_password"
-        app:layout_constraintStart_toStartOf="@+id/again_password"
-        app:layout_constraintTop_toBottomOf="@+id/again_password"
-        app:layout_constraintVertical_bias="0.100000024" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.481"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
 
 
 </android.support.constraint.ConstraintLayout>
