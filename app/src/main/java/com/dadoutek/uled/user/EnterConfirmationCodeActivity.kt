@@ -79,7 +79,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.refresh_code -> verificationCode()
-            R.id.return_image -> finish()
+            R.id.image_return -> finish()
         }
     }
 
