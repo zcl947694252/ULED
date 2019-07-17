@@ -27,6 +27,7 @@
             android:id="@+id/constraintLayout17"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -87,12 +88,14 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black_ee"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout17" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout18"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view15">
@@ -153,6 +156,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black_ee"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout18" />
 
 
@@ -160,6 +164,7 @@
             android:id="@+id/constraintLayout19"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view16">
@@ -235,6 +240,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black_ee"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout19" />
 
 
@@ -242,6 +248,7 @@
             android:id="@+id/constraintLayout21"
             android:layout_width="0dp"
             android:layout_height="60dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view17">
@@ -301,6 +308,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black_ee"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout21" />
 
 
@@ -377,13 +385,145 @@
             <!--android:background="@color/black_ee"-->
             <!--app:layout_constraintTop_toBottomOf="@+id/constraintLayout22" />-->
 
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout30"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view18">
+
+
+            <TextView
+                android:id="@+id/textView40"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delay_time_unit_text"
+                android:textColor="@color/black_three"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.09"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/time"
+                android:layout_width="190dp"
+                android:layout_height="30dp"
+                android:background="@drawable/human_body_sensor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.84"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ten_second"
+                    android:textColor="@color/blue_background"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="11dp"
+                    android:src="@drawable/icon_select_down_pir"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <View
+            android:id="@+id/view30"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black_ee"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout30" />
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraintLayout31"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view30">
+
+
+            <TextView
+                android:id="@+id/textView41"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/trigger_mode_text"
+                android:textColor="@color/black_three"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.09"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/trigger_mode"
+                android:layout_width="190dp"
+                android:layout_height="30dp"
+                android:background="@drawable/human_body_sensor"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.84"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/trigger_mode_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/light_on"
+                    android:textColor="@color/blue_background"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="11dp"
+                    android:src="@drawable/icon_select_down_pir"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.constraint.ConstraintLayout>
+
+        <View
+            android:id="@+id/view31"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black_ee"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout31" />
+
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout23"
             android:layout_width="0dp"
             android:layout_height="60dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view18">
+            app:layout_constraintTop_toBottomOf="@+id/view31">
 
 
             <TextView

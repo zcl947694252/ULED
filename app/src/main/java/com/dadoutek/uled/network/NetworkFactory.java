@@ -51,7 +51,7 @@ public class NetworkFactory {
             okHttpClient = initHttpClient();
         }
         if (api == null) {
-            if (!AppUtils.isAppDebug()) {
+//            if (!AppUtils.isAppDebug()) {
                 Retrofit retrofit = new Retrofit.Builder()
                         .client(okHttpClient)
                         .baseUrl(Constant.BASE_URL)
@@ -69,8 +69,17 @@ public class NetworkFactory {
                         .build();
                 api = retrofit.create(RequestInterface.class);
             }
+//            }else{
+//                Retrofit retrofit = new Retrofit.Builder()
+//                        .client(okHttpClient)
+////                        .baseUrl(Constant.BASE_URL)
+//                        .baseUrl(Constant.BASE_DEBUG_URL)
+//                        .addConverterFactory(gsonConverterFactory)
+//                        .addCallAdapterFactory(rxJavaCallAdapterFactory)
+//                        .build();
+//                api = retrofit.create(RequestInterface.class);
+//            }
 
-        }
         return api;
     }
 
