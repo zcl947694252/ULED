@@ -147,7 +147,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun login() {
 //        verificationLogin()
-        verificationCode()
+//        verificationCode()
         var intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
         intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
         intent.putExtra("country_code",countryCode)

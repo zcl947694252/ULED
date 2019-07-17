@@ -29,7 +29,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
+import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_verification_code.*
+import kotlinx.android.synthetic.main.activity_verification_code.edit_verification
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -39,6 +41,8 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private var isChangePwd = false
 
     private val TIME_INTERVAL: Long = 60
+
+    private var userName: String? = null
 
     private val mCompositeDisposable = CompositeDisposable()
 
@@ -55,6 +59,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         setContentView(R.layout.activity_enter_confirmation_code)
         type = this.intent.extras!!.getString(Constant.TYPE_USER)
         initViewType()
+        verificationCode()
         initView()
     }
 
@@ -68,7 +73,10 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
     private fun initView() {
         verCodeInputView.setOnCompleteListener(VerCodeInputView.OnCompleteListener {
-            verificationLogin()
+//            verificationLogin()
+            var code = it
+            submitCode(countryCode
+                    ?: "", phone!!, code.toString().trim { it <= ' ' })
         })
         SMSSDK.registerEventHandler(eventHandler)
         refresh_code.setOnClickListener(this)
@@ -143,10 +151,14 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun timing() {
-        mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
+    fun submitCode(country: String, phone: String, code: String) {
+        SMSSDK.submitVerificationCode(country, phone, code)
+    }
+
+                @SuppressLint("SetTextI18n")
+                private fun timing() {
+                    mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     val num = 59 - it as Long
@@ -233,5 +245,10 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private fun TransformView() {
         startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SMSSDK.unregisterEventHandler(eventHandler);
     }
 }
