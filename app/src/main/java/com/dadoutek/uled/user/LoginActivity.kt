@@ -419,15 +419,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
        }else{
            ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
        }
-
-        if(!StringUtils.isTrimEmpty(phone)){
-            val intent = Intent(this,EnterPasswordActivity::class.java)
-            intent.putExtra(Constant.TYPE_USER,Constant.TYPE_LOGIN)
-            intent.putExtra("phone",phone)
-            startActivity(intent)
-        }else{
-            ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
-        }
     }
 
     var isSuccess: Boolean = true

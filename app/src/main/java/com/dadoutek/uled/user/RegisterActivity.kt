@@ -247,7 +247,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         NetworkFactory.getApi()
                 .register(userName, MD5PassWord, userName)
                 .compose(NetworkTransformer())
-                .flatMap { it: DbUser ->
+                .flatMap {
                     hideLoadingDialog()
                     showLoadingDialog(getString(R.string.logging_tip))
                     AccountModel.login(userName!!, userPassWord!!, it!!.channel)

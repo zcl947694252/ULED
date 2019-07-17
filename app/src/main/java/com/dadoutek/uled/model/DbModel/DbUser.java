@@ -108,4 +108,20 @@ public class DbUser {
     public void setLast_region_id(String last_region_id) {
         this.last_region_id = last_region_id;
     }
+
+    @Override
+    public String toString() {
+        return "DbUser{" +
+                "id=" + id +
+                ", avatar='" + avatar + '\'' +
+                ", channel='" + channel + '\'' +
+                ", email='" + email + '\'' +
+                ", name='" + name + '\'' +
+                ", account='" + account + '\'' +
+                ", phone='" + phone + '\'' +
+                ", token='" + token + '\'' +
+                ", password='" + password + '\'' +
+                ", last_region_id='" + last_region_id + '\'' +
+                '}';
+    }
 }

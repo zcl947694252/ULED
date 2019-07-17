@@ -362,7 +362,6 @@ class SyncDataPutOrGetUtils {
         private var acc: String?=null
 
         private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
-
             NetworkFactory.getApi()
                     .getRegionList(token)
                     .compose(NetworkTransformer())
