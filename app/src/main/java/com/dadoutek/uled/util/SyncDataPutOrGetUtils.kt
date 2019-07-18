@@ -27,9 +27,6 @@ class SyncDataPutOrGetUtils {
     companion object {
 
         /********************************同步数据之上传数据 */
-
-//        var isSuccess: Boolean = true
-
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
 
@@ -47,7 +44,6 @@ class SyncDataPutOrGetUtils {
                 }
 
                 val observableList = ArrayList<Observable<String>>()
-//                val observableList : MutableList<Observable<String>> = ArrayList<Observable<String>>()
 
                 for (i in dbDataChangeList.indices) {
                     if (i == 0) {
@@ -59,13 +55,12 @@ class SyncDataPutOrGetUtils {
                                 dbDataChangeList[i].changeId,
                                 dbDataChangeList[i].changeType,
                                 dbUser!!.token, dbDataChangeList[i].id!!)
+
                         observable?.let { observableList.add(it) }
 
 
 
                     if (i == dbDataChangeList.size - 1) {
-//                                observableNew = observableList.get(j).mergeWith(observableList.get(j-1))
-//                                observableNew=Observable.merge(observableList)
                         val observables = arrayOfNulls<Observable<String>>(observableList.size)
                         observableList.toArray(observables)
 
@@ -77,7 +72,6 @@ class SyncDataPutOrGetUtils {
                                         override fun onComplete() {
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.complete()
-//                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                                             }
                                         }
                                         override fun onSubscribe(d: Disposable) {
@@ -89,14 +83,12 @@ class SyncDataPutOrGetUtils {
                                         override fun onError(e: Throwable) {
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.error(e.cause.toString())
-//                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                                             }
                                         }
                                     })
                         }else{
                             GlobalScope.launch(Dispatchers.Main) {
                                 syncCallback.complete()
-//                                            ToastUtils.showLong(context.getString(R.string.upload_data_success))
                             }
                         }
                     }
@@ -105,23 +97,20 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String, id: Long): Observable<String>? {
-            var result: Observable<String>?
-//            val token = "1"
+                                     token: String,id: Long): Observable<String>? {
             if(changeId!=null) {
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constant.DB_ADD -> {//todo 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
+
                                 return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
                             }
                             Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val group = DBUtils.getGroupByID(changeId)
                                 if (group != null) {
-//                                return GroupMdodel.update(token, changeId.toInt(),
-//                                        group!!.name, group.brightness, group.colorTemperature, group.color,id)
                                     return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
                                 }
                             }
@@ -140,6 +129,7 @@ class SyncDataPutOrGetUtils {
                             }
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getLightByID(changeId)
+
                                 if (light != null) {
                                     return LightModel.update(token, light,
                                             id, changeId.toInt())
@@ -356,12 +346,13 @@ class SyncDataPutOrGetUtils {
         @Synchronized
         fun syncGetDataStart(dbUser: DbUser, syncCallBack: SyncCallback) {
             val token = dbUser.token
+
             startGet(token, dbUser.account, syncCallBack)
         }
 
         private var acc: String?=null
 
-        private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
+        private fun startGet(token: String,accountNow: String, syncCallBack: SyncCallback) {
             NetworkFactory.getApi()
                     .getRegionList(token)
                     .compose(NetworkTransformer())
@@ -426,6 +417,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveGradient(item, true)
                             for (i in item.colorNodes.indices) {
+                                 LogUtils.e("是不是空的"+item.id)
                                 val k = i + 1
                                 DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
                             }
@@ -448,6 +440,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveScene(item, true)
                             for (i in item.actions.indices) {
+                                LogUtils.e("是不是空的2"+item.id)
                                 val k = i + 1
                                 DBUtils.saveSceneActions(item.actions[i], k.toLong(), item.id)
                             }

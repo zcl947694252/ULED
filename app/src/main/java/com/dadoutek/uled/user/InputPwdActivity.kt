@@ -48,7 +48,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     private fun initView() {
         dbUser = DbUser()
-        LogUtils.d(dbUser.toString()+"----"+dbUser.channel)
+        LogUtils.d(dbUser.toString() + "----" + dbUser.channel)
         if (type == Constant.TYPE_REGISTER) {
             pwd_notice.text = getString(R.string.please_password)
             pwd_title.text = getString(R.string.enter_password)
@@ -64,7 +64,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         pwd_eye.setOnClickListener(this)
         pwd_btn.setOnClickListener(this)
         pwd_return.setOnClickListener(this)
-        pwd_btn.addTextChangedListener(this)
+        pwd_input.addTextChangedListener(this)
     }
 
     override fun onClick(p0: View?) {
@@ -72,10 +72,10 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             R.id.pwd_eye -> eyePassword()
 
             R.id.pwd_return -> {
-                if (pwd_btn.text.equals(getString(R.string.next)) ||
-                        pwd_btn.text.equals(getString(R.string.login_bt_name))) {
+                if (pwd_btn.text.toString().equals(getString(R.string.next)) ||
+                        pwd_btn.text.toString().equals(getString(R.string.login_bt_name))) {
                     finish()
-                } else if (pwd_btn.text.equals(getString(R.string.complete))) {
+                } else if (pwd_btn.text.toString().equals(getString(R.string.complete))) {
                     pwd_input.hint = getString(R.string.please_password)
                     pwd_input.setText(password)
                     pwd_notice.text = getString(R.string.please_password)
@@ -84,8 +84,9 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             }
 
             R.id.pwd_btn -> {
-                val pwd = pwd_input.editableText.toString()
-                if (pwd_btn.text.equals(getString(R.string.next))) {
+                var pwd = pwd_input.editableText.toString()
+
+                if (pwd_btn.text.toString().equals(getString(R.string.next))) {
                     if (TextUtils.isEmpty(pwd)) {
                         toast(getString(R.string.please_password))
                         return
@@ -95,15 +96,14 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     pwd_input.text.clear()
                     pwd_input.hint = getString(R.string.please_again_password)
                     pwd_notice.text = getString(R.string.please_again_password)
-
-                } else if (pwd_btn.text.equals(getString(R.string.complete))) {
-                    if (!pwd.equals(password) && !TextUtils.isEmpty(password)) {
+                } else if (pwd_btn.text.toString().equals(getString(R.string.complete))) {
+                    if (pwd.equals(password) && !TextUtils.isEmpty(password)) {
+                        register()
+                    } else {
                         toast(getString(R.string.different_input))
-                        return
                     }
-                    register()
-                } else if (pwd_btn.text.equals(getString(R.string.login_bt_name))) {
-                    if (TextUtils.isEmpty(password)) {
+                } else if (pwd_btn.text.toString().equals(getString(R.string.login_bt_name))) {
+                    if (TextUtils.isEmpty(pwd)) {
                         toast(getString(R.string.please_password))
                         return
                     }
@@ -196,7 +196,6 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         override fun error(msg: String) {
             LogUtils.d("GetDataError:$msg")
         }
-
     }
 
     override fun afterTextChanged(p0: Editable?) {}

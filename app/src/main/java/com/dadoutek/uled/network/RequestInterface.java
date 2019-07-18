@@ -43,20 +43,20 @@ public interface RequestInterface {
     Observable<Response<DbUser>> login(@Field("account") String account,
                                        @Field("password") String password);
 
-    @GET("auth/salt")
-    Observable<Response<String>> getsalt(@Query("account") String account);
-
-    @GET("auth/account")
-    Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
 
     @FormUrlEncoded
     @POST("auth/forget")
     Observable<Response<DbUser>> putPassword(@Field("account") String account,
                                              @Field("password") String password);
 
+    //获取salt值
+    @GET("auth/salt")
+    Observable<Response<String>> getsalt(@Query("account") String account);
+
     @FormUrlEncoded
     @POST("auth/login_SMS")
     Observable<Response<DbUser>> smsLogin(@Field("phone") String phone);
+
 
     //用户注册相关接口
     @FormUrlEncoded
@@ -64,6 +64,10 @@ public interface RequestInterface {
     Observable<Response<DbUser>> register(@Field("phone") String phone,
                                           @Field("password") String password,
                                           @Field("name") String name);
+
+    //登录蓝牙使用
+    @GET("auth/account")
+    Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
 
     //区域相关接口
 
@@ -209,7 +213,7 @@ public interface RequestInterface {
                                                 @Body RequestBody body);
 
     //删除渐变
-    @HTTP(method = "DELETE",path = "dynamic-change/remove",hasBody = true)
+    @HTTP(method = "DELETE", path = "dynamic-change/remove", hasBody = true)
 //    @DELETE("api/ext/soybean/dynamic-changeToScene/remove")
     Observable<Response<String>> deleteGradients(@Header("token") String token,
                                                  @Body DbDeleteGradientBody body);
@@ -225,7 +229,6 @@ public interface RequestInterface {
                                             @Query("name") String name,
                                             @Query("email") String email,
                                             @Query("introduction") String introduction);
-
 
     @DELETE("auth/clear")
 //    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)

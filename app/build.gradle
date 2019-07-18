@@ -18,7 +18,7 @@ MobSDK {
                 "android.permission.READ_CONTACTS",
                 "android.permission.RECEIVE_SMS"
     }
-    SMSSDK { version "3.2.1" }
+    SMSSDK { version "3.3.2" }
 }
 
 android {
@@ -28,8 +28,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 243
-        versionName "3.0.1"
+        versionCode 244
+        versionName "3.0.2"
 
 
         multiDexEnabled true
@@ -139,6 +139,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.0.0'
     implementation 'com.airbnb.android:lottie:2.7.0'
     implementation 'com.rxjava.rxlife:rxlife:1.0.8'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
 //    implementation 'com.github.wanglu1209:WPopup:lastReleases'
 //    implementation 'actionsheet:1.0.3'
 }

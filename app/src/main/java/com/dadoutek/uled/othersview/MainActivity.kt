@@ -517,6 +517,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 try {
                     val data = jsonObject.getString("isUsable")
                     var judge = "false"
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), "isShowDot", data == judge)
                     if (data == judge) {
                         XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
                         XiaomiUpdateAgent.update(this@MainActivity)

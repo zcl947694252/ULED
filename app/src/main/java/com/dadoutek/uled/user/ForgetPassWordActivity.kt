@@ -8,7 +8,6 @@ import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
-import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
@@ -108,7 +107,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
             showLoadingDialog(getString(R.string.get_code_ing))
-            SMSSDK.getVerificationCode(countryCode, phoneNum)
+            //SMSSDK.getVerificationCode(countryCode, phoneNum)
         }
     }
 

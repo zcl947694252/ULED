@@ -730,4 +730,6 @@
     <string name="five_minute">5分钟</string>
     <string name="auto_regist_account">登录后自动注册账号</string>
     <string name="input_pwd">输入密码</string>
+    <string name="area">区域</string>
+
 </resources>

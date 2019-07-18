@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class FileListAdapter extends BaseAdapter {
 
+
+
     private Context mContext;
     private List<File> mFiles;
 

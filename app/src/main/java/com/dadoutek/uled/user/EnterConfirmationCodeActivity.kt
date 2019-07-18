@@ -31,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
+import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -116,9 +117,10 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     hideLoadingDialog()
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
+                        toast("type"+type)
                         // TODO 处理验证成功的结果
                         if (type == Constant.TYPE_VERIFICATION_CODE) {
-                            verificationLogin()
+                           verificationLogin()
                         } else if (type == Constant.TYPE_REGISTER) {
                             val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                             intent.putExtra("phone", phone)
@@ -130,6 +132,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                             intent.putExtra("phone", phone)
                             startActivity(intent)
                         }
+
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
@@ -197,6 +200,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private fun verificationLogin() {
         if (!StringUtils.isTrimEmpty(phone)) {
             showLoadingDialog(getString(R.string.logging_tip))
+            LogUtils.e("logging: " + "登录错误")
             AccountModel.smsLogin(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
@@ -205,12 +209,13 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 //                            showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
+                             LogUtils.e("logging: " + "登录成功错误")
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            LogUtils.d("logging: " + "登录错误" + e.message)
-                            hideLoadingDialog()
+                             LogUtils.e("logging: " + "登录错误" + e.message)
+                             hideLoadingDialog()
                         }
                     })
         } else {

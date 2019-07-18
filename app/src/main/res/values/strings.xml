@@ -805,4 +805,7 @@
 
     <string name="trigger_mode_text">Trigger mode :</string>
     <string name="delay_time_unit_text">Delay time unit :</string>
+    <string name="please_sdk_first">Please mount SD card first</string>
+    <string name="版本更新">Version updates</string>
+    <string name="area">area</string>
 </resources>

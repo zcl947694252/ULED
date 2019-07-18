@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
@@ -36,16 +35,14 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.telink.bluetooth.event.NotificationEvent
-
-import java.util.ArrayList
-import java.util.concurrent.TimeUnit
-
+import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -61,6 +58,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     internal var isClickExlogin = false
     private var compositeDisposable = CompositeDisposable()
     private var mWakeLock: PowerManager.WakeLock? = null
+    var b: Boolean = false
 
     private var mReceive: BluetoothStateBroadcastReceive? = null
 
@@ -167,6 +165,9 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         } else {
             sleepTime = 200
         }
+
+        b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), "isShowDot", false)
+
         registerBluetoothReceiver()
     }
 
@@ -174,8 +175,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                               savedInstanceState: Bundle?): View? {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.fragment_me, null)
-//        initView(view)
-//        initClick()
         return view
     }
 
@@ -199,10 +198,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             if (bluetooth_image != null) {
                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                 bluetooth_image.isEnabled = true
-                bluetooth_image.setOnClickListener(View.OnClickListener {
+                bluetooth_image.setOnClickListener {
                     var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                     dialog.show()
-                })
+                }
             }
 
         } else {
@@ -210,10 +209,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 if (bluetooth_image != null) {
                     bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                     bluetooth_image.isEnabled = true
-                    bluetooth_image.setOnClickListener(View.OnClickListener {
+                    bluetooth_image.setOnClickListener {
                         var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                         dialog.show()
-                    })
+                    }
                 }
             } else {
                 if (bluetooth_image != null) {
@@ -249,10 +248,11 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         oneClickBackup?.setOnClickListener(this)
         oneClickReset?.setOnClickListener(this)
         constantQuestion?.setOnClickListener(this)
-//        showGuideAgain?.setOnClickListener(this)
         resetAllGroup?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
         region?.setOnClickListener(this)
+
+        version_dot.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -261,18 +261,13 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         appVersion!!.text = versionName
         //暂时屏蔽
         updateIte!!.visibility = View.GONE
-//        if (SharedPreferencesUtils.isDeveloperModel()) {
-//            copyDataBase!!.visibility = View.VISIBLE
-//            chearCache!!.visibility = View.VISIBLE
-//            resetAllGroup.visibility=View.VISIBLE
-//        } else {
-//            copyDataBase!!.visibility = View.GONE
-//            chearCache!!.visibility = View.VISIBLE
-//            resetAllGroup.visibility=View.GONE
-//        }
 
         userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
         userName!!.text = DBUtils.lastUser!!.phone
+        if (b)
+            version_dot!!.visibility = View.VISIBLE
+        else
+            version_dot!!.visibility = View.GONE
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -301,10 +296,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     if (bluetooth_image != null) {
                         bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                         bluetooth_image.isEnabled = true
-                        bluetooth_image.setOnClickListener(View.OnClickListener {
+                        bluetooth_image.setOnClickListener {
                             var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                             dialog.show()
-                        })
+                        }
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
@@ -332,39 +327,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-//    private fun initOnLayoutListener() {
-//        val view = activity?.getWindow()?.getDecorView()
-//        val viewTreeObserver = view?.getViewTreeObserver()
-//        viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-//            override fun onGlobalLayout() {
-//                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
-//                lazyLoad()
-//            }
-//        })
-//    }
-//
-//    fun lazyLoad() {
-//        val guide1 = chearCache
-//        val guide2 = oneClickBackup
-//        val guide3 = constantQuestion
-//        val guide4 = oneClickReset
-//        val guide5 = appVersion
-//        val guide6 = exitLogin
-//        val guide7 = showGuideAgain
-//        GuideUtils.guideBuilder(this, Constant.TAG_MeFragment)
-//                .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple, getString(R.string.me_guide_1)))
-//                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple, getString(R.string.me_guide_2)))
-//                .addGuidePage(GuideUtils.addGuidePage(guide3, R.layout.view_guide_simple, getString(R.string.me_guide_3)))
-//                .addGuidePage(GuideUtils.addGuidePage(guide4, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_4)))
-//                .addGuidePage(GuideUtils.addGuidePage(guide5, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_5)))
-//                .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_6)))
-//                .addGuidePage(GuideUtils.addGuidePage(guide7, R.layout.view_guide_simple_bottom, getString(R.string.me_guide_7)))
-//                .show()
-//    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -383,10 +345,19 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 startActivity(intent)
             }
             R.id.region -> {
-                var intent = Intent(activity, HumanBodySensorActivity::class.java)
+                var intent = Intent(activity, NetworkActivity::class.java)
                 startActivity(intent)
             }
+            R.id.version_dot -> { detectUpdate()}
         }
+    }
+
+    /**
+     * 检查App是否有新版本
+     */
+    private fun detectUpdate() {
+        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
+        XiaomiUpdateAgent.update(context)
     }
 
     private fun gotoResetAllGroup() {
@@ -508,8 +479,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
-                            hideLightVersion()
-                            //                                                addEventListener(); //加回连接状态监听。
+
                         }
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
@@ -531,19 +501,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     }
 
-    private fun hideLightVersion() {
-        //        tvLightVersionText.setVisibility(View.GONE);
-        //        tvLightVersion.setVisibility(View.GONE);
-    }
-
-    private fun addEventListener() {
-        val act = activity as MainActivity?
-        act?.addEventListeners()
-    }
-
-    private fun onOnlineStatusNotify(event: NotificationEvent) {
-        Log.d("NNDadou", "onOnlineStatusNotify: " + event.type)
-    }
 
     private fun exitLogin() {
         isClickExlogin = true

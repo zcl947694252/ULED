@@ -1,0 +1,24 @@
+package com.dadoutek.uled.util
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.PopupWindow
+
+/**
+ * 全都是静态方法的情况 : class 类名 改为 object 类名 即可
+object MoreImageUtils {
+fun filesToMultipartBodyParts(files: List<File>): List<MultipartBody.Part>? {
+}
+普通静态方法
+一部分是静态方法的情况 : 将方法用 companion object { } 包裹即可
+
+ */
+object PopUtil {
+        fun makeMW(context: Context, res: Int): PopupWindow? {
+            return null
+            var popView = LayoutInflater.from(context).inflate(res, null)
+            var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            pop!!.isOutsideTouchable = true
+        }
+}

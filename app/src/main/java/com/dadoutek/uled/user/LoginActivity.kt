@@ -100,7 +100,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         initData()
         initView()
         initListener()
-//        addLayoutListener(linearLayout_1,btn_login)
     }
 
 
@@ -190,7 +189,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
             R.id.btn_register -> {
-                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+                var intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")
                 startActivity(intent)
             }
@@ -222,7 +221,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun verificationCode() {
-        val intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
+        var intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
         intent.putExtra("type", Constant.TYPE_VERIFICATION_CODE)
         startActivity(intent)
         finish()
@@ -394,7 +393,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun forgetPassword() {
-        val intent = Intent(this@LoginActivity, ForgetPassWordActivity::class.java)
+        var intent = Intent(this@LoginActivity, ForgetPassWordActivity::class.java)
         intent.putExtra("fromLogin", "forgetPassword")
         startActivity(intent)
     }
@@ -412,7 +411,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
        if(!StringUtils.isTrimEmpty(phone)){
-           val intent = Intent(this,EnterPasswordActivity::class.java)
+           var intent = Intent(this,EnterPasswordActivity::class.java)
            intent.putExtra("USER_TYPE",Constant.TYPE_LOGIN)
            intent.putExtra("phone",phone)
            startActivity(intent)

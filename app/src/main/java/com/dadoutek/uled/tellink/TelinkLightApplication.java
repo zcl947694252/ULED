@@ -1,21 +1,14 @@
 package com.dadoutek.uled.tellink;
 
 import android.annotation.SuppressLint;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.text.TextUtils;
-import android.widget.ImageView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
-import com.dadoutek.uled.R;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DaoSessionInstance;
@@ -23,7 +16,6 @@ import com.dadoutek.uled.model.DaoSessionUser;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.service.SendLightsInfo;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
@@ -49,8 +41,13 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     private static DaoSession daoSession;
     private Object Toolbar;
+        static TelinkLightApplication mInstance = null;
 
     private Intent intent;
+
+    public static Context getContext() {
+        return mInstance;
+    }
 
     @SuppressLint("SdCardPath")
     @Override
@@ -59,6 +56,11 @@ public final class TelinkLightApplication extends TelinkApplication {
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
         DaoSessionInstance.checkAndUpdateDatabase();
         DaoSessionUser.checkAndUpdateDatabase();
+
+        if (null == mInstance) {
+            mInstance = this;
+        }
+
 
         Utils.init(this);
         if (!AppUtils.isAppDebug()) {

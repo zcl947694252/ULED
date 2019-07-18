@@ -2,7 +2,6 @@ package com.dadoutek.uled.othersview
 
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
@@ -12,7 +11,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.InputType
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,24 +62,19 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private val CMD_OPEN_LIGHT = 0X01
     private val CMD_CLOSE_LIGHT = 0X00
     private val CMD_CONTROL_GROUP = 0X02
-
     private var switchMode = 0X01
     lateinit var secondsList: Array<String>
     private var selectTime = 10
     private var currentPageIsEdit = false
-
     private var showGroupList: MutableList<ItemGroup>? = null
     private var showCheckListData: MutableList<DbGroup>? = null
-
     private var modeStartUpMode = 0
     private var modeDelayUnit = 2
     private var modeSwitchMode = 0
     private var modeTriggerCondition = 0
-
     private val MODE_START_UP_MODE_OPEN = 0
     private val MODE_DELAY_UNIT_SECONDS = 0
     private val MODE_SWITCH_MODE_MOMENT = 0
-
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
@@ -157,7 +150,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun getVersion() {
         var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
-            dstAdress = mDeviceInfo.meshAddress
+            dstAdress = mDeviceInfo!!.meshAddress
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
                         //                        versionLayoutPS.visibility = View.VISIBLE
