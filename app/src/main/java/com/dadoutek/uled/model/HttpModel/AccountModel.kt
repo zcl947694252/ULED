@@ -27,19 +27,15 @@ object AccountModel {
                     account = response
                     NetworkFactory.getApi()
                             .getsalt(response)
-                            .compose(NetworkTransformer())
-
-                }
+                            .compose(NetworkTransformer())}
                 .flatMap { response: String ->
                     val salt = response
-
                     val md5Pwd = (NetworkFactory.md5(
                             NetworkFactory.md5(
                                     NetworkFactory.md5(password) + account) + salt))
 
                     NetworkFactory.getApi().login(account, md5Pwd)
-                            .compose(NetworkTransformer())
-                }
+                            .compose(NetworkTransformer()) }
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
@@ -57,15 +53,12 @@ object AccountModel {
                     account = response
                     NetworkFactory.getApi()
                             .getsalt(response)
-                            .compose(NetworkTransformer())
-
-                }
+                            .compose(NetworkTransformer())}
                 .flatMap { response: String ->
                     val salt = response
 
                     NetworkFactory.getApi().smsLogin(phone)
-                            .compose(NetworkTransformer())
-                }
+                            .compose(NetworkTransformer())}
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
@@ -79,8 +72,7 @@ object AccountModel {
                 .updateUser(token, avatar, name, email, introduction)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
-                .doOnNext {
-                }
+                .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
 

@@ -14,7 +14,6 @@ abstract class NetworkObserver<t>() : Observer<t> {
     override fun onSubscribe(d: Disposable) {
 
     }
-
     override fun onError(e: Throwable) {
 
         //HTTP错误

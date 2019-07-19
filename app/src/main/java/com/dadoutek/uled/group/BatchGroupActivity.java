@@ -1,17 +1,14 @@
 package com.dadoutek.uled.group;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.bluetooth.le.ScanFilter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,8 +34,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
@@ -46,25 +41,19 @@ import com.dadoutek.uled.connector.ScanningConnectorActivity;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.light.DeviceDetailAct;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DeviceType;
-import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.LogInfoActivity;
-import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
-import com.dadoutek.uled.util.AppUtils;
-import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.GuideUtils;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
@@ -79,15 +68,10 @@ import com.telink.bluetooth.event.LeScanEvent;
 import com.telink.bluetooth.event.MeshEvent;
 import com.telink.bluetooth.event.NotificationEvent;
 import com.telink.bluetooth.light.DeviceInfo;
-import com.telink.bluetooth.light.ErrorReportInfo;
 import com.telink.bluetooth.light.LeAutoConnectParameters;
 import com.telink.bluetooth.light.LeRefreshNotifyParameters;
-import com.telink.bluetooth.light.LeScanParameters;
-import com.telink.bluetooth.light.LeUpdateParameters;
 import com.telink.bluetooth.light.LightAdapter;
-import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.bluetooth.light.Parameters;
-import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
@@ -109,8 +93,6 @@ import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
-
-import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
@@ -279,7 +261,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private void startBlink(DbLight light) {
 //        int dstAddress = light.getMeshAddr();
         DbGroup group;
-        if(light.getBelongGroupId()!=null) {
+        if (light.getBelongGroupId() != null) {
             DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId());
             if (groupOfTheLight == null)
                 group = groups.get(0);
@@ -309,7 +291,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void stopBlink(DbLight light) {
         Disposable disposable = mBlinkDisposables.get(light.getMeshAddr());
-        disposable.dispose();
+        if (disposable != null)
+            disposable.dispose();
     }
 
     //扫描失败处理方法
@@ -397,8 +380,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
-        for(int i =0;i<nowLightList.size();i++){
-            if(nowLightList.get(i).selected){
+        for (int i = 0; i < nowLightList.size(); i++) {
+            if (nowLightList.get(i).selected) {
                 nowLightList.get(i).selected = false;
             }
         }
@@ -1038,7 +1021,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         List<DbLight> list = DBUtils.INSTANCE.getAllNormalLight();
         List<DbLight> no_list = new ArrayList<>();
         List<DbLight> group_list = new ArrayList<>();
-        List<DbLight> all_light =new ArrayList<>();
+        List<DbLight> all_light = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
             if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.getInstance().getString(R.string.not_grouped))) {
@@ -1049,26 +1032,26 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         }
 
         if (no_list.size() > 0) {
-            for (int i = 0; i < no_list.size(); i++){
+            for (int i = 0; i < no_list.size(); i++) {
                 all_light.add(no_list.get(i));
             }
         }
 
-        if(group_list.size()>0){
-            for (int i = 0; i < group_list.size(); i++){
+        if (group_list.size() > 0) {
+            for (int i = 0; i < group_list.size(); i++) {
                 all_light.add(group_list.get(i));
             }
         }
 
-        if(lightType.equals("cw_light_group")){
-           List<DbLight> cwLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
+        if (lightType.equals("cw_light_group")) {
+            List<DbLight> cwLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
             this.adapter = new DeviceListAdapter(cwLightGroup, this);
             nowLightList.addAll(cwLightGroup);
-        }else if(lightType.equals("rgb_light_group")){
+        } else if (lightType.equals("rgb_light_group")) {
             List<DbLight> rgbLightGroup = DBUtils.INSTANCE.getLightByGroupID(selectGroupId);
             this.adapter = new DeviceListAdapter(rgbLightGroup, this);
             nowLightList.addAll(rgbLightGroup);
-        }else {
+        } else {
             this.adapter = new DeviceListAdapter(all_light, this);
             nowLightList.addAll(all_light);
         }
@@ -1145,13 +1128,13 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
         lightType = intent.getStringExtra("lightType");
         if (lightType.equals("cw_light")) {
             groupLight = intent.getStringExtra("cw_light_group_name");
-        }else if(lightType.equals("cw_light_group")){
-            selectGroupId = intent.getIntExtra("group",0);
-        }else if(lightType.equals("rgb_light_group")){
-            selectGroupId = intent.getIntExtra("group",0);
+        } else if (lightType.equals("cw_light_group")) {
+            selectGroupId = intent.getIntExtra("group", 0);
+        } else if (lightType.equals("rgb_light_group")) {
+            selectGroupId = intent.getIntExtra("group", 0);
         }
 
-        if(DBUtils.INSTANCE.getGroupByMesh(0xffff)!=null){
+        if (DBUtils.INSTANCE.getGroupByMesh(0xffff) != null) {
             allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
         }
 
@@ -1187,7 +1170,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 initHasGroup = false;
                 currentGroupIndex = -1;
             }
-        }else if(lightType.equals("rgb_light_group")){
+        } else if (lightType.equals("rgb_light_group")) {
             List<DbGroup> list = DBUtils.INSTANCE.getGroupList();
             groups.clear();
             if (scanCURTAIN) {
@@ -1385,8 +1368,8 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private String getDeviceName(DbLight light) {
-        if (light.getBelongGroupId()!=null) {
-            if(light.getBelongGroupId() != allLightId){
+        if (light.getBelongGroupId() != null) {
+            if (light.getBelongGroupId() != allLightId) {
                 return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
             }
             return getString(R.string.not_grouped);

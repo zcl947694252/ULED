@@ -16,7 +16,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 
 import com.telink.util.ContextUtil;
 
@@ -372,7 +371,6 @@ public final class LeBluetooth {
 
         @Override
         public void run() {
-
             if (mCallback != null) {
                 mCallback.onScanFail(SCAN_FAILED_LOCATION_DISABLE);
             }

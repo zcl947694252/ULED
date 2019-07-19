@@ -3,15 +3,13 @@ package com.dadoutek.uled.model.DbModel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
-
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/18.
@@ -47,9 +45,7 @@ object DBUtils {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
 
-            return qb.where(
-                    DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
-                    .list()
+            return qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion())).list()
         }
 
     val swtichList: MutableList<DbSwitch>
@@ -730,6 +726,7 @@ object DBUtils {
     }
 
     fun saveUserDao(dbUser: DbUser) {
+        //insertOrReplace有数据就更新该数据 没有就直接插入
         DaoSessionUser.getInstance().dbUserDao.insertOrReplace(dbUser)
     }
 

@@ -488,12 +488,12 @@
     <string name="name_can_not_null">名字不能为空</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
     <string name="w_bright">白光亮度:</string>
-    <string name="light_light">小夜灯</string>
-    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
-    <string name="light_light_title">小夜灯</string>
+    <string name="light_light">人体感应器</string>
+    <string name="light_light_tip">请先把人体感应器调整到配置模式</string>
+    <string name="light_light_title">人体感应器</string>
     <string name="delay_time">延时时间</string>
     <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
-    <string name="night_light_title">小夜灯</string>
+    <string name="night_light_title">人体感应器</string>
     <string name="current_select_group">当前选择的分组:</string>
     <string name="selected">选中</string>
     <string name="unSelect">未选中</string>
@@ -544,7 +544,7 @@
     <string name="switch_name">开关</string>
     <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
     <string name="sensor">传感器</string>
-    <string name="sensor_describe">例如：小夜灯,PIR</string>
+    <string name="sensor_describe">例如：人体感应器,PIR</string>
     <string name="add_device">添加设备</string>
     <string name="update_name_gp">修改组名</string>
     <string name="curtain">窗帘</string>
@@ -731,5 +731,7 @@
     <string name="auto_regist_account">登录后自动注册账号</string>
     <string name="input_pwd">输入密码</string>
     <string name="area">区域</string>
+    <string name="刷新二维码">刷新二维码</string>
+    <string name="当前网络拥有者">当前网络拥有者:</string>
 
 </resources>

@@ -1,8 +1,8 @@
 package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
@@ -10,7 +10,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -42,7 +41,6 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -693,7 +691,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             } else {
                 startScan();
             }
-//            }
         }
     }
 
@@ -701,20 +698,37 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            mPath = getPath(this, uri);
-//            mPath = data.getStringExtra("path");
-            tvFile.setText(getString(R.string.select_file, mPath));
-            SharedPreferencesUtils.saveUpdateFilePath(mPath);
-            btn_start_update.setVisibility(View.VISIBLE);
-            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
+
+            //Uri uri = data.getData();
+            //mPath = getPath(this, uri);
+            //tvFile.setText(getString(R.string.select_file, mPath));
+            //SharedPreferencesUtils.saveUpdateFilePath(mPath);
+            //btn_start_update.setVisibility(View.VISIBLE);
+            //server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
+
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = data.getData();
+                if ("file".equalsIgnoreCase(uri.getScheme())) {//使用第三方应用打开
+                    mPath = uri.getPath();
+                    tvFile.setText(mPath);
+                   // Toast.makeText(this, mPath + "11111", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
+                    mPath = getPathFour(this, uri);
+                    tvFile.setText(mPath);
+                    //Toast.makeText(this, mPath, Toast.LENGTH_SHORT).show();
+                } else {//4.4以下下系统调用方法
+                    mPath = getRealPathFromURI(uri);
+                    tvFile.setText(mPath);
+                    //Toast.makeText(OTAUpdateActivity.this, mPath + "222222", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
-    public String getPath(final Context context, final Uri uri) {
-
+    private String getPathFour(Context context, Uri uri) {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
         // DocumentProvider
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
@@ -768,6 +782,24 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return null;
     }
 
+    /**
+     * 4.4
+     * @param contentUri
+     * @return
+     */
+    public String getRealPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (null != cursor && cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+            cursor.close();
+        }
+        return res;
+    }
+
+
     public boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
@@ -780,8 +812,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
-    public String getDataColumn(Context context, Uri uri, String selection,
-                                String[] selectionArgs) {
+    public String getDataColumn(Context context, Uri uri, String selection, String[]
+            selectionArgs) {
 
         Cursor cursor = null;
         final String column = "_data";
@@ -801,7 +833,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return null;
     }
 
-
 /*    private float getVersionValue(String version) {
         return Float.valueOf(version.substring(1));
     }*/
@@ -817,7 +848,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void chooseFile() {
-//        startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
+        //startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         //intent.setType(“image/*”);//选择图片
         //intent.setType(“audio/*”); //选择音频
@@ -842,7 +873,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      * 0:最新， 1：可升级， -n：null
      */
     public int compareVersion(String lightVersion, String newVersion) {
-
 //        return lightVersion.equals(newVersion) ? 0 : 1;
         return 1;
     }

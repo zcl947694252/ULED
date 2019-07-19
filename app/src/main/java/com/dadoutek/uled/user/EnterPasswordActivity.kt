@@ -98,9 +98,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
                         }
                         login()
                     }
-
                     Constant.TYPE_FORGET_PASSWORD -> forgetPassword()
-
                 }
             }
 

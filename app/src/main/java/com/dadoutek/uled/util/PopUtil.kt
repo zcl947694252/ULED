@@ -2,6 +2,7 @@ package com.dadoutek.uled.util
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 
@@ -16,9 +17,24 @@ fun filesToMultipartBodyParts(files: List<File>): List<MultipartBody.Part>? {
  */
 object PopUtil {
         fun makeMW(context: Context, res: Int): PopupWindow? {
-            return null
             var popView = LayoutInflater.from(context).inflate(res, null)
             var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             pop!!.isOutsideTouchable = true
+            return pop
+        }
+        fun makeMWf(context: Context, res: Int): PopupWindow? {
+            var popView = LayoutInflater.from(context).inflate(res, null)
+            var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            pop!!.isOutsideTouchable = false
+            return pop
+        }
+
+        fun show(pop: PopupWindow?, view: View, gravity: Int){
+            if (!pop!!.isShowing)
+                pop!!.showAtLocation(view, gravity, 0, 0)
+        }
+        fun dismiss(pop: PopupWindow?){
+            if (pop!=null&&pop!!.isShowing)
+                pop!!.dismiss()
         }
 }

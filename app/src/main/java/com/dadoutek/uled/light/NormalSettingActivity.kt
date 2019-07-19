@@ -5,8 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -20,9 +18,11 @@ import android.view.*
 import android.view.View.OnClickListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.SeekBar
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
-
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -32,7 +32,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
@@ -50,14 +49,11 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
-import kotlinx.android.synthetic.main.fragment_device_setting.sbBrightness
-import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -1844,16 +1840,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             clickNum = 1
-            LogUtils.d("progress:_1__" + seekBar.progress)
+            LogUtils.d("progress:_1__" + seekBar!!.progress)
             this.preTime = System.currentTimeMillis()
-            this.onValueChange(seekBar, seekBar.progress, true, false)
+            this.onValueChange(seekBar, seekBar!!.progress, true, false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
             LogUtils.d("progress:_2__" + progress)
             val currentTime = System.currentTimeMillis()
-            tv_Brightness.text = seekBar.progress.toString() + "%"
+            tv_Brightness.text = seekBar!!.progress.toString() + "%"
             clickNum = 1
             onValueChangeView(seekBar, progress, true, false)
             if (currentTime - this.preTime > this.delayTime) {

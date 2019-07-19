@@ -2,29 +2,20 @@ package com.dadoutek.uled.scene
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.IBinder
 import android.support.constraint.ConstraintLayout
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-
 import com.app.hubert.guide.core.Builder
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -33,9 +24,7 @@ import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbScene
-import com.dadoutek.uled.model.DbModel.DbSceneActions
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -44,11 +33,10 @@ import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.fragment_scene.*
-import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import com.chad.library.adapter.base.BaseQuickAdapter.OnItemLongClickListener
 import java.util.*
 
 /**
@@ -60,7 +48,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var adaper: SceneRecycleListAdapter? = null
 
     private var toolbar: Toolbar? = null
-    internal var toolbarTitle: TextView? = null
 
     private var telinkLightApplication: TelinkLightApplication? = null
     //    private List<Scenes> scenesListData;
@@ -205,23 +192,20 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }, 200)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
 
     private fun initToolBar(view: View) {
         setHasOptionsMenu(true)
         toolbar = view.findViewById(R.id.toolbar)
-        toolbar!!.setTitle(R.string.scene_name)
+        toolbar?.setTitle(R.string.scene_name)
 
-        val btn_add = toolbar!!.findViewById<ImageView>(R.id.img_function1)
-        val btn_delete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
+        val btn_add = toolbar?.findViewById<ImageView>(R.id.img_function1)
+        val btn_delete = toolbar?.findViewById<ImageView>(R.id.img_function2)
 
 //        btn_add.visibility = View.VISIBLE
-        btn_delete.visibility = View.VISIBLE
+        btn_delete?.visibility = View.VISIBLE
 
-        btn_add.setOnClickListener(this)
-        btn_delete.setOnClickListener(this)
+        btn_add?.setOnClickListener(this)
+        btn_delete?.setOnClickListener(this)
     }
 
     fun lazyLoad(showTypeView: Int) {
@@ -232,7 +216,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_KEY, false)
         if (guideShowCurrentPage) {
             GuideUtils.resetSceneGuide(activity!!)
-            val guide1 = toolbar!!.findViewById<View>(R.id.img_function1) as ImageView
+            val guide1 = toolbar?.findViewById<View>(R.id.img_function1) as ImageView
             GuideUtils.guideBuilder(this, GuideUtils.STEP7_GUIDE_ADD_SCENE)
                     .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_scene_1, getString(R.string.scene_guide_1),
                             View.OnClickListener { guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, activity!!)).show()
@@ -291,11 +275,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         telinkLightApplication = this.activity!!.application as TelinkLightApplication
         scenesListData = DBUtils.sceneList
 
-        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-        toolbar!!.navigationIcon = null
-        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-        toolbar!!.setTitle(R.string.scene_name)
+        img_function2?.visibility = View.GONE
+        toolbar?.navigationIcon = null
+        image_bluetooth?.visibility = View.VISIBLE
+        img_function1?.visibility = View.VISIBLE
+        toolbar?.setTitle(R.string.scene_name)
     }
 
     private fun initView() {
@@ -341,10 +325,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         isDelete = true
         adaper!!.changeState(isDelete)
-        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
-        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
-        toolbar!!.title = ""
+        img_function1?.visibility = View.GONE
+        img_function2?.visibility = View.VISIBLE
+        image_bluetooth?.visibility = View.GONE
+        toolbar?.title = ""
         setBack()
         adaper!!.notifyDataSetChanged()
 //        refreshData()
@@ -352,13 +336,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun setBack() {
-        toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar!!.setNavigationOnClickListener {
-            toolbar!!.setTitle(R.string.scene_name)
-            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-            toolbar!!.navigationIcon = null
-            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar?.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar?.setNavigationOnClickListener {
+            toolbar?.setTitle(R.string.scene_name)
+            img_function2?.visibility = View.GONE
+            toolbar?.navigationIcon = null
+            image_bluetooth?.visibility = View.VISIBLE
+            img_function1?.visibility = View.VISIBLE
             isDelete = false
             adaper!!.changeState(isDelete)
             for (i in scenesListData!!.indices) {
@@ -432,11 +416,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == 3 && resultCode == Constant.RESULT_OK) {
         initData()
         initView()
-//            stepEndGuide1()
-//        }
     }
 
     @Synchronized
@@ -469,9 +450,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         super.setUserVisibleHint(isVisibleToUser)
         builder = GuideUtils.guideBuilder(this, Constant.TAG_SceneFragment)
         if (isVisibleToUser) {
-            //            initData();
-            //            initView();
-            //            showLoadingDialog("ss");
             refreshAllData()
             refreshView()
             initOnLayoutListener(1)
@@ -492,14 +470,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     addNewScene!!.visibility = View.VISIBLE
                 }
             } else {
-                if(recyclerView!=null){
+                if (recyclerView != null) {
                     recyclerView!!.visibility = View.GONE
                     no_scene!!.visibility = View.VISIBLE
                     addNewScene!!.visibility = View.GONE
                 }
             }
 
-            if(recyclerView!=null){
+            if (recyclerView != null) {
                 val layoutmanager = LinearLayoutManager(activity)
                 layoutmanager.orientation = LinearLayoutManager.VERTICAL
                 recyclerView!!.layoutManager = layoutmanager
@@ -519,11 +497,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 adaper!!.bindToRecyclerView(recyclerView)
             }
 
-            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-            toolbar!!.navigationIcon = null
-            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            toolbar!!.setTitle(R.string.scene_name)
+            img_function2?.visibility = View.GONE
+            toolbar?.navigationIcon = null
+            image_bluetooth?.visibility = View.VISIBLE
+            img_function1?.visibility = View.VISIBLE
+            toolbar?.setTitle(R.string.scene_name)
 
             isDelete = false
             adaper!!.changeState(isDelete)

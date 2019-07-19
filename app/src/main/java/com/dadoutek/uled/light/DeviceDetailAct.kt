@@ -4,12 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.le.ScanFilter
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.drawable.ColorDrawable
-import android.hardware.Sensor
-import android.hardware.usb.UsbDevice.getDeviceName
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -21,31 +18,26 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.R.string.grouping
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
-import com.dadoutek.uled.group.LightGroupingActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
-import com.dadoutek.uled.scene.SceneRecycleListAdapter
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -66,15 +58,8 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_config_light_light.*
 import kotlinx.android.synthetic.main.activity_device_detail.*
-import kotlinx.android.synthetic.main.activity_device_detail.add_device_btn
-import kotlinx.android.synthetic.main.activity_device_detail.no_device_relativeLayout
-import kotlinx.android.synthetic.main.activity_device_detail.recycleView
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
@@ -82,9 +67,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import org.jetbrains.anko.inputMethodManager
-import java.lang.Exception
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -366,8 +349,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         this.mApplication = this.application as TelinkLightApplication
-//        initDate()
-//        initView()
+
+        lightsData = mutableListOf<DbLight>()
     }
 
     override fun onResume() {
