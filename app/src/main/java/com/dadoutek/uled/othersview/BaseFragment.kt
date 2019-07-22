@@ -15,15 +15,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
-import com.blankj.utilcode.util.ActivityUtils
-
 import com.dadoutek.uled.R
-import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
-import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseFragment : Fragment() {
@@ -120,10 +114,10 @@ open class BaseFragment : Fragment() {
                     if (toolbar != null) {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
                             var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
                             dialog.show()
-                        })
+                        }
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
@@ -133,15 +127,15 @@ open class BaseFragment : Fragment() {
                             if (toolbar != null) {
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
                                     var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
                                     dialog.show()
-                                })
+                                }
                             }
                         }
                         BluetoothAdapter.STATE_ON -> {
                             if (toolbar != null) {
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                             }
                         }

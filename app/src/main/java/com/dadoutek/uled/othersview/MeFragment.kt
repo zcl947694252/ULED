@@ -34,6 +34,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.user.DeveloperActivity
 import com.dadoutek.uled.util.*
 import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.Observable
@@ -101,9 +102,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 isClickExlogin = false
                 hideLoadingDialog()
             }
-
-            //            Log.d("SyncLog", "error: " + msg);
-            //            ToastUtils.showLong(getString(R.string.sync_error_contant));
         }
     }
 
@@ -251,8 +249,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         resetAllGroup?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
         region?.setOnClickListener(this)
-
-        version_dot.setOnClickListener(this)
+        developer.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -264,10 +261,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
         userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
         userName!!.text = DBUtils.lastUser!!.phone
-        if (b)
-            version_dot!!.visibility = View.VISIBLE
-        else
-            version_dot!!.visibility = View.GONE
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -303,21 +296,20 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-                    when (blueState) {
+                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                         BluetoothAdapter.STATE_OFF -> {
                             if (bluetooth_image != null) {
                                 bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                                 bluetooth_image.isEnabled = true
-                                bluetooth_image.setOnClickListener(View.OnClickListener {
+                                bluetooth_image.setOnClickListener {
                                     var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                                     dialog.show()
-                                })
+                                }
                             }
                         }
                         BluetoothAdapter.STATE_ON -> {
                             if (bluetooth_image != null) {
-                                bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                                 bluetooth_image.isEnabled = false
                             }
                         }
@@ -348,7 +340,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 var intent = Intent(activity, NetworkActivity::class.java)
                 startActivity(intent)
             }
-            R.id.version_dot -> { detectUpdate()}
+            R.id.developer -> {
+                var intent = Intent(activity, DeveloperActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
@@ -386,8 +381,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private fun showGuideAgainFun() {
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(getString(R.string.show_guide_again_tip))
-        builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
-        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+        builder.setNegativeButton(R.string.btn_cancel) { _, _ -> }
+        builder.setPositiveButton(android.R.string.ok) { _, _ ->
             GuideUtils.resetAllGuide(activity!!)
             activity?.bnve?.currentItem = 0
         }
@@ -402,7 +397,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     .setTitle(R.string.network_tip_title)
                     .setMessage(R.string.net_disconnect_tip_message)
                     .setPositiveButton(android.R.string.ok
-                    ) { dialog, whichButton ->
+                    ) { _, _ ->
                         // 跳转到设置界面
                         activity.startActivityForResult(Intent(
                                 Settings.ACTION_WIRELESS_SETTINGS),
@@ -436,19 +431,19 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         val curtainList = allCutain
         val relyList = allRely
         var meshAdre = ArrayList<Int>()
-        if (lightList.size > 0) {
+        if (lightList.isNotEmpty()) {
             for (k in lightList.indices) {
                 meshAdre.add(lightList[k].meshAddr)
             }
         }
 
-        if (curtainList.size > 0) {
+        if (curtainList.isNotEmpty()) {
             for (k in curtainList.indices) {
                 meshAdre.add(curtainList[k].meshAddr)
             }
         }
 
-        if (relyList.size > 0) {
+        if (relyList.isNotEmpty()) {
             for (k in relyList.indices) {
                 meshAdre.add(relyList[k].meshAddr)
             }
@@ -465,10 +460,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 null
             })
         }
-
         if (meshAdre.isEmpty()) {
             hideLoadingDialog()
-//            ToastUtils.showLong(R.string.successful_resumption)
         }
     }
 
@@ -478,14 +471,11 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 hideLoadingDialog()
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { aLong ->
-
-                        }
+                        .subscribe { aLong -> }
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
                 }
                 compositeDisposable.add(disposable)
-
             }
 
             override fun error(msg: String) {
@@ -494,9 +484,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
 
             override fun start() {
-
             }
-
         })
 
     }
@@ -504,7 +492,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     private fun exitLogin() {
         isClickExlogin = true
-        if (DBUtils.allLight.size == 0 && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.size == 0 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.size == 0 && !DBUtils.dataChangeAllHaveAboutRelay) {
+        if (DBUtils.allLight.isEmpty() && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.isEmpty() && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.isEmpty() && !DBUtils.dataChangeAllHaveAboutRelay) {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
                 TelinkLightService.Instance().disconnect()
@@ -564,12 +552,17 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         LogUtils.getConfig().setLog2FileSwitch(true)
                         LogUtils.getConfig().setDir(LOG_PATH_DIR)
                         SharedPreferencesUtils.setDeveloperModel(true)
+
+                        startActivity(Intent(context, DeveloperActivity::class.java))
+                        developer.visibility = View.VISIBLE
+
                         dialog.dismiss()
                     }
                     .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
                         LogUtils.getConfig().setLog2FileSwitch(false)
                         LogUtils.getConfig().setDir(LOG_PATH_DIR)
                         SharedPreferencesUtils.setDeveloperModel(false)
+                        developer.visibility = View.GONE
                         dialog.dismiss()
                     }.create()
             alertDialog.setCancelable(false)
@@ -579,6 +572,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
 
     //清空缓存初始化APP
+    @SuppressLint("CheckResult")
     private fun emptyTheCache() {
 //        AlertDialog.Builder(activity)
 //                .setTitle(activity!!.getString(R.string.empty_cache_title))
@@ -600,7 +594,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         btn.isEnabled = false
         val text = getString(android.R.string.ok)
         val timeout = 5
-        val intervalDisposable = Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        Observable.interval(0, 1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .takeWhile { t: Long -> t < timeout }
                 .doOnComplete {
                     btn.isEnabled = true

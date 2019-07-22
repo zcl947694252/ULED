@@ -321,6 +321,9 @@
         <activity
             android:name=".user.InputPwdActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".user.DeveloperActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

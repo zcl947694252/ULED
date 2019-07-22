@@ -346,7 +346,6 @@ class SyncDataPutOrGetUtils {
         @Synchronized
         fun syncGetDataStart(dbUser: DbUser, syncCallBack: SyncCallback) {
             val token = dbUser.token
-
             startGet(token, dbUser.account, syncCallBack)
         }
 

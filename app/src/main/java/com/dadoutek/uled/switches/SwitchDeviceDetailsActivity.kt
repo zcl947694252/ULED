@@ -2,11 +2,8 @@ package com.dadoutek.uled.switches
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.bluetooth.le.ScanFilter
-import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -32,8 +29,6 @@ import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
@@ -42,8 +37,6 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
-import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -61,20 +54,15 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.activity_switch_device_details.*
-import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.startActivity
-import java.lang.Exception
-import java.text.ParsePosition
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -160,7 +148,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
 //        if(isOTA){
         if (currentSwitch != null && bestRSSIDevice != null) {
-            if (currentSwitch!!.macAddr == bestRSSIDevice!!.macAddress) {
+            if (currentSwitch?.macAddr == bestRSSIDevice?.macAddress) {
                 if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                         bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
                     startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentSwitch)

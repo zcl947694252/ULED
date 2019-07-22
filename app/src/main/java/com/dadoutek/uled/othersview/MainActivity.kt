@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
 import android.provider.Settings
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
@@ -22,9 +23,11 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.GONE
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -89,6 +92,8 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
+import android.support.design.widget.Snackbar.Callback as Callback1
+import kotlin.collections.ArrayList as ArrayList1
 
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
@@ -96,6 +101,7 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
+
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
@@ -116,6 +122,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private var mConnectSnackBar: Snackbar? = null
     private var mScanSnackBar: Snackbar? = null
     private var mNotFoundSnackBar: Snackbar? = null
+
     private var mConnectDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mTelinkLightService: TelinkLightService? = null
@@ -130,8 +137,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
     internal var isClickExlogin = false
+    var listSnackbar: ArrayList<Snackbar>? = null
     private var isState = false
-
 
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -157,19 +164,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-//        var isLoginVersion= SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.USER_LOGIN,false)
-//        if(isLoginVersion){
-//
-//        }else{
-//            exitLogin()
-//        }
-        var version = packageName(this)
         var list = DBUtils.getAllUser()
         com.xiaomi.market.sdk.Log.d("dataSize1", list.size.toString())
         detectUpdate()
 
+        listSnackbar = kotlin.collections.ArrayList(4)
 
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
@@ -252,9 +252,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 isClickExlogin = false
                 hideLoadingDialog()
             }
-
-            //            Log.d("SyncLog", "error: " + msg);
-            //            ToastUtils.showLong(getString(R.string.sync_error_contant));
         }
     }
 
@@ -266,7 +263,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     //防止viewpager嵌套fragment,fragment放置后台时间过长,fragment被系统回收了
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-
         super.onSaveInstanceState(outState)
         outState.putParcelable("android:support:fragments", null)
     }
@@ -668,7 +664,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         autoConnect()
     }
 
-    public fun autoConnect() {
+    fun autoConnect() {
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
             Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
@@ -698,8 +694,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                     } else {
                         mNotFoundSnackBar?.dismiss()
-                        progressBar?.visibility = View.GONE
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                        progressBar?.visibility = GONE
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true)
                     }
 
                 }
@@ -747,8 +743,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         startScanTimeout()
 
 
-                        if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true)
+                        if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true) {
                             mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                            setSnackLocation(mScanSnackBar!!)
+                        }
                     } else {
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, {
@@ -786,9 +784,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
 //                            startConnectTimer()
 
-                            if (mConnectSnackBar?.isShown != true)
+                            if (mConnectSnackBar?.isShown != true) {
                                 mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
-
+                                setSnackLocation(mConnectSnackBar!!)
+                            }
                         }
                     } else {
                         //没有授予权限
@@ -815,7 +814,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
                         LogUtils.d("onLeScanTimeout()")
-                        retryConnect();
+                        retryConnect()
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -846,8 +845,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun onNError(event: DeviceEvent) {
-
-//        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
         TelinkLightService.Instance().idleMode(true)
@@ -875,18 +872,60 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         } else {
             LogUtils.d("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
-            if (mNotFoundSnackBar?.isShown != true) {
-                mNotFoundSnackBar = indefiniteSnackbar(root,
-                        R.string.not_found_light, R.string.retry) {
-                    retryConnectCount = 0
-                    connectFailedDeviceMacList.clear()
-                    startScan()
-                }
-            }
+            setSnack()
 
         }
     }
 
+    private fun setSnack() {
+        if (mNotFoundSnackBar?.isShown != true) {
+            mNotFoundSnackBar = indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+                retryConnectCount = 0
+                connectFailedDeviceMacList.clear()
+                startScan()
+            }
+            setSnackLocation(mNotFoundSnackBar!!)
+        }
+    }
+
+    private fun setSnackLocation(snackbar: Snackbar) {
+        if (listSnackbar!!.contains(snackbar))
+            return
+
+        snackbar?.let {
+            var cl = CoordinatorLayout.LayoutParams(it.view.layoutParams.width, it.view.layoutParams.height)
+            cl.gravity = Gravity.BOTTOM//设置显示位置居中
+            cl.bottomMargin = DensityUtil.dip2px(this, 60F)
+            it.view.layoutParams = cl
+            listSnackbar!!.add(snackbar)
+        }
+    }
+
+    /**
+     *   @Override
+    public void onDismissed(Snackbar snackbar, int event) {
+
+    switch (event) {
+
+    case Snackbar.Callback.DISMISS_EVENT_CONSECUTIVE:
+    case Snackbar.Callback.DISMISS_EVENT_MANUAL:
+    case Snackbar.Callback.DISMISS_EVENT_SWIPE:
+    case Snackbar.Callback.DISMISS_EVENT_TIMEOUT:
+    //TODO 网络操作
+    Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
+    break;
+    case Snackbar.Callback.DISMISS_EVENT_ACTION:
+    Toast.makeText(MainActivity.this, "撤销了删除操作", Toast.LENGTH_SHORT).show();
+    break;
+
+    }
+    }
+    @Override
+    public void onShown(Snackbar snackbar) {
+    super.onShown(snackbar);
+    Log.i(TAG, "onShown");
+    }
+     */
 
     /**
      * 检查是不是灯
@@ -954,15 +993,17 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 TelinkLightService.Instance().updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
-                    if (progressBar?.visibility != View.GONE)
-                        progressBar?.visibility = View.GONE
+                    if (progressBar?.visibility != GONE)
+                        progressBar?.visibility = GONE
 
                     mScanSnackBar?.dismiss()
                     mConnectSnackBar?.dismiss()
                     delay(300)
 
-                    if (mConnectSuccessSnackBar?.isShown != true)
+                    if (mConnectSuccessSnackBar?.isShown != true) {
                         mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
+                        setSnackLocation(mConnectSuccessSnackBar!!)
+                    }
                     mConnectSnackBar?.dismiss()
                 }
 
@@ -1155,26 +1196,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //
 //    }
 
-
-/*    */
     /**
      * 扫描不到任何设备了
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
-//        if (mConnectSnackBar) {
-        if (mNotFoundSnackBar?.isShown != true) {
-            mNotFoundSnackBar = indefiniteSnackbar(root,
-                    R.string.not_found_light, R.string.retry) {
-                retryConnectCount = 0
-                connectFailedDeviceMacList.clear()
-                startScan()
-            }
-        }
-//        } else {
-//            retryConnect()
-//        }
+        setSnack()
 
     }
 
@@ -1184,10 +1212,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 LogUtils.d("This is switch")
                 true
             }
-            else -> {
-                false
-
-            }
+            else -> false
         }
     }
 
@@ -1233,15 +1258,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     }
 
-    private fun checkIsLightForScan(productUUID: Int): Boolean {
-        return !(productUUID == DeviceType.NORMAL_SWITCH ||
-                productUUID == DeviceType.NORMAL_SWITCH2 ||
-                productUUID == DeviceType.SCENE_SWITCH ||
-                productUUID == DeviceType.SENSOR)
-    }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
         if (bestRSSIDevice != null) {
 //            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
         }

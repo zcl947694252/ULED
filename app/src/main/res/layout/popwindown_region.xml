@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pop"
+    android:id="@+id/pop_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#88888888"
@@ -277,7 +277,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.487"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pop_qr_net" />
+            app:layout_constraintTop_toBottomOf="@id/pop_qr_net" />
 
         <ImageView
             android:id="@+id/pop_qr_img"

@@ -808,4 +808,5 @@
     <string name="area">area</string>
     <string name="刷新二维码">Refresh qr code</string>
     <string name="当前网络拥有者">Current network owner:</string>
+    <string name="developer">Developer model</string>
 </resources>

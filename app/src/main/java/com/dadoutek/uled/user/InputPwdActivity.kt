@@ -23,6 +23,7 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.dadoutek.uled.util.ToastUtil
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_input_pwd.*
@@ -48,16 +49,21 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     private fun initView() {
         dbUser = DbUser()
-        LogUtils.d(dbUser.toString() + "----" + dbUser.channel)
+        ToastUtil.showToast(this,dbUser.password.toString() + "----" + dbUser.channel+"---"+type)
+
+        LogUtils.e(dbUser.password.toString() + "----" + dbUser.channel+"---"+type)
+
         if (type == Constant.TYPE_REGISTER) {
             pwd_notice.text = getString(R.string.please_password)
             pwd_title.text = getString(R.string.enter_password)
             pwd_btn.text = getString(R.string.next)
+            pwd_input.setText(dbUser.password)
         } else if (type == Constant.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
             pwd_title.text = getString(R.string.forget_password)
             pwd_btn.text = getString(R.string.login_bt_name)
         }
+
     }
 
     private fun initListener() {
@@ -85,7 +91,6 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
             R.id.pwd_btn -> {
                 var pwd = pwd_input.editableText.toString()
-
                 if (pwd_btn.text.toString().equals(getString(R.string.next))) {
                     if (TextUtils.isEmpty(pwd)) {
                         toast(getString(R.string.please_password))

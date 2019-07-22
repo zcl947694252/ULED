@@ -302,7 +302,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
-
 //                scanPb.visibility = View.GONE
 //                adapter?.notifyDataSetChanged()
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
@@ -409,7 +408,61 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         })
 
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
-        adaper!!.onItemChildClickListener = onItemChildClickListener
+        adaper!!.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+            currentLight = lightsData?.get(position)
+            positionCurrent = position
+            val opcode = Opcode.LIGHT_ON_OFF
+            
+            when(view.id){
+                R.id.img_light->{
+                    canBeRefresh = true
+                    //todo 添加未连接提示
+                    if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr, byteArrayOf(0x01, 0x00, 0x00))
+                        if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                            Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                        } else {
+                            Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                        }
+                        currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                    } else {
+//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr, byteArrayOf(0x00, 0x00, 0x00))
+                        if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                            Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                        } else {
+                            Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                        }
+                        currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+                    }
+
+                    when (type) {
+                        Constant.INSTALL_NORMAL_LIGHT -> {
+                            currentLight!!.updateIcon()
+                        }
+
+                        Constant.INSTALL_RGB_LIGHT -> {
+                            currentLight!!.updateRgbIcon()
+                        }
+                    }
+                    DBUtils.updateLight(currentLight!!)
+                    runOnUiThread {
+                        adapter?.notifyDataSetChanged()
+                    }
+                }
+
+                R.id.tv_setting->{
+                    var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
+                    if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                        intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                    }
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                    startActivityForResult(intent, REQ_LIGHT_SETTING)
+                }
+            }
+        }
         adaper!!.bindToRecyclerView(recycleView)
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
@@ -436,8 +489,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 }
             }
         }
-
-
+        
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
         create_scene = findViewById(R.id.create_scene)
@@ -445,10 +497,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
         add_device_btn.setOnClickListener(this)
-//        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-//        toolbar.setNavigationOnClickListener {
-//            finish()
-//        }
+
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 toolbar.title = getString(R.string.normal_light_title) + " (" + lightsData.size + ")"
@@ -622,11 +671,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         installDialog?.setOnShowListener {
 
         }
-
-        if (isGuide) {
-//            installDialog?.setCancelable(false)
-        }
-
         installDialog?.show()
     }
 
@@ -721,65 +765,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        currentLight = lightsData?.get(position)
-        positionCurrent = position
-        val opcode = Opcode.LIGHT_ON_OFF
-        if (view.id == R.id.img_light) {
-            canBeRefresh = true
-            if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x01, 0x00, 0x00))
-                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-                } else {
-                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
-                }
 
-                currentLight!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
-//                        byteArrayOf(0x00, 0x00, 0x00))
-                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                } else {
-                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
-                }
-                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
-            }
-
-            when (type) {
-                Constant.INSTALL_NORMAL_LIGHT -> {
-                    currentLight!!.updateIcon()
-                }
-
-                Constant.INSTALL_RGB_LIGHT -> {
-                    currentLight!!.updateRgbIcon()
-                }
-            }
-//            currentLight!!.updateIcon()
-            DBUtils.updateLight(currentLight!!)
-            runOnUiThread {
-                adapter?.notifyDataSetChanged()
-            }
-        } else if (view.id == R.id.tv_setting) {
-//            if (scanPb.visibility != View.VISIBLE) {
-//                判断是否为rgb灯
-            var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
-            if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
-                intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
-            }
-            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-            intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-            startActivityForResult(intent, REQ_LIGHT_SETTING)
-//            }
-//        else {
-//                ToastUtils.showShort(R.string.reconnecting)
-//            }
-        }
-    }
 
     override fun onClick(v: View?) {
         when (v?.id) {

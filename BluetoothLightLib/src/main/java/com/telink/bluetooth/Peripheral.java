@@ -329,6 +329,9 @@ public class Peripheral extends BluetoothGattCallback {
 
         if(commandContext!=null){
             Command command = commandContext.command;
+            if (command==null){
+                return;
+            }
             Command.CommandType commandType = command.type;
 
             TelinkLog.d("processCommand : " + command.toString());

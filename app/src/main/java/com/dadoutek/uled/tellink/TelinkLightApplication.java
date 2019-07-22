@@ -83,19 +83,6 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     }
 
-//    private void registerBluetoothReceiver(){
-//        if(mReceive == null){
-//            mReceive = new BluetoothStateBroadcastReceive();
-//        }
-//        IntentFilter intentFilter = new IntentFilter();
-//        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-//        intentFilter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-//        intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-//        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF");
-//        intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON");
-//        registerReceiver(mReceive, intentFilter);
-//    }
-
     public static TelinkLightApplication getApp() {
         return thiz;
     }

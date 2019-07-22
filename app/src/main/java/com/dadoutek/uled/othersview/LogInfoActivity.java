@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -54,26 +53,17 @@ public class LogInfoActivity extends TelinkBaseActivity {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
             final EditText editText = new EditText(this);
             dialogBuilder.setView(editText);
-            dialogBuilder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            }).setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (TextUtils.isEmpty(editText.getText().toString())) {
-                        Toast.makeText(LogInfoActivity.this, "fileName cannot be null", Toast.LENGTH_SHORT).show();
-                    } else {
+            dialogBuilder.setNegativeButton("cancel", (dialog, which) -> dialog.dismiss()).setPositiveButton("confirm", (dialog, which) -> {
+                if (TextUtils.isEmpty(editText.getText().toString())) {
+                    Toast.makeText(LogInfoActivity.this, "fileName cannot be null", Toast.LENGTH_SHORT).show();
+                } else {
 
-                        TelinkLightApplication.getApp().saveLogInFile(editText.getText().toString().trim(), tv_info.getText().toString());
-                    }
+                    TelinkLightApplication.getApp().saveLogInFile(editText.getText().toString().trim(), tv_info.getText().toString());
                 }
             });
             dialog = dialogBuilder.create();
         }
         dialog.show();
-
 
     }
 

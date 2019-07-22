@@ -760,7 +760,10 @@ public class LightAdapter {
 
         byte[] outOfMeshName;
 
-        byte[] meshName = Strings.stringToBytes(params.getString(Parameters.PARAM_MESH_NAME), 16);
+        String paramsString = params.getString(Parameters.PARAM_MESH_NAME);
+        if (paramsString==null)
+            return false;
+        byte[] meshName = Strings.stringToBytes(paramsString, 16);
         byte[] meshName1 = light.getMeshName();
 
         if (mode == MODE_SCAN_MESH) {

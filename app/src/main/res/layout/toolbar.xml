@@ -23,7 +23,7 @@
             android:layout_gravity="center"
             android:textColor="@android:color/white"
             android:textSize="20sp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
 
         <ImageView

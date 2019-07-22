@@ -1,67 +1,43 @@
 package com.dadoutek.uled.tellink
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.util.StringUtils
-import com.telink.bluetooth.LeBluetooth
-import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.design.indefiniteSnackbar
-
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.ScanFilter
-import android.content.BroadcastReceiver
-import android.content.Intent
-import android.content.IntentFilter
-import android.util.Log
-import android.widget.ImageView
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
-import com.dadoutek.uled.util.DialogUtils
-import com.tbruyelle.rxpermissions2.RxPermissions
+import com.dadoutek.uled.util.StringUtils
+import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
-import com.telink.bluetooth.event.*
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.LeScanEvent
+import com.telink.bluetooth.event.ServiceEvent
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.ErrorReportInfo
-import com.telink.bluetooth.light.LeScanParameters
-import com.telink.bluetooth.light.LightAdapter
-import com.telink.util.Event
-import com.telink.util.EventListener
-import com.telink.util.Strings
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.*
-import org.jetbrains.anko.toolbar
-import java.util.ArrayList
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
@@ -365,10 +341,10 @@ open class TelinkBaseActivity : AppCompatActivity()  {
 //                    retryConnect()
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
                         var dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
                         dialog.show()
-                    })
+                    }
                 } else {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
@@ -402,12 +378,8 @@ open class TelinkBaseActivity : AppCompatActivity()  {
         val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
         tvContent.text = content
 
-
         //        ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
-        //
-        //        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this,
-        //                R.animator.load_animation);
-
+        //        @SuppressLint("ResourceType") Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(this, R.animator.load_animation);
         //        spaceshipImage.startAnimation(hyperspaceJumpAnimation);
 
         if (loadDialog == null) {
@@ -439,7 +411,6 @@ open class TelinkBaseActivity : AppCompatActivity()  {
         return StringUtils.compileExChar(str)
     }
 
-    fun endCurrentGuide() {}
 
     inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
 
@@ -458,29 +429,28 @@ open class TelinkBaseActivity : AppCompatActivity()  {
 //                        retryConnect()
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
                             var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
                             dialog.show()
-                        })
+                        }
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-                    when (blueState) {
+                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                         BluetoothAdapter.STATE_OFF -> {
                             if (toolbar != null) {
 //                                retryConnect()
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
                                     var dialog = BluetoothConnectionFailedDialog(context, R.style.Dialog)
                                     dialog.show()
-                                })
+                                }
                             }
                         }
                         BluetoothAdapter.STATE_ON -> {
                             if (toolbar != null) {
-                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                             }
                         }

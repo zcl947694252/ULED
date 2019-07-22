@@ -696,4 +696,5 @@
     <string name="open_mode">开启</string>
     <string name="close_mode">关闭</string>
     <string name="password_cannot">密码不能为空</string>
+    <string name="developer">开发者模式</string>
 </resources>

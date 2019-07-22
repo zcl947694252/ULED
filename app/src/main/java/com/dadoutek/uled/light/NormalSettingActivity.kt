@@ -1157,7 +1157,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
-                            com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
+                            LogUtils.d("STATUS_LOGOUT")
 //                            showLoadingDialog(getString(R.string.connecting))
                             ToastUtil.showToast(this,getString(R.string.connecting))
 //                            finish()

@@ -2,7 +2,6 @@ package com.dadoutek.uled.switches;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
@@ -30,7 +29,6 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.Mesh;
@@ -228,23 +226,6 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
                 }
             }
         }
-//        override fun onReceive(context: Context, intent: Intent) {
-//            val action = intent.action
-//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-//
-//                when (state) {
-//                    BluetoothAdapter.STATE_ON -> {
-//                        TelinkLightService.Instance().idleMode(true)
-//                        retryConnectCount = 0
-//                        startScan()
-//                    }
-//                    BluetoothAdapter.STATE_OFF -> {
-//
-//                    }
-//                }
-//            }
-//        }
     };
 
     @Override

@@ -13,18 +13,23 @@ fun filesToMultipartBodyParts(files: List<File>): List<MultipartBody.Part>? {
 }
 普通静态方法
 一部分是静态方法的情况 : 将方法用 companion object { } 包裹即可
-
  */
 object PopUtil {
-        fun makeMW(context: Context, res: Int): PopupWindow? {
+        fun makeMW(context: Context, res: Int,isClick:Boolean): PopupWindow? {
             var popView = LayoutInflater.from(context).inflate(res, null)
             var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            pop!!.isOutsideTouchable = true
+            pop!!.isOutsideTouchable = isClick
+            pop.isFocusable = true // 设置PopupWindow可获得焦点
+            pop.isTouchable = true // 设置PopupWindow可触摸补充：
+
             return pop
         }
+
         fun makeMWf(context: Context, res: Int): PopupWindow? {
             var popView = LayoutInflater.from(context).inflate(res, null)
             var pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            pop.isFocusable = true // 设置PopupWindow可获得焦点
+            pop.isTouchable = true // 设置PopupWindow可触摸补充：
             pop!!.isOutsideTouchable = false
             return pop
         }

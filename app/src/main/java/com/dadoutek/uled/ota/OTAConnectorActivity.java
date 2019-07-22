@@ -210,23 +210,6 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
                 }
             }
         }
-//        override fun onReceive(context: Context, intent: Intent) {
-//            val action = intent.action
-//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-//
-//                when (state) {
-//                    BluetoothAdapter.STATE_ON -> {
-//                        TelinkLightService.Instance().idleMode(true)
-//                        retryConnectCount = 0
-//                        startScan()
-//                    }
-//                    BluetoothAdapter.STATE_OFF -> {
-//
-//                    }
-//                }
-//            }
-//        }
     };
 
     @Override
