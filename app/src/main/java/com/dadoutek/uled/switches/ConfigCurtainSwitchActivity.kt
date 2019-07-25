@@ -460,7 +460,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                         Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
+                    NetworkFactory.md5(account) + account))
         } else {
             params.setNewPassword(mesh?.password)
         }

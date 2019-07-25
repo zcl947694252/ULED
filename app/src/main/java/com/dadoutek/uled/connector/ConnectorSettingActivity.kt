@@ -767,7 +767,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(mesh?.name)
                 if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.password) + account))
+                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account))
                 } else {
                     connectParams.setPassword(mesh?.password)
                 }

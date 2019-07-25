@@ -168,6 +168,7 @@ object AccountModel {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, isLogin)
     }
 
+/*
     private fun setupMesh(account: String) {
 
         val regionList = DBUtils.regionAll
@@ -215,7 +216,9 @@ object AccountModel {
                     Constant.USER_TYPE, Constant.USER_TYPE_OLD)
         }
     }
+*/
 
+/*
     private fun saveToDataBase(factoryName: String, factoryPwd: String, mNewMeshName: String, mNewMeshPwd: String) {
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
         val dbRegio = DbRegion()
@@ -238,4 +241,5 @@ object AccountModel {
 
 //        DBUtils.createAllLightControllerGroup()
     }
+*/
 }

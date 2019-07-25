@@ -406,7 +406,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onPause() {
         super.onPause()
-        LogUtils.d("ss")
+//        LogUtils.d("ss")
     }
 
     override fun onDestroyView() {

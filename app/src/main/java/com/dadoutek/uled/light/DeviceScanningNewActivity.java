@@ -395,7 +395,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         //先连接灯。
         autoConnect();
-        //倒计时10s，出问题了就超时。
+        //倒计时，出问题了就超时。
         mConnectTimer = createConnectTimeout();
 
         btnAddGroups.setVisibility(View.VISIBLE);
@@ -459,6 +459,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      * 开始分组
      */
     private void startGrouping() {
+        animationView.cancelAnimation();
+        animationView.setVisibility(View.GONE);
+
         LeBluetooth.getInstance().stopScan();
 
         //初始化分组页面
@@ -931,19 +934,15 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 connectParams.setMeshName(account);
-                connectParams.setConnectMac(bestRssiDevice.macAddress);
+//                connectParams.setConnectMac(bestRssiDevice.macAddress);
                 connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
                 new Thread(() -> {
-                    try {
-                        Thread.sleep(300);
-                        TelinkLightService.Instance().autoConnect(connectParams);
-                        LogUtils.d("autoConnect");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                        Thread.sleep(300);
+                    TelinkLightService.Instance().autoConnect(connectParams);
+//                    LogUtils.d("autoConnect");
                 }).start();
 //                connectDevice(bestRssiDevice.macAddress);
 //                startScanTimeout();
@@ -951,8 +950,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
             //刷新Notify参数
             LeRefreshNotifyParameters refreshNotifyParams = Parameters.createRefreshNotifyParameters();
-            refreshNotifyParams.setRefreshRepeatCount(1);
-            refreshNotifyParams.setRefreshInterval(2000);
+            refreshNotifyParams.setRefreshRepeatCount(2);
+            refreshNotifyParams.setRefreshInterval(1000);
             //开启自动刷新Notify
             TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
         }

@@ -171,7 +171,7 @@ public static java.lang.String TABLENAME;
 
 -keep class android.support.v7.widget.SearchView { *; }
 
-#checkVersion
+#isVersionAvailable
 -keepattributes Annotation
 -keepclassmembers class * {    @org.greenrobot.eventbus.Subscribe ;}
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }

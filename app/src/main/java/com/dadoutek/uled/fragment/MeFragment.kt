@@ -84,6 +84,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
 
         override fun error(msg: String) {
+            LogUtils.d(msg)
+            ToastUtils.showLong(msg)
             if (isClickExlogin) {
                 AlertDialog.Builder(activity)
                         .setTitle(R.string.sync_error_exlogin)
@@ -102,6 +104,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             } else {
                 isClickExlogin = false
                 hideLoadingDialog()
+
             }
         }
     }

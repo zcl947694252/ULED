@@ -14,6 +14,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
+import com.dadoutek.uled.model.ResponseVersionAvailable;
 
 import java.util.List;
 
@@ -336,8 +337,8 @@ public interface RequestInterface {
 
     @GET("app/isAvailable")
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)
-    Observable<Response<Object>> isAvailavle(@Query("platform") int device,
-                                             @Query("currentVersion") String version);
+    Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
+                                                               @Query("currentVersion") String version);
 
     @GET("app/getNewVersion")
     Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero,@Query("lang") int zero_one);
