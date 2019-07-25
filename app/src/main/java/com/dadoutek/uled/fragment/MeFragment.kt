@@ -167,7 +167,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), "isShowDot", false)
 
-        region.visibility= View.GONE
         registerBluetoothReceiver()
     }
 
@@ -183,6 +182,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
         initClick()
+//        rlRegion?.visibility= View.GONE
         val pm = activity!!.getSystemService(POWER_SERVICE) as PowerManager
         mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ON_AFTER_RELEASE, "DPA")
     }
@@ -250,8 +250,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         constantQuestion?.setOnClickListener(this)
         resetAllGroup?.setOnClickListener(this)
         instructions?.setOnClickListener(this)
-        region?.setOnClickListener(this)
-        developer.setOnClickListener(this)
+        rlRegion?.setOnClickListener(this)
+        developer?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -345,7 +345,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
             }
-            R.id.region -> {
+            R.id.rlRegion -> {
                 var intent = Intent(activity, NetworkActivity::class.java)
                 startActivity(intent)
             }

@@ -483,7 +483,8 @@
                     />
             </RelativeLayout>
             <RelativeLayout
-                android:id="@+id/region"
+                android:id="@+id/rlRegion"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"

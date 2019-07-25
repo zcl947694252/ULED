@@ -251,9 +251,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             main_toast?.let {
                                 main_toast.visibility = View.VISIBLE
                                 if (!b1)
-                                    main_toast.text = getString(R.string.您的版本不可用请升级即将跳转升级界面)+num+"s"
+                                    main_toast.text = getString(R.string.version_disabled)+num+"s"
                                 else
-                                    main_toast.text = getString(R.string.同步数据中请重新登录)+num+"s"
+                                    main_toast.text = getString(R.string.syncing_relogin)+num+"s"
                             }
                         }
                     })
@@ -590,7 +590,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      */
     private fun crateUIData(v: VersionBean): UIData {
         val uiData = UIData.create()
-        uiData.title = getString(R.string.版本升级)
+        uiData.title = getString(R.string.update_version)
         uiData.downloadUrl = v.data.url
         uiData.content = v.data.description
         return uiData
