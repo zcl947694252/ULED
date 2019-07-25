@@ -1,13 +1,11 @@
 package com.dadoutek.uled.device
 
+//import com.dadoutek.uled.light.DeviceDetailAct
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.*
 import android.view.LayoutInflater
 import android.view.View
@@ -22,15 +20,12 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
-import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
-//import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.InstallDeviceModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -39,9 +34,8 @@ import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.OtherUtils
-import com.dadoutek.uled.util.SpaceItemDecoration
 import com.dadoutek.uled.util.StringUtils
-import kotlinx.android.synthetic.main.activity_new_scene_set.*
+import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

@@ -4,14 +4,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
-import com.dadoutek.uled.light.ConfigNightlightActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
@@ -27,7 +25,10 @@ import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.*
+import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.ErrorReportInfo
+import com.telink.bluetooth.light.LeScanParameters
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -71,7 +72,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         initListener()
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
@@ -81,7 +81,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         }
         return super.onOptionsItemSelected(item)
     }
-
 
     private fun initView() {
         setSupportActionBar(toolbar)
@@ -120,7 +119,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 .build())
         return scanFilters
     }
-
 
     @SuppressLint("CheckResult")
     private fun startScan() {
@@ -173,8 +171,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                     progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
                 }
-            } else {
-
             }
         }
     }
@@ -215,7 +211,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
             }
-
 //            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
 //            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
         }
@@ -303,7 +298,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 LogUtils.d("开始登陆")
             }
         }
-
     }
 
     private fun login() {
@@ -317,7 +311,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         }
         TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16)
                 , Strings.stringToBytes(pwd, 16))
-
+        LogUtils.e("zcl**********************pwd$pwd"+"---------"+Strings.stringToBytes(pwd, 16).toString())
     }
 
     private fun onLogin() {
@@ -365,7 +359,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun connect() {
         Thread {
-
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSensorActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSensorActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
@@ -404,7 +397,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         val meshAddress = Constant.SWITCH_PIR_ADDRESS
 
         if (meshAddress == -1) {
-
             this.doFinish()
             return
         }
@@ -422,7 +414,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     } else {
                         progressBtn.text = getString(R.string.connecting)
                     }
-
                 } else {
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }

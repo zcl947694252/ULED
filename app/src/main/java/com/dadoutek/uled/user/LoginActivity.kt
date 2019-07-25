@@ -2,12 +2,10 @@ package com.dadoutek.uled.user
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.os.PowerManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
@@ -23,7 +21,6 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -40,6 +37,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil
+import com.telink.TelinkApplication
 import com.xiaomi.market.sdk.Log
 import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import kotlinx.android.synthetic.main.activity_login.*
@@ -61,7 +59,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var isFirstLauch: Boolean = false
     private var mWakeLock: PowerManager.WakeLock? = null
     private var SAVE_USER_NAME_KEY = "SAVE_USER_NAME_KEY"
-    private var SAVE_USER_PW_KEY = "SAVE_USER_PW_KEY"
     private var recyclerView: RecyclerView? = null
     private var adapter: PhoneListRecycleViewAdapter? = null
     private var phoneList: ArrayList<DbUser>? = null
@@ -69,9 +66,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var currentUser: DbUser? = null
     private var isPassword = false
 
-    private var phoneEdit: EditText? = null
-
-    private var passwordEdit: EditText? = null
 
     private var lastClickTime: Long = 0
 
@@ -86,27 +80,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
         detectUpdate()
 
-        //页面存在耗时操作 需要保持屏幕常亮
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock")
-
-        if (savedInstanceState != null && (savedInstanceState.containsKey(SAVE_USER_NAME_KEY) || savedInstanceState.containsKey(SAVE_USER_PW_KEY))) {
-            phone = savedInstanceState.getString(SAVE_USER_NAME_KEY)
-            editPassWord = savedInstanceState.getString(SAVE_USER_PW_KEY)
-            edit_user_phone_or_email!!.setText(phone)
-            edit_user_password!!.setText(editPassWord)
-        }
-
         initData()
         initView()
         initListener()
-    }
-
-
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        outState?.putString(SAVE_USER_NAME_KEY, phone)
-        outState?.putString(SAVE_USER_PW_KEY, editPassWord)
-        super.onSaveInstanceState(outState, outPersistentState)
     }
 
     /**
@@ -121,6 +97,18 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         dbUser = DbUser()
         val intent = intent
         isFirstLauch = intent.getBooleanExtra(IS_FIRST_LAUNCH, true)
+        var user = SharedPreferencesUtils.getLastUser()
+        user?.let {
+            var list = it.split("-")
+            if (list.isNotEmpty()) {
+                var s = list[0]
+                edit_user_phone_or_email.setText(s)
+                edit_user_phone_or_email.post {
+                    edit_user_phone_or_email.setSelection(s.length)
+                }
+                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
+            }
+        }
     }
 
     private fun initToolbar() {
@@ -138,6 +126,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     override fun onResume() {
         super.onResume()
+        detectUpdate()
         if (mWakeLock != null) {
             mWakeLock!!.acquire()
         }
@@ -171,14 +160,14 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
-        }else
+        } else
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.btn_login -> {
-                if (TextUtils.isEmpty(edit_user_phone_or_email.editableText.toString())){
+                if (TextUtils.isEmpty(edit_user_phone_or_email.editableText.toString())) {
                     toast(getString(R.string.please_phone_number))
                     return
                 }
@@ -224,7 +213,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         var intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
         intent.putExtra("type", Constant.TYPE_VERIFICATION_CODE)
         startActivity(intent)
-        finish()
     }
 
     private fun eyePassword() {
@@ -302,6 +290,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_password!!.setText(currentUser!!.password)
             edit_user_password!!.visibility = View.GONE
             list_phone.visibility = View.GONE
+            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
             login()
         }
         if (view.id == R.id.delete_image) {
@@ -410,14 +399,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phone = edit_user_phone_or_email!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
-       if(!StringUtils.isTrimEmpty(phone)){
-           var intent = Intent(this,EnterPasswordActivity::class.java)
-           intent.putExtra("USER_TYPE",Constant.TYPE_LOGIN)
-           intent.putExtra("phone",phone)
-           startActivity(intent)
-       }else{
-           ToastUtil.showToast(this,getString(R.string.phone_or_password_can_not_be_empty))
-       }
+        if (!StringUtils.isTrimEmpty(phone)) {
+            var intent = Intent(this, EnterPasswordActivity::class.java)
+            intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
+            intent.putExtra("phone", phone)
+            startActivity(intent)
+            finish()
+        } else {
+            ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
+        }
     }
 
     var isSuccess: Boolean = true
@@ -437,12 +427,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
             LogUtils.d("GetDataError:" + msg)
         }
-
     }
 
     private fun syncComplet() {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-//        ToastUtils.showLong(getString(R.string.download_data_success))
         transformView()
         hideLoadingDialog()
     }

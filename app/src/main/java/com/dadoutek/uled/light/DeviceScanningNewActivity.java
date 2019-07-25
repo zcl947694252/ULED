@@ -103,8 +103,6 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -918,6 +916,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void autoConnect() {
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
 
@@ -933,8 +932,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 connectParams.setMeshName(account);
                 connectParams.setConnectMac(bestRssiDevice.macAddress);
-                connectParams.setPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(account) + account).substring(0, 16));
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
@@ -1272,6 +1270,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false);
+
         if (DBUtils.INSTANCE.getGroupByMesh(0xffff) != null) {
             allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
         }
@@ -1409,7 +1408,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             DeviceItemHolder holder;
 
             convertView = inflater.inflate(R.layout.device_item, null);
-            ImageView icon = (ImageView) convertView
+            ImageView icon = convertView
                     .findViewById(R.id.img_icon);
             TextView txtName = (TextView) convertView
                     .findViewById(R.id.txt_name);
@@ -1694,7 +1693,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      * @param event
      */
     private void onLeScan(final LeScanEvent event) {
-
         final Mesh mesh = this.mApplication.getMesh();
         final int meshAddress = mesh.generateMeshAddr();
 
@@ -1709,13 +1707,9 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             }
             return;
         }
-
-
         DeviceInfo deviceInfo = event.getArgs();
-
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "--" + deviceInfo.macAddress+"--productUUID:"+deviceInfo.productUUID);
-
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
@@ -1739,8 +1733,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         params.setOldMeshName(mesh.getFactoryName());
         params.setOldPassword(mesh.getFactoryPassword());
         params.setNewMeshName(mesh.getName());
-        params.setNewPassword(NetworkFactory.md5(
-                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
         params.setUpdateDeviceList(deviceInfo);
         TelinkLightService.Instance().updateMesh(params);
 

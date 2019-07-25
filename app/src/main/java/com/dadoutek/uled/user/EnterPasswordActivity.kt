@@ -1,7 +1,9 @@
 package com.dadoutek.uled.user
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.PowerManager
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -24,42 +26,51 @@ import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.dadoutek.uled.util.ToastUtil
+import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_enter_password.*
 import org.jetbrains.anko.toast
 
 class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
-
+    private var mWakeLock: PowerManager.WakeLock? = null
     private var phone: String? = null
-
     private var type: String? = null
-
+    private var SAVE_USER_PW_KEY = "SAVE_USER_PW_KEY"
     private var isPassword = false
-
     private var editPassWord: String? = null
-
     private var dbUser: DbUser? = null
 
+    @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_password)
         type = intent.extras!!.getString("USER_TYPE")
+
         initViewType()
         initView()
     }
 
     private fun initViewType() {
+        dbUser = DbUser()
         when (type) {
             Constant.TYPE_FORGET_PASSWORD -> {
-
-            }
-            Constant.TYPE_LOGIN -> {
-                dbUser = DbUser()
-                phone = intent.extras!!.getString("phone")
             }
 
-            Constant.TYPE_REGISTER -> {
-                dbUser = DbUser()
-                phone = intent.extras!!.getString("phone")
+            Constant.TYPE_LOGIN -> phone = intent.extras!!.getString("phone")
+
+            Constant.TYPE_REGISTER -> phone = intent.extras!!.getString("phone")
+
+        }
+        val boolean = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
+
+        var user = SharedPreferencesUtils.getLastUser()
+        user?.let {
+            var list = it.split("-")
+            LogUtils.e("zcl**********************${list.size}----$list")
+            if (list.size > 1&&!user.equals("-")&&!boolean) {
+                var s = list[1]
+                edit_user_password.setText(s)
+                edit_user_password.setSelection(s.length)
+                btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
             }
         }
     }
@@ -126,20 +137,21 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
 
 
     private fun login() {
-        LogUtils.e("login hideLoadingDialog()=" + phone)
+        LogUtils.e("login hideLoadingDialog()$phone")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
+        LogUtils.e("zcl**********************login$editPassWord$phone")
+
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
-            LogUtils.d("login phone=" + phone + "===" + editPassWord + "---" + dbUser!!.channel)
-            AccountModel.login(phone!!, editPassWord!!, dbUser!!.channel)
+            AccountModel.login(phone!!, editPassWord!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
                             DBUtils.deleteLocalData()
                             SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                           SharedPreferencesUtils.setUserLogin(true)
-                           LogUtils.e("logging: " + "登录成功" + dbUser.name)
+                            SharedPreferencesUtils.setUserLogin(true)
+                            LogUtils.e("logging: " + "登录成功" + dbUser.name)
                         }
 
                         override fun onError(e: Throwable) {
@@ -199,5 +211,20 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
         else
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        if (this.mWakeLock != null) {
+            mWakeLock!!.acquire()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mWakeLock != null) {
+            mWakeLock!!.acquire()
+        }
     }
 }

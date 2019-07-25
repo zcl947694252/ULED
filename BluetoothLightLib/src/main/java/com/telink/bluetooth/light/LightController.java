@@ -107,6 +107,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
     private int timeoutSeconds = 15;
     //private boolean otaCompleted;
 
+    //高并发的情况下只有一个线程能够访问这个属性值
     private AtomicBoolean isConnecting = new AtomicBoolean(false);
     private AtomicBoolean isLoginWriteFail = new AtomicBoolean(false);
 

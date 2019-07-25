@@ -16,4 +16,19 @@ public class ItemGroup implements Serializable {
     public boolean checked=false;
     public int deviceType;
     public boolean isNo=true;
+
+    @Override
+    public String toString() {
+        return "ItemGroup{" +
+                "groupAress=" + groupAress +
+                ", brightness=" + brightness +
+                ", temperature=" + temperature +
+                ", color=" + color +
+                ", gpName='" + gpName + '\'' +
+                ", enableCheck=" + enableCheck +
+                ", checked=" + checked +
+                ", deviceType=" + deviceType +
+                ", isNo=" + isNo +
+                '}';
+    }
 }

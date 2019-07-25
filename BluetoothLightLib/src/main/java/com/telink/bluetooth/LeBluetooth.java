@@ -15,6 +15,7 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.telink.util.ContextUtil;
@@ -35,7 +36,7 @@ public final class LeBluetooth {
      */
     public static final int SCAN_FAILED_LOCATION_DISABLE = 8;
 
-    private Handler mDelayHandler = new Handler();
+    private Handler mDelayHandler = new Handler(Looper.getMainLooper());
     private LocationCheckTask mLocationCheckTask = new LocationCheckTask();
     private static final long LOCATION_CHECK_PERIOD = 10 * 1000;
 
@@ -133,16 +134,12 @@ public final class LeBluetooth {
                 }
             };
         } else {
-            this.mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+            this.mLeScanCallback = (device, rssi, scanRecord) -> {
+                if (mCallback != null)
+                    mCallback.onLeScan(device, rssi, scanRecord);
 
-                @Override
-                public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    if (mCallback != null)
-                        mCallback.onLeScan(device, rssi, scanRecord);
-
-                    if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
-                        mDelayHandler.removeCallbacks(mLocationCheckTask);
-                    }
+                if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
+                    mDelayHandler.removeCallbacks(mLocationCheckTask);
                 }
             };
         }

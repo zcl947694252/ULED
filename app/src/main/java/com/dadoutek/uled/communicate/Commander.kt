@@ -4,7 +4,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -64,7 +63,8 @@ object Commander : EventListener<String> {
             params = byteArrayOf(0x00, 0x64, 0x00)
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
+        val instance = TelinkLightService.Instance() ?: return
+        instance.sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
     /**
@@ -310,10 +310,7 @@ object Commander : EventListener<String> {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val mesh = mApplication!!.mesh
 
-        val password: ByteArray
-        password = Strings.stringToBytes(NetworkFactory.md5(
-                NetworkFactory.md5(mesh?.password) + newMeshName), 16)
-
+        val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
 
         TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
         TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress = newMeshAddr

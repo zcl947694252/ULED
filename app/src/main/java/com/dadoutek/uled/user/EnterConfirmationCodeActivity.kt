@@ -31,7 +31,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
-import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
@@ -117,7 +116,6 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     hideLoadingDialog()
                 } else if (event == SMSSDK.EVENT_SUBMIT_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
-                        toast("type"+type)
                         // TODO 处理验证成功的结果
                         if (type == Constant.TYPE_VERIFICATION_CODE) {
                            verificationLogin()

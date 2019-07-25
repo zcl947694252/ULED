@@ -339,6 +339,9 @@ public interface RequestInterface {
     Observable<Response<Object>> isAvailavle(@Query("platform") int device,
                                              @Query("currentVersion") String version);
 
+    @GET("app/getNewVersion")
+    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero,@Query("lang") int zero_one);
+
     @GET("auth/isRegister")
     Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);
 }

@@ -809,4 +809,7 @@
     <string name="刷新二维码">Refresh qr code</string>
     <string name="当前网络拥有者">Current network owner:</string>
     <string name="developer">Developer model</string>
+    <string name="版本升级">version upgrade</string>
+    <string name="您的版本不可用请升级即将跳转升级界面">Your version is not available. Please upgrade the upgrade screen</string>
+    <string name="同步数据中请重新登录">Please login again in sync data</string>
 </resources>

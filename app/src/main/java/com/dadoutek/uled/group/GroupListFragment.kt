@@ -4,17 +4,18 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.*
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
-import android.support.v7.widget.*
-import android.support.v7.widget.helper.ItemTouchHelper
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -22,15 +23,11 @@ import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
-import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
-import com.dadoutek.uled.device.NewDevieFragment
 import com.dadoutek.uled.fragment.CWLightFragmentList
 import com.dadoutek.uled.fragment.CurtainFragmentList
 import com.dadoutek.uled.fragment.RGBLightFragmentList
@@ -38,7 +35,6 @@ import com.dadoutek.uled.fragment.RelayFragmentList
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
-import com.dadoutek.uled.light.DeviceListFragment
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -50,28 +46,20 @@ import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.othersview.MeFragment
 import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
-import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.*
+import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main22.*
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
-import org.jetbrains.anko.appcompat.v7.navigationIconResource
-import org.jetbrains.anko.support.v4.onPageChangeListener
-import org.jetbrains.anko.support.v4.viewPager
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -403,15 +391,15 @@ class GroupListFragment : BaseFragment() {
 
         if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
-                btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
-                btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
-                onText!!.setTextColor(resources.getColor(R.color.white))
-                offText!!.setTextColor(resources.getColor(R.color.black_nine))
+                btnOn?.setBackgroundResource(R.drawable.icon_open_group)
+                btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+                onText?.setTextColor(resources.getColor(R.color.white))
+                offText?.setTextColor(resources.getColor(R.color.black_nine))
             } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
-                btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
-                btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
-                onText!!.setTextColor(resources.getColor(R.color.black_nine))
-                offText!!.setTextColor(resources.getColor(R.color.white))
+                btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+                btnOff?.setBackgroundResource(R.drawable.icon_open_group)
+                onText?.setTextColor(resources.getColor(R.color.black_nine))
+                offText?.setTextColor(resources.getColor(R.color.white))
             }
         }
 
@@ -598,7 +586,6 @@ class GroupListFragment : BaseFragment() {
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
-
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
@@ -673,10 +660,10 @@ class GroupListFragment : BaseFragment() {
 
             if (allGroup != null) {
                 if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
-                    btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
-                    btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
-                    onText!!.setTextColor(resources.getColor(R.color.white))
-                    offText!!.setTextColor(resources.getColor(R.color.black_nine))
+                    btnOn?.setBackgroundResource(R.drawable.icon_open_group)
+                    btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+                    onText?.setTextColor(resources.getColor(R.color.white))
+                    offText?.setTextColor(resources.getColor(R.color.black_nine))
                     if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "on")
@@ -684,10 +671,10 @@ class GroupListFragment : BaseFragment() {
                                 .sendBroadcast(intent)
                     }
                 } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
-                    btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
-                    onText!!.setTextColor(resources.getColor(R.color.black_nine))
-                    offText!!.setTextColor(resources.getColor(R.color.white))
+                    btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+                    btnOff?.setBackgroundResource(R.drawable.icon_open_group)
+                    onText?.setTextColor(resources.getColor(R.color.black_nine))
+                    offText?.setTextColor(resources.getColor(R.color.white))
                     if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "false")
@@ -822,10 +809,10 @@ class GroupListFragment : BaseFragment() {
                     if (allGroup != null) {
                         val dstAddr = this.allGroup!!.meshAddr
                         Commander.openOrCloseLights(dstAddr, true)
-                        btnOn!!.setBackgroundResource(R.drawable.icon_open_group)
-                        btnOff!!.setBackgroundResource(R.drawable.icon_down_group)
-                        onText!!.setTextColor(resources.getColor(R.color.white))
-                        offText!!.setTextColor(resources.getColor(R.color.black_nine))
+                        btnOn?.setBackgroundResource(R.drawable.icon_open_group)
+                        btnOff?.setBackgroundResource(R.drawable.icon_down_group)
+                        onText?.setTextColor(resources.getColor(R.color.white))
+                        offText?.setTextColor(resources.getColor(R.color.black_nine))
                         updateLights(true, this.allGroup!!)
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "on")
@@ -843,10 +830,10 @@ class GroupListFragment : BaseFragment() {
                     if (allGroup != null) {
                         val dstAddr = this.allGroup!!.meshAddr
                         Commander.openOrCloseLights(dstAddr, false)
-                        btnOn!!.setBackgroundResource(R.drawable.icon_down_group)
-                        btnOff!!.setBackgroundResource(R.drawable.icon_open_group)
-                        onText!!.setTextColor(resources.getColor(R.color.black_nine))
-                        offText!!.setTextColor(resources.getColor(R.color.white))
+                        btnOn?.setBackgroundResource(R.drawable.icon_down_group)
+                        btnOff?.setBackgroundResource(R.drawable.icon_open_group)
+                        onText?.setTextColor(resources.getColor(R.color.black_nine))
+                        offText?.setTextColor(resources.getColor(R.color.white))
                         updateLights(false, this.allGroup!!)
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "false")

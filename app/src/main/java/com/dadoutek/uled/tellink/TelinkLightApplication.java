@@ -41,7 +41,7 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     private static DaoSession daoSession;
     private Object Toolbar;
-        static TelinkLightApplication mInstance = null;
+    static TelinkLightApplication mInstance = null;
 
     private Intent intent;
 
@@ -66,7 +66,7 @@ public final class TelinkLightApplication extends TelinkApplication {
         if (!AppUtils.isAppDebug()) {
 //            LogUtils.getConfig().setLogSwitch(false);
 //            LogUtils.getConfig().setLog2FileSwitch(false);
-        }else{
+        } else {
             LogUtils.getConfig().setLog2FileSwitch(true);
             //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
         }
@@ -104,7 +104,7 @@ public final class TelinkLightApplication extends TelinkApplication {
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
                     mesh = new Mesh();
                     mesh.setName(name);
-                    mesh.setPassword(pwd);
+                    mesh.setPassword(name);
                     mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
                     mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
                     setupMesh(mesh);
@@ -134,12 +134,10 @@ public final class TelinkLightApplication extends TelinkApplication {
     public Mesh getMesh() {
         if (this.mesh == null) {
             this.mesh = new Mesh();
-            this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
-            this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
-        }else{
-            this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
-            this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
         }
+        this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
+        this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
+
         return this.mesh;
     }
 

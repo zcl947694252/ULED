@@ -1,17 +1,11 @@
 package com.dadoutek.uled.scene
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.os.Handler
 import android.os.IBinder
-import android.os.Message
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.MotionEvent
@@ -19,7 +13,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.SeekBar
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -29,7 +22,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
-import com.dadoutek.uled.model.Group
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
@@ -631,41 +623,45 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             for (i in itemGroups!!.indices) {
                 val sceneActions = DbSceneActions()
 
-                if (OtherUtils.isCurtain(DBUtils.getGroupByName(itemGroups.get(i).gpName))) {
+                val item = itemGroups[i]
+                LogUtils.e("zcl**********************$item")
+
+
+                if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAress))) {
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
+
+                    sceneActions.brightness = item.brightness
+                    sceneActions.colorTemperature = item.temperature
+                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.setColor(item.color)
                     sceneActions.deviceType = 0x10
-                    sceneActions.isOn = itemGroups.get(i).isNo
+                    sceneActions.isOn = item.isNo
 
                     DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isConnector(DBUtils.getGroupByName(itemGroups.get(i).gpName))) {
+                } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAress))) {
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.brightness = item.brightness
+                    sceneActions.colorTemperature = item.temperature
+                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.setColor(item.color)
                     sceneActions.deviceType = 0x05
-                    sceneActions.isOn = itemGroups.get(i).isNo
+                    sceneActions.isOn = item.isNo
                     DBUtils.saveSceneActions(sceneActions)
-                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))){
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
-
+                    sceneActions.brightness = item.brightness
+                    sceneActions.colorTemperature = item.temperature
+                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.setColor(item.color)
                     sceneActions.deviceType = 0x06
 
                     DBUtils.saveSceneActions(sceneActions)
                 }else{
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.brightness = item.brightness
+                    sceneActions.colorTemperature = item.temperature
+                    sceneActions.groupAddr = item.groupAress
+                    sceneActions.setColor(item.color)
 
                     sceneActions.deviceType = 0x04
                     DBUtils.saveSceneActions(sceneActions)
@@ -789,7 +785,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             for (i in itemGroups!!.indices) {
                 val sceneActions = DbSceneActions()
 
-                if (OtherUtils.isCurtain(DBUtils.getGroupByName(itemGroups.get(i).gpName))) {
+                if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
@@ -801,7 +797,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
                     nameList.add(itemGroups.get(i).groupAress)
                     DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isConnector(DBUtils.getGroupByName(itemGroups.get(i).gpName))) {
+                } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
@@ -812,7 +808,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
                     nameList.add(itemGroups.get(i).groupAress)
                     DBUtils.saveSceneActions(sceneActions)
-                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByName(itemGroups.get(i).gpName))){
+                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))){
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature

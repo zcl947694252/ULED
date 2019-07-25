@@ -17,9 +17,11 @@ import kotlinx.coroutines.launch
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
     var userPassword:String?=null
-    fun login(phone: String, password: String, channel: String): Observable<DbUser> {
+    fun login(phone: String, password: String): Observable<DbUser> {
         userPassword=password
+       var userphone =phone
         lateinit var account: String
+
         return NetworkFactory.getApi()
                 .getAccount(phone, "dadou")
                 .compose(NetworkTransformer())
@@ -31,8 +33,7 @@ object AccountModel {
                 .flatMap { response: String ->
                     val salt = response
                     val md5Pwd = (NetworkFactory.md5(
-                            NetworkFactory.md5(
-                                    NetworkFactory.md5(password) + account) + salt))
+                            NetworkFactory.md5(NetworkFactory.md5(password) + account) + salt))
 
                     NetworkFactory.getApi().login(account, md5Pwd)
                             .compose(NetworkTransformer()) }
@@ -228,7 +229,8 @@ object AccountModel {
         val application = getApplication() as TelinkLightApplication
         val mesh = application.mesh
         mesh.name = dbRegio.controlMesh
-        mesh.password = dbRegio.controlMeshPwd
+       // mesh.password = dbRegio.controlMeshPwd
+        mesh.password = account
         mesh.factoryName = dbRegio.installMesh
         mesh.factoryPassword = dbRegio.installMeshPwd
 //        mesh.saveOrUpdate(TelinkLightApplication.getInstance())

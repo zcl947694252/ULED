@@ -1049,7 +1049,7 @@ object DBUtils {
             group.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()//目前暂无分区 区域ID暂为0
             groups.add(group)
             //新增数据库保存
-            DBUtils.saveGroup(group, false)
+            saveGroup(group, false)
 
             group= DBUtils.getGroupByMesh(newMeshAdress)!!
             if(group!=null){
@@ -1076,13 +1076,13 @@ object DBUtils {
             group.deviceType = type
             groups.add(group)
             //新增数据库保存
-            DBUtils.saveGroup(group, false)
+            saveGroup(group, false)
 
             group.index = group.id.toInt()
 
 //            group=DBUtils.getGroupByMesh(newMeshAdress)
 
-            DBUtils.updateGroup(group)
+            updateGroup(group)
 
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,

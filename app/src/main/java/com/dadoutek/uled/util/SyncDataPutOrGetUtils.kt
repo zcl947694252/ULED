@@ -486,7 +486,7 @@ class SyncDataPutOrGetUtils {
 
         private fun setupMesh() {
             val regionList = DBUtils.regionAll
-
+            SharedPreferencesUtils.getLastUser();
             //数据库有区域数据直接加载
             if (regionList.size != 0) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()
@@ -494,7 +494,8 @@ class SyncDataPutOrGetUtils {
                 val application = DeviceHelper.getApplication() as TelinkLightApplication
                 val mesh = application.mesh
                 mesh.name = dbRegion.controlMesh
-                mesh.password = dbRegion.controlMeshPwd
+                //mesh.password = dbRegion.controlMeshPwd
+                mesh.password = dbRegion.belongAccount
                 mesh.factoryName = dbRegion.installMesh
                 mesh.factoryPassword = dbRegion.installMeshPwd
 //            mesh.saveOrUpdate(TelinkLightApplication.getInstance())

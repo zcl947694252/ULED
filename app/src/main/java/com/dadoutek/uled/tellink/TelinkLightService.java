@@ -17,7 +17,7 @@ public final class TelinkLightService extends LightService {
 
     @Override
     public IBinder onBind(Intent intent) {
-
+        mThis = this;
         if (this.mBinder == null)
             this.mBinder = new LocalBinder();
 
@@ -28,9 +28,7 @@ public final class TelinkLightService extends LightService {
     public void onCreate() {
 
         super.onCreate();
-
         mThis = this;
-
         if (this.mAdapter == null)
             this.mAdapter = new LightAdapter();
         this.mAdapter.start(this);

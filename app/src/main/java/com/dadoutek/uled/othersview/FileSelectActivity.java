@@ -26,7 +26,7 @@ public class FileSelectActivity extends TelinkBaseActivity {
     private FileListAdapter mAdapter;
     private List<File> mFiles = new ArrayList<>();
     private File mCurrentDir;
-
+    private static final int REQUEST_CODE_CHOOSE_FILE = 11;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +49,7 @@ public class FileSelectActivity extends TelinkBaseActivity {
 //        mCurrentDir = getFilesDir();
         mAdapter = new FileListAdapter(this);
         lv_file.setAdapter(mAdapter);
+
         lv_file.setOnItemClickListener((parent, view, position, id) -> {
             if (mFiles.get(position).isDirectory()) {
                 mCurrentDir = mFiles.get(position);

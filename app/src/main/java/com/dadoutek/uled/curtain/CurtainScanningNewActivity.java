@@ -45,13 +45,11 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.light.DeviceScanningNewActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DeviceType;
-import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -1573,15 +1571,13 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         params.setOldMeshName(mesh.getFactoryName());
         params.setOldPassword(mesh.getFactoryPassword());
         params.setNewMeshName(mesh.getName());
-        params.setNewPassword(NetworkFactory.md5(
-                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+       // params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
         params.setUpdateDeviceList(deviceInfo);
         TelinkLightService.Instance().updateMesh(params);
 
         Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID);
-        Log.d("MACK",mesh.getFactoryName()+"===>"+mesh.getFactoryPassword()+"--->"+mesh.getName()+"=="+NetworkFactory.md5(
-                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16)+"==123"+account);
     }
 
     private boolean checkIsCurtain(int productUUID) {

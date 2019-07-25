@@ -1,14 +1,10 @@
 package com.dadoutek.uled.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.text.Layout;
-import android.view.View;
 
 import com.app.hubert.guide.NewbieGuide;
-import com.app.hubert.guide.model.GuidePage;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 import java.io.BufferedReader;
@@ -44,7 +40,6 @@ public class AppUtils {
 
     /**
      * [获取应用程序版本名称信息]
-     *
      * @param context
      * @return 当前应用的版本名称
      */
@@ -61,12 +56,10 @@ public class AppUtils {
         return null;
     }
 
+    //手机CPU信息
     public static boolean isExynosSoc() {
         String str1 = "/proc/cpuinfo";
-        String str2 = "";
-        String ret = "";
-        String[] cpuInfo = {"", ""};
-        String[] arrayOfString;
+        String str2 ;
         try {
             FileReader fr = new FileReader(str1);
             BufferedReader localBufferedReader = new BufferedReader(fr, 8192);

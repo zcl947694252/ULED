@@ -61,6 +61,7 @@ public final class DeviceListFragment extends Fragment {
     private EditText txtSendInterval;
     private EditText txtSendNumbers;
     private TextView txtNotifyCount;
+
     private TextView log;
 
     // interval on off test
@@ -86,7 +87,6 @@ public final class DeviceListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-
             if (v == btnAllOn) {
                 byte opcode = (byte) 0xD0;
                 int address = 0xFFFF;

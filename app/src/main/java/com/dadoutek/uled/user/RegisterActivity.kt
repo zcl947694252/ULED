@@ -158,11 +158,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-//        SMSSDK.unregisterEventHandler(eventHandler);
-    }
-
 //    val eventHandler = object : EventHandler() {
 //        override fun afterEvent(event: Int, result: Int, data: Any?) {
 //            // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
@@ -250,8 +245,8 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 .flatMap {
                     hideLoadingDialog()
                     showLoadingDialog(getString(R.string.logging_tip))
-                    AccountModel.login(userName!!, userPassWord!!, it!!.channel)
-                }
+                    AccountModel.login(userName!!, userPassWord!!)
+    }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {

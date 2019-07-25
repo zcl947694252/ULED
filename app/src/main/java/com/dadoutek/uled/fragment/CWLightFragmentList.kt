@@ -21,45 +21,32 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemLongClickListener
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.connector.ConnectorOfGroupActivity
-import com.dadoutek.uled.connector.ConnectorSettingActivity
-import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.group.GroupListFragment
-import com.dadoutek.uled.group.GroupListRecycleViewChildAdapter
-import com.dadoutek.uled.group.GroupNameAdapter
-import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
-import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
-import kotlinx.android.synthetic.main.fragment_group_list.*
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -75,7 +62,7 @@ class CWLightFragmentList : BaseFragment() {
 
     private var groupAdapter: GroupListAdapter? = null
 
-    private lateinit var groupList: ArrayList<DbGroup>
+    private var groupList: ArrayList<DbGroup>? = null
 
     private var isFristUserClickCheckConnect = true
 
@@ -132,23 +119,21 @@ class CWLightFragmentList : BaseFragment() {
                     isDelete = false
                     isLong = true
                     groupAdapter!!.changeState(isDelete)
-                    for (i in groupList.indices) {
-                        if (groupList[i].isSelected) {
-                            groupList[i].isSelected = false
-                        }
+                    groupList?.let {
+                        for (i in it.indices)
+                            if (it[i].isSelected)
+                                it[i].isSelected = false
                     }
                     refreshData()
                 }
                 if (str == "true") {
                     deleteList = ArrayList()
 //                    Log.e("TAG_delete","删除")
-                    for (i in groupList.indices) {
-                        if (groupList[i].isSelected) {
-                            deleteList.add(groupList[i])
-                        }
+                    groupList?.let {
+                        for (i in it.indices)
+                            if (it[i].isSelected)
+                                deleteList.add(it[i])
                     }
-
-//                    showLoadingDialog(getString(R.string.deleting))
                     for (j in deleteList.indices) {
                         Thread.sleep(300)
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
@@ -166,29 +151,27 @@ class CWLightFragmentList : BaseFragment() {
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
                 }
-
-                if (switch == "true") {
-                    for (i in groupList.indices) {
-                        if (groupList[i].isSelected) {
-                            groupList[i].isSelected = false
+                groupList?.let {
+                    if (switch == "true") {
+                        for (i in it.indices) {
+                            if (it[i].isSelected)
+                                it[i].isSelected = false
+                        }
+                    }
+                    if (lightStatus == "on") {
+                        for (i in it.indices) {
+                            it[i].connectionStatus = ConnectionStatus.ON.value
+                            DBUtils.updateGroup(it[i])
+                            groupAdapter!!.notifyDataSetChanged()
+                        }
+                    } else if (lightStatus == "false") {
+                        for (i in it.indices) {
+                            it[i].connectionStatus = ConnectionStatus.OFF.value
+                            DBUtils.updateGroup(it[i])
+                            groupAdapter!!.notifyDataSetChanged()
                         }
                     }
                 }
-
-                if (lightStatus == "on") {
-                    for (i in groupList.indices) {
-                        groupList[i].connectionStatus = ConnectionStatus.ON.value
-                        DBUtils.updateGroup(groupList[i])
-                        groupAdapter!!.notifyDataSetChanged()
-                    }
-                } else if (lightStatus == "false") {
-                    for (i in groupList.indices) {
-                        groupList[i].connectionStatus = ConnectionStatus.OFF.value
-                        DBUtils.updateGroup(groupList[i])
-                        groupAdapter!!.notifyDataSetChanged()
-                    }
-                }
-
             }
         }
         localBroadcastManager.registerReceiver(br, intentFilter)
@@ -259,15 +242,15 @@ class CWLightFragmentList : BaseFragment() {
         for (group in listAll) {
             when (group.deviceType) {
                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                    groupList.add(group)
+                    groupList!!.add(group)
                 }
                 Constant.DEVICE_TYPE_DEFAULT_ALL -> {
-                    groupList.add(group)
+                    groupList!!.add(group)
                 }
             }
         }
 
-        if (groupList.size > 0) {
+        if (groupList!!.size > 0) {
             no_group?.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             addGroupBtn?.visibility = View.VISIBLE
@@ -342,18 +325,15 @@ class CWLightFragmentList : BaseFragment() {
         groupAdapter!!.notifyDataSetChanged()
     }
 
-    var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        var currentLight = groupList[position]
+    var onItemChildClickListener = OnItemChildClickListener { _, view, position ->
+        groupList?.let {
+        var currentLight = it[position]
         val dstAddr = currentLight.meshAddr
         var intent: Intent
-//        if (TelinkLightApplication.getInstance().connectDevice == null) {
-//            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-//            checkConnect()
-//        } else {
-        when (view!!.getId()) {
+        when (view!!.id) {
             R.id.btn_on -> {
                 if (isLong) {
-                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL){
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, true)
                         currentLight.connectionStatus = ConnectionStatus.ON.value
                         DBUtils.updateGroup(currentLight)
@@ -364,7 +344,7 @@ class CWLightFragmentList : BaseFragment() {
             }
             R.id.btn_off -> {
                 if (isLong) {
-                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL){
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, false)
                         currentLight.connectionStatus = ConnectionStatus.OFF.value
                         DBUtils.updateGroup(currentLight)
@@ -385,19 +365,8 @@ class CWLightFragmentList : BaseFragment() {
                 }
             }
 
-//            R.id.group_name -> {
-//                intent = Intent(mContext, LightsOfGroupActivity::class.java)
-//                intent.putExtra("group", currentLight)
-//                intent.putExtra("light", "cw_light")
-//                startActivityForResult(intent, 2)
-//            }
-
             R.id.selected_group -> {
-                if (currentLight.isSelected) {
-                    currentLight.isSelected = false
-                } else {
-                    currentLight.isSelected = true
-                }
+                currentLight.isSelected = !currentLight.isSelected
             }
 
             R.id.item_layout -> {
@@ -411,22 +380,8 @@ class CWLightFragmentList : BaseFragment() {
         }
 //        }
     }
-
-/*
-    private fun checkConnect() {
-        try {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
-                if (isFristUserClickCheckConnect) {
-                    val activity = activity as MainActivity
-                    activity.autoConnect()
-                    isFristUserClickCheckConnect = false
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
-*/
+
 
     override fun onStop() {
         super.onStop()
@@ -515,19 +470,24 @@ class CWLightFragmentList : BaseFragment() {
             groupList = ArrayList()
 
             val listAll = DBUtils.getAllGroupsOrderByIndex()
+
+            groupList?.let {
+
+
+
             for (group in listAll) {
                 when (group.deviceType) {
                     Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                        groupList.add(group)
+                        it.add(group)
                     }
                     Constant.DEVICE_TYPE_DEFAULT_ALL -> {
-                        groupList.add(group)
+                        it.add(group)
                     }
                 }
             }
 
 
-            if (groupList.size > 0) {
+            if (it.size > 0) {
                 no_group?.visibility = View.GONE
                 recyclerView?.visibility = View.VISIBLE
                 addGroupBtn?.visibility = View.VISIBLE
@@ -548,10 +508,12 @@ class CWLightFragmentList : BaseFragment() {
                 LocalBroadcastManager.getInstance(this!!.mContext!!)
                         .sendBroadcast(intent)
             }
-            for (i in groupList.indices) {
-                if (groupList[i].isSelected) {
-                    groupList[i].isSelected = false
+            for (i in it.indices) {
+                if (it[i].isSelected) {
+                    it[i].isSelected = false
                 }
+            }
+
             }
             refreshData()
 
@@ -574,13 +536,13 @@ class CWLightFragmentList : BaseFragment() {
             //添加分割线
             recyclerView?.addItemDecoration(decoration)
             var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
-            lin.setOnClickListener(View.OnClickListener {
+            lin.setOnClickListener {
                 if (TelinkLightApplication.getInstance().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
                 }
-            })
+            }
             groupAdapter!!.addFooterView(lin)
             groupAdapter!!.onItemChildClickListener = onItemChildClickListener
             groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
@@ -644,8 +606,7 @@ class CWLightFragmentList : BaseFragment() {
 
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
@@ -664,7 +625,7 @@ class CWLightFragmentList : BaseFragment() {
                 startPos = pos
                 endPos = 0
 
-                com.dadoutek.uled.util.LogUtils.d("indexchange--" + "--start:" + pos)
+                com.dadoutek.uled.util.LogUtils.d("indexchange----start:$pos")
             }
 
             override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
@@ -674,10 +635,10 @@ class CWLightFragmentList : BaseFragment() {
             override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
                 //                viewHolder.getItemId();
                 endPos = pos
-                com.dadoutek.uled.util.LogUtils.d("indexchange--" + "--end:" + pos)
+                com.dadoutek.uled.util.LogUtils.d("indexchange----end:$pos")
 
                 updateGroupList(list, startPos, endPos)
-                com.dadoutek.uled.util.LogUtils.d("indexchange--" + "--start:" + startPos + "--end:" + endPos)
+                com.dadoutek.uled.util.LogUtils.d("indexchange----start:$startPos--end:$endPos")
             }
         }
 

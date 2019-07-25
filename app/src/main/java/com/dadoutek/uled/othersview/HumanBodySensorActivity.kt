@@ -9,7 +9,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +21,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -67,6 +67,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private var selectTime = 10
     private var currentPageIsEdit = false
     private var showGroupList: MutableList<ItemGroup>? = null
+    /**
+     * 显示选择分组下拉的数据
+     */
     private var showCheckListData: MutableList<DbGroup>? = null
     private var modeStartUpMode = 0
     private var modeDelayUnit = 2
@@ -106,9 +109,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         for (i in showCheckListData!!.indices) {
-            showCheckListData!![i].checked = false
+            val dbGroup = showCheckListData!![i]
+            dbGroup.checked = i == 0 && dbGroup.meshAddr == 0xffff
+            if (dbGroup.checked) {
+                toolbar.title = dbGroup.name
+            }
         }
-        showGroupList = ArrayList<ItemGroup>()
+
+        showGroupList = ArrayList()
     }
 
     private fun initToolbar() {
@@ -364,17 +372,17 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                moment.setOnClickListener(View.OnClickListener {
+                moment.setOnClickListener {
                     brightness_change_text.text = getString(R.string.moment)
                     modeSwitchMode = MODE_SWITCH_MODE_MOMENT
                     popupWindow.dismiss()
-                })
+                }
 
-                gradient.setOnClickListener(View.OnClickListener {
+                gradient.setOnClickListener {
                     brightness_change_text.text = getString(R.string.gradient)
                     modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
                     popupWindow.dismiss()
-                })
+                }
             }
 
             R.id.time -> {
@@ -429,65 +437,107 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                tenSec.setOnClickListener(View.OnClickListener {
+                tenSec.setOnClickListener {
                     time_text.text = getString(R.string.ten_second)
                     selectTime = 10
                     popupWindow.dismiss()
-                })
+                }
 
-                twentySec.setOnClickListener(View.OnClickListener {
-                    time_text.text = getString(R.string.twenty_second)
-                    selectTime = 20
-                    popupWindow.dismiss()
-                })
+                twentySec.run {
 
-                thirtySec.setOnClickListener(View.OnClickListener {
+                    when {
+                        time_text.text.toString() == getString(R.string.ten_second) -> {
+                            tenSec.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.twenty_second) -> {
+                            twentySec.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.thirty_second) -> {
+                            thirtySec.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.forty_second) -> {
+                            fortySec.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.fifty_second) -> {
+                            fiftySec.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.one_minute) -> {
+                            oneMin.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.two_minute) -> {
+                            twoMin.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.three_minute) -> {
+                            threeMin.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.four_minute) -> {
+                            fourMin.setBackgroundResource(R.color.blue_background)
+                        }
+                        time_text.text.toString() == getString(R.string.five_minute) -> {
+                            fiveMin.setBackgroundResource(R.color.blue_background)
+                        }
+                    }
+
+                    tenSec.setOnClickListener {
+                        time_text.text = getString(R.string.ten_second)
+                        selectTime = 10
+                        popupWindow.dismiss()
+                    }
+
+                    twentySec.setOnClickListener {
+                        time_text.text = getString(R.string.twenty_second)
+                        selectTime = 20
+                        popupWindow.dismiss()
+                    }
+                }
+
+                thirtySec.setOnClickListener {
                     time_text.text = getString(R.string.thirty_second)
                     selectTime = 30
                     popupWindow.dismiss()
-                })
+                }
 
-                fortySec.setOnClickListener(View.OnClickListener {
+                fortySec.setOnClickListener {
                     time_text.text = getString(R.string.forty_second)
                     selectTime = 40
                     popupWindow.dismiss()
-                })
+                }
 
-                fiftySec.setOnClickListener(View.OnClickListener {
+                fiftySec.setOnClickListener {
                     time_text.text = getString(R.string.fifty_second)
                     selectTime = 50
                     popupWindow.dismiss()
-                })
+                }
 
-                oneMin.setOnClickListener(View.OnClickListener {
+                oneMin.setOnClickListener {
                     time_text.text = getString(R.string.one_minute)
-                    selectTime = 1*60
+                    selectTime = 1 * 60
                     popupWindow.dismiss()
-                })
+                }
 
-                twoMin.setOnClickListener(View.OnClickListener {
+                twoMin.setOnClickListener {
                     time_text.text = getString(R.string.two_minute)
-                    selectTime = 2*60
+                    selectTime = 2 * 60
                     popupWindow.dismiss()
-                })
+                }
 
-                threeMin.setOnClickListener(View.OnClickListener {
+                threeMin.setOnClickListener {
                     time_text.text = getString(R.string.three_minute)
-                    selectTime = 3*60
+                    selectTime = 3 * 60
                     popupWindow.dismiss()
-                })
+                }
 
-                fourMin.setOnClickListener(View.OnClickListener {
+                fourMin.setOnClickListener {
                     time_text.text = getString(R.string.four_minute)
-                    selectTime = 4*50
+                    selectTime = 4 * 50
                     popupWindow.dismiss()
-                })
+                }
 
-                fiveMin.setOnClickListener(View.OnClickListener {
+                fiveMin.setOnClickListener {
                     time_text.text = getString(R.string.five_minute)
-                    selectTime = 5*60
+                    selectTime = 5 * 60
                     popupWindow.dismiss()
-                })
+                }
             }
 
             R.id.trigger_mode -> {
@@ -501,7 +551,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                 var turnOn = views.findViewById<ConstraintLayout>(R.id.turn_on)
                 var turnOff = views.findViewById<ConstraintLayout>(R.id.turn_off)
 
-                when{
+                when {
                     trigger_mode_text.text.toString() == getString(R.string.light_on) -> {
                         turnOn.setBackgroundResource(R.color.blue_background)
                     }
@@ -511,57 +561,78 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                turnOn.setOnClickListener(View.OnClickListener {
+                turnOn.setOnClickListener {
                     trigger_mode_text.text = getString(R.string.light_on)
                     switchMode = CMD_OPEN_LIGHT
                     popupWindow.dismiss()
-                })
+                }
 
-                turnOff.setOnClickListener(View.OnClickListener {
+                turnOff.setOnClickListener {
                     trigger_mode_text.text = getString(R.string.light_off)
                     switchMode = CMD_CLOSE_LIGHT
                     popupWindow.dismiss()
-                })
+                }
             }
 
             R.id.choose_group -> {
                 isFinish = true
+
                 tv_function1.visibility = View.VISIBLE
                 sensor_three.visibility = View.GONE
                 edit_data_view_layout.visibility = View.VISIBLE
-                toolbar.title = getString(R.string.select_group)
 
-                if (showGroupList!!.size != 0) {
-                    for (i in showCheckListData!!.indices) {
-                        for (j in showGroupList!!.indices) {
-                            if (showCheckListData!![i].meshAddr == showGroupList!![j].groupAress) {
-                                showCheckListData!![i].checked = true
-                                break
-                            } else if (j == showGroupList!!.size - 1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAress) {
-                                showCheckListData!![i].checked = false
-                            }
+                showCheckListData?.let {
+                    if (showGroupList!!.size != 0) {
+                        for (i in it.indices)//0-1
+                            for (j in showGroupList!!.indices)//0-1-3
+                                if (it[i].meshAddr == showGroupList!![j].groupAress) {
+                                    it[i].checked = true
+                                    break //j = 0-1-2   3-1=2
+                                } else if (j == showGroupList!!.size - 1 && it[i].meshAddr != showGroupList!![j].groupAress) {
+                                    it[i].checked = false
+                                }
+                        changeCheckedViewData()
+                    } else {
+                        for (i in it.indices) {
+                            it[i].enableCheck = true
+                            it[i].checked = i == 0
                         }
                     }
-                    changeCheckedViewData()
-                } else {
-                    for (i in showCheckListData!!.indices) {
-                        showCheckListData!![i].enableCheck = true
-                        showCheckListData!![i].checked = false
+
+                    recyclerView_select_group_list_view.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+                    nightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.night_light_sensor_adapter, it)
+                    //添加分割线
+                    val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+                    decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
+                    recyclerView_select_group_list_view.addItemDecoration(decoration)
+
+                    nightLightEditGroupAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
+                    nightLightEditGroupAdapter?.onItemClickListener = OnItemClickListener { adapter, _, position ->
+                        val item = it[position]
+                        if (item.checked) {//t状态
+                            item.checked = !item.checked
+                        } else {//f状态下
+                            if (position == 0 && item.meshAddr == 0xffff) {//65535
+                                setFrist()
+                            } else {
+                                item.checked = true
+                                if (position != 0) {
+                                    it[0].checked = false
+                                } else {
+                                    setFrist()
+                                }
+                            }
+                        }
+                        adapter?.notifyDataSetChanged()
+                        /* if (item.enableCheck) {
+                             item.checked = !item.checked
+                             changeCheckedViewData()
+                             adapter?.notifyDataSetChanged()
+                         }*/
                     }
                 }
-
-                val layoutmanager = LinearLayoutManager(this)
-                layoutmanager.orientation = LinearLayoutManager.VERTICAL
-                recyclerView_select_group_list_view.layoutManager = layoutmanager
-                this.nightLightEditGroupAdapter = NightLightEditGroupAdapter(
-                        R.layout.night_light_sensor_adapter, showCheckListData!!)
-                val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-                decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-                //添加分割线
-                recyclerView_select_group_list_view.addItemDecoration(decoration)
-                nightLightEditGroupAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
-                nightLightEditGroupAdapter?.onItemClickListener = onItemClickListenerCheck
             }
+
 
             R.id.tv_function1 -> {
                 val oldResultItemList = ArrayList<ItemGroup>()
@@ -599,6 +670,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
+
                 showGroupList?.clear()
                 showGroupList?.addAll(oldResultItemList)
                 showGroupList?.addAll(newResultItemList)
@@ -616,10 +688,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun setFrist() {
+        for (i in showCheckListData!!.indices) {
+            showCheckListData!![i].checked = i == 0 //选中全部
+        }
+    }
+
     private fun configDevice() {
         var version = tvPSVersion.text.toString()
         var num = version.substring(2, 3)
-        if(num.toDouble() >= 3.0){
+        if (num.toDouble() >= 3.0) {
             var time = editText.text.toString()
 
             if (time == "") {
@@ -676,7 +754,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         })
 
             }.start()
-        }else{
+        } else {
             if (showGroupList?.size == 0) {
                 ToastUtils.showLong(getString(R.string.config_night_light_select_group))
                 return
@@ -789,8 +867,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 //            }
 //
 //        } else {
-
-
 //        if (isUpdate == "1") {
 //            var sensor = DBUtils.getAllSensor()
 //            if (sensor.size > 0) {
@@ -802,7 +878,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 //                        dbSensor.productUUID = mDeviceInfo.productUUID
 //                        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 //                        DBUtils.updateSensor(dbSensor)
-//
 //                    }
 //                }
 //            }
@@ -823,9 +898,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         DBUtils.recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
                 Constant.DB_ADD)
-
-//        }
-//        }
+//        }}
 
     }
 
@@ -840,7 +913,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         }
         return controlGroupListStr
     }
-
 
     private fun configNewlight() {
 //        val spGroup = groupConvertSpecialValue(groupAddr)
@@ -918,6 +990,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         Thread.sleep(300)
     }
 
+    /**
+     * 显示已选中分组
+     */
     private fun showDataListView() {
         isFinish = false
         toolbar.title = getString(R.string.human_body)
@@ -925,21 +1000,15 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         edit_data_view_layout.visibility = View.GONE
         tv_function1.visibility = View.GONE
 
-        val layoutmanager = GridLayoutManager(this, 3)
-        recyclerGroup.layoutManager = layoutmanager as RecyclerView.LayoutManager?
+        recyclerGroup.layoutManager = GridLayoutManager(this, 3)
         this.nightLightGroupRecycleViewAdapter = NightLightGroupRecycleViewAdapter(
                 R.layout.activity_night_light_groups_item, showGroupList)
-//        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-//        //添加分割线
-//        recyclerViewNightLightGroups.addItemDecoration(decoration)
-        nightLightGroupRecycleViewAdapter?.bindToRecyclerView(recyclerGroup)
-        nightLightGroupRecycleViewAdapter?.onItemChildClickListener = onItemChildClickListener
-    }
 
-    internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        when (view.id) {
-            R.id.imgDelete -> delete(adapter, position)
+        nightLightGroupRecycleViewAdapter?.bindToRecyclerView(recyclerGroup)
+        nightLightGroupRecycleViewAdapter?.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+            when (view.id) {
+                R.id.imgDelete -> delete(adapter, position)
+            }
         }
     }
 
@@ -947,14 +1016,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         adapter.remove(position)
     }
 
-    internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-        val item = showCheckListData!!.get(position)
-        if (item.enableCheck) {
-            showCheckListData!!.get(position).checked = !item.checked
-            changeCheckedViewData()
-            adapter?.notifyDataSetChanged()
-        }
-    }
 
     private fun getModeValue(): Int {
         LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
@@ -965,11 +1026,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun changeCheckedViewData() {
         var isAllCanCheck = true
         for (i in showCheckListData!!.indices) {
-            if (showCheckListData!![0].meshAddr == 0xffff && showCheckListData!![0].checked) {
+            if (showCheckListData!![0].meshAddr == 0xffff && showCheckListData!![0].checked) {//选中全部分组
                 showCheckListData!![0].enableCheck = true
+
                 if (showCheckListData!!.size > 1 && i > 0) {
                     showCheckListData!![i].enableCheck = false
                 }
+
             } else {
                 showCheckListData!![0].enableCheck = false
                 if (showCheckListData!!.size > 1 && i > 0) {

@@ -17,6 +17,6 @@ public class LogUtil {
 
     public static void util(String tag, String s) {
         if (isTry)
-            Log.d(tag,s);
+            Log.e(tag,s);
     }
 }

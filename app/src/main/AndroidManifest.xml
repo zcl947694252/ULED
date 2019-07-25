@@ -132,7 +132,6 @@
         <service
             android:name=".service.SendLightsInfo"
             android:enabled="true" />
-
         <activity
             android:name=".othersview.SplashActivity"
             android:label="@string/app_name"

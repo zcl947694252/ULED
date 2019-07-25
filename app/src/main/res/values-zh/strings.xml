@@ -734,5 +734,8 @@
     <string name="刷新二维码">刷新二维码</string>
     <string name="当前网络拥有者">当前网络拥有者:</string>
     <string name="developer">开发者模式</string>
+    <string name="update_version">新版本升级</string>
+    <string name="您的版本不可用请升级即将跳转升级界面">您的版本不可用请升级即将跳转升级界面</string>
+    <string name="同步数据中请重新登录">同步数据中请重新登录</string>
 
 </resources>

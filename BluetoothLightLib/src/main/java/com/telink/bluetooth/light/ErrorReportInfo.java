@@ -9,7 +9,6 @@ import android.os.Parcelable;
 
 public class ErrorReportInfo implements Parcelable {
 
-
     /**
      * state code
      */
