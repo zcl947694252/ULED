@@ -24,13 +24,15 @@ MobSDK {
     android {
     signingConfigs {
         release {
-            storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
+            //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
+            storeFile file('F:\\androidSpace\\ULED\\ULED\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
             keyPassword 'dadoutek2018'
         }
         debug {
-            storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
+            //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
+            storeFile file('F:\\androidSpace\\ULED\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
             keyPassword 'dadoutek2018'
@@ -42,8 +44,8 @@ MobSDK {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 246
-        versionName  "3.0.3"
+        versionCode 248
+        versionName  "3.0.5"
 
         multiDexEnabled true
 

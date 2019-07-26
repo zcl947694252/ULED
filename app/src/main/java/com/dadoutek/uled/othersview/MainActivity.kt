@@ -20,7 +20,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -80,7 +79,6 @@ import com.telink.util.EventListener
 import com.telink.util.Strings
 import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.Observable
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -200,38 +198,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         XiaomiUpdateAgent.update(this)
     }
 
-    private fun exitLogin() {
-        isClickExlogin = true
-        val b = (DBUtils.allLight.isEmpty() && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.isEmpty()
-                && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.isEmpty() && !DBUtils.dataChangeAllHaveAboutRelay)
-
-        LogUtils.e("zcl**********************b$b")
-        if (b) {
-            if (isClickExlogin) {
-                LogOutAndExitApp()
-            }
-            hideLoadingDialog()
-        }
-    }
-
-    // 如果没有网络，则弹出网络设置对话框
-/*
-    fun checkNetworkAndSync(activity: Activity?) {
-        if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
-            LogUtils.d(getString(R.string.net_disconnect_tip_message))
-//            android.app.AlertDialog.Builder(activity)
-//                    .setTitle(R.string.network_tip_title)
-//                    .setMessage(R.string.net_disconnect_tip_message)
-//                    .setPositiveButton(android.R.string.ok
-//                    ) { _, _ ->
-//                        // 跳转到设置界面
-//                        activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
-//                    }.create().show()
-        } else {
-            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
-        }
-    }
-*/
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
         override fun start() {
@@ -239,18 +205,17 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
 
         override fun complete() {
-            val TIME_INTERVAL: Long = 6
-//            ToastUtil.showToast(this@MainActivity, "上传成功")
-
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
                     .setMessage(getString(R.string.version_disabled))
-                    .setPositiveButton(R.string.exit, { dialog, which ->
+                    .setPositiveButton(R.string.exit) { dialog, which ->
                         LogOutAndExitApp()
-                    })
+                    }
                     .show()
 
-         /*   mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
+         /*
+         val TIME_INTERVAL: Long = 6
+         mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
@@ -277,9 +242,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
                     .setMessage(getString(R.string.version_disabled))
-                    .setPositiveButton(R.string.exit, { dialog, which ->
+                    .setPositiveButton(R.string.exit) { dialog, which ->
                         LogOutAndExitApp()
-                    })
+                    }
 
         }
     }
@@ -288,11 +253,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
         TelinkLightService.Instance().disconnect()
         TelinkLightService.Instance().idleMode(true)
-        restartApplication()
-    }
 
-    //重启app并杀死原进程
-    private fun restartApplication() {
+        //重启app并杀死原进程
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
     }
@@ -540,18 +502,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun syncDataAndExit() {
         if (!NetWorkUtils.isNetworkAvalible(this)) {
             LogUtils.d(getString(R.string.net_disconnect_tip_message))
-//            android.app.AlertDialog.Builder(activity)
-//                    .setTitle(R.string.network_tip_title)
-//                    .setMessage(R.string.net_disconnect_tip_message)
-//                    .setPositiveButton(android.R.string.ok
-//                    ) { _, _ ->
-//                        // 跳转到设置界面
-//                        activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
-//                    }.create().show()
         } else {
             SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallback)
         }
-
     }
 
     /**
@@ -562,15 +515,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         UpdateModel.isVersionAvailable(0, version)
                 .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
                     override fun onNext(s: ResponseVersionAvailable) {
-//                        val jsonObject = JSONObject(s as Map<*, *>)
-//                        val data = jsonObject.getString("isUsable")
-//                        var judge = "false"
 
                         if (s.isUsable == false) {
                             syncDataAndExit()
                         }
                         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), "isShowDot", s.isUsable)
-//                        LogUtils.d("isAvailable = ${s.isUsable}")
                     }
 
                     override fun onError(e: Throwable) {
@@ -983,7 +932,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             LogUtils.d("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
             setSnack()
-
         }
     }
 

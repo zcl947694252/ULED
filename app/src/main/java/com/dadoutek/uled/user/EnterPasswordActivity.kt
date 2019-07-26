@@ -30,6 +30,9 @@ import com.telink.TelinkApplication
 import kotlinx.android.synthetic.main.activity_enter_password.*
 import org.jetbrains.anko.toast
 
+/**
+ * 登录界面 输入密码
+ */
 class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var mWakeLock: PowerManager.WakeLock? = null
     private var phone: String? = null
@@ -196,7 +199,6 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
     private fun transformView() {
         if (DBUtils.allLight.isEmpty()) {
             startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
-            finish()
         } else {
             startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
         }

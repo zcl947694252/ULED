@@ -357,10 +357,8 @@ class GroupListFragment : BaseFragment() {
         }
 
         deviceName = ArrayList()
-        var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light),
-                TelinkLightApplication.getInstance().getString(R.string.rgb_light),
-                TelinkLightApplication.getInstance().getString(R.string.curtain),
-                TelinkLightApplication.getInstance().getString(R.string.connector))
+        var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light), TelinkLightApplication.getInstance().getString(R.string.rgb_light),
+                TelinkLightApplication.getInstance().getString(R.string.curtain), TelinkLightApplication.getInstance().getString(R.string.connector))
 
         for (i in stringName.indices) {
             var device = DbDeviceName()

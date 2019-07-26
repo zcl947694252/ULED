@@ -51,6 +51,9 @@ import org.jetbrains.anko.design.snackbar
 import java.util.*
 import kotlin.collections.ArrayList
 
+/**
+ * 人体感应器
+ */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private lateinit var mDeviceInfo: DeviceInfo
@@ -108,15 +111,30 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
+        showGroupList = ArrayList()
+
         for (i in showCheckListData!!.indices) {
             val dbGroup = showCheckListData!![i]
             dbGroup.checked = i == 0 && dbGroup.meshAddr == 0xffff
             if (dbGroup.checked) {
                 toolbar.title = dbGroup.name
+                showGroupList?.let {
+                    if (it!!.size == 0) {
+                        val newItemGroup = ItemGroup()
+                        newItemGroup.brightness = 50
+                        newItemGroup.temperature = 50
+                        newItemGroup.color = R.color.white
+                        newItemGroup.checked = true
+                        newItemGroup.enableCheck = true
+                        newItemGroup.gpName = showCheckListData!![0].name
+                        newItemGroup.groupAress = showCheckListData!![0].meshAddr
+                        it.add(newItemGroup)
+                        showDataListView()
+                    }
+                }
             }
         }
 
-        showGroupList = ArrayList()
     }
 
     private fun initToolbar() {
@@ -133,7 +151,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                 doFinish()
             }
         }
-
     }
 
     private fun doFinish() {

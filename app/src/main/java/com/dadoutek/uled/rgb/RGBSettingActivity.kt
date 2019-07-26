@@ -1663,8 +1663,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
-                , Strings.stringToBytes(pwd, 16))
+        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16))
         ToastUtil.showToast(this,getString(R.string.connect_success))
         hideLoadingDialog()
     }

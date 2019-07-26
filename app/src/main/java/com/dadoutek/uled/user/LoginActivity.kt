@@ -404,7 +404,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
             intent.putExtra("phone", phone)
             startActivity(intent)
-            finish()
         } else {
             ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
         }

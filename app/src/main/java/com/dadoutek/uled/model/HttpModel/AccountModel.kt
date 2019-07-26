@@ -1,12 +1,13 @@
 package com.dadoutek.uled.model.HttpModel
 
-import android.text.TextUtils
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -57,9 +58,20 @@ object AccountModel {
                             .compose(NetworkTransformer())}
                 .flatMap { response: String ->
                     val salt = response
-
                     NetworkFactory.getApi().smsLogin(phone)
                             .compose(NetworkTransformer())}
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                    initDatBase(it)
+                    Thread.sleep(2000)
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun smsLoginTwo(phone: String): Observable<DbUser> {
+        return NetworkFactory.getApi()
+                .smsLogin(phone)
+                .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)

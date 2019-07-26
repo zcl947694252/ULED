@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -13,6 +16,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import butterknife.ButterKnife
+import cn.smssdk.EventHandler
 import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -87,6 +91,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             register_completed.setText(R.string.btn_ok)
         }
 //        SMSSDK.registerEventHandler(eventHandler)
+        SMSSDK.registerEventHandler(eventHandler)
     }
 
 
@@ -99,11 +104,13 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         ToastUtils.showLong(R.string.phone_input_error)
                         return
                     }
-                    var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
-                    intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
-                    intent.putExtra("country_code",countryCode)
-                    intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
-                    startActivity(intent)
+                    if (com.blankj.utilcode.util.StringUtils.isEmpty(userName)) {
+                        ToastUtils.showShort(R.string.phone_cannot_be_empty)
+                        return
+                    }
+
+                    SMSSDK.getVerificationCode(countryCode, userName)
+
                 } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))
                 }
@@ -118,6 +125,45 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             R.id.image_password_btn -> eyePassword()
             R.id.image_again_password_btn -> eyePasswordAgain()
             R.id.return_image -> finish()
+        }
+    }
+
+    val eventHandler = object : EventHandler() {
+        override fun afterEvent(event: Int, result: Int, data: Any?) {
+            // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
+            val msg = Message()
+            msg.arg1 = event
+            msg.arg2 = result
+            msg.obj = data
+            Handler(Looper.getMainLooper(), Handler.Callback { msg ->
+                val event = msg.arg1
+                val result = msg.arg2
+                val data = msg.obj
+                if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
+                    if (result == SMSSDK.RESULT_COMPLETE) {
+                        // TODO 处理成功得到验证码的结果
+                        // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
+                        ToastUtils.showLong(R.string.send_message_success)
+                       // timing()
+                        var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
+                        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
+                        intent.putExtra("country_code",countryCode)
+                        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+                        startActivity(intent)
+                    } else {
+                        // TODO 处理错误的结果
+                        if (result == SMSSDK.RESULT_ERROR) {
+                            val a = (data as Throwable)
+                            ToastUtils.showLong(a.localizedMessage)
+                        } else {
+                            val a = (data as Throwable)
+                            a.printStackTrace()
+                            ToastUtils.showLong(a.message)
+                        }
+                    }
+                }
+                false
+            }).sendMessage(msg)
         }
     }
 

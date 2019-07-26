@@ -8,22 +8,33 @@ import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.Toast
+import cn.smssdk.SMSSDK
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.Response
+import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkBaseActivity
+import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_forget_password.*
 import kotlinx.android.synthetic.main.activity_register.btn_send_verification
 import kotlinx.android.synthetic.main.activity_register.ccp
 import kotlinx.android.synthetic.main.activity_register.edit_user_phone
 import kotlinx.android.synthetic.main.activity_register.register_completed
 import org.jetbrains.anko.toast
+import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/18.
+ * 忘记密码
  */
 
 class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
@@ -59,22 +70,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.register_completed -> {
-                if (NetWorkUtils.isNetworkAvalible(this)) {
-                    val phone = edit_user_phone.editableText.toString().trim { it <= ' '}
-                            .replace(" ".toRegex(), "")
-                    if (TextUtils.isEmpty(phone)) {
-                        toast(getString(R.string.please_phone_number))
-                        return
-                    } else {
-                        val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
-                        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
-                        intent.putExtra("country_code",countryCode)
-                        intent.putExtra("phone", phone)
-                        startActivity(intent)
-                    }
-                } else {
-                    ToastUtils.showLong(getString(R.string.net_work_error))
-                }
+                getAccount()
             }
             R.id.btn_send_verification ->
                 if (NetWorkUtils.isNetworkAvalible(this)) {
@@ -86,6 +82,55 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
             R.id.image_return -> finish()
         }
     }
+
+    private fun getAccount() {
+        if (NetWorkUtils.isNetworkAvalible(this)) {
+            val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
+                    .replace(" ".toRegex(), "")
+            send_verification()
+
+            if (TextUtils.isEmpty(userName)) {
+                toast(getString(R.string.please_phone_number))
+                return
+            } else {
+                val map = HashMap<String, String>()
+                map["phone"] = userName!!
+                map["channel"] = dbUser!!.channel
+                NetworkFactory.getApi()
+                        .getAccount(userName, dbUser!!.channel)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object: Observer<Response<String>> {
+                            override fun onSubscribe(d: Disposable) {}
+
+                            override fun onNext(stringResponse: Response<String>) {
+                                if (stringResponse.errorCode == 0) {
+                                    LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                                    dbUser!!.account = stringResponse.t
+                                    val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
+                                    intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
+                                    intent.putExtra("country_code",countryCode)
+                                    intent.putExtra("phone", userName)
+                                    intent.putExtra("account", dbUser!!.account)
+                                    startActivity(intent)
+                                } else {
+                                    //ToastUtils.showLong(R.string.get_account_fail)
+                                    ToastUtils.showLong(stringResponse.message)
+                                }
+                            }
+                            override fun onError(e: Throwable) {
+                                hideLoadingDialog()
+                                Toast.makeText(this@ForgetPassWordActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
+                                LogUtils.e("zcl**********************${e.toString()}")
+                            }
+                            override fun onComplete() {}
+                        })
+            }
+        } else {
+            ToastUtils.showLong(getString(R.string.net_work_error))
+        }
+    }
+
 
     private fun eyePassword() {
         if (isPassword) {
@@ -107,7 +152,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {
             showLoadingDialog(getString(R.string.get_code_ing))
-            //SMSSDK.getVerificationCode(countryCode, phoneNum)
+            SMSSDK.getVerificationCode(countryCode, phoneNum)
         }
     }
 

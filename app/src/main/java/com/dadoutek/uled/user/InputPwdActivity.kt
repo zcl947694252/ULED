@@ -116,6 +116,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     private fun upDatePwd() {
         toast("账户$phone----密码$password")
+
         NetworkFactory.getApi()
                 .putPassword(phone, NetworkFactory.md5(password))
                 .subscribeOn(Schedulers.io())
@@ -130,17 +131,18 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         if (stringResponse.errorCode == 0) {
                             LogUtils.d("logging" + stringResponse.errorCode + "更改成功")
                             ToastUtils.showLong(R.string.tip_update_password_success)
+                            startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
                             finish()
                         } else {
-                            ToastUtils.showLong(R.string.tip_update_password_fail)
+                            //ToastUtils.showLong(R.string.tip_update_password_fail)
+                            ToastUtils.showLong(stringResponse.message)
                         }
                     }
 
                     override fun onError(e: Throwable) {
                         hideLoadingDialog()
-                        Toast.makeText(this@InputPwdActivity, "onError:$e", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@InputPwdActivity, "onError:${e.message}", Toast.LENGTH_SHORT).show()
                     }
-
                 })
     }
 

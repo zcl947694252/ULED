@@ -31,10 +31,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
-import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
+/**
+ * 忘记密码设置新密码/短信登录
+ */
 class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var account: String? = null
     private val TIME_INTERVAL: Long = 60
     private val mCompositeDisposable = CompositeDisposable()
     private var countryCode: String? = null
@@ -46,17 +49,19 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         setContentView(R.layout.activity_enter_confirmation_code)
         type = this.intent.extras!!.getString(Constant.TYPE_USER)
         initViewType()
-        verificationCode()
         initView()
+        timing()
     }
 
     private fun initViewType() {
         countryCode = this.intent.extras!!.getString("country_code")
         phone = this.intent.extras!!.getString("phone")
+        account = this.intent.extras!!.getString("account")
         if (type == Constant.TYPE_VERIFICATION_CODE) {
             tv_notice.visibility = View.VISIBLE
             codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
         } else if (type == Constant.TYPE_REGISTER) {
+            codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
             tv_notice.visibility = View.GONE
         } else if (type == Constant.TYPE_FORGET_PASSWORD) {
             tv_notice.visibility = View.GONE
@@ -127,23 +132,20 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                         }else if (type == Constant.TYPE_FORGET_PASSWORD) {
                             val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                             intent.putExtra(Constant.USER_TYPE,Constant.TYPE_FORGET_PASSWORD)
-                            intent.putExtra("phone", phone)
+                            intent.putExtra("phone", account)
                             startActivity(intent)
                         }
-
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
-                            val jsonObject = JSONObject(a.localizedMessage)
-                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(message)
-                            hideLoadingDialog()
+                            ToastUtils.showLong(a.localizedMessage)
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
                             ToastUtils.showLong(a.message)
                         }
+                        hideLoadingDialog()
                     }
                 }
                 // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
@@ -199,23 +201,23 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         if (!StringUtils.isTrimEmpty(phone)) {
             showLoadingDialog(getString(R.string.logging_tip))
             LogUtils.e("logging: " + "登录错误")
-            AccountModel.smsLogin(phone!!)
+            AccountModel.smsLoginTwo(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
-                            DBUtils.deleteLocalData()
-                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
-//                            showLoadingDialog(getString(R.string.sync_now))
-                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                            SharedPreferencesUtils.setUserLogin(true)
-                             LogUtils.e("logging: " + "登录成功错误")
+                          DBUtils.deleteLocalData()
+                          //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                            showLoadingDialog(getString(R.string.sync_now))
+                          SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                          SharedPreferencesUtils.setUserLogin(true)
+                           LogUtils.e("logging: " + "登录成功错误")
                         }
-
                         override fun onError(e: Throwable) {
                             super.onError(e)
                              LogUtils.e("logging: " + "登录错误" + e.message)
                              hideLoadingDialog()
                         }
                     })
+
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }

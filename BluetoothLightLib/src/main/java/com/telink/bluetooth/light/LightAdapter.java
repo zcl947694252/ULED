@@ -286,6 +286,7 @@ public class LightAdapter {
             return false;
 
         TelinkLog.e("LightAdapter#connect");
+
         LightPeripheral light = this.mScannedLights.get(mac);
         this.connect(light, timeoutSeconds);
         return true;

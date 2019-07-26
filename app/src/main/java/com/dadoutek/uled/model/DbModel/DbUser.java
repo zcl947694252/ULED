@@ -46,8 +46,7 @@ public class DbUser {
         this.last_region_id = last_region_id;
     }
     @Generated(hash = 762027100)
-    public DbUser() {
-    }
+    public DbUser() { }
     public Long getId() {
         return this.id;
     }

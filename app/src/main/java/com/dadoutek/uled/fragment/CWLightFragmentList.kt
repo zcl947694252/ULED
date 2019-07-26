@@ -214,7 +214,7 @@ class CWLightFragmentList : BaseFragment() {
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
-//        refreshView()
+       // refreshView()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -239,10 +239,12 @@ class CWLightFragmentList : BaseFragment() {
         groupList = ArrayList()
 
         val listAll = DBUtils.getAllGroupsOrderByIndex()
+
         for (group in listAll) {
             when (group.deviceType) {
                 Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                    groupList!!.add(group)
+                    if (group.meshAddr!=0xffff)
+                        groupList!!.add(group)
                 }
                 Constant.DEVICE_TYPE_DEFAULT_ALL -> {
                     groupList!!.add(group)
@@ -275,7 +277,6 @@ class CWLightFragmentList : BaseFragment() {
         val layoutmanager = LinearLayoutManager(activity)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
-
         Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
         })
@@ -478,6 +479,7 @@ class CWLightFragmentList : BaseFragment() {
             for (group in listAll) {
                 when (group.deviceType) {
                     Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                        if (group.meshAddr!=0xffff)
                         it.add(group)
                     }
                     Constant.DEVICE_TYPE_DEFAULT_ALL -> {
