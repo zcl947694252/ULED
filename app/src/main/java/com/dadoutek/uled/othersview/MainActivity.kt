@@ -779,6 +779,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
                         val account = DBUtils.lastUser?.account
+                        LogUtils.e("zcl**********************扫描账号$account")
                         val scanFilters = ArrayList<ScanFilter>()
                         val scanFilter = ScanFilter.Builder()
                                 .setDeviceName(account)
@@ -796,7 +797,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                         addScanListeners()
                         TelinkLightService.Instance().startScan(params)
-//                        startCheckRSSITimer()
+                        //startCheckRSSITimer()
                         startScanTimeout()
 
 

@@ -10,7 +10,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
-import android.support.v7.widget.*
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
@@ -27,7 +30,6 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
-import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -52,30 +54,32 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_connector_device_detail.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.root
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
-import kotlinx.android.synthetic.main.activity_sensor_device_details.add_device_btn
-import kotlinx.android.synthetic.main.activity_sensor_device_details.no_device_relativeLayout
-import kotlinx.android.synthetic.main.activity_sensor_device_details.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
+/**
+ * 创建者     zcl
+ * 创建时间   2019/7/27 16:35
+ * 描述	      ${人体感应器}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
+ */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
 
     override fun performed(event: Event<String>?) {
@@ -139,20 +143,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun initView() {
-        val layoutmanager = LinearLayoutManager(this)
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
-//        val decoration = DividerItemDecoration(this!!,
-//                DividerItemDecoration
-//                        .VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
-//                .divider)))
-//        recyclerView!!.addItemDecoration(decoration)
-//        //添加Item变化动画
-//        recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = SensorDeviceDetailsAdapter(R.layout.sensor_detail_adapter, sensorData)
         adapter!!.bindToRecyclerView(recycleView)
         adapter!!.onItemChildClickListener = onItemChildClickListener
-
 
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
@@ -640,16 +634,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
-//        if (mConnectSnackBar) {
-//        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance().idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
-//        }
-//        } else {
-//            retryConnect()
-//        }
-
     }
 
     @SuppressLint("CheckResult")
@@ -764,20 +751,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun getNewData(): MutableList<DbSensor> {
-//        if (currentLight!!.meshAddr == 0xffff) {
-//            //            lightList = DBUtils.getAllLight();
-////            lightList=DBUtils.getAllLight()
-//            filter("", false)
-//        } else {
         sensorData = DBUtils.getAllSensor()
-
-//        }
-
-//        if (currentLight!!.meshAddr == 0xffff) {
-//            toolbar.title = getString(R.string.allLight) + " (" + switchData!!.size + ")"
-//        } else {
         toolbar.title = (currentLight!!.name ?: "")
-//        }
         return sensorData
     }
 
@@ -785,15 +760,4 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         super.onDestroy()
         acitivityIsAlive = false
     }
-
-//    private fun filter(groupName: String?, isSearch: Boolean) {
-//        val list = DBUtils.groupList
-////        val nameList : ArrayList<String> = ArrayList()
-//        if (switchData != null && switchData!!.size > 0) {
-//            switchData!!.clear()
-//        }
-
-//        for(i in list.indices){
-//            nameList.add(list[i].name)
-//        }
 }

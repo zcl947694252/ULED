@@ -123,15 +123,15 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理验证成功的结果
                         if (type == Constant.TYPE_VERIFICATION_CODE) {
-                           verificationLogin()
+                            verificationLogin()
                         } else if (type == Constant.TYPE_REGISTER) {
                             val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                             intent.putExtra("phone", phone)
-                            intent.putExtra(Constant.USER_TYPE,Constant.TYPE_REGISTER)
+                            intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
                             startActivity(intent)
-                        }else if (type == Constant.TYPE_FORGET_PASSWORD) {
+                        } else if (type == Constant.TYPE_FORGET_PASSWORD) {
                             val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                            intent.putExtra(Constant.USER_TYPE,Constant.TYPE_FORGET_PASSWORD)
+                            intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
                             intent.putExtra("phone", account)
                             startActivity(intent)
                         }
@@ -175,6 +175,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                         reacquireCode.setTextColor(Color.parseColor("#999999"))
                         refresh_code.isEnabled = false
                         image_refresh.visibility = View.GONE
+
                     }
                 })
     }
@@ -204,20 +205,20 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             AccountModel.smsLoginTwo(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
-                          DBUtils.deleteLocalData()
-                          //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                            DBUtils.deleteLocalData()
+                            //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             showLoadingDialog(getString(R.string.sync_now))
-                          SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
-                          SharedPreferencesUtils.setUserLogin(true)
-                           LogUtils.e("logging: " + "登录成功错误")
+                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                            SharedPreferencesUtils.setUserLogin(true)
+                            LogUtils.e("logging: " + "登录成功错误")
                         }
+
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                             LogUtils.e("logging: " + "登录错误" + e.message)
-                             hideLoadingDialog()
+                            LogUtils.e("logging: " + "登录错误" + e.message)
+                            hideLoadingDialog()
                         }
                     })
-
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }

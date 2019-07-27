@@ -42,6 +42,15 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 
+/**
+ * 创建者     zcl
+ * 创建时间   2019/7/27 11:31
+ * 描述	      ${设备列表-灯暖灯全彩灯列表}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
+ */
 class NewDevieFragment : BaseFragment() {
 
     private var inflater: LayoutInflater? = null
@@ -71,12 +80,10 @@ class NewDevieFragment : BaseFragment() {
         initToolBar(view)
         initData()
         initView(view)
-
         if (firstShowGuide) {
             firstShowGuide = false
             initOnLayoutListener()
         }
-
         return view
     }
 
@@ -84,15 +91,6 @@ class NewDevieFragment : BaseFragment() {
         super.onResume()
         refreshView()
     }
-
-//    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-////        if (isVisibleToUser) {
-////            val act = activity as MainActivity?
-////            act?.addEventListeners()
-//////            refreshView()
-////            initOnLayoutListener()
-////        }
-////    }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
@@ -105,21 +103,19 @@ class NewDevieFragment : BaseFragment() {
             } else {
                 refreshView()
             }
-
         }
     }
 
     private fun refreshAndMoveBottom() {
         refreshView()
-//        recyclerView?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun initOnLayoutListener() {
-        val view = activity?.getWindow()?.getDecorView()
-        val viewTreeObserver = view?.getViewTreeObserver()
+        val view = activity?.window?.decorView
+        val viewTreeObserver = view?.viewTreeObserver
         viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 lazyLoad()
             }
         })
@@ -201,24 +197,11 @@ class NewDevieFragment : BaseFragment() {
     }
 
     private fun initView(view: View?) {
-//        refreshView()
-        val layoutmanager = LinearLayoutManager(activity)
-//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
         newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
-
-//        val decoration = DividerItemDecoration(activity!!,
-//                DividerItemDecoration
-//                        .VERTICAL)=
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-//                .divider)))
-//        //添加分割线
-//        recyclerView?.addItemDecoration(decoration)
-//        recyclerView?.addItemDecoration(SpaceItemDecoration(32))
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
-        newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
-//        adapter!!.addFooterView(getFooterView())
+        newDeviceAdapter!!.onItemClickListener = onItemClickListener
         newDeviceAdapter!!.bindToRecyclerView(recyclerView)
 
 
@@ -232,7 +215,7 @@ class NewDevieFragment : BaseFragment() {
 
     private fun refreshView() {
         if (activity != null) {
-            deviceTypeList = ArrayList<String>()
+            deviceTypeList = ArrayList()
             val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
             for (installDeviceModel in installList) {
                 deviceTypeList!!.add(installDeviceModel.deviceType)
@@ -275,12 +258,9 @@ class NewDevieFragment : BaseFragment() {
 //    allDeviceList!!.add(DBUtils.getAllCurtain())
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-        //        if(TelinkLightApplication.getInstance().connectDevice==null){
-//            ToastUtils.showLong(R.string.device_not_connected)
-//        }else{
         var intent: Intent? = null
         when (position) {
-            Constant.INSTALL_NORMAL_LIGHT -> {
+            Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
             }
@@ -306,11 +286,10 @@ class NewDevieFragment : BaseFragment() {
             }
         }
         startActivityForResult(intent, Activity.RESULT_OK)
-//        }
     }
 
     private fun initData() {
-        deviceTypeList = ArrayList<String>()
+        deviceTypeList = ArrayList()
         val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
         for (installDeviceModel in installList) {
             deviceTypeList!!.add(installDeviceModel.deviceType)

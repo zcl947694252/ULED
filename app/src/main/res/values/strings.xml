@@ -370,7 +370,7 @@
     <string name="input_groupAdress">Please enter a group name</string>
     <string name="not_find_pir">Sensor not found</string>
     <string name="max_tip_brightness">Final brightness cannot exceed 99%</string>
-    <string name="time_max_tip">delay-time cannot exceed 30 minutes</string>
+    <string name="time_max_tip">The delay should not exceed 255 minutes or 255 seconds</string>
     <string name="ota_str">OTA</string>
     <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
@@ -812,4 +812,5 @@
     <string name="update_version">version upgrade</string>
     <string name="version_disabled">This version is not available</string>
     <string name="syncing_relogin">Please login again in sync data</string>
+    <string name="bluetooth_open_connet">蓝牙未连接,正在连接中</string>
 </resources>

@@ -371,7 +371,7 @@
     <string name="input_groupAdress">请输入组名</string>
     <string name="not_find_pir">未找到传感器</string>
     <string name="max_tip_brightness">最终亮度不能大于99%</string>
-    <string name="time_max_tip">延时不能超过30分钟</string>
+    <string name="time_max_tip">延时最大不能超过255分钟或255秒</string>
     <string name="ota_str">固件升级</string>
     <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
