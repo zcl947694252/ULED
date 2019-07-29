@@ -812,5 +812,8 @@
     <string name="update_version">version upgrade</string>
     <string name="version_disabled">This version is not available</string>
     <string name="syncing_relogin">Please login again in sync data</string>
-    <string name="bluetooth_open_connet">蓝牙未连接,正在连接中</string>
+    <string name="in_use">in_use</string>
+    <string name="use">use</string>
+    <string name="creater_name">Creator: +</string>
+    <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
 </resources>

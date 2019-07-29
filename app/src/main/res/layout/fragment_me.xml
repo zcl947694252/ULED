@@ -44,6 +44,7 @@
             android:id="@+id/bluetooth_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="@dimen/dp_10"
             android:layout_marginEnd="16dp"
             android:src="@drawable/bluetooth_no"
             app:layout_constraintEnd_toEndOf="parent"
@@ -482,9 +483,10 @@
                     android:layout_centerVertical="true"
                     />
             </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/rlRegion"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"
@@ -495,7 +497,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="11dp"
-                    android:src="@drawable/icon_on"
+                    android:src="@mipmap/icon_internet"
                     android:layout_centerVertical="true"
                     />
 
@@ -525,6 +527,7 @@
                     android:layout_centerVertical="true"
                     />
             </RelativeLayout>
+
             <RelativeLayout
                 android:id="@+id/developer"
                 android:layout_width="match_parent"

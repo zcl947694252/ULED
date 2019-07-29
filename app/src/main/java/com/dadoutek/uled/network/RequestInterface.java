@@ -93,8 +93,8 @@ public interface RequestInterface {
                                               @Body DbRegion dbRegion
 //                                              @Query("controlMesh") String controlMesh,
 //                                              @Query("controlMeshPwd") String controlMeshPwd,
-//                                              @Query("installMesh") String installMesh,
-//                                              @Query("installMeshPwd") String installMeshPwd
+//                                              @Query("installMesh") String dadousmart,
+//                                              @Query("installMeshPwd") String 123
     );
 
     //删除区域

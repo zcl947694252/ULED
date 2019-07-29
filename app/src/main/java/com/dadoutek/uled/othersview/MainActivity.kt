@@ -112,7 +112,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
-    private val mCompositeDisposable = CompositeDisposable()
     private var mApplication: TelinkLightApplication? = null
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
@@ -176,18 +175,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
-
         isCreate = true
 
-        val info = packageManager.getPackageInfo(this.packageName, 0)
+        LogUtils.e("zcl**********************${DBUtils.lastUser.toString()}")
 
-//        islowVersion = info.versionCode < 244
-
-//        b1 = SharedPreferencesHelper.getBoolean(this, Constant.UP_VERSION, true)
-//        LogUtils.e("zcl**********************a" + islowVersion + "----------" + b1)
-//        if (b1) {
-//        SharedPreferencesHelper.putBoolean(this, Constant.UP_VERSION, false)
-//        }
     }
 
     /**
@@ -341,14 +332,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .setView(view)
                 .create()
 
-        installDialog?.setOnShowListener {
-
-        }
-
+        installDialog?.setOnShowListener {}
         if (isGuide) {
 //            installDialog?.setCancelable(false)
         }
-
         installDialog?.show()
     }
 

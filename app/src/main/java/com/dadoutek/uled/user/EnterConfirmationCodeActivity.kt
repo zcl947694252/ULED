@@ -31,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_enter_confirmation_code.*
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 /**
@@ -111,7 +112,11 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             val a = (data as Throwable)
-                            ToastUtils.showLong(a.localizedMessage)
+
+                            val jsonObject = JSONObject(a.localizedMessage)
+                            val message = jsonObject.opt("detail").toString()
+                            ToastUtils.showLong(message)
+
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
@@ -129,11 +134,13 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                             intent.putExtra("phone", phone)
                             intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
                             startActivity(intent)
+                            finish()
                         } else if (type == Constant.TYPE_FORGET_PASSWORD) {
                             val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                             intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
                             intent.putExtra("phone", account)
                             startActivity(intent)
+                            finish()
                         }
                     } else {
                         // TODO 处理错误的结果
@@ -225,31 +232,17 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     }
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
-
-        override fun start() {
-            showLoadingDialog(getString(R.string.tip_start_sync))
-        }
-
+        override fun start() { showLoadingDialog(getString(R.string.tip_start_sync)) }
         override fun complete() {
-            syncComplet()
+            hideLoadingDialog()
+            startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
+            finish()
         }
-
         override fun error(msg: String) {
             LogUtils.d("GetDataError:$msg")
         }
-
     }
 
-    private fun syncComplet() {
-//        ToastUtils.showLong(getString(R.string.upload_complete))
-        hideLoadingDialog()
-        TransformView()
-    }
-
-    private fun TransformView() {
-        startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
-        finish()
-    }
 
     override fun onDestroy() {
         super.onDestroy()

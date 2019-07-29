@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
@@ -12,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.CallAdapter;
 import retrofit2.Converter;
@@ -27,21 +29,24 @@ public class NetworkFactory {
 
     private static OkHttpClient initHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-        DbUser user = new DbUser();
+        DbUser user = DBUtils.INSTANCE.getLastUser();
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
                 .writeTimeout(3, TimeUnit.MINUTES)
-                //.addInterceptor(chain -> {  添加请求头
-                //    Request request = chain.request();
-                //    Request.Builder builder1 = request.newBuilder();
-                //    Request build = builder1
-                //            .addHeader("token", user.getToken())
-                //            .addHeader("region-id", user.getToken())
-                //            .build();
-                //    return chain.proceed(build);
-                //})
+                .addInterceptor(chain -> {  //添加请求头
+                    Request request = chain.request();
+                    String token = request.header("token");
+                    Request build;
+                    Request.Builder builder1 = request.newBuilder();
+                    if (token == null || token.isEmpty())
+                        builder1.addHeader("token", user.getToken());
+
+                    build = builder1.addHeader("region-id", user.getLast_region_id())
+                            .build();
+                    return chain.proceed(build);
+                })
                 .retryOnConnectionFailure(true);
 
         if (BuildConfig.DEBUG)
@@ -57,15 +62,15 @@ public class NetworkFactory {
             okHttpClient = initHttpClient();
         }
         if (api == null) {
-                Retrofit retrofit = new Retrofit.Builder()
-                        .client(okHttpClient)
-                        .baseUrl(Constant.BASE_URL)
-                        //.baseUrl(Constant.BASE_DEBUG_URL)
-                        .addConverterFactory(gsonConverterFactory)
-                        .addCallAdapterFactory(rxJavaCallAdapterFactory)
-                        .build();
-                api = retrofit.create(RequestInterface.class);
-            }
+            Retrofit retrofit = new Retrofit.Builder()
+                    .client(okHttpClient)
+                    .baseUrl(Constant.BASE_URL)
+                    //.baseUrl(Constant.BASE_DEBUG_URL)
+                    .addConverterFactory(gsonConverterFactory)
+                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
+                    .build();
+            api = retrofit.create(RequestInterface.class);
+        }
 
         return api;
     }

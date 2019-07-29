@@ -32,8 +32,8 @@ public class DbUser {
     private String last_region_id;
     @Generated(hash = 1735856997)
     public DbUser(Long id, String avatar, String channel, String email, String name,
-            String account, String phone, String token, String password,
-            String last_region_id) {
+                  String account, String phone, String token, String password,
+                  String last_region_id) {
         this.id = id;
         this.avatar = avatar;
         this.channel = channel;
@@ -46,7 +46,8 @@ public class DbUser {
         this.last_region_id = last_region_id;
     }
     @Generated(hash = 762027100)
-    public DbUser() { }
+    public DbUser() {
+    }
     public Long getId() {
         return this.id;
     }

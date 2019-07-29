@@ -69,7 +69,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
         user?.let {
             var list = it.split("-")
             LogUtils.e("zcl**********************${list.size}----$list")
-            if (list.size > 1&&!user.equals("-")&&!boolean) {
+            if (list.size > 1 && !user.equals("-") && !boolean) {
                 var s = list[1]
                 edit_user_password.setText(s)
                 edit_user_password.setSelection(s.length)
@@ -142,7 +142,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
     private fun login() {
         LogUtils.e("login hideLoadingDialog()$phone")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
-        LogUtils.e("zcl**********************login$editPassWord$phone")
+        LogUtils.e("zcl**********************login$editPassWord$phone${dbUser.toString()}")
 
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
@@ -154,7 +154,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                            LogUtils.e("logging: " + "登录成功" + dbUser.name)
+                            LogUtils.e("logging: " + "登录成功" + dbUser.toString())
                         }
 
                         override fun onError(e: Throwable) {

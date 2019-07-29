@@ -13,9 +13,12 @@ import android.os.*
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.PopupWindow
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
@@ -37,10 +40,10 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
 import com.dadoutek.uled.util.*
-import com.xiaomi.market.sdk.XiaomiUpdateAgent
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
 import java.util.*
@@ -52,6 +55,9 @@ import java.util.concurrent.TimeUnit
  */
 
 class MeFragment : BaseFragment(), View.OnClickListener {
+    private var cancel: Button? = null
+    private var confirm: Button? = null
+    private lateinit var pop: PopupWindow
     private var inflater: LayoutInflater? = null
 
     private var mApplication: TelinkLightApplication? = null
@@ -104,7 +110,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             } else {
                 isClickExlogin = false
                 hideLoadingDialog()
-
             }
         }
     }
@@ -161,20 +166,16 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         if (Build.BRAND.contains("Huawei")) {
             sleepTime = 500
         } else {
             sleepTime = 200
         }
-
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), "isShowDot", false)
-
         registerBluetoothReceiver()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.fragment_me, null)
         return view
@@ -192,10 +193,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+        isVisableDeveloper()
         if (mWakeLock != null) {
             mWakeLock?.acquire()
         }
-
         val blueadapter = BluetoothAdapter.getDefaultAdapter()
         if (blueadapter?.isEnabled == false) {
             if (bluetooth_image != null) {
@@ -206,7 +207,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     dialog.show()
                 }
             }
-
         } else {
             if (TelinkLightApplication.getInstance().connectDevice == null) {
                 if (bluetooth_image != null) {
@@ -222,7 +222,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
                     bluetooth_image.isEnabled = false
                 }
-
             }
         }
     }
@@ -258,7 +257,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun initView(view: View) {
-//        toolbar.title=getString(R.string.fragment_name_me)
         val versionName = AppUtils.getVersionName(activity!!)
         appVersion!!.text = versionName
         //暂时屏蔽
@@ -266,20 +264,43 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
         userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
         userName!!.text = DBUtils.lastUser!!.phone
+        isVisableDeveloper()
 
+        //todo 恢复出厂设置
+        var popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
+        cancel = popView.findViewById(R.id.btn_cancel)
+        confirm = popView.findViewById(R.id.btn_confirm)
+
+        cancel?.let {
+            it.setOnClickListener { PopUtil.dismiss(pop) }
+        }
+        confirm?.setOnClickListener {
+            PopUtil.dismiss(pop)
+            //恢复出厂设置
+            if (TelinkLightApplication.getInstance().connectDevice != null)
+                resetAllLight()
+            else {
+                ToastUtils.showShort(R.string.device_not_connected)
+            }
+        }
+        pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        confirm?.isClickable = false
+        pop!!.isOutsideTouchable = true
+        pop.isFocusable = true // 设置PopupWindow可获得焦点
+        pop.isTouchable = true // 设置PopupWindow可触摸补充：
+    }
+
+    private fun isVisableDeveloper() {
         val developerModel = SharedPreferencesUtils.isDeveloperModel()
         if (developerModel)
             developer.visibility = View.VISIBLE
         else
             developer.visibility = View.GONE
-
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             this.mApplication = TelinkLightApplication.getApp()
-            val mainAct = activity as MainActivity?
-            //            getVersion();
         } else {
             compositeDisposable.dispose()
         }
@@ -331,7 +352,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.chearCache -> emptyTheCache()
@@ -359,14 +379,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    /**
-     * 检查App是否有新版本
-     */
-    private fun detectUpdate() {
-        XiaomiUpdateAgent.setCheckUpdateOnlyWifi(true)
-        XiaomiUpdateAgent.update(context)
-    }
-
     private fun gotoResetAllGroup() {
         showResetSelectTypeDialog()
     }
@@ -390,18 +402,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         builder.create().show()
     }
 
-    private fun showGuideAgainFun() {
-        val builder = AlertDialog.Builder(activity)
-        builder.setTitle(getString(R.string.show_guide_again_tip))
-        builder.setNegativeButton(R.string.btn_cancel) { _, _ -> }
-        builder.setPositiveButton(android.R.string.ok) { _, _ ->
-            GuideUtils.resetAllGuide(activity!!)
-            activity?.bnve?.currentItem = 0
-        }
-        val dialog = builder.create()
-        dialog.show()
-    }
-
     // 如果没有网络，则弹出网络设置对话框
     fun checkNetworkAndSync(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
@@ -420,10 +420,29 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    @SuppressLint("CheckResult", "SetTextI18n")
     private fun showSureResetDialogByApp() {
-        val builder = AlertDialog.Builder(activity)
+        val developMode = SharedPreferencesUtils.isDeveloperModel()
+        if (!developMode)
+            Observable.intervalRange(0, 6, 0, 1, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        var num = 5 - it as Long
+                        LogUtils.e("zcl**********************num$num")
+                        if (num == 0L) {
+                            confirm?.isClickable = true
+                            confirm?.text = getString(R.string.btn_ok)
+                        } else {
+                            confirm?.isClickable = false
+                            confirm?.text = getString(R.string.btn_ok) + "(" + num + "s)"
+                        }
+                    }
+        pop.showAtLocation(view, Gravity.CENTER, 0, 0)
+        /*val builder = AlertDialog.Builder(activity)
         builder.setTitle(R.string.tip_reset_sure)
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
+
         builder.setPositiveButton(android.R.string.ok) { dialog, which ->
             if (TelinkLightApplication.getInstance().connectDevice != null)
                 resetAllLight()
@@ -432,7 +451,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
         }
         val dialog = builder.create()
-        dialog.show()
+        dialog.show()*/
     }
 
 
@@ -518,7 +537,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         } else {
             checkNetworkAndSync(activity)
         }
-
     }
 
 
@@ -567,8 +585,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         LogUtils.getConfig().setDir(LOG_PATH_DIR)
                         SharedPreferencesUtils.setDeveloperModel(true)
 
-                       // startActivity(Intent(context, DeveloperActivity::class.java))
-                       // developer.visibility = View.VISIBLE
+                        startActivity(Intent(context, DeveloperActivity::class.java))
+                        developer.visibility = View.VISIBLE
 
                         dialog.dismiss()
                     }
@@ -583,7 +601,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             alertDialog.show()
         }
     }
-
 
     //清空缓存初始化APP
     @SuppressLint("CheckResult")
@@ -688,6 +705,4 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
         private val LOG_PATH_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path
     }
-
-
 }

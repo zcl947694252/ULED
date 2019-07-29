@@ -737,5 +737,9 @@
     <string name="update_version">新版本升级</string>
     <string name="version_disabled">当前版本不可用</string>
     <string name="syncing_relogin">同步数据中请重新登录</string>
+    <string name="in_use">使用中</string>
+    <string name="use">使用</string>
+    <string name="creater_name">创建者: +</string>
+    <string name="bluetooth_open_connet">蓝牙未连接，正在连接中</string>
 
 </resources>

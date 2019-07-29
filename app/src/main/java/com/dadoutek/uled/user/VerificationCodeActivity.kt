@@ -178,7 +178,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                     intent.putExtra("phone", userName)
                                     intent.putExtra("account", dbUser!!.account)
                                     startActivity(intent)
-
                                 } else {
                                     ToastUtils.showLong(stringResponse.message)
                                 }
@@ -198,8 +197,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
 
     val eventHandler = object : EventHandler() {
+            //afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
         override fun afterEvent(event: Int, result: Int, data: Any?) {
-            // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
             val msg = Message()
             msg.arg1 = event
             msg.arg2 = result
@@ -211,7 +210,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理成功得到验证码的结果
-                        // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
                         ToastUtils.showLong(R.string.send_message_success)
                     } else {
                         // TODO 处理错误的结果
@@ -227,7 +225,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         }
                     }
                     hideLoadingDialog()
-                } // TODO 其他接口的返回结果也类似，根据event判断当前数据属于哪个接口
+                }
                 false
             }).sendMessage(msg)
         }

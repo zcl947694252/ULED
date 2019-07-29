@@ -104,6 +104,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                             override fun onSubscribe(d: Disposable) {}
 
                             override fun onNext(stringResponse: Response<String>) {
+                                hideLoadingDialog()
                                 if (stringResponse.errorCode == 0) {
                                     LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
                                     dbUser!!.account = stringResponse.t

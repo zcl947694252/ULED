@@ -37,11 +37,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/pop_net_top"
+                android:id="@+id/pop_net_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="网络1"
+                android:text="@string/btn_ok"
                 android:textColor="@color/black_three"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +49,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/pop_quipment_num"
+                android:id="@+id/pop_equipment_num"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -60,7 +60,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.858"
-                app:layout_constraintStart_toEndOf="@+id/pop_net_top"
+                app:layout_constraintStart_toEndOf="@+id/pop_net_name"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.488" />
 
@@ -219,25 +219,15 @@
             android:id="@+id/pop_creater_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="46dp"
-            android:text="1234"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="43dp"
             android:textColor="@color/black_three"
-            android:textSize="13sp"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout12" />
-
-
-        <TextView
-            android:id="@+id/pop_create_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="17dp"
-            android:text="124456"
-            android:textColor="@color/black_three"
-            android:textSize="13sp"
-            app:layout_constraintStart_toStartOf="@+id/pop_creater_name"
-            app:layout_constraintTop_toBottomOf="@+id/pop_creater_name" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout12"
+            app:layout_constraintVertical_bias="0.317"/>
 
     </android.support.constraint.ConstraintLayout>
 
