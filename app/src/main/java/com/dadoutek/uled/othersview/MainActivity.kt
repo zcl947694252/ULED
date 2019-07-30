@@ -35,7 +35,6 @@ import com.allenliu.versionchecklib.v2.callback.CustomVersionDialogListener
 import com.allenliu.versionchecklib.v2.ui.VersionService.builder
 import com.app.hubert.guide.core.Controller
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -177,7 +176,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         initBottomNavigation()
         isCreate = true
 
-        LogUtils.e("zcl**********************${DBUtils.lastUser.toString()}")
+        //("zcl**********************${DBUtils.lastUser.toString()}")
 
     }
 
@@ -229,7 +228,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
 
         override fun error(msg: String) {
-            LogUtils.d("upload data failed msg = $msg")
+           //("upload data failed msg = $msg")
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
                     .setMessage(getString(R.string.version_disabled))
@@ -488,7 +487,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun syncDataAndExit() {
         if (!NetWorkUtils.isNetworkAvalible(this)) {
-            LogUtils.d(getString(R.string.net_disconnect_tip_message))
+           //(getString(R.string.net_disconnect_tip_message))
         } else {
             SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallback)
         }
@@ -519,12 +518,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getVersion() {
         val info = this.packageManager.getPackageInfo(this.packageName, 0)
-        LogUtils.e("zcl**********************VersionBean${info.versionName}")
+        //("zcl**********************VersionBean${info.versionName}")
         UpdateModel.getVersion(info.versionName)!!.subscribe {
             object : NetworkObserver<VersionBean>() {
                 override fun onNext(t: VersionBean) {
                     CreateDialog(t)
-                    LogUtils.e("zcl**********************VersionBean$t")
+                    //("zcl**********************VersionBean$t")
                 }
 
                 override fun onError(e: Throwable) {
@@ -766,7 +765,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
                         val account = DBUtils.lastUser?.account
-                        LogUtils.e("zcl**********************扫描账号$account")
+                        //("zcl**********************扫描账号$account")
                         val scanFilters = ArrayList<ScanFilter>()
                         val scanFilter = ScanFilter.Builder()
                                 .setDeviceName(account)
@@ -859,7 +858,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
+                       //("onLeScanTimeout()")
                         retryConnect()
                     }
 
@@ -870,7 +869,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -888,7 +887,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
-        LogUtils.d("start Login")
+       //("start Login")
     }
 
     private fun onNError(event: DeviceEvent) {
@@ -912,12 +911,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true) {
-                LogUtils.d("reconnect")
+               //("reconnect")
                 startScan()
             } else
                 login()
         } else {
-            LogUtils.d("exceed max retry time, show connection error")
+           //("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
             setSnack()
         }
@@ -1061,8 +1060,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
             }
             LightAdapter.STATUS_LOGOUT -> {
-                LogUtils.d("status logout")
-                LogUtils.d("STATUS_LOGOUT")
+               //("status logout")
+               //("STATUS_LOGOUT")
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTED -> {
@@ -1085,7 +1084,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
 
         if (notificationInfoList.isEmpty()) {
-            LogUtils.d("notificationInfoList is empty")
+           //("notificationInfoList is empty")
             return
         }
 
@@ -1106,7 +1105,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbLight()
-                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
+                       //("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0xff || (productUUID and 0xff) == 0x04) {
                             dbLightNew?.productUUID = 0x04
                         } else if ((productUUID and 0xff) == 0x06) {
@@ -1122,7 +1121,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
                         DBUtils.saveLight(dbLightNew, false)
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        //"creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
@@ -1136,7 +1135,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbConnector()
-                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
+                       //("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0x05) {
                             dbLightNew?.productUUID = 0x05
                         }
@@ -1148,7 +1147,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
                         DBUtils.saveConnector(dbLightNew, false)
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        //"creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
@@ -1162,7 +1161,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbCurtain()
-                        LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
+                       //("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0x10) {
                             dbLightNew?.productUUID = 0x10
                         }
@@ -1173,7 +1172,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
                         DBUtils.saveCurtain(dbLightNew, false)
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        //"creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
@@ -1192,11 +1191,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
-//        LogUtils.d("onServiceConnected")
+//       //("onServiceConnected")
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-        LogUtils.d("onServiceDisconnected")
+       //("onServiceDisconnected")
         TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
     }
 
@@ -1227,7 +1226,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 //    private fun onLeScanTimeout() {
-//        com.dadoutek.uled.util.LogUtils.d("onErrorReport: onLeScanTimeout")
+//        //"onErrorReport: onLeScanTimeout")
 ////        if (mConnectSnackBar) {
 ////        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
 //        TelinkLightService.Instance().idleMode(true)
@@ -1248,7 +1247,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        LogUtils.d("onErrorReport: onLeScanTimeout")
+       //("onErrorReport: onLeScanTimeout")
         setSnack()
 
     }
@@ -1256,7 +1255,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
-                LogUtils.d("This is switch")
+               //("This is switch")
                 true
             }
             else -> false
@@ -1288,11 +1287,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //            if (bestRSSIDevice != null) {
 //                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
 //                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-//                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+//                   //("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
 //                    bestRSSIDevice = deviceInfo
 //                }
 //            } else {
-//                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+//               //("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
 //                bestRSSIDevice = deviceInfo
 //            }
 
@@ -1300,7 +1299,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             bestRSSIDevice = deviceInfo
 
             connect(bestRSSIDevice!!.macAddress)
-            LogUtils.d("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
+           //("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
 
         }
     }
@@ -1314,13 +1313,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        LogUtils.d("蓝牙未开启")
+                       //("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        LogUtils.d("无法收到广播包以及响应包")
+                       //("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        LogUtils.d("未扫到目标设备")
+                       //("未扫到目标设备")
                     }
                 }
 
@@ -1328,10 +1327,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        LogUtils.d("未读到att表")
+                       //("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        LogUtils.d("未建立物理连接")
+                       //("未建立物理连接")
                     }
                 }
 //                retryConnect()
@@ -1340,13 +1339,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        LogUtils.d("value check失败： 密码错误")
+                       //("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        LogUtils.d("read login data 没有收到response")
+                       //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        LogUtils.d("write login data 没有收到response")
+                       //("write login data 没有收到response")
                     }
                 }
 //                retryConnect()

@@ -1380,7 +1380,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void onErrorReport(ErrorReportInfo info) {
 //        retryConnect()
-        LogUtils.d("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+       //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
     }
 
 
@@ -1412,7 +1412,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
             groupAddress = groupAddress | 0x8000;
 
             if (groupingGroup.getMeshAddr() == groupAddress) {
-                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
+               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
                 groupingSuccess = true;
             }
         }
@@ -1460,14 +1460,14 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                         animationView.setVisibility(View.VISIBLE);
                         if (grouping) {
 //                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-                            LogUtils.d("Grouping");
+                           //("Grouping");
                             return;
                         }
                         handleIfSupportBle();
                         TelinkLightService.Instance().idleMode(true);
                         if (mApplication.isEmptyMesh()) {
 //                            Toast.makeText(this, "Empty Mesh", Toast.LENGTH_SHORT).show();
-                            LogUtils.d("Empty Mesh");
+                           //("Empty Mesh");
                             return;
                         }
 

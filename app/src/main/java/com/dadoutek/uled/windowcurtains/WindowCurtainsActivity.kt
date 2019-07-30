@@ -1,7 +1,6 @@
 package com.dadoutek.uled.windowcurtains
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
@@ -13,49 +12,36 @@ import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.*
-import com.android.ehorizontalselectedview.EHorizontalSelectedView
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.CurtainGroupingActivity
-import com.dadoutek.uled.group.LightGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.ota.OTAUpdateSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.warkiz.widget.IndicatorSeekBar
-import com.warkiz.widget.IndicatorType
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_window_curtains.*
 import kotlinx.android.synthetic.main.fragment_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.w3c.dom.Text
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
     override fun performed(event: Event<String>?) {
@@ -238,7 +224,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
 
                     } else {
-                        ToastUtils.showLong("当前处于未连接状态，重连中。。。")
+                        ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                         this!!.finish()
                     }
                 }
@@ -928,7 +914,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                    LogUtils.d("retry delete group timeout")
+                   //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)

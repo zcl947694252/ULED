@@ -20,6 +20,17 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun addRegion(token: String, dbRegion: DbRegion, changeId: Long?): Observable<String>? {
+        return NetworkFactory.getApi()
+                .addRegion(token, dbRegion, changeId!!.toInt())
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
+                .doOnNext {
+
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun update(token: String, rid: Int, dbRegion: DbRegion, id: Long): Observable<String>? {
         return NetworkFactory.getApi()
                 .updateRegion(token, rid, dbRegion)

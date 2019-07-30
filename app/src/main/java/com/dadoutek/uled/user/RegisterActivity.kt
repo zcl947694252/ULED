@@ -298,7 +298,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
 
-                        LogUtils.d("logging: " + "登录成功")
+                       //("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
 //                        ToastUtils.showLong(R.string.login_success)
                         hideLoadingDialog()
@@ -326,7 +326,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+           //("GetDataError:$msg")
         }
     }
 
@@ -375,7 +375,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun onNext(stringResponse: Response<String>) {
             if (stringResponse.errorCode == 0) {
-                LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+               //("logging" + stringResponse.errorCode + "获取成功account")
                 dbUser!!.account = stringResponse.t
                 updatePassword()
             } else {
@@ -397,7 +397,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         override fun onNext(stringResponse: Response<DbUser>) {
             hideLoadingDialog()
             if (stringResponse.errorCode == 0) {
-                LogUtils.d("logging" + stringResponse.errorCode + "更改成功")
+               //("logging" + stringResponse.errorCode + "更改成功")
                 ToastUtils.showLong(R.string.tip_update_password_success)
                 finish()
             } else {

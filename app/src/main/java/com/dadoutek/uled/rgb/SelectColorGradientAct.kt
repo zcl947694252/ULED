@@ -303,7 +303,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 //                    light?.color = color
 //                }
 
-//                LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
+//               //("changedff2" + opcode + "--" + addr + "--" + brightness)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
@@ -393,7 +393,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
             this.onValueChange(seekBar, seekBar.progress, true)
-            LogUtils.d("seekBarstop" + seekBar.progress)
+           //("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {

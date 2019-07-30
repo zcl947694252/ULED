@@ -37,7 +37,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -143,7 +145,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
                             }
                 }.start()
 
-                LogUtils.d("pir开始扫描")
+               //("pir开始扫描")
                 progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                 progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
             } else {
@@ -154,7 +156,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
     private fun retryConnect() {
         mRetryConnectCount++
-        LogUtils.d("reconnect time = $mRetryConnectCount")
+       //("reconnect time = $mRetryConnectCount")
         if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
             showConnectFailed()
         } else {
@@ -198,13 +200,13 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                        //"蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                        //"无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                        //"未扫到目标设备")
                     }
                 }
 
@@ -212,30 +214,30 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                        //"未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                        //"未建立物理连接")
 
                     }
                 }
-                LogUtils.d("onError retry")
+               //("onError retry")
                 retryConnect()
 
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                        //"value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                        //"read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                        //"write login data 没有收到response")
                     }
                 }
-                LogUtils.d("onError login")
+               //("onError login")
                 retryConnect()
 
             }
@@ -243,7 +245,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-        LogUtils.d("onLeScanTimeout")
+       //("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main){
             progressBtn.progress = -1   //控件显示Error状态
             progressBtn.text = getString(R.string.not_find_pir)
@@ -258,7 +260,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 onLogin()
-                LogUtils.d("登陆成功")
+               //("登陆成功")
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
@@ -267,7 +269,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
             LightAdapter.STATUS_CONNECTED -> {
                 connectDisposable?.dispose()
                 login()
-                LogUtils.d("开始登陆")
+               //("开始登陆")
             }
         }
 
@@ -303,7 +305,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
 
-        LogUtils.d("showConnectFailed")
+       //("showConnectFailed")
         progressBtn.progress = -1    //控件显示Error状态
         progressBtn.text = getString(R.string.connect_failed)
     }
@@ -315,7 +317,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningNightlightActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningNightlightActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-            LogUtils.d("开始连接")
+           //("开始连接")
         }.start()
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -325,7 +327,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        LogUtils.d("timeout retryConnect")
+                       //("timeout retryConnect")
                         retryConnect()
                     }
         }

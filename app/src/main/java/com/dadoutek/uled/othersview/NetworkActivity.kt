@@ -19,13 +19,14 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.PopUtil
 import kotlinx.android.synthetic.main.activity_network.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 
 class NetworkActivity : AppCompatActivity(), View.OnClickListener {
+    private lateinit var popAdd: PopupWindow
+    private var viewAdd: View? = null
     var dbUser: DbUser? = null
     var adapter: AreaItemAdapter? = null
     var list: List<DbRegion>? = null
@@ -49,15 +50,14 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         image_bluetooth.visibility = View.VISIBLE
         image_bluetooth.setImageResource(R.mipmap.icon_scanning)
 
-
         dbUser = DBUtils.lastUser
-        LogUtils.e("zcl**********************${dbUser.toString()}")
+        //("zcl**********************${dbUser.toString()}")
         makePop()
         initListener()
     }
 
     private fun initListener() {
-        img_function1.setOnClickListener { addRegion() }
+        img_function1.setOnClickListener {  }
         image_bluetooth.setOnClickListener {  }
     }
 
@@ -85,12 +85,14 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun makePop() {
         view = View.inflate(this, R.layout.popwindown_region, null)
+        viewAdd = View.inflate(this, R.layout.popwindown_add_region, null)
+
         pop = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        pop?.let {
-            pop!!.isOutsideTouchable = true
-            pop!!.isFocusable = true // 设置PopupWindow可获得焦点
-            pop!!.isTouchable = true // 设置PopupWindow可触摸补充：
-        }
+        popAdd = PopupWindow(viewAdd, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        setPopSetting(pop!!)
+        setPopSetting(popAdd!!)
+
         view?.let {
             it.findViewById<RelativeLayout>(R.id.pop_view).setOnClickListener(this)
             it.findViewById<ConstraintLayout>(R.id.pop_net_ly).setOnClickListener(this)
@@ -100,6 +102,14 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
             it.findViewById<ImageView>(R.id.pop_update_net).setOnClickListener(this)
             it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name)+ dbUser!!.phone
             //  it.findViewById<ImageView>(R.id.pop_qr_img).setOnClickListener(this)
+        }
+    }
+
+    private fun setPopSetting(pop: PopupWindow) {
+        pop?.let {
+           pop!!.isOutsideTouchable = true
+           pop!!.isFocusable = true // 设置PopupWindow可获得焦点
+           pop!!.isTouchable = true // 设置PopupWindow可触摸补充：
         }
     }
 
@@ -137,9 +147,6 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
             R.id.pop_update_net -> {
 
             }
-            // R.id.pop_qr_img -> {
-            //     LogUtils.e("15989416")
-            // }
         }
     }
 

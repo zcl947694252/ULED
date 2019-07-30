@@ -22,7 +22,6 @@ import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -936,7 +935,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                    LogUtils.d("retry delete group timeout")
+                   //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
@@ -1095,18 +1094,18 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-//        LogUtils.d("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
+//       //("onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                        //"蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                        //"无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                        //"未扫到目标设备")
                     }
                 }
 
@@ -1114,10 +1113,10 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                        //"未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                        //"未建立物理连接")
                     }
                 }
 
@@ -1127,13 +1126,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                        //"value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                        //"read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                        //"write login data 没有收到response")
                     }
                 }
 
@@ -1157,7 +1156,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
-                            LogUtils.d("STATUS_LOGOUT")
+                           //("STATUS_LOGOUT")
 //                            showLoadingDialog(getString(R.string.connecting))
                             ToastUtil.showToast(this,getString(R.string.connecting))
 //                            finish()
@@ -1834,20 +1833,20 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            LogUtils.d("progress:_3__" + seekBar.progress)
+           //("progress:_3__" + seekBar.progress)
             this.onValueChange(seekBar, seekBar.progress, true, true)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             clickNum = 1
-            LogUtils.d("progress:_1__" + seekBar!!.progress)
+           //("progress:_1__" + seekBar!!.progress)
             this.preTime = System.currentTimeMillis()
             this.onValueChange(seekBar, seekBar!!.progress, true, false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
-            LogUtils.d("progress:_2__" + progress)
+           //("progress:_2__" + progress)
             val currentTime = System.currentTimeMillis()
             tv_Brightness.text = seekBar!!.progress.toString() + "%"
             clickNum = 1
@@ -2127,7 +2126,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
 
                         } else {
-                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
+                            ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                             this.finish()
                         }
                     }

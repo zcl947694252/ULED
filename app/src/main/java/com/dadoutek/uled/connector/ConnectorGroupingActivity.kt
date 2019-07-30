@@ -17,22 +17,21 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.DeviceGroupingAdapter
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import kotlinx.android.synthetic.main.activity_set_diy_color.*
 import java.util.*
 
 
@@ -115,7 +114,6 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             }
         } else {
             //                Toast.makeText(mApplication, "", Toast.LENGTH_SHORT).show();
-            LogUtils.d("group is null")
         }
     }
     //        }

@@ -22,7 +22,6 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observer
@@ -129,7 +128,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     override fun onNext(stringResponse: Response<DbUser>) {
                         hideLoadingDialog()
                         if (stringResponse.errorCode == 0) {
-                            LogUtils.d("logging" + stringResponse.errorCode + "更改成功")
+                           //("logging" + stringResponse.errorCode + "更改成功")
                             ToastUtils.showLong(R.string.tip_update_password_success)
                             startActivity(Intent(this@InputPwdActivity, MainActivity::class.java))
                             finish()
@@ -159,7 +158,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
-                        LogUtils.d("logging: " + "登录成功")
+                       //("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
                         hideLoadingDialog()
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
@@ -201,7 +200,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+           //("GetDataError:$msg")
         }
     }
 

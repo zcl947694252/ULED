@@ -18,14 +18,11 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
@@ -100,7 +97,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             }
         } else {
             //                Toast.makeText(mApplication, "", Toast.LENGTH_SHORT).show();
-            LogUtils.d("group is null")
+           //"group is null")
         }
     }
     //        }

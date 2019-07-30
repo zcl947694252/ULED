@@ -607,7 +607,7 @@ class RGBLightFragmentList : BaseFragment() {
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                    LogUtils.d("retry delete group timeout")
+                   //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)

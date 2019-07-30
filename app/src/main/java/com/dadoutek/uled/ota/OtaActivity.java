@@ -21,7 +21,6 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.util.LogUtil;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -188,7 +187,7 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
         otaCompleted = false;
         Mesh currentMesh = this.mApp.getMesh();
         LeOtaParameters params = LeOtaParameters.create();
-        LogUtils.d("currentMesh name = " + currentMesh.getName());
+       //("currentMesh name = " + currentMesh.getName());
         params.setMeshName(currentMesh.getName());
         params.setPassword(NetworkFactory.md5(NetworkFactory.md5(currentMesh.getName()) + currentMesh.getName()).substring(0, 16));
         params.setLeScanTimeoutSeconds(10);

@@ -179,7 +179,7 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
 ////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
 ////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                        LogUtils.d("\n" + time + ":" + msg.obj.toString());
+                       //("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }

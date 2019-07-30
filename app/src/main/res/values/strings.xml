@@ -816,4 +816,5 @@
     <string name="use">use</string>
     <string name="creater_name">Creator: +</string>
     <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
+    <string name="input_region_name">Please enter a zone name</string>
 </resources>

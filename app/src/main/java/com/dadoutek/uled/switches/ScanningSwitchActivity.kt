@@ -3,9 +3,7 @@ package com.dadoutek.uled.switches
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
-import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
@@ -14,35 +12,27 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.VENDOR_ID
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.ota.OTAUpdateSwitchActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
 import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.DialogUtils.hideLoadingDialog
-import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.StringUtils
 import com.dd.processbutton.iml.ActionProcessButton
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.*
+import com.telink.bluetooth.light.DeviceInfo
+import com.telink.bluetooth.light.ErrorReportInfo
+import com.telink.bluetooth.light.LeScanParameters
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -52,16 +42,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
-import kotlinx.android.synthetic.main.activity_scene_set.view.*
-import kotlinx.android.synthetic.main.activity_switch_group.*
-import kotlinx.android.synthetic.main.content_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -275,7 +260,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        com.dadoutek.uled.util.LogUtils.d("onLeScanTimeout()")
+                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -286,7 +271,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            com.dadoutek.uled.util.LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -300,7 +285,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 //    private fun retryConnect() {
 //        mRetryConnectCount++
-//        LogUtils.d("reconnect time = $mRetryConnectCount")
+//       //("reconnect time = $mRetryConnectCount")
 //        if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
 //            showConnectFailed()
 //        } else {
@@ -313,7 +298,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 //    private fun retryLogin() {
 //        mRetryConnectCount++
-//        LogUtils.d("reconnect time = $mRetryConnectCount")
+//       //("reconnect time = $mRetryConnectCount")
 //        if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
 //            showConnectFailed()
 //        } else {
@@ -358,13 +343,13 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                       //("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                       //("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                       //("未扫到目标设备")
                     }
                 }
 
@@ -372,10 +357,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                       //("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                       //("未建立物理连接")
 
                     }
                 }
@@ -385,16 +370,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                       //("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                       //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                       //("write login data 没有收到response")
                     }
                 }
-                LogUtils.d("onError login")
+               //("onError login")
                 retryConnect()
 
             }
@@ -402,7 +387,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-        LogUtils.d("onLeScanTimeout")
+       //("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
 //            if(isOTA){
@@ -430,7 +415,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {
                 onLogin()
                 stopConnectTimer()
-                LogUtils.d("connected22")
+               //("connected22")
             }
             LightAdapter.STATUS_LOGOUT -> {
 //                onLoginFailed()
@@ -446,7 +431,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 connectDisposable?.dispose()
 
                 login()
-                LogUtils.d("connected11")
+               //("connected11")
             }
         }
 
@@ -525,7 +510,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
 
-        LogUtils.d("showConnectFailed")
+       //("showConnectFailed")
 //        if(isOTA){
             if(isSupportInstallOldDevice){
                 progressOldBtn.progress = -1    //控件显示Error状态
@@ -545,7 +530,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 //    private fun connect() {
 //        Thread {
-//            LogUtils.d("connected33")
+//           //("connected33")
 //            mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
 //            mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
 //            TelinkLightService.Instance().connect(bestRSSIDevice?.macAddress, CONNECT_TIMEOUT_SECONDS)
@@ -556,7 +541,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //            connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit
 //                    .SECONDS, AndroidSchedulers.mainThread())
 //                    .subscribe {
-//                        LogUtils.d("timeout retryConnect")
+//                       //("timeout retryConnect")
 //                        retryConnect()
 //                    }
 //        }
@@ -657,11 +642,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                         if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                            com.dadoutek.uled.util.LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                           //("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                             bestRSSIDevice = deviceInfo
                         }
                     } else {
-                        com.dadoutek.uled.util.LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                       //("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                         bestRSSIDevice = deviceInfo
                     }
 

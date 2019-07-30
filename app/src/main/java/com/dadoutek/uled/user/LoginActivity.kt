@@ -34,7 +34,6 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
@@ -155,7 +154,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         recyclerView = findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
-        if (info != null && !info.isEmpty()) {
+        val havePhone = info != null && !info.isEmpty()
+        if (havePhone) {
             val messge = info.split("-")
             edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
@@ -163,6 +163,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         } else
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
     }
+
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -424,7 +425,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             isSuccess = false
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
-            LogUtils.d("GetDataError:" + msg)
+            //("GetDataError:" + msg)
         }
     }
 

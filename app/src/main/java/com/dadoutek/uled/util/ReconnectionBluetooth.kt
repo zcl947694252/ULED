@@ -156,7 +156,7 @@ class ReconnectionBluetooth : EventListener<String> {
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-            LogUtils.d("startScanLight_LightOfGroup")
+           //("startScanLight_LightOfGroup")
             TelinkLightService.Instance().idleMode(true)
             bestRSSIDevice = null   //扫描前置空信号最好设备。
             //扫描参数
@@ -198,7 +198,7 @@ class ReconnectionBluetooth : EventListener<String> {
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
+                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -209,7 +209,7 @@ class ReconnectionBluetooth : EventListener<String> {
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -222,7 +222,7 @@ class ReconnectionBluetooth : EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-        com.dadoutek.uled.util.LogUtils.d("onErrorReport: onLeScanTimeout")
+       //("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
         startScan()
     }

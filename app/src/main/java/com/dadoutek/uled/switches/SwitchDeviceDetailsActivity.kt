@@ -189,11 +189,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                         if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                            com.dadoutek.uled.util.LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                           //("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                             bestRSSIDevice = deviceInfo
                         }
                     } else {
-                        com.dadoutek.uled.util.LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                       //("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                         bestRSSIDevice = deviceInfo
                     }
 
@@ -551,7 +551,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        com.dadoutek.uled.util.LogUtils.d("onLeScanTimeout()")
+                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -562,7 +562,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connectSwitch(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -702,7 +702,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-                LogUtils.d("startScanLight_LightOfGroup")
+               //("startScanLight_LightOfGroup")
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -758,7 +758,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
+                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -769,7 +769,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -783,7 +783,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun onLeScanTimeout() {
         hideLoadingDialog()
-        LogUtils.d("onErrorReport: onLeScanTimeout")
+       //("onErrorReport: onLeScanTimeout")
         ToastUtil.showToast(this, getString(R.string.not_found_switch))
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {

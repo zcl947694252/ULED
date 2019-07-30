@@ -826,7 +826,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+               //("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
         }
 
@@ -988,7 +988,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+               //("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
         }
 
@@ -1035,8 +1035,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun getModeValue(): Int {
-        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
-        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
+       //("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+       //("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 

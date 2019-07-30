@@ -17,7 +17,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.FileSystem;
-import com.dadoutek.uled.util.LogUtil;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
 import com.telink.TelinkApplication;
@@ -104,7 +103,7 @@ public final class TelinkLightApplication extends TelinkApplication {
                 String name = dbRegion.getControlMesh();
                 String pwd = dbRegion.getControlMeshPwd();
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                    LogUtils.d("mesh.setPassword = " + name);
+                   //("mesh.setPassword = " + name);
                     mesh = new Mesh();
                     mesh.setName(name);
                     mesh.setPassword(name);

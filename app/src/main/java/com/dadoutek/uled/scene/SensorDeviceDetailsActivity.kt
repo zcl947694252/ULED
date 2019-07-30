@@ -39,7 +39,10 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -555,7 +558,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-                LogUtils.d("startScanLight_LightOfGroup")
+               //"startScanLight_LightOfGroup")
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -609,7 +612,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
+                       //"onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -620,7 +623,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //"connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -633,7 +636,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
 
     private fun onLeScanTimeout() {
-        LogUtils.d("onErrorReport: onLeScanTimeout")
+       //"onErrorReport: onLeScanTimeout")
         TelinkLightService.Instance().idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()

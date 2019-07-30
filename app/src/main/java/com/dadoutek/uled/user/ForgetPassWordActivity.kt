@@ -17,7 +17,6 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import io.reactivex.Observer
@@ -106,7 +105,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                             override fun onNext(stringResponse: Response<String>) {
                                 hideLoadingDialog()
                                 if (stringResponse.errorCode == 0) {
-                                    LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                                   //("logging" + stringResponse.errorCode + "获取成功account")
                                     dbUser!!.account = stringResponse.t
                                     val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
                                     intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
@@ -122,7 +121,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                             override fun onError(e: Throwable) {
                                 hideLoadingDialog()
                                 Toast.makeText(this@ForgetPassWordActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
-                                LogUtils.e("zcl**********************${e.toString()}")
+                                //("zcl**********************${e.toString()}")
                             }
                             override fun onComplete() {}
                         })

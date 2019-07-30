@@ -36,8 +36,10 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.*
-import com.dadoutek.uled.windowcurtains.CurtainBatchGroupActivity
+import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -56,10 +58,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_connector_device_detail.*
-import kotlinx.android.synthetic.main.activity_connector_device_detail.add_device_btn
-import kotlinx.android.synthetic.main.activity_connector_device_detail.no_device_relativeLayout
-import kotlinx.android.synthetic.main.activity_connector_device_detail.recycleView
-import kotlinx.android.synthetic.main.activity_curtains_device_details.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -68,7 +66,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 private const val MAX_RETRY_CONNECT_TIME = 5
@@ -810,7 +807,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-                LogUtils.d("startScanLight_LightOfGroup")
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -863,7 +859,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -874,7 +869,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -952,7 +946,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        LogUtils.d("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance().idleMode(true)

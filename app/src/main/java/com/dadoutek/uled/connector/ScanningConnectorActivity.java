@@ -37,7 +37,6 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
@@ -45,14 +44,11 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.light.DeviceScanningNewActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DeviceType;
-import com.dadoutek.uled.model.Group;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -1376,7 +1372,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
 
     private void onErrorReport(ErrorReportInfo info) {
 //        retryConnect()
-        LogUtils.d("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+       //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
     }
 
 
@@ -1408,7 +1404,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
             groupAddress = groupAddress | 0x8000;
 
             if (groupingGroup.getMeshAddr() == groupAddress) {
-                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
+               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
                 groupingSuccess = true;
             }
         }
@@ -1456,14 +1452,14 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         animationView.setVisibility(View.VISIBLE);
                         if (grouping) {
 //                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-                            LogUtils.d("Grouping");
+                           //("Grouping");
                             return;
                         }
                         handleIfSupportBle();
                         TelinkLightService.Instance().idleMode(true);
                         if (mApplication.isEmptyMesh()) {
 //                            Toast.makeText(this, "Empty Mesh", Toast.LENGTH_SHORT).show();
-                            LogUtils.d("Empty Mesh");
+                           //("Empty Mesh");
                             return;
                         }
 

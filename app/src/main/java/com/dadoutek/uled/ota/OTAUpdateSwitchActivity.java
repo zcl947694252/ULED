@@ -2,7 +2,6 @@ package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
@@ -32,7 +31,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
@@ -42,7 +40,6 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -202,7 +199,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
 ////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
 ////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                        LogUtils.d("\n" + time + ":" + msg.obj.toString());
+                       //("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }
@@ -291,7 +288,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
         sv_log = (ScrollView) findViewById(R.id.sv_log);
         tv_version = (TextView) findViewById(R.id.tv_version);
 
-        if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
+      /*  if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
             mPath = SharedPreferencesUtils.getUpdateFilePath();
             tvFile.setText(getString(R.string.select_file, mPath));
             btn_start_update.setVisibility(View.VISIBLE);
@@ -299,7 +296,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
             local_version.setText(getString(R.string.local_version, dbLight.version));
             server_version.setVisibility(View.VISIBLE);
             server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
-        }
+        }*/
     }
 
     private void initToolbar() {
@@ -666,18 +663,25 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
             text_info.setVisibility(View.GONE);
             btn_start_update.setVisibility(View.VISIBLE);
             btn_start_update.setClickable(false);
+
+            local_version.setVisibility(View.VISIBLE);
+            local_version.setText(getString(R.string.local_version, dbLight.version));
+            server_version.setVisibility(View.VISIBLE);
+            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
+
 //            btn_start_update.setText(R.string.updating);
 //            btn_start_update.setText(R.string.scan_and_connect);
 //            if (TelinkLightApplication.getApp().getConnectDevice() != null) {
 //                sendGetVersionCommand();
 //            } else {
+          /*
             if (TelinkLightApplication.getInstance().getConnectDevice() != null &&
                     TelinkLightApplication.getInstance().getConnectDevice().meshAddress == dbLight.getMeshAddr()) {
                 startOTA();
             } else {
                 startScan();
-            }
-//            }
+            }*/
+    //   }
         }
     }
 

@@ -90,7 +90,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
 
         override fun error(msg: String) {
-            LogUtils.d(msg)
+           //(msg)
             ToastUtils.showLong(msg)
             if (isClickExlogin) {
                 AlertDialog.Builder(activity)
@@ -429,7 +429,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         var num = 5 - it as Long
-                        LogUtils.e("zcl**********************num$num")
+                        //("zcl**********************num$num")
                         if (num == 0L) {
                             confirm?.isClickable = true
                             confirm?.text = getString(R.string.btn_ok)

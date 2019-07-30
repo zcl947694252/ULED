@@ -249,19 +249,19 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val scene = DBUtils.getSceneByID(changeId)
-                                LogUtils.d("scene_add--id==" + changeId)
+                               //("scene_add--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.add(token, bodyScene
                                             , id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                LogUtils.d("scene_delete--id==" + changeId)
+                               //("scene_delete--id==" + changeId)
                                 return SceneModel.delete(token,
                                         changeId.toInt(), id)
                             }
                             Constant.DB_UPDATE -> {
-                                LogUtils.d("scene_update--id==" + changeId)
+                               //("scene_update--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.update(token, changeId.toInt(), bodyScene, id)
                                 }
@@ -292,14 +292,14 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
-                                LogUtils.d("scene_add--id==" + changeId)
+                               //("scene_add--id==" + changeId)
                                 if (bodyGradient != null) {
                                     return GradientModel.add(token, bodyGradient
                                             , id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                LogUtils.d("scene_delete--id==" + changeId)
+                               //("scene_delete--id==" + changeId)
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
@@ -307,7 +307,7 @@ class SyncDataPutOrGetUtils {
                                         body, id)
                             }
                             Constant.DB_UPDATE -> {
-                                LogUtils.d("scene_update--id==" + changeId)
+                               //("scene_update--id==" + changeId)
                                 if (bodyGradient != null) {
                                     return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
                                 }
@@ -416,7 +416,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveGradient(item, true)
                             for (i in item.colorNodes.indices) {
-                                 LogUtils.e("是不是空的"+item.id)
+                                 //("是不是空的"+item.id)
                                 val k = i + 1
                                 DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
                             }
@@ -439,7 +439,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveScene(item, true)
                             for (i in item.actions.indices) {
-                                LogUtils.e("是不是空的2"+item.id)
+                                //("是不是空的2"+item.id)
                                 val k = i + 1
                                 DBUtils.saveSceneActions(item.actions[i], k.toLong(), item.id)
                             }
@@ -475,11 +475,11 @@ class SyncDataPutOrGetUtils {
             }
 
             override fun complete() {
-                LogUtils.d("putSuccess:" + "上传成功")
+               //("putSuccess:" + "上传成功")
             }
 
             override fun error(msg: String) {
-                LogUtils.d("GetDataError:" + msg)
+               //("GetDataError:" + msg)
             }
 
         }

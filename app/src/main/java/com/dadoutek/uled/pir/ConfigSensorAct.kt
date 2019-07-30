@@ -6,7 +6,6 @@ import android.view.ViewTreeObserver
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -103,7 +102,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
                         val versionNum = Integer.parseInt(StringUtils.versionResolution(it, 1))
-                        LogUtils.d("kkkk" + versionNum)
+                       //("kkkk" + versionNum)
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
                         isSupportModeSelect = (it ?: "").contains("PS")
@@ -159,8 +158,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
 
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
-        LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
-                "   triggerValue = $triggerValue")
+       //("delayTime = $delayTime  minBrightness = $minBrightness  " +
+               // "   triggerValue = $triggerValue")
 //        val spGroup = groupConvertSpecialValue(groupAddr)
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
@@ -301,8 +300,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         Thread.sleep(300)
 //
 //                        addGroup(mDeviceInfo.meshAddress, mSelectGroupAddr,
-//                                { LogUtils.d("success") },
-//                                { LogUtils.d("failed") })
+//                                {//("success") },
+//                                {//("failed") })
 //                        Thread.sleep(300)
 
                         Commander.updateMeshName(
@@ -322,8 +321,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun getModeValue(): Int {
-        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
-        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
+       //("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+       //("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 }

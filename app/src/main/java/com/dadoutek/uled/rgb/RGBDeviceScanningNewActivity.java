@@ -1085,7 +1085,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //
 //    private void onErrorReport(ErrorReportInfo info) {
 ////        retryConnect()
-//        LogUtils.d("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+//       //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
 //    }
 //
 //
@@ -1117,7 +1117,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //            groupAddress = groupAddress | 0x8000;
 //
 //            if (groupingGroup.getMeshAddr() == groupAddress) {
-//                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
+//               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
 //                groupingSuccess = true;
 //            }
 //        }
@@ -1162,14 +1162,14 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                        startTimer();
 //                        if (grouping) {
 ////                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-//                            LogUtils.d("Grouping");
+//                           //("Grouping");
 //                            return;
 //                        }
 //                        handleIfSupportBle();
 //                        TelinkLightService.Instance().idleMode(true);
 //                        if (mApplication.isEmptyMesh()) {
 ////                            Toast.makeText(this, "Empty Mesh", Toast.LENGTH_SHORT).show();
-//                            LogUtils.d("Empty Mesh");
+//                           //("Empty Mesh");
 //                            return;
 //                        }
 //                        List<ScanFilter> scanFilters = new ArrayList<>();

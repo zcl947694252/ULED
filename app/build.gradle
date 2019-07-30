@@ -25,14 +25,14 @@ MobSDK {
     signingConfigs {
         release {
             //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
-            storeFile file('F:\\androidSpace\\ULED\\ULED\\dadou.key')
+            storeFile file('.\\..\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
             keyPassword 'dadoutek2018'
         }
         debug {
             //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
-            storeFile file('F:\\androidSpace\\ULED\\dadou.key')
+            storeFile file('.\\..\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
             keyPassword 'dadoutek2018'

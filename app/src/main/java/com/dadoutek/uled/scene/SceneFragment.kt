@@ -29,7 +29,6 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.fragment_scene.*
@@ -406,7 +405,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onPause() {
         super.onPause()
-//        LogUtils.d("ss")
+//       //("ss")
     }
 
     override fun onDestroyView() {

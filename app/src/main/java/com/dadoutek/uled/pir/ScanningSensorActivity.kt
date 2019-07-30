@@ -166,7 +166,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                             }
                 }.start()
 
-                LogUtils.e("zcl pir开始扫描")
+                //("zcl pir开始扫描")
                 if (isSupportInstallOldDevice) {
                     progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                     progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
@@ -180,7 +180,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun retryConnect() {
         mRetryConnectCount++
-        LogUtils.e("zcl reconnect time = $mRetryConnectCount")
+        //("zcl reconnect time = $mRetryConnectCount")
         if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
             showConnectFailed()
         } else {
@@ -205,7 +205,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun performed(event: Event<String>?) {
-        LogUtils.e("zcl**********************Event${event!!.type}")
+        //("zcl**********************Event${event!!.type}")
         when (event?.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
 //            LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout()
@@ -221,18 +221,18 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-        LogUtils.e("zcl**********************onErrorReport${info.stateCode}")
+        //("zcl**********************onErrorReport${info.stateCode}")
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 蓝牙未开启")
+                        //"zcl 蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 无法收到广播包以及响应包")
+                        //"zcl 无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl  未扫到目标设备")
+                        //"zcl  未扫到目标设备")
                     }
                 }
 
@@ -240,30 +240,30 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 未读到att表")
+                        //"zcl 未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 未建立物理连接")
+                        //"zcl 未建立物理连接")
 
                     }
                 }
-                LogUtils.e("zcl onError retry")
+                //("zcl onError retry")
                 retryConnect()
 
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl value check失败： 密码错误")
+                        //"zcl value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl read login data 没有收到response")
+                        //"zcl read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl write login data 没有收到response")
+                        //"zcl write login data 没有收到response")
                     }
                 }
-                LogUtils.e("zcl onError login")
+                //("zcl onError login")
 
                 retryConnect()
 
@@ -272,7 +272,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-        LogUtils.e("zcl onLeScanTimeout")
+        //("zcl onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
             if (isSupportInstallOldDevice) {
                 progressOldBtn.progress = -1   //控件显示Error状态
@@ -288,26 +288,26 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo: DeviceInfo = deviceEvent.args
         mDeviceMeshName = deviceInfo.meshName
-        LogUtils.e("zcl**********************$deviceInfo")
+        //("zcl**********************$deviceInfo")
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_CONNECTING -> {//0
-                LogUtils.e("zcl 链接中")
+                //("zcl 链接中")
             }
 
             LightAdapter.STATUS_LOGIN -> {//3
                 onLogin()
-                LogUtils.e("zcl 登陆成功")
+                //("zcl 登陆成功")
             }
 
             LightAdapter.STATUS_LOGOUT -> {//4
 //                onLoginFailed()
-                LogUtils.e("zcl 链接失败")
+                //("zcl 链接失败")
                 retryConnect()
             }
 
             LightAdapter.STATUS_CONNECTED -> {//11
-                LogUtils.e("zcl 开始登陆")
+                //("zcl 开始登陆")
                 connectDisposable?.dispose()
                 login()
             }
@@ -315,7 +315,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun login() {
-        LogUtils.e("zcl**********************进入登录$")
+        //("zcl**********************进入登录$")
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
         if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
@@ -324,7 +324,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
 
-        LogUtils.e("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
+        //("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
 
         TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
@@ -362,7 +362,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         TelinkLightService.Instance().idleMode(true)
 
-        LogUtils.e("zcl  showConnectFailed")
+        //("zcl  showConnectFailed")
         if (isSupportInstallOldDevice) {
             progressOldBtn.progress = -1    //控件显示Error状态
             progressOldBtn.text = getString(R.string.connect_failed)
@@ -378,7 +378,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSensorActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSensorActivity)
             TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
-            LogUtils.e("zcl开始连接")
+            //("zcl开始连接")
         }.start()
 
         GlobalScope.launch(Dispatchers.Main) {
@@ -388,7 +388,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        LogUtils.e("zcl timeout retryConnect")
+                        //("zcl timeout retryConnect")
                         retryConnect()
                     }
         }

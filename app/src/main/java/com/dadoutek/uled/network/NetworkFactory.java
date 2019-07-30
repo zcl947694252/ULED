@@ -1,6 +1,7 @@
 package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.model.Constant;
@@ -30,6 +31,7 @@ public class NetworkFactory {
     private static OkHttpClient initHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
         DbUser user = DBUtils.INSTANCE.getLastUser();
+        Log.e("zcl","zcl***************************"+user==null?user.toString():"null");
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
@@ -40,12 +42,13 @@ public class NetworkFactory {
                     String token = request.header("token");
                     Request build;
                     Request.Builder builder1 = request.newBuilder();
-                    if (token == null || token.isEmpty())
-                        builder1.addHeader("token", user.getToken());
+                  // if (token == null || token.isEmpty())
+                  //     builder1.addHeader("token", user.getToken());
 
-                    build = builder1.addHeader("region-id", user.getLast_region_id())
-                            .build();
-                    return chain.proceed(build);
+                  // String last_region_id = user!=null?user.getLast_region_id():"1";
+                  // build = builder1.addHeader("region-id", last_region_id==null?"1":last_region_id)
+                  //         .build();
+                    return chain.proceed(request.newBuilder().build());
                 })
                 .retryOnConnectionFailure(true);
 

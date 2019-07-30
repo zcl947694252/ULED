@@ -335,7 +335,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             outState?.putParcelable(SCENE_KEY, scene!!)
         }
         super.onSaveInstanceState(outState)
-        LogUtils.d("onSaveInstanceState")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -624,7 +623,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 val sceneActions = DbSceneActions()
 
                 val item = itemGroups[i]
-                LogUtils.e("zcl**********************$item")
+                //("zcl**********************$item")
 
 
                 if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAress))) {

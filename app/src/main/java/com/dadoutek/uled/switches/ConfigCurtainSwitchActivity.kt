@@ -3,7 +3,6 @@ package com.dadoutek.uled.switches
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.view.MenuItem
@@ -44,7 +43,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
@@ -225,13 +223,13 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                        //"蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                        //"无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                        //"未扫到目标设备")
                     }
                 }
                 showDisconnectSnackBar()
@@ -240,10 +238,10 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                        //"未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                        //"未建立物理连接")
 
                     }
                 }
@@ -253,16 +251,16 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                        //"value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                        //"read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                        //"write login data 没有收到response")
                     }
                 }
-                LogUtils.d("onError login")
+               //("onError login")
                 showDisconnectSnackBar()
 
             }
@@ -307,7 +305,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 } else {
                     showDisconnectSnackBar()
 
-                    LogUtils.d("Disconnected")
+                   //("Disconnected")
                 }
             }
         }

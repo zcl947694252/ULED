@@ -1,6 +1,5 @@
 package com.dadoutek.uled.communicate
 
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -237,7 +236,7 @@ object Commander : EventListener<String> {
 
                     override fun onNext(t: Long) {
                         val timeOut=30
-                        LogUtils.d("mGroupSuccess = $mGroupSuccess")
+                       //("mGroupSuccess = $mGroupSuccess")
                         if (t >= timeOut) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
@@ -248,7 +247,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
-                        LogUtils.d(e.message)
+                       //(e.message)
                     }
                 })
     }
@@ -296,7 +295,7 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
-                        LogUtils.d("addGroup error: ${e.message}")
+                       //("addGroup error: ${e.message}")
                     }
                 })
     }
@@ -344,7 +343,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
-                        LogUtils.d("updateMeshName error: ${e.message}")
+                       //("updateMeshName error: ${e.message}")
                     }
                 })
 
@@ -378,7 +377,7 @@ object Commander : EventListener<String> {
 
     private fun onMeshEvent(event: MeshEvent) {
 //        ToastUtils.showShort(event.toString())
-        LogUtils.d("Error ${event.toString()}")
+       //("Error ${event.toString()}")
     }
 
     private fun onGetGroupEvent(event: NotificationEvent) {
@@ -405,7 +404,7 @@ object Commander : EventListener<String> {
             }
 
             if (mGroupingAddr == groupAddress) {
-//                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x",
+//               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x",
 //                        groupAddress, mLightAddr))
                 mGroupSuccess = true
             }
@@ -527,7 +526,7 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
-                        LogUtils.d(e.message)
+                       //(e.message)
                     }
                 })
     }
@@ -565,9 +564,7 @@ object Commander : EventListener<String> {
     private fun onKickoutEvent(notificationEvent: NotificationEvent) {
         val data = notificationEvent.args.params
         for (i in data.indices) {
-            com.dadoutek.uled.util.LogUtils.d("Res----------" + data[i].toInt())
         }
-        com.dadoutek.uled.util.LogUtils.d("Reset----------" + data[0].toInt() + "==" + mLightAddr)
 //        if(data[0].toInt()== mLightAddr){
         mResetSuccess = true
 //        }

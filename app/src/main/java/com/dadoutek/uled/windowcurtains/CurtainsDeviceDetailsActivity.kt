@@ -784,7 +784,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-                LogUtils.d("startScanLight_LightOfGroup")
+               //("startScanLight_LightOfGroup")
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
@@ -837,7 +837,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
+                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -848,7 +848,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -926,7 +926,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        LogUtils.d("onErrorReport: onLeScanTimeout")
+       //("onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance().idleMode(true)

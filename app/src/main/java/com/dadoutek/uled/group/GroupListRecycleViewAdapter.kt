@@ -12,7 +12,6 @@ import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.ItemTypeGroup
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.telink.TelinkApplication
 
@@ -103,7 +102,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
                 startPos=pos
                 endPos=0
 
-                LogUtils.d("indexchange--"+"--start:"+pos)
+              //"indexchange--"+"--start:"+pos)
             }
 
             override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
@@ -113,10 +112,10 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
             override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
                 //                viewHolder.getItemId();
                 endPos=pos
-                LogUtils.d("indexchange--"+"--end:"+pos)
+              //"indexchange--"+"--end:"+pos)
 
                 updateGroupList(list,startPos,endPos)
-                LogUtils.d("indexchange--"+"--start:"+startPos+"--end:"+endPos)
+              //"indexchange--"+"--start:"+startPos+"--end:"+endPos)
             }
         }
 

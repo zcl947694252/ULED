@@ -22,7 +22,6 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -208,7 +207,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private fun verificationLogin() {
         if (!StringUtils.isTrimEmpty(phone)) {
             showLoadingDialog(getString(R.string.logging_tip))
-            LogUtils.e("logging: " + "登录错误")
+            //("logging: " + "登录错误")
             AccountModel.smsLoginTwo(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
@@ -217,12 +216,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                             showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                            LogUtils.e("logging: " + "登录成功错误")
+                            //("logging: " + "登录成功错误")
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            LogUtils.e("logging: " + "登录错误" + e.message)
+                            //("logging: " + "登录错误" + e.message)
                             hideLoadingDialog()
                         }
                     })
@@ -239,7 +238,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             finish()
         }
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+           //("GetDataError:$msg")
         }
     }
 

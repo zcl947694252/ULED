@@ -22,7 +22,6 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.dadoutek.uled.util.ToastUtil
@@ -68,7 +67,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
         var user = SharedPreferencesUtils.getLastUser()
         user?.let {
             var list = it.split("-")
-            LogUtils.e("zcl**********************${list.size}----$list")
+            //("zcl**********************${list.size}----$list")
             if (list.size > 1 && !user.equals("-") && !boolean) {
                 var s = list[1]
                 edit_user_password.setText(s)
@@ -107,7 +106,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
                     Constant.TYPE_LOGIN -> {
                         if (TextUtils.isEmpty(edit_user_password.editableText.toString())) {
                             toast(getString(R.string.please_password))
-                            LogUtils.e(type)
+                            //(type)
                             return
                         }
                         login()
@@ -140,9 +139,9 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
 
 
     private fun login() {
-        LogUtils.e("login hideLoadingDialog()$phone")
+        //("login hideLoadingDialog()$phone")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
-        LogUtils.e("zcl**********************login$editPassWord$phone${dbUser.toString()}")
+        //("zcl**********************login$editPassWord$phone${dbUser.toString()}")
 
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
@@ -154,12 +153,12 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                            LogUtils.e("logging: " + "登录成功" + dbUser.toString())
+                            //("logging: " + "登录成功" + dbUser.toString())
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            LogUtils.d("logging: " + "登录错误" + e.message)
+                           //("logging: " + "登录错误" + e.message)
                             hideLoadingDialog()
                         }
                     })
@@ -184,7 +183,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
             isSuccess = false
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
-            LogUtils.d("GetDataError:" + msg)
+           //("GetDataError:" + msg)
         }
 
     }

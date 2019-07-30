@@ -8,5 +8,6 @@
     <dimen name="fab_margin">20dp</dimen>
     <dimen name="sp_12">12sp</dimen>
     <dimen name="dp_15">15dp</dimen>
+    <dimen name="dp_3">3dp</dimen>
 
 </resources>

@@ -22,7 +22,6 @@ import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,10 +29,8 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.acitvity_phone_verification.*
-import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_verification_code.*
 import kotlinx.android.synthetic.main.activity_verification_code.btn_send_verification
-import kotlinx.android.synthetic.main.activity_verification_code.edit_user_phone
 import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.*
@@ -169,7 +166,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                             override fun onSubscribe(d: Disposable) {}
                             override fun onNext(stringResponse: Response<String>) {
                                 if (stringResponse.errorCode == 0) {
-                                    LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                                   //("logging" + stringResponse.errorCode + "获取成功account")
                                     dbUser!!.account = stringResponse.t
                                     verificationCode()
                                     val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
@@ -185,7 +182,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                             override fun onError(e: Throwable) {
                                 hideLoadingDialog()
                                 Toast.makeText(this@VerificationCodeActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
-                                LogUtils.e("zcl**********************$e")
+                                //("zcl**********************$e")
                             }
                             override fun onComplete() {}
                         })
@@ -242,7 +239,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+           //("GetDataError:$msg")
         }
 
     }
@@ -262,7 +259,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
     private fun verificationCode() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
             val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
-            LogUtils.e("zcl**********************$phoneNum")
+            //("zcl**********************$phoneNum")
             if (StringUtils.isEmpty(phoneNum)) {
                 ToastUtils.showShort(R.string.phone_cannot_be_empty)
             } else {

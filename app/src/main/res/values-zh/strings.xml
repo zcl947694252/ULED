@@ -740,6 +740,7 @@
     <string name="in_use">使用中</string>
     <string name="use">使用</string>
     <string name="creater_name">创建者: +</string>
-    <string name="bluetooth_open_connet">蓝牙未连接，正在连接中</string>
+    <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
+    <string name="input_region_name">请输入区域名称</string>
 
 </resources>
