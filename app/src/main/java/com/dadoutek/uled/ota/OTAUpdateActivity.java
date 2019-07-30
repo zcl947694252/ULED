@@ -780,7 +780,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         //intent.setType(“video/*;image/*”);//同时选择视频和图片
         intent.setType("*/*");//无类型限制
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-       // startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
+        // startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
     }
 
     private boolean hasLight(int meshAddress) {
@@ -1205,10 +1205,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         super.onActivityResult(requestCode, resultCode, data);
         //第一个是传递标记监听 第二个是回传标记监听
         if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-                 Bundle b=data.getExtras(); //data为B中回传的Intent
-                 String str=b.getString("path");//str即为回传的值
-                 tvFile.setText(str);
-             LogUtil.util("zcl","返回数据是:"+requestCode+"---"+resultCode+"----"+data.toString()+"----"+data.getDataString()+"----"+data.getData());
+            Bundle b=data.getExtras(); //data为B中回传的Intent
+            String str=b.getString("path");//str即为回传的值
+            tvFile.setText(str);
+            LogUtil.util("zcl","返回数据是:"+requestCode+"---"+resultCode+"----"+data.toString()+"----"+data.getDataString()+"----"+data.getData());
 
 //            if (resultCode == Activity.RESULT_OK) {
 //                Uri uri = data.getData();
