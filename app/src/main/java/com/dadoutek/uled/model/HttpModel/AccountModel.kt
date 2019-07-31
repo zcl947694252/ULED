@@ -1,12 +1,13 @@
 package com.dadoutek.uled.model.HttpModel
 
-import android.text.TextUtils
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbGroup
+import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.mob.tools.utils.DeviceHelper.getApplication
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -17,9 +18,11 @@ import kotlinx.coroutines.launch
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
     var userPassword:String?=null
-    fun login(phone: String, password: String, channel: String): Observable<DbUser> {
+    fun login(phone: String, password: String): Observable<DbUser> {
         userPassword=password
+       var userphone =phone
         lateinit var account: String
+
         return NetworkFactory.getApi()
                 .getAccount(phone, "dadou")
                 .compose(NetworkTransformer())
@@ -27,19 +30,27 @@ object AccountModel {
                     account = response
                     NetworkFactory.getApi()
                             .getsalt(response)
-                            .compose(NetworkTransformer())
-
-                }
+                            .compose(NetworkTransformer())}
                 .flatMap { response: String ->
                     val salt = response
-
                     val md5Pwd = (NetworkFactory.md5(
-                            NetworkFactory.md5(
-                                    NetworkFactory.md5(password) + account) + salt))
+                            NetworkFactory.md5(NetworkFactory.md5(password) + account) + salt))
 
                     NetworkFactory.getApi().login(account, md5Pwd)
-                            .compose(NetworkTransformer())
+                            .compose(NetworkTransformer()) }
+                .observeOn(Schedulers.io())
+                .doOnNext {
+                    initDatBase(it)
+                    Thread.sleep(2000)
                 }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    fun smsLoginTwo(phone: String): Observable<DbUser> {
+        return NetworkFactory.getApi()
+                .smsLogin(phone)
+                .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
@@ -53,8 +64,8 @@ object AccountModel {
                 .updateUser(token, avatar, name, email, introduction)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
-                .doOnNext {
-                }
+
+                .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
@@ -149,6 +160,7 @@ object AccountModel {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, isLogin)
     }
 
+/*
     private fun setupMesh(account: String) {
 
         val regionList = DBUtils.regionAll
@@ -196,7 +208,9 @@ object AccountModel {
                     Constant.USER_TYPE, Constant.USER_TYPE_OLD)
         }
     }
+*/
 
+/*
     private fun saveToDataBase(factoryName: String, factoryPwd: String, mNewMeshName: String, mNewMeshPwd: String) {
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
         val dbRegio = DbRegion()
@@ -210,7 +224,8 @@ object AccountModel {
         val application = getApplication() as TelinkLightApplication
         val mesh = application.mesh
         mesh.name = dbRegio.controlMesh
-        mesh.password = dbRegio.controlMeshPwd
+       // mesh.password = dbRegio.controlMeshPwd
+        mesh.password = account
         mesh.factoryName = dbRegio.installMesh
         mesh.factoryPassword = dbRegio.installMeshPwd
 //        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
@@ -218,4 +233,5 @@ object AccountModel {
 
 //        DBUtils.createAllLightControllerGroup()
     }
+*/
 }

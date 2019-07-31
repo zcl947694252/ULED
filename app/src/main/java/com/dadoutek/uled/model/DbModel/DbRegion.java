@@ -19,16 +19,19 @@ public class DbRegion {
     private String installMeshPwd;
 
     private String belongAccount;
+    private String name;
 
-    @Generated(hash = 1441573477)
+    @Generated(hash = 156570483)
     public DbRegion(Long id, String controlMesh, String controlMeshPwd,
-            String installMesh, String installMeshPwd, String belongAccount) {
+            String installMesh, String installMeshPwd, String belongAccount,
+            String name) {
         this.id = id;
         this.controlMesh = controlMesh;
         this.controlMeshPwd = controlMeshPwd;
         this.installMesh = installMesh;
         this.installMeshPwd = installMeshPwd;
         this.belongAccount = belongAccount;
+        this.name = name;
     }
 
     @Generated(hash = 2106128169)
@@ -81,5 +84,13 @@ public class DbRegion {
 
     public void setBelongAccount(String belongAccount) {
         this.belongAccount = belongAccount;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

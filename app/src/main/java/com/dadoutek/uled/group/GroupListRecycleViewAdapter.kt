@@ -1,9 +1,5 @@
 package com.dadoutek.uled.group
 
-import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -16,7 +12,6 @@ import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.ItemTypeGroup
-import com.dadoutek.uled.othersview.MeFragment
 import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.telink.TelinkApplication
@@ -89,9 +84,9 @@ class GroupListRecycleViewAdapter(layoutResId: Int,internal var onItemChildClick
 ////        recyclerView?.addItemDecoration(decoration)
 //        recyclerViewChild?.itemAnimator = DefaultItemAnimator() as RecyclerView.ItemAnimator?
 
-        adapter!!.setOnItemChildClickListener { adapter, view, position ->
-            onItemChildClickListener1.onItemChildClick(adapter,view,position,helper.adapterPosition)
-        }
+//        adapter!!.setOnItemChildClickListener { adapter, view, position ->
+//            onItemChildClickListener1.onItemChildClick(adapter,view,position,helper.adapterPosition)
+//        }
 //        adapter!!.addFooterView(getFooterView())
         adapter!!.bindToRecyclerView(recyclerViewChild)
         setMove(recyclerViewChild!!)

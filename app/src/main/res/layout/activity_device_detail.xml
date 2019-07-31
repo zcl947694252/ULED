@@ -1,42 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-android:id="@+id/root"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:background="@color/white"
-android:orientation="vertical">
 
-<include
-    android:id="@+id/topView"
-    layout="@layout/toolbar"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent" />
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:id="@+id/root"
+    android:layout_height="match_parent">
 
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/recycleView"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="1.0"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/scanPb" />
+    <include
+        android:id="@+id/topView"
+        layout="@layout/toolbar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
-<me.zhanghai.android.materialprogressbar.MaterialProgressBar
-    android:id="@+id/scanPb"
-    style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
-    android:indeterminate="true"
-    android:visibility="gone"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/topView"
-    app:mpb_indeterminateTint="@color/accent"
-    app:mpb_progressStyle="horizontal"
-    app:mpb_showProgressBackground="false"
-    app:mpb_useIntrinsicPadding="false" />
-</android.support.constraint.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/no_device_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image_no_device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/no_device"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="170dp"
+            />
+
+        <Button
+            android:id="@+id/add_device_btn"
+            android:text="@string/device_scan_scan"
+            style="@style/ButtonStyle"
+            android:layout_below="@id/image_no_device"
+            />
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/dialog_device"
+        layout="@layout/popwindow_install_deive_list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/topView"
+        android:visibility="gone"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="18dp"
+        android:id="@+id/recycleView"
+        android:visibility="gone"
+        android:layout_below="@+id/topView"
+        />
+
+</RelativeLayout>

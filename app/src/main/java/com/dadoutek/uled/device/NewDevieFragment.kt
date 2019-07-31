@@ -1,17 +1,17 @@
 package com.dadoutek.uled.device
 
+//import com.dadoutek.uled.light.DeviceDetailAct
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -20,10 +20,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
-import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
-//import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
@@ -37,20 +35,30 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.ArrayList
+import java.util.*
 
-class NewDevieFragment :BaseFragment(){
+/**
+ * 创建者     zcl
+ * 创建时间   2019/7/27 11:31
+ * 描述	      ${设备列表-灯暖灯全彩灯列表}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
+ */
+class NewDevieFragment : BaseFragment() {
 
     private var inflater: LayoutInflater? = null
-    var recyclerView:RecyclerView? = null
-    var newDeviceAdapter:DeviceTypeRecycleViewAdapter? = null
+    var recyclerView: RecyclerView? = null
+    var newDeviceAdapter: DeviceTypeRecycleViewAdapter? = null
 
-    private var deviceTypeList : ArrayList<String>? = null
-    private var allDeviceList : ArrayList<DbLight>? = null
+    private var deviceTypeList: ArrayList<String>? = null
+    private var allDeviceList: ArrayList<DbLight>? = null
     private var isGuide = false
     private var toolbar: Toolbar? = null
     private var isRgbClick = false
@@ -68,17 +76,20 @@ class NewDevieFragment :BaseFragment(){
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view=getViewThis(inflater)
+        val view = getViewThis(inflater)
         initToolBar(view)
         initData()
         initView(view)
-
         if (firstShowGuide) {
             firstShowGuide = false
             initOnLayoutListener()
         }
-
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshView()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -86,15 +97,25 @@ class NewDevieFragment :BaseFragment(){
             val act = activity as MainActivity?
             act?.addEventListeners()
             initOnLayoutListener()
+            if (Constant.isCreat) {
+                refreshAndMoveBottom()
+                Constant.isCreat = false
+            } else {
+                refreshView()
+            }
         }
     }
 
+    private fun refreshAndMoveBottom() {
+        refreshView()
+    }
+
     private fun initOnLayoutListener() {
-        val view = activity?.getWindow()?.getDecorView()
-        val viewTreeObserver = view?.getViewTreeObserver()
+        val view = activity?.window?.decorView
+        val viewTreeObserver = view?.viewTreeObserver
         viewTreeObserver?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 lazyLoad()
             }
         })
@@ -176,22 +197,11 @@ class NewDevieFragment :BaseFragment(){
     }
 
     private fun initView(view: View?) {
-        val layoutmanager = LinearLayoutManager(activity)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView!!.layoutManager = layoutmanager
-        newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item,deviceTypeList!!)
-
-        val decoration = DividerItemDecoration(activity!!,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                .divider)))
-        //添加分割线
-        recyclerView?.addItemDecoration(decoration)
+        recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
+        newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
-        newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
-//        adapter!!.addFooterView(getFooterView())
+        newDeviceAdapter!!.onItemClickListener = onItemClickListener
         newDeviceAdapter!!.bindToRecyclerView(recyclerView)
 
 
@@ -203,61 +213,94 @@ class NewDevieFragment :BaseFragment(){
         create_scene?.setOnClickListener(onClick)
     }
 
+    private fun refreshView() {
+        if (activity != null) {
+            deviceTypeList = ArrayList()
+            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
+            for (installDeviceModel in installList) {
+                deviceTypeList!!.add(installDeviceModel.deviceType)
+            }
+
+            allDeviceList = ArrayList()
+            val layoutmanager = LinearLayoutManager(activity)
+//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+            recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
+            newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
+
+//        val decoration = DividerItemDecoration(activity!!,
+//                DividerItemDecoration
+//                        .VERTICAL)=
+//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+//                .divider)))
+//        //添加分割线
+//        recyclerView?.addItemDecoration(decoration)
+//            recyclerView?.addItemDecoration(SpaceItemDecoration(32))
+            recyclerView?.itemAnimator = DefaultItemAnimator()
+
+            newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
+//        adapter!!.addFooterView(getFooterView())
+            newDeviceAdapter!!.bindToRecyclerView(recyclerView)
+        }
+//            deviceTypeList = ArrayList<String>()
+//            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
+//            for(installDeviceModel in installList){
+//                deviceTypeList!!.add(installDeviceModel.deviceType)
+//            }
+//
+//            allDeviceList = ArrayList()
+//        }
+    }
+
 //    allDeviceList!!.add(DBUtils.getAllNormalLight())
 //    allDeviceList!!.add(DBUtils.getAllRGBLight())
 //    allDeviceList!!.add(DBUtils.getAllSwitch())
 //    allDeviceList!!.add(DBUtils.getAllSensor())
 //    allDeviceList!!.add(DBUtils.getAllCurtain())
 
-    var onItemClickListener = BaseQuickAdapter.OnItemClickListener {
-        adapter, view, position ->
-        if(TelinkLightApplication.getInstance().connectDevice==null){
-            ToastUtils.showLong(R.string.device_not_connected)
-        }else{
-            var intent:Intent?=null
-            when(position){
-                Constant.INSTALL_NORMAL_LIGHT ->{
-                    intent= Intent(activity, DeviceDetailAct::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_NORMAL_LIGHT)
-                }
-                Constant.INSTALL_RGB_LIGHT ->{
-                    intent= Intent(activity, DeviceDetailAct::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RGB_LIGHT)
-                }
-                Constant.INSTALL_SWITCH ->{
-                    intent= Intent(activity,SwitchDeviceDetailsActivity::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_SWITCH)
-                }
-                Constant.INSTALL_SENSOR ->{
-                    intent= Intent(activity,SensorDeviceDetailsActivity::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_SENSOR)
-                }
-                Constant.INSTALL_CURTAIN ->{
-                    intent= Intent(activity,CurtainsDeviceDetailsActivity::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN)
-                }
-                Constant.INSTALL_CONNECTOR->{
-                    intent= Intent(activity,ConnectorDeviceDetailActivity::class.java)
-                    intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN)
-                }
+    var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+        var intent: Intent? = null
+        when (position) {
+            Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
+                intent = Intent(activity, DeviceDetailAct::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
             }
-            startActivityForResult(intent, Activity.RESULT_OK)
+            Constant.INSTALL_RGB_LIGHT -> {
+                intent = Intent(activity, DeviceDetailAct::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_RGB_LIGHT)
+            }
+            Constant.INSTALL_SWITCH -> {
+                intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+            }
+            Constant.INSTALL_SENSOR -> {
+                intent = Intent(activity, SensorDeviceDetailsActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
+            }
+            Constant.INSTALL_CURTAIN -> {
+                intent = Intent(activity, CurtainsDeviceDetailsActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CURTAIN)
+            }
+            Constant.INSTALL_CONNECTOR -> {
+                intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
+                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
+            }
         }
+        startActivityForResult(intent, Activity.RESULT_OK)
     }
 
     private fun initData() {
-        deviceTypeList = ArrayList<String>()
+        deviceTypeList = ArrayList()
         val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
-        for(installDeviceModel in installList){
+        for (installDeviceModel in installList) {
             deviceTypeList!!.add(installDeviceModel.deviceType)
         }
 
         allDeviceList = ArrayList()
     }
 
-    private fun getViewThis(inflater: LayoutInflater): View?{
-        this.inflater=inflater
-        val view = inflater.inflate(R.layout.fragment_new_device,null)
+    private fun getViewThis(inflater: LayoutInflater): View? {
+        this.inflater = inflater
+        val view = inflater.inflate(R.layout.fragment_new_device, null)
         recyclerView = view.findViewById<RecyclerView>(R.id.deviceTypeList)
         return view
     }
@@ -273,7 +316,7 @@ class NewDevieFragment :BaseFragment(){
                 showInstallDeviceList()
             }
             R.id.create_group -> {
-                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -281,7 +324,7 @@ class NewDevieFragment :BaseFragment(){
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -313,12 +356,19 @@ class NewDevieFragment :BaseFragment(){
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL,activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+        val timer = Timer()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                val inputManager = textGp.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputManager.showSoftInput(textGp, 0)
+            }
+        }, 200)
     }
 
     fun myPopViewClickPosition(x: Float, y: Float) {
@@ -351,16 +401,16 @@ class NewDevieFragment :BaseFragment(){
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 //        refreshData()
-        if(requestCode==CREATE_SCENE_REQUESTCODE){
+        if (requestCode == CREATE_SCENE_REQUESTCODE) {
             callbackLinkMainActAndFragment?.changeToScene()
         }
     }
 
-    var callbackLinkMainActAndFragment: CallbackLinkMainActAndFragment?=null
+    var callbackLinkMainActAndFragment: CallbackLinkMainActAndFragment? = null
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if(context is CallbackLinkMainActAndFragment){
+        if (context is CallbackLinkMainActAndFragment) {
             callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
         }
     }
@@ -368,10 +418,11 @@ class NewDevieFragment :BaseFragment(){
     override fun onDetach() {
         super.onDetach()
         callbackLinkMainActAndFragment = null
+
     }
 
     private fun showInstallDeviceList() {
-        dialog_pop.visibility=View.GONE
-        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
+        dialog_pop.visibility = View.GONE
+        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide, isRgbClick)
     }
 }

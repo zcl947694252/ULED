@@ -12,8 +12,7 @@ object UserModel {
                 .clearUserData(token)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
-                .doOnNext {
-                }
+                .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
 }

@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupWindow;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -61,7 +62,14 @@ public class ManagerVerificationActivity extends TelinkBaseActivity {
         initToolbar();
         initData();
         initView();
+        PopupWindow  p = makeP();
     }
+
+    private static PopupWindow makeP() {
+        return null;
+
+    }
+
 
     private void initData() {
         phone = DBUtils.INSTANCE.getLastUser().getPhone();

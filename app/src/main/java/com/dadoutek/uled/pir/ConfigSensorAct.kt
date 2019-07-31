@@ -283,7 +283,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
                 } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
                     ToastUtils.showLong(getString(R.string.max_tip_brightness))
-                } else if (tietDelay.text.toString().toInt() > 30) {
+                } else if (tietDelay.text.toString().toInt() > 255) {
                     ToastUtils.showLong(getString(R.string.time_max_tip))
                 } else {
                     showLoadingDialog(getString(R.string.configuring_switch))

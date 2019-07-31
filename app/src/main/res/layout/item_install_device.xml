@@ -1,39 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="480dp"
-    android:layout_height="80dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/constraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
 
-    <android.support.constraint.ConstraintLayout
+    <ImageView
+        android:id="@+id/add_device_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_light_add_device"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <View
+        android:id="@+id/view2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <TextView
-            android:id="@+id/device_name"
-            android:text="ssssssss"
-            android:textSize="20sp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textColor="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            android:paddingStart="20dp"
-            android:paddingEnd="0dp"
-            android:layout_marginTop="20dp"
-            />
+        android:layout_height="4dp"
+        android:layout_marginStart="72dp"
+        android:background="#ffffff"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/add_device_image"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/device_describe"
-            android:text="11111111"
-            android:textSize="15sp"
-            android:layout_width="330dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/device_name"
-            app:layout_constraintStart_toStartOf="parent"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            />
-    </android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/device_describe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="11111111"
+        android:textColor="@color/black_nine"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="@+id/view2"
+        app:layout_constraintTop_toBottomOf="@+id/view2" />
+
+    <TextView
+        android:id="@+id/device_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ssssssss"
+        android:textColor="@color/black_three"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintStart_toStartOf="@+id/view2" />
+
 
 </android.support.constraint.ConstraintLayout>

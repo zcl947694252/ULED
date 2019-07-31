@@ -23,6 +23,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
@@ -32,6 +34,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.connector.ConnectorBatchGroupActivity
+import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -42,6 +46,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -85,7 +90,8 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener {
+class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener, View.OnClickListener {
+
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
@@ -111,6 +117,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private var recyclerView: RecyclerView? = null
     private var mConnectSnackBar: Snackbar? = null
     private var mScanSnackBar: Snackbar? = null
+    private var strLight: String? = null
 
     override fun onStart() {
         super.onStart()
@@ -150,6 +157,59 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 lazyLoad()
             }
         })
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.light_add_device_btn -> {
+                if (strLight == "cw_light") {
+                    if (DBUtils.getAllNormalLight().size == 0) {
+                        intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+                        startActivityForResult(intent, 0)
+                    } else {
+                        addDevice()
+                    }
+                } else if (strLight == "rgb_light") {
+                    if (DBUtils.getAllRGBLight().size == 0) {
+                        intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
+                        startActivityForResult(intent, 0)
+                    } else {
+                        addDevice()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun addDevice() {
+        if (strLight == "cw_light") {
+//            val intent = Intent(this, DeviceDetailAct::class.java)
+//            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_CW)
+//            intent.putExtra("cw_light_name", group.name)
+            val intent = Intent(this,
+                    BatchGroupActivity::class.java)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+            intent.putExtra("lightType", "cw_light")
+            intent.putExtra("cw_light_group_name", group.name)
+            startActivity(intent)
+        } else if (strLight == "rgb_light") {
+//            val intent = Intent(this, DeviceDetailAct::class.java)
+//            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_RGB)
+//            intent.putExtra("rgb_light_name", group.name)
+            val intent = Intent(this,
+                    RgbBatchGroupActivity::class.java)
+            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+            intent.putExtra("lightType", "rgb_light")
+            intent.putExtra("rgb_light_group_name", group.name)
+//            startActivity(intent)
+            startActivity(intent)
+        }
     }
 
     fun lazyLoad() {
@@ -235,12 +295,18 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun initParameter() {
         this.group = this.intent.extras!!.get("group") as DbGroup
+        this.strLight = this.intent.extras!!.get("light") as String
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
     }
 
     override fun onResume() {
         super.onResume()
+        initToolbar()
+        initParameter()
+        initData()
+        initView()
+        initOnLayoutListener()
 //        initData()
 //        initView()
 //        Thread {
@@ -308,6 +374,42 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             filter("", false)
         } else {
             lightList = DBUtils.getLightByGroupID(group.id)
+        }
+
+        if (lightList.size > 0) {
+            recycler_view_lights.visibility = View.VISIBLE
+            no_light.visibility = View.GONE
+            if (strLight == "cw_light") {
+                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                batchGroup.setText(R.string.batch_group)
+                batchGroup.setOnClickListener(View.OnClickListener {
+                    val intent = Intent(this,
+                            BatchGroupActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent.putExtra("lightType", "cw_light_group")
+                    intent.putExtra("group", group.id.toInt())
+                    startActivity(intent)
+                })
+            } else if (strLight == "rgb_light") {
+                var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+                toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+                batchGroup.setText(R.string.batch_group)
+                batchGroup.setOnClickListener(View.OnClickListener {
+                    val intent = Intent(this,
+                            BatchGroupActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent.putExtra("lightType", "rgb_light_group")
+                    intent.putExtra("group", group.id.toInt())
+                    startActivity(intent)
+                })
+            }
+        } else {
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
+            recycler_view_lights.visibility = View.GONE
+            no_light.visibility = View.VISIBLE
         }
     }
 
@@ -408,16 +510,44 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
-        recyclerView=findViewById(R.id.recycler_view_lights)
+        light_add_device_btn.setOnClickListener(this)
+        recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
         adapter = LightsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, lightList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
         adapter!!.bindToRecyclerView(recyclerView)
-        for (i in lightList.indices) {
-            lightList[i].updateIcon()
+        if (strLight == "cw_light") {
+            for (i in lightList.indices) {
+                lightList[i].updateIcon()
+            }
+        } else if (strLight == "rgb_light") {
+            for (i in lightList.indices) {
+                lightList[i].updateRgbIcon()
+            }
         }
+
+        if (strLight == "cw_light") {
+            if (DBUtils.getAllNormalLight().size == 0) {
+                light_add_device_btn.text = getString(R.string.device_scan_scan)
+            } else {
+                light_add_device_btn.text = getString(R.string.add_device)
+            }
+        } else if (strLight == "rgb_light") {
+            if (DBUtils.getAllRGBLight().size == 0) {
+                light_add_device_btn.text = getString(R.string.device_scan_scan)
+            } else {
+                light_add_device_btn.text = getString(R.string.add_device)
+            }
+        }
+
+//        if(DBUtils.allLight.isNotEmpty()){
+//            light_add_device_btn.text = getString(R.string.device_scan_scan)
+//        }else{
+//            light_add_device_btn.text = getString(R.string.add_device)
+//        }
     }
+
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentLight = lightList[position]
@@ -428,46 +558,51 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
 //                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
 //                        byteArrayOf(0x01, 0x00, 0x00))
-                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,true,false)
-                }else{
-                    Commander.openOrCloseLights(currentLight!!.meshAddr,true)
+                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                } else {
+                    Commander.openOrCloseLights(currentLight!!.meshAddr, true)
                 }
 
                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
 //                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
 //                        byteArrayOf(0x00, 0x00, 0x00))
-                if(currentLight!!.productUUID==DeviceType.SMART_CURTAIN){
-                    Commander.openOrCloseCurtain(currentLight!!.meshAddr,false,false)
-                }else{
-                    Commander.openOrCloseLights(currentLight!!.meshAddr,false)
+                if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
+                    Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                } else {
+                    Commander.openOrCloseLights(currentLight!!.meshAddr, false)
                 }
                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
             }
 
-            currentLight!!.updateIcon()
+            if (strLight == "cw_light") {
+                currentLight!!.updateIcon()
+            } else if (strLight == "rgb_light") {
+                currentLight!!.updateRgbIcon()
+            }
+//            currentLight!!.updateIcon()
             DBUtils.updateLight(currentLight!!)
             runOnUiThread {
                 adapter?.notifyDataSetChanged()
             }
         } else
             if (view.id == R.id.tv_setting) {
-            if (scanPb.visibility != View.VISIBLE) {
-                //判断是否为rgb灯
-                var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
-                if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                    intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
-                    intent.putExtra(Constant.TYPE_VIEW,Constant.TYPE_LIGHT)
+                if (scanPb.visibility != View.VISIBLE) {
+                    //判断是否为rgb灯
+                    var intent = Intent(this@LightsOfGroupActivity, NormalSettingActivity::class.java)
+                    if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                        intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                    }
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                    startActivityForResult(intent, REQ_LIGHT_SETTING)
+                } else {
+                    ToastUtils.showShort(R.string.reconnecting)
                 }
-                intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
-                intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                startActivityForResult(intent, REQ_LIGHT_SETTING)
-            } else {
-                ToastUtils.showShort(R.string.reconnecting)
             }
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -558,12 +693,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     fun autoConnect() {
         //检查是否支持蓝牙设备
         if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
-            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    var root=findViewById<ConstraintLayout>(R.id.configPirRoot)
+                    var root = findViewById<ConstraintLayout>(R.id.configPirRoot)
                     root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
@@ -571,17 +706,17 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
-                     GlobalScope.launch(Dispatchers.Main) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         showOpenLocationServiceDialog()
                     }
                 } else {
-                     GlobalScope.launch(Dispatchers.Main) {
+                    GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
                     mTelinkLightService = TelinkLightService.Instance()
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                             GlobalScope.launch(Dispatchers.Main) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
                                 startScan()
@@ -590,7 +725,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                         }
 
                     } else {
-                         GlobalScope.launch(Dispatchers.Main) {
+                        GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
@@ -690,7 +825,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun connect(mac: String) {
         try {
             mCheckRssiDisposal?.dispose()
-            mCheckRssiDisposal=RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+            mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
                     .subscribe {
                         if (it) {
@@ -706,7 +841,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
                     }
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -833,7 +968,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
                 TelinkLightService.Instance().enableNotification()
                 TelinkLightService.Instance().updateNotification()
-                 GlobalScope.launch(Dispatchers.Main) {
+                GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE
@@ -849,9 +984,9 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 adapter?.notifyDataSetChanged()
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
-//            LightAdapter.STATUS_LOGOUT -> {
-//                retryConnect()
-//            }
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
             LightAdapter.STATUS_CONNECTING -> {
                 Log.d("connectting", "444")
                 scanPb.visibility = View.VISIBLE

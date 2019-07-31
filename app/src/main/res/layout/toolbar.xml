@@ -8,13 +8,13 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="match_parent"
         android:background="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/ToolBarTheme"
-        >
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        app:popupTheme="@style/ToolBarTheme">
 
         <TextView
             android:id="@+id/toolbarTv"
@@ -22,8 +22,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textColor="@android:color/white"
-            android:visibility="gone"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:visibility="visible" />
 
 
         <ImageView
@@ -31,128 +31,121 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:src="@drawable/add"
-            android:visibility="gone"
             android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:paddingEnd="14dp"
+            android:padding="5dp"
+            android:src="@drawable/add"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tv_function1"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:gravity="center"
-            android:visibility="gone"
-            android:textColor="@color/white"
-            android:text="@string/install_device"
             android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:padding="5dp"
+            android:text="@string/install_device"
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/img_function2"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:src="@drawable/ic_delete_white_24dp"
-            android:visibility="gone"
             android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:src="@drawable/ic_delete_white_24dp"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/image_bluetooth"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:paddingTop="@dimen/dp_10"
             android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:src="@drawable/bluetooth_no"
-            android:visibility="gone"
-            android:foreground="?android:attr/selectableItemBackground" />
+            android:paddingBottom="@dimen/dp_10"
+            android:paddingEnd="@dimen/dp_10"
+            android:src="@drawable/bluetooth_no" />
 
         <TextView
             android:id="@+id/btnStopGradient"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:visibility="gone"
+            android:paddingEnd="8dp"
             android:text="@string/stop"
-            android:textSize="16sp"
             android:textColor="@android:color/white"
-            android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:textSize="16sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvOta"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:visibility="gone"
+            android:paddingEnd="8dp"
             android:text="@string/ota"
-            android:textSize="16sp"
             android:textColor="@android:color/white"
-            android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:textSize="16sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvRename"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
+            android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:paddingStart="16dp"
-            android:paddingEnd="14dp"
-            android:visibility="gone"
+            android:paddingEnd="8dp"
             android:text="@string/rename"
-            android:textSize="16sp"
             android:textColor="@android:color/white"
-            android:foreground="?android:attr/selectableItemBackground"
-            />
+            android:textSize="16sp"
+            android:visibility="gone" />
 
         <com.dadoutek.uled.widget.AutoTextSizeEditText
             android:id="@+id/editTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignWithParentIfMissing="false"
-            android:singleLine="true"
-            android:maxLength="50"
-            android:textSize="18sp"
             android:layout_gravity="center"
-            android:text=""
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textCursorDrawable="@drawable/edit_cursor"
             android:background="@null"
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:imeOptions="actionDone"
+            android:maxLength="50"
+            android:singleLine="true"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textCursorDrawable="@drawable/edit_cursor"
+            android:textSize="18sp"
             android:visibility="gone"
-            app:aet_autoSizeTextType="uniform"
             app:aet_autoSizeMaxTextSize="18sp"
             app:aet_autoSizeMinTextSize="10sp"
-            />
+            app:aet_autoSizeTextType="uniform" />
 
         <TextView
             android:id="@+id/titleCenterName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@color/white"
             android:layout_gravity="center"
-            android:singleLine="true"
-            android:visibility="gone"
-            />
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="visible" />
     </android.support.v7.widget.Toolbar>
 
 

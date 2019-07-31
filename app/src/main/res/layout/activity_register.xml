@@ -1,125 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout_editor_absoluteY="25dp"
+    android:background="#ffffff"
     >
 
-    <include
-        android:id="@+id/tb"
-        layout="@layout/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="0dp" />
+    <!--<include-->
+        <!--android:id="@+id/tb"-->
+        <!--layout="@layout/toolbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp" />-->
 
-    <android.support.design.widget.TextInputLayout
+    <ImageView
+        android:id="@+id/return_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_return"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="20dp"
+        />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/login_bg"
+        app:layout_constraintBottom_toBottomOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintStart_toStartOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="30dp"
+        android:paddingEnd="4dp"
+        android:paddingStart="4dp"
+        android:text="@string/register_title_name"
+        android:textColor="@color/black_three"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/return_image"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/welcome_register"
+        android:textColor="@color/black_three"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <com.hbb20.CountryCodePicker
+        android:id="@+id/ccp"
+        android:layout_width="70dp"
+        android:layout_height="40dp"
+        app:ccpDialog_showCloseIcon="true"
+        app:ccpDialog_showTitle="false"
+        app:ccp_autoDetectLanguage="true"
+        app:ccp_defaultNameCode="CN"
+        app:ccp_showFlag="false"
+        app:ccp_showNameCode="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/return_image"
+        app:layout_constraintVertical_bias="0.22000003" />
+
+    <EditText
         android:id="@+id/edit_user_phone"
-        android:layout_width="240dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
+        android:hint="@string/please_phone_number"
+        android:inputType="phone"
+        android:maxLength="16"
+        android:maxLines="1"
+        android:textColor="@color/black_three"
+        android:textColorHint="@color/black_ee"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/ccp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/ccp"
         app:layout_constraintTop_toTopOf="@+id/ccp"
-        >
+        app:layout_constraintVertical_bias="0.07999998" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/edit_phone"
-            android:inputType="phone"
-            android:maxLength="16"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:padding="5dp"
-            />
-    </android.support.design.widget.TextInputLayout>
+    <EditText
+        android:id="@+id/edit_verification"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:hint="@string/please_code"
+        android:inputType="phone"
+        android:maxLength="16"
+        android:visibility="gone"
+        android:maxLines="1"
+        android:textColor="@color/black_three"
+        android:textColorHint="@color/black_ee"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
+        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
+
+    <Button
+        android:id="@+id/btn_send_verification"
+        style="@style/VerificationButtonStyle"
+        android:text="@string/get_verification_code"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/edit_verification"
+        app:layout_constraintTop_toTopOf="@+id/edit_verification" />
 
 
-    <com.hbb20.CountryCodePicker
-        android:id="@+id/ccp"
-        android:layout_width="70dp"
-        android:layout_height="50dp"
-        android:gravity="bottom"
-        app:ccp_countryPreference="CN,AU"
-        app:ccp_defaultNameCode="CN"
-        app:ccp_showFlag="false"
-        app:ccp_showNameCode="false"
-        app:ccp_autoDetectLanguage="true"
-        app:ccpDialog_showTitle="false"
-        app:ccpDialog_showCloseIcon="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.13"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tb"
-        app:layout_constraintVertical_bias="0.19999999" />
-
-    <android.support.design.widget.TextInputLayout
+    <EditText
         android:id="@+id/edit_user_password"
-        android:layout_width="310dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintStart_toStartOf="@+id/ccp"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone"
-        app:passwordToggleEnabled="true">
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:hint="@string/please_password"
+        android:inputType="textPassword"
+        android:maxLength="16"
+        android:maxLines="1"
+        android:visibility="gone"
+        android:textColor="@color/black_three"
+        android:textColorHint="@color/black_ee"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/edit_verification"
+        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/edit_verification" />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/set_password"
-            android:inputType="textPassword"
-            android:maxLength="16"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:padding="5dp"
-            />
-    </android.support.design.widget.TextInputLayout>
+    <ImageView
+        android:id="@+id/image_password_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dp_10"
+        android:src="@drawable/icon_turn"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_user_password"
+        app:layout_constraintEnd_toEndOf="@+id/edit_user_password"
+        app:layout_constraintTop_toTopOf="@+id/edit_user_password" />
+
+
+    <EditText
+        android:id="@+id/again_password"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="30dp"
+        android:hint="@string/please_again_password"
+        android:inputType="textPassword"
+        android:textColorHint="@color/black_ee"
+        android:maxLength="16"
+        android:visibility="gone"
+        android:maxLines="1"
+        android:textColor="@color/black_three"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/edit_user_password"
+        app:layout_constraintStart_toStartOf="@+id/textView2"
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_password" />
+
+    <ImageView
+        android:id="@+id/image_again_password_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dp_10"
+        android:visibility="gone"
+        android:src="@drawable/icon_turn"
+        app:layout_constraintBottom_toBottomOf="@+id/again_password"
+        app:layout_constraintEnd_toEndOf="@+id/again_password"
+        app:layout_constraintTop_toTopOf="@+id/again_password" />
 
 
     <Button
         android:id="@+id/register_completed"
-        android:layout_width="310dp"
-        android:layout_height="58dp"
-        android:text="@string/register"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="300dp"
+        android:layout_height="44dp"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="68dp"
+        android:layout_marginEnd="38dp"
+        android:background="@drawable/btn_rec_black_bt"
+        android:text="@string/next"
+        android:textColor="@color/black_three"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.481"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_verification"
-        app:layout_constraintVertical_bias="0.79" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
 
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/edit_verification"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="32dp"
-        app:layout_constraintStart_toStartOf="@+id/edit_user_password"
-        app:layout_constraintTop_toBottomOf="@+id/edit_user_password">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/VerificationCode"
-            android:inputType="number"
-            android:maxLength="16"
-            android:maxLines="1"
-            android:padding="5dp"
-            android:singleLine="true"
-            />
-    </android.support.design.widget.TextInputLayout>
-
-    <Button
-        android:id="@+id/btn_send_verification"
-        android:layout_width="110dp"
-        android:layout_height="50dp"
-        android:text="@string/btn_get_verificationCode"
-        android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@+id/edit_verification"
-        app:layout_constraintTop_toTopOf="@+id/edit_verification" />
 
 </android.support.constraint.ConstraintLayout>

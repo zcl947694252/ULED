@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class FileListAdapter extends BaseAdapter {
 
+
+
     private Context mContext;
     private List<File> mFiles;
 
@@ -53,9 +55,9 @@ public class FileListAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.item_file_list, null);
             holder = new ViewHolder();
-            holder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
-            holder.iv_icon = (ImageView) convertView.findViewById(R.id.iv_icon);
-            holder.iv_right = (ImageView) convertView.findViewById(R.id.iv_right);
+            holder.tv_name =  convertView.findViewById(R.id.tv_name);
+            holder.iv_icon =  convertView.findViewById(R.id.iv_icon);
+            holder.iv_right =  convertView.findViewById(R.id.iv_right);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

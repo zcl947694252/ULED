@@ -159,4 +159,7 @@ object NetworkStatusCode {
     const val ERROR_CLIEN=50000
     //服务器异常
 
+    const val ERROR_NO_PASSOWRD = 20007
+    //没有密码
+
 }

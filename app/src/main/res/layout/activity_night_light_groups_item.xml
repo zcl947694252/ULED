@@ -1,31 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="wrap_content"
     android:gravity="center_vertical">
+
     <android.support.constraint.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:id="@+id/layout"
+        android:layout_width="100dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/bg_choose_group"
+        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
             android:id="@+id/tvGroupName"
-            android:text="组1"
-            android:textSize="18sp"
-            android:layout_width="wrap_content"
+            android:layout_width="56dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:singleLine="true"
-            android:paddingEnd="8dp"
-            />
+            android:text="123456789123"
+            android:textSize="15sp"
+            android:textColor="@color/white"
+            android:layout_marginStart="5dp"
+            android:ellipsize="end"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/imgDelete"
-            app:layout_constraintEnd_toEndOf="@id/tvGroupName"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:src="@drawable/delete"
-            />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/delete_group"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </android.support.constraint.ConstraintLayout>
-</LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

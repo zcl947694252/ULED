@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -121,6 +122,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     ConstraintLayout topView;
     @BindView(R.id.scanPb)
     MaterialProgressBar scanPb;
+    @BindView(R.id.add_group_relativeLayout)
+    RelativeLayout add_relativeLayout;
+    @BindView(R.id.add_group)
+    RelativeLayout add_group;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -146,6 +151,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
 
     private Disposable mTimer;
     private int mRetryCount = 0;
+
+    private String lightType;
+
+    private String groupLight;
 
     //当前所选组index
     private int currentGroupIndex = -1;
@@ -364,6 +373,13 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 disposable.dispose();
         }
 
+        for(int i =0;i<nowLightList.size();i++){
+            if(nowLightList.get(i).selected){
+                nowLightList.get(i).selected = false;
+            }
+        }
+
+
         finish();
     }
 
@@ -524,7 +540,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 if (light.getBelongGroupId() != allLightId) {
                     nowLightList.get(i).hasGroup = true;
                     nowLightList.get(i).setBelongGroupId(group.getId());
-                    nowLightList.get(i).setName(getString(R.string.unnamed));
+                    nowLightList.get(i).setName(light.getName());
                     DBUtils.INSTANCE.updateLight(light);
                 } else {
                     nowLightList.get(i).hasGroup = false;
@@ -611,6 +627,23 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         layoutmanager = new LinearLayoutManager(this);
         layoutmanager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewGroups.setLayoutManager(layoutmanager);
+
+        if(lightType.equals("cw_light")){
+            add_relativeLayout.setVisibility(View.GONE);
+            add_group.setVisibility(View.GONE);
+            groupsBottom.setVisibility(View.GONE);
+        }else{
+            groupsBottom.setVisibility(View.VISIBLE);
+            if (groups.size() > 0) {
+                groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+                recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+                add_relativeLayout.setVisibility(View.GONE);
+                add_group.setVisibility(View.VISIBLE);
+            } else {
+                add_relativeLayout.setVisibility(View.VISIBLE);
+                add_group.setVisibility(View.GONE);
+            }
+        }
 
         groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
         recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
@@ -728,6 +761,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             }
         }
 
+        groupsRecyclerViewAdapter = new GroupsRecyclerViewAdapter(groups, onRecyclerviewItemClickListener, onRecyclerviewItemLongClickListener);
+        recyclerViewGroups.setAdapter(groupsRecyclerViewAdapter);
+        add_relativeLayout.setVisibility(View.GONE);
+        add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
@@ -816,7 +853,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         //设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_rgb_batch_group);
+        setContentView(R.layout.activity_batch_group);
         ButterKnife.bind(this);
         initData();
         initView();
@@ -830,7 +867,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             @Override
             public void onGlobalLayout() {
                 view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                lazyLoad();
+//                lazyLoad();
             }
         });
     }
@@ -930,13 +967,40 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
         List <DbLight> list=DBUtils.INSTANCE.getAllRGBLight();
-        this.adapter = new DeviceListAdapter(list,this);
-        nowLightList.addAll(list);
+        List<DbLight> no_list = new ArrayList<>();
+        List<DbLight> group_list = new ArrayList<>();
+        List<DbLight> all_light =new ArrayList<>();
+
+        for (int i = 0; i < list.size(); i++) {
+            if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.getInstance().getString(R.string.not_grouped))) {
+                no_list.add(list.get(i));
+            } else {
+                group_list.add(list.get(i));
+            }
+        }
+
+        if (no_list.size() > 0) {
+            for (int i = 0; i < no_list.size(); i++){
+                all_light.add(no_list.get(i));
+            }
+        }
+
+        if(group_list.size()>0){
+            for (int i = 0; i < group_list.size(); i++){
+                all_light.add(group_list.get(i));
+            }
+        }
+        this.adapter = new DeviceListAdapter(all_light,this);
+        nowLightList.addAll(all_light);
+
+
 
         groupsBottom = findViewById(R.id.groups_bottom);
         recyclerViewGroups = findViewById(R.id.recycler_view_groups);
         this.btnAddGroups = findViewById(R.id.btn_add_groups);
         this.groupingCompleted = findViewById(R.id.grouping_completed);
+        this.add_group = (RelativeLayout) this.findViewById(R.id.add_group);
+        this.add_relativeLayout = (RelativeLayout) this.findViewById(R.id.add_group_relativeLayout);
         this.groupingCompleted.setBackgroundColor(getResources().getColor(R.color.gray));
         this.btnLog = findViewById(R.id.btn_log);
         this.btnScan = (Button) this.findViewById(R.id.btn_scan);
@@ -945,6 +1009,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         deviceListView = this.findViewById(R.id.list_devices);
         deviceListView.setAdapter(this.adapter);
         this.updateList = new ArrayList<>();
+
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
 
         startGrouping();
     }
@@ -955,16 +1023,36 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     };
 
     private void initToolbar() {
-        toolbar.setTitle(R.string.batch_group);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+//        toolbar.setTitle(R.string.batch_group);
+//        setSupportActionBar(toolbar);
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setDisplayHomeAsUpEnabled(true);
+//        }
+        if(lightType.equals("rgb_light")){
+            toolbar.setTitle(groupLight);
+            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+            toolbar.setOnMenuItemClickListener(this);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
+        }else{
+            toolbar.setTitle(R.string.batch_group);
+            toolbar.inflateMenu(R.menu.menu_grouping_select_all);
+            toolbar.setOnMenuItemClickListener(this);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_grouping_select_all, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -981,6 +1069,10 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
     private void initData() {
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        lightType = intent.getStringExtra("lightType");
+        if(lightType.equals("rgb_light")){
+            groupLight = intent.getStringExtra("rgb_light_group_name");
+        }
         allLightId = DBUtils.INSTANCE.getGroupByMesh(0xffff).getId();
 
         this.mApplication = (TelinkLightApplication) this.getApplication();
@@ -998,22 +1090,58 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             }
         }
 
-        if (groups.size() > 1) {
-            for (int i = 0; i < groups.size(); i++) {
-                if (i == groups.size() - 1) {
-                    groups.get(i).checked = true;
-                    currentGroupIndex = i;
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
-                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
-                } else {
-                    groups.get(i).checked = false;
+        if(lightType.equals("rgb_light")){
+            if (groups.size() > 0) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (groups.get(i).getName().equals(groupLight)) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
                 }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
             }
-            initHasGroup = true;
-        } else {
-            initHasGroup = false;
-            currentGroupIndex = -1;
+        }else {
+            if (groups.size() > 0) {
+                for (int i = 0; i < groups.size(); i++) {
+                    if (i ==0) {
+                        groups.get(i).checked = true;
+                        currentGroupIndex = i;
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                    } else {
+                        groups.get(i).checked = false;
+                    }
+                }
+                initHasGroup = true;
+            } else {
+                initHasGroup = false;
+                currentGroupIndex = -1;
+            }
         }
+
+//        if (groups.size() > 1) {
+//            for (int i = 0; i < groups.size(); i++) {
+//                if (i == groups.size() - 1) {
+//                    groups.get(i).checked = true;
+//                    currentGroupIndex = i;
+//                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+//                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+//                } else {
+//                    groups.get(i).checked = false;
+//                }
+//            }
+//            initHasGroup = true;
+//        } else {
+//            initHasGroup = false;
+//            currentGroupIndex = -1;
+//        }
     }
 
     @Override
@@ -1069,6 +1197,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         public ImageView icon;
         public TextView txtName;
         public CheckBox selected;
+        public TextView lightName;
     }
 
     final class DeviceListAdapter extends BaseAdapter {
@@ -1108,12 +1237,14 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             TextView txtName = (TextView) convertView
                     .findViewById(R.id.txt_name);
             CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
+            TextView lightName = (TextView) convertView.findViewById(R.id.light_name);
 
             holder = new DeviceItemHolder();
 
             holder.icon = icon;
             holder.txtName = txtName;
             holder.selected = selected;
+            holder.lightName = lightName;
 
             convertView.setTag(holder);
 
@@ -1122,14 +1253,14 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
 
             holder.txtName.setText(light.getName());
             if(light.getProductUUID()== DeviceType.LIGHT_RGB){
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_rgblight);
             }
             else{
-                holder.icon.setImageResource(R.drawable.icon_light_on);
+                holder.icon.setImageResource(R.drawable.icon_rgblight_down);
             }
 
             holder.selected.setChecked(light.selected);
-
+            holder.lightName.setText(light.getName());
             holder.txtName.setText(getDeviceName(light));
             holder.icon.setVisibility(View.VISIBLE);
             holder.selected.setVisibility(View.VISIBLE);

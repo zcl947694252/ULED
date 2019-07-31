@@ -225,7 +225,7 @@ public class DbCurtain implements Serializable {
         } else if (this.connectionStatus == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.curtain_off;
         } else if (this.connectionStatus == ConnectionStatus.ON.getValue()) {
-            this.icon = R.drawable.curtain_on;
+            this.icon = R.drawable.icon_curtain;
         }
     }
 }

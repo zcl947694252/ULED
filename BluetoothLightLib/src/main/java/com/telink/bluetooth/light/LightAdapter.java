@@ -124,6 +124,7 @@ public class LightAdapter {
     private Handler mScanDelayHandler;
 
     private HandlerThread mThread;
+    private boolean aBoolean;
 
     /********************************************************************************
      * Public API
@@ -139,7 +140,7 @@ public class LightAdapter {
 
     synchronized public void setMode(int value) {
         this.mode.getAndSet(value);
-        TelinkLog.d("set mode : " + value);
+        TelinkLog.e("set mode : " + value);
     }
 
     private String getModeStr(int value) {
@@ -167,7 +168,7 @@ public class LightAdapter {
 
     synchronized public void start(Context context) {
 
-        TelinkLog.d("light mAdapter start");
+        TelinkLog.e("light mAdapter start");
 
         if (this.isStarted.get())
             return;
@@ -222,7 +223,7 @@ public class LightAdapter {
 
     synchronized public void stop() {
 
-        TelinkLog.d("light mAdapter stop");
+        TelinkLog.e("light mAdapter stop");
 
         if (!this.isStarted.get())
             return;
@@ -284,7 +285,8 @@ public class LightAdapter {
         if (index == -1)
             return false;
 
-        TelinkLog.d("LightAdapter#connect");
+        TelinkLog.e("LightAdapter#connect");
+
         LightPeripheral light = this.mScannedLights.get(mac);
         this.connect(light, timeoutSeconds);
         return true;
@@ -294,7 +296,7 @@ public class LightAdapter {
 
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#disconnect");
+        TelinkLog.e("LightAdapter#disconnect");
         this.mLightCtrl.disconnect();
     }
 
@@ -320,7 +322,7 @@ public class LightAdapter {
             Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
             return false;
         }
-        TelinkLog.d("LightAdapter#login");
+        TelinkLog.e("LightAdapter#login");
         this.mLightCtrl.login(meshName, password);
         return true;
     }
@@ -331,7 +333,7 @@ public class LightAdapter {
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
         if (light == null || !this.mLightCtrl.isLogin())
             return false;
-        TelinkLog.d("LightAdapter#startOta");
+        TelinkLog.e("LightAdapter#startOta");
         this.mLightCtrl.startOta(firmware);
         return true;
     }
@@ -342,7 +344,7 @@ public class LightAdapter {
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
         if (light == null || !light.isConnected())
             return false;
-        TelinkLog.d("LightAdapter#getFirmwareVersion");
+        TelinkLog.e("LightAdapter#getFirmwareVersion");
         this.mLightCtrl.requestFirmware();
         return true;
     }
@@ -428,12 +430,17 @@ public class LightAdapter {
 
     synchronized public void startScan(Parameters params, Callback callback) {
 
-        if (!this.isStarted.get())
+        aBoolean = this.isStarted.get();
+        TelinkLog.e("返回数据是:"+aBoolean+"-------"+mode);
+        
+        if (!aBoolean)
             return;
 
-        if (this.getMode() == MODE_SCAN_MESH)
+        int mode = this.getMode();
+        if (mode == MODE_SCAN_MESH){
             return;
-        TelinkLog.d("LightAdapter#startLeScan");
+        }
+        TelinkLog.e("LightAdapter#startLeScan");
         this.setMode(MODE_IDLE);
 
 //        stopLeScan();
@@ -456,7 +463,7 @@ public class LightAdapter {
 
         if (this.getMode() == MODE_UPDATE_MESH)
             return;
-        TelinkLog.d("LightAdapter#updateMesh");
+        TelinkLog.e("LightAdapter#updateMesh");
         this.setMode(MODE_IDLE);
 
         stopLeScan();
@@ -520,7 +527,7 @@ public class LightAdapter {
 
         if (this.getMode() == MODE_AUTO_CONNECT_MESH)
             return;
-        TelinkLog.d("LightAdapter#autoConnect");
+        TelinkLog.e("LightAdapter#autoConnect");
         this.setMode(MODE_IDLE);
 
 //        stopLeScan();
@@ -638,7 +645,7 @@ public class LightAdapter {
             return;
         if (this.getMode() == MODE_IDLE)
             return;
-        TelinkLog.d("LightAdapter#idleMode");
+        TelinkLog.e("LightAdapter#idleMode");
         this.setMode(MODE_IDLE);
         this.status.getAndSet(-1);
         this.enableLoop(false);
@@ -658,7 +665,7 @@ public class LightAdapter {
 
         if (this.getMode() == MODE_OTA)
             return;
-        TelinkLog.d("LightAdapter#startOta");
+        TelinkLog.e("LightAdapter#startOta");
         this.setMode(MODE_IDLE);
 
 //        LeBluetooth.getInstance().stopScan();
@@ -680,7 +687,7 @@ public class LightAdapter {
 
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#enableAutoRefreshNotify");
+        TelinkLog.e("LightAdapter#enableAutoRefreshNotify");
         this.autoRefreshParams = params;
         this.autoRefreshCount = 0;
         this.enableRefreshNotify(true);
@@ -690,7 +697,7 @@ public class LightAdapter {
 
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#disableAutoRefreshNotify");
+        TelinkLog.e("LightAdapter#disableAutoRefreshNotify");
         this.enableRefreshNotify(false);
         this.autoRefreshParams = null;
     }
@@ -698,28 +705,28 @@ public class LightAdapter {
     public void enableNotification() {
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#enableNotification");
+        TelinkLog.e("LightAdapter#enableNotification");
         this.mLightCtrl.enableNotification();
     }
 
     public void disableNotification() {
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#disableNotification");
+        TelinkLog.e("LightAdapter#disableNotification");
         this.mLightCtrl.disableNotification();
     }
 
     public void updateNotification() {
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#updateNotification");
+        TelinkLog.e("LightAdapter#updateNotification");
         this.mLightCtrl.updateNotification();
     }
 
     public void updateNotification(byte[] params) {
         if (!this.isStarted.get())
             return;
-        TelinkLog.d("LightAdapter#updateNotification-with-params");
+        TelinkLog.e("LightAdapter#updateNotification-with-params");
         this.mLightCtrl.updateNotification(params);
     }
 
@@ -739,7 +746,7 @@ public class LightAdapter {
             try {
                 light = filter.filter(device, rssi, scanRecord);
             } catch (Exception e) {
-                TelinkLog.d("Advertise Filter Exception : " + filter.toString() + "--" + e.getMessage(), e);
+                TelinkLog.e("Advertise Filter Exception : " + filter.toString() + "--" + e.getMessage(), e);
             }
 
             if (light != null)
@@ -760,7 +767,10 @@ public class LightAdapter {
 
         byte[] outOfMeshName;
 
-        byte[] meshName = Strings.stringToBytes(params.getString(Parameters.PARAM_MESH_NAME), 16);
+        String paramsString = params.getString(Parameters.PARAM_MESH_NAME);
+        if (paramsString==null)
+            return false;
+        byte[] meshName = Strings.stringToBytes(paramsString, 16);
         byte[] meshName1 = light.getMeshName();
 
         if (mode == MODE_SCAN_MESH) {
@@ -856,14 +866,14 @@ public class LightAdapter {
     }
 
     private void setStatus(int newStatus) {
-        TelinkLog.d("LightAdapter#setStatus:" + newStatus);
+        TelinkLog.e("LightAdapter#setStatus:" + newStatus);
         this.setStatus(newStatus, false, false);
     }
 
     // 上报错误信息
     private void reportError(int stateCode, int errorCode) {
         if (this.mCallback != null) {
-            TelinkLog.d("reportError: state-" + stateCode + " error-" + errorCode);
+            TelinkLog.e("reportError: state-" + stateCode + " error-" + errorCode);
             int deviceId = 0;
             if (stateCode != ErrorReportEvent.STATE_SCAN && this.mLightCtrl != null && this.mLightCtrl.getCurrentLight() != null) {
                 deviceId = this.mLightCtrl.getCurrentLight().getMeshAddress();
@@ -938,7 +948,7 @@ public class LightAdapter {
 
         @Override
         public void onScanFail(int errorCode) {
-            TelinkLog.d(" scan fail : " + errorCode);
+            TelinkLog.e(" scan fail : " + errorCode);
             if (mCallback != null)
                 mCallback.onError(errorCode);
         }
@@ -956,8 +966,7 @@ public class LightAdapter {
 
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-
-//            TelinkLog.d("Scan : " + device.getName() + "-" + device.getAddress());
+            TelinkLog.e("Scan : " + device.getName() + "-" + device.getAddress());
 
             if (scanEmpty.get()) {
                 scanEmpty.set(false);
@@ -988,7 +997,7 @@ public class LightAdapter {
             if (scanNoTarget.get()) {
                 scanNoTarget.set(false);
             }
-            TelinkLog.d("add scan result : " + device.getAddress());
+            TelinkLog.e("add scan result : " + device.getAddress());
 //            saveLog("add scan result : " + device.getAddress());
 
             int mode = getMode();
@@ -1038,23 +1047,20 @@ public class LightAdapter {
 
                 LightPeripheral light = mLightCtrl.getCurrentLight();
                 login(light);
-                Log.d("sggs", "onConnected: " + light.getMacAddress());
+//                Log.d("sggs", "onConnected: " + light.getMacAddress());
             } else {
                 mLightCtrl.requestFirmware();
             }
         }
 
         private void onLoginSuccess() {
-
-            TelinkLog.d("onLoginSuccess "
-                    + mLightCtrl.getCurrentLight().getMacAddress());
+            TelinkLog.e("onLoginSuccess " + mLightCtrl.getCurrentLight().getMacAddress());
 
             setStatus(STATUS_LOGIN, true);
 
             int mode = getMode();
 
             if (mode == MODE_UPDATE_MESH) {
-
                 setStatus(STATUS_UPDATING_MESH);
 
                 byte[] meshName = Strings.stringToBytes(mParams.getString(Parameters.PARAM_NEW_MESH_NAME), 16);
@@ -1090,7 +1096,7 @@ public class LightAdapter {
 
         private void onLoginFailure() {
 
-            TelinkLog.d("onLoginFail "
+            TelinkLog.e("onLoginFail "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
             int mode = getMode();
@@ -1123,7 +1129,7 @@ public class LightAdapter {
         }
 
         private void onNError() {
-            TelinkLog.d("onNError "
+            TelinkLog.e("onNError "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
             setStatus(STATUS_LOGOUT, true);
@@ -1197,7 +1203,7 @@ public class LightAdapter {
 
         private void onResetMeshSuccess() {
 
-            TelinkLog.d("onResetMeshSuccess "
+            TelinkLog.e("onResetMeshSuccess "
                     + mLightCtrl.getCurrentLight().getMacAddress());
 
             Log.d("Saw", "LightAdapter setStatus STATUS_UPDATE_MESH_COMPLETED");
@@ -1216,7 +1222,7 @@ public class LightAdapter {
 
         private void onResetMeshFailure(String reason) {
 
-            TelinkLog.d("onResetMeshFail "
+            TelinkLog.e("onResetMeshFail "
                     + mLightCtrl.getCurrentLight().getMacAddress()
                     + " error msg : " + reason);
 
@@ -1308,13 +1314,13 @@ public class LightAdapter {
     private final class OtaListener implements EventListener<Integer> {
 
         private void onOtaSuccess() {
-            TelinkLog.d("OTA Success");
+            TelinkLog.e("OTA Success");
             setStatus(STATUS_OTA_COMPLETED, true);
             setMode(MODE_IDLE);
         }
 
         private void onOtaFailure() {
-            TelinkLog.d("OTA Failure");
+            TelinkLog.e("OTA Failure");
             setStatus(STATUS_OTA_FAILURE, true);
             setMode(MODE_IDLE);
         }
@@ -1414,7 +1420,7 @@ public class LightAdapter {
 
             if ((currentTime - lastScanTime) >= timeoutSeconds) {
 
-                TelinkLog.d("scan timeout");
+                TelinkLog.e("scan timeout");
 
                 if (isSingleScan) {
                     setStatus(STATUS_MESH_SCAN_TIMEOUT);
@@ -1528,10 +1534,10 @@ public class LightAdapter {
             }
 
             if (light.isConnected()) {
-                TelinkLog.d("login");
+                TelinkLog.e("login");
                 login(light);
             } else {
-                TelinkLog.d("connect");
+                TelinkLog.e("connect");
                 connect(light, timeoutSeconds);
             }
         }
@@ -1600,7 +1606,7 @@ public class LightAdapter {
                     autoRefreshRunning = false;
                 } else {
                     autoRefreshCount = count;
-                    TelinkLog.d("AutoRefresh : " + count);
+                    TelinkLog.e("AutoRefresh : " + count);
                     mNotifyHandler.postDelayed(this, delay);
                 }
             } else if (repeat <= 0) {

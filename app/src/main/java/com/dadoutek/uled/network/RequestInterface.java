@@ -14,6 +14,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitch;
 import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
+import com.dadoutek.uled.model.ResponseVersionAvailable;
 
 import java.util.List;
 
@@ -43,16 +44,20 @@ public interface RequestInterface {
     Observable<Response<DbUser>> login(@Field("account") String account,
                                        @Field("password") String password);
 
-    @GET("auth/salt")
-    Observable<Response<String>> getsalt(@Query("account") String account);
-
-    @GET("auth/account")
-    Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
 
     @FormUrlEncoded
     @POST("auth/forget")
     Observable<Response<DbUser>> putPassword(@Field("account") String account,
                                              @Field("password") String password);
+
+    //获取salt值
+    @GET("auth/salt")
+    Observable<Response<String>> getsalt(@Query("account") String account);
+
+    @FormUrlEncoded
+    @POST("auth/login_SMS")
+    Observable<Response<DbUser>> smsLogin(@Field("phone") String phone);
+
 
     //用户注册相关接口
     @FormUrlEncoded
@@ -60,6 +65,10 @@ public interface RequestInterface {
     Observable<Response<DbUser>> register(@Field("phone") String phone,
                                           @Field("password") String password,
                                           @Field("name") String name);
+
+    //登录蓝牙使用
+    @GET("auth/account")
+    Observable<Response<String>> getAccount(@Query("phone") String phone, @Query("channel") String channel);
 
     //区域相关接口
 
@@ -84,8 +93,8 @@ public interface RequestInterface {
                                               @Body DbRegion dbRegion
 //                                              @Query("controlMesh") String controlMesh,
 //                                              @Query("controlMeshPwd") String controlMeshPwd,
-//                                              @Query("installMesh") String installMesh,
-//                                              @Query("installMeshPwd") String installMeshPwd
+//                                              @Query("installMesh") String dadousmart,
+//                                              @Query("installMeshPwd") String 123
     );
 
     //删除区域
@@ -191,8 +200,8 @@ public interface RequestInterface {
     //添加渐变
     @POST("dynamic-change/add/{did}")
     Observable<Response<String>> addGradient(@Header("token") String token,
-                                          @Body RequestBody body,
-                                          @Path("did") int did);
+                                             @Body RequestBody body,
+                                             @Path("did") int did);
 
     //获取渐变列表
     @GET("dynamic-change/list")
@@ -201,11 +210,11 @@ public interface RequestInterface {
     //更新渐变
     @POST("dynamic-change/add/{did}")
     Observable<Response<String>> updateGradient(@Header("token") String token,
-                                             @Path("did") int did,
-                                             @Body RequestBody body);
+                                                @Path("did") int did,
+                                                @Body RequestBody body);
 
     //删除渐变
-    @HTTP(method = "DELETE",path = "dynamic-change/remove",hasBody = true)
+    @HTTP(method = "DELETE", path = "dynamic-change/remove", hasBody = true)
 //    @DELETE("api/ext/soybean/dynamic-changeToScene/remove")
     Observable<Response<String>> deleteGradients(@Header("token") String token,
                                                  @Body DbDeleteGradientBody body);
@@ -222,14 +231,13 @@ public interface RequestInterface {
                                             @Query("email") String email,
                                             @Query("introduction") String introduction);
 
-
     @DELETE("auth/clear")
 //    @HTTP(method = "DELETE",path = "dauth/clear",hasBody = false)
     Observable<Response<String>> clearUserData(@Header("token") String token);
 
     //获取下载链接
     @GET("api/ext/soybean/download/bin/{l1}/{l2}")
-    Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1,@Path("l2") int l2);
+    Observable<Response<String>> getFirmwareUrl(@Path("l1") int l1, @Path("l2") int l2);
 
     //获取下载链接
     @GET("bin/download")
@@ -238,8 +246,8 @@ public interface RequestInterface {
     //添加开关
     @POST("switch/add/{lid}")
     Observable<Response<String>> addSwitch(@Header("token") String token,
-                                          @Body DbSwitchChild dbSwitch,
-                                          @Path("lid") int lid);
+                                           @Body DbSwitchChild dbSwitch,
+                                           @Path("lid") int lid);
 
     //获取开关列表
     @GET("switch/list")
@@ -248,15 +256,15 @@ public interface RequestInterface {
     //更新开关
     @POST("switch/add/{lid}")
     Observable<Response<String>> updateSwitch(@Header("token") String token,
-                                             @Path("lid") int lid,
-                                             @Body DbSwitchChild dbSwitch
+                                              @Path("lid") int lid,
+                                              @Body DbSwitchChild dbSwitch
     );
 
     //删除开关
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("switch/remove/{lid}")
     Observable<Response<String>> deleteSwitch(@Header("token") String token,
-                                             @Path("lid") int lid);
+                                              @Path("lid") int lid);
 
     //添加传感器
     @POST("sensor/add/{lid}")
@@ -284,8 +292,8 @@ public interface RequestInterface {
     //添加连接器
     @POST("relay/add/{lid}")
     Observable<Response<String>> addRely(@Header("token") String token,
-                                           @Body DbConnector dbConnector,
-                                           @Path("lid") int lid);
+                                         @Body DbConnector dbConnector,
+                                         @Path("lid") int lid);
 
     //获取连接器列表
     @GET("relay/list")
@@ -294,15 +302,15 @@ public interface RequestInterface {
     //更新连接器
     @POST("relay/add/{lid}")
     Observable<Response<String>> updateRely(@Header("token") String token,
-                                              @Path("lid") int lid,
-                                              @Body DbConnector dbConnector
+                                            @Path("lid") int lid,
+                                            @Body DbConnector dbConnector
     );
 
     //删除连接器
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("relay/remove/{lid}")
     Observable<Response<String>> deleteRely(@Header("token") String token,
-                                              @Path("lid") int lid);
+                                            @Path("lid") int lid);
 
     //添加窗帘
     @POST("curtain/add/{lid}")
@@ -329,6 +337,12 @@ public interface RequestInterface {
 
     @GET("app/isAvailable")
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)
-    Observable<Response<Object>> isAvailavle(@Query("platform") int device,
-                                             @Query("currentVersion") String version);
+    Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
+                                                               @Query("currentVersion") String version);
+
+    @GET("app/getNewVersion")
+    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero,@Query("lang") int zero_one);
+
+    @GET("auth/isRegister")
+    Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);
 }

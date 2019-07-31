@@ -44,14 +44,21 @@ public class DbGroup implements Serializable{
     @Transient
     public int textColor;//文字颜色
 
+    public int status = 1;//链接状态
+
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public boolean isSeek = true;
+
+
     @Generated(hash = 1966413977)
     public DbGroup() {
     }
 
-    @Generated(hash = 794192172)
+    @Generated(hash = 2096192422)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, int belongRegionId, Long deviceType, int index,
-            int color) {
+            int color, int status) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -61,6 +68,7 @@ public class DbGroup implements Serializable{
         this.deviceType = deviceType;
         this.index = index;
         this.color = color;
+        this.status = status;
     }
 
     public static long getSerialVersionUID() {
@@ -131,6 +139,14 @@ public class DbGroup implements Serializable{
         this.checked = checked;
     }
 
+    public boolean isSeek() {
+        return isSeek;
+    }
+
+    public void setSeek(boolean seek) {
+        isSeek = seek;
+    }
+
     public boolean isSelected() {
         return selected;
     }
@@ -161,5 +177,21 @@ public class DbGroup implements Serializable{
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public int getConnectionStatus() {
+        return this.status;
+    }
+
+    public void setConnectionStatus(int connectionStatus) {
+        this.status = connectionStatus;
+    }
+
+    public int getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

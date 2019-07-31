@@ -2,17 +2,22 @@ package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.arch.lifecycle.LiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -25,7 +30,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
@@ -82,8 +86,8 @@ import io.reactivex.schedulers.Schedulers;
  * 在OTA升级过程中会保存此时现在的所有设备信息（onlineLights），
  * 如果是从MainActivity页面跳转而来（1.自动连接的设备有上报MeshOTA进度信息；2主动连接之前本地保存的设备），需要读取一次版本信息\n
  * 并初始化onlineLights
- * 1. {@link MainActivity#onNotificationEvent(NotificationEvent)}；
- * 2. {@link MainActivity#onDeviceStatusChanged(DeviceEvent)}；
+ * 1. {@link MainActivity#//onNotificationEvent(NotificationEvent)}；
+ * 2. {@link MainActivity#//onDeviceStatusChanged(DeviceEvent)}；
  * <p>
  * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity#sendGetDeviceOtaStateCommand()},
  * \n\t 并通过 {@link OTAUpdateActivity#onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
@@ -154,7 +158,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private static final int TIME_OUT_CONNECT = 15;
     private Disposable mSendataDisposal;
     private long TIME_OUT_SENDDATA = 10;
-    private boolean OTA_IS_HAVEN_START=false;
+    private boolean OTA_IS_HAVEN_START = false;
 
     private Handler delayHandler = new Handler();
     @SuppressLint("HandlerLeak")
@@ -194,28 +198,28 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 ////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
 ////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                        LogUtils.d("\n" + time + ":" + msg.obj.toString());
+                        //("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }
         }
     };
 
-    private BroadcastReceiver mReceiver = new  BroadcastReceiver() {
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-                        String action = intent.getAction();
-            if (BluetoothAdapter.ACTION_STATE_CHANGED .equals(action) ) {
+            String action = intent.getAction();
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
 
                 switch (state) {
-                    case BluetoothAdapter.STATE_ON:{
+                    case BluetoothAdapter.STATE_ON: {
                         log("蓝牙打开");
                         TelinkLightService.Instance().idleMode(true);
                         TelinkLightService.Instance().disconnect();
                         LeBluetooth.getInstance().stopScan();
                     }
-                    case BluetoothAdapter.STATE_OFF:{
+                    case BluetoothAdapter.STATE_OFF: {
                         log("蓝牙关闭");
                         ToastUtils.showLong(R.string.tip_phone_ble_off);
                         TelinkLightService.Instance().idleMode(true);
@@ -225,23 +229,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 }
             }
         }
-//        override fun onReceive(context: Context, intent: Intent) {
-//            val action = intent.action
-//            if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-//                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-//
-//                when (state) {
-//                    BluetoothAdapter.STATE_ON -> {
-//                        TelinkLightService.Instance().idleMode(true)
-//                        retryConnectCount = 0
-//                        startScan()
-//                    }
-//                    BluetoothAdapter.STATE_OFF -> {
-//
-//                    }
-//                }
-//            }
-//        }
     };
 
     @Override
@@ -291,7 +278,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().enableNotification();
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         initToolbar();
         otaProgress = (TextView) findViewById(R.id.progress_ota);
         meshOtaProgress = (TextView) findViewById(R.id.progress_mesh_ota);
@@ -299,7 +286,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         sv_log = (ScrollView) findViewById(R.id.sv_log);
         tv_version = (TextView) findViewById(R.id.tv_version);
 
-        if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
+       /* if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
             mPath = SharedPreferencesUtils.getUpdateFilePath();
             tvFile.setText(getString(R.string.select_file, mPath));
             btn_start_update.setVisibility(View.VISIBLE);
@@ -307,10 +294,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             local_version.setText(getString(R.string.local_version, dbLight.version));
             server_version.setVisibility(View.VISIBLE);
             server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
-        }
+        }*/
     }
 
-        private void initToolbar() {
+    private void initToolbar() {
         toolbar.setTitle(R.string.ota_update_title);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -319,7 +306,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     }
 
-        @Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -336,7 +323,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 chooseFile();
                 break;
             case R.id.btn_start_update:
-                updateStep1();
+                beginToOta();
                 break;
         }
     }
@@ -537,15 +524,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
     }
 
-    private boolean isConnectting = false;
-
     @Override
     protected void onPause() {
         super.onPause();
         if (mWakeLock != null) {
             mWakeLock.acquire();
         }
-
         stopConnectTimer();
         stopScanTimer();
     }
@@ -590,8 +574,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             startScan();
         }
     }
-
-    AlertDialog.Builder mScanTimeoutDialog;
 
     private void log(String log) {
         msgHandler.obtainMessage(MSG_LOG, log).sendToTarget();
@@ -670,39 +652,119 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         } else {
             tv_version.setText("File Version: " + mFileVersion);
             tv_version.setVisibility(View.GONE);
+
+            local_version.setVisibility(View.VISIBLE);
+            local_version.setText(getString(R.string.local_version, dbLight.version));
+            server_version.setVisibility(View.VISIBLE);
+            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
+
             select.setEnabled(false);
             text_info.setVisibility(View.GONE);
             btn_start_update.setVisibility(View.VISIBLE);
-            btn_start_update.setClickable(false);
-//            btn_start_update.setText(R.string.updating);
-//            btn_start_update.setText(R.string.scan_and_connect);
-//            if (TelinkLightApplication.getApp().getConnectDevice() != null) {
-//                sendGetVersionCommand();
-//            } else {
-            if (TelinkLightApplication.getInstance().getConnectDevice() != null &&
-                    TelinkLightApplication.getInstance().getConnectDevice().meshAddress == dbLight.getMeshAddr()) {
-                startOTA();
-            } else {
-                startScan();
+            btn_start_update.setClickable(true);
+        }
+    }
+
+    private void beginToOta() {
+        if (TelinkLightApplication.getInstance().getConnectDevice() != null &&
+                TelinkLightApplication.getInstance().getConnectDevice().meshAddress == dbLight.getMeshAddr()) {
+            startOTA();
+        } else {
+            startScan();
+        }
+    }
+
+
+    private String getPathFour(Context context, Uri uri) {
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            String docId = DocumentsContract.getDocumentId(uri);
+            Log.e("zcl", "返回数据是uri:" + uri);
+
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                String[] split = docId.split(":");
+                String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    Log.e("zcl", "Storage返回数据是:" + Environment.getExternalStorageDirectory() + "/" + split[1]);
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+            }// DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+                Log.e("zcl", "*******************contentPrivode返回数据是:uri.getAuthority(uri)：" + uri.getAuthority());
+                // Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
+                // return getDataColumn(context, contentUri, null, null);
+                String s = docId.replace("/Download", "");
+                String[] split = s.split(":");
+                return split[1];
             }
-//            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[]{split[1]};
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
         }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-            mPath = data.getStringExtra("path");
-            tvFile.setText(getString(R.string.select_file, mPath));
-            SharedPreferencesUtils.saveUpdateFilePath(mPath);
-            btn_start_update.setVisibility(View.VISIBLE);
-        }
+
+    public boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
-/*    private float getVersionValue(String version) {
-        return Float.valueOf(version.substring(1));
-    }*/
+    public boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    public boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    public String getDataColumn(Context context, Uri uri, String selection, String[]
+            selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {column};
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } catch (Exception e) {
+            e.getLocalizedMessage();
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
 
     private DbLight getLightByMeshAddress(int meshAddress) {
         if (onlineLights == null || onlineLights.size() == 0) return null;
@@ -716,6 +778,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void chooseFile() {
         startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //intent.setType(“image/*”);//选择图片
+        //intent.setType(“audio/*”); //选择音频
+        //intent.setType(“video/*”); //选择视频 （mp4 3gp 是android支持的视频格式）
+        //intent.setType(“video/*;image/*”);//同时选择视频和图片
+        intent.setType("*/*");//无类型限制
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        // startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
     }
 
     private boolean hasLight(int meshAddress) {
@@ -732,12 +802,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      * 0:最新， 1：可升级， -n：null
      */
     public int compareVersion(String lightVersion, String newVersion) {
-
 //        return lightVersion.equals(newVersion) ? 0 : 1;
         return 1;
     }
 
     private void updateStep1() {
+
         if (mPath != null && !mPath.isEmpty()) {
             parseFile();
         } else {
@@ -757,7 +827,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         List<ScanFilter> scanFilters = new ArrayList<>();
         ScanFilter.Builder scanFilterBuilder = new ScanFilter.Builder();
         scanFilterBuilder.setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount());
-        if(dbLight.getMacAddr().length()>16){
+        if (dbLight.getMacAddr().length() > 16) {
             scanFilterBuilder.setDeviceAddress(dbLight.getMacAddr());
         }
         ScanFilter scanFilter = scanFilterBuilder.build();
@@ -765,12 +835,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
-        if(!AppUtils.isExynosSoc()){
+        if (!AppUtils.isExynosSoc()) {
             params.setScanFilters(scanFilters);
         }
         params.setMeshName(mesh.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
-        if(dbLight.getMacAddr().length()>16){
+        if (dbLight.getMacAddr().length() > 16) {
             params.setScanMac(dbLight.getMacAddr());
         }
         TelinkLightService.Instance().startScan(params);
@@ -779,18 +849,19 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     Disposable mScanDisposal;
+
     @SuppressLint("CheckResult")
-    private void startScanTimer(){
+    private void startScanTimer() {
         if (mScanDisposal != null) {
             mScanDisposal.dispose();
         }
-            mScanDisposal=Observable.timer(TIME_OUT_SCAN,TimeUnit.SECONDS).subscribe(aLong -> {
-                    onScanTimeout();
-            });
+        mScanDisposal = Observable.timer(TIME_OUT_SCAN, TimeUnit.SECONDS).subscribe(aLong -> {
+            onScanTimeout();
+        });
     }
 
     private void stopScanTimer() {
-        if(mScanDisposal!=null){
+        if (mScanDisposal != null) {
             mScanDisposal.dispose();
         }
     }
@@ -807,7 +878,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         visibleHandler.obtainMessage(View.GONE, otaProgress).sendToTarget();
 
         if (TelinkLightApplication.getApp().getConnectDevice() != null) {
-            OTA_IS_HAVEN_START=true;
+            OTA_IS_HAVEN_START = true;
             TelinkLightService.Instance().startOta(mFirmwareData);
         } else {
             startScan();
@@ -869,7 +940,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 if (!connectStart) {
                     LeBluetooth.getInstance().stopScan();
                     connectDevice(deviceInfo.macAddress);
-                    connectRetryCount=1;
+                    connectRetryCount = 1;
 //                    startConnectTimer();
                 }
                 connectStart = true;
@@ -899,11 +970,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             LeBluetooth.getInstance().stopScan();
             stopConnectTimer();
 //            addEventListener();
-            if(OTA_IS_HAVEN_START){
+            if (OTA_IS_HAVEN_START) {
                 btn_start_update.setVisibility(View.GONE);
                 btn_start_update.setClickable(false);
                 TelinkLightApplication.getApp().removeEventListener(this);
-            }else{
+            } else {
                 btn_start_update.setText(getString(R.string.re_upgrade));
                 btn_start_update.setVisibility(View.VISIBLE);
                 btn_start_update.setClickable(true);
@@ -998,7 +1069,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private int connectRetryCount = 0;
 
-    //    private boolean loginStart=false;
+    //private boolean loginStart=false;
     private void onDeviceEvent(DeviceEvent event) {
         int status = event.getArgs().status;
         switch (status) {
@@ -1114,6 +1185,60 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
         TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
                 params);
+    }
+
+
+    /**
+     * 4.4
+     *
+     * @param contentUri
+     * @return
+     */
+    public String getRealPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (null != cursor && cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+            cursor.close();
+        }
+        return res;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //第一个是传递标记监听 第二个是回传标记监听
+        if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
+            Bundle b=data.getExtras(); //data为B中回传的Intent
+            mPath=b.getString("path");//str即为回传的值
+            tvFile.setText(mPath);
+            parseFile();
+
+            Log.e("zcl","返回数据是:"+requestCode+"---"+resultCode+"---mPath-"+mPath);
+            // Log.e("zcl","返回数据是:"+requestCode+"---"+resultCode+"----"+data.toString()+"----"+data.getDataString()+"----"+data.getData());
+
+//            if (resultCode == Activity.RESULT_OK) {
+//                Uri uri = data.getData();
+//                if ("file".equalsIgnoreCase(uri.getScheme())) {//使用第三方应用打开
+//                    mPath = uri.getPath();
+//
+//                    Log.e("zcl", "file返回数据是mPath:" + mPath);
+//                    tvFile.setText(mPath);
+//                    return;
+//                }
+//                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
+//                    mPath = getPathFour(this, uri);
+//                    Log.e("zcl", "4.4返回数据是mPath:" + mPath);
+//                    tvFile.setText(mPath);
+//                } else {//4.4以下下系统调用方法
+//                    Log.e("zcl", "4.1返回数据是mPath:" + mPath);
+//                    mPath = getRealPathFromURI(uri);
+//                    tvFile.setText(mPath);
+//                }
+//            }
+        }
     }
 
 }

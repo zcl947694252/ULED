@@ -4,7 +4,6 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar"/>
 
     <include layout="@layout/connector_device_setting"/>
 

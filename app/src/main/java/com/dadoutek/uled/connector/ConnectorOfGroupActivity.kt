@@ -23,6 +23,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
@@ -64,7 +66,11 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_connector_of_group.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
+import kotlinx.android.synthetic.main.activity_lights_of_group.no_light
+import kotlinx.android.synthetic.main.activity_lights_of_group.recycler_view_lights
+import kotlinx.android.synthetic.main.activity_lights_of_group.scanPb
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -83,7 +89,7 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener {
+class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener,View.OnClickListener {
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
@@ -135,6 +141,35 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         initData()
         initView()
         initOnLayoutListener()
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.light_add_device_btns -> {
+                if(DBUtils.getAllConnctor().size == 0){
+                    intent = Intent(this, ScanningConnectorActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    startActivityForResult(intent, 0)
+                }else{
+                    addDevice()
+                }
+            }
+        }
+    }
+
+    private fun addDevice() {
+//        intent = Intent(this, ConnectorDeviceDetailActivity::class.java)
+//        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RELAY_OF)
+//        intent.putExtra("relay_name",group.name)
+        val intent = Intent(this,
+                ConnectorBatchGroupActivity::class.java)
+        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent.putExtra("relayType","group_relay")
+        intent.putExtra("relay_group_name",group.name)
+        startActivity(intent)
+        finish()
     }
 
     private fun initOnLayoutListener() {
@@ -237,6 +272,11 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     override fun onResume() {
         super.onResume()
+        initToolbar()
+        initParameter()
+        initData()
+        initView()
+        initOnLayoutListener()
 //        initData()
 //        initView()
 //        Thread {
@@ -304,6 +344,27 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             filter("", false)
         } else {
             lightList = DBUtils.getConnectorByGroupID(group.id)
+        }
+
+        if (lightList.size > 0) {
+            recycler_view_lights.visibility = View.VISIBLE
+            no_light.visibility = View.GONE
+            var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
+            batchGroup.setText(R.string.batch_group)
+            batchGroup.setOnClickListener(View.OnClickListener {
+                val intent = Intent(this,
+                        ConnectorBatchGroupActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra("relayType","relayGroup")
+                intent.putExtra("group",group.id.toInt())
+                startActivity(intent)
+            })
+        } else {
+            recycler_view_lights.visibility = View.GONE
+            no_light.visibility = View.VISIBLE
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 
@@ -404,6 +465,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         } else {
             toolbar.title = (group.name ?: "") + " (" + lightList.size + ")"
         }
+        light_add_device_btns.setOnClickListener(this)
         recyclerView=findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 3)
         recyclerView!!.itemAnimator = DefaultItemAnimator()
@@ -412,6 +474,12 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         adapter!!.bindToRecyclerView(recyclerView)
         for (i in lightList.indices) {
             lightList[i].updateIcon()
+        }
+
+        if(DBUtils.getAllConnctor().size == 0){
+            light_add_device_btns.text = getString(R.string.device_scan_scan)
+        }else{
+            light_add_device_btns.text = getString(R.string.add_device)
         }
     }
 

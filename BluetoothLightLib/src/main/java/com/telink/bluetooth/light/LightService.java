@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.TelinkLog;
@@ -98,7 +97,6 @@ public abstract class LightService extends Service implements
      * @see com.telink.bluetooth.event.MeshEvent
      */
     public void startScan(Parameters params) {
-
         if (this.mAdapter == null)
             return;
 
@@ -190,7 +188,6 @@ public abstract class LightService extends Service implements
      * service.sendCommandNoResponse((byte) 0xD0, 0xFFFF, new byte[]{0x01, 0x00, 0x00});
      * }
      * </pre>
-     *
      * @param opcode  操作码
      * @param address 设备的地址
      * @param params  参数

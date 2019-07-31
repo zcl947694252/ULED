@@ -81,6 +81,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var isGlassSwitch=false
 
+    private var groupName: String? = null
+
+    private var switchDate: DbSwitch?= null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_group)
@@ -355,7 +359,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         .setTitle(R.string.install_success)
                         .setMessage(R.string.tip_config_switch_success)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            saveSwitch()
+                            if((groupName!=null && groupName=="true") || (groupName!=null && groupName=="false")){
+                                  updateSwitch()
+                            }else {
+                                saveSwitch()
+                            }
                             TelinkLightService.Instance().idleMode(true)
                             TelinkLightService.Instance().disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -365,30 +373,37 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }catch (e:Exception){
             e.printStackTrace()
         }
-//        finally {
-//            //确认配置成功后,添加开关到服务器
-//            var newMeshAdress: Int
-////            var dbSwitch:DbSwitch=DbSwitch()
-//            newMeshAdress=groupAdress
-////            DBUtils.saveSwitch(dbSwitch,false)
-//            var dbSwitch: DbSwitch?=DbSwitch()
-////            DBUtils.saveSwitch(dbSwitch,false)
-//            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-//            dbSwitch.macAddr=mDeviceInfo.macAddress
-//            dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-//            dbSwitch.productUUID=mDeviceInfo.productUUID
-////            dbSwitch!!.index=dbSwitch.id.toInt()
-//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-//
-////            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
-//            DBUtils.saveSwitch(dbSwitch,false)
-//            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-//            dbSwitch!!.index=dbSwitch.id.toInt()
-//            recordingChange(dbSwitch!!.id,
-//                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-//                    Constant.DB_ADD)
-//
-//        }
+    }
+
+    private fun updateSwitch() {
+        if(groupName =="false"){
+            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            if(dbSwitch!=null){
+                dbSwitch.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+                DBUtils.updateSwicth(dbSwitch)
+            }else{
+                var dbSwitch: DbSwitch?=DbSwitch()
+                DBUtils.saveSwitch(dbSwitch,false)
+                dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+                dbSwitch.macAddr=mDeviceInfo.macAddress
+                dbSwitch.meshAddr=mDeviceInfo.meshAddress
+                dbSwitch.productUUID=mDeviceInfo.productUUID
+                dbSwitch!!.index=dbSwitch.id.toInt()
+                dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+//                dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
+                DBUtils.saveSwitch(dbSwitch,false)
+                dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                recordingChange(dbSwitch!!.id,
+                        DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                        Constant.DB_ADD)
+            }
+        }else{
+            switchDate!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            switchDate!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            DBUtils.updateSwicth(switchDate!!)
+        }
     }
 
     private fun saveSwitch(){
@@ -396,23 +411,35 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //            var dbSwitch:DbSwitch=DbSwitch()
         newMeshAdress=groupAdress
 //            DBUtils.saveSwitch(dbSwitch,false)
-        var dbSwitch: DbSwitch?=DbSwitch()
-        DBUtils.saveSwitch(dbSwitch,false)
-        dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
-        dbSwitch.macAddr=mDeviceInfo.macAddress
-        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-        dbSwitch.productUUID=mDeviceInfo.productUUID
-        dbSwitch!!.index=dbSwitch.id.toInt()
-        dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+        var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+        if(switch!=null){
+            var dbSwitch: DbSwitch?=DbSwitch()
+            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch!!.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+            dbSwitch.macAddr=mDeviceInfo.macAddress
+            dbSwitch.meshAddr=mDeviceInfo.meshAddress
+            dbSwitch.productUUID=mDeviceInfo.productUUID
+            dbSwitch!!.index=switch.id.toInt()
+            dbSwitch.id = switch.id
+//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+            DBUtils.updateSwicth(dbSwitch)
+        }else{
+            var dbSwitch: DbSwitch?=DbSwitch()
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch!!.belongGroupId=mGroupArrayList.get(mAdapter.selectedPos).id
+            dbSwitch.macAddr=mDeviceInfo.macAddress
+            dbSwitch.meshAddr=mDeviceInfo.meshAddress
+            dbSwitch.productUUID=mDeviceInfo.productUUID
+            dbSwitch!!.index=dbSwitch.id.toInt()
+            dbSwitch.controlGroupAddr = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+//            dbSwitch.name=StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
-//            dbSwitch= DBUtils.getSwitchByMeshAddr(newMeshAdress)!!
-        DBUtils.saveSwitch(dbSwitch,false)
-        dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-//        dbSwitch!!.index=dbSwitch.id.toInt()
-        recordingChange(dbSwitch!!.id,
-                DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                Constant.DB_ADD)
-
+            DBUtils.saveSwitch(dbSwitch,false)
+            dbSwitch= DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            recordingChange(dbSwitch!!.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                    Constant.DB_ADD)
+        }
     }
 
     private var mConnectingSnackBar: Snackbar? = null
@@ -459,7 +486,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                         Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(mesh?.password) + account))
+                    NetworkFactory.md5(account) + account))
         } else {
             params.setNewPassword(mesh?.password)
         }
@@ -475,6 +502,10 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initView() {
         mDeviceInfo = intent.getParcelableExtra<DeviceInfo>("deviceInfo")
+        groupName = intent.getStringExtra("group")
+        if(groupName!=null && groupName == "true"){
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+        }
         val mesh = mApplication.mesh
 //        val dataManager = DataManager(this, mesh.name, mesh.password)
         mGroupArrayList = ArrayList<DbGroup>()
@@ -484,7 +515,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         for (group in groupList) {
 //            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
 //            group.checked = false
-            if(OtherUtils.isNormalGroup(group)){
+            if(OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group)){
                 group.checked = false
                 mGroupArrayList.add(group)
             }

@@ -10,34 +10,34 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
-import android.view.*
+import android.view.KeyEvent
+import android.view.MenuItem
+import android.view.View
 import android.view.View.OnClickListener
+import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
-
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.LightGroupingActivity
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAConnectorActivity
-import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -51,10 +51,9 @@ import com.telink.util.Event
 import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.fragment_device_setting.*
+import kotlinx.android.synthetic.main.connector_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -79,28 +78,28 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private var mConnectTimer: Disposable? = null
     private var isLoginSuccess = false
     private var mApplication: TelinkLightApplication? = null
-    private var isRenameState=false
+    private var isRenameState = false
     private var group: DbGroup? = null
     //    private var stopTracking = false
     private var connectTimes = 0
-    private var currentShowPageGroup=true
+    private var currentShowPageGroup = true
 
     private val clickListener = OnClickListener { v ->
-        when(v.id){
-            R.id.tvOta ->{
-                if(isRenameState){
-                    saveName()
-                }else{
-                    checkPermission()
-                }
-            }
-            R.id.btnRename ->{
+        when (v.id) {
+//            R.id.tvOta ->{
+//                if(isRenameState){
+//                    saveName()
+//                }else{
+//                    checkPermission()
+//                }
+//            }
+            R.id.btnRename -> {
                 renameGp()
             }
-            R.id.updateGroup ->{
+            R.id.updateGroup -> {
                 updateGroup()
             }
-            R.id.btnRemove ->{
+            R.id.btnRemove -> {
                 remove()
             }
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
@@ -121,6 +120,14 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
             R.id.btn_rename -> renameGroup()
+
+            R.id.btnOTA -> {
+                if(txtTitle.text.toString()!=null && txtTitle.text.toString() !=""){
+                    checkPermission()
+                }else{
+                    Toast.makeText(this,R.string.number_no,Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 
@@ -174,7 +181,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                         if (canSave) {
                             group?.name = textGp.text.toString().trim { it <= ' ' }
                             DBUtils.updateGroup(group!!)
-                            toolbar.title = group?.name
+                            relayName.text = group?.name
                             dialog.dismiss()
                         }
                     }
@@ -186,7 +193,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
 
-                    if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                    if ( TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null &&TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.getMeshAddr(), null)
                         DBUtils.deleteConnector(light!!)
@@ -216,12 +223,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun updateGroup() {
         val intent = Intent(this,
                 ConnectorGroupingActivity::class.java)
-        intent.putExtra(Constant.TYPE_VIEW,Constant.LIGHT_KEY)
+        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
         intent.putExtra("light", light)
         intent.putExtra("gpAddress", gpAddress)
-        intent.putExtra("uuid",light!!.productUUID)
-        intent.putExtra("belongId",light!!.belongGroupId)
-        Log.d("addLight",light!!.productUUID.toString()+","+light!!.meshAddr)
+        intent.putExtra("uuid", light!!.productUUID)
+        intent.putExtra("belongId", light!!.belongGroupId)
+        Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
         this!!.finish()
     }
@@ -292,11 +299,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
         editTitle?.setFocusableInTouchMode(false)
         editTitle?.setFocusable(false)
-        if(!currentShowPageGroup){
+        if (!currentShowPageGroup) {
             checkAndSaveName()
-            isRenameState=false
-            tvOta.setText(R.string.ota)
-        }else{
+            isRenameState = false
+//            tvOta.setText(R.string.ota)
+        } else {
             checkAndSaveNameGp()
         }
     }
@@ -305,14 +312,14 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         val name = editTitle?.text.toString().trim()
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
-            editTitle.visibility=View.GONE
-            titleCenterName.visibility=View.VISIBLE
-            titleCenterName.text = light?.name
-        }else{
-            editTitle.visibility=View.GONE
-            titleCenterName.visibility=View.VISIBLE
-            titleCenterName.text = name
-            light?.name=name
+//            editTitle.visibility=View.GONE
+            relayName.visibility = View.VISIBLE
+            relayName.text = light?.name
+        } else {
+//            editTitle.visibility=View.GONE
+            relayName.visibility = View.VISIBLE
+            relayName.text = name
+            light?.name = name
             DBUtils.updateConnector(light!!)
         }
     }
@@ -322,25 +329,24 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         if (compileExChar(name)) {
             Toast.makeText(this, R.string.rename_tip_check, Toast.LENGTH_SHORT).show()
 
-            editTitle.visibility=View.GONE
-            titleCenterName.visibility=View.VISIBLE
-            titleCenterName.text = group?.name
-        }
-        else {
-            var canSave=true
-            val groups=DBUtils.allGroups
-            for(i in groups.indices){
-                if(groups[i].name==name){
+//            editTitle.visibility=View.GONE
+            relayName.visibility = View.VISIBLE
+            relayName.text = group?.name
+        } else {
+            var canSave = true
+            val groups = DBUtils.allGroups
+            for (i in groups.indices) {
+                if (groups[i].name == name) {
                     ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
-                    canSave=false
+                    canSave = false
                     break
                 }
             }
 
-            if(canSave){
-                editTitle.visibility=View.GONE
-                titleCenterName.visibility=View.VISIBLE
-                titleCenterName.text = name
+            if (canSave) {
+//                editTitle.visibility=View.GONE
+                relayName.visibility = View.VISIBLE
+                relayName.text = name
                 group?.name = name
                 DBUtils.updateGroup(group!!)
             }
@@ -355,10 +361,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
-                        if(isBoolean){
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
+                        if (isBoolean) {
                             transformView()
-                        }else {
+                        } else {
                             OtaPrepareUtils.instance().gotoUpdateView(this@ConnectorSettingActivity, localVersion, otaPrepareListner)
                         }
                     } else {
@@ -442,9 +448,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
-                        light?.name=textGp.text.toString().trim { it <= ' ' }
+                        light?.name = textGp.text.toString().trim { it <= ' ' }
                         DBUtils.updateConnector(light!!)
-                        toolbar.title=light?.name
+                        relayName.text = light?.name
                         dialog.dismiss()
                     }
                 }
@@ -548,6 +554,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         mDisposable.dispose()
         this.mApplication?.removeEventListener(this)
     }
+
     fun addEventListeners() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 //        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
@@ -575,7 +582,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             EditorInfo.IME_ACTION_DONE,
             EditorInfo.IME_ACTION_NONE -> {
                 saveName()
-                if(currentShowPageGroup){
+                if (currentShowPageGroup) {
                     tvRename.visibility = View.GONE
                 }
             }
@@ -583,18 +590,18 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun initType() {
-        val type=intent.getStringExtra(Constant.TYPE_VIEW)
-        if(type==Constant.TYPE_GROUP){
-            currentShowPageGroup=true
-            show_light_btn.visibility=View.GONE
-            show_group_btn.visibility=View.VISIBLE
+        val type = intent.getStringExtra(Constant.TYPE_VIEW)
+        if (type == Constant.TYPE_GROUP) {
+            currentShowPageGroup = true
+            show_light_btn.visibility = View.GONE
+            show_group_btn.visibility = View.VISIBLE
             initDataGroup()
             initViewGroup()
-        }else{
-            currentShowPageGroup=false
-            show_light_btn.visibility=View.VISIBLE
-            show_group_btn.visibility=View.GONE
-            initToolbarLight()
+        } else {
+            currentShowPageGroup = false
+            show_light_btn.visibility = View.VISIBLE
+            show_group_btn.visibility = View.GONE
+//            initToolbarLight()
             initViewLight()
             getVersion()
         }
@@ -619,20 +626,22 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbConnector
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
+        txtTitle.visibility = View.VISIBLE
         txtTitle!!.text = ""
-        editTitle!!.setText(light?.name)
-        editTitle!!.visibility=View.GONE
-        titleCenterName.visibility=View.VISIBLE
-        titleCenterName.setText(light?.name)
+//        editTitle!!.setText(light?.name)
+//        editTitle!!.visibility=View.GONE
+        relayName.visibility = View.VISIBLE
+        relayName.setText(light?.name)
 
-        tvOta!!.setOnClickListener(this.clickListener)
+//        tvOta!!.setOnClickListener(this.clickListener)
         updateGroup.setOnClickListener(this.clickListener)
         btnRemove.setOnClickListener(this.clickListener)
         btnRename.setOnClickListener(clickListener)
+        btnOTA.setOnClickListener(clickListener)
         mRxPermission = RxPermissions(this)
 
-        this.sbBrightness?.max = 100
-        this.sbTemperature?.max = 100
+//        this.sbBrightness?.max = 100
+//        this.sbTemperature?.max = 100
 
 //        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
         mConnectDevice = TelinkLightApplication.getInstance().connectDevice
@@ -658,21 +667,23 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     }
 
     private fun initViewGroup() {
-        editTitle.visibility=View.GONE
-        titleCenterName.visibility=View.VISIBLE
+//        editTitle.visibility=View.GONE
+        relayName.visibility = View.VISIBLE
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
-                editTitle!!.setText(getString(R.string.allLight))
-                titleCenterName!!.text = getString(R.string.allLight)
+//                editTitle!!.setText(getString(R.string.allLight))
+                relayName!!.text = getString(R.string.allLight)
             } else {
-                editTitle!!.setText(group!!.name)
-                titleCenterName!!.text = group!!.name
+//                editTitle!!.setText(group!!.name)
+                relayName!!.text = group!!.name
             }
         }
 
-        toolbar.title=""
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        txtTitle.visibility = View.GONE
+
+//        toolbar.title=""
+//        setSupportActionBar(toolbar)
+//        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         btn_remove_group?.setOnClickListener(clickListener)
         btn_rename?.setOnClickListener(clickListener)
@@ -699,23 +710,23 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             Commander.getDeviceVersion(light!!.meshAddr, { s ->
                 localVersion = s
                 if (txtTitle != null) {
-//                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
                         txtTitle!!.visibility = View.VISIBLE
-                        txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
+                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
                         light!!.version = localVersion
-                        tvOta!!.visibility = View.VISIBLE
-//                    } else {
-//                        txtTitle!!.visibility = View.VISIBLE
-//                        txtTitle!!.text = resources.getString(R.string.firmware_version,localVersion)
-//                        light!!.version = localVersion
+//                        tvOta!!.visibility = View.VISIBLE
+                    } else {
+                        txtTitle!!.visibility = View.VISIBLE
+                        txtTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
+                        light!!.version = localVersion
 //                        tvOta!!.visibility = View.GONE
                     }
-//                }
+                }
                 null
             }, {
                 if (txtTitle != null) {
-                    txtTitle!!.visibility = View.GONE
-                    tvOta!!.visibility = View.GONE
+//                    txtTitle!!.visibility = View.GONE
+//                    tvOta!!.visibility = View.GONE
                 }
                 null
             })
@@ -756,8 +767,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(mesh?.name)
                 if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                    connectParams.setPassword(NetworkFactory.md5(
-                            NetworkFactory.md5(mesh?.password) + account))
+                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account))
                 } else {
                     connectParams.setPassword(mesh?.password)
                 }

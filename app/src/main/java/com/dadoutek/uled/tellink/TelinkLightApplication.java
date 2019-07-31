@@ -1,6 +1,8 @@
 package com.dadoutek.uled.tellink;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -15,6 +17,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.FileSystem;
+import com.dadoutek.uled.util.LogUtil;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
 import com.telink.TelinkApplication;
@@ -35,7 +38,17 @@ public final class TelinkLightApplication extends TelinkApplication {
     private Toast toast;
     private int onlineCount = 0;
 
+//    private BluetoothStateBroadcastReceive mReceive;
+
     private static DaoSession daoSession;
+    private Object Toolbar;
+    static TelinkLightApplication mInstance = null;
+
+    private Intent intent;
+
+    public static Context getContext() {
+        return mInstance;
+    }
 
     @SuppressLint("SdCardPath")
     @Override
@@ -45,21 +58,31 @@ public final class TelinkLightApplication extends TelinkApplication {
         DaoSessionInstance.checkAndUpdateDatabase();
         DaoSessionUser.checkAndUpdateDatabase();
 
-        Utils.init(this);
-        if (!AppUtils.isAppDebug()) {
-            LogUtils.getConfig().setLogSwitch(false);
-//            LogUtils.getConfig().setLog2FileSwitch(false);
-        }else{
-//            LogUtils.getConfig().setLog2FileSwitch(true);
-            //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
+        if (null == mInstance) {
+            mInstance = this;
         }
 
+
+        Utils.init(this);
+        LogUtils.getConfig().setBorderSwitch(false);
+        if (!AppUtils.isAppDebug()) {
+//            LogUtils.getConfig().setLogSwitch(false);
+//            LogUtils.getConfig().setLog2FileSwitch(false);
+        } else {
+            LogUtils.getConfig().setLog2FileSwitch(true);
+            //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
+        }
+//        registerBluetoothReceiver();
         MobSDK.init(this);
 //        CrashReport.testJavaCrash();
 
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+
+//        intent = new Intent(this,SendLightsInfo.class);
+//        startService(intent);
+
     }
 
     public static TelinkLightApplication getApp() {
@@ -81,9 +104,10 @@ public final class TelinkLightApplication extends TelinkApplication {
                 String name = dbRegion.getControlMesh();
                 String pwd = dbRegion.getControlMeshPwd();
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
+                    LogUtils.d("mesh.setPassword = " + name);
                     mesh = new Mesh();
                     mesh.setName(name);
-                    mesh.setPassword(pwd);
+                    mesh.setPassword(name);
                     mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
                     mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
                     setupMesh(mesh);
@@ -99,17 +123,24 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void doDestroy() {
         TelinkLog.onDestroy();
         super.doDestroy();
+//        stopService(intent);
+//        unregisterBluetoothReceiver();
     }
+
+//    private void unregisterBluetoothReceiver(){
+//        if(mReceive != null){
+//            unregisterReceiver(mReceive);
+//            mReceive = null;
+//        }
+//    }
 
     public Mesh getMesh() {
         if (this.mesh == null) {
             this.mesh = new Mesh();
-            this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
-            this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
-        }else{
-            this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
-            this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
         }
+        this.mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
+        this.mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
+
         return this.mesh;
     }
 
@@ -169,6 +200,36 @@ public final class TelinkLightApplication extends TelinkApplication {
             showToast("save success --" + fileName);
         }
     }
+
+//    public class BluetoothStateBroadcastReceive extends BroadcastReceiver {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//            switch (action){
+//                case BluetoothDevice.ACTION_ACL_CONNECTED:
+//                    Toast.makeText(context , "蓝牙设备:" + device.getName() + "已链接", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case BluetoothDevice.ACTION_ACL_DISCONNECTED:
+//                    Toast.makeText(context , "蓝牙设备:" + device.getName() + "已断开", Toast.LENGTH_SHORT).show();
+//                    break;
+//                case BluetoothAdapter.ACTION_STATE_CHANGED:
+//                    int blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0);
+//                    switch (blueState){
+//                        case BluetoothAdapter.STATE_OFF:
+//                            Toast.makeText(context , "蓝牙已关闭", Toast.LENGTH_SHORT).show();
+//////                            (ImageView)findViewById(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no);
+//                            break;
+//                        case BluetoothAdapter.STATE_ON:
+//                            Toast.makeText(context , "蓝牙已开启"  , Toast.LENGTH_SHORT).show();
+//                            break;
+//                    }
+//                    break;
+//            }
+//        }
+//
+//    }
 
 
     public void showToast(CharSequence s) {

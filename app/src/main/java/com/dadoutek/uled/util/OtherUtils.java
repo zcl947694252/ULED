@@ -69,6 +69,14 @@ public class OtherUtils {
         }
     }
 
+    public static boolean isAllRightGroup(DbGroup dbGroup){
+        if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_NO.intValue()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public static boolean isDefaultGroup(DbGroup dbGroup){
         if(dbGroup.getDeviceType()!=null && dbGroup.getDeviceType().intValue()==Constant.DEVICE_TYPE_DEFAULT_ALL.intValue()){
             return true;
@@ -100,11 +108,16 @@ public class OtherUtils {
     //初始颜色预设值
     public static int getCreateInitColor(int type){
         switch (type){
-            case 0:return Color.RED;
-            case 1:return Color.BLUE;
-            case 2:return Color.GREEN;
-            case 3:return Color.YELLOW;
-            case 4:return Color.parseColor("#800080");
+//            case 0:return Color.RED;
+//            case 1:return Color.BLUE;
+//            case 2:return Color.GREEN;
+//            case 3:return Color.YELLOW;
+//            case 4:return Color.parseColor("#800080");
+
+            case 0:return Color.parseColor("#ff4f4f");
+            case 1:return Color.parseColor("#ff439b");
+            case 2:return Color.parseColor("#4FFFE0");
+            case 3:return Color.parseColor("#FFF94F");
         }
         return 0;
     }
@@ -117,7 +130,7 @@ public class OtherUtils {
         InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
         InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
         InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
-        InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.connector),context.getString(R.string.connector));
+        InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.connector),context.getString(R.string.for_connector));
         list.add(installDeviceModel1);
         list.add(installDeviceModel2);
         list.add(installDeviceModel3);

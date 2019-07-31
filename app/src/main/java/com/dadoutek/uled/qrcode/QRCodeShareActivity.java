@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,21 +22,11 @@ public final class QRCodeShareActivity extends TelinkBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_place_share);
-        findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        qr_image = (ImageView) this.findViewById(R.id.qr_image);
-        TextView title = (TextView) this.findViewById(R.id.txt_header_title);
+        findViewById(R.id.iv_back).setOnClickListener(v -> finish());
+        qr_image =  this.findViewById(R.id.qr_image);
+        TextView title =  this.findViewById(R.id.txt_header_title);
         title.setText("Share");
-        findViewById(R.id.act_share_other).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(QRCodeShareActivity.this, QRCodeScanActivity.class), Request_Code_Scan);
-            }
-        });
+        findViewById(R.id.act_share_other).setOnClickListener(v -> startActivityForResult(new Intent(QRCodeShareActivity.this, QRCodeScanActivity.class), Request_Code_Scan));
 
         mGeneratorHandler = new Handler() {
             @Override

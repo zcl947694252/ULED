@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -14,226 +15,341 @@
         <!--app:layout_constraintBottom_toTopOf="@+id/bottomBar"-->
         <!--app:layout_constraintTop_toTopOf="parent">-->
 
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottomBar"
-            app:layout_constraintTop_toTopOf="parent">
-            >
 
-            <LinearLayout
-                android:id="@+id/ll_r"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+    <!--<android.support.constraint.ConstraintLayout-->
+        <!--android:id="@+id/bottomBar"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent">-->
 
-                <TextView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="#621A1B"
-                    android:gravity="center"
-                    android:text="R"
-                    android:textColor="@color/white" />
+        <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="1px"-->
+        <!--app:layout_constraintTop_toTopOf="parent"-->
+        <!--android:background="@color/divider"/>-->
+        <!--<TextView-->
+        <!--android:id="@+id/normal_rgb"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="center"-->
+        <!--android:text="@string/color_mode"-->
+        <!--android:textColor="@android:color/holo_blue_light"-->
+        <!--android:textSize="16sp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:id="@+id/color_r"
-                    android:layout_width="40dp"
-                    android:layout_height="20dp"
-                    android:background="@color/red"
-                    android:text="100"
-                    android:textColor="@color/white" />
-            </LinearLayout>
+        <!--<View-->
+            <!--android:layout_width="1dp"-->
+            <!--android:layout_height="42dp"-->
+            <!--android:background="#eeeeee"-->
+            <!--app:layout_constraintEnd_toEndOf="@+id/dynamic_rgb"-->
+            <!--app:layout_constraintStart_toStartOf="@+id/normal_rgb"-->
+            <!--app:layout_constraintTop_toTopOf="parent" />-->
 
-            <LinearLayout
-                android:id="@+id/ll_g"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="@id/ll_r"
-                app:layout_constraintTop_toBottomOf="@id/ll_r">
+        <!--<TextView-->
+        <!--android:id="@+id/dynamic_rgb"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--android:gravity="center"-->
+        <!--android:text="@string/gradient_mode"-->
+        <!--android:textColor="@android:color/darker_gray"-->
+        <!--android:textSize="16sp"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintStart_toEndOf="@id/normal_rgb"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
 
-                <TextView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="#254216"
-                    android:gravity="center"
-                    android:text="G"
-                    android:textColor="@color/white" />
+    <!--</android.support.constraint.ConstraintLayout>-->
 
-                <TextView
-                    android:id="@+id/color_g"
-                    android:layout_width="40dp"
-                    android:layout_height="20dp"
-                    android:background="#95F668"
-                    android:text="100"
-                    android:textColor="@color/white" />
-            </LinearLayout>
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#eeeeee"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
-                android:id="@+id/ll_b"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="@id/ll_r"
-                app:layout_constraintTop_toBottomOf="@id/ll_g">
-
-                <TextView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:background="#001054"
-                    android:gravity="center"
-                    android:text="B"
-                    android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/color_b"
-                    android:layout_width="40dp"
-                    android:layout_height="20dp"
-                    android:background="@color/blue"
-                    android:text="100"
-                    android:textColor="@color/white" />
-            </LinearLayout>
-
-                <top.defaults.colorpicker.ColorPickerView
-                    android:id="@+id/color_picker"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:enableBrightness="false"
-                    android:gravity="center"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/tip"
-                    />
-            <LinearLayout
-                android:id="@+id/tip"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp"
-                android:visibility="visible"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/brightness">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    android:text="@string/long_click_select_color_tip"
-                    android:textColor="@color/gray"
-                    android:textSize="12dp" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/diy_color_recycler_list_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/brightness"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="visible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/lightVersion">
-
-                <TextView
-                    android:id="@+id/tv_brightness_rgb"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:padding="5dp"
-                    android:text="@string/device_setting_brightness" />
-
-                <SeekBar
-                    android:id="@+id/sbBrightness"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:padding="6dp"
-                    android:progress="100" />
-
-                <TextView
-                    android:id="@+id/tv_brightness_w"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:padding="5dp"
-                    android:text="@string/w_bright" />
-
-                <SeekBar
-                    android:id="@+id/sb_w_bright"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:padding="6dp" />
-
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/lightVersion"
-                android:text=" "
-                android:textColor="@color/black"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="15dp"
-                android:visibility="gone"
-                />
-
-        </android.support.constraint.ConstraintLayout>
-    <!--</ScrollView>-->
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/bottomBar"
+        android:id="@+id/constraintLayout6"
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view1">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1px"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/divider"/>
-        <TextView
-            android:id="@+id/normal_rgb"
+
+        <top.defaults.colorpicker.ColorPickerView
+            android:id="@+id/color_picker"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
-            android:text="RGB"
-            android:textColor="@android:color/holo_blue_light"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"
+            app:enableBrightness="false"
+            app:layout_constraintBottom_toTopOf="@+id/brightness"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/dynamic_rgb"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/rgb_gradient"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/normal_rgb"
+        <LinearLayout
+            android:id="@+id/ll_r"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#621A1B"
+                android:gravity="center"
+                android:text="R"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/color_r"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:background="@color/red"
+                android:text="100"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_g"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/ll_r"
+            app:layout_constraintTop_toBottomOf="@id/ll_r">
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#254216"
+                android:gravity="center"
+                android:text="G"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/color_g"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:background="#95F668"
+                android:text="100"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/ll_r"
+            app:layout_constraintTop_toBottomOf="@id/ll_g">
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#001054"
+                android:gravity="center"
+                android:text="B"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/color_b"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:background="@color/blue"
+                android:text="100"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/brightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tip">
+
+            <TextView
+                android:id="@+id/tv_brightness_w"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textSize="15sp"
+                android:textColor="@color/black_three"
+                android:text="@string/white_light_regulation" />
+
+            <SeekBar
+                android:layout_marginTop="2dp"
+                android:id="@+id/sb_w_bright"
+                style="@style/SeekBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="25dp"
+                android:paddingEnd="25dp"
+                android:max="100" />
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:id="@+id/sb_w_bright_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/add_enabled"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/sb_w_bright_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100%"
+                    android:textColor="@color/black_three"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/sb_w_bright_add"
+                    app:layout_constraintStart_toEndOf="@+id/sb_w_bright_less"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/sb_w_bright_less"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/less_enabled"
+                    android:layout_marginEnd="100dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </android.support.constraint.ConstraintLayout>
+
+            <TextView
+                android:layout_marginTop="6dp"
+                android:id="@+id/tv_brightness_rgb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textSize="15sp"
+                android:textColor="@color/black_three"
+                android:text="@string/bright_regulation" />
+
+            <SeekBar
+                android:layout_marginTop="2dp"
+                android:id="@+id/sbBrightness"
+                style="@style/SeekBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="25dp"
+                android:paddingEnd="25dp"
+                android:max="100"
+                android:progress="100" />
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <ImageView
+                    android:id="@+id/sbBrightness_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="25dp"
+                    android:background="@drawable/add_enabled"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/sbBrightness_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100%"
+                    android:textColor="@color/black_three"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/sbBrightness_add"
+                    app:layout_constraintStart_toEndOf="@+id/sbBrightness_less"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/sbBrightness_less"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="100dp"
+                    android:background="@drawable/less_enabled"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </android.support.constraint.ConstraintLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="4dp"
+            android:id="@+id/tip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="8dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/lightVersion"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/long_click_select_color_tip"
+                android:textColor="@color/black_three"
+                android:textSize="15dp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:layout_marginTop="8dp"
+                android:id="@+id/diy_color_recycler_list_view"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lightVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" "
+            android:textColor="@color/black_nine"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="11sp"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
+    <!--</ScrollView>-->
+
 </android.support.constraint.ConstraintLayout>

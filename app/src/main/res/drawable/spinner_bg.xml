@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item>
+        <shape>
+            <stroke
+             android:width="1dp"
+            android:color="@color/blue_background" />
+            <corners android:radius="3dp" />
+            <solid android:color="#ffffff" >
+
+            </solid>
+            <padding android:right="5dp" />
+        </shape>
+    </item>
+    <item>
+        <bitmap
+            android:gravity="end"
+        android:src="@drawable/icon_spinner_bg" />
+    </item>
+</layer-list>

@@ -1,6 +1,5 @@
 package com.dadoutek.uled.light
 
-import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -9,20 +8,16 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 class NightLightEditGroupAdapter (layoutResId: Int, data: List<DbGroup>) : BaseQuickAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, item: DbGroup) {
-        helper.setText(R.id.group_name,item.name)
-        val tvState = helper.getView<TextView>(R.id.group_check_state)
+        helper.setText(R.id.group_name,item.name).addOnClickListener(R.id.sensor_delete)
         if (item.isChecked) {
-            tvState.text = mContext.getString(R.string.selected)
-            tvState.setTextColor(mContext.resources.getColor(R.color.white))
-            tvState.setBackgroundColor(mContext.resources.getColor(R.color.primary))
+            helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_selected)
         } else {
-            tvState.text = mContext.getString(R.string.unSelect)
-            tvState.setBackgroundColor(mContext.resources.getColor(R.color.white))
-            if(item.enableCheck){
-                tvState.setTextColor(mContext.resources.getColor(R.color.primary))
-            }else{
-                tvState.setTextColor(mContext.resources.getColor(R.color.gray))
-            }
+                helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_unselected)
+           //if(item.enableCheck){
+           //    helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_unselected)
+           //}else{
+           //    helper.setImageResource(R.id.sensor_delete,R.drawable.icon_checkbox_unselected)
+           //}
         }
     }
 }

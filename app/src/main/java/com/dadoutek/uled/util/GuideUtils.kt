@@ -102,7 +102,7 @@ object GuideUtils {
                 .build()
         val location = IntArray(2)
         guideTargetView.getLocationOnScreen(location)
-        val rect = RectF(location[0].toFloat(), location[1].toFloat(),100f,100f)
+        val rect = RectF(location[0].toFloat()-100f, location[1].toFloat()+50f,1000f,130f)
         guide.addHighLightWithOptions(rect, highlightOptions)
 
         return guide

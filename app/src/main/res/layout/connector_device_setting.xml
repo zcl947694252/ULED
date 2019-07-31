@@ -63,12 +63,17 @@
 
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
-            android:background="@color/border_line" />
+
+        <TextView
+            android:id="@+id/relayName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="123"
+            android:layout_gravity="center"
+            android:textSize="18sp"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/black_three"
+            />
 
         <LinearLayout
             android:id="@+id/show_light_btn"
@@ -76,25 +81,29 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             >
+
+
             <Button
                 android:id="@+id/btnRename"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/click_btn"
+                android:layout_height="35dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="38dp"
+                android:layout_marginEnd="38dp"
+                android:background="@drawable/relay_setting_background"
                 android:text="@string/btn_rename_light"
+                android:textSize="15sp"
                 android:textColor="@android:color/white" />
 
             <Button
                 android:id="@+id/updateGroup"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/click_btn"
+                android:layout_height="35dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="38dp"
+                android:layout_marginEnd="38dp"
+                android:textSize="15sp"
+                android:background="@drawable/relay_setting_background"
                 android:text="@string/update_group"
                 android:textColor="@android:color/white"
                 />
@@ -102,13 +111,27 @@
             <Button
                 android:id="@+id/btnRemove"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:background="@color/red"
+                android:layout_height="35dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="38dp"
+                android:layout_marginEnd="38dp"
+                android:background="@drawable/relay_setting_background"
+                android:textSize="15sp"
                 android:text="@string/factory_reset"
                 android:textColor="@android:color/white" />
+
+            <Button
+                android:id="@+id/btnOTA"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="38dp"
+                android:layout_marginEnd="38dp"
+                android:textSize="15sp"
+                android:background="@drawable/relay_setting_background"
+                android:text="@string/online_upgrade"
+                android:textColor="@android:color/white"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -122,8 +145,12 @@
             <Button
                 android:id="@+id/btn_remove_group"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:background="@drawable/click_btn"
+                android:layout_height="35dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="38dp"
+                android:layout_marginEnd="38dp"
+                android:textSize="15sp"
+                android:background="@drawable/relay_setting_background"
                 android:text="@string/delete_group"
                 android:visibility="visible"
                 android:textColor="@android:color/white" />
@@ -131,19 +158,18 @@
             <Button
                 android:id="@+id/btn_rename"
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/click_btn"
+                android:layout_height="35dp"
+                android:layout_marginTop="13dp"
+                android:layout_marginStart="38dp"
+                android:layout_marginEnd="38dp"
+                android:textSize="15sp"
+                android:background="@drawable/relay_setting_background"
                 android:text="@string/rename_the_group"
                 android:visibility="visible"
+                android:layout_marginBottom="30dp"
                 android:textColor="@android:color/white" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/border_line" />
 
         <TextView
             android:id="@+id/txtTitle"
@@ -152,9 +178,12 @@
             android:singleLine="true"
             android:text="@string/firmware_version"
             android:textAlignment="center"
+            android:layout_gravity="center"
             android:layout_marginStart="10dp"
-            android:visibility="gone"
-            android:textSize="12sp" />
+            android:textColor="@color/black_nine"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="11sp" />
     </LinearLayout>
 
 </LinearLayout>

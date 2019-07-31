@@ -1,4 +1,4 @@
-//package com.dadoutek.uled.rgb;
+package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //
 //import android.Manifest;
 //import android.app.AlertDialog;

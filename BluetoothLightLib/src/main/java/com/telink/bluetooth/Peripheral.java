@@ -151,7 +151,8 @@ public class Peripheral extends BluetoothGattCallback {
                 this.mConnState.set(CONN_STATE_IDLE);
                 TelinkLog.d("Peripheral# gatt NULL onDisconnect:" + this.getDeviceName() + " -- "
                         + this.getMacAddress());
-                this.onDisconnect();
+//                this.onDisconnect();
+                this.disconnect();
             }
 //            else{
 //                gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH);
@@ -161,7 +162,6 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public void disconnect() {
-
         if (this.mConnState.get() != CONN_STATE_CONNECTING && this.mConnState.get() != CONN_STATE_CONNECTED)
             return;
 
@@ -175,6 +175,7 @@ public class Peripheral extends BluetoothGattCallback {
                 int connState = this.mConnState.get();
                 if (connState == CONN_STATE_CONNECTED) {
                     this.gatt.disconnect();
+//                    this.gatt.close();
                     this.mConnState.set(CONN_STATE_DISCONNECTING);
                 } else {
                     this.gatt.disconnect();
@@ -328,6 +329,9 @@ public class Peripheral extends BluetoothGattCallback {
 
         if(commandContext!=null){
             Command command = commandContext.command;
+            if (command==null){
+                return;
+            }
             Command.CommandType commandType = command.type;
 
             TelinkLog.d("processCommand : " + command.toString());
@@ -497,7 +501,7 @@ public class Peripheral extends BluetoothGattCallback {
         boolean success = true;
         String errorMsg = "";
 
-        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
+//        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
 
         BluetoothGattService service = this.gatt.getService(serviceUUID);
 
@@ -538,7 +542,7 @@ public class Peripheral extends BluetoothGattCallback {
         if (!success) {
             this.commandError(errorMsg);
             this.commandCompleted();
-            Log.d("checkXConnect-wrerro", "writeCharacteristic: ");
+//            Log.d("checkXConnect-wrerro", "writeCharacteristic: ");
         }
     }
 

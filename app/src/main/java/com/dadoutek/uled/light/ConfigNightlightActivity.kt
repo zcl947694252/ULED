@@ -7,6 +7,7 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -70,6 +71,10 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
+
+    private var isUpdate: String? = null
+
+    private var triggerLux: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_light_light)
@@ -84,8 +89,9 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         showDataListView()
         spDelay.onItemSelectedListener = this
         spSwitchMode.onItemSelectedListener = this
-        sp_SwitchMode.onItemSelectedListener=this
-        sp_DelayUnit.onItemSelectedListener=this
+        sp_SwitchMode.onItemSelectedListener = this
+        sp_DelayUnit.onItemSelectedListener = this
+        spTrigger_lux.onItemSelectedListener = this
         secondsList = resources.getStringArray(R.array.light_light_time_list)
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, secondsList)
         spDelay.adapter = adapter
@@ -126,7 +132,16 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         data_view_layout.visibility = View.GONE
         edit_data_view_layout.visibility = View.VISIBLE
 
-        showCheckListData = DBUtils.allGroups
+//        var lightGroup = DBUtils.allGroups
+//
+//        showCheckListData!!.clear()
+//
+//        for(i in lightGroup.indices){
+//            if(lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN){
+//                showCheckListData!!.add(lightGroup[i])
+//            }
+//        }
+
         if (showGroupList!!.size != 0) {
             for (i in showCheckListData!!.indices) {
                 for (j in showGroupList!!.indices) {
@@ -160,12 +175,12 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-                val item = showCheckListData!!.get(position)
-                if (item.enableCheck) {
-                    showCheckListData!!.get(position).checked = !item.checked
-                    changeCheckedViewData()
-                    adapter?.notifyDataSetChanged()
-                }
+        val item = showCheckListData!!.get(position)
+        if (item.enableCheck) {
+            showCheckListData!!.get(position).checked = !item.checked
+            changeCheckedViewData()
+            adapter?.notifyDataSetChanged()
+        }
     }
 
     private fun changeCheckedViewData() {
@@ -247,13 +262,21 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                     successCallback = {
                         versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
-                        var version=tvPSVersion.text.toString()
-                        var num=version.substring(2,3)
-                        if(num.toDouble()>=3.0){
-//                            tv_TriggerLux.visibility = View.VISIBLE
-//                            spTrigger_lux.visibility = View.VISIBLE
+                        var version = tvPSVersion.text.toString()
+                        var num = version.substring(2, 3)
+                        if (num.toDouble() >= 3.0) {
+                            tv_TriggerLux.visibility = View.VISIBLE
+                            spTrigger_lux.visibility = View.VISIBLE
                             sp_SwitchMode.visibility = View.VISIBLE
                             tv_SwitchMode.visibility = View.VISIBLE
+                            tvDelay.visibility = View.GONE
+                            spDelay.visibility = View.GONE
+                            tvDelayUnits.visibility = View.VISIBLE
+                            sp_DelayUnit.visibility = View.VISIBLE
+                            til_Delay.visibility = View.VISIBLE
+                            tiet_Delay.visibility = View.VISIBLE
+                            tilMinimum_Brightness.visibility = View.VISIBLE
+                            tietMinimumBrightness.visibility = View.VISIBLE
                         }
                     },
                     failedCallback = {
@@ -273,7 +296,19 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        isUpdate = intent.getStringExtra("update")
         showCheckListData = DBUtils.allGroups
+
+        var lightGroup = DBUtils.allGroups
+
+        showCheckListData!!.clear()
+
+        for (i in lightGroup.indices) {
+            if (lightGroup[i].deviceType != Constant.DEVICE_TYPE_CURTAIN) {
+                showCheckListData!!.add(lightGroup[i])
+            }
+        }
+
         for (i in showCheckListData!!.indices) {
             showCheckListData!![i].checked = false
         }
@@ -329,12 +364,13 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
         val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
         val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
         val timeL: Byte = (selectTime and 0xff).toByte()
-        var mode= getModeValue()
+        var mode = getModeValue()
+        Log.e("TAG", tiet_Delay.toString())
         val paramBytes = byteArrayOf(
-                switchMode.toByte(), 0x00,0x00,
-                tiet_Delay.toString().toInt().toByte(),
+                switchMode.toByte(), 0x00, 0x00,
+                tiet_Delay.text.toString().toInt().toByte(),
                 tietMinimumBrightness.text.toString().toInt().toByte(),
-                0x00,
+                triggerLux.toByte(),
                 mode.toByte()
         )
         val paramBytesGroup: ByteArray
@@ -375,11 +411,11 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             R.id.spDelay -> {
                 val time = getTime(spDelay.selectedItem as String)
                 if (position > 4) {
-                    selectTime = time
-                    modeDelayUnit =MODE_DELAY_UNIT_MINUTE
+                    selectTime = time * 60
+                    modeDelayUnit = MODE_DELAY_UNIT_MINUTE
                 } else {
                     selectTime = time
-                    modeDelayUnit =MODE_DELAY_UNIT_SECONDS
+                    modeDelayUnit = MODE_DELAY_UNIT_SECONDS
                 }
             }
             R.id.spSwitchMode -> {
@@ -407,11 +443,11 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                 }
             }
             R.id.sp_SwitchMode -> {
-            if (position == 0) {
-                modeSwitchMode = MODE_SWITCH_MODE_MOMENT
-            } else {
-                modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
-            }
+                if (position == 0) {
+                    modeSwitchMode = MODE_SWITCH_MODE_MOMENT
+                } else {
+                    modeSwitchMode = MODE_SWITCH_MODE_GRADIENT
+                }
             }
 
             R.id.sp_DelayUnit -> {
@@ -421,6 +457,23 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                 } else {
                     til_Delay.hint = getString(R.string.delay_seconds)
                     modeDelayUnit = MODE_DELAY_UNIT_SECONDS
+                }
+            }
+
+            R.id.spTrigger_lux -> {
+                when (position) {
+                    0 -> {
+                        triggerLux = 0
+                    }
+                    1 -> {
+                        triggerLux = 2
+                    }
+                    2 -> {
+                        triggerLux = 10
+                    }
+                    3 -> {
+                        triggerLux = 50
+                    }
                 }
             }
         }
@@ -452,31 +505,82 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun saveSensor() {
-        var dbSensor : DbSensor = DbSensor()
-        DBUtils.saveSensor(dbSensor,false)
-        dbSensor.controlGroupAddr = getControlGroup()
-        dbSensor.index = dbSensor.id.toInt()
-        dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
-        dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//        var sensor = DBUtils.getAllSensor()
+//        if (sensor.size > 0) {
+//            for (i in sensor.indices) {
+//                if (mDeviceInfo.macAddress == sensor[i].macAddr) {
+//                    var dbSensor: DbSensor = DbSensor()
+//                    dbSensor.macAddr = mDeviceInfo.macAddress
+//                    dbSensor.id = sensor[i].id
+//                    dbSensor.productUUID = mDeviceInfo.productUUID
+//                    dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//                    DBUtils.updateSensor(dbSensor)
+//                } else {
+//                    var dbSensor: DbSensor = DbSensor()
+//                    DBUtils.saveSensor(dbSensor, false)
+//                    dbSensor.controlGroupAddr = getControlGroup()
+//                    dbSensor.index = dbSensor.id.toInt()
+//                    dbSensor.macAddr = mDeviceInfo.macAddress
+//                    dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
+//                    dbSensor.productUUID = mDeviceInfo.productUUID
+//                    dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+//
+//                    DBUtils.saveSensor(dbSensor, false)
+//
+//                    dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
+//
+//                    DBUtils.recordingChange(dbSensor.id,
+//                            DaoSessionInstance.getInstance().dbSensorDao.tablename,
+//                            Constant.DB_ADD)
+//                }
+//            }
+//
+//        } else {
+        if (isUpdate == "1") {
+            var sensor = DBUtils.getAllSensor()
+            if (sensor.size > 0) {
+                for (i in sensor.indices) {
+                    if (mDeviceInfo.macAddress == sensor[i].macAddr) {
+                        var dbSensor: DbSensor = DbSensor()
+                        dbSensor.macAddr = mDeviceInfo.macAddress
+                        dbSensor.id = sensor[i].id
+                        dbSensor.productUUID = mDeviceInfo.productUUID
+                        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+                        DBUtils.updateSensor(dbSensor)
 
-        DBUtils.saveSensor(dbSensor,false)
+                    }
+                }
+            }
+        } else {
+            var dbSensor: DbSensor = DbSensor()
+            DBUtils.saveSensor(dbSensor, false)
+            dbSensor.controlGroupAddr = getControlGroup()
+            dbSensor.index = dbSensor.id.toInt()
+            dbSensor.macAddr = mDeviceInfo.macAddress
+            dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
+            dbSensor.productUUID = mDeviceInfo.productUUID
+            dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
-        dbSensor= DBUtils.getSensorByID(dbSensor.id)!!
+            DBUtils.saveSensor(dbSensor, false)
 
-        DBUtils.recordingChange(dbSensor.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
+            dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
+
+            DBUtils.recordingChange(dbSensor.id,
+                    DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                    Constant.DB_ADD)
+
+        }
+//        }
+
     }
 
     private fun getControlGroup(): String? {
         var controlGroupListStr = ""
-        for(j in showGroupList!!.indices){
-            if(j==0){
-                controlGroupListStr= showGroupList!![j].groupAress.toString()
-            }else{
-                controlGroupListStr+= ","+showGroupList!![j].groupAress.toString()
+        for (j in showGroupList!!.indices) {
+            if (j == 0) {
+                controlGroupListStr = showGroupList!![j].groupAress.toString()
+            } else {
+                controlGroupListStr += "," + showGroupList!![j].groupAress.toString()
             }
         }
         return controlGroupListStr
@@ -506,9 +610,9 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun configDevice() {
-        var version=tvPSVersion.text.toString()
-            var num=version.substring(2,3)
-            if(num.toDouble()>=3.0){
+        var version = tvPSVersion.text.toString()
+        var num = version.substring(2, 3)
+        if (num.toDouble() >= 3.0) {
             if (tietMinimumBrightness.text?.isEmpty() != false) {
                 snackbar(configPirRoot, getString(R.string.params_cannot_be_empty))
             } else if (tietMinimumBrightness.text.toString().toInt() > 99) {
@@ -542,7 +646,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
                 }.start()
 
             }
-        }else{
+        } else {
             Thread {
 
                 val mApplication = this.application as TelinkLightApplication

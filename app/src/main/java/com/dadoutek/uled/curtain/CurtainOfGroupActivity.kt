@@ -21,6 +21,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import android.widget.Toast
 import butterknife.ButterKnife
 import com.blankj.utilcode.util.ActivityUtils
@@ -40,10 +41,13 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.dadoutek.uled.windowcurtains.CurtainBatchGroupActivity
+import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
 import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -84,7 +88,7 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener {
+class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener ,View.OnClickListener{
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
@@ -137,6 +141,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         initOnLayoutListener()
     }
 
+
     private fun initOnLayoutListener() {
         val view = getWindow().getDecorView()
         val viewTreeObserver = view.getViewTreeObserver()
@@ -163,6 +168,35 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //            val guide = builder.show()
 //
 //        }
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.light_add_device_btn -> {
+                if(DBUtils.getAllCurtains().size ==0){
+                    intent = Intent(this, CurtainScanningNewActivity::class.java)
+                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    startActivityForResult(intent, 0)
+                }else{
+                    addDevice()
+                }
+            }
+        }
+    }
+
+    private fun addDevice() {
+//        intent = Intent(this, CurtainsDeviceDetailsActivity::class.java)
+//        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
+//        intent.putExtra("curtain_name",group.name)
+        val intent = Intent(this,
+                CurtainBatchGroupActivity::class.java)
+        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+        intent.putExtra("curtain","group_curtain")
+        intent.putExtra("curtain_group_name",group.name)
+        startActivity(intent)
+        finish()
     }
 
     private fun initToolbar() {
@@ -237,6 +271,11 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     override fun onResume() {
         super.onResume()
+//        initToolbar()
+//        initParameter()
+//        initData()
+//        initView()
+//        initOnLayoutListener()
     }
 
     override fun onStop() {
@@ -266,6 +305,28 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             filter("", false)
         } else {
             curtainList = DBUtils.getCurtainByGroupID(group.id)
+        }
+
+        if (curtainList.size > 0) {
+            recycler_view_lights.visibility = View.VISIBLE
+            no_light.visibility = View.GONE
+            var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
+            batchGroup.setText(R.string.batch_group)
+            batchGroup.setOnClickListener(View.OnClickListener {
+                val intent = Intent(this,
+                        CurtainBatchGroupActivity::class.java)
+                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                intent.putExtra("curtain", "curtain_group")
+                intent.putExtra("group",group.id.toInt())
+                startActivity(intent)
+                finish()
+            })
+        } else {
+            recycler_view_lights.visibility = View.GONE
+            no_light.visibility = View.VISIBLE
+            toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.GONE
         }
     }
 
@@ -366,6 +427,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         } else {
             toolbar.title = (group.name ?: "") + " (" + curtainList.size + ")"
         }
+        light_add_device_btn.setOnClickListener(this)
         recycler_view_lights.layoutManager = GridLayoutManager(this, 3)
         adapter = CurtainsOfGroupRecyclerViewAdapter(R.layout.item_lights_of_group, curtainList)
         adapter!!.onItemChildClickListener = onItemChildClickListener
@@ -373,7 +435,15 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         for (i in curtainList.indices) {
             curtainList[i].updateIcon()
         }
+
+        if(DBUtils.getAllCurtains().size==0){
+            light_add_device_btn.text = getString(R.string.device_scan_scan)
+        }else{
+            light_add_device_btn.text = getString(R.string.add_device)
+        }
     }
+
+
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentCurtain = curtainList[position]
@@ -808,6 +878,11 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 Log.d("connectting", "444")
                 scanPb.visibility = View.VISIBLE
             }
+
+            LightAdapter.STATUS_LOGOUT -> {
+                retryConnect()
+            }
+
             LightAdapter.STATUS_CONNECTED -> {
                 if (!TelinkLightService.Instance().isLogin)
                     login()

@@ -1,18 +1,15 @@
 package com.dadoutek.uled.light;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -21,20 +18,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.othersview.AddMeshActivity;
-import com.dadoutek.uled.othersview.LogInfoActivity;
-import com.dadoutek.uled.ota.OTAUpdateActivity;
-import com.dadoutek.uled.othersview.SelectDeviceTypeActivity;
-import com.dadoutek.uled.othersview.UserAllActivity;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Lights;
+import com.dadoutek.uled.ota.OTAUpdateActivity;
+import com.dadoutek.uled.othersview.AddMeshActivity;
+import com.dadoutek.uled.othersview.LogInfoActivity;
+import com.dadoutek.uled.othersview.SelectDeviceTypeActivity;
+import com.dadoutek.uled.othersview.UserAllActivity;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.DataManager;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.telink.bluetooth.light.ConnectionStatus;
@@ -61,6 +59,7 @@ public final class DeviceListFragment extends Fragment {
     private EditText txtSendInterval;
     private EditText txtSendNumbers;
     private TextView txtNotifyCount;
+
     private TextView log;
 
     // interval on off test
@@ -73,12 +72,10 @@ public final class DeviceListFragment extends Fragment {
     private boolean onOff = false;
     private TextView tv_test_count;
     private int testCount;
-
     private DataManager mDataManager;
     private TelinkLightApplication mApplication;
-
     private Button btn_online_status;
-
+    private LinearLayout mLy;
 
     private static final int REQ_CHANGE_MESH_NAME = 0x01;
 
@@ -86,7 +83,6 @@ public final class DeviceListFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-
             if (v == btnAllOn) {
                 byte opcode = (byte) 0xD0;
                 int address = 0xFFFF;
@@ -138,7 +134,6 @@ public final class DeviceListFragment extends Fragment {
             }
         }
     };
-
 
     private void startIntervalTest() {
         try {
@@ -205,8 +200,8 @@ public final class DeviceListFragment extends Fragment {
     private OnItemClickListener itemClickListener = new OnItemClickListener() {
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position,
-                                long id) {
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
 
             Light light = adapter.getItem(position);
 
@@ -218,21 +213,16 @@ public final class DeviceListFragment extends Fragment {
             byte opcode = (byte) 0xD0;
 
             if (light.status == ConnectionStatus.OFF) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                        new byte[]{0x01, 0x00, 0x00});
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, new byte[]{0x01, 0x00, 0x00});
             } else if (light.status == ConnectionStatus.ON) {
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr,
-                        new byte[]{0x00, 0x00, 0x00});
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, new byte[]{0x00, 0x00, 0x00});
             }
         }
     };
 
     private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
-
         @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                       int position, long id) {
-
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             Intent intent = new Intent(getActivity(),
                     NormalSettingActivity.class);
             Light light = adapter.getItem(position);
@@ -268,23 +258,22 @@ public final class DeviceListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         this.inflater = inflater;
 
         View view = inflater.inflate(R.layout.fragment_device_list, null);
 
         GridView listView = (GridView) view.findViewById(R.id.list_devices);
+        mLy = view.findViewById(R.id.normal_light_list_ly);
         listView.setOnItemClickListener(this.itemClickListener);
         listView.setOnItemLongClickListener(this.itemLongClickListener);
         listView.setAdapter(this.adapter);
 
         this.backView = (ImageView) view.findViewById(R.id.img_header_menu_left);
         this.backView.setOnClickListener(this.clickListener);
-        if(SharedPreferencesUtils.isDeveloperModel()){
+        if (SharedPreferencesUtils.isDeveloperModel()) {
             backView.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             backView.setVisibility(View.GONE);
         }
 
@@ -323,13 +312,6 @@ public final class DeviceListFragment extends Fragment {
         this.adapter.add(light);
     }
 
-    public Light getDevice(int meshAddress) {
-        if (this.adapter != null)
-            return this.adapter.get(meshAddress);
-        else
-            return null;
-    }
-
     public void notifyDataSetChanged() {
         Lights lights = Lights.getInstance();
         for (int k = 0; k < lights.size(); k++) {
@@ -345,14 +327,6 @@ public final class DeviceListFragment extends Fragment {
     }
 
 
-    private static void hidSoftInput(Context context, IBinder token) {
-        try {
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(token, 0);
-        } catch (Exception e) {
-        }
-    }
-
     private static class DeviceItemHolder {
         public ImageView statusIcon;
         public TextView txtName;
@@ -361,7 +335,6 @@ public final class DeviceListFragment extends Fragment {
     final class DeviceListAdapter extends BaseAdapter {
 
         public DeviceListAdapter() {
-
         }
 
         @Override
@@ -381,16 +354,12 @@ public final class DeviceListFragment extends Fragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
             DeviceItemHolder holder;
-
             if (convertView == null) {
-
                 convertView = inflater.inflate(R.layout.device_item, null);
-
-                ImageView statusIcon = (ImageView) convertView
+                ImageView statusIcon = convertView
                         .findViewById(R.id.img_icon);
-                TextView txtName = (TextView) convertView
+                TextView txtName = convertView
                         .findViewById(R.id.txt_name);
 
                 holder = new DeviceItemHolder();
