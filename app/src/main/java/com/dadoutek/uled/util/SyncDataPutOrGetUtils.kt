@@ -220,6 +220,7 @@ class SyncDataPutOrGetUtils {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.add(token, region, id, changeId)
                             }
+
                             Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(),
                                     id)
                             Constant.DB_UPDATE -> {

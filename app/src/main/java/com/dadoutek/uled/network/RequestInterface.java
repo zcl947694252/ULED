@@ -15,6 +15,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
+import com.dadoutek.uled.network.bean.BaseBean;
 
 import java.util.List;
 
@@ -75,12 +76,21 @@ public interface RequestInterface {
     //添加区域
     @POST("region/add/{rid}")
     Observable<Response<String>> addRegion(@Header("token") String token,
-                                           @Body DbRegion dbRegion,
+                                             @Body DbRegion dbRegion,
 //                                           @Field("controlMesh") String controlMesh,
 //                                           @Field("controlMeshPwd") String controlMeshPwd,
 //                                           @Field("installMesh") String installMesh,
 //                                           @Field("installMeshPwd") String installMeshPwd,
-                                           @Path("rid") int rid);
+                                             @Path("rid") int rid);  //添加区域
+
+    @POST("region/add/{rid}")
+    Observable<Response<BaseBean<Object>>> addRegionNew(@Header("token") String token,
+                                             @Body DbRegion dbRegion,
+//                                           @Field("controlMesh") String controlMesh,
+//                                           @Field("controlMeshPwd") String controlMeshPwd,
+//                                           @Field("installMesh") String installMesh,
+//                                           @Field("installMeshPwd") String installMeshPwd,
+                                             @Path("rid") long rid);
 
     //获取区域列表
     @GET("region/list")

@@ -8,10 +8,11 @@
         android:layout_width="300dp"
         android:layout_height="150dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="150dp"
         android:orientation="vertical">
 
         <EditText
+            android:id="@+id/pop_region_name"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:background="@drawable/rect_white_h"

@@ -35,7 +35,11 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.othersview.*
+import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
+import com.dadoutek.uled.othersview.BaseFragment
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.SplashActivity
+import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity

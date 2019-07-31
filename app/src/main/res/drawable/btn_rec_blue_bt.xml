@@ -27,7 +27,7 @@
 
             <gradient
                 android:angle="270"
-                android:endColor="@color/blue_light"
+                android:endColor="@color/holo_blue_bright"
                 android:startColor="@color/blue_background"/>
 
             <corners android:radius="28dp" />
