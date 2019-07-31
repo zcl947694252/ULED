@@ -20,6 +20,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -89,11 +90,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import org.jetbrains.anko.design.snackbar
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-private const val MAX_RETRY_CONNECT_TIME = 5
+private const val MAX_RETRY_CONNECT_TIME = 3
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
@@ -134,11 +134,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-    internal var isClickExlogin = false
     var listSnackbar: ArrayList<Snackbar>? = null
-    private var isState = false
-    var islowVersion: Boolean = false
-    var b1: Boolean = false
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
@@ -163,21 +159,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        var list = DBUtils.getAllUser()
-//        com.xiaomi.market.sdk.Log.d("dataSize1", list.size.toString())
-
         detectUpdate()
         checkVersionAvailable()
-
         listSnackbar = kotlin.collections.ArrayList(4)
-
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         isCreate = true
-
-        //("zcl**********************${DBUtils.lastUser.toString()}")
-
     }
 
     /**
@@ -202,33 +190,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         LogOutAndExitApp()
                     }
                     .show()
-
-         /*
-         val TIME_INTERVAL: Long = 6
-         mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        val num = 5 - it as Long
-                        if (num == 0L) {
-                            main_toast.visibility = GONE
-//                            倒计时退出APP
-                            LogOutAndExitApp()
-//                            ActivityUtils.finishAllActivities(true)
-                        } else {
-                            main_toast?.let {
-                                main_toast.visibility = View.VISIBLE
-                                if (!b1)
-                                    main_toast.text = getString(R.string.version_disabled) + num + "s"
-                                else
-                                    main_toast.text = getString(R.string.syncing_relogin) + num + "s"
-                            }
-                        }
-                    })*/
         }
 
         override fun error(msg: String) {
-           //("upload data failed msg = $msg")
+            //("upload data failed msg = $msg")
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
                     .setMessage(getString(R.string.version_disabled))
@@ -439,13 +404,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     val INSTALL_CONNECTOR = 5
 
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
         isGuide = false
         installDialog?.dismiss()
-//        hidePopupMenu()
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
@@ -487,7 +447,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun syncDataAndExit() {
         if (!NetWorkUtils.isNetworkAvalible(this)) {
-           //(getString(R.string.net_disconnect_tip_message))
         } else {
             SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallback)
         }
@@ -501,13 +460,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         UpdateModel.isVersionAvailable(0, version)
                 .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
                     override fun onNext(s: ResponseVersionAvailable) {
-
-                        if (s.isUsable == false) {
+                        if (!s.isUsable) {
                             syncDataAndExit()
                         }
                         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), "isShowDot", s.isUsable)
                     }
-
                     override fun onError(e: Throwable) {
                         super.onError(e)
                         ToastUtils.showLong(R.string.get_server_version_fail)
@@ -515,6 +472,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 })
     }
 
+    /**
+     * 自定义下载
+     */
     @SuppressLint("CheckResult")
     private fun getVersion() {
         val info = this.packageManager.getPackageInfo(this.packageName, 0)
@@ -523,7 +483,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             object : NetworkObserver<VersionBean>() {
                 override fun onNext(t: VersionBean) {
                     CreateDialog(t)
-                    //("zcl**********************VersionBean$t")
                 }
 
                 override fun onError(e: Throwable) {
@@ -606,19 +565,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.setupWithViewPager(viewPager)
     }
 
-//    private fun guide1() {
-//        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_MAIN_KEY, false)
-//        if (guideShowCurrentPage) {
-//            val guide1 = bnve.getBottomNavigationItemView(1)
-//
-//            GuideUtils.guideBuilder(this, GuideUtils.MAIN_STEP0_GUIDE_TO_SCENE)
-//                    .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_main_1, getString(R.string.change_to_scene), View.OnClickListener {
-//                        transScene()
-//                        GuideUtils.changeCurrentViewIsEnd(this,GuideUtils.END_MAIN_KEY,true)
-//                    }, GuideUtils.END_MAIN_KEY,this))
-//                    .show()
-//        }
-//    }
 
     public fun transDevice() {
         bnve.currentItem = 0
@@ -786,11 +732,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //startCheckRSSITimer()
                         startScanTimeout()
 
+                        //ToastUtils.showLong(getString(R.string.scanning_devices))
+                       // if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true) {
+                       //     mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
+                       //     setSnackLocation(mScanSnackBar!!)
+                       // }
 
-                        if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true) {
-                            mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
-                            setSnackLocation(mScanSnackBar!!)
-                        }
                     } else {
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, {
@@ -826,12 +773,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             progressBar?.visibility = View.VISIBLE
                             mScanTimeoutDisposal?.dispose()
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-//                            startConnectTimer()
-
-                            if (mConnectSnackBar?.isShown != true) {
-                                mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
-                                setSnackLocation(mConnectSnackBar!!)
-                            }
+                            //  startConnectTimer()
+                           // if (mConnectSnackBar?.isShown != true) {
+                           //     mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
+                           //     setSnackLocation(mConnectSnackBar!!)
+                           // }
+                            TmtUtils.midToastLong(this@MainActivity,getString(R.string.connecting))
+                            Log.e("zcl","zcl******connecting");
                         }
                     } else {
                         //没有授予权限
@@ -841,6 +789,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun startScanTimeout() {
+         Log.e("zcl", "zcl******￥startScanTimeout")
         mScanTimeoutDisposal?.dispose()
         mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
                 .subscribe {
@@ -887,7 +836,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
-       //("start Login")
+        //("start Login")
     }
 
     private fun onNError(event: DeviceEvent) {
@@ -911,32 +860,36 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
             if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true) {
-               //("reconnect")
+                //("reconnect")
                 startScan()
             } else
                 login()
         } else {
-           //("exceed max retry time, show connection error")
+            //("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
             setSnack()
         }
     }
 
+
     private fun setSnack() {
-        if (mNotFoundSnackBar?.isShown != true) {
-            mNotFoundSnackBar = indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-                retryConnectCount = 0
-                connectFailedDeviceMacList.clear()
-                startScan()
-            }
-            setSnackLocation(mNotFoundSnackBar!!)
-        }
+        retryConnectCount = 0
+        connectFailedDeviceMacList.clear()
+        startScan()
+
+        //if (mNotFoundSnackBar?.isShown != true) {
+        //    mNotFoundSnackBar = indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
+        //        retryConnectCount = 0
+        //        connectFailedDeviceMacList.clear()
+        //        startScan()
+        //    }
+        //    setSnackLocation(mNotFoundSnackBar!!)
+        //}
     }
 
     private fun setSnackLocation(snackbar: Snackbar) {
         if (listSnackbar!!.contains(snackbar))
             return
-
         snackbar?.let {
             var cl = CoordinatorLayout.LayoutParams(it.view.layoutParams.width, it.view.layoutParams.height)
             cl.gravity = Gravity.BOTTOM//设置显示位置居中
@@ -1045,12 +998,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     mScanSnackBar?.dismiss()
                     mConnectSnackBar?.dismiss()
                     delay(300)
+                    Log.e("zcl","zcl******connect_success");
+                    TmtUtils.midToastLong(this@MainActivity,getString(R.string.connect_success))
 
-                    if (mConnectSuccessSnackBar?.isShown != true) {
-                        mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
-                        setSnackLocation(mConnectSuccessSnackBar!!)
-                    }
-                    mConnectSnackBar?.dismiss()
+                   // if (mConnectSuccessSnackBar?.isShown != true) {
+                   //     mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
+                   //     setSnackLocation(mConnectSuccessSnackBar!!)
+                   // }
+                   // mConnectSnackBar?.dismiss()
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
@@ -1060,8 +1015,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
             }
             LightAdapter.STATUS_LOGOUT -> {
-               //("status logout")
-               //("STATUS_LOGOUT")
+                //("status logout")
+                //("STATUS_LOGOUT")
+                Log.e("zcl","zcl******not_found_light")
+                TmtUtils.midToastLong(this@MainActivity,getString(R.string.not_found_light))
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTED -> {
@@ -1084,7 +1041,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         notificationInfoList = event.parse() as List<OnlineStatusNotificationParser.DeviceNotificationInfo>
 
         if (notificationInfoList.isEmpty()) {
-           //("notificationInfoList is empty")
+            //("notificationInfoList is empty")
             return
         }
 
@@ -1105,7 +1062,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbLight()
-                       //("light_mesh_2:" + (productUUID and 0xff))
+                        //("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0xff || (productUUID and 0xff) == 0x04) {
                             dbLightNew?.productUUID = 0x04
                         } else if ((productUUID and 0xff) == 0x06) {
@@ -1135,7 +1092,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbConnector()
-                       //("light_mesh_2:" + (productUUID and 0xff))
+                        //("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0x05) {
                             dbLightNew?.productUUID = 0x05
                         }
@@ -1161,7 +1118,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbCurtain()
-                       //("light_mesh_2:" + (productUUID and 0xff))
+                        //("light_mesh_2:" + (productUUID and 0xff))
                         if ((productUUID and 0xff) == 0x10) {
                             dbLightNew?.productUUID = 0x10
                         }
@@ -1195,7 +1152,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-       //("onServiceDisconnected")
+        //("onServiceDisconnected")
         TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
     }
 
@@ -1247,7 +1204,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-       //("onErrorReport: onLeScanTimeout")
+        //("onErrorReport: onLeScanTimeout")
         setSnack()
 
     }
@@ -1255,7 +1212,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
-               //("This is switch")
+                //("This is switch")
                 true
             }
             else -> false
@@ -1299,7 +1256,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             bestRSSIDevice = deviceInfo
 
             connect(bestRSSIDevice!!.macAddress)
-           //("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
+            //("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
 
         }
     }
@@ -1313,13 +1270,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                       //("蓝牙未开启")
+                        //("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                       //("无法收到广播包以及响应包")
+                        //("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                       //("未扫到目标设备")
+                        //("未扫到目标设备")
                     }
                 }
 
@@ -1327,10 +1284,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                       //("未读到att表")
+                        //("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                       //("未建立物理连接")
+                        //("未建立物理连接")
                     }
                 }
 //                retryConnect()
@@ -1339,13 +1296,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                       //("value check失败： 密码错误")
+                        //("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                       //("read login data 没有收到response")
+                        //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                       //("write login data 没有收到response")
+                        //("write login data 没有收到response")
                     }
                 }
 //                retryConnect()

@@ -817,4 +817,8 @@
     <string name="creater_name">Creator: +</string>
     <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
     <string name="input_region_name">Please enter a zone name</string>
+    <string name="developer_mode_open">Developer mode is on</string>
+    <string name="apply">apply</string>
+    <string name="in_apply">applied</string>
+    <string name="scene_apply_success">Scene apply success</string>
 </resources>

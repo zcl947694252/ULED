@@ -31,6 +31,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.TmtUtils
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,7 @@ import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/2.
+ * 场景fragment
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
@@ -69,12 +71,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-    val CREATE_GROUP_REQUESTCODE = 3
 
     internal var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         try {
-            if (position < adapter.getData().size) {
-                setScene(scenesListData!![position].id!!)
+            if (position < adapter.data.size) {
+                //setScene(scenesListData!![position].id!!)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -83,17 +84,30 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-            if (view.getId() == R.id.scene_delete) {
-                scenesListData!![position].isSelected = !scenesListData!![position].isSelected
-            } else
-                if (view.getId() == R.id.scene_edit) {
-                    //                setScene(scenesListData.get(position).getId());
+            Log.e("zcl","zcl******onItemChildClickListener")
+            when (view.id) {
+                R.id.scene_delete -> scenesListData!![position].isSelected = !scenesListData!![position].isSelected
+
+                R.id.scene_edit -> {
+                    Log.e("zcl","zcl******scene_edit")
                     val scene = scenesListData!![position]
                     val intent = Intent(activity, NewSceneSetAct::class.java)
                     intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
                     intent.putExtra(Constant.IS_CHANGE_SCENE, true)
                     startActivityForResult(intent, 3)
                 }
+
+                R.id.scene_apply -> {
+                    Log.e("zcl","zcl******scene_apply")
+                    try {
+                        if (position < adapter.data.size) {
+                            setScene(scenesListData!![position].id!!)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
     }
 
@@ -304,8 +318,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         //添加Item变化动画
         recyclerView!!.itemAnimator = DefaultItemAnimator()
         adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
-        adaper!!.setOnItemClickListener(onItemClickListener)
-        adaper!!.setOnItemChildClickListener(onItemChildClickListener)
+        adaper!!.onItemClickListener = onItemClickListener
+        adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.onItemLongClickListener = onItemChildLongClickListener
         adaper!!.bindToRecyclerView(recyclerView)
 
@@ -357,9 +371,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-            //            deleteScene(position)
-//            adapter.notifyItemRemoved(position)
-//            refreshData()
             Log.e("TAG_SIZE", scenesListData!!.size.toString())
             for (i in scenesListData!!.indices) {
                 if (scenesListData!![i].isSelected) {
@@ -373,17 +384,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
                         DBUtils.deleteSceneActionsList(list)
                         DBUtils.deleteScene(scenesListData!![i])
-//                        scenesListData!!.removeAt(position)
                     }
-//                    startDeleteGradientCmd(diyGradientList!![i].id)
-//                    DBUtils.deleteGradient(diyGradientList!![i])
-//                    DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
                 }
             }
             refreshView()
-//              scenesListData = DBUtils.sceneList
-//              adapter.setNewData(scenesListData)
-//            adaper!!.setNewData(scenesListData )
         }
         builder.setNegativeButton(activity!!.getString(R.string.cancel)) { dialog, which -> }
         val dialog = builder.show()
@@ -438,11 +442,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val opcode = Opcode.SCENE_LOAD
         val list = DBUtils.getActionsBySceneId(id)
         Thread {
-            val params: ByteArray
-            params = byteArrayOf(id.toByte())
+            val params: ByteArray = byteArrayOf(id.toByte())
             TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params)
         }.start()
 
+        TmtUtils.midToast(activity,getString(R.string.scene_apply_success))
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

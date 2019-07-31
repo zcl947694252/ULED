@@ -223,7 +223,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 }
             } else {
                 if (bluetooth_image != null) {
-                    bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                    bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
                     bluetooth_image.isEnabled = false
                 }
             }
@@ -318,7 +318,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             when (action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
                     if (bluetooth_image != null) {
-                        bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                        bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
                         bluetooth_image.isEnabled = false
                     }
                 }
@@ -517,9 +517,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 hideLoadingDialog()
                 ToastUtils.showShort(R.string.backup_failed)
             }
-
-            override fun start() {
-            }
+            override fun start() {}
         })
 
     }
@@ -544,56 +542,29 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
 
-    private fun developerMode() {
-//        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
-////        if(isBoolean){
-////            //将mHints数组内的所有元素左移一个位置
-////            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-////            //获得当前系统已经启动的时间
-////            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-////            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-////                ToastUtils.showLong(R.string.developer_mode_close)
-//////                copyDataBase!!.visibility = View.GONE
-//////                chearCache!!.visibility = View.GONE
-//////                resetAllGroup.visibility = View.GONE
-////                //开发者模式启动时启动LOG日志
-////                LogUtils.getConfig().setLog2FileSwitch(false)
-////                LogUtils.getConfig().setDir(LOG_PATH_DIR)
-////                SharedPreferencesUtils.setDeveloperModel(false)
-////            }
-////        }else{
-////            //将mHints数组内的所有元素左移一个位置
-////            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-////            //获得当前系统已经启动的时间
-////            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-////            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-////                ToastUtils.showLong(R.string.developer_mode)
-//////                copyDataBase!!.visibility = View.VISIBLE
-//////                chearCache!!.visibility = View.VISIBLE
-//////                resetAllGroup.visibility=View.VISIBLE
-////                //开发者模式启动时启动LOG日志
-////                LogUtils.getConfig().setLog2FileSwitch(true)
-////                LogUtils.getConfig().setDir(LOG_PATH_DIR)
-////                SharedPreferencesUtils.setDeveloperModel(true)
-////            }
-////        }
-
+    private fun developerMode(){
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-            val alertDialog = AlertDialog.Builder(activity)
+
+            LogUtils.getConfig().setLog2FileSwitch(true)
+            LogUtils.getConfig().setDir(LOG_PATH_DIR)
+            SharedPreferencesUtils.setDeveloperModel(true)
+            TmtUtils.midToastLong(activity,getString(R.string.developer_mode_open))
+            startActivity(Intent(context, DeveloperActivity::class.java))
+            developer.visibility = View.VISIBLE
+
+          /*  val alertDialog = AlertDialog.Builder(activity)
                     .setTitle(R.string.developer_mode_on)
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .setPositiveButton(getString(R.string.open_mode)) { dialog, which ->
                         LogUtils.getConfig().setLog2FileSwitch(true)
                         LogUtils.getConfig().setDir(LOG_PATH_DIR)
                         SharedPreferencesUtils.setDeveloperModel(true)
-
                         startActivity(Intent(context, DeveloperActivity::class.java))
                         developer.visibility = View.VISIBLE
-
                         dialog.dismiss()
-                    }
+                  }
                     .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
                         LogUtils.getConfig().setLog2FileSwitch(false)
                         LogUtils.getConfig().setDir(LOG_PATH_DIR)
@@ -602,7 +573,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         dialog.dismiss()
                     }.create()
             alertDialog.setCancelable(false)
-            alertDialog.show()
+            alertDialog.show()*/
         }
     }
 
@@ -616,8 +587,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 //                .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
 //                    TelinkLightService.Instance().idleMode(true)
 //                    clearData()
-//                }
-//                .create().show()
+//                } .create().show()
+
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
@@ -693,13 +664,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             // Check if we have write permission
             val permission = ActivityCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 // We don't have permission so prompt the user
                 ActivityCompat.requestPermissions(
-                        activity,
-                        PERMISSIONS_STORAGE,
-                        REQUEST_EXTERNAL_STORAGE
+                        activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE
                 )
             } else {
                 DBManager.getInstance().copyDatabaseToSDCard(activity)

@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/dp_10"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/bluetooth_no"
+            android:src="@drawable/icon_bluetooth"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="16dp"
@@ -486,7 +486,7 @@
 
             <RelativeLayout
                 android:id="@+id/rlRegion"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"
@@ -533,6 +533,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"
+                android:visibility="gone"
                 android:foreground="?android:attr/selectableItemBackground"
                 >
 

@@ -346,7 +346,7 @@ open class TelinkBaseActivity : AppCompatActivity()  {
                         dialog.show()
                     }
                 } else {
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                 }
             }
@@ -420,7 +420,7 @@ open class TelinkBaseActivity : AppCompatActivity()  {
             when (action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
                     if (toolbar != null) {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                     }
                 }

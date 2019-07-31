@@ -25,7 +25,6 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.acitvity_phone_verification.*
@@ -44,9 +43,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
     private lateinit var dbUser: DbUser
     private var countryCode: String? = null
-    private val mCompositeDisposable = CompositeDisposable()
-    private val TIME_INTERVAL: Long = 60
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

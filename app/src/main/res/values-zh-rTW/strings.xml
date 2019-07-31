@@ -704,4 +704,8 @@
     <string name="creater_name">创建者: +</string>
     <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
     <string name="input_region_name">请输入区域名称</string>
+    <string name="developer_mode_open">开发者模式已开启</string>
+    <string name="apply">应用</string>
+    <string name="in_apply">应用中</string>
+    <string name="scene_apply_success">场景应用成功</string>
 </resources>
