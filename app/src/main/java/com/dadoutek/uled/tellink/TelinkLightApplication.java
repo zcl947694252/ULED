@@ -22,6 +22,7 @@ import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -56,6 +57,7 @@ public final class TelinkLightApplication extends TelinkApplication {
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
         DaoSessionInstance.checkAndUpdateDatabase();
         DaoSessionUser.checkAndUpdateDatabase();
+        ZXingLibrary.initDisplayOpinion(this);
 
         if (null == mInstance) {
             mInstance = this;

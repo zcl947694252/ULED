@@ -17,10 +17,10 @@ import kotlinx.coroutines.launch
 
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
-    var userPassword:String?=null
+    var userPassword: String? = null
     fun login(phone: String, password: String): Observable<DbUser> {
-        userPassword=password
-       var userphone =phone
+        userPassword = password
+        var userphone = phone
         lateinit var account: String
 
         return NetworkFactory.getApi()
@@ -30,14 +30,16 @@ object AccountModel {
                     account = response
                     NetworkFactory.getApi()
                             .getsalt(response)
-                            .compose(NetworkTransformer())}
+                            .compose(NetworkTransformer())
+                }
                 .flatMap { response: String ->
                     val salt = response
                     val md5Pwd = (NetworkFactory.md5(
                             NetworkFactory.md5(NetworkFactory.md5(password) + account) + salt))
 
                     NetworkFactory.getApi().login(account, md5Pwd)
-                            .compose(NetworkTransformer()) }
+                            .compose(NetworkTransformer())
+                }
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
@@ -139,7 +141,7 @@ object AccountModel {
         }
     }
 
-    private fun initDatBase(user: DbUser) {
+    public fun initDatBase(user: DbUser) {
         //首先保存当前数据库名
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.account)
 
@@ -150,8 +152,8 @@ object AccountModel {
         DaoSessionUser.getInstance()
 
         DBUtils.saveUser(user)
-        user.password= userPassword
-        if(DBUtils.getUserPhone(user.phone)==null){
+        user.password = userPassword
+        if (DBUtils.getUserPhone(user.phone) == null) {
             DBUtils.saveUserDao(user)
         }
     }

@@ -75,7 +75,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     internal var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         try {
             if (position < adapter.data.size) {
-                //setScene(scenesListData!![position].id!!)
+                setScene(scenesListData!![position].id!!)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -214,8 +214,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btn_add = toolbar?.findViewById<ImageView>(R.id.img_function1)
         val btn_delete = toolbar?.findViewById<ImageView>(R.id.img_function2)
 
-//        btn_add.visibility = View.VISIBLE
-        btn_delete?.visibility = View.VISIBLE
+        btn_add?.visibility = View.VISIBLE
+       // btn_delete?.visibility = View.VISIBLE
 
         btn_add?.setOnClickListener(this)
         btn_delete?.setOnClickListener(this)

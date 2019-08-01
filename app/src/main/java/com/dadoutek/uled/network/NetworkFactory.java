@@ -30,11 +30,6 @@ public class NetworkFactory {
 
     private static OkHttpClient initHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-        DbUser user = DBUtils.INSTANCE.getLastUser();
-        Log.e("zcl","zcl***************************"+user==null?user.toString():"null");
-        String oldToken = user==null?null:user.getToken();
-        String last_region_id = user!=null&&user.getLast_region_id()!=null&&!TextUtils.isEmpty(user.getLast_region_id())?user.getLast_region_id():"1";
-
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
@@ -44,12 +39,18 @@ public class NetworkFactory {
                   String token = request.header("token");
                   Request build;
                   Request.Builder builder1 = request.newBuilder();
-                 if (token == null || token.isEmpty())
+
+                  DbUser user = DBUtils.INSTANCE.getLastUser();
+                  Log.e("zcl","zcl***************************"+user==null?user.toString():"null");
+                  String oldToken = user==null?null:user.getToken();
+                  String last_region_id = user!=null&&user.getLast_region_id()!=null&&!TextUtils.isEmpty(user.getLast_region_id())?user.getLast_region_id():"1";
+
+                  if (token == null || token.isEmpty())
                      builder1.addHeader("token", oldToken);
                  build = builder1.addHeader("region-id", last_region_id).build();
-                  return chain.proceed(build);
-              })
-                .retryOnConnectionFailure(true);
+
+                 return chain.proceed(build);
+              }).retryOnConnectionFailure(true);
 
         if (BuildConfig.DEBUG)
             okHttpBuilder.addInterceptor(logging);

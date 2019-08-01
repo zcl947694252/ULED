@@ -84,7 +84,7 @@ public interface RequestInterface {
                                              @Path("rid") int rid);  //添加区域
 
     @POST("region/add/{rid}")
-    Observable<Response<BaseBean<Object>>> addRegionNew(@Header("token") String token,
+    Observable<BaseBean<Object>> addRegionNew(@Header("token") String token,
                                              @Body DbRegion dbRegion,
 //                                           @Field("controlMesh") String controlMesh,
 //                                           @Field("controlMeshPwd") String controlMeshPwd,

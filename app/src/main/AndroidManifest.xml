@@ -324,6 +324,8 @@
         <activity
             android:name=".user.DeveloperActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".region.SettingActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

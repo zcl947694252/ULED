@@ -12,8 +12,6 @@ import java.io.Serializable;
  * 更新描述   ${TODO}
  */
 public class BaseBean<T> implements Serializable {
-
-
     /**
      * data : null
      * errorCode : 0
@@ -25,8 +23,6 @@ public class BaseBean<T> implements Serializable {
     private String message;
     private long serverTime;
     private boolean isSucess;
-
-
 
     public T getData() {
         return data;
@@ -63,5 +59,4 @@ public class BaseBean<T> implements Serializable {
     public boolean isSucess() {
         return errorCode==0;
     }
-
 }

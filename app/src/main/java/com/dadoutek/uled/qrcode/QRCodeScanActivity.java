@@ -1,37 +1,13 @@
 package com.dadoutek.uled.qrcode;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.hardware.Camera;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.view.SurfaceView;
-import android.view.ViewTreeObserver;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import com.dadoutek.uled.R;
-import com.dadoutek.uled.tellink.TelinkBaseActivity;
-import com.dadoutek.uled.qrcode.camera.Cameras;
-
-
 /**
  * 二维码扫描页面
  * 扫描 --> 解析 --> 同步
  *
  * @author kee
  */
-public class QRCodeScanActivity extends TelinkBaseActivity implements ViewTreeObserver.OnGlobalLayoutListener {
-    private static final int PERMISSION_REQUEST_CODE_CAMERA = 0x12;
+public class QRCodeScanActivity /*extends TelinkBaseActivity implements ViewTreeObserver.OnGlobalLayoutListener*/ {
+   /* private static final int PERMISSION_REQUEST_CODE_CAMERA = 0x12;
     private Cameras mCameras;
     private CameraPreviewCallback mPreviewCallback;
 
@@ -109,11 +85,11 @@ public class QRCodeScanActivity extends TelinkBaseActivity implements ViewTreeOb
         this.mDelayHandler.removeCallbacks(this.mAutoFocus);
         this.mPreviewCallback.stop();
         //
-        /*Places.getInstance().clear();
+        *//*Places.getInstance().clear();
         List<PlaceSort> placeSortList = PlacesDbUtils.getInstance().getAllPlace();
         if (placeSortList != null && placeSortList.size() > 0) {
             PlaceManage.changePlace(placeSortList.get(0));
-        }*/
+        }*//*
         //PlaceManage.changeToNoUser(null);
     }
 
@@ -141,15 +117,15 @@ public class QRCodeScanActivity extends TelinkBaseActivity implements ViewTreeOb
         int locationX = (containerWidth - cropWh) / 2;
         int locationY = (cameraHeight - cropWh) / 2;
 
-        /** 计算最终截取的矩形的左上角顶点x坐标 */
+        *//** 计算最终截取的矩形的左上角顶点x坐标 *//*
         int x = locationX * cameraWidth / containerWidth;
-        /** 计算最终截取的矩形的左上角顶点y坐标 */
+        *//** 计算最终截取的矩形的左上角顶点y坐标 *//*
         int y = locationY * cameraHeight / containerHeight;
-        /** 计算最终截取的矩形的宽度 */
+        *//** 计算最终截取的矩形的宽度 *//*
         int width = cropWh * cameraWidth / containerWidth;
-        /** 计算最终截取的矩形的高度 */
+        *//** 计算最终截取的矩形的高度 *//*
         int height = cropWh * cameraHeight / containerHeight;
-        /** 生成最终的截取的矩形 */
+        *//** 生成最终的截取的矩形 *//*
         return new Rect(x, y, width + x, height + y);
     }
 
@@ -227,5 +203,5 @@ public class QRCodeScanActivity extends TelinkBaseActivity implements ViewTreeOb
                 Toast.makeText(this, "camera permission denied", Toast.LENGTH_SHORT).show();
             }
         }
-    }
+    }*/
 }

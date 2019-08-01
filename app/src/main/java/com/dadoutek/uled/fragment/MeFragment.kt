@@ -40,6 +40,7 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.region.NetworkActivity
+import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
@@ -258,6 +259,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         instructions?.setOnClickListener(this)
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
+        setting?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -270,6 +272,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         userName!!.text = DBUtils.lastUser!!.phone
         isVisableDeveloper()
 
+        makePop()
+    }
+
+    private fun makePop() {
         //todo 恢复出厂设置
         var popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
         cancel = popView.findViewById(R.id.btn_cancel)
@@ -378,6 +384,9 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
             R.id.developer -> {
                 var intent = Intent(activity, DeveloperActivity::class.java)
+                startActivity(intent)
+            } R.id.setting -> {
+                var intent = Intent(activity, SettingActivity::class.java)
                 startActivity(intent)
             }
         }

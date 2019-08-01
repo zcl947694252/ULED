@@ -24,7 +24,6 @@ import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-import com.google.zxing.client.android.camera.CameraConfigurationUtils;
 import com.telink.bluetooth.TelinkLog;
 
 import java.io.IOException;
@@ -202,13 +201,13 @@ public final class CameraManager {
             screenResolutionForCamera.y = mScreenResolution.x;
         }
 
-        Point resolved = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolutionForCamera);
-        mCameraResolution.set(resolved.x, resolved.y);
-        TelinkLog.i(TAG + "- Camera resolution: " + mCameraResolution);
+       // Point resolved = CameraConfigurationUtils.findBestPreviewSizeValue(parameters, screenResolutionForCamera);
+       // mCameraResolution.set(resolved.x, resolved.y);
+       // TelinkLog.i(TAG + "- Camera resolution: " + mCameraResolution);
     }
 
     private void setDesiredCameraParameters(Camera camera, boolean safeMode) {
-        Camera.Parameters parameters = camera.getParameters();
+   /*     Camera.Parameters parameters = camera.getParameters();
         CameraConfigurationUtils.setFocus(parameters,
                 true, // auto focus
                 true, // disable continuous
@@ -222,6 +221,6 @@ public final class CameraManager {
                     ", but after setting it, preview size is " + afterSize.width + 'x' + afterSize.height);
             mCameraResolution.x = afterSize.width;
             mCameraResolution.y = afterSize.height;
-        }
+        }*/
     }
 }

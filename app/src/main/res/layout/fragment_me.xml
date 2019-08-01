@@ -8,9 +8,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:background="@drawable/my_backgroud"
-        >
+        android:layout_height="205dp"
+        android:background="@mipmap/top_back">
 
         <ImageView
             android:id="@+id/userIcon"
@@ -77,9 +76,9 @@
             <!--android:textSize="18sp" />-->
     <!--</RelativeLayout>-->
 
-    <ScrollView
+   <!-- <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent">-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -228,6 +227,7 @@
                 android:layout_height="44dp"
                 android:layout_marginTop="8dp"
                 android:background="@color/white"
+                android:visibility="gone"
                 android:foreground="?android:attr/selectableItemBackground"
                 >
 
@@ -270,6 +270,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"
+                android:visibility="gone"
                 android:foreground="?android:attr/selectableItemBackground"
                 >
                 <ImageView
@@ -313,6 +314,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@color/white"
+                android:visibility="gone"
                 android:foreground="?android:attr/selectableItemBackground"
                 >
 
@@ -396,6 +398,50 @@
                     />
 
             </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/rlRegion"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@color/white"
+                android:foreground="?android:attr/selectableItemBackground"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="11dp"
+                    android:src="@mipmap/icon_internet"
+                    android:layout_centerVertical="true"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/network"
+                    android:textColor="@color/black_e"
+                    android:textSize="13sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="38dp"
+                    />
+
+                <TextView
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="@color/background_color"
+                    />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_arrow"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="23dp"
+                    android:layout_centerVertical="true"
+                    />
+            </RelativeLayout>
+
 
             <RelativeLayout
                 android:id="@+id/instructions"
@@ -485,46 +531,56 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/rlRegion"
-                android:visibility="gone"
+                android:id="@+id/about"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"
-                android:foreground="?android:attr/selectableItemBackground"
-                >
+                android:foreground="?android:attr/selectableItemBackground">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="11dp"
-                    android:src="@mipmap/icon_internet"
                     android:layout_centerVertical="true"
-                    />
+                    android:layout_marginStart="11dp"
+                    android:src="@drawable/icon_number" />
 
                 <TextView
+                    android:id="@+id/tvLightVersionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/area"
-                    android:textColor="@color/black_e"
-                    android:textSize="13sp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="38dp"
-                    />
+                    android:text="@string/light_version"
+                    android:textColor="@color/black_e"
+                    android:textSize="13sp" />
 
+                <ImageView
+                    android:id="@+id/appVersion_dot"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginEnd="28dp"
+                    android:layout_marginBottom="5dp"
+                    android:visibility="gone"
+                    android:layout_toStartOf="@+id/appVersion"
+                    android:padding="@dimen/dp_10"
+                    android:src="@drawable/red_dot" />
+
+                <TextView
+                    android:id="@+id/appVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="23dp"
+                    android:text="1.0.0"
+                    android:textColor="@color/primary"
+                    android:textSize="13sp" />
                 <TextView
                     android:layout_alignParentBottom="true"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_height="10dp"
                     android:background="@color/background_color"
-                    />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/icon_arrow"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="23dp"
-                    android:layout_centerVertical="true"
                     />
             </RelativeLayout>
 
@@ -573,7 +629,8 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/about"
+                android:id="@+id/setting"
+                android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:background="@color/white"
@@ -584,36 +641,47 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="11dp"
-                    android:src="@mipmap/icon_number"
+                    android:src="@drawable/icon_setting"
                     android:layout_centerVertical="true"
                     />
 
                 <TextView
-                    android:id="@+id/tvLightVersionText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/light_version"
+                    android:text="@string/setting"
                     android:textColor="@color/black_e"
                     android:textSize="13sp"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="38dp"
                     />
+
                 <TextView
-                    android:id="@+id/appVersion"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/background_color"
+                    />
+
+                <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1.0.0"
-                    android:textColor="@color/primary"
+                    android:src="@drawable/icon_arrow"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="23dp"
                     android:layout_centerVertical="true"
-                    android:textSize="13sp" />
+                    />
             </RelativeLayout>
 
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/background_color"/>
+
             <Button
                 android:id="@+id/exitLogin"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="13dp"
                 android:text="@string/exit_login"
                 android:layout_gravity="center"
                 android:textSize="14sp"
@@ -623,5 +691,5 @@
                 android:textColor="@color/blue_background"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-    </ScrollView>
+    <!--</ScrollView>-->
 </LinearLayout>

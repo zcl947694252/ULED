@@ -100,7 +100,7 @@
             android:text="@string/ota"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tvRename"

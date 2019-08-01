@@ -756,7 +756,7 @@
     <string name="delete_network">Delete Network</string>
     <string name="share_network">Share Network</string>
     <string name="update_name">Update Name</string>
-    <string name="current_account">Current account</string>
+    <string name="current_account">Current account:</string>
     <string name="all">All</string>
     <string name="developer_mode_on">Whether to turn developer mode on/off</string>
     <string name="open_mode">open</string>
@@ -821,4 +821,10 @@
     <string name="apply">apply</string>
     <string name="in_apply">applied</string>
     <string name="scene_apply_success">Scene apply success</string>
+    <string name="network">authorization management</string>
+    <string name="transfer_accounts">Transfer accounts</string>
+    <string name="start_change_region">Start switching area</string>
+    <string name="error_change_region">Failed to switch zone</string>
+    <string name="success_change_region">Switching region successful</string>
+
 </resources>

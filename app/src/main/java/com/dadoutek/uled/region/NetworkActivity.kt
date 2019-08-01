@@ -2,40 +2,48 @@ package com.dadoutek.uled.region
 
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
+import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
+import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.adapter.AreaItemAdapter
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
-import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import kotlinx.android.synthetic.main.activity_network.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 
 class NetworkActivity : AppCompatActivity(), View.OnClickListener {
+    private  var loadDialog: Dialog? = null
     private lateinit var popAdd: PopupWindow
     private var viewAdd: View? = null
-    var dbUser: DbUser? = null
     var adapter: AreaItemAdapter? = null
     var list: MutableList<DbRegion>? = null
     var pop: PopupWindow? = null
     var view: View? = null
     var root: View? = null
+    var isFrist: Boolean = true
+    var dbRegion: DbRegion? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,15 +55,20 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initView() {
+        initToolBar()
+        makePop()
+
+        initListener()
+    }
+
+    private fun initToolBar() {
         toolbarTv.visibility = View.VISIBLE
         toolbarTv.text = getString(R.string.area)
         img_function1.visibility = View.VISIBLE
         image_bluetooth.visibility = View.VISIBLE
         image_bluetooth.setImageResource(R.mipmap.icon_scanning)
-
-        dbUser = DBUtils.lastUser
-        makePop()
-        initListener()
+        toolbar.setNavigationIcon(R.drawable.navigation_back_white)
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
     private fun initListener() {
@@ -65,53 +78,40 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun addRegion(text: Editable) {
-        val dbRegion = DbRegion()
+        val dbRegion = DBUtils.lastRegion
 
+        Log.e("zcl", "zcl*****addRegion*${dbRegion.id}")
         dbRegion.installMesh = Constant.PIR_SWITCH_MESH_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.name = text.toString()
-        dbRegion.id = DBUtils.lastRegion.id+1
-        DbUser()
-
-    /*    RegionModel.addRegions(dbUser!!.token, dbRegion, dbRegion.id)!!.subscribe {
+        dbRegion.id = DBUtils.lastRegion.id + 1
+        RegionModel.addRegions(DBUtils.lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe {
             if (it.isSucess) {
                 initData()
             }
-        }*/
-
-        NetworkFactory.getApi()
-                .addRegionNew(dbUser!!.token, dbRegion, dbRegion.id)
-                .compose(NetworkTransformer())
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
-                    if (it.isSucess) {
-                        initData()
-                    }
-                }
-               // .observeOn(AndroidSchedulers.mainThread())
+        }
     }
 
     @SuppressLint("CheckResult")
     private fun initData() {
-        if (dbUser != null) {
-            RegionModel.get(dbUser!!.token)?.subscribe { it ->
+        if (DBUtils.lastUser != null) {
+            RegionModel.get(DBUtils.lastUser!!.token)?.subscribe { it ->
                 setData(it)
             }
         }
     }
 
     private fun setData(it: MutableList<DbRegion>?) {
-        if (list!!.isEmpty()){
-            list = it
-            area_account.text = getString(R.string.current_account) + ": +" + dbUser!!.phone
-            area_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
-            adapter = AreaItemAdapter(R.layout.item_area_net, it!!, dbUser!!.last_region_id)
-            adapter!!.setOnItemClickListener { _, _, position -> setPop(position) }
-            area_recycleview.adapter = adapter
-        }else{
-            list!!.addAll(it!!)
-            adapter!!.notifyDataSetChanged()
+        list = it
+        area_account.text = getString(R.string.current_account) + ": +" + DBUtils.lastUser!!.phone
+        area_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
+        adapter = AreaItemAdapter(R.layout.item_area_net, it!!, DBUtils.lastUser!!.last_region_id)
+        adapter!!.setOnItemClickListener { _, _, position -> setPop(position) }
+        area_recycleview.adapter = adapter
+        list?.let {
+            if (list!!.size > 0)
+                DBUtils.saveRegion(it[list!!.size - 1], isFrist)//是第一次就是从服务器获取
+            isFrist = false
         }
     }
 
@@ -127,13 +127,12 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
 
         view?.let {
             it.findViewById<RelativeLayout>(R.id.pop_view).setOnClickListener(this)
-            it.findViewById<ConstraintLayout>(R.id.pop_net_ly).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_user_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_del_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_share_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_update_net).setOnClickListener(this)
-            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + dbUser!!.phone
-            //  it.findViewById<ImageView>(R.id.pop_qr_img).setOnClickListener(this)
+            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + DBUtils.lastUser!!.phone
+            //it.findViewById<ImageView>(R.id.pop_qr_img).setOnClickListener(this)
         }
 
         viewAdd?.let {
@@ -157,11 +156,13 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun setPop(position: Int) {
-        val dbRegion = list!![position]
+        dbRegion = list!![position]
+        if (dbRegion == null)
+            return
         view?.let {
-            it.findViewById<TextView>(R.id.pop_net_name).text = dbRegion.name
+            it.findViewById<TextView>(R.id.pop_net_name).text = dbRegion!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list!!.size
-            if (dbRegion.id.toString() == dbUser!!.last_region_id)
+            if (dbRegion!!.id.toString() == DBUtils.lastUser!!.last_region_id)
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
             else
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
@@ -169,19 +170,22 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         root?.let { PopUtil.show(pop, it, Gravity.BOTTOM) }
     }
 
+
     override fun onClick(v: View?) {
+        DBUtils.deleteAll()
         when (v!!.id) {
             R.id.pop_view -> {
                 PopUtil.dismiss(pop)
             }
-            R.id.pop_net_ly -> {
-                view!!.findViewById<TextView>(R.id.pop_net_name).text = "11"
-            }
+
             R.id.pop_user_net -> {
-                view!!.findViewById<TextView>(R.id.pop_net_name).text = "22"
+                //上传数据到服务器
+                if (dbRegion!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
+                    checkNetworkAndSync(this)
+                }
             }
             R.id.pop_del_net -> {
-                view!!.findViewById<TextView>(R.id.pop_net_name).text = "33"
+
             }
             R.id.pop_share_net -> {
                 view!!.findViewById<TextView>(R.id.pop_net_name).text = "444"
@@ -195,6 +199,92 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun getQr() {
 
+    }
+
+
+    /**
+     * 检查网络上传数据
+     * 如果没有网络，则弹出网络设置对话框
+     */
+    fun checkNetworkAndSync(activity: Activity?) {
+        if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
+            AlertDialog.Builder(activity)
+                    .setTitle(R.string.network_tip_title)
+                    .setMessage(R.string.net_disconnect_tip_message)
+                    .setPositiveButton(android.R.string.ok
+                    ) { _, _ ->
+                        // 跳转到设置界面
+                        activity.startActivityForResult(Intent(
+                                Settings.ACTION_WIRELESS_SETTINGS),
+                                0)
+                    }.create().show()
+        } else {
+            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+        }
+    }
+
+    /**
+     * 上传回调
+     */
+    internal var syncCallback: SyncCallback = object : SyncCallback {
+        override fun start() {
+            showLoadingDialog(this@NetworkActivity!!.getString(R.string.start_change_region))
+        }
+
+        override fun complete() {
+            ToastUtils.showLong(this@NetworkActivity!!.getString(R.string.success_change_region))
+            //创建数据库
+            val user = DBUtils.lastUser
+            user?.let {
+                //更新user
+                it.last_region_id = dbRegion?.id.toString()
+                //创建数据库
+                AccountModel.initDatBase(it)
+                //更新last—region-id
+                DBUtils.saveUser(user)
+
+                if (dbRegion!!.id.toString() == DBUtils.lastUser!!.last_region_id)
+                    view!!.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+                else
+                    view!!.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+               initData()
+            }
+            hideLoadingDialog()
+        }
+
+        override fun error(msg: String) {
+            ToastUtils.showLong(getString(R.string.error_change_region))
+            hideLoadingDialog()
+        }
+    }
+
+
+    fun showLoadingDialog(content: String) {
+        val inflater = LayoutInflater.from(this)
+        val v = inflater.inflate(R.layout.dialogview, null)
+
+        val layout = v.findViewById<View>(R.id.dialog_view) as LinearLayout
+        val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
+        tvContent.text = content
+
+
+        if (loadDialog == null) {
+            loadDialog = Dialog(this!!,
+                    R.style.FullHeightDialog)
+        }
+        //loadDialog没显示才把它显示出来
+        if (!loadDialog!!.isShowing) {
+            loadDialog!!.setCancelable(false)
+            loadDialog!!.setCanceledOnTouchOutside(false)
+            loadDialog!!.setContentView(layout)
+            loadDialog!!.show()
+        }
+    }
+
+    fun hideLoadingDialog() {
+        if (loadDialog != null) {
+            loadDialog!!.dismiss()
+        }
     }
 
     override fun onDestroy() {

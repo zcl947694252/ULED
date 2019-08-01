@@ -478,7 +478,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getVersion() {
         val info = this.packageManager.getPackageInfo(this.packageName, 0)
-        //("zcl**********************VersionBean${info.versionName}")
         UpdateModel.getVersion(info.versionName)!!.subscribe {
             object : NetworkObserver<VersionBean>() {
                 override fun onNext(t: VersionBean) {
@@ -582,7 +581,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onPause() {
         super.onPause()
         mScanTimeoutDisposal?.dispose()
-        mConnectDisposal?.dispose()
+
         mScanSnackBar?.dismiss()
         mNotFoundSnackBar?.dismiss()
         mConnectSnackBar?.dismiss()
@@ -597,6 +596,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             e.printStackTrace()
         }
         stopConnectTimer()
+    }
+
+    private fun stopConnectTimer() {
+        mConnectDisposal?.dispose()
     }
 
     override fun onResume() {
@@ -635,7 +638,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     fun hideLocationServiceDialog() {
         locationServiceDialog?.hide()
     }
-
 
     fun addEventListeners() {
         // 监听各种事件
@@ -758,9 +760,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
     }
 
-    private fun stopConnectTimer() {
-        mConnectDisposal?.dispose()
-    }
 
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
@@ -770,7 +769,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     if (it) {
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
-                            progressBar?.visibility = View.VISIBLE
+                            progressBar?.visibility = View.GONE
                             mScanTimeoutDisposal?.dispose()
                             TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
                             //  startConnectTimer()
@@ -798,7 +797,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
     }
 
-
 /*
     private fun startCheckRSSITimer() {
         mScanTimeoutDisposal?.dispose()
@@ -814,7 +812,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     override fun onSubscribe(d: Disposable) {
                         mScanTimeoutDisposal = d
                     }
-
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
@@ -867,6 +864,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         } else {
             //("exceed max retry time, show connection error")
             TelinkLightService.Instance().idleMode(true)
+            TmtUtils.midToastLong(this@MainActivity,getString(R.string.not_found_light))
             setSnack()
         }
     }
@@ -1018,7 +1016,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 //("status logout")
                 //("STATUS_LOGOUT")
                 Log.e("zcl","zcl******not_found_light")
-                TmtUtils.midToastLong(this@MainActivity,getString(R.string.not_found_light))
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTED -> {
@@ -1096,7 +1093,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         if ((productUUID and 0xff) == 0x05) {
                             dbLightNew?.productUUID = 0x05
                         }
-                        dbLightNew.setConnectionStatus(connectionStatus.value)
+                        dbLightNew.connectionStatus = connectionStatus.value
                         dbLightNew.updateIcon()
                         dbLightNew.belongGroupId = DBUtils.groupNull?.id
                         dbLightNew.color = 0
@@ -1279,7 +1276,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //("未扫到目标设备")
                     }
                 }
-
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
@@ -1290,8 +1286,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //("未建立物理连接")
                     }
                 }
-//                retryConnect()
-
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
@@ -1305,7 +1299,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //("write login data 没有收到response")
                     }
                 }
-//                retryConnect()
             }
         }
     }
@@ -1342,7 +1335,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     firstTime = secondTime
                     return true
                 } else {
-//                System.exit(0)
                     ActivityUtils.finishAllActivities(true)
                 }
             }

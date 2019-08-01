@@ -24,10 +24,8 @@ object RegionModel {
     fun addRegions(token: String, dbRegion: DbRegion, changeId: Long?): Observable<BaseBean<Any>>? {
         return NetworkFactory.getApi()
                 .addRegionNew(token, dbRegion, changeId!!)
-                .compose(NetworkTransformer())
-                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
                 .doOnNext {
-
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
