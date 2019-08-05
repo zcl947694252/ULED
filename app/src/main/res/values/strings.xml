@@ -848,5 +848,8 @@
     <string name="see_more">See more</string>
     <string name="me_net_num">Personal network (%1$s)</string>
     <string name="received_net_num">Received networks (%1$s)</string>
+    <string name="pick_up">pick_up</string>
+    <string name="see_qr">View qr code</string>
+    <string name="input_new_region_name">Please enter a new zone name</string>
 
 </resources>

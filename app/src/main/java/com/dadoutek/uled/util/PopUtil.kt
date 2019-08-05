@@ -35,11 +35,11 @@ object PopUtil {
         }
 
         fun show(pop: PopupWindow?, view: View, gravity: Int){
-            if (!pop!!.isShowing)
-                pop!!.showAtLocation(view, gravity, 0, 0)
+            if (pop!=null&&pop.isShowing)
+                pop.showAtLocation(view, gravity, 0, 0)
         }
         fun dismiss(pop: PopupWindow?){
-            if (pop!=null&&pop!!.isShowing)
-                pop!!.dismiss()
+            if (pop!=null&&pop.isShowing)
+                pop.dismiss()
         }
 }

@@ -115,14 +115,31 @@ public interface RequestInterface {
                                               @Path("rid") int rid,
                                               @Body DbRegion dbRegion);
 
+
+
     //删除区域
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("region/remove/{rid}")
     Observable<Response<String>> deleteRegion(@Header("token") String token,
                                               @Path("rid") int rid);
 
-    //组相关接口
+    //57、授权码过期
+    //使一个授权码过期
+    //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/{rid}/{type}
+    //DELETE
+    //区域id和码种类type，在url中
+    //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/1/1
+    @DELETE("auth/authorization/code/remove/{rid}/{type}")
+    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid,@Path("type") int type);
 
+    //6、清除当前区域和其下数据
+    //清除当前区域和其下数据，区域本身(除区域一)也会被删除。
+    //http://dev.dadoutek.com/smartlight/auth/region/clear
+    //DELETE
+    @DELETE("auth/region/clear")
+    Observable<Response<String>> removeRegion();
+
+    //组相关接口
     //添加组
     @POST("group/add/{region_id}/{gid}")
     Observable<Response<String>> addGroup(@Header("token") String token,

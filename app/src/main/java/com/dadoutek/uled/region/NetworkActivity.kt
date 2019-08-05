@@ -8,6 +8,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
@@ -27,7 +28,10 @@ import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.region.bean.RegionBean
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.DensityUtil
+import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.PopUtil
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.uuzuche.lib_zxing.activity.CodeUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,6 +39,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_network.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.textColor
 import java.util.concurrent.TimeUnit
 
 
@@ -49,10 +54,7 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     var listAuthorize: MutableList<RegionBean>? = null
     var listAuthorizeAll: MutableList<RegionBean>? = null
     var subAuthorizeList: MutableList<RegionBean>? = null
-    var meShowAll =false
-    var authorizeShowAll =false
 
-    private var mType: Int = 0
     private var loadDialog: Dialog? = null
     private lateinit var popAdd: PopupWindow
     private var viewAdd: View? = null
@@ -65,11 +67,12 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     var mCompositeDisposable = CompositeDisposable()
     var mBuild: AlertDialog.Builder? = null
     var isShowType = 3 //1自己的区域  2接收区域  3 全部区域
+    var mExpire: Long = 0
+    private var isAddRegion = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_network)
-        root = View.inflate(this, R.layout.activity_network, null)
         list = ArrayList()
         listAuthorize = ArrayList()
         listTwo = ArrayList()
@@ -95,7 +98,13 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun initListener() {
-        img_function1.setOnClickListener { PopUtil.show(popAdd, window.decorView, Gravity.CENTER) }
+        img_function1.setOnClickListener {
+            isAddRegion =true
+            viewAdd!!.findViewById<EditText>(R.id.pop_region_name).setText("")
+            viewAdd!!.findViewById<EditText>(R.id.pop_region_name).hint = getString(R.string.input_region_name)
+            showPop(popAdd, Gravity.CENTER)
+        }
+
         image_bluetooth.setOnClickListener {
             //S扫描
         }
@@ -107,18 +116,21 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-
     @SuppressLint("CheckResult")
     private fun addRegion(text: Editable) {
         val dbRegion = DbRegion()
         dbRegion.installMesh = Constant.PIR_SWITCH_MESH_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.name = text.toString()
-        if (list == null || list!!.size <= 0) {
-            dbRegion.id = 1
-        } else {
-            val region = list?.get(list!!.size - 1)
-            dbRegion.id = region!!.id + 1
+        if (isAddRegion){
+            if (list == null || list!!.size <= 0) {
+                dbRegion.id = 1
+            } else {
+                val region = list?.get(list!!.size - 1)
+                dbRegion.id = region!!.id + 1
+            }
+        }else{
+            dbRegion.id = regionBean?.id
         }
 
         RegionModel.addRegions(DBUtils.lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe {
@@ -128,17 +140,20 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    @SuppressLint("CheckResult")
-    private fun initData(){
-        if (DBUtils.lastUser != null)
+    @SuppressLint("CheckResult", "SetTextI18n")
+    private fun initData() {
+        if (DBUtils.lastUser != null){
+            region_account_num.text = "+"+DBUtils.lastUser!!.phone
+            Log.e("zcl","zcl******lastUser!!.account****${DBUtils.lastUser!!.phone}")
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe { it -> setMeData(it) }
                 2 -> RegionModel.getAuthorizerList()?.subscribe { it -> setMeData(it) }
                 3 -> {
                     RegionModel.getAuthorizerList()?.subscribe { it -> setAuthorizeData(it) }
-                    RegionModel.get()?.subscribe { it -> setMeData(it) }
+                    RegionModel.get()?.subscribe { it -> setMeData(it)}
                 }
             }
+        }
     }
 
     /**
@@ -147,27 +162,43 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun setMeData(it: MutableList<RegionBean>) {
         listAll = it
-        region_me_net_num.text = getString(R.string.me_net_num,it.size)
-        if (it.size>3){
-            region_me_more.visibility =View.VISIBLE
+        region_me_net_num.text = getString(R.string.me_net_num, it.size)
+        if (it.size > 3) {
+            region_me_more.visibility = View.VISIBLE
             subMeList = it.subList(0, 2)
-        }else{
-            subMeList =it
-            region_me_more.visibility =View.GONE
+        } else {
+            subMeList = it
+            region_me_more.visibility = View.GONE
         }
 
-        list =if (!isMeRegionAll) subMeList else listAll
+        list = if (!isMeRegionAll) subMeList else listAll
 
-        Log.e("zcl","zcl******me**${list!!.size}")
+        Log.e("zcl", "zcl******me**${list!!.size}")
         region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
         adapter = AreaItemAdapter(R.layout.item_area_net, list!!, DBUtils.lastUser!!.last_region_id)
         adapter!!.setOnItemChildClickListener { _, view, position ->
+            isShowType = 1
             setClickAction(position, view, list!!)
-            mType=1 }
+        }
         region_me_recycleview.adapter = adapter
         region_me_more.setOnClickListener {
-            isMeRegionAll =!isMeRegionAll
+            isMeRegionAll = !isMeRegionAll
+            setMoreArr(isMeRegionAll, region_me_more_tv, region_me_more_arr)
+            isShowType = 1
             initData()
+        }
+    }
+
+    /**
+     * 查看更多状态变化
+     */
+    private fun setMoreArr(isAll: Boolean, more_tv: TextView, more_arr: ImageView) {
+        if (isAll) {
+            more_arr.setImageResource(R.mipmap.icon_on)
+            more_tv.text = getString(R.string.pick_up)
+        } else {
+            more_tv.text = getString(R.string.see_more)
+            more_arr.setImageResource(R.mipmap.icon_under)
         }
     }
 
@@ -178,27 +209,30 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     @SuppressLint("StringFormatMatches")
     private fun setAuthorizeData(it: MutableList<RegionBean>) {
         listAuthorizeAll = it
-        region_authorize_net_num.text = getString(R.string.received_net_num,it.size)
+        region_authorize_net_num.text = getString(R.string.received_net_num, it.size)
 
-        if (it.size>3){
-            region_authorize_more.visibility =View.VISIBLE
+        if (it.size > 3) {
+            region_authorize_more.visibility = View.VISIBLE
             subAuthorizeList = it.subList(0, 2)
-        }else{
-            subAuthorizeList =it
-            region_authorize_more.visibility =View.GONE
+        } else {
+            subAuthorizeList = it
+            region_authorize_more.visibility = View.GONE
         }
-        listAuthorize =if (!isAuthorizeRegionAll) subAuthorizeList else listAuthorizeAll
+        listAuthorize = if (!isAuthorizeRegionAll) subAuthorizeList else listAuthorizeAll
 
-        Log.e("zcl","zcl******authorize**${listAuthorize!!.size}")
+        Log.e("zcl", "zcl******authorize**${listAuthorize!!.size}")
 
         region_authorize_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
         adapterAuthorize = AreaItemAdapter(R.layout.item_area_net, listAuthorize!!, DBUtils.lastUser!!.last_region_id)
         adapterAuthorize!!.setOnItemChildClickListener { _, view, position ->
+            isShowType = 2
             setClickAction(position, view, listAuthorize!!)
-            mType=2 }
+        }
         region_authorize_recycleview.adapter = adapter
         region_authorize_recycleview.setOnClickListener {
-            isAuthorizeRegionAll =!isAuthorizeRegionAll
+            isAuthorizeRegionAll = !isAuthorizeRegionAll
+            setMoreArr(isAuthorizeRegionAll, region_authorize_more_tv, region_authorize_more_arr)
+            isShowType = 2
             initData()
         }
     }
@@ -231,25 +265,57 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         DBUtils.deleteAll()
         when (v!!.id) {
             R.id.pop_view -> PopUtil.dismiss(pop)
-
+            R.id.pop_qr_ly -> {
+            }
             R.id.pop_qr_cancel -> PopUtil.dismiss(pop)
-
             R.id.pop_user_net -> {
                 //上传数据到服务器
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-
+                //只能删除当前切换的区域
+                RegionModel.removeRegion()!!.subscribe {
+                    if (it.errorCode==0)
+                        initData()
+                }
             }
             R.id.pop_share_net -> {
-                mType = 1
-                getQr()
+                if (mExpire > 0) {
+                    view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
+                } else {
+                    getQr()
+                }
             }
             R.id.pop_update_net -> {
-s
+                viewAdd!!.findViewById<EditText>(R.id.pop_region_name).setText("")
+                viewAdd!!.findViewById<EditText>(R.id.pop_region_name).hint = getString(R.string.input_new_region_name)
+                PopUtil.dismiss(pop)
+                isAddRegion = false
+                showPop(popAdd, Gravity.CENTER)
             }
             R.id.pop_qr_undo -> {
                 //撤销二维码
+                RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe {
+                    if (it.errorCode == 0) {
+                        //设置二维码失效状态 倒计时颜色状态
+                        view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
+                        view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
+
+                        //设置刷新二维码变为二维码已撤销
+                        view?.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
+                        view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_canceled)
+                        view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
+                        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_cancel)
+                        view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
+
+                        setCreatShareCodeState()
+
+                        view?.findViewById<View>(R.id.view19)?.visibility = View.GONE
+
+                        mCompositeDisposable.clear()
+                        mExpire = 0
+                    }
+                }
             }
         }
     }
@@ -265,12 +331,9 @@ s
      */
     @SuppressLint("CheckResult")
     private fun getQr() {
-        //http://47.107.227.130/smartlight/auth/authorization/code/generate/{rid}
         RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe {
             if (it.errorCode == 0) {
-                var mBitmap = CodeUtils.createImage(it.t.code, DensityUtil.dip2px(this, 231f), DensityUtil.dip2px(this, 231f), null)
-                view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
-                mType = it.t.type
+                setQR(it.t.code)
                 val expire = it.t.expire.toLong()
                 downTimer(expire)
                 view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
@@ -278,28 +341,60 @@ s
         }
     }
 
+    private fun setQR(it: String) {
+        var mBitmap = CodeUtils.createImage(it, DensityUtil.dip2px(this, 231f), DensityUtil.dip2px(this, 231f), null)
+        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
+    }
+
     @SuppressLint("SetTextI18n")
     private fun downTimer(expire: Long) {
-        mCompositeDisposable.add(Observable
-                //从0开始到expire 第一次0秒开始 以后一秒一次
-                .intervalRange(0, expire, 0, 1, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    var num = expire - it
-                    if (num == 0L) {
-                        ToastUtil.showToast(this, getString(R.string.QR_expired))
-                        PopUtil.dismiss(pop)
+        mCompositeDisposable.clear()
 
-                        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_cancel)
-                        view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_canceled)
-                    } else {
-                        val s = num % 60
-                        val m = num / 60 % 60
-                        val h = num / 60 / 60
-                        view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = "$h:$m:$s"
-                    }
-                })
+        if (expire > 0) {
+            view?.findViewById<ImageView>(R.id.pop_share_net)?.setImageResource(R.mipmap.icon_code)
+            view?.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
+            view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.black_three)
+            view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.VISIBLE
+            view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_cancel)
+            view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = true
+            view?.findViewById<View>(R.id.view19)?.visibility = View.VISIBLE
+
+            mCompositeDisposable.add(Observable
+                    //从0开始到expire 第一次0秒开始 以后一秒一次
+                    .intervalRange(0, expire, 0, 1, TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        mExpire = expire - it
+                        if (mExpire == 0L) {
+                            setShareAndTimerAndCancelState()
+                        } else {
+                            val s = mExpire % 60
+                            val m = mExpire / 60 % 60
+                            val h = mExpire / 60 / 60
+                            view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = "$h:$m:$s"
+                        }
+                    })
+        }
+    }
+
+    private fun setShareAndTimerAndCancelState() {
+        //设置分享网络状态
+        setCreatShareCodeState()
+        //设置二维码失效状态 倒计时颜色状态
+        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_invalid)
+        view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
+        view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
+        //设置取消二维码变为刷新状态
+        view?.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
+        view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.refresh_qr_code)
+        view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = true
+    }
+
+    private fun setCreatShareCodeState() {
+        view?.findViewById<ImageView>(R.id.pop_share_net)?.setImageResource(R.drawable.icon_share)
+        view?.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
+        view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.black_three)
     }
 
     private fun makePop() {
@@ -321,6 +416,7 @@ s
             it.findViewById<ImageView>(R.id.pop_update_net).setOnClickListener(this)
             it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + DBUtils.lastUser!!.phone
             it.findViewById<TextView>(R.id.pop_qr_cancel).setOnClickListener(this)
+            it.findViewById<LinearLayout>(R.id.pop_qr_ly).setOnClickListener(this)
             it.findViewById<TextView>(R.id.pop_qr_undo).setOnClickListener(this)
         }
 
@@ -349,8 +445,10 @@ s
      */
     private fun setPopData(position: Int, list: MutableList<RegionBean>) {
         regionBean = list[position]
+
         if (regionBean == null)
             return
+
         view?.let {
             it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
@@ -363,12 +461,20 @@ s
                 it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
             else
                 it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
-        }
 
-        root?.let {
-            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
-            PopUtil.show(pop, it, Gravity.BOTTOM)
+            mExpire = regionBean!!.code_info!!.expire.toLong()
+            Log.e("zcl", "zcl****regionBean**${regionBean.toString()}")
+            if (mExpire > 0) {
+                it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_code)
+                regionBean!!.code_info!!.code?.let { it1 -> setQR(it1) }
+                downTimer(mExpire)
+            } else {
+                it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
+            }
         }
+        view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
+        view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
+        showPop(pop!!, Gravity.BOTTOM)
     }
 
     /**
@@ -461,6 +567,11 @@ s
         }
 
         override fun error(msg: String) {}
+    }
+
+    private fun showPop(pop: PopupWindow, gravity: Int) {
+        if (pop != null && !pop.isShowing)
+            pop.showAtLocation(window.decorView, gravity, 0, 0)
     }
 
     override fun onDestroy() {

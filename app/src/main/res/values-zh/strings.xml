@@ -773,5 +773,8 @@
     <string name="see_more">查看更多</string>
     <string name="me_net_num">个人网络(%1$s个)</string>
     <string name="received_net_num">已接收网络(%1$s个)</string>
+    <string name="pick_up">收起</string>
+    <string name="see_qr">查看二维码</string>
+    <string name="input_new_region_name">请输入新的区域名称</string>
 
 </resources>

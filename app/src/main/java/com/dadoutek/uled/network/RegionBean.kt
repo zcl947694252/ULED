@@ -1,5 +1,7 @@
 package com.dadoutek.uled.region.bean
 
+import java.io.Serializable
+
 
 /**
  * 创建者     ZCL
@@ -10,7 +12,7 @@ package com.dadoutek.uled.region.bean
  * 更新时间   $Date$
  * 更新描述   ${TODO}
  */
-class RegionBean {
+class RegionBean: Serializable {
     /**
      * count_light : 121
      * count_curtain : 0
@@ -47,6 +49,7 @@ class RegionBean {
     var state: Int = 0
     var ref_users: List<RefUsersBean>? = null
 
+
     class CodeInfoBean {
         /**
          * expire : 86396
@@ -57,6 +60,9 @@ class RegionBean {
         var expire: Int = 0
         var code: String? = null
         var type: Int = 0
+        override fun toString(): String {
+            return "CodeInfoBean(expire=$expire, code=$code, type=$type)"
+        }
     }
 
     class RefUsersBean {
@@ -87,5 +93,15 @@ class RegionBean {
         var email: String? = null
         var account: String? = null
         var token: String? = null
+
+        override fun toString(): String {
+            return "RefUsersBean(password=$password, role=$role, create_time=$create_time, phone=$phone, channel=$channel, name=$name, last_region_id=$last_region_id, id=$id, avatar=$avatar, email=$email, account=$account, token=$token)"
+        }
     }
+
+    override fun toString(): String {
+        return "RegionBean(count_light=$count_light, count_curtain=$count_curtain, count_sensor=$count_sensor, count_all=$count_all, installMesh=$installMesh, count_switch=$count_switch, code_info=$code_info, belongAccount=$belongAccount, controlMesh=$controlMesh, installMeshPwd=$installMeshPwd, count_relay=$count_relay, name=$name, id=$id, controlMeshPwd=$controlMeshPwd, state=$state, ref_users=$ref_users)"
+    }
+
+
 }

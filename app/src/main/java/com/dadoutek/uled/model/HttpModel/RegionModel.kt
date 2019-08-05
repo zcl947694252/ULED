@@ -106,12 +106,23 @@ object RegionModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    /*fun sendAuthorizationCodeExpired(regionId: Long):Observable<Response<ShareCodeBean>>?{
+    fun removeAuthorizationCode(regionId: Long, type: Int):Observable<Response<String>>?{
         return NetworkFactory.getApi()
-                .authorizationCodeExpired(regionId)
+                .removeAuthorizeCode(regionId,type)
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-    }*/
+    }
+    fun removeRegion():Observable<Response<String>>?{
+        return NetworkFactory.getApi()
+                .removeRegion()
+                .subscribeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+
 }

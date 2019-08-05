@@ -1,5 +1,7 @@
 package com.dadoutek.uled.region.bean;
 
+import java.io.Serializable;
+
 /**
  * 创建者     ZCL
  * 创建时间   2019/8/2 14:30
@@ -9,7 +11,7 @@ package com.dadoutek.uled.region.bean;
  * 更新时间   $Date$
  * 更新描述   ${TODO}
  */
-public class ShareCodeBean {
+public class ShareCodeBean  implements Serializable {
 
     /**
      * data : {"expire":86400,"type":1,"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJyZWdpb25faWQiOjEsImF1dGhvcml6ZXJfaWQiOjMwMDUxNCwibGV2ZWwiOjF9.IaT-nXYdttXXqkAoK1960L-du05qLmdf71OhSXenDvosmartlight"}

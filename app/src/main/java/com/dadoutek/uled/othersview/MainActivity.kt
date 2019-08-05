@@ -791,7 +791,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun startScanTimeout() {
-         Log.e("zcl", "zcl******￥startScanTimeout")
         mScanTimeoutDisposal?.dispose()
         mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
                 .subscribe {

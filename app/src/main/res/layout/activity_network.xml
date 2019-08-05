@@ -153,7 +153,7 @@
                 android:background="@color/white">
 
                 <TextView
-                    android:id="@+id/textView24"
+                    android:id="@+id/region_me_more_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="144dp"
@@ -177,7 +177,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.107"
-                    app:layout_constraintStart_toEndOf="@+id/textView24"
+                    app:layout_constraintStart_toEndOf="@+id/region_me_more_tv"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
                     app:srcCompat="@mipmap/icon_under" />
@@ -210,7 +210,7 @@
                 android:background="@color/white">
 
                 <TextView
-                    android:id="@+id/textView25"
+                    android:id="@+id/region_authorize_more_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="144dp"
