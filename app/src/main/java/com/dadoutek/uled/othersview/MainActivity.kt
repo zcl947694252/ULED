@@ -55,6 +55,7 @@ import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UpdateModel
+import com.dadoutek.uled.network.CommonParamsInterceptor.JSON
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
@@ -90,6 +91,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
+import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -613,6 +615,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(mReceiver, filter)
+
     }
 
     var locationServiceDialog: AlertDialog? = null

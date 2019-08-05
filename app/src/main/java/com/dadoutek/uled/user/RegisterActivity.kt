@@ -32,7 +32,10 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -90,7 +93,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             dbUser = DbUser()
             register_completed.setText(R.string.btn_ok)
         }
-//        SMSSDK.registerEventHandler(eventHandler)
         SMSSDK.registerEventHandler(eventHandler)
     }
 
@@ -109,6 +111,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         return
                     }
 
+                    goSkipActivity()
                     SMSSDK.getVerificationCode(countryCode, userName)
 
                 } else {
@@ -145,11 +148,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
                         ToastUtils.showLong(R.string.send_message_success)
                        // timing()
-                        var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
-                        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
-                        intent.putExtra("country_code",countryCode)
-                        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
-                        startActivity(intent)
+                        goSkipActivity()
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
@@ -165,6 +164,20 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 false
             }).sendMessage(msg)
         }
+    }
+
+    private fun goSkipActivity() {
+        var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
+        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
+        intent.putExtra("country_code",countryCode)
+        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+        startActivity(intent)
+        //todo 测试注册
+       // val intent = Intent(this@RegisterActivity, InputPwdActivity::class.java)
+       // intent.putExtra("phone", edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+       // intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
+       // startActivity(intent)
+       // finish()
     }
 
     private fun eyePasswordAgain() {

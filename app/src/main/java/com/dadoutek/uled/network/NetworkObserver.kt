@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network
 
+import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import io.reactivex.Observer
@@ -15,7 +16,7 @@ abstract class NetworkObserver<t>() : Observer<t> {
 
     }
     override fun onError(e: Throwable) {
-
+        Log.e("zcl", "zcl******onError${e.localizedMessage}")
         //HTTP错误
         if (e is HttpException) {
             ToastUtils.showShort(R.string.network_error)

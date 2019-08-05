@@ -1,12 +1,9 @@
 package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.dadoutek.uled.BuildConfig;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbUser;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import java.security.MessageDigest;
@@ -14,7 +11,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.CallAdapter;
 import retrofit2.Converter;
@@ -30,27 +26,12 @@ public class NetworkFactory {
 
     private static OkHttpClient initHttpClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
                 .writeTimeout(3, TimeUnit.MINUTES)
-              .addInterceptor(chain -> {  //添加请求头
-                  Request request = chain.request();
-                  String token = request.header("token");
-                  Request build;
-                  Request.Builder builder1 = request.newBuilder();
-
-                  DbUser user = DBUtils.INSTANCE.getLastUser();
-                  Log.e("zcl","zcl***************************"+user==null?user.toString():"null");
-                  String oldToken = user==null?null:user.getToken();
-                  String last_region_id = user!=null&&user.getLast_region_id()!=null&&!TextUtils.isEmpty(user.getLast_region_id())?user.getLast_region_id():"1";
-
-                  if (token == null || token.isEmpty())
-                     builder1.addHeader("token", oldToken);
-                 build = builder1.addHeader("region-id", last_region_id).build();
-
-                 return chain.proceed(build);
-              }).retryOnConnectionFailure(true);
+              .addInterceptor(new CommonParamsInterceptor()).retryOnConnectionFailure(true);
 
         if (BuildConfig.DEBUG)
             okHttpBuilder.addInterceptor(logging);
@@ -67,8 +48,8 @@ public class NetworkFactory {
         if (api == null) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
-                    //.baseUrl(Constant.BASE_DEBUG_URL)
+                    //.baseUrl(Constant.BASE_URL)
+                    .baseUrl(Constant.BASE_DEBUG_URL)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)
                     .build();

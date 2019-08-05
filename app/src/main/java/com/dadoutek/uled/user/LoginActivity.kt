@@ -358,7 +358,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 return if (!beanOld?.name.equals(beanNew?.name)) {
                     return false//如果有内容不同，就返回false
                 } else true
-
             }
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }
@@ -425,7 +424,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             isSuccess = false
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
-            //("GetDataError:" + msg)
         }
     }
 

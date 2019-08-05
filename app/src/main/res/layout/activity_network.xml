@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout16"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f8f8f8">
+    android:background="#f8f8f8"
+    android:orientation="vertical">
 
     <include
         android:id="@+id/topView"
@@ -23,68 +24,227 @@
         app:layout_constraintTop_toBottomOf="@+id/topView">
 
         <TextView
-            android:id="@+id/area_account"
+            android:id="@+id/region_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="@dimen/dp_15"
             android:text="@string/current_account"
             android:textColor="@color/black_three"
-            android:textSize="16sp"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/area_account_num"
-            android:layout_width="7dp"
+            android:id="@+id/region_account_num"
+            android:layout_width="173dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="11dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="13dp"
             android:layout_marginBottom="@dimen/dp_15"
             android:text="+"
+            android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/area_account"
+            app:layout_constraintTop_toBottomOf="@+id/region_account"
+            app:layout_constraintVertical_bias="0.0"
             tools:ignore="MissingConstraints" />
 
-        <ImageView
-            android:id="@+id/transfer_account"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="11dp"
-            android:layout_marginEnd="52dp"
-            android:layout_marginBottom="8dp"
-            android:src="@mipmap/icon_transfer"
-            app:layout_constraintBottom_toTopOf="@+id/transfer_account_tv"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="1.0" />
-
-        <TextView
-            android:id="@+id/transfer_account_tv"
+        <LinearLayout
+            android:id="@+id/region_to_receive"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="106dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/region_account_num"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0">
+
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@mipmap/icon_transfer" />
+
+            <TextView
+                android:id="@+id/region_to_receive_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/to_receive"
+                android:textColor="@color/black_three"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/transfer_account"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginBottom="11dp"
-            android:text="@string/transfer_accounts"
-            android:textColor="@color/black_three"
-            android:textSize="13sp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/constraintLayout16"
-            app:layout_constraintVertical_bias="0.0"
-            tools:ignore="NotSibling" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/region_to_receive"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@mipmap/icon_transfer" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:singleLine="true"
+                android:text="@string/transfer_accounts"
+                android:textColor="@color/black_three"
+                android:textSize="13sp" />
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/area_recycleview"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout15" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
 
-</android.support.constraint.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/region_me_net_num"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                android:background="@color/gray_e"
+                android:textColor="@color/black_three" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/region_me_recycleview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:descendantFocusability="blocksDescendants" />
+
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/region_me_more"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/textView24"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="144dp"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:layout_marginBottom="@dimen/dp_15"
+                    android:text="@string/see_more"
+                    android:textColor="@color/black_three"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/region_me_more_arr"
+                    android:layout_width="17dp"
+                    android:layout_height="9dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="128dp"
+                    android:layout_marginBottom="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.107"
+                    app:layout_constraintStart_toEndOf="@+id/textView24"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@mipmap/icon_under" />
+
+            </android.support.constraint.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/region_authorize_net_num"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:paddingStart="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                android:background="@color/gray_e"
+                android:gravity="center_vertical"
+                android:textColor="@color/black_three"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/region_authorize_recycleview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:descendantFocusability="blocksDescendants" />
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/region_authorize_more"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="144dp"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:layout_marginBottom="@dimen/dp_15"
+                    android:text="@string/see_more"
+                    android:textColor="@color/black_three"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/region_authorize_more_arr"
+                    android:layout_width="17dp"
+                    android:layout_height="9dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginEnd="128dp"
+                    android:layout_marginBottom="18dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.107"
+                    app:layout_constraintStart_toEndOf="@+id/textView25"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@mipmap/icon_under" />
+
+            </android.support.constraint.ConstraintLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
+
+
+
+

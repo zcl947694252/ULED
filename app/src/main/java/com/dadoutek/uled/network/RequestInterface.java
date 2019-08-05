@@ -15,7 +15,8 @@ import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
-import com.dadoutek.uled.network.bean.BaseBean;
+import com.dadoutek.uled.region.bean.RegionBean;
+import com.dadoutek.uled.region.bean.ShareCodeBean;
 
 import java.util.List;
 
@@ -75,37 +76,44 @@ public interface RequestInterface {
 
     //添加区域
     @POST("region/add/{rid}")
-    Observable<Response<String>> addRegion(@Header("token") String token,
-                                             @Body DbRegion dbRegion,
-//                                           @Field("controlMesh") String controlMesh,
-//                                           @Field("controlMeshPwd") String controlMeshPwd,
-//                                           @Field("installMesh") String installMesh,
-//                                           @Field("installMeshPwd") String installMeshPwd,
-                                             @Path("rid") int rid);  //添加区域
+    Observable<Response<String>> addRegion(@Header("token") String token, @Body DbRegion dbRegion,
+                                           @Path("rid") int rid);  //添加区域
 
+    //添加区域
     @POST("region/add/{rid}")
-    Observable<BaseBean<Object>> addRegionNew(@Header("token") String token,
-                                             @Body DbRegion dbRegion,
-//                                           @Field("controlMesh") String controlMesh,
-//                                           @Field("controlMeshPwd") String controlMeshPwd,
-//                                           @Field("installMesh") String installMesh,
-//                                           @Field("installMeshPwd") String installMeshPwd,
-                                             @Path("rid") long rid);
+    Observable<Response<Object>> addRegionNew(@Header("token") String token, @Body DbRegion dbRegion,
+                                              @Path("rid") long rid);
+
+    // http://47.107.227.130/smartlight/ auth/authorization/code/generate/{rid}
+    //https://dev.dadoutek.com/smartlight/
+    //获取区域授权码
+    @GET("auth/authorization/code/generate/{rid}")
+    Observable<Response<ShareCodeBean>> regionAuthorizationCode(@Path("rid") long rid);
+
+    //使一个授权码过期
+    //请求URL：DELETE  http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/{rid}/{type}
+    @DELETE("auth/authorization/code/remove/{rid}/{type}")
+    Observable<Response<ShareCodeBean>> authorizationCodeExpired(@Path("rid") long rid, @Path("type") long type);
 
     //获取区域列表
     @GET("region/list")
     Observable<Response<List<DbRegion>>> getRegionList(@Header("token") String token);
 
+    //47.获取区域列表 区域activity内使用
+    // http://dev.dadoutek.com/smartlight/auth/region/list
+    @GET("auth/region/list")
+    Observable<Response<List<RegionBean>>> getRegionActivityList();
+
+    //53授权区域列表
+    //http://dev.dadoutek.com/smartlight/auth/authorization/authorizer-region/list
+    @GET("auth/authorization/authorizer-region/list")
+    Observable<Response<List<RegionBean>>> getAuthorizerList();
+
     //更新区域
     @POST("region/add/{rid}")
     Observable<Response<String>> updateRegion(@Header("token") String token,
                                               @Path("rid") int rid,
-                                              @Body DbRegion dbRegion
-//                                              @Query("controlMesh") String controlMesh,
-//                                              @Query("controlMeshPwd") String controlMeshPwd,
-//                                              @Query("installMesh") String dadousmart,
-//                                              @Query("installMeshPwd") String 123
-    );
+                                              @Body DbRegion dbRegion);
 
     //删除区域
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
@@ -351,7 +359,7 @@ public interface RequestInterface {
                                                                @Query("currentVersion") String version);
 
     @GET("app/getNewVersion")
-    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero,@Query("lang") int zero_one);
+    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero, @Query("lang") int zero_one);
 
     @GET("auth/isRegister")
     Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);

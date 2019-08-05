@@ -713,4 +713,26 @@
     <string name="start_change_region">开始切换区域</string>
     <string name="error_change_region">切换区域失败</string>
     <string name="success_change_region">切换区域成功</string>
+    <string name="timer">倒计时</string>
+    <string name="error_api_no_perission">调用了无权限的API接口</string>
+    <string name="error_unkown">未知错误</string>
+    <string name="error_system">服务器出错</string>
+    <string name="error_http_500">服务器错误</string>
+    <string name="error_http_404">服务器资源找不到</string>
+    <string name="error_http_400">错误请求</string>
+    <string name="error_socket_timeout">网络超时</string>
+    <string name="error_socket_unreachable">无法连接到服务器</string>
+    <string name="error_http" />
+    <string name="QR_cancel">撤销二维码</string>
+    <string name="QR_canceled">当前二维码已撤销</string>
+    <string name="QR_expired">二维码已失效,请重新生成</string>
+    <string name="unbind_network">解绑网络</string>
+    <string name="more">更多</string>
+    <string name="change_region">确定切换到区域</string>
+    <string name="total_device">\"(共%1$s个设备)\"</string>
+    <string name="share_person">分享人数: %1$s人</string>
+    <string name="to_receive">待接收</string>
+    <string name="see_more">查看更多</string>
+    <string name="me_net_num">个人网络(100个)</string>
+    <string name="received_net_num">已接收网络(%1$s个)</string>
 </resources>

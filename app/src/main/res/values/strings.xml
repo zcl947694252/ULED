@@ -822,9 +822,31 @@
     <string name="in_apply">applied</string>
     <string name="scene_apply_success">Scene apply success</string>
     <string name="network">authorization management</string>
-    <string name="transfer_accounts">Transfer accounts</string>
+    <string name="transfer_accounts">Transfer A/C</string>
     <string name="start_change_region">Start switching area</string>
     <string name="error_change_region">Failed to switch zone</string>
     <string name="success_change_region">Switching region successful</string>
+    <string name="timer">Count down</string>
+    <string name="error_api_no_perission">Invoke the unauthorized API interface</string>
+    <string name="error_unkown"> Unknown Error</string>
+    <string name="error_system">System error</string>
+    <string name="error_http_500">Server error</string>
+    <string name="error_http_404">Server resource not found</string>
+    <string name="error_http_400">Bad request</string>
+    <string name="error_socket_timeout">Network timeout</string>
+    <string name="error_socket_unreachable">Unable to connect to server</string>
+    <string name="error_http">Network connection error</string>
+    <string name="QR_cancel">Undo qr code</string>
+    <string name="QR_canceled">The qr code has been revoked</string>
+    <string name="QR_expired">The qr code is invalid, please regenerate it</string>
+    <string name="unbind_network">Unbund network</string>
+    <string name="more">More</string>
+    <string name="change_region">Make sure to switch to region </string>
+    <string name="total_device">(%1$s devices in total)</string>
+    <string name="share_person">Number of participants: %1$s per person</string>
+    <string name="to_receive">To_receive</string>
+    <string name="see_more">See more</string>
+    <string name="me_net_num">Personal network (%1$s)</string>
+    <string name="received_net_num">Received networks (%1$s)</string>
 
 </resources>
