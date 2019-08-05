@@ -493,8 +493,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                     }.start()
                                 }
                             }
-
-//
 //                        } else {
 //                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
 //                        }
@@ -536,17 +534,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                             }
                             break
                         }
-
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
-
                 }
             }
-
         }
     }
 
