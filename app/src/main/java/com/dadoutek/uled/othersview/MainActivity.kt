@@ -178,7 +178,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         isCreate = true
 
         LogUtils.e("zcl**********************${DBUtils.lastUser.toString()}")
-
     }
 
     /**

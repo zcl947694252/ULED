@@ -2,8 +2,6 @@ package com.dadoutek.uled.model;
 
 import com.dadoutek.uled.BuildConfig;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.Serializable;
 
 /**
@@ -255,4 +253,7 @@ public class Constant implements Serializable {
 
     //升级标记
     public static final String UP_VERSION ="UP_VERSION";
+    public static final String OTA_MAC ="OTA_MAC";
+    public static final String OTA_MES_Add ="OTA_MES_Add";
+    public static final String OTA_Version ="OTA_Version";
 }

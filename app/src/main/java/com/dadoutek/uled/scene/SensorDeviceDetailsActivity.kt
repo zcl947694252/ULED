@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.GridLayoutManager
@@ -16,7 +15,9 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
@@ -34,6 +35,7 @@ import com.dadoutek.uled.model.InstallDeviceModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
@@ -63,7 +65,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 private const val MAX_RETRY_CONNECT_TIME = 5
@@ -464,7 +465,53 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         currentLight = sensorData?.get(position)
         positionCurrent = position
         if (view.id == R.id.tv_setting) {
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
+
+            var views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
+            var set = view!!.findViewById<ImageView>(R.id.tv_setting)
+            var popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            popupWindow.contentView = views
+            popupWindow.isFocusable = true
+            popupWindow.showAsDropDown(set)
+
+            var group = views.findViewById<TextView>(R.id.switch_group)
+            var ota = views.findViewById<TextView>(R.id.ota)
+            var delete = views.findViewById<TextView>(R.id.deleteBtn)
+            var rename = views.findViewById<TextView>(R.id.rename)
+
+            rename.visibility = View.GONE
+            group.visibility = View.GONE
+
+            delete.setOnClickListener {
+                DBUtils.deleteSensor(currentLight!!)
+                notifyData()
+                Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
+                val opcode = Opcode.KICK_OUT
+                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr, null)
+                if (mConnectDevice != null) {
+                    Log.d(this.javaClass.getSimpleName(), "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
+                    Log.d(this.javaClass.getSimpleName(), "light.getMeshAddr() = " + currentLight?.meshAddr)
+                    if (currentLight?.meshAddr == mConnectDevice?.meshAddress) {
+                        Thread {
+                            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+                            Thread.sleep(2500)
+                            if (this@SensorDeviceDetailsActivity == null ||
+                                    this@SensorDeviceDetailsActivity.isDestroyed ||
+                                    this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
+                            } else {
+                                autoConnect()
+                            }
+                        }.start()
+                    }
+                }
+            }
+            ota.setOnClickListener {
+                val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
+                intent.putExtra(Constant.OTA_MAC,currentLight?.macAddr)
+                intent.putExtra(Constant.OTA_MES_Add,currentLight?.meshAddr)
+               // intent.putExtra(Constant.OTA_Version,currentLight?.meshAddr)
+                startActivity(intent)
+            }
+           /* AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                     .setPositiveButton(android.R.string.ok) { dialog, which ->
                         DBUtils.deleteSensor(currentLight!!)
                         notifyData()
@@ -498,7 +545,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 //                        }
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
+                    .show()*/
         }
     }
 

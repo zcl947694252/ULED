@@ -1,11 +1,11 @@
 package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSensor implements Serializable {
@@ -22,6 +22,8 @@ public class DbSensor implements Serializable {
     private int productUUID;
     private int index;
     private Long belongGroupId;
+
+
     @Generated(hash = 82280314)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId) {

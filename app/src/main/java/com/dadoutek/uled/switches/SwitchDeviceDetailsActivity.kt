@@ -375,7 +375,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         var delete = views.findViewById<TextView>(R.id.deleteBtn)
         var rename = views.findViewById<TextView>(R.id.rename)
 
-        rename.setOnClickListener(View.OnClickListener {
+        rename.setOnClickListener {
             popupWindow.dismiss()
             val textGp = EditText(this)
             StringUtils.initEditTextFilter(textGp)
@@ -398,7 +398,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         }
                     }
                     .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-        })
+        }
 
         group.setOnClickListener(View.OnClickListener {
             popupWindow.dismiss()

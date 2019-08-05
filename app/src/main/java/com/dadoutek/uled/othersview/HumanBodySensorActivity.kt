@@ -90,7 +90,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.huuman_body_sensor)
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
         initData()
         getVersion()
@@ -128,6 +128,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         newItemGroup.enableCheck = true
                         newItemGroup.gpName = showCheckListData!![0].name
                         newItemGroup.groupAress = showCheckListData!![0].meshAddr
+
                         it.add(newItemGroup)
                         showDataListView()
                     }
@@ -712,6 +713,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun configDevice() {
+        //获取人体感应灯version
         var version = tvPSVersion.text.toString()
         var num = version.substring(2, 3)
         if (num.toDouble() >= 3.0) {
@@ -853,53 +855,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveSensor() {
-//        var sensor = DBUtils.getAllSensor()
-//        if (sensor.size > 0) {
-//            for (i in sensor.indices) {
-//                if (mDeviceInfo.macAddress == sensor[i].macAddr) {
-//                    var dbSensor: DbSensor = DbSensor()
-//                    dbSensor.macAddr = mDeviceInfo.macAddress
-//                    dbSensor.id = sensor[i].id
-//                    dbSensor.productUUID = mDeviceInfo.productUUID
-//                    dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-//                    DBUtils.updateSensor(dbSensor)
-//                } else {
-//                    var dbSensor: DbSensor = DbSensor()
-//                    DBUtils.saveSensor(dbSensor, false)
-//                    dbSensor.controlGroupAddr = getControlGroup()
-//                    dbSensor.index = dbSensor.id.toInt()
-//                    dbSensor.macAddr = mDeviceInfo.macAddress
-//                    dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
-//                    dbSensor.productUUID = mDeviceInfo.productUUID
-//                    dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-//
-//                    DBUtils.saveSensor(dbSensor, false)
-//
-//                    dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
-//
-//                    DBUtils.recordingChange(dbSensor.id,
-//                            DaoSessionInstance.getInstance().dbSensorDao.tablename,
-//                            Constant.DB_ADD)
-//                }
-//            }
-//
-//        } else {
-//        if (isUpdate == "1") {
-//            var sensor = DBUtils.getAllSensor()
-//            if (sensor.size > 0) {
-//                for (i in sensor.indices) {
-//                    if (mDeviceInfo.macAddress == sensor[i].macAddr) {
-//                        var dbSensor: DbSensor = DbSensor()
-//                        dbSensor.macAddr = mDeviceInfo.macAddress
-//                        dbSensor.id = sensor[i].id
-//                        dbSensor.productUUID = mDeviceInfo.productUUID
-//                        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-//                        DBUtils.updateSensor(dbSensor)
-//                    }
-//                }
-//            }
-//        } else {
-        var dbSensor: DbSensor = DbSensor()
+        var dbSensor = DbSensor()
         DBUtils.saveSensor(dbSensor, false)
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.index = dbSensor.id.toInt()
@@ -913,10 +869,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
         DBUtils.recordingChange(dbSensor.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
-//        }}
-
+                DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
     }
 
     private fun getControlGroup(): String? {
