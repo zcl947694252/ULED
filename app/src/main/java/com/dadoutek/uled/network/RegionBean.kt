@@ -49,8 +49,7 @@ class RegionBean: Serializable {
     var state: Int = 0
     var ref_users: List<RefUsersBean>? = null
 
-
-    class CodeInfoBean {
+    class CodeInfoBean :Serializable {
         /**
          * expire : 86396
          * code : dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight
@@ -65,7 +64,7 @@ class RegionBean: Serializable {
         }
     }
 
-    class RefUsersBean {
+    class RefUsersBean :Serializable{
         /**
          * password : 99762463923db138661c164aa2e7bda3
          * role : 0

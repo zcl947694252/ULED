@@ -55,8 +55,10 @@ public class CommonParamsInterceptor implements Interceptor {
 
         String oldToken = tokenNow;
         String last_region_id = user != null && user.getLast_region_id() != null && !TextUtils.isEmpty(user.getLast_region_id()) ? user.getLast_region_id() : "1";
-
         builder.addHeader("region-id", last_region_id).build();
+
+      //  builder.addHeader("authorizer-user-id", last_region_id).build();
+
 
         if (token == null || token.isEmpty())
             builder.addHeader("token", oldToken);

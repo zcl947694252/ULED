@@ -1,12 +1,26 @@
 package com.dadoutek.uled.qrcode;
 
+import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
+
+import com.dadoutek.uled.R;
+import com.dadoutek.uled.tellink.TelinkBaseActivity;
+
 /**
  * 二维码扫描页面
  * 扫描 --> 解析 --> 同步
  *
  * @author kee
  */
-public class QRCodeScanActivity /*extends TelinkBaseActivity implements ViewTreeObserver.OnGlobalLayoutListener*/ {
+public class QRCodeScanActivity extends TelinkBaseActivity /*implements ViewTreeObserver.OnGlobalLayoutListener*/ {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Window window = getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        this.setContentView(R.layout.activity_qrcode_scan);
+    }
    /* private static final int PERMISSION_REQUEST_CODE_CAMERA = 0x12;
     private Cameras mCameras;
     private CameraPreviewCallback mPreviewCallback;

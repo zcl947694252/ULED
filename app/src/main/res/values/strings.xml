@@ -851,5 +851,11 @@
     <string name="pick_up">pick_up</string>
     <string name="see_qr">View qr code</string>
     <string name="input_new_region_name">Please enter a new zone name</string>
+    <string name="share_person_num_b">Number of participants: (%1$s)</string>
+    <string name="unbond">unbond</string>
+    <string name="warm_unbind_config">Are you sure you want to revoke the authorization of %1$s?</string>
+    <string name="warm_unbind_authorize_config">Are you sure you want to remove the %1$s authorization zone?</string>
+    <string name="parse_result">Parse the result :%1$s</string>
+    <string name="fail_parse_qr">Failed to parse qr code</string>
 
 </resources>

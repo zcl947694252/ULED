@@ -12,6 +12,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object RegionModel {
+
     fun add(token: String, dbRegion: DbRegion, id: Long, changeId: Long?): Observable<String>? {
         return NetworkFactory.getApi()
                 .addRegion(token, dbRegion, changeId!!.toInt())
@@ -114,9 +115,17 @@ object RegionModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun removeRegion():Observable<Response<String>>?{
+    fun removeRegion(id: Long):Observable<Response<String>>?{
         return NetworkFactory.getApi()
-                .removeRegion()
+                .removeRegion(id.toInt())
+                .subscribeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun parseQRCode(code: String):Observable<Response<String>>?{
+        return NetworkFactory.getApi()
+                .parseQRCode(code)
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }

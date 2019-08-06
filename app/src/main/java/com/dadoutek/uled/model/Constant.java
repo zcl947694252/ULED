@@ -2,6 +2,7 @@ package com.dadoutek.uled.model;
 
 import com.dadoutek.uled.BuildConfig;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -107,11 +108,11 @@ public class Constant implements Serializable {
     public static String USER_INFO = "USER_INFO";
 
     //用户名
-    public static final String USER_NAME ="NAME";
+    public static final String USER_NAME = "NAME";
 
     //ps
-    public static final String USER_PS ="PS";
-    public static final String NOT_SHOW ="NOT_SHOW";
+    public static final String USER_PS = "PS";
+    public static final String NOT_SHOW = "NOT_SHOW";
 
     //用户登录此版本
     public static String USER_LOGIN = "USER_LOGIN";
@@ -254,5 +255,7 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_CONNECTOR = Long.valueOf(0x05);
 
     //升级标记
-    public static final String UP_VERSION ="UP_VERSION";
+    public static final String UP_VERSION = "UP_VERSION";
+    //网络授权分享人数
+    public static final String SHARE_PERSON = "SHARE_PERSON";
 }

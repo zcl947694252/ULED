@@ -738,4 +738,10 @@
     <string name="pick_up">收起</string>
     <string name="see_qr">查看二维码</string>
     <string name="input_new_region_name">请输入新的区域名称</string>
+    <string name="share_person_num_b">分享人数: (%1$s人)</string>
+    <string name="unbond">解除绑定</string>
+    <string name="warm_unbind_config">确定要解除对%1$s的授权吗？</string>
+    <string name="warm_unbind_authorize_config">确定要移除%1$s该授权区域吗？</string>
+    <string name="parse_result">Parse the result :%1$s</string>
+    <string name="fail_parse_qr">解析二维码失败</string>
 </resources>

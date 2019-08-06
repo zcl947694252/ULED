@@ -3,16 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/dp_10"
-    >
-
+    android:orientation="vertical">
     <TextView
         android:id="@+id/recycleview_title_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/Text_Title"
-        android:textColor="#767778"/>
+        android:layout_height="35dp"
+        android:text="@string/more"
+        android:textSize="15sp"
+        android:background="@color/gray_e"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/dp_10"
+        android:paddingEnd="@dimen/dp_10"
+        android:textColor="@color/black_three"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycleview_title_recycle"
@@ -20,9 +23,11 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"
         android:scrollbarStyle="outsideOverlay"
-        android:layout_marginTop="10dp"
+
         android:clipToPadding="false"
         android:elevation="1dp"
+        android:paddingStart="@dimen/dp_11"
+        android:paddingEnd="@dimen/dp_11"
         />
 </LinearLayout>
 

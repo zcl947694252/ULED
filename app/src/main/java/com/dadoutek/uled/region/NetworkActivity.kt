@@ -1,15 +1,17 @@
 package com.dadoutek.uled.region
 
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.constraint.ConstraintLayout
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
 import android.util.Log
@@ -21,6 +23,7 @@ import android.widget.*
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.adapter.AreaItemAdapter
+import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -32,6 +35,7 @@ import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -40,10 +44,17 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_network.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.textColor
+import org.jetbrains.anko.toast
 import java.util.concurrent.TimeUnit
 
 
-class NetworkActivity : AppCompatActivity(), View.OnClickListener {
+class NetworkActivity : BaseActivity(), View.OnClickListener {
+    override fun setLayoutID(): Int {
+        return R.layout.activity_network
+    }
+
+    private val REQUEST_CODE: Int = 1000
+    private val REQUEST_CODE_CARMER: Int = 100
     private var isAuthorizeRegionAll: Boolean = false
     private var isMeRegionAll: Boolean = false
     private var listTwo: MutableList<MutableList<RegionBean>>? = null
@@ -69,22 +80,21 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     var isShowType = 3 //1自己的区域  2接收区域  3 全部区域
     var mExpire: Long = 0
     private var isAddRegion = true
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_network)
+    override fun initView() {
         list = ArrayList()
         listAuthorize = ArrayList()
         listTwo = ArrayList()
-        initView()
-        initData()
-    }
-
-    private fun initView() {
         initToolBar()
         makePop()
         initListener()
         mBuild = AlertDialog.Builder(this@NetworkActivity)
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CARMER)
+            }
+        }
     }
 
     private fun initToolBar() {
@@ -97,19 +107,16 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
-    private fun initListener() {
+    override fun initListener() {
         img_function1.setOnClickListener {
-            isAddRegion =true
+            isAddRegion = true
             viewAdd!!.findViewById<EditText>(R.id.pop_region_name).setText("")
             viewAdd!!.findViewById<EditText>(R.id.pop_region_name).hint = getString(R.string.input_region_name)
             showPop(popAdd, Gravity.CENTER)
         }
 
         image_bluetooth.setOnClickListener {
-            //S扫描
-        }
-        region_to_receive.setOnClickListener {
-
+            openScan()
         }
         transfer_account.setOnClickListener {
 
@@ -122,14 +129,14 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         dbRegion.installMesh = Constant.PIR_SWITCH_MESH_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.name = text.toString()
-        if (isAddRegion){
-            if (list == null || list!!.size <= 0) {
+        if (isAddRegion) {
+            if (listAll == null || listAll!!.size <= 0) {
                 dbRegion.id = 1
             } else {
-                val region = list?.get(list!!.size - 1)
+                val region = listAll?.get(listAll!!.size - 1)
                 dbRegion.id = region!!.id + 1
             }
-        }else{
+        } else {
             dbRegion.id = regionBean?.id
         }
 
@@ -141,16 +148,16 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     @SuppressLint("CheckResult", "SetTextI18n")
-    private fun initData() {
-        if (DBUtils.lastUser != null){
-            region_account_num.text = "+"+DBUtils.lastUser!!.phone
-            Log.e("zcl","zcl******lastUser!!.account****${DBUtils.lastUser!!.phone}")
+    override fun initData() {
+        if (DBUtils.lastUser != null) {
+            region_account_num.text = "+" + DBUtils.lastUser!!.phone
+            Log.e("zcl", "zcl******isShowType****$isShowType")
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe { it -> setMeData(it) }
                 2 -> RegionModel.getAuthorizerList()?.subscribe { it -> setMeData(it) }
                 3 -> {
                     RegionModel.getAuthorizerList()?.subscribe { it -> setAuthorizeData(it) }
-                    RegionModel.get()?.subscribe { it -> setMeData(it)}
+                    RegionModel.get()?.subscribe { it -> setMeData(it) }
                 }
             }
         }
@@ -265,7 +272,19 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         DBUtils.deleteAll()
         when (v!!.id) {
             R.id.pop_view -> PopUtil.dismiss(pop)
-            R.id.pop_qr_ly -> {
+            R.id.pop_unbind_net_ly -> {
+                toast(getString(R.string.btn_ok))
+                //解绑网络
+                when (isShowType) {
+                    1 -> {
+                        val intent = Intent(this@NetworkActivity, UnbindMeNetActivity::class.java)
+                        intent.putExtra(Constant.SHARE_PERSON, regionBean)
+                        startActivity(intent)
+                    }
+                    2 -> {
+                        showUnbindDialog(regionBean)
+                    }
+                }
             }
             R.id.pop_qr_cancel -> PopUtil.dismiss(pop)
             R.id.pop_user_net -> {
@@ -273,10 +292,11 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-                //只能删除当前切换的区域
-                RegionModel.removeRegion()!!.subscribe {
-                    if (it.errorCode==0)
+                RegionModel.removeRegion(regionBean!!.id)!!.subscribe {
+                    if (it.errorCode == 0){
+                        PopUtil.dismiss(pop)
                         initData()
+                    }
                 }
             }
             R.id.pop_share_net -> {
@@ -409,10 +429,11 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         setPopSetting(popAdd!!)
 
         view?.let {
-            it.findViewById<RelativeLayout>(R.id.pop_view).setOnClickListener(this)
+            it.findViewById<ImageView>(R.id.pop_view).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_user_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_delete_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_share_net).setOnClickListener(this)
+            it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_update_net).setOnClickListener(this)
             it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + DBUtils.lastUser!!.phone
             it.findViewById<TextView>(R.id.pop_qr_cancel).setOnClickListener(this)
@@ -423,6 +444,7 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         viewAdd?.let {
             var name = it.findViewById<EditText>(R.id.pop_region_name)
             it.findViewById<Button>(R.id.btn_confirm).setOnClickListener {
+                isShowType = 1
                 addRegion(name.text)
                 PopUtil.dismiss(popAdd)
             }
@@ -452,15 +474,31 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         view?.let {
             it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
-            if (regionBean!!.id.toString() == DBUtils.lastUser!!.last_region_id)
-                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
-            else
-                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
-
-            if (regionBean!!.id == 1L)
+            if (regionBean!!.id.toString() == DBUtils.lastUser!!.last_region_id) {//使用中不能删除
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
                 it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
-            else
+                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+            } else {
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
                 it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
+                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+            }
+
+            if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+            } else {
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
+                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
+            }
+
+            if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
+                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
+                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
+            } else {
+                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
+                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
+            }
 
             mExpire = regionBean!!.code_info!!.expire.toLong()
             Log.e("zcl", "zcl****regionBean**${regionBean.toString()}")
@@ -553,6 +591,20 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    private fun showUnbindDialog(bean: RegionBean?) {
+        val builder = android.support.v7.app.AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.warm_unbind_authorize_config, bean!!.name))
+        builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
+            //解除授权
+
+            dialog.dismiss()
+        }
+        builder.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
+    }
+
     fun hideLoadingDialog() {
         if (loadDialog != null) {
             loadDialog!!.dismiss()
@@ -580,6 +632,46 @@ class NetworkActivity : AppCompatActivity(), View.OnClickListener {
         PopUtil.dismiss(popAdd)
         mCompositeDisposable.dispose()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_CODE -> {  //处理扫描结果
+                if (null != data) {
+                    var bundle: Bundle? = data.extras ?: return
+                    if (bundle!!.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                        var result = bundle.getString(CodeUtils.RESULT_STRING)
+                        Log.e("zcl", "zcl***parse_result***$result")
+                        RegionModel.parseQRCode(result)?.subscribe {
+                            if (it.errorCode==0){
+                                isShowType = 2
+                                initData()
+                            }
+                        }
+                    } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                        Toast.makeText(this, getString(R.string.fail_parse_qr), Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_CARMER) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openScan()
+            } else {
+                ToastUtils.showShort(getString(R.string.fail_parse_qr))
+            }
+        }
+    }
+
+    private fun openScan() {
+        var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE)
+    }
 }
+
 
 

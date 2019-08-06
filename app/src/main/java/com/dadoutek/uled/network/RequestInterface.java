@@ -136,8 +136,8 @@ public interface RequestInterface {
     //清除当前区域和其下数据，区域本身(除区域一)也会被删除。
     //http://dev.dadoutek.com/smartlight/auth/region/clear
     //DELETE
-    @DELETE("auth/region/clear")
-    Observable<Response<String>> removeRegion();
+    @DELETE("auth/region/clear/{rid}")
+    Observable<Response<String>> removeRegion(@Path("rid") int rid);
 
     //组相关接口
     //添加组
@@ -380,4 +380,14 @@ public interface RequestInterface {
 
     @GET("auth/isRegister")
     Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);
+
+    //59、解析码
+    //http://dev.dadoutek.com/smartlight/auth/code/parse
+    //POST
+    //content-type : application/json
+    //token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+    //code	是	string	码的值
+    //{"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
+    @POST("auth/code/parse")
+    Observable<Response<String>> parseQRCode(@Body String code);
 }

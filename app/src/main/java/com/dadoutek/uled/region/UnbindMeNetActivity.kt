@@ -1,0 +1,64 @@
+package com.dadoutek.uled.region
+
+import android.annotation.SuppressLint
+import android.support.v7.app.AlertDialog
+import android.support.v7.widget.LinearLayoutManager
+import android.view.View
+import com.dadoutek.uled.R
+import com.dadoutek.uled.base.BaseActivity
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.region.adapter.UnbindNetWorkAdapter
+import com.dadoutek.uled.region.bean.RegionBean
+import kotlinx.android.synthetic.main.template_recycleview_with_title.*
+import kotlinx.android.synthetic.main.toolbar.*
+
+
+class UnbindMeNetActivity : BaseActivity() {
+    var adapter: UnbindNetWorkAdapter? = null
+    var unbindBean: RegionBean.RefUsersBean? = null
+
+    override fun setLayoutID(): Int {
+        return R.layout.activity_unbind_network
+    }
+
+    override fun initView() {
+        image_bluetooth.visibility = View.GONE
+        toolbar.title = getString(R.string.unbind_network)
+        toolbar.setNavigationIcon(R.mipmap.icon_return)
+        toolbar.setNavigationOnClickListener { finish() }
+    }
+
+    @SuppressLint("StringFormatMatches")
+    override fun initData() {
+        val regionbBean = intent.getSerializableExtra(Constant.SHARE_PERSON) as RegionBean
+
+        recycleview_title_recycle.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        regionbBean.ref_users?.let {
+            recycleview_title_title.text = getString(R.string.share_person_num_b, it.size)
+            adapter = UnbindNetWorkAdapter(R.layout.item_unbind_network, it)
+            adapter!!.setOnItemChildClickListener { _, _, position ->
+                unbindBean = it[position]
+                showUnbindDialog(unbindBean!!)
+            }
+            recycleview_title_recycle.adapter = adapter
+        }
+    }
+
+    private fun showUnbindDialog(bean: RegionBean.RefUsersBean) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(getString(R.string.warm_unbind_config, bean.phone))
+        builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
+            //解除授权
+            dialog.dismiss()
+        }
+        builder.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
+    }
+
+    override fun initListener() {
+
+    }
+
+}
