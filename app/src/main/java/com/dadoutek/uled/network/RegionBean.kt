@@ -49,6 +49,7 @@ class RegionBean: Serializable {
     var state: Int = 0
     var ref_users: List<RefUsersBean>? = null
 
+
     class CodeInfoBean :Serializable {
         /**
          * expire : 86396

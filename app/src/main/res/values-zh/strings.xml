@@ -782,5 +782,7 @@
     <string name="warm_unbind_authorize_config">确定要移除%1$s授权区域吗？</string>
     <string name="parse_result">Parse the result :%1$s</string>
     <string name="fail_parse_qr">解析二维码失败</string>
+    <string name="unbundling_success">解绑成功</string>
+    <string name="unbundling_fail">解绑失败</string>
 
 </resources>

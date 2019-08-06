@@ -130,6 +130,13 @@ object RegionModel {
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+    }  fun cancelAuthorize(ref_id:Long, rid:Long):Observable<Response<String>>?{
+        return NetworkFactory.getApi()
+                .cancelAuthorize(ref_id, rid)
+                .subscribeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
 

@@ -1,4 +1,4 @@
-package com.dadoutek.uled.adapter
+package com.dadoutek.uled.region.adapter
 
 import android.annotation.SuppressLint
 import android.view.View

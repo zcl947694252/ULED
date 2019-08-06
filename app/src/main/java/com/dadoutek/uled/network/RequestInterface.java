@@ -390,4 +390,16 @@ public interface RequestInterface {
     //{"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
     @POST("auth/code/parse")
     Observable<Response<String>> parseQRCode(@Body String code);
+    /**
+     * 62、取消授权(主动方:授权者)
+     * 取消一个区域对一个用户的授权。如:A授权了区域1给B，B接受了。有一天A不想让B用区域1了，A调用这个接口
+     * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/{ref_id}/{rid}
+     * DELETE
+     * ref_id为被授权者id
+     * rid为区域id
+     * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/300600/1
+     */
+    @POST("auth/authorization/cancel/{ref_id}/{rid}")
+    Observable<Response<String>> cancelAuthorize(@Path("ref_id") Long ref_id,@Path("rid") Long rid);
+
 }

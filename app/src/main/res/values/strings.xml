@@ -857,5 +857,7 @@
     <string name="warm_unbind_authorize_config">Are you sure you want to remove the %1$s authorization zone?</string>
     <string name="parse_result">Parse the result :%1$s</string>
     <string name="fail_parse_qr">Failed to parse qr code</string>
+    <string name="unbundling_success">Unbundling success</string>
+    <string name="unbundling_fail">Unbundling failure</string>
 
 </resources>
