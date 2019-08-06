@@ -15,6 +15,7 @@ import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
+import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 
@@ -107,7 +108,7 @@ public interface RequestInterface {
     //53授权区域列表
     //http://dev.dadoutek.com/smartlight/auth/authorization/authorizer-region/list
     @GET("auth/authorization/authorizer-region/list")
-    Observable<Response<List<RegionBean>>> getAuthorizerList();
+    Observable<Response<List<RegionAuthorizeBean>>> getAuthorizerList();
 
     //更新区域
     @POST("region/add/{rid}")
@@ -400,6 +401,18 @@ public interface RequestInterface {
      * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/300600/1
      */
     @POST("auth/authorization/cancel/{ref_id}/{rid}")
-    Observable<Response<String>> cancelAuthorize(@Path("ref_id") Long ref_id,@Path("rid") Long rid);
+    Observable<Response<String>> cancelAuthorize(@Path("ref_id") int ref_id,@Path("rid") int rid);
+
+    /**
+     * 61、解除授权(主动方:被授权者)
+     * 解除授权关系。主动方为被授权者。如：A授权了区域1给B，B接受了。有一天B不想要了。B调用这个接口
+     * http://dev.dadoutek.com/smartlight/auth/authorization/release/{authorizer_id}/{rid}
+     * DELETE
+     * authorizer_id授权用户id
+     * rid区域id
+     * http://dev.dadoutek.com/smartlight/auth/authorization/release/300430/1
+     */
+    @DELETE("auth/authorization/release/{authorizer_id}/{rid}")
+    Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id,@Path("rid") int rid);
 
 }

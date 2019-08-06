@@ -6,12 +6,12 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.region.bean.RegionBean
+import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 
 
-class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var last_region_id: String) : BaseQuickAdapter<RegionBean, BaseViewHolder>(layoutResId, data) {
+class AreaAuthorizeItemAdapter(layoutResId: Int, data: List<RegionAuthorizeBean>, var last_region_id: String) : BaseQuickAdapter<RegionAuthorizeBean, BaseViewHolder>(layoutResId, data) {
     @SuppressLint("StringFormatMatches")
-    override fun convert(helper: BaseViewHolder?, item: RegionBean?) {
+    override fun convert(helper: BaseViewHolder?, item: RegionAuthorizeBean?) {
         item?.let {
             helper?.let {
                 it.addOnClickListener(R.id.item_area_state)
@@ -22,14 +22,7 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var last_region_
                 else
                     it.setText(R.id.item_area_title, item.name + mContext.getString(R.string.total_device, item.count_all))
 
-                val b = item.ref_users != null && item.ref_users!!.isNotEmpty()
-
-                if (b) {
-                    personTv.text = mContext.getString(R.string.share_person, item.ref_users!!.size)
-                    personTv.visibility = View.VISIBLE
-                } else {
                     personTv.visibility = View.GONE
-                }
 
                 if (item.id.toString() == last_region_id) {
                     it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))

@@ -5,6 +5,7 @@ import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.region.bean.ShareCodeBean
 import io.reactivex.Observable
@@ -67,25 +68,12 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getAuthorizerList(): Observable<MutableList<RegionBean>>? {
+    fun getAuthorizerList(): Observable<MutableList<RegionAuthorizeBean>>? {
         return NetworkFactory.getApi()
                 .getAuthorizerList()
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
-                .doOnNext {
-                    for (item in it) {
-                        val dbRegion = DbRegion()
-                        dbRegion.installMeshPwd = item.installMeshPwd
-                        dbRegion.controlMeshPwd = item.controlMeshPwd
-                        dbRegion.belongAccount = item.belongAccount
-                        dbRegion.controlMesh = item.controlMesh
-                        dbRegion.installMesh = item.installMesh
-                        dbRegion.name = item.name
-                        dbRegion.id = item.id
-
-                        DBUtils.saveRegion(dbRegion, true)
-                    }
-                }
+                .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
@@ -130,7 +118,7 @@ object RegionModel {
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-    }  fun cancelAuthorize(ref_id:Long, rid:Long):Observable<Response<String>>?{
+    }  fun cancelAuthorize(ref_id:Int, rid:Int):Observable<Response<String>>?{
         return NetworkFactory.getApi()
                 .cancelAuthorize(ref_id, rid)
                 .subscribeOn(Schedulers.io())
@@ -139,6 +127,16 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    /**
+     *
+     */
+    fun dropAuthorizeRegion(authorizer_id:Int, rid:Int) :Observable<Response<String>>?{
+        return NetworkFactory.getApi()
+                .dropAuthorize(authorizer_id, rid)
+                .subscribeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
 
 }

@@ -43,6 +43,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
+import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -152,8 +153,14 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-                            ToastUtils.showLong(a.localizedMessage)
+                            try {
+                                val a = (data as Throwable)
+                                val jsonObject = JSONObject(a.localizedMessage)
+                                val message = jsonObject.opt("detail").toString()
+                                ToastUtils.showLong(message)
+                            }catch (ex:Exception){
+                                ex.printStackTrace()
+                            }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()

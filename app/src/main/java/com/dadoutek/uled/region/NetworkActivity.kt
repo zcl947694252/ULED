@@ -22,7 +22,6 @@ import android.view.ViewGroup
 import android.widget.*
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.adapter.AreaItemAdapter
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -30,6 +29,9 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.network.bean.RegionAuthorizeBean
+import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
+import com.dadoutek.uled.region.adapter.AreaItemAdapter
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.NetWorkUtils
@@ -57,24 +59,25 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private val REQUEST_CODE_CARMER: Int = 100
     private var isAuthorizeRegionAll: Boolean = false
     private var isMeRegionAll: Boolean = false
-    private var listTwo: MutableList<MutableList<RegionBean>>? = null
+
     var list: MutableList<RegionBean>? = null
     var listAll: MutableList<RegionBean>? = null
     var subMeList: MutableList<RegionBean>? = null
 
-    var listAuthorize: MutableList<RegionBean>? = null
-    var listAuthorizeAll: MutableList<RegionBean>? = null
-    var subAuthorizeList: MutableList<RegionBean>? = null
+    var listAuthorize: MutableList<RegionAuthorizeBean>? = null
+    var listAuthorizeAll: MutableList<RegionAuthorizeBean>? = null
+    var subAuthorizeList: MutableList<RegionAuthorizeBean>? = null
 
     private var loadDialog: Dialog? = null
     private lateinit var popAdd: PopupWindow
     private var viewAdd: View? = null
     var adapter: AreaItemAdapter? = null
-    var adapterAuthorize: AreaItemAdapter? = null
+    var adapterAuthorize: AreaAuthorizeItemAdapter? = null
     var pop: PopupWindow? = null
     var view: View? = null
     var root: View? = null
     var regionBean: RegionBean? = null
+    var regionBeanAuthorize: RegionAuthorizeBean? = null
     var mCompositeDisposable = CompositeDisposable()
     var mBuild: AlertDialog.Builder? = null
     var isShowType = 3 //1自己的区域  2接收区域  3 全部区域
@@ -83,7 +86,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     override fun initView() {
         list = ArrayList()
         listAuthorize = ArrayList()
-        listTwo = ArrayList()
+
         initToolBar()
         makePop()
         initListener()
@@ -154,7 +157,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             Log.e("zcl", "zcl******isShowType****$isShowType")
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe { it -> setMeData(it) }
-                2 -> RegionModel.getAuthorizerList()?.subscribe { it -> setMeData(it) }
+                2 -> RegionModel.getAuthorizerList()?.subscribe { it -> setAuthorizeData(it) }
                 3 -> {
                     RegionModel.getAuthorizerList()?.subscribe { it -> setAuthorizeData(it) }
                     RegionModel.get()?.subscribe { it -> setMeData(it) }
@@ -214,7 +217,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 赋值接受区域数据
      */
     @SuppressLint("StringFormatMatches")
-    private fun setAuthorizeData(it: MutableList<RegionBean>) {
+    private fun setAuthorizeData(it: MutableList<RegionAuthorizeBean>) {
         listAuthorizeAll = it
         region_authorize_net_num.text = getString(R.string.received_net_num, it.size)
 
@@ -230,10 +233,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         Log.e("zcl", "zcl******authorize**${listAuthorize!!.size}")
 
         region_authorize_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
-        adapterAuthorize = AreaItemAdapter(R.layout.item_area_net, listAuthorize!!, DBUtils.lastUser!!.last_region_id)
+        adapterAuthorize = AreaAuthorizeItemAdapter(R.layout.item_area_net, listAuthorize!!, DBUtils.lastUser!!.last_region_id)
         adapterAuthorize!!.setOnItemChildClickListener { _, view, position ->
             isShowType = 2
-            setClickAction(position, view, listAuthorize!!)
+            setClickActionAuthorize(position, view, listAuthorize!!)
         }
         region_authorize_recycleview.adapter = adapter
         region_authorize_recycleview.setOnClickListener {
@@ -241,6 +244,63 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             setMoreArr(isAuthorizeRegionAll, region_authorize_more_tv, region_authorize_more_arr)
             isShowType = 2
             initData()
+        }
+    }
+
+    private fun setClickActionAuthorize(position: Int, view: View?, list: MutableList<RegionAuthorizeBean>) {
+        regionBeanAuthorize = list[position]
+        when (view?.id) {
+            R.id.item_area_state -> {
+                setChangeDialog()
+            }
+            R.id.item_area_more -> setPopDataAuthorize(position, list)
+        }
+
+    }
+
+    private fun setPopDataAuthorize(position: Int, list: MutableList<RegionAuthorizeBean>) {
+        isShowType = 2
+        regionBeanAuthorize = list[position]
+
+        if (regionBeanAuthorize == null)
+            return
+
+        view?.let {
+            it.findViewById<TextView>(R.id.pop_net_name).text = regionBeanAuthorize!!.name
+            it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
+            if (regionBeanAuthorize!!.id.toString() == DBUtils.lastUser!!.last_region_id) {//使用中不能删除
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+            } else {
+                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
+                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
+                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+            }
+            it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
+            it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
+
+            it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_share)
+            it.findViewById<ImageView>(R.id.pop_share_net).isClickable = false
+        }
+        view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
+        view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
+        showPop(pop!!, Gravity.BOTTOM)
+
+    }
+
+    private fun setChangeDialog() {
+        mBuild?.let {
+            it.setMessage(getString(R.string.change_region))
+            it.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
+                changeRegion()
+                dialog.dismiss()
+            }
+            it.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            it.setCancelable(true)
+            it.show()
         }
     }
 
@@ -293,7 +353,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_delete_net -> {
                 RegionModel.removeRegion(regionBean!!.id)!!.subscribe {
-                    if (it.errorCode == 0){
+                    if (it.errorCode == 0) {
                         PopUtil.dismiss(pop)
                         initData()
                     }
@@ -466,6 +526,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 设置指定pop内容并弹框
      */
     private fun setPopData(position: Int, list: MutableList<RegionBean>) {
+        isShowType = 1
         regionBean = list[position]
 
         if (regionBean == null)
@@ -502,6 +563,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
             mExpire = regionBean!!.code_info!!.expire.toLong()
             Log.e("zcl", "zcl****regionBean**${regionBean.toString()}")
+
+            it.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
             if (mExpire > 0) {
                 it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_code)
                 regionBean!!.code_info!!.code?.let { it1 -> setQR(it1) }
@@ -550,8 +613,16 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             val user = DBUtils.lastUser
             user?.let {
                 //更新user
-                it.last_region_id = regionBean?.id.toString()
-
+                when (isShowType) {
+                    1 -> {
+                        it.last_region_id = regionBean?.id.toString()
+                        it.authorizer_user_id = user.id.toString()
+                    }
+                    2 -> {
+                        it.last_region_id = regionBeanAuthorize?.id.toString()
+                        it.authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
+                    }
+                }
                 DBUtils.deleteAllData()
                 //创建数据库
                 AccountModel.initDatBase(it)
@@ -596,7 +667,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         builder.setMessage(getString(R.string.warm_unbind_authorize_config, bean!!.name))
         builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
             //解除授权
-
+            //authorizer_id授权用户id  rid区域id
+            RegionModel.dropAuthorizeRegion(regionBeanAuthorize!!.authorizer_id, regionBeanAuthorize!!.id)
+                    ?.subscribe {
+                        if (it.errorCode == 0) {
+                            isShowType = 2
+                            initData()
+                            ToastUtils.showShort(getString(R.string.unbundling_success))
+                        } else {
+                            ToastUtils.showShort(getString(R.string.unbundling_fail))
+                        }
+                    }
             dialog.dismiss()
         }
         builder.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
@@ -643,7 +724,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                         var result = bundle.getString(CodeUtils.RESULT_STRING)
                         Log.e("zcl", "zcl***parse_result***$result")
                         RegionModel.parseQRCode(result)?.subscribe {
-                            if (it.errorCode==0){
+                            if (it.errorCode == 0) {
                                 isShowType = 2
                                 initData()
                             }

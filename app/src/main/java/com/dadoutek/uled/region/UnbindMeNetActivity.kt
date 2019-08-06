@@ -57,8 +57,8 @@ class UnbindMeNetActivity : BaseActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.warm_unbind_config, bean.phone))
         builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
-            unbindBean?.id?.toLong()?.let { regionbBean?.id?.let { it1 ->
-                RegionModel.cancelAuthorize(it, it1)?.subscribe {
+            unbindBean?.id?.let { regionbBean?.id?.let { it1 ->
+                RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe {
                     Log.e("zcl","zcl***before***$list")
                     if (it.errorCode == 0){
                         list = list?.minus(unbindBean!!)

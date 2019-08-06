@@ -55,9 +55,19 @@ public class CommonParamsInterceptor implements Interceptor {
 
         String oldToken = tokenNow;
         String last_region_id = user != null && user.getLast_region_id() != null && !TextUtils.isEmpty(user.getLast_region_id()) ? user.getLast_region_id() : "1";
-        builder.addHeader("region-id", last_region_id).build();
+        builder.addHeader("region-id", last_region_id);
 
-      //  builder.addHeader("authorizer-user-id", last_region_id).build();
+        //authorizer-user-id：80
+        //在请求头加上键值对authorizer-user-id:80即可获取id为80用户的数据，如果请求头中缺少这对键值对，后台默认authorizer-user-id：自己用户的id。
+        //如何用回自己的数据？
+        //1、请求头缺少authorizer-user-id     2、authorizer-user-id：自己的id  3、authorizer-user-id乱传
+        //region-id：2
+        //在请求头加上键值对region-id:2即可获取区域2的数据，如果请求头中缺少这对键值对，后台默认region-id:1
+        //以下情况使用的是区域一的数据
+        //1、请求头缺少region-id  2、region-id:1   3、region-id乱传
+
+        if (user != null &&user.getAuthorizer_user_id()!=null&&!user.getAuthorizer_user_id().equals(""))
+            builder.addHeader("authorizer-user-id", last_region_id);
 
 
         if (token == null || token.isEmpty())

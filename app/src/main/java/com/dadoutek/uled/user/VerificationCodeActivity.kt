@@ -207,10 +207,14 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-                            val jsonObject = JSONObject(a.localizedMessage)
-                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(message)
+                            try {
+                                val a = (data as Throwable)
+                                val jsonObject = JSONObject(a.localizedMessage)
+                                val message = jsonObject.opt("detail").toString()
+                                ToastUtils.showLong(message)
+                            }catch (ex:Exception){
+                                ex.printStackTrace()
+                            }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()

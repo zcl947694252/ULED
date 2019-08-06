@@ -150,9 +150,10 @@ object AccountModel {
         DaoSessionInstance.getInstance()
         DaoSessionUser.destroySession()
         DaoSessionUser.getInstance()
-
+        user.authorizer_user_id = user.id.toString()
         DBUtils.saveUser(user)
         user.password = userPassword
+
         if (DBUtils.getUserPhone(user.phone) == null) {
             DBUtils.saveUserDao(user)
         }
