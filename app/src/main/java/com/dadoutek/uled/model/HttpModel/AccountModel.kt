@@ -42,7 +42,7 @@ object AccountModel {
                 }
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    initDatBase(it, false)
+                    initDatBase(it)
                     Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -55,7 +55,7 @@ object AccountModel {
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    initDatBase(it, false)
+                    initDatBase(it)
                     Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -141,7 +141,7 @@ object AccountModel {
         }
     }
 
-    fun initDatBase(user: DbUser, changeRegion: Boolean) {
+    fun initDatBase(user: DbUser) {
         //首先保存当前数据库名
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.account)
 

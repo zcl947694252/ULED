@@ -13,7 +13,7 @@
         <LinearLayout
             android:id="@+id/item_area_ly"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="vertical">
@@ -37,6 +37,7 @@
                 android:layout_marginTop="11dp"
                 android:gravity="center_vertical"
                 android:textColor="@color/blue_background"
+                android:layout_marginBottom="@dimen/dp_13"
                 android:textSize="13sp" />
         </LinearLayout>
 

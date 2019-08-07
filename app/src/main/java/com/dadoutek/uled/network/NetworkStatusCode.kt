@@ -161,9 +161,55 @@ object NetworkStatusCode {
 
     const val ERROR_NO_PASSOWRD = 20007
     //没有密码
+
     const val ERROR_CANCEL_AUHORIZE= 20019
     //授权用户取消授权
+    const val ERROR_UNAUHORIZE_LEVE= 20020
+    //未收录的授权等级:
+    const val ERROR_REGION_MORE_CODE = 20021
+    //单个区域同时只能生成一种码
+     const val ERROR_CAN_NOT_PARSE = 20022
+    //无法解析: 20022
+     const val ERROR_CAN_NOT_PARSE_MINE = 20023
+    //不能解析自己生成的码: 20023
+    const val ERROR_ACCEPT_AUTHORIZATION = 20024
+    //该用户已接受授权: 20024
     const val ERROR_EXPIRED_AUHORIZE= 20025
     //20025 码已过期
+    const val ERROR_USER_LOCKED= 20026
+    //用户被锁定: 20026
+    const val ERROR_CODE_FAILURE = 20027
+    //20025 二维码已失效
+    const val ERROR_PERMISSION_DENFINED = 20028
+    // 权限不足,无法操作: 20028
+    const val ERROR_REGION_NOT_EXIST = 30000
+    //20025  该区域不存在
+
+
+    /**
+     * 请求成功处理: 0
+    服务器出错: 500
+    参数异常: 10000
+    参数没有通过正则验证: 10001
+    数据库操作时抛出错误,数据操作失败: 10002
+    JSESSIONID过期: 10003
+    用户已存在: 20000
+    用户不存在: 20001
+    密码错误: 20002
+    盐值错误: 请先获取盐值或盐值错误或盐值已过期 : 20003
+    请求头中不包含token: 20004
+    用户不是管理员: 20006
+    用户密码为空: 20007
+    电话号码为空: 20008
+    授权信息不存在或授权者取消了授权: 20019
+
+    不能解析自己生成的码: 20023
+    该用户已接受授权: 20024
+    码已过期: 20025
+
+    码已失效: 20027
+    权限不足,无法操作: 20028
+    该区域不存在: 30000
+     */
 
 }

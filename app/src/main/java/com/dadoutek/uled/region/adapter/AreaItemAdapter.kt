@@ -32,15 +32,16 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var user: DbUser
                     personTv.visibility = View.GONE
                 }
 
-                if (item.id.toString() == user!!.last_region_id&& user!!.authorizer_user_id == user!!.id.toString()) {
-                    it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
-                            .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
-                            .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))
-                } else {
-                    it.setText(R.id.item_area_state, mContext.getString(R.string.use))
-                            .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_three))
-                            .setTextColor(R.id.item_area_title, mContext.getColor(R.color.black_three))
-                }
+                if (item.id.toString() == user!!.last_region_id)
+                    if (user!!.authorizer_user_id == user!!.id.toString() || user!!.authorizer_user_id == null) {
+                        it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
+                                .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
+                                .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))
+                    } else {
+                        it.setText(R.id.item_area_state, mContext.getString(R.string.use))
+                                .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_three))
+                                .setTextColor(R.id.item_area_title, mContext.getColor(R.color.black_three))
+                    }
             }
         }
     }

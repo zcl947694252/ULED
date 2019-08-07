@@ -786,6 +786,14 @@
     <string name="unbundling_fail">解绑失败</string>
     <string name="scan_success">扫描成功</string>
     <string name="cancel_authorization">授权用户取消授权</string>
-    <string name="authorization_exprize">授权码已过期</string>
+    <string name="authorization_exprize">二维码已过期</string>
+    <string name="unauthorization_leve">未收录的授权等级</string>
+    <string name="region_one_code">单个区域同时只能生成一种码</string>
+    <string name="can_not_parse">无法解析</string>
+    <string name="can_not_parse_mine">不能解析自己生成的码</string>
+    <string name="accept_authrozation">该用户已接受授权</string>
+    <string name="user_locked">用户被锁定</string>
+    <string name="permission_denfied">权限不足,无法操作</string>
+    <string name="region_not_exist">该区域不存在</string>
 
 </resources>

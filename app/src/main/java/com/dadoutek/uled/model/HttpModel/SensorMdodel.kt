@@ -25,6 +25,7 @@ object SensorMdodel {
         }
         return NetworkFactory.getApi()
                 .addSensor(token,dbChild,changeId!!.toInt())
+
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
 import com.dadoutek.uled.region.adapter.AreaItemAdapter
@@ -47,7 +48,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_network.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.textColor
-import org.jetbrains.anko.toast
 import java.util.concurrent.TimeUnit
 
 
@@ -56,7 +56,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         return R.layout.activity_network
     }
 
-    private val isChangeRegion: Boolean = true
     private val REQUEST_CODE: Int = 1000
     private val REQUEST_CODE_CARMER: Int = 100
     private var isAuthorizeRegionAll: Boolean = false
@@ -145,23 +144,30 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             dbRegion.id = regionBean?.id
         }
 
-        RegionModel.addRegions(DBUtils.lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe {
-            initData()
-
-        }
+        RegionModel.addRegions(DBUtils.lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe(
+                { initData() },
+                { ToastUtils.showShort(it.message) })
     }
 
     @SuppressLint("CheckResult", "SetTextI18n")
     override fun initData() {
         if (DBUtils.lastUser != null) {
             region_account_num.text = "+" + DBUtils.lastUser!!.phone
-            Log.e("zcl", "zcl******isShowType****$isShowType"+"user${DBUtils.lastUser.toString()}")
+            Log.e("zcl", "zcl******isShowType****$isShowType" + "user${DBUtils.lastUser.toString()}")
             when (isShowType) {
-                1 -> RegionModel.get()?.subscribe { it -> setMeData(it) }
-                2 -> RegionModel.getAuthorizerList()?.subscribe { it -> setAuthorizeData(it) }
+                1 -> RegionModel.get()?.subscribe ({ it -> setMeData(it) },{
+                    ToastUtils.showShort(it.message)
+                })
+                2 -> RegionModel.getAuthorizerList()?.subscribe ({ it -> setAuthorizeData(it) },{
+                    ToastUtils.showShort(it.message)
+                })
                 3 -> {
-                    RegionModel.getAuthorizerList()?.subscribe { it -> setAuthorizeData(it) }
-                    RegionModel.get()?.subscribe { it -> setMeData(it) }
+                    RegionModel.get()?.subscribe ({ it -> setMeData(it) },{
+                        ToastUtils.showShort(it.message)
+                    })
+                    RegionModel.getAuthorizerList()?.subscribe ({ it -> setAuthorizeData(it) },{
+                        ToastUtils.showShort(it.message)
+                    })
                 }
             }
         }
@@ -282,22 +288,21 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.mipmap.icon_modify)
             it.findViewById<ImageView>(R.id.pop_update_net).isClickable = false
 
-            it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
-            it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
-
 
             if (DBUtils.lastUser!!.authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString()
-                    && DBUtils.lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString())
+                    && DBUtils.lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString()) {
+                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
+                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
-            else
+            } else {
+                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
+                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
-
-
+            }
         }
         view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
         view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
         showPop(pop!!, Gravity.BOTTOM)
-
     }
 
     private fun setChangeDialog() {
@@ -344,7 +349,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         when (v!!.id) {
             R.id.pop_view -> PopUtil.dismiss(pop)
             R.id.pop_unbind_net_ly -> {
-                toast(getString(R.string.btn_ok))
                 //解绑网络
                 when (isShowType) {
                     1 -> {
@@ -363,17 +367,18 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-                RegionModel.removeRegion(regionBean!!.id)!!.subscribe {
+                RegionModel.removeRegion(regionBean!!.id)!!.subscribe ({
                     PopUtil.dismiss(pop)
                     initData()
-                }
+                },{
+                    ToastUtils.showShort(it.message)
+                })
             }
             R.id.pop_share_net -> {
-                if (mExpire > 0) {
+                if (mExpire > 0)
                     view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
-                } else {
+                else
                     getQr()
-                }
             }
             R.id.pop_update_net -> {
                 viewAdd!!.findViewById<EditText>(R.id.pop_region_name).setText("")
@@ -408,16 +413,16 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun changeRegion() {
-            when (isShowType) {
-                1 -> if (DBUtils.lastUser!!.authorizer_user_id != DBUtils.lastUser!!.id.toString()||
-                        regionBean!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
-                    checkNetworkAndSync(this)
-                }
-                2 -> if (DBUtils.lastUser!!.authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString()
-                        || regionBeanAuthorize!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
-                    checkNetworkAndSync(this)
-                }
+        when (isShowType) {
+            1 -> if (DBUtils.lastUser!!.authorizer_user_id != DBUtils.lastUser!!.id.toString() ||
+                    regionBean!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
+                checkNetworkAndSync(this)
             }
+            2 -> if (DBUtils.lastUser!!.authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString()
+                    || regionBeanAuthorize!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
+                checkNetworkAndSync(this)
+            }
+        }
     }
 
     /**
@@ -425,12 +430,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     @SuppressLint("CheckResult")
     private fun getQr() {
-        RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe {
+        RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe ({
             setQR(it.code)
             val expire = it.expire.toLong()
             downTimer(expire)
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
-        }
+        },{
+            ToastUtils.showShort(it.message)
+        })
     }
 
     private fun setQR(it: String) {
@@ -543,19 +550,20 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         if (regionBean == null)
             return
-
         view?.let {
             it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
-            if (regionBean!!.id.toString() == DBUtils.lastUser!!.last_region_id) {//使用中不能删除
-                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
-                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
-            } else {
-                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
-                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
-                it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
-            }
+            val lastUser = DBUtils.lastUser!!
+            if (regionBean!!.id.toString() == lastUser.last_region_id)//使用中不能删除
+                if (regionBean!!.authorizer_id == lastUser!!.authorizer_user_id.toInt() || lastUser!!.authorizer_user_id == null) {
+                    it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                    it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+                    it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+                } else {
+                    it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
+                    it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
+                    it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+                }
 
             if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
                 it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
@@ -573,7 +581,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
             }
 
-            it.findViewById<LinearLayout>(R.id.pop_update_net).isClickable = true
+            it.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
             it.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
 
 
@@ -644,10 +652,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 isShowType = 3
                 DBUtils.deleteAllData()
                 //创建数据库
-                AccountModel.initDatBase(it,isChangeRegion)
+                AccountModel.initDatBase(it)
                 //更新last—region-id
                 DBUtils.saveUser(it)
-                Log.e("zcl", "zcl**isShowType****$isShowType*****切换后***$it&&&&&${DBUtils.lastUser.toString()}")
                 //下拉数据
                 SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGet)
             }
@@ -657,6 +664,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         override fun error(msg: String) {
             ToastUtils.showLong(getString(R.string.error_change_region))
+            //ToastUtils.showLong(msg)
             hideLoadingDialog()
         }
     }
@@ -690,16 +698,19 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             //解除授权
             //authorizer_id授权用户id  rid区域id
             RegionModel.dropAuthorizeRegion(regionBeanAuthorize!!.authorizer_id, regionBeanAuthorize!!.id)
-                    ?.subscribe {
+                    ?.subscribe ({
                         isShowType = 2
                         initData()
                         ToastUtils.showShort(getString(R.string.unbundling_success))
-                    }
+                    },{
+                        ToastUtils.showShort(it.message)
+                    })
             dialog.dismiss()
         }
         builder.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
             dialog.dismiss()
         }
+
         builder.create().show()
     }
 
@@ -715,6 +726,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             view?.findViewById<ImageView>(R.id.pop_user_net)?.setImageResource(R.drawable.icon_use_blue)
             initData()
         }
+
         override fun error(msg: String) {}
     }
 
@@ -751,11 +763,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun postParseCode(result: String?) {
         result?.let { it1 ->
-            RegionModel.parseQRCode(it1)?.subscribe {
-                isShowType = 2
-                initData()
-                ToastUtils.showShort(getString(R.string.unbundling_success))
-            }
+            RegionModel.parseQRCode(it1)?.subscribe(object : NetworkObserver<String>() {
+                override fun onNext(t: String) {
+                    isShowType = 2
+                    initData()
+                    ToastUtils.showShort(getString(R.string.unbundling_success))
+                }
+
+            })
         }
     }
 

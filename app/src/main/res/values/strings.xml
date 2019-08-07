@@ -861,6 +861,14 @@
     <string name="unbundling_fail">Unbundling failure</string>
     <string name="scan_success">Scan success</string>
     <string name="cancel_authorization">Authorized user cancels authorization</string>
-    <string name="authorization_exprize">The authorization code has expired</string>
+    <string name="authorization_exprize">The QR code has expired</string>
+    <string name="unauthorization_leve">Unauthorized authorization level</string>
+    <string name="region_one_code">A single region can generate only one code at a time</string>
+    <string name="can_not_parse">Unable to parse </string>
+    <string name="can_not_parse_mine">Unable to parse self-generated code</string>
+    <string name="accept_authrozation">This user has been authorized</string>
+    <string name="user_locked">User locked</string>
+    <string name="permission_denfied">Insufficient permission to operate</string>
+    <string name="region_not_exist">This region does not exist</string>
 
 </resources>

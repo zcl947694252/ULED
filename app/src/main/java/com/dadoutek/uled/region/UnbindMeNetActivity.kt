@@ -58,13 +58,14 @@ class UnbindMeNetActivity : BaseActivity() {
         builder.setMessage(getString(R.string.warm_unbind_config, bean.phone))
         builder.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
             unbindBean?.id?.let { regionbBean?.id?.let { it1 ->
-                RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe {
+                RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe ({
                     Log.e("zcl","zcl***before***$list")
-
                         list = list?.minus(unbindBean!!)
                         Log.e("zcl","zcl***minus***$list")
                         ToastUtils.showShort(getString(R.string.unbundling_success))
-                }
+                },{
+                    ToastUtils.showShort(it.message)
+                })
             } }
                     dialog.dismiss()
         }

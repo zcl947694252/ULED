@@ -11,7 +11,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 object ServerResultException {
     fun handleException(response: Response<*>) {
         val code = response.errorCode
-
         when (code) {
             NetworkStatusCode.ERROR_RUNTIME_TOKEN -> {
                 //token 过期
@@ -47,13 +46,40 @@ object ServerResultException {
             NetworkStatusCode.ERROR_NO_PASSOWRD->{
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.no_password))
             }
-            NetworkStatusCode.ERROR_CANCEL_AUHORIZE->{
+            NetworkStatusCode.ERROR_CANCEL_AUHORIZE->{//授权用户取消授权
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.cancel_authorization))
             }
-            NetworkStatusCode.ERROR_EXPIRED_AUHORIZE->{
+            NetworkStatusCode.ERROR_EXPIRED_AUHORIZE->{ //20025 码已过期
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.authorization_exprize))
             }
-            else -> {
+            NetworkStatusCode.ERROR_UNAUHORIZE_LEVE->{// 未收录的授权等级:
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.unauthorization_leve))
+            }
+            NetworkStatusCode.ERROR_REGION_MORE_CODE->{//单个区域同时只能生成一种码
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.region_one_code))
+            }
+            NetworkStatusCode.ERROR_CAN_NOT_PARSE->{//无法解析: 20022
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.can_not_parse))
+            }
+            NetworkStatusCode.ERROR_CAN_NOT_PARSE_MINE->{ //不能解析自己生成的码: 20023
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.can_not_parse_mine))
+            }
+            NetworkStatusCode.ERROR_ACCEPT_AUTHORIZATION->{ //该用户已接受授权: 20024
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.accept_authrozation))
+            }
+
+            NetworkStatusCode.ERROR_USER_LOCKED->{//用户被锁定: 20026
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.user_locked))
+            }
+            NetworkStatusCode.ERROR_CODE_FAILURE->{//20025 二维码已失效
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.QR_expired))
+            }
+            NetworkStatusCode.ERROR_PERMISSION_DENFINED->{// 权限不足,无法操作: 20028
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.permission_denfied))
+            }
+            NetworkStatusCode.ERROR_REGION_NOT_EXIST->{//30000  该区域不存在
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.region_not_exist))
+            }else -> {
                 throw RuntimeException(response.message)
             }
         }
