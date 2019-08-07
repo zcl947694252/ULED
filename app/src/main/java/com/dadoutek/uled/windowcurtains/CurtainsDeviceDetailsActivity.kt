@@ -150,11 +150,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
         setContentView(R.layout.activity_curtains_device_details)
         type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
+        initData()
     }
 
     override fun onResume() {
         super.onResume()
-        initData()
         initView()
     }
 
