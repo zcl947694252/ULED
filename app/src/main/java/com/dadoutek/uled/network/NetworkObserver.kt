@@ -10,10 +10,9 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-abstract class NetworkObserver<t>() : Observer<t> {
+abstract class NetworkObserver<t>: Observer<t> {
 
     override fun onSubscribe(d: Disposable) {
-
     }
     override fun onError(e: Throwable) {
         Log.e("zcl", "zcl******onError${e.localizedMessage}")

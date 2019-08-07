@@ -42,7 +42,7 @@ object AccountModel {
                 }
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    initDatBase(it)
+                    initDatBase(it, false)
                     Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -55,7 +55,7 @@ object AccountModel {
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
-                    initDatBase(it)
+                    initDatBase(it, false)
                     Thread.sleep(2000)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -141,7 +141,7 @@ object AccountModel {
         }
     }
 
-    public fun initDatBase(user: DbUser) {
+    fun initDatBase(user: DbUser, changeRegion: Boolean) {
         //首先保存当前数据库名
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.account)
 
@@ -150,7 +150,10 @@ object AccountModel {
         DaoSessionInstance.getInstance()
         DaoSessionUser.destroySession()
         DaoSessionUser.getInstance()
-        user.authorizer_user_id = user.id.toString()
+
+       /* if (!changeRegion)//不是切换区域就是登录
+            user.authorizer_user_id = user.id.toString()*/
+
         DBUtils.saveUser(user)
         user.password = userPassword
 

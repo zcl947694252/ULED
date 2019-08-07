@@ -269,7 +269,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         updateIte!!.visibility = View.GONE
 
         userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
-        userName!!.text = DBUtils.lastUser!!.phone
+        userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
 
         makePop()

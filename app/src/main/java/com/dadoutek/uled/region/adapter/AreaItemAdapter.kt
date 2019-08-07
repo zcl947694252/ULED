@@ -6,10 +6,11 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.region.bean.RegionBean
 
 
-class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var last_region_id: String) : BaseQuickAdapter<RegionBean, BaseViewHolder>(layoutResId, data) {
+class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var user: DbUser?) : BaseQuickAdapter<RegionBean, BaseViewHolder>(layoutResId, data) {
     @SuppressLint("StringFormatMatches")
     override fun convert(helper: BaseViewHolder?, item: RegionBean?) {
         item?.let {
@@ -31,7 +32,7 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var last_region_
                     personTv.visibility = View.GONE
                 }
 
-                if (item.id.toString() == last_region_id) {
+                if (item.id.toString() == user!!.last_region_id&& user!!.authorizer_user_id == user!!.id.toString()) {
                     it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))

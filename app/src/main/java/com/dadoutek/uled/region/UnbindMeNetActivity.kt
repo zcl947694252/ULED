@@ -60,13 +60,10 @@ class UnbindMeNetActivity : BaseActivity() {
             unbindBean?.id?.let { regionbBean?.id?.let { it1 ->
                 RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe {
                     Log.e("zcl","zcl***before***$list")
-                    if (it.errorCode == 0){
+
                         list = list?.minus(unbindBean!!)
                         Log.e("zcl","zcl***minus***$list")
                         ToastUtils.showShort(getString(R.string.unbundling_success))
-                    }else{
-                        ToastUtils.showLong(getString(R.string.unbundling_fail))
-                    }
                 }
             } }
                     dialog.dismiss()

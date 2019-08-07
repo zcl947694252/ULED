@@ -36,7 +36,13 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
- * Created by hejiajun on 2018/5/16.
+ * 创建者     zcl
+ * 创建时间   2019/8/7 11:54
+ * 描述	      ${TODO}$
+ * <p>
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${使用post传递body参数一种是使用@body传递封装的Requestbody对象 一种是使用@FormUrlEncoded+@Field表单模式}$
  */
 
 public interface RequestInterface {
@@ -55,6 +61,7 @@ public interface RequestInterface {
 
     //获取salt值
     @GET("auth/salt")
+    //@Headers("Content-Type:application/text; charset=utf-8")
     Observable<Response<String>> getsalt(@Query("account") String account);
 
     @FormUrlEncoded
@@ -117,7 +124,6 @@ public interface RequestInterface {
                                               @Body DbRegion dbRegion);
 
 
-
     //删除区域
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
     @DELETE("region/remove/{rid}")
@@ -131,7 +137,7 @@ public interface RequestInterface {
     //区域id和码种类type，在url中
     //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/1/1
     @DELETE("auth/authorization/code/remove/{rid}/{type}")
-    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid,@Path("type") int type);
+    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid, @Path("type") int type);
 
     //6、清除当前区域和其下数据
     //清除当前区域和其下数据，区域本身(除区域一)也会被删除。
@@ -389,8 +395,11 @@ public interface RequestInterface {
     //token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
     //code	是	string	码的值
     //{"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
+
+    @FormUrlEncoded
     @POST("auth/code/parse")
-    Observable<Response<String>> parseQRCode(@Body String code);
+    Observable<Response<String>> parseQRCode(@Field("code") String code);
+
     /**
      * 62、取消授权(主动方:授权者)
      * 取消一个区域对一个用户的授权。如:A授权了区域1给B，B接受了。有一天A不想让B用区域1了，A调用这个接口
@@ -401,7 +410,7 @@ public interface RequestInterface {
      * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/300600/1
      */
     @POST("auth/authorization/cancel/{ref_id}/{rid}")
-    Observable<Response<String>> cancelAuthorize(@Path("ref_id") int ref_id,@Path("rid") int rid);
+    Observable<Response<String>> cancelAuthorize(@Path("ref_id") int ref_id, @Path("rid") int rid);
 
     /**
      * 61、解除授权(主动方:被授权者)
@@ -413,6 +422,6 @@ public interface RequestInterface {
      * http://dev.dadoutek.com/smartlight/auth/authorization/release/300430/1
      */
     @DELETE("auth/authorization/release/{authorizer_id}/{rid}")
-    Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id,@Path("rid") int rid);
+    Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id, @Path("rid") int rid);
 
 }

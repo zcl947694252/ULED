@@ -1,15 +1,18 @@
 package com.dadoutek.uled.region.adapter
 
 import android.annotation.SuppressLint
+import android.util.Log
+
 import android.view.View
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 
 
-class AreaAuthorizeItemAdapter(layoutResId: Int, data: List<RegionAuthorizeBean>, var last_region_id: String) : BaseQuickAdapter<RegionAuthorizeBean, BaseViewHolder>(layoutResId, data) {
+class AreaAuthorizeItemAdapter(layoutResId: Int, data: List<RegionAuthorizeBean>, var user: DbUser?) : BaseQuickAdapter<RegionAuthorizeBean, BaseViewHolder>(layoutResId, data) {
     @SuppressLint("StringFormatMatches")
     override fun convert(helper: BaseViewHolder?, item: RegionAuthorizeBean?) {
         item?.let {
@@ -24,7 +27,9 @@ class AreaAuthorizeItemAdapter(layoutResId: Int, data: List<RegionAuthorizeBean>
 
                     personTv.visibility = View.GONE
 
-                if (item.id.toString() == last_region_id) {
+                Log.e("zcl","zcl*判断*****${user!!.last_region_id}*******************${user!!.authorizer_user_id}")
+
+                if (item.id.toString() == user!!.last_region_id  && user!!.authorizer_user_id == item.authorizer_id.toString()) {
                     it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))

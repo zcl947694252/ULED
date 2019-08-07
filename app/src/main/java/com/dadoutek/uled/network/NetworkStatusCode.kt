@@ -161,5 +161,9 @@ object NetworkStatusCode {
 
     const val ERROR_NO_PASSOWRD = 20007
     //没有密码
+    const val ERROR_CANCEL_AUHORIZE= 20019
+    //授权用户取消授权
+    const val ERROR_EXPIRED_AUHORIZE= 20025
+    //20025 码已过期
 
 }

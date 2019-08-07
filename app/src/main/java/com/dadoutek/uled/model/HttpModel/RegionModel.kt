@@ -2,7 +2,6 @@ package com.dadoutek.uled.model.HttpModel
 
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
@@ -78,49 +77,56 @@ object RegionModel {
     }
 
     /*区域新接口*/
-    fun addRegions(token: String, dbRegion: DbRegion, rid: Long?): Observable<Response<Any>>? {
+    fun addRegions(token: String, dbRegion: DbRegion, rid: Long?): Observable<Any>? {
         return NetworkFactory.getApi()
                 .addRegionNew(token, dbRegion, rid!!)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun getAuthorizationCode(regionId: Long):Observable<Response<ShareCodeBean>>?{
+    fun getAuthorizationCode(regionId: Long): Observable<ShareCodeBean>? {
         return NetworkFactory.getApi()
                 .regionAuthorizationCode(regionId)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun removeAuthorizationCode(regionId: Long, type: Int):Observable<Response<String>>?{
+    fun removeAuthorizationCode(regionId: Long, type: Int): Observable<String>? {
         return NetworkFactory.getApi()
                 .removeAuthorizeCode(regionId,type)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun removeRegion(id: Long):Observable<Response<String>>?{
+    fun removeRegion(id: Long): Observable<String>? {
         return NetworkFactory.getApi()
                 .removeRegion(id.toInt())
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun parseQRCode(code: String):Observable<Response<String>>?{
+    fun parseQRCode(code: String): Observable<String>? {
         return NetworkFactory.getApi()
                 .parseQRCode(code)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-    }  fun cancelAuthorize(ref_id:Int, rid:Int):Observable<Response<String>>?{
+    }
+    fun cancelAuthorize(ref_id:Int, rid:Int): Observable<String>? {
         return NetworkFactory.getApi()
                 .cancelAuthorize(ref_id, rid)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
@@ -130,13 +136,13 @@ object RegionModel {
     /**
      *
      */
-    fun dropAuthorizeRegion(authorizer_id:Int, rid:Int) :Observable<Response<String>>?{
+    fun dropAuthorizeRegion(authorizer_id:Int, rid:Int) : Observable<String>? {
         return NetworkFactory.getApi()
                 .dropAuthorize(authorizer_id, rid)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
 
 }

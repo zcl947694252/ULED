@@ -784,5 +784,8 @@
     <string name="fail_parse_qr">解析二维码失败</string>
     <string name="unbundling_success">解绑成功</string>
     <string name="unbundling_fail">解绑失败</string>
+    <string name="scan_success">扫描成功</string>
+    <string name="cancel_authorization">授权用户取消授权</string>
+    <string name="authorization_exprize">授权码已过期</string>
 
 </resources>

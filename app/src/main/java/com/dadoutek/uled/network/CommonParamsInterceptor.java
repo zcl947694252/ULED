@@ -47,9 +47,11 @@ public class CommonParamsInterceptor implements Interceptor {
         Request.Builder builder = request.newBuilder();
 
         DbUser user = DBUtils.INSTANCE.getLastUser();
-        Log.e("zcl", "zcl*********user" + user == null ? user.toString() : "null" + "---method---" + method);
+        Log.e("zcl", "zcl*******method---" + method);
 
         //添加请求头
+        builder.addHeader("Content-Type", TEXT);
+
         String token = request.header("token");
         String tokenNow = user == null ? "" : user.getToken();
 
@@ -67,13 +69,14 @@ public class CommonParamsInterceptor implements Interceptor {
         //1、请求头缺少region-id  2、region-id:1   3、region-id乱传
 
         if (user != null &&user.getAuthorizer_user_id()!=null&&!user.getAuthorizer_user_id().equals(""))
-            builder.addHeader("authorizer-user-id", last_region_id);
+            builder.addHeader("authorizer-user-id",user.getAuthorizer_user_id());
 
 
         if (token == null || token.isEmpty())
             builder.addHeader("token", oldToken);
 
         RequestBody body = request.body();
+        Log.e("zcl","zcl**method.equals(GET)****"+method.equals("GET")+"00000000"+(method.equals("POST") || method.equals("DELETE"))+"----"+(body != null));
         if (body != null) {
             MediaType mediaType = body.contentType();
             try {
@@ -84,13 +87,10 @@ public class CommonParamsInterceptor implements Interceptor {
                 } else if (method.equals("POST") || method.equals("DELETE")) {
                     field.set(mediaType, JSON);
                     HashMap<String, Object> rootMap = new HashMap<>();
-
                     RequestBody requestBody;
-
                     if (body instanceof FormBody) { // form 表单
-                        for (int i = 0; i < ((FormBody) body).size(); i++) {
+                        for (int i = 0; i < ((FormBody) body).size(); i++)
                             rootMap.put(((FormBody) body).encodedName(i), ((FormBody) body).encodedValue(i));
-                        }
                         Log.e("zcl", "zcl******rootMap" + rootMap.toString());
                         requestBody = RequestBody.create(MJSON, new JSONObject(rootMap).toString());
                     } else {

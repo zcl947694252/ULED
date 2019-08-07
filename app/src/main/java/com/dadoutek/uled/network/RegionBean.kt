@@ -31,7 +31,7 @@ class RegionBean: Serializable {
      * controlMeshPwd : 0611685
      * state : 1
      */
-
+    var authorizer_id: Int = 0
     var count_light: Int = 0
     var count_curtain: Int = 0
     var count_sensor: Int = 0
@@ -100,7 +100,7 @@ class RegionBean: Serializable {
     }
 
     override fun toString(): String {
-        return "RegionBean(count_light=$count_light, count_curtain=$count_curtain, count_sensor=$count_sensor, count_all=$count_all, installMesh=$installMesh, count_switch=$count_switch, code_info=$code_info, belongAccount=$belongAccount, controlMesh=$controlMesh, installMeshPwd=$installMeshPwd, count_relay=$count_relay, name=$name, id=$id, controlMeshPwd=$controlMeshPwd, state=$state, ref_users=$ref_users)"
+        return "RegionBean(authorizer_id=$authorizer_id,count_light=$count_light, count_curtain=$count_curtain, count_sensor=$count_sensor, count_all=$count_all, installMesh=$installMesh, count_switch=$count_switch, code_info=$code_info, belongAccount=$belongAccount, controlMesh=$controlMesh, installMeshPwd=$installMeshPwd, count_relay=$count_relay, name=$name, id=$id, controlMeshPwd=$controlMeshPwd, state=$state, ref_users=$ref_users)"
     }
 
 

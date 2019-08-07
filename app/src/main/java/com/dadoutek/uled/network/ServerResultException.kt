@@ -1,8 +1,8 @@
 package com.dadoutek.uled.network
 
 import com.dadoutek.uled.R
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.model.Response
+import com.dadoutek.uled.tellink.TelinkLightApplication
 
 /**
  * Created by Saw on 2017/1/13 0013.
@@ -43,6 +43,15 @@ object ServerResultException {
             }
             NetworkStatusCode.ERROR_NO_PASSOWRD->{
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.no_password))
+            }
+            NetworkStatusCode.ERROR_NO_PASSOWRD->{
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.no_password))
+            }
+            NetworkStatusCode.ERROR_CANCEL_AUHORIZE->{
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.cancel_authorization))
+            }
+            NetworkStatusCode.ERROR_EXPIRED_AUHORIZE->{
+                throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.authorization_exprize))
             }
             else -> {
                 throw RuntimeException(response.message)

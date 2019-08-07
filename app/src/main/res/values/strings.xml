@@ -859,5 +859,8 @@
     <string name="fail_parse_qr">Failed to parse qr code</string>
     <string name="unbundling_success">Unbundling success</string>
     <string name="unbundling_fail">Unbundling failure</string>
+    <string name="scan_success">Scan success</string>
+    <string name="cancel_authorization">Authorized user cancels authorization</string>
+    <string name="authorization_exprize">The authorization code has expired</string>
 
 </resources>
