@@ -28,22 +28,21 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.rgb.RGBSettingActivity
-import com.dadoutek.uled.rgb.RgbBatchGroupActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LeScanParameters
 import com.telink.util.Event
@@ -55,22 +54,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_curtains_device_details.*
-import kotlinx.android.synthetic.main.activity_curtains_device_details.add_device_btn
-import kotlinx.android.synthetic.main.activity_curtains_device_details.no_device_relativeLayout
-import kotlinx.android.synthetic.main.activity_curtains_device_details.recycleView
-import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.activity_switch_device_details.*
-import kotlinx.android.synthetic.main.item_install_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 private const val MAX_RETRY_CONNECT_TIME = 5
@@ -692,9 +683,11 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
             }
         }, true)
-        adapter?.let { diffResult.dispatchUpdatesTo(it) }
-        curtain = mNewDatas!!
-        adapter!!.setNewData(curtain)
+        adapter?.let {
+            diffResult.dispatchUpdatesTo(it)
+            adapter!!.setNewData(curtain)
+        }
+
         toolbar.title=getString(R.string.curtain) + " (" + curtain.size + ")"
     }
 
@@ -942,8 +935,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
     private fun filter(groupName: String?, isSearch: Boolean) {
         val list = DBUtils.groupList
 //        val nameList : ArrayList<String> = ArrayList()
-        if (curtain != null && curtain!!.size > 0) {
-            curtain!!.clear()
+        if (curtain.size > 0) {
+            curtain.clear()
         }
 
 //        for(i in list.indices){

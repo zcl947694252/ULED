@@ -18,6 +18,7 @@ import com.dadoutek.uled.model.ResponseVersionAvailable;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
+import com.dadoutek.uled.region.bean.TransferData;
 
 import java.util.List;
 
@@ -137,7 +138,16 @@ public interface RequestInterface {
     //区域id和码种类type，在url中
     //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/1/1
     @DELETE("auth/authorization/code/remove/{rid}/{type}")
-    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid, @Path("type") int type);
+    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid, @Path("type") int type); //57、授权码过期
+
+    /**
+     * 58、移交码过期
+     * 使一个移交码过期
+     * http://dev.dadoutek.com/smartlight/auth/transfer/code/remove
+     * DELETE
+     */
+    @DELETE("auth/transfer/code/remove")
+    Observable<Response<String>> removeTransferCode();
 
     //6、清除当前区域和其下数据
     //清除当前区域和其下数据，区域本身(除区域一)也会被删除。
@@ -409,7 +419,7 @@ public interface RequestInterface {
      * rid为区域id
      * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/300600/1
      */
-    @POST("auth/authorization/cancel/{ref_id}/{rid}")
+    @DELETE("auth/authorization/cancel/{ref_id}/{rid}")
     Observable<Response<String>> cancelAuthorize(@Path("ref_id") int ref_id, @Path("rid") int rid);
 
     /**
@@ -424,4 +434,11 @@ public interface RequestInterface {
     @DELETE("auth/authorization/release/{authorizer_id}/{rid}")
     Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id, @Path("rid") int rid);
 
+    /**
+     * 56、生成移交码
+     * http://dev.dadoutek.com/smartlight/auth/transfer/code/generate
+     * GET
+     */
+    @GET("auth/transfer/code/generate")
+    Observable<Response<TransferData>> makeTransferCode();
 }

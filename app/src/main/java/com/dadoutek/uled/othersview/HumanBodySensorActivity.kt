@@ -18,7 +18,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener
@@ -38,11 +37,7 @@ import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
-import kotlinx.android.synthetic.main.activity_config_light_light.*
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
-import kotlinx.android.synthetic.main.huuman_body_sensor.edit_data_view_layout
-import kotlinx.android.synthetic.main.huuman_body_sensor.recyclerView_select_group_list_view
-import kotlinx.android.synthetic.main.huuman_body_sensor.tvPSVersion
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -239,23 +234,23 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                any.setOnClickListener(View.OnClickListener {
+                any.setOnClickListener {
                     triggering_conditions_text.text = getString(R.string.any_environment)
                     modeTriggerCondition = 0
                     popupWindow.dismiss()
-                })
+                }
 
-                darker.setOnClickListener(View.OnClickListener {
+                darker.setOnClickListener {
                     triggering_conditions_text.text = getString(R.string.dark_environment)
                     modeTriggerCondition = 1
                     popupWindow.dismiss()
-                })
+                }
 
-                veryDark.setOnClickListener(View.OnClickListener {
+                veryDark.setOnClickListener {
                     triggering_conditions_text.text = getString(R.string.very_dark_environment)
                     modeTriggerCondition = 2
                     popupWindow.dismiss()
-                })
+                }
 
             }
 
@@ -283,19 +278,19 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                lightOn.setOnClickListener(View.OnClickListener {
+                lightOn.setOnClickListener {
                     trigger_time_text.text = getString(R.string.light_on)
                     modeStartUpMode = MODE_START_UP_MODE_OPEN
                     popupWindow.dismiss()
-                })
+                }
 
-                lightOff.setOnClickListener(View.OnClickListener {
+                lightOff.setOnClickListener {
                     trigger_time_text.text = getString(R.string.light_off)
                     modeStartUpMode = MODE_START_UP_MODE_CLOSE
                     popupWindow.dismiss()
-                })
+                }
 
-                brightness.setOnClickListener(View.OnClickListener {
+                brightness.setOnClickListener({
                     popupWindow.dismiss()
                     val textGp = EditText(this)
                     textGp.inputType = InputType.TYPE_CLASS_NUMBER
@@ -304,21 +299,16 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     AlertDialog.Builder(this)
                             .setTitle(R.string.target_brightness)
                             .setView(textGp)
-
                             .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-
                                 var brin = textGp.text.toString().toInt()
-
                                 if (brin == 0) {
                                     ToastUtil.showToast(this, getString(R.string.brightness_cannot))
                                     return@setPositiveButton
                                 }
-
                                 if (brin > 100) {
                                     ToastUtil.showToast(this, getString(R.string.brightness_cannot_be_greater_than))
                                     return@setPositiveButton
                                 }
-
                                 trigger_time_text.text = textGp.text.toString() + "%"
                                 modeStartUpMode = MODE_START_UP_MODE_OPEN
                                 dialog.dismiss()
@@ -766,7 +756,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             configureComplete()
                         },
                         failedCallback = {
-                            snackbar(configPirRoot, getString(R.string.pace_fail))
+                            snackbar(sensor_root, getString(R.string.pace_fail))
                             hideLoadingDialog()
                         })
 
@@ -794,7 +784,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             configureComplete()
                         },
                         failedCallback = {
-                            snackbar(configPirRoot, getString(R.string.pace_fail))
+                            snackbar(sensor_root, getString(R.string.pace_fail))
                             hideLoadingDialog()
                         })
 

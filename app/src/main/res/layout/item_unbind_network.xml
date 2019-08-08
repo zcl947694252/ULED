@@ -9,9 +9,8 @@
         android:id="@+id/item_unbind_net_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dp_11"
         android:layout_weight="1"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:textColor="@color/black_three"
         android:textSize="15sp" />
 

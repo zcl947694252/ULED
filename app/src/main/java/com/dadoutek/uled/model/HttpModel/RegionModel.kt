@@ -7,6 +7,7 @@ import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.region.bean.ShareCodeBean
+import com.dadoutek.uled.region.bean.TransferData
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -105,6 +106,16 @@ object RegionModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    fun removeTransferCode(): Observable<String>? {
+        return NetworkFactory.getApi()
+                .removeTransferCode()
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext {
+                }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun removeRegion(id: Long): Observable<String>? {
         return NetworkFactory.getApi()
                 .removeRegion(id.toInt())
@@ -139,6 +150,15 @@ object RegionModel {
     fun dropAuthorizeRegion(authorizer_id:Int, rid:Int) : Observable<String>? {
         return NetworkFactory.getApi()
                 .dropAuthorize(authorizer_id, rid)
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun transferCode() :Observable<TransferData>{
+        return NetworkFactory.getApi()
+                .makeTransferCode()
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}

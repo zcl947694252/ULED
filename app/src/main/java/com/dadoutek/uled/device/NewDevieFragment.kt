@@ -87,6 +87,11 @@ class NewDevieFragment : BaseFragment() {
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
+
     override fun onResume() {
         super.onResume()
         refreshView()
@@ -197,7 +202,7 @@ class NewDevieFragment : BaseFragment() {
     }
 
     private fun initView(view: View?) {
-        recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
+        recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
         newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
@@ -224,7 +229,7 @@ class NewDevieFragment : BaseFragment() {
             allDeviceList = ArrayList()
             val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
+            recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
             newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
 
 //        val decoration = DividerItemDecoration(activity!!,
@@ -301,7 +306,7 @@ class NewDevieFragment : BaseFragment() {
     private fun getViewThis(inflater: LayoutInflater): View? {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.fragment_new_device, null)
-        recyclerView = view.findViewById<RecyclerView>(R.id.deviceTypeList)
+        recyclerView = view.findViewById(R.id.deviceTypeList)
         return view
     }
 

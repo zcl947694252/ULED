@@ -27,7 +27,6 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
-import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.network.NetworkObserver
@@ -83,6 +82,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     var mBuild: AlertDialog.Builder? = null
     var isShowType = 3 //1自己的区域  2接收区域  3 全部区域
     var mExpire: Long = 0
+    var isTransferCode = false
     private var isAddRegion = true
     override fun initView() {
         list = ArrayList()
@@ -92,8 +92,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         makePop()
         initListener()
         mBuild = AlertDialog.Builder(this@NetworkActivity)
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CARMER)
@@ -123,8 +121,22 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             openScan()
         }
         transfer_account.setOnClickListener {
-
+            transferCode()
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun transferCode() {
+        RegionModel.transferCode().subscribe({
+            isTransferCode =true
+            setQR(it.code)
+            downTimer(it.expire.toLong())
+            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
+            view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.GONE
+            showPop(pop!!, Gravity.BOTTOM)
+        }, {
+            ToastUtils.showShort(it.message)
+        })
     }
 
     @SuppressLint("CheckResult")
@@ -155,17 +167,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             region_account_num.text = "+" + DBUtils.lastUser!!.phone
             Log.e("zcl", "zcl******isShowType****$isShowType" + "user${DBUtils.lastUser.toString()}")
             when (isShowType) {
-                1 -> RegionModel.get()?.subscribe ({ it -> setMeData(it) },{
+                1 -> RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
                     ToastUtils.showShort(it.message)
                 })
-                2 -> RegionModel.getAuthorizerList()?.subscribe ({ it -> setAuthorizeData(it) },{
+                2 -> RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
                     ToastUtils.showShort(it.message)
                 })
                 3 -> {
-                    RegionModel.get()?.subscribe ({ it -> setMeData(it) },{
+                    RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
                         ToastUtils.showShort(it.message)
                     })
-                    RegionModel.getAuthorizerList()?.subscribe ({ it -> setAuthorizeData(it) },{
+                    RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
                         ToastUtils.showShort(it.message)
                     })
                 }
@@ -355,6 +367,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                         val intent = Intent(this@NetworkActivity, UnbindMeNetActivity::class.java)
                         intent.putExtra(Constant.SHARE_PERSON, regionBean)
                         startActivity(intent)
+                        PopUtil.dismiss(pop)
                     }
                     2 -> {
                         showUnbindDialog()
@@ -367,10 +380,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-                RegionModel.removeRegion(regionBean!!.id)!!.subscribe ({
+                RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
                     PopUtil.dismiss(pop)
                     initData()
-                },{
+                }, {
                     ToastUtils.showShort(it.message)
                 })
             }
@@ -389,27 +402,34 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_qr_undo -> {
                 //撤销二维码
-                RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe {
-                    //设置二维码失效状态 倒计时颜色状态
-                    view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
-                    view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
-
-                    //设置刷新二维码变为二维码已撤销
-                    view?.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
-                    view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_canceled)
-                    view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
-                    view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_cancel)
-                    view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
-
+                if (!isTransferCode)
+                RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe ({
+                    setCancel()
                     setCreatShareCodeState()
-
-                    view?.findViewById<View>(R.id.view19)?.visibility = View.GONE
-
-                    mCompositeDisposable.clear()
-                    mExpire = 0
-                }
+                },{ToastUtils.showShort(it.message)})
+                else
+                    RegionModel.removeTransferCode()!!.subscribe {
+                        //设置二维码失效状态 倒计时颜色状态
+                      setCancel()
+                    }
             }
         }
+    }
+
+    private fun setCancel() {
+        //设置二维码失效状态 倒计时颜色状态
+        view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
+        view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
+
+        //设置刷新二维码变为二维码已撤销
+        view?.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
+        view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_canceled)
+        view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
+        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_cancel)
+        view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
+
+        view?.findViewById<View>(R.id.view19)?.visibility = View.GONE
+        mCompositeDisposable.clear()
     }
 
     private fun changeRegion() {
@@ -430,12 +450,13 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     @SuppressLint("CheckResult")
     private fun getQr() {
-        RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe ({
+        RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe({
+            isTransferCode =false
             setQR(it.code)
             val expire = it.expire.toLong()
             downTimer(expire)
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
-        },{
+        }, {
             ToastUtils.showShort(it.message)
         })
     }
@@ -496,6 +517,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.black_three)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun makePop() {
         view = View.inflate(this, R.layout.popwindown_region, null)
         viewAdd = View.inflate(this, R.layout.popwindown_add_region, null)
@@ -505,7 +527,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         popAdd = PopupWindow(viewAdd, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
         setPopSetting(pop!!)
-        setPopSetting(popAdd!!)
+        setPopSetting(popAdd)
 
         view?.let {
             it.findViewById<ImageView>(R.id.pop_view).setOnClickListener(this)
@@ -534,17 +556,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun setPopSetting(pop: PopupWindow) {
-        pop?.let {
-            pop!!.isOutsideTouchable = true
-            pop!!.isFocusable = true // 设置PopupWindow可获得焦点
-            pop!!.isTouchable = true // 设置PopupWindow可触摸补充：
-        }
+        pop.isOutsideTouchable = true
+        pop.isFocusable = true // 设置PopupWindow可获得焦点
+        pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
     /**
      * 设置指定pop内容并弹框
      */
-    private fun setPopData(position: Int, list: MutableList<RegionBean>) {
+    @SuppressLint("SetTextI18n")
+    private fun
+            setPopData(position: Int, list: MutableList<RegionBean>) {
         isShowType = 1
         regionBean = list[position]
 
@@ -555,7 +577,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
             val lastUser = DBUtils.lastUser!!
             if (regionBean!!.id.toString() == lastUser.last_region_id)//使用中不能删除
-                if (regionBean!!.authorizer_id == lastUser!!.authorizer_user_id.toInt() || lastUser!!.authorizer_user_id == null) {
+                if (lastUser.authorizer_user_id == null || regionBean!!.authorizer_id == lastUser.authorizer_user_id.toInt()) {
                     it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
                     it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
                     it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
@@ -628,13 +650,12 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     internal var syncCallback: SyncCallback = object : SyncCallback {
         override fun start() {
-            showLoadingDialog(this@NetworkActivity!!.getString(R.string.start_change_region))
+            showLoadingDialog(this@NetworkActivity.getString(R.string.start_change_region))
         }
 
         override fun complete() {
-            ToastUtils.showLong(this@NetworkActivity!!.getString(R.string.success_change_region))
+            ToastUtils.showLong(this@NetworkActivity.getString(R.string.success_change_region))
             //创建数据库
-            var user = DbUser()
             var lastUser = DBUtils.lastUser
             lastUser?.let {
                 //更新user
@@ -679,8 +700,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
 
         if (loadDialog == null) {
-            loadDialog = Dialog(this!!,
-                    R.style.FullHeightDialog)
+            loadDialog = Dialog(this, R.style.FullHeightDialog)
         }
         //loadDialog没显示才把它显示出来
         if (!loadDialog!!.isShowing) {
@@ -698,11 +718,12 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             //解除授权
             //authorizer_id授权用户id  rid区域id
             RegionModel.dropAuthorizeRegion(regionBeanAuthorize!!.authorizer_id, regionBeanAuthorize!!.id)
-                    ?.subscribe ({
+                    ?.subscribe({
                         isShowType = 2
                         initData()
                         ToastUtils.showShort(getString(R.string.unbundling_success))
-                    },{
+                        PopUtil.dismiss(pop)
+                    }, {
                         ToastUtils.showShort(it.message)
                     })
             dialog.dismiss()
@@ -731,7 +752,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun showPop(pop: PopupWindow, gravity: Int) {
-        if (pop != null && !pop.isShowing)
+        if (!pop.isShowing)
             pop.showAtLocation(window.decorView, gravity, 0, 0)
     }
 
@@ -752,7 +773,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                         var result = bundle.getString(CodeUtils.RESULT_STRING)
                         Log.e("zcl", "zcl***parse_result***$result")
                         postParseCode(result)
-                        ToastUtils.showShort(getString(R.string.scan_success))
                     } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                         Toast.makeText(this, getString(R.string.fail_parse_qr), Toast.LENGTH_LONG).show()
                     }
@@ -767,7 +787,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 override fun onNext(t: String) {
                     isShowType = 2
                     initData()
-                    ToastUtils.showShort(getString(R.string.unbundling_success))
+                    ToastUtils.showShort(getString(R.string.scan_success))
                 }
 
             })

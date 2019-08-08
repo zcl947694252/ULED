@@ -23,22 +23,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="11dp"
-                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
                 android:text="网络1(共10个设备)"
                 android:textColor="@color/black_three"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/item_area_share_person"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="11dp"
-                android:layout_marginTop="11dp"
+                android:layout_marginTop="7dp"
                 android:gravity="center_vertical"
+                android:text="@string/more"
                 android:textColor="@color/blue_background"
-                android:layout_marginBottom="@dimen/dp_13"
-                android:textSize="13sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView

@@ -14,8 +14,7 @@
         android:gravity="center_vertical"
         android:paddingStart="@dimen/dp_10"
         android:paddingEnd="@dimen/dp_10"
-        android:textColor="@color/black_three"
-        />
+        android:textColor="@color/black_three"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycleview_title_recycle"
@@ -23,12 +22,11 @@
         android:layout_height="match_parent"
         android:scrollbars="vertical"
         android:scrollbarStyle="outsideOverlay"
-
         android:clipToPadding="false"
         android:elevation="1dp"
         android:paddingStart="@dimen/dp_11"
-        android:paddingEnd="@dimen/dp_11"
-        />
+        android:paddingEnd="@dimen/dp_11"/>
+
 </LinearLayout>
 
 
