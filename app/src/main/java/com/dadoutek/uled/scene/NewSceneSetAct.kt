@@ -728,10 +728,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     }
                 } else if (type == SMART_CONNECTOR) {
                     if (list[i].isOn) {
-                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
+                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01) //接收器开是1
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     } else {
-                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
+                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02) //接收器关是2
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
                 } else if(type == LIGHT_RGB){
@@ -892,10 +892,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 }
             } else if (type == SMART_CONNECTOR) {
                 if (list[i].isOn) {
-                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //接收器开是1
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 } else {
-                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //接收器关是2
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
             }else if(type == LIGHT_RGB){
