@@ -95,7 +95,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
 
         override fun error(msg: String) {
-           //(msg)
+            //(msg)
             ToastUtils.showLong(msg)
             if (isClickExlogin) {
                 AlertDialog.Builder(activity)
@@ -385,7 +385,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             R.id.developer -> {
                 var intent = Intent(activity, DeveloperActivity::class.java)
                 startActivity(intent)
-            } R.id.setting -> {
+            }
+            R.id.setting -> {
                 var intent = Intent(activity, SettingActivity::class.java)
                 startActivity(intent)
             }
@@ -526,6 +527,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 hideLoadingDialog()
                 ToastUtils.showShort(R.string.backup_failed)
             }
+
             override fun start() {}
         })
 
@@ -551,38 +553,47 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     }
 
 
-    private fun developerMode(){
+    private fun developerMode() {
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
 
             LogUtils.getConfig().setLog2FileSwitch(true)
             LogUtils.getConfig().setDir(LOG_PATH_DIR)
-            SharedPreferencesUtils.setDeveloperModel(true)
-            TmtUtils.midToastLong(activity,getString(R.string.developer_mode_open))
-            startActivity(Intent(context, DeveloperActivity::class.java))
-            developer.visibility = View.VISIBLE
+            SharedPreferencesUtils.setDeveloperModel(!SharedPreferencesUtils.isDeveloperModel())
+            if (SharedPreferencesUtils.isDeveloperModel())
+                TmtUtils.midToastLong(activity, getString(R.string.developer_mode_open))
+            else
+                TmtUtils.midToastLong(activity, getString(R.string.developer_mode_close))
 
-          /*  val alertDialog = AlertDialog.Builder(activity)
-                    .setTitle(R.string.developer_mode_on)
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .setPositiveButton(getString(R.string.open_mode)) { dialog, which ->
-                        LogUtils.getConfig().setLog2FileSwitch(true)
-                        LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                        SharedPreferencesUtils.setDeveloperModel(true)
-                        startActivity(Intent(context, DeveloperActivity::class.java))
-                        developer.visibility = View.VISIBLE
-                        dialog.dismiss()
-                  }
-                    .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
-                        LogUtils.getConfig().setLog2FileSwitch(false)
-                        LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                        SharedPreferencesUtils.setDeveloperModel(false)
-                        developer.visibility = View.GONE
-                        dialog.dismiss()
-                    }.create()
-            alertDialog.setCancelable(false)
-            alertDialog.show()*/
+             if (SharedPreferencesUtils.isDeveloperModel()){
+                 startActivity(Intent(context, DeveloperActivity::class.java))
+                 developer.visibility =  View.VISIBLE
+             }
+             else
+                 developer.visibility =  View.GONE
+
+
+            /*  val alertDialog = AlertDialog.Builder(activity)
+                      .setTitle(R.string.developer_mode_on)
+                      .setIcon(android.R.drawable.ic_dialog_info)
+                      .setPositiveButton(getString(R.string.open_mode)) { dialog, which ->
+                          LogUtils.getConfig().setLog2FileSwitch(true)
+                          LogUtils.getConfig().setDir(LOG_PATH_DIR)
+                          SharedPreferencesUtils.setDeveloperModel(true)
+                          startActivity(Intent(context, DeveloperActivity::class.java))
+                          developer.visibility = View.VISIBLE
+                          dialog.dismiss()
+                    }
+                      .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
+                          LogUtils.getConfig().setLog2FileSwitch(false)
+                          LogUtils.getConfig().setDir(LOG_PATH_DIR)
+                          SharedPreferencesUtils.setDeveloperModel(false)
+                          developer.visibility = View.GONE
+                          dialog.dismiss()
+                      }.create()
+              alertDialog.setCancelable(false)
+              alertDialog.show()*/
         }
     }
 

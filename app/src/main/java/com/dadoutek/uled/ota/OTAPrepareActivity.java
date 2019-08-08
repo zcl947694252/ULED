@@ -82,10 +82,6 @@ public class OTAPrepareActivity extends TelinkBaseActivity implements View.OnCli
     }
 
 
-
-
-
-
 /*    private void getVersion() {
         byte opcode = (byte) 0xC7;
         int address = 0xFFFF;
