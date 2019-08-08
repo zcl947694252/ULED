@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network
 
 
-class ServerException(message: String?) : RuntimeException(message) {
+
+class ServerException(message: String?) : Exception(message) {
 }

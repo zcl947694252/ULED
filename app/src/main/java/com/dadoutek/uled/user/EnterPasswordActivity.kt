@@ -142,7 +142,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
     private fun login() {
         LogUtils.e("login hideLoadingDialog()$phone")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
-        LogUtils.e("zcl**********************login$editPassWord$phone${dbUser.toString()}")
+//        LogUtils.e("zcl**********************login$editPassWord$phone${dbUser.toString()}")
 
         if (!StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))

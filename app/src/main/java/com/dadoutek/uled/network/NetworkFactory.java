@@ -38,13 +38,15 @@ public class NetworkFactory {
                 .addInterceptor(chain -> {  //添加请求头
                     Request request = chain.request();
                     String token = request.header("token");
-                    Request build;
-                    Request.Builder builder1 = request.newBuilder();
-                    if (token == null || token.isEmpty())
-                        builder1.addHeader("token", user.getToken());
+                    Request build = request.newBuilder().build();
+                    if (user != null) {
+                        Request.Builder builder1 = request.newBuilder();
+                        if (token == null || token.isEmpty())
+                            builder1.addHeader("token", user.getToken());
 
-                    build = builder1.addHeader("region-id", user.getLast_region_id())
-                            .build();
+                        build = builder1.addHeader("region-id", user.getLast_region_id())
+                                .build();
+                    }
                     return chain.proceed(build);
                 })
                 .retryOnConnectionFailure(true);

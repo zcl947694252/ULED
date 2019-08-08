@@ -22,6 +22,9 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
+import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
+import com.dadoutek.uled.model.DeviceType.SMART_CONNECTOR
+import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
@@ -715,7 +718,15 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 var blue = color and 0x0000ff
                 var w = color shr 24
                 var type = list[i].deviceType
-                if (type == 0x10) {
+                if (type == SMART_CURTAIN) {
+                    if (list[i].isOn) {
+                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01) //窗帘开是1
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    } else {
+                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
+                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    }
+                } else if (type == SMART_CONNECTOR) {
                     if (list[i].isOn) {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
@@ -723,15 +734,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
-                } else if (type == 0x05) {
-                    if (list[i].isOn) {
-                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
-                    } else {
-                        params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
-                    }
-                } else if(type == 0x06){
+                } else if(type == LIGHT_RGB){
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }else {
@@ -879,7 +882,15 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
             Log.d("RGBCOLOR", logStr)
             var type = list[i].deviceType
-            if (type == 0x10) {
+            if (type == SMART_CURTAIN) {
+                if (list[i].isOn) {
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //窗帘开是1
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                } else {
+                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
+                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                }
+            } else if (type == SMART_CONNECTOR) {
                 if (list[i].isOn) {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
@@ -887,15 +898,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
-            } else if (type == 0x05) {
-                if (list[i].isOn) {
-                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
-                } else {
-                    params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
-                }
-            }else if(type == 0x06){
+            }else if(type == LIGHT_RGB){
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
             } else {
