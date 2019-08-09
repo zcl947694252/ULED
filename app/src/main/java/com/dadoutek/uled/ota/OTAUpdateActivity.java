@@ -1,10 +1,12 @@
 package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -30,7 +32,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.blankj.utilcode.util.UriUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -38,7 +42,6 @@ import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -61,6 +64,7 @@ import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -86,8 +90,8 @@ import io.reactivex.schedulers.Schedulers;
  * 在OTA升级过程中会保存此时现在的所有设备信息（onlineLights），
  * 如果是从MainActivity页面跳转而来（1.自动连接的设备有上报MeshOTA进度信息；2主动连接之前本地保存的设备），需要读取一次版本信息\n
  * 并初始化onlineLights
- * 1. {@link MainActivity#//onNotificationEvent(NotificationEvent)}；
- * 2. {@link MainActivity#//onDeviceStatusChanged(DeviceEvent)}；
+ * 1. {@link MainActivity#onNotificationEvent(NotificationEvent)}；
+ * 2. {@link MainActivity#onDeviceStatusChanged(DeviceEvent)}；
  * <p>
  * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity#sendGetDeviceOtaStateCommand()},
  * \n\t 并通过 {@link OTAUpdateActivity#onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
@@ -198,7 +202,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 ////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
 ////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                        //("\n" + time + ":" + msg.obj.toString());
+                        LogUtils.d("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }
@@ -278,7 +282,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().enableNotification();
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
-        toolbar = findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         initToolbar();
         otaProgress = (TextView) findViewById(R.id.progress_ota);
         meshOtaProgress = (TextView) findViewById(R.id.progress_mesh_ota);
@@ -286,7 +290,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         sv_log = (ScrollView) findViewById(R.id.sv_log);
         tv_version = (TextView) findViewById(R.id.tv_version);
 
-       /* if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
+        if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
             mPath = SharedPreferencesUtils.getUpdateFilePath();
             tvFile.setText(getString(R.string.select_file, mPath));
             btn_start_update.setVisibility(View.VISIBLE);
@@ -294,7 +298,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             local_version.setText(getString(R.string.local_version, dbLight.version));
             server_version.setVisibility(View.VISIBLE);
             server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
-        }*/
+        }
     }
 
     private void initToolbar() {
@@ -323,7 +327,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 chooseFile();
                 break;
             case R.id.btn_start_update:
-                beginToOta();
+                updateStep1();
                 break;
         }
     }
@@ -524,12 +528,15 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
     }
 
+    private boolean isConnectting = false;
+
     @Override
     protected void onPause() {
         super.onPause();
         if (mWakeLock != null) {
             mWakeLock.acquire();
         }
+
         stopConnectTimer();
         stopScanTimer();
     }
@@ -574,6 +581,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             startScan();
         }
     }
+
+    AlertDialog.Builder mScanTimeoutDialog;
 
     private void log(String log) {
         msgHandler.obtainMessage(MSG_LOG, log).sendToTarget();
@@ -652,55 +661,64 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         } else {
             tv_version.setText("File Version: " + mFileVersion);
             tv_version.setVisibility(View.GONE);
-
-            local_version.setVisibility(View.VISIBLE);
-            local_version.setText(getString(R.string.local_version, dbLight.version));
-            server_version.setVisibility(View.VISIBLE);
-            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mPath, 2)));
-
             select.setEnabled(false);
             text_info.setVisibility(View.GONE);
             btn_start_update.setVisibility(View.VISIBLE);
-            btn_start_update.setClickable(true);
+            btn_start_update.setClickable(false);
+//            btn_start_update.setText(R.string.updating);
+//            btn_start_update.setText(R.string.scan_and_connect);
+//            if (TelinkLightApplication.getApp().getConnectDevice() != null) {
+//                sendGetVersionCommand();
+//            } else {
+            if (TelinkLightApplication.getInstance().getConnectDevice() != null &&
+                    TelinkLightApplication.getInstance().getConnectDevice().meshAddress == dbLight.getMeshAddr()) {
+                startOTA();
+            } else {
+                startScan();
+            }
         }
     }
 
-    private void beginToOta() {
-        if (TelinkLightApplication.getInstance().getConnectDevice() != null &&
-                TelinkLightApplication.getInstance().getConnectDevice().meshAddress == dbLight.getMeshAddr()) {
-            startOTA();
-        } else {
-            startScan();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
+            Uri uri = data.getData();
+            mPath = UriUtils.uri2File(uri).getAbsolutePath();
+            tvFile.setText(mPath);
+            File file = new File(mPath);
+
+            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(file.getName(), 2)));
+
         }
     }
-
 
     private String getPathFour(Context context, Uri uri) {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+        // DocumentProvider
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-            String docId = DocumentsContract.getDocumentId(uri);
-            Log.e("zcl", "返回数据是uri:" + uri);
-
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
-                String[] split = docId.split(":");
-                String type = split[0];
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
 
                 if ("primary".equalsIgnoreCase(type)) {
-                    Log.e("zcl", "Storage返回数据是:" + Environment.getExternalStorageDirectory() + "/" + split[1]);
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
-            }// DownloadsProvider
+            }
+            // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
-                Log.e("zcl", "*******************contentPrivode返回数据是:uri.getAuthority(uri)：" + uri.getAuthority());
-                // Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
-                // return getDataColumn(context, contentUri, null, null);
-                String s = docId.replace("/Download", "");
-                String[] split = s.split(":");
-                return split[1];
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
             }
             // MediaProvider
             else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 final String type = split[0];
 
@@ -730,6 +748,23 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         return null;
     }
 
+    /**
+     * 4.4
+     * @param contentUri
+     * @return
+     */
+    public String getRealPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (null != cursor && cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+            cursor.close();
+        }
+        return res;
+    }
+
 
     public boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
@@ -757,14 +792,16 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 final int column_index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(column_index);
             }
-        } catch (Exception e) {
-            e.getLocalizedMessage();
         } finally {
             if (cursor != null)
                 cursor.close();
         }
         return null;
     }
+
+/*    private float getVersionValue(String version) {
+        return Float.valueOf(version.substring(1));
+    }*/
 
     private DbLight getLightByMeshAddress(int meshAddress) {
         if (onlineLights == null || onlineLights.size() == 0) return null;
@@ -777,7 +814,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void chooseFile() {
-        startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
+        //startActivityForResult(new Intent(this, FileSelectActivity.class), REQUEST_CODE_CHOOSE_FILE);
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         //intent.setType(“image/*”);//选择图片
         //intent.setType(“audio/*”); //选择音频
@@ -785,7 +822,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         //intent.setType(“video/*;image/*”);//同时选择视频和图片
         intent.setType("*/*");//无类型限制
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        // startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
+        startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
     }
 
     private boolean hasLight(int meshAddress) {
@@ -807,7 +844,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void updateStep1() {
-
         if (mPath != null && !mPath.isEmpty()) {
             parseFile();
         } else {
@@ -1069,7 +1105,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private int connectRetryCount = 0;
 
-    //private boolean loginStart=false;
+    //    private boolean loginStart=false;
     private void onDeviceEvent(DeviceEvent event) {
         int status = event.getArgs().status;
         switch (status) {
@@ -1185,60 +1221,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
         TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
                 params);
-    }
-
-
-    /**
-     * 4.4
-     *
-     * @param contentUri
-     * @return
-     */
-    public String getRealPathFromURI(Uri contentUri) {
-        String res = null;
-        String[] proj = {MediaStore.Images.Media.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (null != cursor && cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            res = cursor.getString(column_index);
-            cursor.close();
-        }
-        return res;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //第一个是传递标记监听 第二个是回传标记监听
-        if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-            Bundle b=data.getExtras(); //data为B中回传的Intent
-            mPath=b.getString("path");//str即为回传的值
-            tvFile.setText(mPath);
-            parseFile();
-
-            Log.e("zcl","返回数据是:"+requestCode+"---"+resultCode+"---mPath-"+mPath);
-            // Log.e("zcl","返回数据是:"+requestCode+"---"+resultCode+"----"+data.toString()+"----"+data.getDataString()+"----"+data.getData());
-
-//            if (resultCode == Activity.RESULT_OK) {
-//                Uri uri = data.getData();
-//                if ("file".equalsIgnoreCase(uri.getScheme())) {//使用第三方应用打开
-//                    mPath = uri.getPath();
-//
-//                    Log.e("zcl", "file返回数据是mPath:" + mPath);
-//                    tvFile.setText(mPath);
-//                    return;
-//                }
-//                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
-//                    mPath = getPathFour(this, uri);
-//                    Log.e("zcl", "4.4返回数据是mPath:" + mPath);
-//                    tvFile.setText(mPath);
-//                } else {//4.4以下下系统调用方法
-//                    Log.e("zcl", "4.1返回数据是mPath:" + mPath);
-//                    mPath = getRealPathFromURI(uri);
-//                    tvFile.setText(mPath);
-//                }
-//            }
-        }
     }
 
 }

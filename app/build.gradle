@@ -44,8 +44,8 @@ MobSDK {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 249
-        versionName  "3.0.6"
+        versionCode 250
+        versionName  "3.0.7"
 
         multiDexEnabled true
 

@@ -155,7 +155,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         recyclerView = findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
-        if (info != null && !info.isEmpty()) {
+        val havePhone = info != null && !info.isEmpty()
+        if (havePhone) {
             val messge = info.split("-")
             edit_user_phone_or_email!!.setText(messge[0])
             edit_user_password!!.setText(messge[1])
@@ -357,7 +358,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 return if (!beanOld?.name.equals(beanNew?.name)) {
                     return false//如果有内容不同，就返回false
                 } else true
-
             }
         }, true)
         adapter?.let { diffResult.dispatchUpdatesTo(it) }

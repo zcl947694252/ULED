@@ -97,7 +97,7 @@ import java.util.concurrent.TimeUnit
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
+private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
@@ -765,7 +765,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
                         val account = DBUtils.lastUser?.account
-                        LogUtils.e("zcl**********************扫描账号$account")
+//                        LogUtils.e("zcl**********************扫描账号$account")
                         val scanFilters = ArrayList<ScanFilter>()
                         val scanFilter = ScanFilter.Builder()
                                 .setDeviceName(account)
@@ -782,9 +782,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         params.setScanMode(false)
 
                         addScanListeners()
-                        TelinkLightService.Instance().startScan(params)
-                        //startCheckRSSITimer()
                         startScanTimeout()
+                        TelinkLightService.Instance().startScan(params)
+                        startCheckRSSITimer()
 
 
                         if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true) {
@@ -850,15 +850,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-/*
+
     private fun startCheckRSSITimer() {
         mScanTimeoutDisposal?.dispose()
         val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND
         Observable.intervalRange(1, periodCount, SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND, 1,
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Long?> {
+                .subscribe(object : io.reactivex.Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
                         retryConnect()
                     }
 
@@ -875,12 +874,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     }
 
                     override fun onError(e: Throwable) {
-                        Log.d("SawTest", "error = $e")
-
+                        LogUtils.d(e)
                     }
                 })
+
+
     }
-*/
+
 
     private fun login() {
         val account = DBUtils.lastUser?.account
@@ -1284,22 +1284,22 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (!isSwitch(deviceInfo.productUUID)) {
 //        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
 //            connect(deviceInfo.macAddress)
-//            if (bestRSSIDevice != null) {
-//                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
-//                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-//                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
-//                    bestRSSIDevice = deviceInfo
-//                }
-//            } else {
-//                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
-//                bestRSSIDevice = deviceInfo
-//            }
+            if (bestRSSIDevice != null) {
+                //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
+                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    bestRSSIDevice = deviceInfo
+                }
+            } else {
+                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                bestRSSIDevice = deviceInfo
+            }
 
-            TelinkLightService.Instance().idleMode(false)
-            bestRSSIDevice = deviceInfo
-
-            connect(bestRSSIDevice!!.macAddress)
-            LogUtils.d("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
+//            TelinkLightService.Instance().idleMode(false)
+//            bestRSSIDevice = deviceInfo
+//
+//            connect(bestRSSIDevice!!.macAddress)
+//            LogUtils.d("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
 
         }
     }
