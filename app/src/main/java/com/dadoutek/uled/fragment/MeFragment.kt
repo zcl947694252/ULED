@@ -573,7 +573,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
              else
                  developer.visibility =  View.GONE
 
-
             /*  val alertDialog = AlertDialog.Builder(activity)
                       .setTitle(R.string.developer_mode_on)
                       .setIcon(android.R.drawable.ic_dialog_info)

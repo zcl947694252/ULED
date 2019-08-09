@@ -127,6 +127,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun transferCode() {
+        RegionModel.lookTransferCode().subscribe(
+                {},{}
+        )
+
         RegionModel.transferCode().subscribe({
             isTransferCode =true
             setQR(it.code)
@@ -388,10 +392,19 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 })
             }
             R.id.pop_share_net -> {
-                if (mExpire > 0)
-                    view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
-                else
-                    getQr()
+                RegionModel.lookAuthorizeCode(regionBean!!.id).subscribe({
+                    mExpire= it.expire.toLong()
+                    Log.e("zcl", "zcl****判断**"+(it.code==""))
+                    when {
+                        it.code=="" -> if (mExpire > 0)
+                            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE else getQr()
+
+
+                        else -> getQr()
+                    }
+                },{
+                    ToastUtils.showShort(it.message)
+                })
             }
             R.id.pop_update_net -> {
                 viewAdd!!.findViewById<EditText>(R.id.pop_region_name).setText("")
@@ -469,7 +482,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     private fun downTimer(expire: Long) {
         mCompositeDisposable.clear()
-
         if (expire > 0) {
             view?.findViewById<ImageView>(R.id.pop_share_net)?.setImageResource(R.mipmap.icon_code)
             view?.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
@@ -606,17 +618,18 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
             it.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
 
-
             mExpire = regionBean!!.code_info!!.expire.toLong()
             Log.e("zcl", "zcl****regionBean**${regionBean.toString()}")
 
             it.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
             if (mExpire > 0) {
                 it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_code)
+                it.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
                 regionBean!!.code_info!!.code?.let { it1 -> setQR(it1) }
                 downTimer(mExpire)
             } else {
                 it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
+                it?.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
             }
         }
         view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE

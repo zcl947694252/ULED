@@ -46,13 +46,13 @@ object ServerResultException {
             NetworkStatusCode.ERROR_NO_PASSOWRD->{
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.no_password))
             }
-            NetworkStatusCode.ERROR_CANCEL_AUHORIZE->{//授权用户取消授权
+            NetworkStatusCode.ERROR_CANCEL_AUHORIZE->{//授权信息不存在或授权者取消了授权: 20019  需要弹框
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.cancel_authorization))
             }
             NetworkStatusCode.ERROR_EXPIRED_AUHORIZE->{ //20025 码已过期
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.authorization_exprize))
             }
-            NetworkStatusCode.ERROR_UNAUHORIZE_LEVE->{// 未收录的授权等级:
+            NetworkStatusCode.ERROR_UNAUHORIZE_LEVE->{// 未收录的授权等级:20020
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.unauthorization_leve))
             }
             NetworkStatusCode.ERROR_REGION_MORE_CODE->{//单个区域同时只能生成一种码
@@ -77,7 +77,7 @@ object ServerResultException {
             NetworkStatusCode.ERROR_PERMISSION_DENFINED->{// 权限不足,无法操作: 20028
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.permission_denfied))
             }
-            NetworkStatusCode.ERROR_REGION_NOT_EXIST->{//30000  该区域不存在
+            NetworkStatusCode.ERROR_REGION_NOT_EXIST->{//30000  该区域不存在  需要弹框
                 throw  ServerException(TelinkLightApplication.getInstance().getString(R.string.region_not_exist))
             }else -> {
                 throw RuntimeException(response.message)

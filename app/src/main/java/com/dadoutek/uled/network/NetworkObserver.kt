@@ -30,8 +30,6 @@ abstract class NetworkObserver<t>: Observer<t> {
             ToastUtils.showShort(R.string.unknown_network_error)
         }
     }
-
-
     override fun onComplete() {
     }
 }

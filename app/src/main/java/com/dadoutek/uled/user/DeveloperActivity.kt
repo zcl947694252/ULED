@@ -43,6 +43,8 @@ class DeveloperActivity : TelinkBaseActivity() {
         toolbar.title = getString(R.string.developer)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
+            developer_switch_cb.isChecked =SharedPreferencesUtils.isDeveloperModel()
     }
+
 
 }

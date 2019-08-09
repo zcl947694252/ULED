@@ -164,5 +164,33 @@ object RegionModel {
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    fun lookAuthorizeCode(rid: Long) :Observable<TransferData>{
+        return NetworkFactory.getApi()
+                .mlookAuthroizeCode(rid)
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun lookTransferCode() :Observable<TransferData>{
+        return NetworkFactory.getApi()
+                .mlookTransferCode()
+                .compose(NetworkTransformer())
+                //todo 转换
+               /* .flatMap{
+                    var compose: Observable<TransferData>?
+                    if (it.code=="")
+                        compose = NetworkFactory.getApi().makeTransferCode()
+                                .compose(NetworkTransformer())
+                    else{
+
+                    }
+
+                }*/
+                .subscribeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
 }
+

@@ -441,4 +441,22 @@ public interface RequestInterface {
      */
     @GET("auth/transfer/code/generate")
     Observable<Response<TransferData>> makeTransferCode();
+
+    /**
+     * 59、获取区域授权码信息(新增)
+     * http://dev.dadoutek.com/smartlight/auth/authorization/code/info/{rid}
+     * GET
+     * http://dev.dadoutek.com/smartlight/auth/authorization/code/info/1
+     */
+    @GET("auth/authorization/code/info/{rid}")
+    Observable<Response<TransferData>> mlookAuthroizeCode(@Path("rid") Long rid);
+
+    /**
+     * 60、获取用户移交码信息(新增)
+     * http://dev.dadoutek.com/smartlight/auth/transfer/code/info
+     * GET
+     */
+    @GET("auth/transfer/code/info")
+    Observable<Response<TransferData>> mlookTransferCode();
+
 }
