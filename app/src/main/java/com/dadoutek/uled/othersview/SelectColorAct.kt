@@ -5,44 +5,22 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.*
 import android.widget.SeekBar
-import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter
-import com.dadoutek.uled.rgb.ColorSelectDiyRecyclerViewAdapter
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color.*
-import kotlinx.android.synthetic.main.activity_select_color.btn_save
-import kotlinx.android.synthetic.main.activity_select_color.color_b
-import kotlinx.android.synthetic.main.activity_select_color.color_g
-import kotlinx.android.synthetic.main.activity_select_color.color_picker
-import kotlinx.android.synthetic.main.activity_select_color.color_r
-import kotlinx.android.synthetic.main.activity_select_color.diy_color_recycler_list_view
-import kotlinx.android.synthetic.main.activity_select_color.ll_b
-import kotlinx.android.synthetic.main.activity_select_color.ll_g
-import kotlinx.android.synthetic.main.activity_select_color.ll_r
-import kotlinx.android.synthetic.main.activity_select_color.sb_w_bright
-import kotlinx.android.synthetic.main.activity_select_color.tv_brightness_w
-import kotlinx.android.synthetic.main.activity_select_color_gradient.*
-import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
-import kotlinx.android.synthetic.main.toolbar.*
 import top.defaults.colorpicker.ColorObserver
-import java.util.ArrayList
-import javax.xml.transform.Result
+import java.util.*
 
 class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var itemGroup: ItemGroup? = null
@@ -70,7 +48,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         num = intent.getIntExtra("circle", 0);
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "StringFormatInvalid")
     private fun initView() {
 //        toolbar.title = getString(R.string.color_checked_set)
 //        setSupportActionBar(toolbar)
@@ -245,7 +223,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
                 val params: ByteArray = byteArrayOf(w!!.toByte())
 
 //                Thread.sleep(80)
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
 
                 Thread.sleep(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
@@ -333,10 +311,10 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         if (isOnceSet) {
 //            for(i in 0..3){
             Thread.sleep(50)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
 //            }
         } else {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
         }
     }
 
@@ -359,7 +337,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             itemGroup!!.color = (wValue shl 24) or (red shl 16) or (green shl 8) or blue
 
             Thread.sleep(50)
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
+//            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
 
         } catch (e: InterruptedException) {
             e.printStackTrace()
@@ -411,6 +389,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
+        @SuppressLint("StringFormatInvalid")
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
 
             var addr = itemGroup!!.groupAress

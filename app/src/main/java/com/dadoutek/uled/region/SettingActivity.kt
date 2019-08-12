@@ -172,7 +172,7 @@ class SettingActivity : AppCompatActivity() {
         val alertDialog = AlertDialog.Builder(this).setTitle(this!!.getString(R.string.empty_cache_title))
                 .setMessage(this!!.getString(R.string.empty_cache_tip))
                 .setPositiveButton(this!!.getString(android.R.string.ok)) { _, _ ->
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     clearData()
                 }.setNegativeButton(this!!.getString(R.string.btn_cancel)) { _, _ -> }.create()
         alertDialog.show()

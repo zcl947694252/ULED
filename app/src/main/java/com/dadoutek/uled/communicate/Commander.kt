@@ -62,8 +62,7 @@ object Commander : EventListener<String> {
             params = byteArrayOf(0x00, 0x64, 0x00)
         }
 
-        val instance = TelinkLightService.Instance() ?: return
-        instance.sendCommandNoResponse(opcode, mGroupAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
     /**
@@ -87,7 +86,7 @@ object Commander : EventListener<String> {
             }
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, mGroupAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mGroupAddr, params)
     }
 
     @Synchronized
@@ -114,7 +113,7 @@ object Commander : EventListener<String> {
                 for (light in lightList) {
                     for (k in 0..resendCmdTime) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light, null)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light, null)
                         Thread.sleep(sleepTime)
                     }
                     DBUtils.deleteAll()
@@ -170,7 +169,7 @@ object Commander : EventListener<String> {
                 for (light in lightList) {
                     for (k in 0..resendCmdTime) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light.meshAddr, null)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light.meshAddr, null)
                         Thread.sleep(sleepTime)
                     }
                     Thread.sleep(sleepTime)
@@ -204,7 +203,7 @@ object Commander : EventListener<String> {
             var w = color shr 24
 
             params = byteArrayOf(0x01, sceneId.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, meshAddr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
         }
     }
 
@@ -219,7 +218,7 @@ object Commander : EventListener<String> {
 //                (groupMeshAddr shr 8 and 0xFF).toByte())
         val params = byteArrayOf(0x00, 0xFF.toByte(), //0x00 代表删除组
                 0xFF.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -265,7 +264,7 @@ object Commander : EventListener<String> {
                 (groupAddr shr 8 and 0xFF).toByte())
         Thread {
             Thread.sleep(200)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
         }.start()
 
         Observable.interval(0, 300, TimeUnit.MILLISECONDS)
@@ -311,12 +310,12 @@ object Commander : EventListener<String> {
 
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
 
-        TelinkLightService.Instance().adapter.mode = LightAdapter.MODE_UPDATE_MESH
-        TelinkLightService.Instance().adapter.mLightCtrl.currentLight.newMeshAddress = newMeshAddr
-        TelinkLightService.Instance().adapter.mLightCtrl.reset(
+        TelinkLightService.Instance()?.adapter!!.mode = LightAdapter.MODE_UPDATE_MESH
+        TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.newMeshAddress = newMeshAddr
+        TelinkLightService.Instance()?.adapter!!.mLightCtrl.reset(
                 Strings.stringToBytes(newMeshName, 16), password, null)
-//        TelinkLightService.Instance().enableNotification()
-//        TelinkLightService.Instance().updateMesh(params)
+//        TelinkLightService.Instance()?.).enableNotification()
+//        TelinkLightService.Instance()?.).updateMesh(params)
 
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -419,7 +418,7 @@ object Commander : EventListener<String> {
         val gradientActionType = 0x03
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
     }
 
     //加载渐变
@@ -431,7 +430,7 @@ object Commander : EventListener<String> {
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         for (i in 0..2) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
         }
     }
@@ -445,7 +444,7 @@ object Commander : EventListener<String> {
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         for (i in 0..2) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
         }
     }
@@ -460,7 +459,7 @@ object Commander : EventListener<String> {
         //删除方式为删除索引
         val deleteType = 0x01
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), deleteType.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
     }
 
     /**
@@ -479,7 +478,7 @@ object Commander : EventListener<String> {
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), node.toByte(),
                 mode.toByte(), brightness.toByte(), r.toByte(), g.toByte(), b.toByte(), c.toByte(), w.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
     }
 
     fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit,
@@ -498,7 +497,7 @@ object Commander : EventListener<String> {
             params = byteArrayOf(0x3c, TelinkApplication.getInstance().connectDevice.meshAddress.toByte())
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -576,9 +575,9 @@ object Commander : EventListener<String> {
      */
     fun autoConnect(macAddress: String,successCallback: (version: String?) -> Unit,
                     failedCallback: () -> Unit) {
-        if (TelinkLightService.Instance() != null) {
-            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                TelinkLightService.Instance().idleMode(true);
+        if (TelinkLightService.Instance()!= null) {
+            if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                TelinkLightService.Instance()?.idleMode(true);
                 val account = DBUtils.lastUser!!.account
 
                 //自动重连参数
@@ -593,7 +592,7 @@ object Commander : EventListener<String> {
                 Thread {
                     try {
                         Thread.sleep(300)
-                        TelinkLightService.Instance().autoConnect(connectParams)
+                        TelinkLightService.Instance()?.autoConnect(connectParams)
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }
@@ -606,7 +605,7 @@ object Commander : EventListener<String> {
             refreshNotifyParams.setRefreshRepeatCount(1)
             refreshNotifyParams.setRefreshInterval(2000)
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+            TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
         }
     }
 }

@@ -449,7 +449,7 @@ public interface RequestInterface {
      * http://dev.dadoutek.com/smartlight/auth/authorization/code/info/1
      */
     @GET("auth/authorization/code/info/{rid}")
-    Observable<Response<TransferData>> mlookAuthroizeCode(@Path("rid") Long rid);
+    Observable<Response<ShareCodeBean>> mlookAuthroizeCode(@Path("rid") Long rid);
 
     /**
      * 60、获取用户移交码信息(新增)

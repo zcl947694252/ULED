@@ -128,7 +128,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun onLogin() {
-        TelinkLightService.Instance().enableNotification()
+        TelinkLightService.Instance()?.enableNotification()
         mApplication!!.removeEventListener(this)
 //        connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
@@ -443,9 +443,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         DBUtils.deleteSwitch(deleteSwitch!!)
                         notifyData()
                         Toast.makeText(this@SwitchDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
-//                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+//                        if (TelinkLightService.Instance()?.adapter.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, deleteSwitch!!.getMeshAddr(), null)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, deleteSwitch!!.getMeshAddr(), null)
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(deleteSwitch!!.getMeshAddr())) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
                         }
@@ -488,7 +488,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             if (granted) {
 
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication!!.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
@@ -581,11 +581,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 .subscribe {
                     if (it) {
                         //授予了权限
-                        if (TelinkLightService.Instance() != null) {
+                        if (TelinkLightService.Instance()!= null) {
 //                            progressBar?.visibility = View.VISIBLE
                             mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this@SwitchDeviceDetailsActivity)
                             mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this@SwitchDeviceDetailsActivity)
-                            TelinkLightService.Instance().connect(macAddress, CONNECT_TIMEOUT)
+                            TelinkLightService.Instance()?.connect(macAddress, CONNECT_TIMEOUT)
                             startConnectTimer()
 
 //                            if(isOTA){
@@ -708,7 +708,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         .subscribeOn(Schedulers.io())
                         .subscribe {
                             if (it) {
-                                TelinkLightService.Instance().idleMode(true)
+                                TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
                                 val account = DBUtils.lastUser?.account
@@ -729,7 +729,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                 params.setScanMode(false)
 
                                 addScanListeners()
-                                TelinkLightService.Instance().startScan(params)
+                                TelinkLightService.Instance()?.startScan(params)
                                 startCheckRSSITimer()
 
                             } else {
@@ -787,7 +787,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         ToastUtil.showToast(this, getString(R.string.not_found_switch))
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
 //        }
@@ -806,9 +806,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     .subscribe {
                         if (it) {
                             //授予了权限
-                            if (TelinkLightService.Instance() != null) {
+                            if (TelinkLightService.Instance()!= null) {
                                 progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
                             }
                         } else {
@@ -838,12 +838,12 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
 //            if (!scanPb.isShown) {
                 retryConnectCount = 0
                 connectFailedDeviceMacList.clear()
@@ -856,7 +856,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 

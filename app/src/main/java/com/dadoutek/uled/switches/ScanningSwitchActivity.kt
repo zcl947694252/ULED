@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -101,11 +100,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun readyConnection() {
+        val b =TelinkLightService.Instance()!=null&& !TelinkLightService.Instance()!!.isLogin
         mIntervalCheckConnection = Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     //如果已经断连或者检测超过10次，直接完成。
-                    if (!TelinkLightService.Instance().isLogin || it > 10) {
+                    if (b || it > 10) {
                         onInited()
                     }
                 }
@@ -197,7 +197,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             if (granted) {
 
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
@@ -455,13 +455,13 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName)
                     .substring(0, 16)
         }
-        TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16)
                 , Strings.stringToBytes(pwd, 16))
 
     }
 
     private fun onLogin() {
-        TelinkLightService.Instance().enableNotification()
+        TelinkLightService.Instance()?.enableNotification()
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
@@ -508,7 +508,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun showConnectFailed() {
         mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
 
        //("showConnectFailed")
 //        if(isOTA){
@@ -533,7 +533,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //           //("connected33")
 //            mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
 //            mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
-//            TelinkLightService.Instance().connect(bestRSSIDevice?.macAddress, CONNECT_TIMEOUT_SECONDS)
+//            TelinkLightService.Instance()?.connect(bestRSSIDevice?.macAddress, CONNECT_TIMEOUT_SECONDS)
 //        }.start()
 //
 //        GlobalScope.launch(Dispatchers.Main) {
@@ -559,7 +559,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //                            progressBar?.visibility = View.VISIBLE
                             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
                             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
-                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                            TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
 //                            if(isOTA){
@@ -601,20 +601,20 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
             retryConnectCount = 0
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             showConnectFailed()
         }
     }
 
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -782,7 +782,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //        val groupAddress = bestRSSIDevice!!.meshAddress
 //        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
 //                (groupAddress shr 8 and 0xFF).toByte())
-//        TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, bestRSSIDevice!!.meshAddress,
+//        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, bestRSSIDevice!!.meshAddress,
 //                paramBytes)
 //        otaUpdate()
 //    }

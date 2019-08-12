@@ -6,7 +6,6 @@ import android.bluetooth.le.ScanFilter
 import android.os.Bundle
 import android.view.MenuItem
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -130,7 +129,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
                 Thread {
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     val mesh = mApplication.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
@@ -149,7 +148,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                     }
                     params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                     params.setScanMode(false)
-
 
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
                     this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
@@ -326,11 +324,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
         //("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
 
-        TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
     private fun onLogin() {
-        TelinkLightService.Instance().enableNotification()
+        TelinkLightService.Instance()?.enableNotification()
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         scanDisposable?.dispose()
@@ -360,7 +358,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun showConnectFailed() {
         mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
 
         //("zcl  showConnectFailed")
         if (isSupportInstallOldDevice) {
@@ -377,7 +375,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         Thread {
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSensorActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSensorActivity)
-            TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
+            TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
             //("zcl开始连接")
         }.start()
 
@@ -397,9 +395,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
-        if (TelinkLightService.Instance() != null) {
-            TelinkLightService.Instance().idleMode(true)
-        }
+        TelinkLightService.Instance()?.idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 

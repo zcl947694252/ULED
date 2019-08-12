@@ -660,9 +660,9 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
      */
     private boolean isAllLightsGrouped() {
         for (int j = 0; j < nowLightList.size(); j++) {
-            if (nowLightList.get(j).getBelongGroupId() == allLightId) {
-                return false;
-            }
+            DbLight dbLight = nowLightList.get(j);
+            if (dbLight!=null&&dbLight.getBelongGroupId() == allLightId)
+                    return false;
         }
         return true;
     }

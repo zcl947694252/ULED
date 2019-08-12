@@ -55,7 +55,6 @@ import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UpdateModel
-import com.dadoutek.uled.network.CommonParamsInterceptor.JSON
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.VersionBean
@@ -91,7 +90,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
-import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -144,7 +142,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
                 when (state) {
                     BluetoothAdapter.STATE_ON -> {
-                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance()?.idleMode(true)
                         retryConnectCount = 0
                         startScan()
                     }
@@ -208,8 +206,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun LogOutAndExitApp() {
         SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
-        TelinkLightService.Instance().disconnect()
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
 
         //重启app并杀死原进程
         ActivityUtils.finishAllActivities(true)
@@ -607,7 +605,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onResume() {
         super.onResume()
         //检测service是否为空，为空则重启
-        if (TelinkLightService.Instance() == null) {
+        if (TelinkLightService.Instance()== null) {
             mApplication?.startLightService(TelinkLightService::class.java)
         }
 
@@ -712,7 +710,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribeOn(Schedulers.io())
                 .subscribe {
                     if (it) {
-                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance()?.idleMode(true)
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
                         val account = DBUtils.lastUser?.account
@@ -733,7 +731,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         params.setScanMode(false)
 
                         addScanListeners()
-                        TelinkLightService.Instance().startScan(params)
+                        TelinkLightService.Instance()?.startScan(params)
                         //startCheckRSSITimer()
                         startScanTimeout()
 
@@ -771,10 +769,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribe {
                     if (it) {
                         //授予了权限
-                        if (TelinkLightService.Instance() != null) {
+                        if (TelinkLightService.Instance()!= null) {
                             progressBar?.visibility = View.GONE
                             mScanTimeoutDisposal?.dispose()
-                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                            TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             //  startConnectTimer()
                            // if (mConnectSnackBar?.isShown != true) {
                            //     mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
@@ -833,7 +831,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
         //("start Login")
     }
@@ -841,7 +839,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun onNError(event: DeviceEvent) {
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
         val builder = AlertDialog.Builder(this)
@@ -858,14 +856,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true) {
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true) {
                 //("reconnect")
                 startScan()
             } else
                 login()
         } else {
             //("exceed max retry time, show connection error")
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             TmtUtils.midToastLong(this@MainActivity,getString(R.string.not_found_light))
             setSnack()
         }
@@ -960,8 +958,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onStop() {
         super.onStop()
-        if (TelinkLightService.Instance() != null)
-            TelinkLightService.Instance().disableAutoRefreshNotify()
+            TelinkLightService.Instance()?.disableAutoRefreshNotify()
         isCreate = false
         installDialog?.dismiss()
     }
@@ -988,8 +985,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
+                TelinkLightService.Instance()?.enableNotification()
+                TelinkLightService.Instance()?.updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != GONE)
@@ -1021,7 +1018,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 retryConnect()
             }
             LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
+                TelinkLightService.Instance()?:return
+                if (!TelinkLightService.Instance()!!.isLogin)
                     login()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)
@@ -1185,13 +1183,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //        //"onErrorReport: onLeScanTimeout")
 ////        if (mConnectSnackBar) {
 ////        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-//        TelinkLightService.Instance().idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true)
 //        LeBluetooth.getInstance().stopScan()
 //        startScan()
 ////        }
 ////        } else {
 ////        retryConnect()
-////        TelinkLightService.Instance().idleMode(true)
+////        TelinkLightService.Instance()?.idleMode(true)
 ////        LeBluetooth.getInstance().stopScan()
 ////        startScan()
 ////        }
@@ -1251,7 +1249,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //                bestRSSIDevice = deviceInfo
 //            }
 
-            TelinkLightService.Instance().idleMode(false)
+            TelinkLightService.Instance()?.idleMode(false)
             bestRSSIDevice = deviceInfo
 
             connect(bestRSSIDevice!!.macAddress)

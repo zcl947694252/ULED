@@ -84,12 +84,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
-            Log.e("zcl","zcl******onItemChildClickListener")
+            Log.e("zcl", "zcl******onItemChildClickListener")
             when (view.id) {
                 R.id.scene_delete -> scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.scene_edit -> {
-                    Log.e("zcl","zcl******scene_edit")
+                    Log.e("zcl", "zcl******scene_edit")
                     val scene = scenesListData!![position]
                     val intent = Intent(activity, NewSceneSetAct::class.java)
                     intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
@@ -98,7 +98,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
 
                 R.id.scene_apply -> {
-                    Log.e("zcl","zcl******scene_apply")
+                    Log.e("zcl", "zcl******scene_apply")
                     try {
                         if (position < adapter.data.size) {
                             setScene(scenesListData!![position].id!!)
@@ -215,7 +215,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btn_delete = toolbar?.findViewById<ImageView>(R.id.img_function2)
 
         btn_add?.visibility = View.VISIBLE
-       // btn_delete?.visibility = View.VISIBLE
+        // btn_delete?.visibility = View.VISIBLE
 
         btn_add?.setOnClickListener(this)
         btn_delete?.setOnClickListener(this)
@@ -381,7 +381,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         val id = scenesListData!![i].id!!
                         val list = DBUtils.getActionsBySceneId(id)
                         params = byteArrayOf(0x00, id.toByte())
-                        Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
+                        Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
                         DBUtils.deleteSceneActionsList(list)
                         DBUtils.deleteScene(scenesListData!![i])
                     }
@@ -431,7 +431,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             val id = scenesListData!![position].id!!
             val list = DBUtils.getActionsBySceneId(id)
             params = byteArrayOf(0x00, id.toByte())
-            Thread { TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
+            Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
             DBUtils.deleteSceneActionsList(list)
             DBUtils.deleteScene(scenesListData!![position])
             scenesListData!!.removeAt(position)
@@ -443,10 +443,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val list = DBUtils.getActionsBySceneId(id)
         Thread {
             val params: ByteArray = byteArrayOf(id.toByte())
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
         }.start()
 
-        TmtUtils.midToast(activity,getString(R.string.scene_apply_success))
+        TmtUtils.midToast(activity, getString(R.string.scene_apply_success))
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -494,17 +494,21 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 //添加Item变化动画
                 recyclerView!!.itemAnimator = DefaultItemAnimator()
                 adaper = SceneRecycleListAdapter(R.layout.item_scene, scenesListData, isDelete)
-                adaper!!.setOnItemClickListener(onItemClickListener)
-                adaper!!.setOnItemChildClickListener(onItemChildClickListener)
-                adaper!!.onItemLongClickListener = onItemChildLongClickListener
-                adaper!!.bindToRecyclerView(recyclerView)
+                adaper?.let {
+                    it.onItemClickListener = onItemClickListener
+                    it.onItemChildClickListener = onItemChildClickListener
+                    it.onItemLongClickListener = onItemChildLongClickListener
+                    it.bindToRecyclerView(recyclerView)
+                }
             }
 
+            toolbar?.let {
+                it.navigationIcon = null
+                it.setTitle(R.string.scene_name)
+            }
             img_function2?.visibility = View.GONE
-            toolbar?.navigationIcon = null
             image_bluetooth?.visibility = View.VISIBLE
             img_function1?.visibility = View.VISIBLE
-            toolbar?.setTitle(R.string.scene_name)
 
             isDelete = false
             adaper!!.changeState(isDelete)

@@ -172,7 +172,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 triggerValue.toByte(),
                 mode.toByte()
         )
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_PIR,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_PIR,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
@@ -235,15 +235,15 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun doFinish() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+       TelinkLightService.Instance()?.idleMode(true)
+       TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
     private fun configureComplete() {
         saveSensor()
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+       TelinkLightService.Instance()?.idleMode(true)
+       TelinkLightService.Instance()?.disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 

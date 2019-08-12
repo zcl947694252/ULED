@@ -172,9 +172,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
 
-                    if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                    if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.meshAddr, null)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.meshAddr, null)
                         DBUtils.deleteLight(light!!)
                         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr)) {
                             TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
@@ -1284,10 +1284,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
                 val paramsW: ByteArray = byteArrayOf(ws.toByte())
                 val params: ByteArray = byteArrayOf(w!!.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcodeW, addr!!, paramsW)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr!!, paramsW)
 
                 Thread.sleep(80)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
 
                 Thread.sleep(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
@@ -1567,8 +1567,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
 
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
+                TelinkLightService.Instance()?.enableNotification()
+                TelinkLightService.Instance()?.updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
@@ -1593,7 +1593,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 //                scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
+                
+                if (!TelinkLightService.Instance()!!.isLogin)
                     login()
                 hideLoadingDialog()
             }
@@ -1611,7 +1612,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 //        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
 
@@ -1626,12 +1627,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
 //            if (!scanPb.isShown) {
             retryConnectCount = 0
             connectFailedDeviceMacList.clear()
@@ -1644,7 +1645,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16))
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16))
         ToastUtil.showToast(this,getString(R.string.connect_success))
         hideLoadingDialog()
     }
@@ -1663,7 +1664,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 //                            if (it) {
 //                showLoadingDialog(getString(R.string.connecting))
                 ToastUtil.showToast(this,getString(R.string.connecting))
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数
                 val account = DBUtils.lastUser?.account
@@ -1684,7 +1685,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 params.setScanMode(false)
 
                 addScanListeners()
-                TelinkLightService.Instance().startScan(params)
+                TelinkLightService.Instance()?.startScan(params)
 //                startScanTimeout()
                 startCheckRSSITimer()
 
@@ -1740,13 +1741,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 //        ToastUtil.showToast(this,getString(R.string.connect_failed))
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
 //        }
 //        } else {
 //        retryConnect()
-//        TelinkLightService.Instance().idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true)
 //        LeBluetooth.getInstance().stopScan()
 //        startScan()
 //        }
@@ -1762,9 +1763,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     .subscribe {
                         if (it) {
                             //授予了权限
-                            if (TelinkLightService.Instance() != null) {
+                            if (TelinkLightService.Instance()!= null) {
                                 progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
 //                                startConnectTimer()
                             }
                         } else {
@@ -1786,7 +1787,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
         if (TelinkLightService.Instance() != null) {
 
-            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+            if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 ToastUtils.showLong(getString(R.string.connecting))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
@@ -1800,7 +1801,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 val mesh = this.mApp?.getMesh()
 
                 if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     return
                 }
 
@@ -1823,7 +1824,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     connectParams.setConnectMac(mesh?.otaDevice!!.mac)
                 }
                 //自动重连
-                TelinkLightService.Instance().autoConnect(connectParams)
+                TelinkLightService.Instance()?.autoConnect(connectParams)
             }
 
             //刷新Notify参数
@@ -1831,7 +1832,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             refreshNotifyParams.setRefreshRepeatCount(2)
             refreshNotifyParams.setRefreshInterval(2000)
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+            TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
         }
     }
 
@@ -2046,10 +2047,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
                 val paramsW: ByteArray = byteArrayOf(w.toByte())
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcodeW, addr!!, paramsW)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr!!, paramsW)
 
                 Thread.sleep(80)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
 
                 Thread.sleep(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
@@ -2168,7 +2169,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         acitivityIsAlive = false
         mScanDisposal?.dispose()
         if (TelinkLightApplication.getInstance().connectDevice == null) {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
     }
@@ -2524,10 +2525,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         if (isOnceSet) {
 //            for(i in 0..3){
             Thread.sleep(50)
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
 //            }
         } else {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
         }
 
 //        color_picker.setInitialColor((light?.color ?: 0
@@ -2618,7 +2619,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     private fun renameGp() {

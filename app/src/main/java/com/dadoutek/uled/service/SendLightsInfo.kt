@@ -139,7 +139,7 @@ class SendLightsInfo : Service(), EventListener<String> {
 //                    GlobalScope.launch(Dispatchers.Main) {
 ////                        hideLocationServiceDialog()
 //                    }
-//                    mTelinkLightService = TelinkLightService.Instance()
+//                    mTelinkLightService = TelinkLightService.Instance()?.)
 //                    if (TelinkLightApplication.getInstance().connectDevice == null) {
 //                        while (TelinkApplication.getInstance()?.serviceStarted == true) {
 //                            GlobalScope.launch(Dispatchers.Main) {
@@ -174,7 +174,7 @@ class SendLightsInfo : Service(), EventListener<String> {
 //                        .subscribeOn(Schedulers.io())
 //                        .subscribe {
 //                            if (it) {
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数
                 val account = DBUtils.lastUser?.account
@@ -195,7 +195,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                 params.setScanMode(false)
 
                 addScanListeners()
-                TelinkLightService.Instance().startScan(params)
+                TelinkLightService.Instance()?.startScan(params)
                 startCheckRSSITimer()
 
 //                            } else {
@@ -255,7 +255,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                             //授予了权限
                             if (TelinkLightService.Instance() != null) {
 //                                progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
                             }
 //                        } else {
@@ -282,7 +282,7 @@ class SendLightsInfo : Service(), EventListener<String> {
        //"onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-//        TelinkLightService.Instance().idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true)
 //        LeBluetooth.getInstance().stopScan()
 //        startScan()
 //        }
@@ -299,12 +299,12 @@ class SendLightsInfo : Service(), EventListener<String> {
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
 //            if (!scanPb.isShown) {
 //                retryConnectCount = 0
 //                connectFailedDeviceMacList.clear()
@@ -317,7 +317,7 @@ class SendLightsInfo : Service(), EventListener<String> {
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 

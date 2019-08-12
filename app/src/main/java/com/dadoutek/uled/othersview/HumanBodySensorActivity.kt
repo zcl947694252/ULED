@@ -85,7 +85,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.huuman_body_sensor)
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         initToolbar()
         initData()
         getVersion()
@@ -149,8 +149,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun doFinish() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
@@ -290,7 +290,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     popupWindow.dismiss()
                 }
 
-                brightness.setOnClickListener({
+                brightness.setOnClickListener {
                     popupWindow.dismiss()
                     val textGp = EditText(this)
                     textGp.inputType = InputType.TYPE_CLASS_NUMBER
@@ -322,7 +322,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             inputManager.showSoftInput(textGp, 0)
                         }
                     }, 200)
-                })
+                }
 
             }
 
@@ -346,17 +346,17 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                minute.setOnClickListener(View.OnClickListener {
+                minute.setOnClickListener {
                     time_type_text.text = getString(R.string.minute)
                     modeDelayUnit = MODE_DELAY_UNIT_MINUTE
                     popupWindow.dismiss()
-                })
+                }
 
-                second.setOnClickListener(View.OnClickListener {
+                second.setOnClickListener {
                     time_type_text.text = getString(R.string.second)
                     modeDelayUnit = MODE_DELAY_UNIT_SECONDS
                     popupWindow.dismiss()
-                })
+                }
             }
 
             R.id.brightness_change -> {
@@ -820,14 +820,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
         Thread.sleep(300)
 
         if (canSendGroup) {
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
@@ -837,8 +837,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun configureComplete() {
         saveSensor()
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -983,14 +983,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         }
 
         if (canSendGroup) {
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
 
         Thread.sleep(300)
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 

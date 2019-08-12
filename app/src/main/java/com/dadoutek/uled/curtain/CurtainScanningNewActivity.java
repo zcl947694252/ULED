@@ -37,7 +37,6 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
@@ -879,7 +878,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
      * 此处用作设备登录
      */
     private void autoConnect() {
-        if (TelinkLightService.Instance() != null) {
+        if (TelinkLightService.Instance()!= null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
@@ -1170,7 +1169,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     protected void onResume() {
         super.onResume();
         //检测service是否为空，为空则重启
-        if (TelinkLightService.Instance() == null) {
+        if (TelinkLightService.Instance()== null) {
             mApplication.startLightService(TelinkLightService.class);
         }
 //
@@ -1435,7 +1434,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
      * （扫描结束）
      */
     private void onLeScanTimeout() {
-//        TelinkLightService.Instance()
+//        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
         TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);

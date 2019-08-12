@@ -1166,7 +1166,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     protected void onResume() {
         super.onResume();
         //检测service是否为空，为空则重启
-        if (TelinkLightService.Instance() == null) {
+        if (TelinkLightService.Instance()== null) {
             mApplication.startLightService(TelinkLightService.class);
         }
 //
@@ -1427,7 +1427,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
      * （扫描结束）
      */
     private void onLeScanTimeout() {
-//        TelinkLightService.Instance()
+//        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
         TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);

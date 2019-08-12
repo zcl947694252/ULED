@@ -26,6 +26,7 @@ import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
@@ -49,7 +50,15 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.textColor
 import java.util.concurrent.TimeUnit
 
-
+/**
+ * 创建者     zcl
+ * 创建时间   2019/8/12 10:51
+ * 描述	      ${不论区域怎么切换永远不变的是user的ID}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
+ */
 class NetworkActivity : BaseActivity(), View.OnClickListener {
     override fun setLayoutID(): Int {
         return R.layout.activity_network
@@ -120,6 +129,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         image_bluetooth.setOnClickListener {
             openScan()
         }
+
         transfer_account.setOnClickListener {
             transferCode()
         }
@@ -127,12 +137,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun transferCode() {
-        RegionModel.lookTransferCode().subscribe(
-                {},{}
-        )
-
-        RegionModel.transferCode().subscribe({
-            isTransferCode =true
+        RegionModel.lookTransferCode().subscribe({
+            isTransferCode = true
             setQR(it.code)
             downTimer(it.expire.toLong())
             view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
@@ -160,16 +166,16 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             dbRegion.id = regionBean?.id
         }
 
-        RegionModel.addRegions(DBUtils.lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe(
+        RegionModel.addRegions(lastUser!!.token, dbRegion, dbRegion.id)!!.subscribe(
                 { initData() },
                 { ToastUtils.showShort(it.message) })
     }
 
     @SuppressLint("CheckResult", "SetTextI18n")
     override fun initData() {
-        if (DBUtils.lastUser != null) {
-            region_account_num.text = "+" + DBUtils.lastUser!!.phone
-            Log.e("zcl", "zcl******isShowType****$isShowType" + "user${DBUtils.lastUser.toString()}")
+        if (lastUser != null) {
+            region_account_num.text = "+" + lastUser!!.phone
+            Log.e("zcl", "zcl******isShowType****$isShowType" + "user${lastUser.toString()}")
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
                     ToastUtils.showShort(it.message)
@@ -208,7 +214,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         Log.e("zcl", "zcl******me**${list!!.size}")
         region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
-        adapter = AreaItemAdapter(R.layout.item_area_net, list!!, DBUtils.lastUser)
+        adapter = AreaItemAdapter(R.layout.item_area_net, list!!, lastUser)
         adapter!!.setOnItemChildClickListener { _, view, position ->
             isShowType = 1
             setClickAction(position, view, list!!)
@@ -236,7 +242,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-
     /**
      * 赋值接受区域数据
      */
@@ -257,9 +262,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         Log.e("zcl", "zcl******authorize**${listAuthorize!!.size}")
 
         region_authorize_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
-        adapterAuthorize = AreaAuthorizeItemAdapter(R.layout.item_area_net, listAuthorize!!, DBUtils.lastUser)
+        adapterAuthorize = AreaAuthorizeItemAdapter(R.layout.item_area_net, listAuthorize!!, lastUser)
         adapterAuthorize!!.setOnItemChildClickListener { _, view, position ->
             isShowType = 2
+
             setClickActionAuthorize(position, view, listAuthorize!!)
         }
         region_authorize_recycleview.adapter = adapterAuthorize
@@ -276,14 +282,19 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         regionBeanAuthorize = list[position]
         when (view?.id) {
             R.id.item_area_state -> {
-                setChangeDialog()
+                val lastUser = lastUser!!
+                //不是使用中的
+                if (lastUser.authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString() || regionBeanAuthorize!!.id.toString() != lastUser.last_region_id)
+                    setChangeDialog()
             }
             R.id.item_area_more -> setPopDataAuthorize(position, list)
         }
-
     }
 
     private fun setPopDataAuthorize(position: Int, list: MutableList<RegionAuthorizeBean>) {
+        if (lastUser!!.authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString() && regionBeanAuthorize!!.id.toString() == lastUser!!.last_region_id)
+            return
+
         isShowType = 2
         regionBeanAuthorize = list[position]
 
@@ -305,8 +316,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<ImageView>(R.id.pop_update_net).isClickable = false
 
 
-            if (DBUtils.lastUser!!.authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString()
-                    && DBUtils.lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString()) {
+            if (lastUser!!.authorizer_user_id == regionBeanAuthorize!!.authorizer_id.toString()
+                    && lastUser!!.last_region_id == regionBeanAuthorize!!.id.toString()) {
                 it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
                 it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
                 it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
@@ -343,18 +354,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         regionBean = list[position]
         when (view.id) {
             R.id.item_area_state -> {
-                mBuild?.let {
-                    it.setMessage(getString(R.string.change_region))
-                    it.setNegativeButton(getString(R.string.btn_ok)) { dialog, _ ->
-                        changeRegion()
-                        dialog.dismiss()
-                    }
-                    it.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    it.setCancelable(true)
-                    it.show()
-                }
+                //不是使用中的
+                if (lastUser!!.authorizer_user_id != lastUser!!.id.toString() || regionBean!!.id.toString() != lastUser!!.last_region_id)
+                    setChangeDialog()
             }
             R.id.item_area_more -> setPopData(position, list)
         }
@@ -393,16 +395,16 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_share_net -> {
                 RegionModel.lookAuthorizeCode(regionBean!!.id).subscribe({
-                    mExpire= it.expire.toLong()
-                    Log.e("zcl", "zcl****判断**"+(it.code==""))
-                    when {
-                        it.code=="" -> if (mExpire > 0)
-                            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE else getQr()
+                    mExpire = it.expire.toLong()
 
+                    Log.e("zcl", "zcl****判断**" + (it.code == ""))
+                    isTransferCode = false
+                    setQR(it.code)
+                    val expire = it.expire.toLong()
 
-                        else -> getQr()
-                    }
-                },{
+                    downTimer(expire)
+                    view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
+                }, {
                     ToastUtils.showShort(it.message)
                 })
             }
@@ -416,43 +418,46 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             R.id.pop_qr_undo -> {
                 //撤销二维码
                 if (!isTransferCode)
-                RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe ({
-                    setCancel()
-                    setCreatShareCodeState()
-                },{ToastUtils.showShort(it.message)})
+                    RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe({
+                        setCancel()
+                        setCreatShareCodeState()
+                    }, { ToastUtils.showShort(it.message) })
                 else
                     RegionModel.removeTransferCode()!!.subscribe {
                         //设置二维码失效状态 倒计时颜色状态
-                      setCancel()
+                        setCancel()
                     }
             }
         }
     }
 
     private fun setCancel() {
-        //设置二维码失效状态 倒计时颜色状态
-        view?.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
-        view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
+        view?.let {
+            //设置二维码失效状态 倒计时颜色状态
+            it.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
+            it.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
 
-        //设置刷新二维码变为二维码已撤销
-        view?.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
-        view?.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_canceled)
-        view?.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
-        view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_cancel)
-        view?.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
+            //设置刷新二维码变为二维码已撤销
+            it.findViewById<TextView>(R.id.pop_qr_undo)?.textColor = getColor(R.color.black_three)
+            it.findViewById<TextView>(R.id.pop_qr_undo)?.text = getString(R.string.QR_canceled)
+            it.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
+            it.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_cancel)
+            it.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
 
-        view?.findViewById<View>(R.id.view19)?.visibility = View.GONE
-        mCompositeDisposable.clear()
+            it.findViewById<View>(R.id.view19)?.visibility = View.GONE
+            mCompositeDisposable.clear()
+        }
+
     }
 
     private fun changeRegion() {
         when (isShowType) {
-            1 -> if (DBUtils.lastUser!!.authorizer_user_id != DBUtils.lastUser!!.id.toString() ||
-                    regionBean!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
+            1 -> if (lastUser!!.authorizer_user_id != lastUser!!.id.toString() ||
+                    regionBean!!.id.toString() != lastUser!!.last_region_id) {
                 checkNetworkAndSync(this)
             }
-            2 -> if (DBUtils.lastUser!!.authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString()
-                    || regionBeanAuthorize!!.id.toString() != DBUtils.lastUser!!.last_region_id) {
+            2 -> if (lastUser!!.authorizer_user_id != regionBeanAuthorize!!.authorizer_id.toString()
+                    || regionBeanAuthorize!!.id.toString() != lastUser!!.last_region_id) {
                 checkNetworkAndSync(this)
             }
         }
@@ -464,7 +469,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     private fun getQr() {
         RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe({
-            isTransferCode =false
+            isTransferCode = false
             setQR(it.code)
             val expire = it.expire.toLong()
             downTimer(expire)
@@ -548,7 +553,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<ImageView>(R.id.pop_share_net).setOnClickListener(this)
             it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_update_net).setOnClickListener(this)
-            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + DBUtils.lastUser?.phone
+            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser?.phone
             it.findViewById<TextView>(R.id.pop_qr_cancel).setOnClickListener(this)
             it.findViewById<LinearLayout>(R.id.pop_qr_ly).setOnClickListener(this)
             it.findViewById<TextView>(R.id.pop_qr_undo).setOnClickListener(this)
@@ -577,8 +582,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 设置指定pop内容并弹框
      */
     @SuppressLint("SetTextI18n")
-    private fun
-            setPopData(position: Int, list: MutableList<RegionBean>) {
+    private fun setPopData(position: Int, list: MutableList<RegionBean>) {
         isShowType = 1
         regionBean = list[position]
 
@@ -587,7 +591,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         view?.let {
             it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
-            val lastUser = DBUtils.lastUser!!
+            val lastUser = lastUser!!
             if (regionBean!!.id.toString() == lastUser.last_region_id)//使用中不能删除
                 if (lastUser.authorizer_user_id == null || regionBean!!.authorizer_id == lastUser.authorizer_user_id.toInt()) {
                     it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
@@ -654,7 +658,15 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                                 0)
                     }.create().show()
         } else {
-            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+            val lastUser = lastUser
+            lastUser?.let {
+                //如果是自己的区域切换到其他区域 那么就要上传自己数据 否则不上传
+                if (it.id.toString() == it.authorizer_user_id)
+                    SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+                else
+                    downLoadDataAndChangeDbUser()
+            }
+
         }
     }
 
@@ -668,38 +680,42 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         override fun complete() {
             ToastUtils.showLong(this@NetworkActivity.getString(R.string.success_change_region))
-            //创建数据库
-            var lastUser = DBUtils.lastUser
-            lastUser?.let {
-                //更新user
-                when (isShowType) {
-                    1 -> {
-                        it.last_region_id = regionBean?.id.toString()
-                        it.authorizer_user_id = regionBean?.authorizer_id.toString()
-                    }
-                    2 -> {
-                        it.last_region_id = regionBeanAuthorize?.id.toString()
-                        it.authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
-                    }
-                }
-
-                isShowType = 3
-                DBUtils.deleteAllData()
-                //创建数据库
-                AccountModel.initDatBase(it)
-                //更新last—region-id
-                DBUtils.saveUser(it)
-                //下拉数据
-                SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGet)
-            }
-
+            Log.e("zcl","zcl******上传数据成功")
+            downLoadDataAndChangeDbUser()
             hideLoadingDialog()
         }
 
         override fun error(msg: String) {
             ToastUtils.showLong(getString(R.string.error_change_region))
-            //ToastUtils.showLong(msg)
             hideLoadingDialog()
+        }
+    }
+
+    private fun downLoadDataAndChangeDbUser() {
+        //创建数据库
+        var lastUser = lastUser
+
+        lastUser?.let {
+            //更新user
+            when (isShowType) {
+                1 -> {
+                    it.last_region_id = regionBean?.id.toString()
+                    it.authorizer_user_id = regionBean?.authorizer_id.toString()
+                }
+                2 -> {
+                    it.last_region_id = regionBeanAuthorize?.id.toString()
+                    it.authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
+                }
+            }
+
+            DBUtils.deleteAllData()
+            //创建数据库
+            AccountModel.initDatBase(it)
+            //更新last—region-id
+            DBUtils.saveUser(it)
+            //下拉数据
+            SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGet)
+            isShowType = 3
         }
     }
 
@@ -757,6 +773,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
         override fun complete() {
+            Log.e("zcl","zcl******下拉数据成功")
             view?.findViewById<ImageView>(R.id.pop_user_net)?.setImageResource(R.drawable.icon_use_blue)
             initData()
         }

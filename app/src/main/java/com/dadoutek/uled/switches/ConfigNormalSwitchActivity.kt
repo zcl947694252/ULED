@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -114,7 +113,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
-                    if (TelinkLightService.Instance().isLogin) {
+                    if (TelinkLightService.Instance()!=null&&TelinkLightService.Instance().isLogin) {
                         progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()
@@ -148,8 +147,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 showConfigSuccessDialog()
             }
         }else{
-            TelinkLightService.Instance().idleMode(true)
-            TelinkLightService.Instance().disconnect()
+            TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.disconnect()
         }
     }
 
@@ -291,7 +290,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun showDisconnectSnackBar() {
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
                 .string.device_disconnected), getString(R.string.reconnect)) {
             reconnect()
@@ -338,8 +337,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun showConfigSuccessDialog() {
         try{
             if(isGlassSwitch){
-                TelinkLightService.Instance().idleMode(true)
-                TelinkLightService.Instance().disconnect()
+                TelinkLightService.Instance()?.idleMode(true)
+                TelinkLightService.Instance()?.disconnect()
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
             }else{
                 AlertDialog.Builder(this)
@@ -352,8 +351,8 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                             }else {
                                 saveSwitch()
                             }
-                            TelinkLightService.Instance().idleMode(true)
-                            TelinkLightService.Instance().disconnect()
+                            TelinkLightService.Instance()?.idleMode(true)
+                            TelinkLightService.Instance()?.disconnect()
                             ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                         }
                         .show()
@@ -455,7 +454,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
                 .string.connecting))
 
-        TelinkLightService.Instance().autoConnect(connectParams)
+        TelinkLightService.Instance()?.autoConnect(connectParams)
 
     }
 
@@ -483,7 +482,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val groupAddress = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
         val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddress shr 8 and 0xFF).toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,
                 paramBytes)
 //        Commander.addGroup(mDeviceInfo.meshAddress,groupAddress,)
     }

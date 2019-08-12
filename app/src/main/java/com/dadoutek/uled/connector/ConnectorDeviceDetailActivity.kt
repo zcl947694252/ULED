@@ -97,7 +97,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
     private var acitivityIsAlive = true
 
-    private var mTelinkLightService: TelinkLightService? = null
 
     private var retryConnectCount = 0
 
@@ -467,7 +466,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         if (view.id == R.id.img_light) {
             canBeRefresh = true
             if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
 //                        byteArrayOf(0x01, 0x00, 0x00))
                 if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
                     Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
@@ -477,7 +476,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
             } else {
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentLight!!.meshAddr,
+//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentLight!!.meshAddr,
 //                        byteArrayOf(0x00, 0x00, 0x00))
                 if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {
                     Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
@@ -762,7 +761,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
-                    mTelinkLightService = TelinkLightService.Instance()
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {
@@ -812,7 +810,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                         .subscribeOn(Schedulers.io())
                         .subscribe {
                             if (it) {
-                                TelinkLightService.Instance().idleMode(true)
+                                TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
                                 val account = DBUtils.lastUser?.account
@@ -833,7 +831,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                                 params.setScanMode(false)
 
                                 addScanListeners()
-                                TelinkLightService.Instance().startScan(params)
+                                TelinkLightService.Instance()?.startScan(params)
                                 startCheckRSSITimer()
 
                             } else {
@@ -887,9 +885,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     .subscribe {
                         if (it) {
                             //授予了权限
-                            if (TelinkLightService.Instance() != null) {
+                            if (TelinkLightService.Instance()!= null) {
                                 progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
                             }
                         } else {
@@ -919,12 +917,12 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             if (!scanPb.isShown) {
                 retryConnectCount = 0
                 connectFailedDeviceMacList.clear()
@@ -937,7 +935,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 
@@ -948,7 +946,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     private fun onLeScanTimeout() {
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
 //        }

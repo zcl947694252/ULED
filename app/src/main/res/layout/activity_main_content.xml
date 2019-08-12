@@ -48,7 +48,7 @@
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
         android:id="@+id/bnve"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="49dp"
         android:layout_alignParentBottom="true"
         android:background="@color/background_color"
         app:itemIconTint="@color/selector_item_color"

@@ -174,11 +174,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
 //                        if (light_current.colorTemperature > Constant.MAX_VALUE) {
 //                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        } else {
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        }
-//                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         } else {
@@ -219,11 +219,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
 //                        if (light_current.colorTemperature > Constant.MAX_VALUE) {
 //                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        } else {
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        }
-//                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         }
@@ -269,11 +269,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //
 //                        if (light_current.brightness > Constant.MAX_VALUE) {
 //                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        } else {
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        }
-//                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         } else {
@@ -314,11 +314,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //
 //                        if (light_current.brightness > Constant.MAX_VALUE) {
 //                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        } else {
-//                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
 //                        }
-//                        TelinkLightService.Instance().sendCommandNoResponse(opcode, light_current.meshAddr, params)
+//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         }
@@ -356,9 +356,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun lightSwitch() {
         if (currentShowPageGroup) {
             var light_current = DBUtils.getGroupByID(group!!.id)
-            if(group!!.id.toInt() ==1){
+            if (group!!.id.toInt() == 1) {
                 SharedPreferencesUtils.setAllLightModel(true)
-            }else{
+            } else {
                 SharedPreferencesUtils.setAllLightModel(false)
             }
             if (light_current != null) {
@@ -412,7 +412,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                             handler_handler.sendMessage(msg)
                                             Log.e("TAG_TOUCH", tvValue++.toString())
                                             try {
-                                                Thread.sleep(100)
+                                                sleep(100)
                                             } catch (e: InterruptedException) {
                                                 e.printStackTrace()
                                             }
@@ -452,7 +452,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                             handler.sendMessage(msg)
                                             Log.e("TAG_TOUCH", tvValue++.toString())
                                             try {
-                                                Thread.sleep(100)
+                                                sleep(100)
                                             } catch (e: InterruptedException) {
                                                 e.printStackTrace()
                                             }
@@ -541,7 +541,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                             handler_handler.sendMessage(msg)
                                             Log.e("TAG_TOUCH", tvValue++.toString())
                                             try {
-                                                Thread.sleep(100)
+                                                sleep(100)
                                             } catch (e: InterruptedException) {
                                                 e.printStackTrace()
                                             }
@@ -581,7 +581,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                             handler.sendMessage(msg)
                                             Log.e("TAG_TOUCH", tvValue++.toString())
                                             try {
-                                                Thread.sleep(100)
+                                                sleep(100)
                                             } catch (e: InterruptedException) {
                                                 e.printStackTrace()
                                             }
@@ -935,7 +935,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                   //("retry delete group timeout")
+                    //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
@@ -956,7 +956,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     fun addEventListeners() {
@@ -986,13 +986,15 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-        intent.putExtra("light", light)
-        intent.putExtra("gpAddress", gpAddress)
-        intent.putExtra("uuid", light!!.productUUID)
-        intent.putExtra("belongId", light!!.belongGroupId)
-        Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
-        startActivity(intent)
-        this!!.finish()
+        light?.let {
+            intent.putExtra("light", it)
+            intent.putExtra("gpAddress", gpAddress)
+            intent.putExtra("uuid", it.productUUID)
+            intent.putExtra("belongId", it.belongGroupId)
+            Log.d("addLight", it.productUUID.toString() + "," + it.meshAddr)
+            startActivity(intent)
+            this!!.finish()
+        }
     }
 
     override fun performed(event: Event<String>?) {
@@ -1156,9 +1158,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                         .subscribe { aLong ->
-                           //("STATUS_LOGOUT")
+                            //("STATUS_LOGOUT")
 //                            showLoadingDialog(getString(R.string.connecting))
-                            ToastUtil.showToast(this,getString(R.string.connecting))
+                            ToastUtil.showToast(this, getString(R.string.connecting))
 //                            finish()
                         }
             }
@@ -1343,7 +1345,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                     handler_handler.sendMessage(msg)
                                     Log.e("TAG_TOUCH", tvValue++.toString())
                                     try {
-                                        Thread.sleep(100)
+                                        sleep(100)
                                     } catch (e: InterruptedException) {
                                         e.printStackTrace()
                                     }
@@ -1383,7 +1385,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                     handler.sendMessage(msg)
                                     Log.e("TAG_TOUCH", tvValue++.toString())
                                     try {
-                                        Thread.sleep(100)
+                                        sleep(100)
                                     } catch (e: InterruptedException) {
                                         e.printStackTrace()
                                     }
@@ -1436,7 +1438,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private fun initDataGroup() {
         this.mApplication = this.application as TelinkLightApplication
-        this.group = this.intent.extras!!.get("group") as DbGroup
+        val groupString = this.intent.extras!!.get("group")
+        groupString ?: return
+        this.group = groupString as DbGroup
     }
 
     private fun initToolbarLight() {
@@ -1471,12 +1475,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
-                                        (this as NormalSettingActivity).hideLoadingDialog()
+                                        this.hideLoadingDialog()
                                         this?.setResult(Constant.RESULT_OK)
                                         this?.finish()
                                     },
                                     failedCallback = {
-                                        (this as NormalSettingActivity).hideLoadingDialog()
+                                        this.hideLoadingDialog()
                                         ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                     })
                         }
@@ -1504,9 +1508,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         when (item.itemId) {
             android.R.id.home -> {
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
-                editTitle?.setFocusableInTouchMode(false)
-                editTitle?.setFocusable(false)
+                imm.hideSoftInputFromWindow(editTitle?.windowToken, 0)
+                editTitle?.isFocusableInTouchMode = false
+                editTitle?.isFocusable = false
                 finish()
             }
         }
@@ -1605,7 +1609,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                     handler_handler.sendMessage(msg)
                                     Log.e("TAG_TOUCH", tvValue++.toString())
                                     try {
-                                        Thread.sleep(100)
+                                        sleep(100)
                                     } catch (e: InterruptedException) {
                                         e.printStackTrace()
                                     }
@@ -1645,7 +1649,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                                     handler.sendMessage(msg)
                                     Log.e("TAG_TOUCH", tvValue++.toString())
                                     try {
-                                        Thread.sleep(100)
+                                        sleep(100)
                                     } catch (e: InterruptedException) {
                                         e.printStackTrace()
                                     }
@@ -1731,7 +1735,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this@NormalSettingActivity)
                 .setTitle(R.string.rename)
                 .setView(textGp)
@@ -1770,9 +1774,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private fun saveName() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(editTitle?.getWindowToken(), 0)
-        editTitle?.setFocusableInTouchMode(false)
-        editTitle?.setFocusable(false)
+        imm.hideSoftInputFromWindow(editTitle?.windowToken, 0)
+        editTitle?.isFocusableInTouchMode = false
+        editTitle?.isFocusable = false
         if (!currentShowPageGroup) {
             checkAndSaveName()
             isRenameState = false
@@ -1833,20 +1837,20 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-           //("progress:_3__" + seekBar.progress)
+            //("progress:_3__" + seekBar.progress)
             this.onValueChange(seekBar, seekBar.progress, true, true)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
             clickNum = 1
-           //("progress:_1__" + seekBar!!.progress)
+            //("progress:_1__" + seekBar!!.progress)
             this.preTime = System.currentTimeMillis()
             this.onValueChange(seekBar, seekBar!!.progress, true, false)
         }
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int,
                                        fromUser: Boolean) {
-           //("progress:_2__" + progress)
+            //("progress:_2__" + progress)
             val currentTime = System.currentTimeMillis()
             tv_Brightness.text = seekBar!!.progress.toString() + "%"
             clickNum = 1
@@ -1888,18 +1892,18 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             if (group?.brightness != progress) {
                                 if (progress > Constant.MAX_VALUE) {
                                     params = byteArrayOf(Constant.MAX_VALUE.toByte())
-                                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
-                                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 }
                             }
                         } else {
                             if (light?.brightness != progress) {
                                 if (progress > Constant.MAX_VALUE) {
                                     params = byteArrayOf(Constant.MAX_VALUE.toByte())
-                                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
-                                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 }
                             }
                         }
@@ -1966,26 +1970,30 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         if (currentShowPageGroup) {
                             if (group?.colorTemperature != progress) {
                                 Log.e("TAG", progress.toString())
-                                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                             }
                         } else {
                             if (light?.colorTemperature != progress) {
                                 Log.e("TAG", progress.toString())
-                                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+                                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                             }
                         }
 
                         if (currentShowPageGroup) {
                             group?.colorTemperature = progress
-                            if (progress <= 0) {
-                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                                device_light_add.setImageResource(R.drawable.icon_puls)
-                            } else if (progress >= 100) {
-                                device_light_add.setImageResource(R.drawable.icon_puls_no)
-                                device_light_minus.setImageResource(R.drawable.icon_minus)
-                            } else {
-                                device_light_minus.setImageResource(R.drawable.icon_minus)
-                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            when {
+                                progress <= 0 -> {
+                                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                    device_light_add.setImageResource(R.drawable.icon_puls)
+                                }
+                                progress >= 100 -> {
+                                    device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                                }
+                                else -> {
+                                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                                    device_light_add.setImageResource(R.drawable.icon_puls)
+                                }
                             }
                         } else {
                             light?.colorTemperature = progress
@@ -2002,7 +2010,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         }
 
                         Log.e("TAG", progress.toString())
-//                        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                         if (isStopTracking) {
                             if (currentShowPageGroup) {
                                 var group_current = DBUtils.getGroupByID(group!!.id)
@@ -2042,7 +2050,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //                    light?.colorTemperature = progress
 //                }
 //
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
 //                if (isStopTracking) {
 //                    if (currentShowPageGroup) {
 //                        DBUtils.updateGroup(group!!)
@@ -2089,7 +2097,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         opcode = Opcode.SET_LUM
         params = byteArrayOf(brightness.toByte())
         light?.brightness = brightness
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr!!, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
 
         try {
             Thread.sleep(200)
@@ -2099,18 +2107,18 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             opcode = Opcode.SET_TEMPERATURE
             params = byteArrayOf(0x05, colorTemperature.toByte())
             light?.colorTemperature = colorTemperature
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
         }
     }
 
     fun remove() {
-        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null) {
+        if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
             AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                     .setPositiveButton(android.R.string.ok) { dialog, which ->
 
-                        if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight != null && TelinkLightService.Instance().adapter.mLightCtrl.currentLight.isConnected) {
+                        if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                             val opcode = Opcode.KICK_OUT
-                            TelinkLightService.Instance().sendCommandNoResponse(opcode, light!!.getMeshAddr(), null)
+                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.getMeshAddr(), null)
                             DBUtils.deleteLight(light!!)
                             if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.getMeshAddr())) {
                                 TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
@@ -2140,9 +2148,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
      */
     private fun autoConnect() {
 
-        if (TelinkLightService.Instance() != null) {
+        if (TelinkLightService.Instance()!= null) {
 
-            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+            if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 ToastUtils.showLong(getString(R.string.connecting))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
@@ -2156,7 +2164,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 val mesh = this.mApp?.getMesh()
 
                 if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     return
                 }
 
@@ -2179,7 +2187,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     connectParams.setConnectMac(mesh?.otaDevice!!.mac)
                 }
                 //自动重连
-                TelinkLightService.Instance().autoConnect(connectParams)
+                TelinkLightService.Instance()?.autoConnect(connectParams)
             }
 
             //刷新Notify参数
@@ -2187,7 +2195,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             refreshNotifyParams.setRefreshRepeatCount(2)
             refreshNotifyParams.setRefreshInterval(2000)
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+            TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
         }
     }
 

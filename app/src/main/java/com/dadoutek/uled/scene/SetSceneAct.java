@@ -513,7 +513,7 @@ package com.dadoutek.uled.scene;//package com.dadoutek.uled.scene;
 ////                    opcode = (byte) Opcode.SET_LUM;
 ////                    params = new byte[]{(byte) brightness};
 ////                    itemGroupArrayList.get(currentPosition).brightness=brightness;
-////                    TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+////                    TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, addr, params);
 ////
 ////                } catch (InterruptedException e) {
 ////                    e.printStackTrace();
@@ -581,7 +581,7 @@ package com.dadoutek.uled.scene;//package com.dadoutek.uled.scene;
 //        Log.d("RGBCOLOR", logStr);
 //
 //
-//        TelinkLightService.Instance().sendCommandNoResponse(opcode, addr, params);
+//        TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, addr, params);
 //    }
 //
 //    private void delete(BaseQuickAdapter adapter, int position) {
@@ -922,7 +922,7 @@ package com.dadoutek.uled.scene;//package com.dadoutek.uled.scene;
 //
 //                params = new byte[]{0x01, (byte) id, light,
 //                        (byte) red, (byte) green, (byte) blue, temperature};
-//                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+//                    TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
 //            } while (count < 3);
 //        }
 //    }
@@ -1006,7 +1006,7 @@ package com.dadoutek.uled.scene;//package com.dadoutek.uled.scene;
 //            Log.d("RGBCOLOR", logStr);
 //            params = new byte[]{0x01, (byte) id, light,
 //                    (byte) red, (byte) green, (byte) blue, temperature};
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
+//            TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, list.get(i).getGroupAddr(), params);
 //        }
 //    }
 //
@@ -1017,7 +1017,7 @@ package com.dadoutek.uled.scene;//package com.dadoutek.uled.scene;
 //            params = new byte[]{0x00, (byte) id};
 //            try {
 //                Thread.sleep(100);
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params);
+//                TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, 0xFFFF, params);
 //                Thread.sleep(300);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();

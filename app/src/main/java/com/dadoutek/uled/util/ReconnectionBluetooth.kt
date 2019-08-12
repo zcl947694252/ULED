@@ -1,18 +1,14 @@
 package com.dadoutek.uled.util
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
 import android.util.Log
-import android.view.View
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -26,8 +22,6 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_lights_of_group.*
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -80,8 +74,8 @@ class ReconnectionBluetooth : EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
 
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
+                TelinkLightService.Instance()?.enableNotification()
+                TelinkLightService.Instance()?.updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     delay(300)
@@ -104,7 +98,7 @@ class ReconnectionBluetooth : EventListener<String> {
 //                scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
+                if (TelinkLightService.Instance()!=null&&!TelinkLightService.Instance()!!.isLogin)
                     login()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)
@@ -116,7 +110,7 @@ class ReconnectionBluetooth : EventListener<String> {
 //        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(mApplication, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
 //        val builder = android.support.v7.app.AlertDialog.Builder(this)
@@ -129,19 +123,19 @@ class ReconnectionBluetooth : EventListener<String> {
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             retryConnectCount = 0
             connectFailedDeviceMacList.clear()
             startScan()
@@ -157,7 +151,7 @@ class ReconnectionBluetooth : EventListener<String> {
         //当App在前台时，才进行扫描。
         if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
            //("startScanLight_LightOfGroup")
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             bestRSSIDevice = null   //扫描前置空信号最好设备。
             //扫描参数
             val account = DBUtils.lastUser?.account
@@ -178,7 +172,7 @@ class ReconnectionBluetooth : EventListener<String> {
             params.setScanMode(false)
 
             addScanListeners()
-            TelinkLightService.Instance().startScan(params)
+            TelinkLightService.Instance()?.startScan(params)
             startCheckRSSITimer()
 
 
@@ -231,7 +225,7 @@ class ReconnectionBluetooth : EventListener<String> {
     private fun connect(mac: String) {
         //授予了权限
         if (TelinkLightService.Instance() != null) {
-            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+            TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
             startConnectTimer()
 
         }

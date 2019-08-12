@@ -157,7 +157,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+       TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     /**
@@ -171,7 +171,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
                     (groupAddress shr 8 and 0xFF).toByte())
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+           TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         }
     }
 
@@ -257,10 +257,10 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
         if (dstAddress != null) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+           TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         }
 
-        TelinkLightService.Instance().updateNotification()
+       TelinkLightService.Instance()?.updateNotification()
     }
 
     override fun onDestroy() {
@@ -269,16 +269,16 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun getDeviceGroup() {
-            TelinkLightService.Instance().updateNotification()
+           TelinkLightService.Instance()?.updateNotification()
             val opcode = 0xDD.toByte()
             val dstAddress = lights!!.meshAddr
             val params = byteArrayOf(0x08, 0x01)
 
         if (dstAddress != null) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+           TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         }
 
-            TelinkLightService.Instance().updateNotification()
+           TelinkLightService.Instance()?.updateNotification()
 
     }
 
@@ -290,7 +290,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             params[0] = 0x01
 
         if (dstAddress != null) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+           TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         }
 
             lights!!.belongGroupId = group.id

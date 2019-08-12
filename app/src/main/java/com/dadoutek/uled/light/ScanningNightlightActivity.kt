@@ -6,7 +6,6 @@ import android.bluetooth.le.ScanFilter
 import android.os.Bundle
 import android.view.MenuItem
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -112,7 +111,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
                 Thread {
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     val mesh = mApplication.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
@@ -284,13 +283,13 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
             pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName)
                     .substring(0, 16)
         }
-        TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16)
                 , Strings.stringToBytes(pwd, 16))
 
     }
 
     private fun onLogin() {
-        TelinkLightService.Instance().enableNotification()
+        TelinkLightService.Instance()?.enableNotification()
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         scanDisposable?.dispose()
@@ -303,7 +302,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
     private fun showConnectFailed() {
         mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
 
        //("showConnectFailed")
         progressBtn.progress = -1    //控件显示Error状态
@@ -316,7 +315,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningNightlightActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningNightlightActivity)
-            TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
+            TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
            //("开始连接")
         }.start()
 
@@ -336,7 +335,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
 
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 

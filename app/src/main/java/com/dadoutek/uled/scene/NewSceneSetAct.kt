@@ -717,25 +717,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                 if (type == 0x10) {
                     if (list[i].isOn) {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     } else {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
                 } else if (type == 0x05) {
                     if (list[i].isOn) {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     } else {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
-                        TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
                 } else if(type == 0x06){
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }else {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
 
             } while (count < 3)
@@ -881,25 +881,25 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             if (type == 0x10) {
                 if (list[i].isOn) {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 } else {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
             } else if (type == 0x05) {
                 if (list[i].isOn) {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 } else {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x00)
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
             }else if(type == 0x06){
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
             } else {
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
             }
         }
     }
@@ -911,7 +911,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             params = byteArrayOf(0x00, id.toByte())
             try {
                 Thread.sleep(100)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
                 Thread.sleep(300)
             } catch (e: InterruptedException) {
                 e.printStackTrace()

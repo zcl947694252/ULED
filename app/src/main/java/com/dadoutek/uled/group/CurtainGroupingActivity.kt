@@ -141,7 +141,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     /**
@@ -155,7 +155,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
                     (groupAddress shr 8 and 0xFF).toByte())
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         }
     }
 
@@ -221,8 +221,8 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val dstAddress = curtain!!.meshAddr
         val params = byteArrayOf(0x10, 0x00)
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
-        TelinkLightService.Instance().updateNotification()
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
+        TelinkLightService.Instance()?.updateNotification()
     }
 
     override fun onDestroy() {
@@ -235,8 +235,8 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val dstAddress = curtain!!.meshAddr
         val params = byteArrayOf(0x08, 0x01)
 
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
-        TelinkLightService.Instance().updateNotification()
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
+        TelinkLightService.Instance()?.updateNotification()
     }
 
     private fun allocDeviceGroup(group: DbGroup) {
@@ -246,7 +246,7 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val opcode = 0xD7.toByte()
         val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
         params[0] = 0x01
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         curtain!!.belongGroupId = group.id
     }
 

@@ -134,7 +134,7 @@ public class OnlineStatusTestActivity extends TelinkBaseActivity implements Even
     private void userAll() {
         index++;
         rspCnt = 0;
-        TelinkLightService.Instance().updateNotification();
+      TelinkLightService.Instance().updateNotification();
     }
 
 

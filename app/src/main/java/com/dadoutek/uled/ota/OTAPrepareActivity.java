@@ -86,7 +86,7 @@ public class OTAPrepareActivity extends TelinkBaseActivity implements View.OnCli
         byte opcode = (byte) 0xC7;
         int address = 0xFFFF;
         byte[] params = new byte[]{0x10, 0x00};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params);
+        TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, address, params);
 
         btn_next.setEnabled(false);
         mHandler.postDelayed(new Runnable() {

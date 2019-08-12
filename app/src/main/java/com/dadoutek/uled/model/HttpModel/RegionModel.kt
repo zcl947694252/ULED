@@ -97,15 +97,17 @@ object RegionModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun removeAuthorizationCode(regionId: Long, type: Int): Observable<String>? {
         return NetworkFactory.getApi()
-                .removeAuthorizeCode(regionId,type)
+                .removeAuthorizeCode(regionId, type)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun removeTransferCode(): Observable<String>? {
         return NetworkFactory.getApi()
                 .removeTransferCode()
@@ -125,6 +127,7 @@ object RegionModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun parseQRCode(code: String): Observable<String>? {
         return NetworkFactory.getApi()
                 .parseQRCode(code)
@@ -134,7 +137,8 @@ object RegionModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun cancelAuthorize(ref_id:Int, rid:Int): Observable<String>? {
+
+    fun cancelAuthorize(ref_id: Int, rid: Int): Observable<String>? {
         return NetworkFactory.getApi()
                 .cancelAuthorize(ref_id, rid)
                 .compose(NetworkTransformer())
@@ -147,7 +151,7 @@ object RegionModel {
     /**
      *
      */
-    fun dropAuthorizeRegion(authorizer_id:Int, rid:Int) : Observable<String>? {
+    fun dropAuthorizeRegion(authorizer_id: Int, rid: Int): Observable<String>? {
         return NetworkFactory.getApi()
                 .dropAuthorize(authorizer_id, rid)
                 .compose(NetworkTransformer())
@@ -156,7 +160,7 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun transferCode() :Observable<TransferData>{
+    fun transferCode(): Observable<TransferData> {
         return NetworkFactory.getApi()
                 .makeTransferCode()
                 .compose(NetworkTransformer())
@@ -164,33 +168,41 @@ object RegionModel {
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun lookAuthorizeCode(rid: Long) :Observable<TransferData>{
+
+    fun lookAuthorizeCode(rid: Long): Observable<ShareCodeBean> {
         return NetworkFactory.getApi()
                 .mlookAuthroizeCode(rid)
                 .compose(NetworkTransformer())
+                .flatMap{
+                    if (it.code.trim() =="")
+                        NetworkFactory.getApi().regionAuthorizationCode(rid).compose(NetworkTransformer())
+                    else
+                        Observable.create { emitter ->
+                            emitter.onNext(it)
+                        }
+                }
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun lookTransferCode() :Observable<TransferData>{
+
+    fun lookTransferCode(): Observable<TransferData> {
+        //数据转换
         return NetworkFactory.getApi()
                 .mlookTransferCode()
                 .compose(NetworkTransformer())
-                //todo 转换
-               /* .flatMap{
-                    var compose: Observable<TransferData>?
-                    if (it.code=="")
-                        compose = NetworkFactory.getApi().makeTransferCode()
-                                .compose(NetworkTransformer())
-                    else{
-
+                .flatMap {
+                    if (it.code.trim() == "")
+                        NetworkFactory.getApi().makeTransferCode().compose(NetworkTransformer())
+                    else {
+                        Observable.create { emitter ->
+                            emitter.onNext(it)
+                        }
                     }
-
-                }*/
+                }
                 .subscribeOn(Schedulers.io())
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
 }
 

@@ -287,8 +287,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
 
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
+               TelinkLightService.Instance()?.enableNotification()
+               TelinkLightService.Instance()?.updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
@@ -312,7 +312,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //                scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
+                TelinkLightService.Instance()?:return
+                if (!TelinkLightService.Instance()!!.isLogin)
                     login()
                 hideLoadingDialog()
             }
@@ -328,7 +329,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 //        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-        TelinkLightService.Instance().idleMode(true)
+       TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
         val builder = AlertDialog.Builder(this)
@@ -1051,7 +1052,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         acitivityIsAlive = false
         mScanDisposal?.dispose()
         if (TelinkLightApplication.getInstance().connectDevice == null) {
-            TelinkLightService.Instance().idleMode(true)
+           TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
 //        this.mApplication?.removeEventListener(this)
@@ -1228,7 +1229,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 if (!isRetry)
                     TmtUtils.midToastLong(this, getString(R.string.bluetooth_open_connet))
 
-                TelinkLightService.Instance().idleMode(true)
+               TelinkLightService.Instance()?.idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数
                 val account = DBUtils.lastUser?.account
@@ -1249,7 +1250,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 params.setScanMode(false)
 
                 addScanListeners()
-                TelinkLightService.Instance().startScan(params)
+               TelinkLightService.Instance()?.startScan(params)
                 startCheckRSSITimer()
             }
     }
@@ -1301,7 +1302,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             //授予了权限
                             if (TelinkLightService.Instance() != null) {
                                 progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                               TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             }
                         } else {
                             //没有授予权限
@@ -1320,12 +1321,12 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan(true)
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+           TelinkLightService.Instance()?.idleMode(true)
             retryConnectCount = 0
             connectFailedDeviceMacList.clear()
             startScan(true)
@@ -1335,7 +1336,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+       TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
         ToastUtil.showToast(this, getString(R.string.connect_success))
         hideLoadingDialog()
@@ -1348,7 +1349,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
      */
     private fun onLeScanTimeout() {
        //"onErrorReport: onLeScanTimeout")
-        TelinkLightService.Instance().idleMode(true)
+       TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan(true)
     }
@@ -1357,7 +1358,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onStop()
         this.mApplication!!.removeEventListener(this)
         if (TelinkLightService.Instance() != null)
-            TelinkLightService.Instance().disableAutoRefreshNotify()
+           TelinkLightService.Instance()?.disableAutoRefreshNotify()
     }
 
     private fun getPositionAndOffset() {

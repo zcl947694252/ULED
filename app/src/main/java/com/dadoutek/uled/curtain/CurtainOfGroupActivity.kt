@@ -95,7 +95,6 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private var canBeRefresh = true
     private var bestRSSIDevice: DeviceInfo? = null
     private var connectMeshAddress: Int = 0
-    private var mTelinkLightService: TelinkLightService? = null
     private var retryConnectCount = 0
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var mConnectDisposal: Disposable? = null
@@ -274,8 +273,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun onStop() {
         super.onStop()
         this.mApplication!!.removeEventListener(this)
-        if (TelinkLightService.Instance() != null)
-            TelinkLightService.Instance().disableAutoRefreshNotify()
+            TelinkLightService.Instance()?.disableAutoRefreshNotify()
     }
 
     override fun onDestroy() {
@@ -285,7 +283,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         acitivityIsAlive = false
         mScanDisposal?.dispose()
         if (TelinkLightApplication.getInstance().connectDevice == null) {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
     }
@@ -445,7 +443,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //        if (view.id == R.id.img_light) {
 //            canBeRefresh = true
 //            if (currentCurtain!!.connectionStatus == ConnectionStatus.OFF.value) {
-////                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
+////                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
 ////                        byteArrayOf(0x01, 0x00, 0x00))
 //                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
 //                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,true,false)
@@ -455,7 +453,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //
 //                currentCurtain!!.connectionStatus = ConnectionStatus.ON.value
 //            } else {
-////                TelinkLightService.Instance().sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
+////                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentCurtain!!.meshAddr,
 ////                        byteArrayOf(0x00, 0x00, 0x00))
 //                if(currentCurtain!!.productUUID==DeviceType.SMART_CURTAIN){
 //                    Commander.openOrCloseCurtain(currentCurtain!!.meshAddr,false,false)
@@ -598,7 +596,6 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                      GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
-                    mTelinkLightService = TelinkLightService.Instance()
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                              GlobalScope.launch(Dispatchers.Main) {
@@ -656,7 +653,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                         .subscribeOn(Schedulers.io())
                         .subscribe {
                             if (it) {
-                                TelinkLightService.Instance().idleMode(true)
+                                TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
                                 val account = DBUtils.lastUser?.account
@@ -677,7 +674,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                                 params.setScanMode(false)
 
                                 addScanListeners()
-                                TelinkLightService.Instance().startScan(params)
+                                TelinkLightService.Instance()?.startScan(params)
                                 startCheckRSSITimer()
 
                             } else {
@@ -714,11 +711,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     .subscribe {
                         if (it) {
                             //授予了权限
-                            if (TelinkLightService.Instance() != null) {
                                 progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
-                            }
                         } else {
                             //没有授予权限
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
@@ -737,7 +732,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         //"onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
 //        }
@@ -785,7 +780,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 
@@ -794,7 +789,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
         val builder = AlertDialog.Builder(this)
@@ -811,12 +806,12 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             if (!scanPb.isShown) {
                 retryConnectCount = 0
                 connectFailedDeviceMacList.clear()
@@ -849,8 +844,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
 
-                TelinkLightService.Instance().enableNotification()
-                TelinkLightService.Instance().updateNotification()
+                TelinkLightService.Instance()?.enableNotification()
+                TelinkLightService.Instance()?.updateNotification()
                  GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
@@ -877,7 +872,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             }
 
             LightAdapter.STATUS_CONNECTED -> {
-                if (!TelinkLightService.Instance().isLogin)
+                TelinkLightService.Instance()?:return
+                if (!TelinkLightService.Instance()!!.isLogin)
                     login()
             }
             LightAdapter.STATUS_ERROR_N -> onNError(event)

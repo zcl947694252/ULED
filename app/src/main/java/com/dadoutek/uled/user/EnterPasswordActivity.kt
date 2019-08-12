@@ -68,7 +68,7 @@ class EnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener, TextWa
         user?.let {
             var list = it.split("-")
             //("zcl**********************${list.size}----$list")
-            if (list.size > 1 && !user.equals("-") && !boolean) {
+            if (list.size > 1 && user != "-" && !boolean) {
                 var s = list[1]
                 edit_user_password.setText(s)
                 edit_user_password.setSelection(s.length)
