@@ -254,12 +254,10 @@ object Commander : EventListener<String> {
 
     fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
         mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
-
         mLightAddr = dstAddr
         mGroupingAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
-
         val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddr shr 8 and 0xFF).toByte())
         Thread {
@@ -301,21 +299,13 @@ object Commander : EventListener<String> {
 
 
     fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.account, newMeshAddr: Int =
-            Constant.SWITCH_PIR_ADDRESS,
-                       successCallback: () -> Unit,
-                       failedCallback: () -> Unit) {
+            Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit, failedCallback: () -> Unit) {
         mUpdateMeshSuccess = false
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        val mesh = mApplication!!.mesh
-
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
-
         TelinkLightService.Instance()?.adapter!!.mode = LightAdapter.MODE_UPDATE_MESH
         TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.newMeshAddress = newMeshAddr
-        TelinkLightService.Instance()?.adapter!!.mLightCtrl.reset(
-                Strings.stringToBytes(newMeshName, 16), password, null)
-//        TelinkLightService.Instance()?.).enableNotification()
-//        TelinkLightService.Instance()?.).updateMesh(params)
+        TelinkLightService.Instance()?.adapter!!.mLightCtrl.reset(Strings.stringToBytes(newMeshName, 16), password, null)
 
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -326,11 +316,9 @@ object Commander : EventListener<String> {
                         mDisposable?.dispose()
                         mApplication?.removeEventListener(Commander)
                     }
-
                     override fun onSubscribe(d: Disposable) {
                         mDisposable = d
                     }
-
                     override fun onNext(t: Long) {
                         if (t >= 30) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
@@ -340,9 +328,8 @@ object Commander : EventListener<String> {
                             successCallback.invoke()
                         }
                     }
-
                     override fun onError(e: Throwable) {
-                       //("updateMeshName error: ${e.message}")
+                      //Log.e("zcl","zcl******${e.message}")
                     }
                 })
 
