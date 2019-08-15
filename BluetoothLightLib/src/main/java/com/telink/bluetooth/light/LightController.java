@@ -716,7 +716,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
         boolean success = true;
 
 //        synchronized (this) {
-        Log.d("checkXConnect", "sendCommand: "+isLogin);
+//        Log.d("checkXConnect", "sendCommand: "+isLogin);
         if (!this.isLogin.get()) {
             success = false;
         }

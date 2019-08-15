@@ -878,7 +878,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
-        LogUtils.d("start Login")
+//        LogUtils.d("start Login")
     }
 
     private fun onNError(event: DeviceEvent) {
