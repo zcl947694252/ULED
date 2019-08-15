@@ -714,6 +714,7 @@
     <string name="light_open_mode">亮度变化方式&#160;&#160;&#160;&#160;:</string>
     <string name="choose_group">选&#160;&#160;&#160;择&#160;&#160;&#160;分&#160;&#160;&#160;组&#160;&#160;&#160;&#160;:</string>
     <string name="brightness_cannot">亮度不能为0</string>
+    <string name="brightness_cannot_null">亮度不能为空</string>
     <string name="brightness_cannot_be_greater_than">亮度不能大于100</string>
     <string name="delay_time_unit">延时时间单位</string>
     <string name="trigger_mode_text">触&#160;&#160;&#160;发&#160;&#160;&#160;方&#160;&#160;&#160;式&#160;&#160;&#160;:</string>
@@ -741,5 +742,7 @@
     <string name="use">使用</string>
     <string name="creater_name">创建者: +</string>
     <string name="bluetooth_open_connet">蓝牙未连接，正在连接中</string>
+    <string name="device_not_connected_connecting">当前处于未连接状态，重连中。。。</string>
+    <string name="delete_sensor_failed">删除传感器初始化失败</string>
 
 </resources>

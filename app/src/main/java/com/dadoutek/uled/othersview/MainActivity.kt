@@ -176,8 +176,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         isCreate = true
-
-        LogUtils.e("zcl**********************${DBUtils.lastUser.toString()}")
     }
 
     /**
@@ -203,28 +201,28 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     }
                     .show()
 
-         /*
-         val TIME_INTERVAL: Long = 6
-         mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        val num = 5 - it as Long
-                        if (num == 0L) {
-                            main_toast.visibility = GONE
-//                            倒计时退出APP
-                            LogOutAndExitApp()
-//                            ActivityUtils.finishAllActivities(true)
-                        } else {
-                            main_toast?.let {
-                                main_toast.visibility = View.VISIBLE
-                                if (!b1)
-                                    main_toast.text = getString(R.string.version_disabled) + num + "s"
-                                else
-                                    main_toast.text = getString(R.string.syncing_relogin) + num + "s"
-                            }
-                        }
-                    })*/
+            /*
+            val TIME_INTERVAL: Long = 6
+            mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
+                       .subscribeOn(Schedulers.io())
+                       .observeOn(AndroidSchedulers.mainThread())
+                       .subscribe {
+                           val num = 5 - it as Long
+                           if (num == 0L) {
+                               main_toast.visibility = GONE
+   //                            倒计时退出APP
+                               LogOutAndExitApp()
+   //                            ActivityUtils.finishAllActivities(true)
+                           } else {
+                               main_toast?.let {
+                                   main_toast.visibility = View.VISIBLE
+                                   if (!b1)
+                                       main_toast.text = getString(R.string.version_disabled) + num + "s"
+                                   else
+                                       main_toast.text = getString(R.string.syncing_relogin) + num + "s"
+                               }
+                           }
+                       })*/
         }
 
         override fun error(msg: String) {
@@ -695,6 +693,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         // 监听各种事件
         addScanListeners()
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+
         this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
 //        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
         this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
@@ -801,15 +802,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
     }
 
-    private fun startConnectTimer() {
-        mConnectDisposal?.dispose()
-        mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    retryConnect()
-                }
-    }
 
     private fun stopConnectTimer() {
         mConnectDisposal?.dispose()
@@ -848,7 +840,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     onLeScanTimeout()
                 }
     }
-
 
 
     private fun startCheckRSSITimer() {
@@ -930,6 +921,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 startScan()
             }
             setSnackLocation(mNotFoundSnackBar!!)
+            progressBar.visibility = GONE
         }
     }
 
@@ -1111,7 +1103,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         } else if ((productUUID and 0xff) == 0x06) {
                             dbLightNew?.productUUID = 0x06
                         }
-                        dbLightNew.setConnectionStatus(connectionStatus.value)
+                        dbLightNew.connectionStatus = connectionStatus.value
                         dbLightNew.updateIcon()
                         dbLightNew.belongGroupId = DBUtils.groupNull?.id
                         dbLightNew.brightness = brightness
@@ -1208,14 +1200,18 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+           LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
+            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
             NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
+            NotificationEvent.GET_ALARM -> { }
+            DeviceEvent.STATUS_CHANGED -> {
+                progressBar.visibility = GONE
+                this.onDeviceStatusChanged(event as DeviceEvent)
             }
-            DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
 //            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
-            ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
+            ServiceEvent.SERVICE_CONNECTED -> {
+                this.onServiceConnected(event as ServiceEvent)
+            }
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
             NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
@@ -1225,22 +1221,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-//    private fun onLeScanTimeout() {
-//        com.dadoutek.uled.util.LogUtils.d("onErrorReport: onLeScanTimeout")
-////        if (mConnectSnackBar) {
-////        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-//        TelinkLightService.Instance().idleMode(true)
-//        LeBluetooth.getInstance().stopScan()
-//        startScan()
-////        }
-////        } else {
-////        retryConnect()
-////        TelinkLightService.Instance().idleMode(true)
-////        LeBluetooth.getInstance().stopScan()
-////        startScan()
-////        }
-//
-//    }
 
     /**
      * 扫描不到任何设备了
@@ -1282,8 +1262,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }.start()
 
         if (!isSwitch(deviceInfo.productUUID)) {
-//        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
-//            connect(deviceInfo.macAddress)
+
             if (bestRSSIDevice != null) {
                 //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                 if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
@@ -1294,13 +1273,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                 bestRSSIDevice = deviceInfo
             }
-
-//            TelinkLightService.Instance().idleMode(false)
-//            bestRSSIDevice = deviceInfo
-//
-//            connect(bestRSSIDevice!!.macAddress)
-//            LogUtils.d("connect(bestRSSIDevice!!.macAddress) = ${bestRSSIDevice!!.macAddress}")
-
         }
     }
 

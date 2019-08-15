@@ -245,6 +245,9 @@
 
     </style>
 
+    <style name="dialog_theme">
+        <![CDATA[<style name="dialog_theme">     <item name="android:windowFrame">@null</item>     <item name="android:windowContentOverlay">@null</item>     <item name="android:windowIsFloating">true</item>     <item name="android:windowIsTranslucent">true</item>     <item name="android:windowNoTitle">true</item>     <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>     <item name="android:windowBackground">@color/transparent</item>     <!-- 背景透明 -->     <!-- 激活背景变暗遮罩 -->     <item name="android:backgroundDimEnabled">true</item>     <item name="android:backgroundDimAmount">0.6</item> </style> ---------------------  版权声明：本文为CSDN博主「西盘」的原创文章，遵循CC 4.0 by-sa版权协议，转载请附上原文出处链接及本声明。 原文链接：https://blog.csdn.net/qq_32560357/article/details/51179292]]></style>
+
     <declare-styleable name="VerCodeInputView">
 
         <attr name="box" format="integer" />

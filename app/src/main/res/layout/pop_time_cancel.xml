@@ -42,7 +42,6 @@
                 android:layout_weight="1"
                 android:background="@drawable/bottom_left"
                 android:text="@string/cancel"
-
                 android:textColor="@color/black_six"/>
 
             <View

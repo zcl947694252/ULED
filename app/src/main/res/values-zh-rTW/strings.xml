@@ -703,4 +703,6 @@
     <string name="use">使用</string>
     <string name="creater_name">创建者: +</string>
     <string name="bluetooth_open_connet">蓝牙未连接，正在连接中</string>
+    <string name="device_not_connected_connecting">当前处于未连接状态，重连中。。。</string>
+    <string name="delete_sensor_failed">删除传感器初始化失败</string>
 </resources>

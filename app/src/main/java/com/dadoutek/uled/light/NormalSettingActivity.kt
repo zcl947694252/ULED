@@ -2127,7 +2127,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
 
                         } else {
-                            ToastUtils.showLong("当前处于未连接状态，重连中。。。")
+                            ToastUtils.showLong(getString(R.string.device_not_connected_connecting))
                             this.finish()
                         }
                     }

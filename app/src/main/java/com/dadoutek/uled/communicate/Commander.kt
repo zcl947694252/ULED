@@ -112,6 +112,7 @@ object Commander : EventListener<String> {
                 }
                 //把当前连接的灯放到list的最后一个
                 Collections.swap(lightList, lastIndex, connectDeviceIndex)
+
                 for (light in lightList) {
                     for (k in 0..resendCmdTime) {
                         val opcode = Opcode.KICK_OUT

@@ -37,7 +37,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_scanning_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -344,9 +346,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
-        val mesh = this.mApplication.mesh
         val meshAddress = Constant.SWITCH_PIR_ADDRESS
-
         if (meshAddress == -1) {
             this.doFinish()
             return

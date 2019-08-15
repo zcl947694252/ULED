@@ -68,6 +68,7 @@
         app:pb_colorNormal="@color/primary"
         app:pb_colorPressed="@android:color/holo_blue_dark"
         app:pb_colorProgress="@color/primary"
+        android:visibility="gone"
         app:pb_textComplete="@string/connected"
         app:pb_textError="@string/not_found_switch"
         app:pb_textProgress="@string/searching" />

@@ -275,17 +275,17 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             it.setOnClickListener { PopUtil.dismiss(pop) }
         }
         confirm?.setOnClickListener {
+            Log.e("zcl","zcl******确定")
             PopUtil.dismiss(pop)
             //恢复出厂设置
             if (TelinkLightApplication.getInstance().connectDevice != null)
                 resetAllLight()
-            else {
+            else
                 ToastUtils.showShort(R.string.device_not_connected)
-            }
         }
+
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        confirm?.isClickable = false
-        pop!!.isOutsideTouchable = true
+        pop.isOutsideTouchable = true
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
@@ -439,19 +439,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)
-        /*val builder = AlertDialog.Builder(activity)
-        builder.setTitle(R.string.tip_reset_sure)
-        builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
-
-        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-            if (TelinkLightApplication.getInstance().connectDevice != null)
-                resetAllLight()
-            else {
-                ToastUtils.showShort(R.string.device_not_connected)
-            }
-        }
-        val dialog = builder.create()
-        dialog.show()*/
     }
 
 
@@ -541,39 +528,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
 
     private fun developerMode() {
-//        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
-////        if(isBoolean){
-////            //将mHints数组内的所有元素左移一个位置
-////            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-////            //获得当前系统已经启动的时间
-////            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-////            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-////                ToastUtils.showLong(R.string.developer_mode_close)
-//////                copyDataBase!!.visibility = View.GONE
-//////                chearCache!!.visibility = View.GONE
-//////                resetAllGroup.visibility = View.GONE
-////                //开发者模式启动时启动LOG日志
-////                LogUtils.getConfig().setLog2FileSwitch(false)
-////                LogUtils.getConfig().setDir(LOG_PATH_DIR)
-////                SharedPreferencesUtils.setDeveloperModel(false)
-////            }
-////        }else{
-////            //将mHints数组内的所有元素左移一个位置
-////            System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
-////            //获得当前系统已经启动的时间
-////            mHints[mHints.size - 1] = SystemClock.uptimeMillis()
-////            if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-////                ToastUtils.showLong(R.string.developer_mode)
-//////                copyDataBase!!.visibility = View.VISIBLE
-//////                chearCache!!.visibility = View.VISIBLE
-//////                resetAllGroup.visibility=View.VISIBLE
-////                //开发者模式启动时启动LOG日志
-////                LogUtils.getConfig().setLog2FileSwitch(true)
-////                LogUtils.getConfig().setDir(LOG_PATH_DIR)
-////                SharedPreferencesUtils.setDeveloperModel(true)
-////            }
-////        }
-
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
@@ -605,15 +559,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     //清空缓存初始化APP
     @SuppressLint("CheckResult")
     private fun emptyTheCache() {
-//        AlertDialog.Builder(activity)
-//                .setTitle(activity!!.getString(R.string.empty_cache_title))
-//                .setMessage(activity!!.getString(R.string.empty_cache_tip))
-//                .setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }
-//                .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-//                    TelinkLightService.Instance().idleMode(true)
-//                    clearData()
-//                }
-//                .create().show()
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
@@ -686,10 +631,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         private val PERMISSIONS_STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         fun verifyStoragePermissions(activity: Activity?) {
-            // Check if we have write permission
             val permission = ActivityCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 // We don't have permission so prompt the user
                 ActivityCompat.requestPermissions(

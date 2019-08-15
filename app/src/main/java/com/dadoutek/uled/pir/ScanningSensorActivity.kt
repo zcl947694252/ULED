@@ -46,7 +46,7 @@ import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 /**
- * 人体感应器扫描
+ * 人体感应器扫描新设备/已连接设备
  */
 class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private val SCAN_TIMEOUT_SECOND: Int = 8
@@ -130,7 +130,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
                 Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
             if (granted) {
                 Thread {
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     val mesh = mApplication.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
@@ -205,18 +205,15 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun performed(event: Event<String>?) {
-        LogUtils.e("zcl**********************Event${event!!.type}")
-        when (event?.type) {
+        event?:return
+        LogUtils.e("zcl**********************Event${event.type}")
+        when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout()
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            LeScanEvent.LE_SCAN_COMPLETED -> this.onLeScanTimeout()
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
             }
-//            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
-//            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
         }
     }
 
@@ -318,14 +315,12 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         LogUtils.e("zcl**********************进入登录$")
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
-            pwd = mesh.factoryPassword.toString()
+        pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
+            mesh.factoryPassword.toString()
         } else {
-            pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
+            NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
-
         LogUtils.e("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
-
         TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 

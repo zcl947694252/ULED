@@ -1,7 +1,6 @@
 package com.dadoutek.uled.ota;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanFilter;
@@ -257,6 +256,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void initData() {
         dbLight = (DbLight) getIntent().getSerializableExtra(Constant.UPDATE_LIGHT);
+        if (dbLight==null)
+            return;
         log("current-light-mesh" + dbLight.getMeshAddr());
 
         onlineLights = new ArrayList<>();

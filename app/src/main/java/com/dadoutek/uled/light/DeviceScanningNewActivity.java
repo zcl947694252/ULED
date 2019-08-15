@@ -934,11 +934,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
                 connectParams.setMeshName(account);
-//                connectParams.setConnectMac(bestRssiDevice.macAddress);
+                connectParams.setConnectMac(bestRssiDevice.macAddress);
                 connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
+
                 new Thread(() -> {
 //                        Thread.sleep(300);
                     TelinkLightService.Instance().autoConnect(connectParams);

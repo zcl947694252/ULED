@@ -789,6 +789,7 @@
     <string name="light_open_mode">Light-open mode :</string>
     <string name="choose_group">Choose group :</string>
     <string name="brightness_cannot">Brightness cannot be zero</string>
+    <string name="brightness_cannot_null">Brightness cannot be null</string>
     <string name="brightness_cannot_be_greater_than">Brightness cannot be greater than 100</string>
     <string name="delay_time_unit">Delay time unit :</string>
     <string name="ten_second">10s</string>
@@ -817,4 +818,6 @@
     <string name="use">use</string>
     <string name="creater_name">Creator: +</string>
     <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
+    <string name="device_not_connected_connecting">Currently unconnected, reconnected...</string>
+    <string name="delete_sensor_failed">Deletion sensor initialization failed</string>
 </resources>
