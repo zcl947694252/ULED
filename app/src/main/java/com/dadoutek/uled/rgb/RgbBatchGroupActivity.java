@@ -1407,7 +1407,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);
 
-                Log.d("ScanningTest", "update mesh success");
+//                Log.d("ScanningTest", "update mesh success");
                 mRetryCount = 0;
 //                this.startScan(0);
                 break;

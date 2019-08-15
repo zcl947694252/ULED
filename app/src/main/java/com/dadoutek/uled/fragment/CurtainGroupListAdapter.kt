@@ -35,7 +35,7 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
             if (group.textColor == 0)
                 group.textColor = mContext.resources
                         .getColor(R.color.black)
-            Log.d("setAddress", group.meshAddr.toString())
+//            Log.d("setAddress", group.meshAddr.toString())
             if (group.meshAddr == 0xffff) {
                 helper.setText(R.id.txt_name, TelinkLightApplication.getInstance().getString(R.string.allLight))
             } else {

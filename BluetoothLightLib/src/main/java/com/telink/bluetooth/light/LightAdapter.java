@@ -74,6 +74,8 @@ public class LightAdapter {
     //自动连接时最大重连次数
     private static final int CONNECT_MAX_RETRY = 2;
 
+    private static final int AUTO_CONNECT_SCAN_TIMEOUT_SECONDS = 3;
+
     private final EventListener<Integer> mConnectionListener = new ConnectionListener();
     private final EventListener<Integer> mResetMeshListener = new ResetMeshListener();
     private final EventListener<Integer> mOtaListener = new OtaListener();
@@ -125,6 +127,7 @@ public class LightAdapter {
 
     private HandlerThread mThread;
     private boolean aBoolean;
+    private long autoConnectScanLastTime;
 
     /********************************************************************************
      * Public API
@@ -546,6 +549,7 @@ public class LightAdapter {
         this.setMode(MODE_AUTO_CONNECT_MESH);
         this.setState(STATE_RUNNING);
 
+
         this.enableLoop(true);
     }
 
@@ -578,6 +582,7 @@ public class LightAdapter {
             }
             mScanDelayHandler.removeCallbacks(startScanTask);
             mScanDelayHandler.postDelayed(startScanTask, delay);
+            autoConnectScanLastTime = System.currentTimeMillis();
         }
         return true;
 
@@ -798,7 +803,7 @@ public class LightAdapter {
         int minLength = 20;
         int position = 7;
 
-        Log.d("LightAdapter:", "light_mesh_2:  " + "data=" + Arrays.bytesToHexString(data, "-"));
+//        Log.d("LightAdapter:", "light_mesh_2:  " + "data=" + Arrays.bytesToHexString(data, "-"));
 
         if (length < minLength)
             return;
@@ -1482,6 +1487,10 @@ public class LightAdapter {
                 return;
             }
 
+            if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS * 1000)) {
+                return;
+            }
+
             int count = mScannedLights.size();
 
             if (count <= 0) {
@@ -1505,13 +1514,17 @@ public class LightAdapter {
             int timeoutSeconds = mParams
                     .getInt(Parameters.PARAM_TIMEOUT_SECONDS);
 //            LightPeripheral light = mScannedLights.getTop();
-            LightPeripheral light = mScannedLights.get(0);
+//            LightPeripheral light = mScannedLights.get(0);           // 默认用的是这个
+            LightPeripheral light = mScannedLights.getByMaxRssi();  //改为获取信号最好的设备，很关键的改动。
             if (light != null) {
                 connect(light, timeoutSeconds);
+                Log.d(getClass().getSimpleName(), "connect to mac = " + light.getMacAddress()+ "    rssi = " + light.getRssi());
             } else {
                 setState(STATE_RUNNING);
             }
         }
+
+
 
         private void autoOta() {
 
@@ -1719,6 +1732,7 @@ public class LightAdapter {
 
             synchronized (this) {
                 for (LightPeripheral light : this.mPeripherals) {
+                    Log.d(getClass().getSimpleName(), "light mac = " + light.getMacAddress()+ "     rssi = " + light.getRssi());
                     if (result == null || light.getRssi() > result.getRssi())
                         result = light;
                 }

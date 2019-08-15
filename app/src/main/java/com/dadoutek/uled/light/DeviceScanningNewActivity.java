@@ -67,7 +67,6 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
-import com.rxjava.rxlife.RxLife;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -149,6 +148,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     LottieAnimationView animationView;
 
 
+    private static final int MAX_RETRY_CONNECT_COUNT = 3;  //重连次数是3
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
@@ -173,6 +173,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private Disposable mTimer;
     private int mRetryCount = 0;
+    private int mRetryConnectCount = 0;
+    private boolean mIsConnectingDevice = false;
 
     private String type;
 
@@ -393,10 +395,12 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
         scanPb.setVisibility(View.GONE);
 
+        //是否是扫完灯后连接的流程。
+        mIsConnectingDevice = true;
+        //重置重连次数
+        mRetryConnectCount = 0;
         //先连接灯。
         autoConnect();
-        //倒计时，出问题了就超时。
-        mConnectTimer = createConnectTimeout();
 
         btnAddGroups.setVisibility(View.VISIBLE);
         btnAddGroups.setText(R.string.start_group_bt);
@@ -407,8 +411,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 //进入分组
                 startGrouping();
             } else if (mConnectTimer == null) {
+                //是否是扫完灯后连接的流程。
+                mIsConnectingDevice = true;
+                //重置重连次数
+                mRetryConnectCount = 0;
                 autoConnect();
-                mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
@@ -918,6 +925,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
      */
     private void autoConnect() {
         if (TelinkLightService.Instance() != null) {
+            if (mConnectTimer != null)
+                mConnectTimer.dispose();
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
@@ -937,6 +946,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //                connectParams.setConnectMac(bestRssiDevice.macAddress);
                 connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
                 connectParams.autoEnableNotification(true);
+//                connectParams.setTimeoutSeconds(SCAN_DEVICE_TIMER);
 
                 //连接，如断开会自动重连
                 new Thread(() -> {
@@ -954,44 +964,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             refreshNotifyParams.setRefreshInterval(1000);
             //开启自动刷新Notify
             TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
+
+
+            //倒计时，出问题了就超时。
+            mConnectTimer = createConnectTimeout();
         }
     }
 
-    private void startScanTimeout() {
-//        Observable.timer(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-//                .subscribe(
-//                        new Observer<Long>() {
-//                            Disposable disposable;
-//
-//                            @Override
-//                            public void onSubscribe(Disposable d) {
-//                                disposable = d;
-//                            }
-//
-//                            //updateMesh超时时间 50*200=10S
-//                                @Override
-//                                public void onNext(Long aLong) {
-////                                TelinkLightService.Instance().idleMode(false) ;     //use this stop scan
-//                                    onLeScanTimeout();
-//                                }
-//
-//                                @Override
-//                                public void onError(Throwable e) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onComplete() {
-//
-//                            }
-//                        }
-//                );
-        Observable.timer(SCAN_TIMEOUT_SECOND, TimeUnit.SECONDS)
-                .as(RxLife.as(this))
-                .subscribe(aLong -> {
-                    LeScanTimeOut();
-                });
-    }
 
     private void LeScanTimeOut() {
         hideLoadingDialog();
@@ -1537,7 +1516,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void onErrorReport(ErrorReportInfo info) {
 //        retryConnect()
-        LogUtils.d("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+        LogUtils.d("onErrorReport stateCode = " + info.stateCode + "error code = " + info.errorCode);
     }
 
 
@@ -1847,6 +1826,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 if (mConnectTimer != null && !mConnectTimer.isDisposed()) {
                     Log.d("ScanningTest", " !mConnectTimer.isDisposed() = " + !mConnectTimer.isDisposed());
                     mConnectTimer.dispose();
+                    mIsConnectingDevice = false;
                     isLoginSuccess = true;
                     //进入分组
                     hideLoadingDialog();
@@ -1854,6 +1834,8 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                 }
                 break;
             case LightAdapter.STATUS_LOGOUT:
+                if (mIsConnectingDevice)
+                    retryConnect();
                 isLoginSuccess = false;
                 break;
 //                case LightAdapter.STATUS_CONNECTED:
@@ -1862,6 +1844,18 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 //                    }
 //                    break;
         }
+    }
+
+    private void retryConnect() {
+        if (mRetryConnectCount < MAX_RETRY_CONNECT_COUNT) {
+            mRetryConnectCount++;
+            autoConnect();
+        } else {
+            LogUtils.d("exceed max retry time, show connection error");
+            TelinkLightService.Instance().idleMode(true);
+            mIsConnectingDevice = false;
+        }
+
     }
 
     private void login() {
