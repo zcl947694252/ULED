@@ -448,7 +448,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
+        //val allSensor = DBUtils.getAllSensor()
+
         var meshAdre = ArrayList<Int>()
+
         if (lightList.isNotEmpty()) {
             for (k in lightList.indices) {
                 meshAdre.add(lightList[k].meshAddr)
@@ -466,8 +469,15 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 meshAdre.add(relyList[k].meshAddr)
             }
         }
+/*
+        if (allSensor.isNotEmpty()) {
+            for (k in allSensor.indices) {
+                meshAdre.add(allSensor[k].meshAddr)
+            }
+        }*/
 
         if (meshAdre.size > 0) {
+            //重置所以灯可以直接发0xffff可以恢复所有灯 但是有的灯可能收不到 单独发送meshAddr比较稳定
             Commander.resetLights(meshAdre, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()

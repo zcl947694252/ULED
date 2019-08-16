@@ -17,7 +17,9 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
@@ -35,7 +37,6 @@ class SyncDataPutOrGetUtils {
                 val dbDataChangeList = DBUtils.dataChangeAll
 
                 val dbUser = DBUtils.lastUser
-
                 if (dbDataChangeList.size == 0) {
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
@@ -51,12 +52,12 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                        var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
-                                dbDataChangeList[i].changeId,
-                                dbDataChangeList[i].changeType,
-                                dbUser!!.token, dbDataChangeList[i].id!!)
+                    var observable: Observable<String>? = this.sendDataToServer(dbDataChangeList[i].tableName,
+                            dbDataChangeList[i].changeId,
+                            dbDataChangeList[i].changeType,
+                            dbUser!!.token, dbDataChangeList[i].id!!)
 
-                        observable?.let { observableList.add(it) }
+                    observable?.let { observableList.add(it) }
 
 
 
@@ -64,16 +65,16 @@ class SyncDataPutOrGetUtils {
                         val observables = arrayOfNulls<Observable<String>>(observableList.size)
                         observableList.toArray(observables)
 
-                        if(observables.isNotEmpty()){
+                        if (observables.isNotEmpty()) {
                             Observable.mergeArrayDelayError<String>(*observables)
-                                    .doFinally {
-                                    }
+                                    .doFinally {}
                                     .subscribe(object : NetworkObserver<String?>() {
                                         override fun onComplete() {
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.complete()
                                             }
                                         }
+
                                         override fun onSubscribe(d: Disposable) {
                                         }
 
@@ -86,7 +87,7 @@ class SyncDataPutOrGetUtils {
                                             }
                                         }
                                     })
-                        }else{
+                        } else {
                             GlobalScope.launch(Dispatchers.Main) {
                                 syncCallback.complete()
                             }
@@ -97,8 +98,8 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String,id: Long): Observable<String>? {
-            if(changeId!=null) {
+                                     token: String, id: Long): Observable<String>? {
+            if (changeId != null) {
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
@@ -180,7 +181,9 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
-                                return SensorMdodel.add(token, sensor!!, id, changeId)
+                                if (sensor != null) {
+                                    return SensorMdodel.add(token, sensor, id, changeId)
+                                }
                             }
                             Constant.DB_DELETE -> {
                                 return SensorMdodel.delete(token,
@@ -349,15 +352,15 @@ class SyncDataPutOrGetUtils {
             startGet(token, dbUser.account, syncCallBack)
         }
 
-        private var acc: String?=null
+        private var acc: String? = null
 
-        private fun startGet(token: String,accountNow: String, syncCallBack: SyncCallback) {
+        private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
             NetworkFactory.getApi()
                     .getRegionList(token)
                     .compose(NetworkTransformer())
                     .flatMap {
                         Log.d("itSize", it.size.toString())
-                        acc=accountNow
+                        acc = accountNow
                         for (item in it) {
                             DBUtils.saveRegion(item, true)
                         }
@@ -416,7 +419,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveGradient(item, true)
                             for (i in item.colorNodes.indices) {
-                                 LogUtils.e("是不是空的"+item.id)
+                                LogUtils.e("是不是空的" + item.id)
                                 val k = i + 1
                                 DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
                             }
@@ -439,7 +442,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveScene(item, true)
                             for (i in item.actions.indices) {
-                                LogUtils.e("是不是空的2"+item.id)
+                                LogUtils.e("是不是空的2" + item.id)
                                 val k = i + 1
                                 DBUtils.saveSceneActions(item.actions[i], k.toLong(), item.id)
                             }
@@ -502,7 +505,7 @@ class SyncDataPutOrGetUtils {
                 application.setupMesh(mesh)
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
                 return
-            }else{
+            } else {
                 setupMeshCreat(this!!.acc!!)
             }
         }

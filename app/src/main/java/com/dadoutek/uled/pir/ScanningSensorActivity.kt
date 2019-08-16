@@ -109,7 +109,6 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun getScanFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-
         scanFilters.add(ScanFilter.Builder()
                 .setManufacturerData(Constant.VENDOR_ID,
                         byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SENSOR.toByte()),

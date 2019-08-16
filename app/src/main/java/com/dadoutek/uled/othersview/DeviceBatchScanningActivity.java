@@ -18,12 +18,13 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.model.Light;
+import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.model.Light;
-import com.dadoutek.uled.model.Mesh;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -165,7 +166,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         int meshAddress = mesh.generateMeshAddr();
 
         if (meshAddress == -1) {
-            this.showToast("哎呦，网络里的灯泡太多了！目前可以有256灯");
+            ToastUtils.showLong(getString(R.string.much_lamp_tip));
             this.finish();
             return;
         }

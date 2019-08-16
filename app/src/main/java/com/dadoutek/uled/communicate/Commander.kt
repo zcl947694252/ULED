@@ -77,14 +77,14 @@ object Commander : EventListener<String> {
         mGroupAddr = groupAddr
         val params: ByteArray
 
-        if(isPause){
-            params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0B, 0x00, Opcode.CURTAIN_PACK_END)
-        }else{
+        if (isPause) {
+            params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
+        } else {
             if (isOpen) {
                 //0x64代表延时100ms保证开关同步
-                params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0A, 0x00, Opcode.CURTAIN_PACK_END)
+                params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
             } else {
-                params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0C, 0x00, Opcode.CURTAIN_PACK_END)
+                params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             }
         }
 
@@ -121,23 +121,28 @@ object Commander : EventListener<String> {
                     }
                     DBUtils.deleteAll()
                     Thread.sleep(sleepTime)
-                    for(k in lightList.indices)
-                        if(DBUtils.getLightByMeshAddr(lightList[k])!=null){
-                            var ligh=DBUtils.getLightByMeshAddr(lightList[k])
+                    for (k in lightList.indices)
+                        if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {
+                            var ligh = DBUtils.getLightByMeshAddr(lightList[k])
                             if (ligh != null) {
                                 DBUtils.deleteLight(ligh)
-                        }
-                        }else if(DBUtils.getCurtainByMeshAddr(lightList[k])!=null){
-                            var curtain=DBUtils.getCurtainByMeshAddr(lightList[k])
-                            if (curtain!= null) {
+                            }
+                        } else if (DBUtils.getCurtainByMeshAddr(lightList[k]) != null) {
+                            var curtain = DBUtils.getCurtainByMeshAddr(lightList[k])
+                            if (curtain != null) {
                                 DBUtils.deleteCurtain(curtain)
                             }
-                    }else if(DBUtils.getRelyByMeshAddr(lightList[k])!=null){
-                            var rely=DBUtils.getRelyByMeshAddr(lightList[k])
+                        } else if (DBUtils.getRelyByMeshAddr(lightList[k]) != null) {
+                            var rely = DBUtils.getRelyByMeshAddr(lightList[k])
                             if (rely != null) {
                                 DBUtils.deleteConnector(rely)
                             }
-                        }
+                        } /*else if (DBUtils.getSensorByMeshAddr(lightList[k]) != null) {
+                            var sensor = DBUtils.getSensorByMeshAddr(lightList[k])
+                            if (sensor != null) {
+                                DBUtils.deleteSensor(sensor)
+                            }
+                        }*/
                 }
                 GlobalScope.launch(Dispatchers.Main) {
                     successCallback.invoke()
@@ -150,7 +155,7 @@ object Commander : EventListener<String> {
 
     @Synchronized
     fun resetCurtain(lightList: List<DbCurtain>, successCallback: () -> Unit,
-                    failedCallback: () -> Unit) {
+                     failedCallback: () -> Unit) {
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
@@ -237,7 +242,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        val timeOut=30
+                        val timeOut = 30
                         LogUtils.d("mGroupSuccess = $mGroupSuccess")
                         if (t >= timeOut) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
@@ -578,7 +583,7 @@ object Commander : EventListener<String> {
      * 自动重连
      * 此处用作设备登录
      */
-    fun autoConnect(macAddress: String,successCallback: (version: String?) -> Unit,
+    fun autoConnect(macAddress: String, successCallback: (version: String?) -> Unit,
                     failedCallback: () -> Unit) {
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {

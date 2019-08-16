@@ -99,6 +99,9 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 
+/**
+ * 首页
+ */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -200,29 +203,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         LogOutAndExitApp()
                     }
                     .show()
-
-            /*
-            val TIME_INTERVAL: Long = 6
-            mCompositeDisposable.add(Observable.intervalRange(0, TIME_INTERVAL, 0, 1, TimeUnit.SECONDS)
-                       .subscribeOn(Schedulers.io())
-                       .observeOn(AndroidSchedulers.mainThread())
-                       .subscribe {
-                           val num = 5 - it as Long
-                           if (num == 0L) {
-                               main_toast.visibility = GONE
-   //                            倒计时退出APP
-                               LogOutAndExitApp()
-   //                            ActivityUtils.finishAllActivities(true)
-                           } else {
-                               main_toast?.let {
-                                   main_toast.visibility = View.VISIBLE
-                                   if (!b1)
-                                       main_toast.text = getString(R.string.version_disabled) + num + "s"
-                                   else
-                                       main_toast.text = getString(R.string.syncing_relogin) + num + "s"
-                               }
-                           }
-                       })*/
         }
 
         override fun error(msg: String) {
@@ -254,13 +234,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (ev?.getAction() == MotionEvent.ACTION_DOWN) {
-            if (bnve.currentItem == 0) {
-                newDeviceFragment.myPopViewClickPosition(ev.x, ev.y)
-            } else if (bnve.currentItem == 1) {
-                groupFragment.myPopViewClickPosition(ev.x, ev.y)
-            } else if (bnve.currentItem == 2) {
-                sceneFragment.myPopViewClickPosition(ev.x, ev.y)
+        if (ev?.action == MotionEvent.ACTION_DOWN) {
+            when {
+                bnve.currentItem == 0 -> newDeviceFragment.myPopViewClickPosition(ev.x, ev.y)
+                bnve.currentItem == 1 -> groupFragment.myPopViewClickPosition(ev.x, ev.y)
+                bnve.currentItem == 2 -> sceneFragment.myPopViewClickPosition(ev.x, ev.y)
             }
             return super.dispatchTouchEvent(ev)
         }
@@ -283,9 +261,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val installDeviceListAdapter = InstallDeviceListAdapter(R.layout.item_install_device, installList)
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         install_device_recyclerView?.layoutManager = layoutManager
-//        install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
-
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
         installDialog = AlertDialog.Builder(this)
@@ -312,12 +288,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
         val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
-        stepOneText = view.findViewById<TextView>(R.id.step_one)
-        stepTwoText = view.findViewById<TextView>(R.id.step_two)
-        stepThreeText = view.findViewById<TextView>(R.id.step_three)
-        switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
-        switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
-        swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
+        stepOneText = view.findViewById(R.id.step_one)
+        stepTwoText = view.findViewById(R.id.step_two)
+        stepThreeText = view.findViewById(R.id.step_three)
+        switchStepOne = view.findViewById(R.id.switch_step_one)
+        switchStepTwo = view.findViewById(R.id.switch_step_two)
+        swicthStepThree = view.findViewById(R.id.switch_step_three)
         val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
         val search_bar = view.findViewById<Button>(R.id.search_bar)
         close_install_list.setOnClickListener(dialogOnclick)
@@ -330,20 +306,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .create()
 
         installDialog?.setOnShowListener {}
-        if (isGuide) {
-//            installDialog?.setCancelable(false)
-        }
+
         installDialog?.show()
     }
 
     private val dialogOnclick = View.OnClickListener {
-        var medressData = 0
-        var allData = DBUtils.allLight
-        var sizeData = DBUtils.allLight.size
-        if (sizeData != 0) {
-            var lightData = allData[sizeData - 1]
-            medressData = lightData.meshAddr
-        }
 
         when (it.id) {
             R.id.close_install_list -> {
@@ -352,50 +319,34 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
-                        if (medressData < 254) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
                             intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
                             startActivityForResult(intent, 0)
-
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
                     }
                     INSTALL_RGB_LIGHT -> {
-                        if (medressData < 254) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                             intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
                             startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
+
                     }
                     INSTALL_CURTAIN -> {
-                        if (medressData < 254) {
+
                             intent = Intent(this, CurtainScanningNewActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                             intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                             startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
                     }
                     INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        if (medressData < 254) {
                             intent = Intent(this, ScanningConnectorActivity::class.java)
                             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                             intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                             startActivityForResult(intent, 0)
-                        } else {
-                            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-                        }
                     }
                 }
-
                 installDialog?.dismiss()
             }
             R.id.btnBack -> {
@@ -1027,6 +978,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
+                mScanTimeoutDisposal?.dispose()
                 TelinkLightService.Instance().enableNotification()
                 TelinkLightService.Instance().updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
@@ -1201,7 +1153,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
+//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
             NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
             NotificationEvent.GET_ALARM -> { }
             DeviceEvent.STATUS_CHANGED -> {

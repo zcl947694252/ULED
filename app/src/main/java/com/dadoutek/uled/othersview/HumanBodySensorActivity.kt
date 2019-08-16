@@ -49,7 +49,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * 人体感应器
+ * 人体感应器连接后设置界面
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
@@ -710,6 +710,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun configDevice() {
         //获取人体感应灯version
         var version = tvPSVersion.text.toString()
+        if (version.length<=3)
+            return
         var num = version.substring(2, 3)
         if (num.toDouble() >= 3.0) {
             var time = editText.text.toString()
