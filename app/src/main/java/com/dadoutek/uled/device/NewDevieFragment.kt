@@ -45,7 +45,7 @@ import java.util.*
 /**
  * 创建者     zcl
  * 创建时间   2019/7/27 11:31
- * 描述	      ${设备列表-灯暖灯全彩灯列表}$
+ * 描述	      ${设备列表-灯暖灯RGB灯具列表}$
  *
  * 更新者     $Author$
  * 更新时间   $Date$
@@ -260,7 +260,7 @@ class NewDevieFragment : BaseFragment() {
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         var intent: Intent? = null
         when (position) {
-            Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
+            Constant.INSTALL_NORMAL_LIGHT -> {//跳转可变色温灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
             }

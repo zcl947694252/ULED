@@ -442,8 +442,8 @@
     <string name="btn_jump_over">跳过</string>
     <string name="reset_boot_tutorial">重新查看引导页</string>
     <string name="select_device_tip">请选择需要安装的设备</string>
-    <string name="normal_light">冷暖灯</string>
-    <string name="rgb_light">全彩灯</string>
+    <string name="normal_light">可变色温灯</string>
+    <string name="rgb_light">RGB灯具</string>
     <string name="i_know_tip">我知道了!</string>
 
     <string name="warning">警告</string>
@@ -470,8 +470,8 @@
     <string name="allLight">所有灯</string>
     <string name="group_list_on">开</string>
     <string name="group_list_off">关</string>
-    <string name="normal_light_title">冷暖灯</string>
-    <string name="rgb_title">全彩灯</string>
+    <string name="normal_light_title">可变色温灯</string>
+    <string name="rgb_title">RGB灯具</string>
     <string name="switch_title">开关</string>
     <string name="apply_scene">点击此处即可应用场景</string>
 
