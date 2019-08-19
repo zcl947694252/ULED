@@ -60,7 +60,7 @@
         app:layout_constraintTop_toTopOf="@+id/textView2" />
 
     <com.hbb20.CountryCodePicker
-        android:id="@+id/ccp"
+        android:id="@+id/country_code_picker"
         android:layout_width="70dp"
         android:layout_height="40dp"
         app:ccpDialog_showCloseIcon="true"
@@ -90,11 +90,11 @@
         android:maxLines="1"
         android:textColor="@color/black_three"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/ccp"
+        app:layout_constraintBottom_toBottomOf="@+id/country_code_picker"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ccp"
-        app:layout_constraintTop_toTopOf="@+id/ccp"
+        app:layout_constraintStart_toEndOf="@+id/country_code_picker"
+        app:layout_constraintTop_toTopOf="@+id/country_code_picker"
         app:layout_constraintVertical_bias="0.07999998" />
 
     <ImageView
@@ -114,7 +114,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
-        app:layout_constraintStart_toStartOf="@+id/ccp"
+        app:layout_constraintStart_toStartOf="@+id/country_code_picker"
         app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
 
     <EditText

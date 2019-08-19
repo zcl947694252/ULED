@@ -346,7 +346,7 @@ public class TelinkApplication extends Application {
 
         NotificationEvent event = NotificationEvent.newInstance(this, eventType, notifyInfo);
         event.setThreadMode(Event.ThreadMode.Background);
-        Log.d("Reset", "onNotify: "+opcode);
+//        Log.d("Reset", "onNotify: "+opcode);
         this.dispatchEvent(event);
     }
 

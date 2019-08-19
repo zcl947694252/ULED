@@ -115,6 +115,9 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     goSkipActivity()
                     SMSSDK.getVerificationCode(countryCode, userName)
 
+                    regist_frist_progress.visibility=   View.VISIBLE
+                    register_completed.isClickable = false
+
                 } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))
                 }
@@ -143,6 +146,10 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 val event = msg.arg1
                 val result = msg.arg2
                 val data = msg.obj
+
+                regist_frist_progress.visibility=   View.GONE
+                register_completed.isClickable = true
+
                 if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
                         // TODO 处理成功得到验证码的结果
@@ -216,7 +223,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     }
 
     private fun send_verification() {
-        val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
+        val phoneNum = edit_user_phone.text.toString().trim { it <= ' ' }
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {

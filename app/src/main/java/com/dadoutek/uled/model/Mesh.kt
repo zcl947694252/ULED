@@ -53,17 +53,18 @@ class Mesh : Serializable {
         val lights = DBUtils.allLight
         val curtain = DBUtils.allCurtain
         val relay = DBUtils.allRely
-
         var meshAddress: Int = -1
+
         when {
             lights.isEmpty() && curtain.isEmpty()&&relay.isEmpty() -> meshAddress = 1
             lights.size > MeshUtils.DEVICE_ADDRESS_MAX && curtain.size > MeshUtils.DEVICE_ADDRESS_MAX &&relay.size> MeshUtils.DEVICE_ADDRESS_MAX-> meshAddress = -1
             else -> {
+                var address = lights.map { it.meshAddr }
+                var curtains = curtain.map { it.meshAddr }
+                var relays = relay.map { it.meshAddr }
+
                 for (meshAddr in MeshUtils.DEVICE_ADDRESS_MIN..MeshUtils.DEVICE_ADDRESS_MAX) {
-                    val address = lights.map { it.meshAddr }
-                    val curtains = curtain.map { it.meshAddr }
-                    val relays = relay.map { it.meshAddr }
-                    if (!address.contains(meshAddr) && !curtains.contains(meshAddr) && !relays.contains(meshAddr)) {
+                    if (!address.contains(meshAddr) && !curtains.contains(meshAddr) && !relays.contains(meshAddr)) {//判断该值是不是再已安装里面 如果不是说明该值就是当前设倍数
                         meshAddress = meshAddr
                         break
                     }

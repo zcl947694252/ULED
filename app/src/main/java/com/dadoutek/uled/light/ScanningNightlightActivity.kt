@@ -345,9 +345,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
-        val mesh = this.mApplication.mesh
         val meshAddress = Constant.SWITCH_PIR_ADDRESS
-
         if (meshAddress == -1) {
             this.doFinish()
             return

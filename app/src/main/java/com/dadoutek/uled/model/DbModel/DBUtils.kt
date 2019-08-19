@@ -31,13 +31,13 @@ object DBUtils {
             return list[0]
         }
 
-    val allLight: List<DbLight>
+    val allLight: List<DbLight>//普通等
          get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
 
-    val allCurtain:List<DbCurtain>
+    val allCurtain:List<DbCurtain>//窗帘
          get()=DaoSessionInstance.getInstance().dbCurtainDao.loadAll()
 
-    val allRely :List<DbConnector>
+    val allRely :List<DbConnector>//蓝牙接收器
         get()=DaoSessionInstance.getInstance().dbConnectorDao.loadAll()
 
     val groupList: MutableList<DbGroup>
@@ -1256,5 +1256,14 @@ object DBUtils {
         dataChange.changeType = operating
         dataChange.tableName = changeTable
         DaoSessionInstance.getInstance().dbDataChangeDao.insert(dataChange)
+    }
+
+
+    fun getSensorByMeshAddr(meshAddr: Int): DbSensor? {
+        val sensorDbList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().
+                where(DbSensorDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return if (sensorDbList.size > 0) {
+            sensorDbList[0]
+        } else null
     }
 }
