@@ -93,10 +93,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun initListener() {
         progressBtn.onClick {
-            mRetryConnectCount = 0
-            isSupportInstallOldDevice = false
-            progressOldBtn.progress = 0
-            startScan()
+            setNewScan()
         }
 
         progressOldBtn.onClick {
@@ -105,6 +102,14 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             progressBtn.progress = 0
             startScan()
         }
+        setNewScan()
+    }
+
+    private fun setNewScan() {
+        mRetryConnectCount = 0
+        isSupportInstallOldDevice = false
+        progressOldBtn.progress = 0
+        startScan()
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {

@@ -66,6 +66,7 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
+import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -93,8 +94,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private var settingType: Int = 0 //0是正常连接 1是点击修改 2是点击删除
 
     private val NORMAL_SENSOR: Int = 0 //0是正常连接 1是点击修改 2是点击删除
-    private val RESET_SENSOR: Int = 1 //0是正常连接 1是点击修改 2是点击删除
-    private val RECOVER_SENSOR: Int = 2 //0是正常连接 1是点击修改 2是点击删除
+    private val RECOVER_SENSOR: Int = 1 //0是正常连接 1是点击修改 2是点击删除
+    private val RESET_SENSOR: Int = 2 //0是正常连接 1是点击修改 2是点击删除
     val INSTALL_NORMAL_LIGHT = 0
     val INSTALL_RGB_LIGHT = 1
     val INSTALL_SWITCH = 2
@@ -441,17 +442,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             ota.visibility = View.GONE
             group.visibility = View.VISIBLE
             group.text = getString(R.string.switch_grouping)
+            
             group.setOnClickListener {
-
                 settingType = if (TelinkLightApplication.getInstance().connectDevice == null) {
                     autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
-                    RESET_SENSOR
+                    RECOVER_SENSOR
                 } else {
                     TelinkLightService.Instance().idleMode(true)
                     TelinkLightService.Instance().disconnect()
                     NORMAL_SENSOR
                 }
-                isClick = RESET_SENSOR
+                isClick = RECOVER_SENSOR
                 popupWindow!!.dismiss()
             }
 
@@ -478,10 +479,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 .setTitle(R.string.factory_reset)
                 .setView(textView)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                    isClick = RECOVER_SENSOR
+                    isClick = RESET_SENSOR
                     Log.e("zcl", "zcl******" + { TelinkLightApplication.getInstance().connectDevice == null})
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
-                        settingType = RECOVER_SENSOR
+                        settingType = RESET_SENSOR
                         autoConnectSensor()
                     } else {
                         TelinkLightService.Instance().idleMode(true)
@@ -489,6 +490,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         settingType = NORMAL_SENSOR
                     }
                     popupWindow!!.dismiss()
+                    progressBar_sensor.visibility = View.VISIBLE
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { _, _ ->
                     popupWindow!!.dismiss()
@@ -547,10 +549,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
                         Log.e("zcl", "zcl***STATUS_LOGIN***$isClick")
                         when (isClick) {
-                            RESET_SENSOR -> {//重新配置
+                            RECOVER_SENSOR -> {//重新配置
                                 Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe { relocationSensor() }
                             }
-                            RECOVER_SENSOR -> {//恢复出厂设置
+                            RESET_SENSOR -> {//恢复出厂设置
                                 resetSensor()
                             }
                         }
@@ -560,23 +562,23 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         when (settingType) {
                             NORMAL_SENSOR -> {//断开其他灯的连接回调判断
                                 when (isClick) {
-                                    RECOVER_SENSOR -> {//恢复出厂设置
+                                    RESET_SENSOR -> {//恢复出厂设置
                                         if (TelinkLightApplication.getInstance().connectDevice == null) {
                                             autoConnectSensor()
-                                            progressBar_sensor.visibility = View.VISIBLE
+                                           // progressBar_sensor.visibility = View.VISIBLE
                                         }
                                     }
-                                    RESET_SENSOR -> {//断联通知重新配置
+                                    RECOVER_SENSOR -> {//断联通知重新配置
                                         Log.e("zcl", "zcl**重新配置****" + { TelinkLightApplication.getInstance().connectDevice == null })
                                             relocationSensor()
                                     }
                                 }
                             }
 
-                            RECOVER_SENSOR -> {//恢复出厂设置成功后
+                            RESET_SENSOR -> {//恢复出厂设置成功后
                                 Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
                                 DBUtils.deleteSensor(currentLight!!)
-                                notifyData()
+                                notifyData()//重新设置传感器数量
                                 progressBar_sensor.visibility = View.GONE
                                 settingType = NORMAL_SENSOR
                                 if (mConnectDevice != null) {
@@ -819,7 +821,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 connectFailedDeviceMacList.clear()
                 startScan()
             }
-
         }
     }
 
