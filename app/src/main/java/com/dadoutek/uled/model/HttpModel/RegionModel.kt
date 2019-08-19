@@ -1,7 +1,10 @@
 package com.dadoutek.uled.model.HttpModel
 
+import android.content.Context
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbRegion
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
@@ -149,7 +152,7 @@ object RegionModel {
     }
 
     /**
-     *
+     *授权码失效
      */
     fun dropAuthorizeRegion(authorizer_id: Int, rid: Int): Observable<String>? {
         return NetworkFactory.getApi()
@@ -160,6 +163,9 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    /**
+     * 生成移交吗
+     */
     fun transferCode(): Observable<TransferData> {
         return NetworkFactory.getApi()
                 .makeTransferCode()
@@ -169,12 +175,31 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun lookAuthorizeCode(rid: Long): Observable<ShareCodeBean> {
+    /**
+     * 查看移交吗
+     */
+    fun lookTransferCodeState(): Observable<TransferData> {
+        //数据转换
+        return NetworkFactory.getApi()
+                .mlookTransferCode()
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+
+    /**
+     * 查看生成授权码
+     */
+    fun lookAuthorizeCode(rid: Long, context: Context): Observable<ShareCodeBean> {
         return NetworkFactory.getApi()
                 .mlookAuthroizeCode(rid)
                 .compose(NetworkTransformer())
                 .flatMap{
-                    if (it.code.trim() =="")
+                    var isNewQr = it.code == null || it.code.trim() == ""
+                    SharedPreferencesHelper.putBoolean(context,Constant.IS_NEW_AUTHOR_CODE,isNewQr)
+                    if (isNewQr)
                         NetworkFactory.getApi().regionAuthorizationCode(rid).compose(NetworkTransformer())
                     else
                         Observable.create { emitter ->
@@ -186,13 +211,18 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun lookTransferCode(): Observable<TransferData> {
+    /**
+     * 查看生成移交吗
+     */
+    fun lookTransferCode(context: Context): Observable<TransferData> {
         //数据转换
         return NetworkFactory.getApi()
                 .mlookTransferCode()
                 .compose(NetworkTransformer())
                 .flatMap {
-                    if (it.code.trim() == "")
+                    var isNewQr = it.code == null || it.code.trim() == ""
+                    SharedPreferencesHelper.putBoolean(context,Constant.IS_NEW_TRANSFER_CODE,isNewQr)
+                    if (isNewQr)
                         NetworkFactory.getApi().makeTransferCode().compose(NetworkTransformer())
                     else {
                         Observable.create { emitter ->

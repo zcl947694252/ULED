@@ -2,9 +2,6 @@ package com.dadoutek.uled.model;
 
 import com.dadoutek.uled.BuildConfig;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.io.Serializable;
 
 /**
@@ -258,4 +255,12 @@ public class Constant implements Serializable {
     public static final String UP_VERSION = "UP_VERSION";
     //网络授权分享人数
     public static final String SHARE_PERSON = "SHARE_PERSON";
+
+    public static final String OTA_MAC = "OTA_MAC";
+    public static final String OTA_MES_Add = "OTA_MES_Add";
+
+    //是否是新生成的移交码
+    public static final String IS_NEW_TRANSFER_CODE = "IS_NEW_TRANSFER_CODE";
+    //是否是新生成的授权码
+    public static final String IS_NEW_AUTHOR_CODE = "IS_NEW_AUTHOR_CODE";
 }

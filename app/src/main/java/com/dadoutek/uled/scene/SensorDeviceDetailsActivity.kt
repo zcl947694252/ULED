@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
@@ -44,7 +45,10 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.DialogUtils
+import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -105,7 +109,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     var installDialog: android.app.AlertDialog? = null
     var isGuide: Boolean = false
     var clickRgb: Boolean = false
-    private var cp: CustomProgressBar? = null
     private lateinit var sensorData: MutableList<DbSensor>
     private var adapter: SensorDeviceDetailsAdapter? = null
     private var mScanTimeoutDisposal: Disposable? = null
@@ -164,9 +167,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
         add_device_btn.setOnClickListener { startActivity(Intent(this, ScanningSensorActivity::class.java)) }//添加设备
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
-        toolbar.setNavigationOnClickListener {
-            finish()
-        }
+        toolbar.setNavigationOnClickListener { finish() }
         toolbar.title = getString(R.string.sensor) + " (" + sensorData!!.size + ")"
     }
 
@@ -480,7 +481,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 .setView(textView)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                     isClick = RESET_SENSOR
-                    Log.e("zcl", "zcl******" + { TelinkLightApplication.getInstance().connectDevice == null})
+                    val b = TelinkLightApplication.getInstance().connectDevice == null
+
+                    Log.e("zcl", "zcl******$b")
                     if (TelinkLightApplication.getInstance().connectDevice == null) {
                         settingType = RESET_SENSOR
                         autoConnectSensor()
@@ -535,7 +538,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 progressBar_sensor.visibility = View.GONE
             }
             LeScanEvent.LE_SCAN_COMPLETED -> {
-                Log.e("zcl", "zcl******LE_SCAN")
+                Log.e("zcl", "zcl******LE_SCAN_COMPLETED")
                 progressBar_sensor.visibility = View.GONE
             }
 

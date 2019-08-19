@@ -34,7 +34,6 @@ import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.*
 import kotlinx.android.synthetic.main.activity_register.ccp as ccp1
-import kotlinx.android.synthetic.main.activity_verification_code.ccp as ccp1
 
 /**uu
  * 手机号短信登录第一步

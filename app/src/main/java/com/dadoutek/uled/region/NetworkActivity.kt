@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
@@ -64,6 +65,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         return R.layout.activity_network
     }
 
+    private var isNewQr: Boolean = false
     private val REQUEST_CODE: Int = 1000
     private val REQUEST_CODE_CARMER: Int = 100
     private var isAuthorizeRegionAll: Boolean = false
@@ -100,12 +102,23 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         initToolBar()
         makePop()
         initListener()
+
+        getQrInfo()
+
         mBuild = AlertDialog.Builder(this@NetworkActivity)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CARMER)
             }
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getQrInfo() {
+        RegionModel.lookTransferCodeState().subscribe({
+            val isNewQr = it.code == null || it.code.trim() == ""
+            transfer_account_tv.text = if (isNewQr) getString(R.string.transfer_accounts) else getString(R.string.to_receive)
+        },{ ToastUtils.showShort(it.message) })
     }
 
     private fun initToolBar() {
@@ -116,6 +129,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         image_bluetooth.setImageResource(R.mipmap.icon_scanning)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
+
+        isNewQr = SharedPreferencesHelper.getBoolean(this, Constant.IS_NEW_TRANSFER_CODE, false)
     }
 
     override fun initListener() {
@@ -137,7 +152,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun transferCode() {
-        RegionModel.lookTransferCode().subscribe({
+        RegionModel.lookTransferCode(this).subscribe({
             isTransferCode = true
             setQR(it.code)
             downTimer(it.expire.toLong())
@@ -394,9 +409,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 })
             }
             R.id.pop_share_net -> {
-                RegionModel.lookAuthorizeCode(regionBean!!.id).subscribe({
+                RegionModel.lookAuthorizeCode(regionBean!!.id,this).subscribe({
                     mExpire = it.expire.toLong()
-
                     Log.e("zcl", "zcl****判断**" + (it.code == ""))
                     isTransferCode = false
                     setQR(it.code)

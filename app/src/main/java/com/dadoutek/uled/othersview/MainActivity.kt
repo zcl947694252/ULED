@@ -1065,7 +1065,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
                         DBUtils.saveLight(dbLightNew, false)
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
@@ -1091,7 +1091,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
                         DBUtils.saveConnector(dbLightNew, false)
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }
@@ -1116,7 +1116,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         dbLightNew.name = getString(R.string.unnamed)
                         dbLightNew.macAddr = "0"
                         DBUtils.saveCurtain(dbLightNew, false)
-                        com.dadoutek.uled.util.LogUtils.d("creat_light" + dbLightNew.meshAddr)
+                        LogUtils.d("creat_light" + dbLightNew.meshAddr)
                     }
                 }
             }

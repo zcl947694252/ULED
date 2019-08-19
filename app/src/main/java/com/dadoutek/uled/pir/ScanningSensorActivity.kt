@@ -227,13 +227,13 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 蓝牙未开启")
+                        LogUtils.e("zcl 蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 无法收到广播包以及响应包")
+                        LogUtils.e("zcl 无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl  未扫到目标设备")
+                        LogUtils.e("zcl  未扫到目标设备")
                     }
                 }
 
@@ -241,10 +241,10 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 未读到att表")
+                        LogUtils.e("zcl 未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl 未建立物理连接")
+                        LogUtils.e("zcl 未建立物理连接")
 
                     }
                 }
@@ -255,13 +255,13 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl value check失败： 密码错误")
+                        LogUtils.e("zcl value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl read login data 没有收到response")
+                        LogUtils.e("zcl read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.e("zcl write login data 没有收到response")
+                        LogUtils.e("zcl write login data 没有收到response")
                     }
                 }
                 LogUtils.e("zcl onError login")
