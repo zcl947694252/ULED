@@ -197,7 +197,7 @@ object RegionModel {
                 .mlookAuthroizeCode(rid)
                 .compose(NetworkTransformer())
                 .flatMap{
-                    var isNewQr = it.code == null || it.code.trim() == ""
+                    var isNewQr = it.code == null || it.code.trim() == ""||it.expire<=0
                     SharedPreferencesHelper.putBoolean(context,Constant.IS_NEW_AUTHOR_CODE,isNewQr)
                     if (isNewQr)
                         NetworkFactory.getApi().regionAuthorizationCode(rid).compose(NetworkTransformer())
@@ -220,7 +220,7 @@ object RegionModel {
                 .mlookTransferCode()
                 .compose(NetworkTransformer())
                 .flatMap {
-                    var isNewQr = it.code == null || it.code.trim() == ""
+                    var isNewQr = it.code == null || it.code.trim() == ""||it.expire<=0
                     SharedPreferencesHelper.putBoolean(context,Constant.IS_NEW_TRANSFER_CODE,isNewQr)
                     if (isNewQr)
                         NetworkFactory.getApi().makeTransferCode().compose(NetworkTransformer())

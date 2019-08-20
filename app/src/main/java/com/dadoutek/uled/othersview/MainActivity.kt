@@ -12,7 +12,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
-import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
@@ -20,7 +19,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -877,7 +875,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun setSnackLocation(snackbar: Snackbar) {
-        if (listSnackbar!!.contains(snackbar))
+
+       /* if (listSnackbar!!.contains(snackbar))
             return
 
         snackbar?.let {
@@ -886,7 +885,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             cl.bottomMargin = DensityUtil.dip2px(this, 60F)
             it.view.layoutParams = cl
             listSnackbar!!.add(snackbar)
-        }
+        }*/
     }
 
     /**

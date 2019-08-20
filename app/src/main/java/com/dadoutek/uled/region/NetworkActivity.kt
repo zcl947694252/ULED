@@ -30,7 +30,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.DbModel.DbRegion
 import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.HttpModel.RegionModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
@@ -102,7 +101,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         initToolBar()
         makePop()
         initListener()
-
         getQrInfo()
 
         mBuild = AlertDialog.Builder(this@NetworkActivity)
@@ -116,7 +114,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     private fun getQrInfo() {
         RegionModel.lookTransferCodeState().subscribe({
-            val isNewQr = it.code == null || it.code.trim() == ""
+            val isNewQr = it.code == null || it.code.trim() == ""||it.expire<=0
             transfer_account_tv.text = if (isNewQr) getString(R.string.transfer_accounts) else getString(R.string.to_receive)
         },{ ToastUtils.showShort(it.message) })
     }
@@ -129,8 +127,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         image_bluetooth.setImageResource(R.mipmap.icon_scanning)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener { finish() }
-
-        isNewQr = SharedPreferencesHelper.getBoolean(this, Constant.IS_NEW_TRANSFER_CODE, false)
     }
 
     override fun initListener() {
@@ -199,13 +195,13 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     ToastUtils.showShort(it.message)
                 })
                 3 -> {
-                    RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
-                        ToastUtils.showShort(it.message)
-                    })
+                   RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
+                       ToastUtils.showShort(it.message)
+                   })
                     RegionModel.getAuthorizerList()?.subscribe({ it -> setAuthorizeData(it) }, {
                         ToastUtils.showShort(it.message)
                     })
-                }
+                    }
             }
         }
     }
@@ -477,21 +473,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * 获取授权码
-     */
-    @SuppressLint("CheckResult")
-    private fun getQr() {
-        RegionModel.getAuthorizationCode(regionBean!!.id)!!.subscribe({
-            isTransferCode = false
-            setQR(it.code)
-            val expire = it.expire.toLong()
-            downTimer(expire)
-            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.VISIBLE
-        }, {
-            ToastUtils.showShort(it.message)
-        })
-    }
 
     private fun setQR(it: String) {
         var mBitmap = CodeUtils.createImage(it, DensityUtil.dip2px(this, 231f), DensityUtil.dip2px(this, 231f), null)
@@ -511,8 +492,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             view?.findViewById<View>(R.id.view19)?.visibility = View.VISIBLE
 
             mCompositeDisposable.add(Observable
-                    //从0开始到expire 第一次0秒开始 以后一秒一次
-                    .intervalRange(0, expire, 0, 1, TimeUnit.SECONDS)
+                    //从0开始发射11个数字为：0-10依次输出，延时0s执行，每1s发射一次。 (0, 11, 0, 1, TimeUnit.SECONDS
+                    //从1开始发送ex个数字 1-ex  从0开始发射11个数字为：0-10依次输出
+                    .intervalRange(1, expire, 0, 1, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
