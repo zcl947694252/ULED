@@ -1,14 +1,12 @@
 package com.dadoutek.uled.rgb
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
@@ -336,7 +334,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.diy_mode_off -> {
 
-                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed, successCallback = {}, failedCallback = {})
+                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
                 diyGradientList!![position].select = false
                 rgbDiyGradientAdapter!!.notifyItemChanged(position)
                 DBUtils.updateGradient(diyGradientList!![position])
@@ -548,7 +546,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     fun stopGradient() {
-        Commander.closeGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
+        Commander.closeGradient(dstAddress, positionState, speed)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

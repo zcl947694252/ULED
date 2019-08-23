@@ -6,7 +6,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -227,40 +230,15 @@ class NewDevieFragment : BaseFragment() {
             }
 
             allDeviceList = ArrayList()
-            val layoutmanager = LinearLayoutManager(activity)
-//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
             recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
             newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
 
-//        val decoration = DividerItemDecoration(activity!!,
-//                DividerItemDecoration
-//                        .VERTICAL)=
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-//                .divider)))
-//        //添加分割线
-//        recyclerView?.addItemDecoration(decoration)
-//            recyclerView?.addItemDecoration(SpaceItemDecoration(32))
             recyclerView?.itemAnimator = DefaultItemAnimator()
-
-            newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
-//        adapter!!.addFooterView(getFooterView())
-            newDeviceAdapter!!.bindToRecyclerView(recyclerView)
+            newDeviceAdapter?.onItemClickListener = onItemClickListener
+            newDeviceAdapter?.bindToRecyclerView(recyclerView)
         }
-//            deviceTypeList = ArrayList<String>()
-//            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
-//            for(installDeviceModel in installList){
-//                deviceTypeList!!.add(installDeviceModel.deviceType)
-//            }
-//
-//            allDeviceList = ArrayList()
-//        }
     }
 
-//    allDeviceList!!.add(DBUtils.getAllNormalLight())
-//    allDeviceList!!.add(DBUtils.getAllRGBLight())
-//    allDeviceList!!.add(DBUtils.getAllSwitch())
-//    allDeviceList!!.add(DBUtils.getAllSensor())
-//    allDeviceList!!.add(DBUtils.getAllCurtain())
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         var intent: Intent? = null

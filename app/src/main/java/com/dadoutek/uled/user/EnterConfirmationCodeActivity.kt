@@ -53,6 +53,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         timing()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initViewType() {
         countryCode = this.intent.extras!!.getString("country_code")
         phone = this.intent.extras!!.getString("phone")

@@ -94,7 +94,7 @@ repositories {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 23
+    schemaVersion 25
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
@@ -108,8 +108,6 @@ dependencies {
     implementation project(':BluetoothLightLib')
     implementation project(path: ':guide')
 
-   // implementation 'com.google.zxing:core:3.3.0'
-    //implementation 'com.google.zxing:android-core:3.3.0'
     /**
      * 二维码
      */
@@ -165,6 +163,10 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
     implementation 'com.allenliu.versionchecklib:library:2.2.0'
 
-//    implementation 'com.github.wanglu1209:WPopup:lastReleases'
-//    implementation 'actionsheet:1.0.3'
+
+    /**
+     * 长连接websocket
+     */
+    //implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
 }

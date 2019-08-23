@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
+import kotlin.Unit as Unit1
 
 object Commander : EventListener<String> {
     private var mApplication: TelinkLightApplication? = null
@@ -90,8 +91,8 @@ object Commander : EventListener<String> {
     }
 
     @Synchronized
-    fun resetLights(lightList: List<Int>, successCallback: () -> Unit,
-                    failedCallback: () -> Unit) {
+    fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
+                    failedCallback: () -> Unit1) {
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
@@ -146,8 +147,8 @@ object Commander : EventListener<String> {
     }
 
     @Synchronized
-    fun resetCurtain(lightList: List<DbCurtain>, successCallback: () -> Unit,
-                    failedCallback: () -> Unit) {
+    fun resetCurtain(lightList: List<DbCurtain>, successCallback: () -> Unit1,
+                     failedCallback: () -> Unit1) {
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
@@ -207,7 +208,7 @@ object Commander : EventListener<String> {
         }
     }
 
-    fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
+    fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
 
         mLightAddr = lightMeshAddr
@@ -252,7 +253,7 @@ object Commander : EventListener<String> {
     }
 
 
-    fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit, failedCallback: () -> Unit) {
+    fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
         mLightAddr = dstAddr
         mGroupingAddr = groupAddr
@@ -299,7 +300,7 @@ object Commander : EventListener<String> {
 
 
     fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.account, newMeshAddr: Int =
-            Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit, failedCallback: () -> Unit) {
+            Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mUpdateMeshSuccess = false
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
@@ -398,8 +399,7 @@ object Commander : EventListener<String> {
     }
 
     //关闭渐变
-    fun closeGradient(dstAddr: Int, id: Int, speed: Int, successCallback: (version: String?) -> Unit,
-                      failedCallback: () -> Unit) {
+    fun closeGradient(dstAddr: Int, id: Int, speed: Int) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //关闭渐变
         val gradientActionType = 0x03
@@ -409,8 +409,8 @@ object Commander : EventListener<String> {
     }
 
     //加载渐变
-    fun applyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit,
-                      failedCallback: () -> Unit) {
+    fun applyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit1,
+                      failedCallback: () -> Unit1) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //开始内置渐变
         val gradientActionType = 0x02
@@ -423,8 +423,8 @@ object Commander : EventListener<String> {
     }
 
     //加载自定义渐变
-    fun applyDiyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit,
-                         failedCallback: () -> Unit) {
+    fun applyDiyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit1,
+                         failedCallback: () -> Unit1) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //开始自定义渐变
         val gradientActionType = 0x04
@@ -437,8 +437,8 @@ object Commander : EventListener<String> {
     }
 
     //删除渐变
-    fun deleteGradient(dstAddr: Int, id: Int, successCallback: (version: String?) -> Unit,
-                       failedCallback: () -> Unit) {
+    fun deleteGradient(dstAddr: Int, id: Int, successCallback: (version: String?) -> Unit1,
+                       failedCallback: () -> Unit1) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //删除渐变
         val gradientActionType = 0x01
@@ -458,8 +458,8 @@ object Commander : EventListener<String> {
      * 双色温渐变模式：[16]: 色温
      */
     fun addGradient(dstAddr: Int, id: Int, node: Int, mode: Int, brightness: Int,
-                    r: Int, g: Int, b: Int, c: Int = 0xff, w: Int = 0xff, successCallback: (version: String?) -> Unit,
-                    failedCallback: () -> Unit) {
+                    r: Int, g: Int, b: Int, c: Int = 0xff, w: Int = 0xff, successCallback: (version: String?) -> Unit1,
+                    failedCallback: () -> Unit1) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         val gradientActionType = 0x00
         val params: ByteArray
@@ -468,8 +468,8 @@ object Commander : EventListener<String> {
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
     }
 
-    fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit,
-                         failedCallback: () -> Unit) {
+    fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit1,
+                         failedCallback: () -> Unit1) {
         mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 
         mLightAddr = dstAddr
@@ -560,8 +560,8 @@ object Commander : EventListener<String> {
      * 自动重连
      * 此处用作设备登录
      */
-    fun autoConnect(macAddress: String,successCallback: (version: String?) -> Unit,
-                    failedCallback: () -> Unit) {
+    fun autoConnect(macAddress: String, successCallback: (version: String?) -> Unit1,
+                    failedCallback: () -> Unit1) {
         if (TelinkLightService.Instance()!= null) {
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 TelinkLightService.Instance()?.idleMode(true);

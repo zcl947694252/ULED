@@ -1062,7 +1062,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
             R.id.diy_mode_off -> {
 
-                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed, successCallback = {}, failedCallback = {})
+                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
                 diyGradientList!![position].select = false
                 rgbDiyGradientAdapter!!.notifyItemChanged(position)
                 DBUtils.updateGradient(diyGradientList!![position])
@@ -1160,7 +1160,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     fun stopGradient() {
-        Commander.closeGradient(dstAddress, positionState, speed, successCallback = {}, failedCallback = {})
+        Commander.closeGradient(dstAddress, positionState, speed)
     }
 
 

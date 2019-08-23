@@ -866,9 +866,17 @@
     <string name="region_one_code">A single region can generate only one code at a time</string>
     <string name="can_not_parse">Unable to parse </string>
     <string name="can_not_parse_mine">Unable to parse self-generated code</string>
+
     <string name="accept_authrozation">This user has been authorized</string>
     <string name="user_locked">User locked</string>
     <string name="permission_denfied">Insufficient permission to operate</string>
     <string name="region_not_exist">This region does not exist</string>
+    <string name="single_login_warm">Your ULED account has been logged in on other devices. If this is not your operation, please change the password as soon as possible</string>
+    <string name="other_device_login">Other device login reminders</string>
+    <string name="author_region_receviced">The area you share has been received</string>
+    <string name="author_account_receviced">Your Shared account has been received</string>
+    <string name="recevicer">receiver:</string>
+    <string name="hint">Hint</string>
+    <string name="please_select_area">Please select area</string>
 
 </resources>

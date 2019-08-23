@@ -26,9 +26,9 @@ class AreaAuthorizeItemAdapter(layoutResId: Int, data: List<RegionAuthorizeBean>
 
                     personTv.visibility = View.GONE
 
-                Log.e("zcl","zcl*判断*****${user!!.last_region_id}*******************${user!!.authorizer_user_id}")
+                Log.e("zcl","zcl*授权区域判断*****${user!!.last_region_id}*******************${user!!.last_authorizer_user_id}-----$user")
 
-                if (item.id.toString() == user!!.last_region_id  && user!!.authorizer_user_id == item.authorizer_id.toString()) {
+                if (item.id.toString() == user!!.last_region_id  && user!!.last_authorizer_user_id == item.authorizer_id.toString()) {
                     it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))

@@ -757,4 +757,11 @@
     <string name="user_locked">用户被锁定</string>
     <string name="permission_denfied">权限不足,无法操作</string>
     <string name="region_not_exist">该区域不存在</string>
+    <string name="single_login_warm">你的优乐迪账号已再其他设备登录,如果这不是你的操作,请尽快修改密码</string>
+    <string name="other_device_login">其他设备登录提醒</string>
+    <string name="author_region_receviced">您分享的区域已被接收</string>
+    <string name="author_account_receviced">您分享的账号已被接收</string>
+    <string name="recevicer">接收者:</string>
+    <string name="hint">提示</string>
+    <string name="please_select_area">请选择区域</string>
 </resources>

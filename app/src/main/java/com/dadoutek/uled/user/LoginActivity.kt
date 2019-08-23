@@ -77,7 +77,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         if (phoneList!!.size == 0) {
             date_phone.visibility = View.GONE
         }
-//        detectUpdate()
 
         initData()
         initView()

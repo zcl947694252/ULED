@@ -104,19 +104,22 @@ public interface RequestInterface {
     @DELETE("auth/authorization/code/remove/{rid}/{type}")
     Observable<Response<ShareCodeBean>> authorizationCodeExpired(@Path("rid") long rid, @Path("type") long type);
 
-    //获取区域列表
+    //获取区域列表 (已过期) 仅用于获取自己的区域
     @GET("region/list")
-    Observable<Response<List<DbRegion>>> getRegionList(@Header("token") String token);
+    Observable<Response<List<DbRegion>>> getOldRegionList(@Header("token") String token);
+
+
+
 
     //47.获取区域列表 区域activity内使用
     // http://dev.dadoutek.com/smartlight/auth/region/list
     @GET("auth/region/list")
-    Observable<Response<List<RegionBean>>> getRegionActivityList();
+    Observable<Response<List<RegionBean>>> gotRegionActivityList();
 
     //53授权区域列表
     //http://dev.dadoutek.com/smartlight/auth/authorization/authorizer-region/list
     @GET("auth/authorization/authorizer-region/list")
-    Observable<Response<List<RegionAuthorizeBean>>> getAuthorizerList();
+    Observable<Response<List<RegionAuthorizeBean>>> gotAuthorizerList();
 
     //更新区域
     @POST("region/add/{rid}")
@@ -404,11 +407,12 @@ public interface RequestInterface {
     //content-type : application/json
     //token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
     //code	是	string	码的值
+    //password	是	string
     //{"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
 
     @FormUrlEncoded
     @POST("auth/code/parse")
-    Observable<Response<String>> parseQRCode(@Field("code") String code);
+    Observable<Response<String>> parseQRCode(@Field("code") String code,@Field("password") String password);
 
     /**
      * 62、取消授权(主动方:授权者)

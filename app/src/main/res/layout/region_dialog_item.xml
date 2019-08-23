@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="57dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/item_area_dialog_ly"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_area_dialog_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="11dp"
+                android:gravity="center_vertical"
+                android:text="网络1(共10个设备)"
+                android:textColor="@color/black_three"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/item_area_dialog_share_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="11dp"
+                android:layout_marginTop="7dp"
+                android:gravity="center_vertical"
+                android:text="@string/more"
+                android:textColor="@color/blue_background"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/item_area_dialog_more"
+            android:layout_width="60dp"
+            android:layout_height="23dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="@dimen/dp_10"
+            android:gravity="center"
+            android:textColor="@color/black_three"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/black_ee" />
+</LinearLayout>

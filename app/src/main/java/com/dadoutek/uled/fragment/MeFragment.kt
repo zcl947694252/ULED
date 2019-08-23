@@ -530,7 +530,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
 
             override fun start() {}
         })
-
     }
 
 
@@ -538,20 +537,23 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         isClickExlogin = true
         val b1 = (DBUtils.allLight.isEmpty() && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.isEmpty()
                 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.isEmpty() && !DBUtils.dataChangeAllHaveAboutRelay)
-        val lastUser = DBUtils.lastUser!!
-        if (b1 || lastUser.id.toString() != lastUser.authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
-            if (isClickExlogin) {
-                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                TelinkLightService.Instance()?.disconnect()
-                TelinkLightService.Instance()?.idleMode(true)
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
+                if (isClickExlogin) {
+                    SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+                    TelinkLightService.Instance()?.disconnect()
+                    TelinkLightService.Instance()?.idleMode(true)
 
-                restartApplication()
+                    restartApplication()
+                }
+                hideLoadingDialog()
+                Log.e("zcl", "zcl******推出上传其区域数据"+(it.id.toString() == it.last_authorizer_user_id))
+            } else {
+                checkNetworkAndSync(activity)
             }
-            hideLoadingDialog()
-            Log.e("zcl", "zcl******推出不上传"+(lastUser.id.toString() != lastUser.authorizer_user_id))
-        } else {
-            checkNetworkAndSync(activity)
         }
+
     }
 
 
@@ -573,41 +575,12 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 developer.visibility = View.VISIBLE
             } else
                 developer.visibility = View.GONE
-
-            /*  val alertDialog = AlertDialog.Builder(activity)
-                      .setTitle(R.string.developer_mode_on)
-                      .setIcon(android.R.drawable.ic_dialog_info)
-                      .setPositiveButton(getString(R.string.open_mode)) { dialog, which ->
-                          LogUtils.getConfig().setLog2FileSwitch(true)
-                          LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                          SharedPreferencesUtils.setDeveloperModel(true)
-                          startActivity(Intent(context, DeveloperActivity::class.java))
-                          developer.visibility = View.VISIBLE
-                          dialog.dismiss()
-                    }
-                      .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
-                          LogUtils.getConfig().setLog2FileSwitch(false)
-                          LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                          SharedPreferencesUtils.setDeveloperModel(false)
-                          developer.visibility = View.GONE
-                          dialog.dismiss()
-                      }.create()
-              alertDialog.setCancelable(false)
-              alertDialog.show()*/
         }
     }
 
     //清空缓存初始化APP
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SetTextI18n")
     private fun emptyTheCache() {
-//        AlertDialog.Builder(activity)
-//                .setTitle(activity!!.getString(R.string.empty_cache_title))
-//                .setMessage(activity!!.getString(R.string.empty_cache_tip))
-//                .setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }
-//                .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-//                    TelinkLightService.Instance()?.idleMode(true)
-//                    clearData()
-//                } .create().show()
 
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
@@ -662,8 +635,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
 
             override fun onError(e: Throwable) {
-                super.onError(e)
                 ToastUtils.showLong(R.string.clear_fail)
+                super.onError(e)
                 hideLoadingDialog()
             }
         })

@@ -15,7 +15,7 @@ abstract class NetworkObserver<t>: Observer<t> {
     override fun onSubscribe(d: Disposable) {
     }
     override fun onError(e: Throwable) {
-        Log.e("zcl", "zcl******onError${e.localizedMessage}")
+        Log.e("zcl", "zcl_NetworkObserver******onError${e.localizedMessage}")
         //HTTP错误
         if (e is HttpException) {
             ToastUtils.showShort(R.string.network_error)

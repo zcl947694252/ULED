@@ -71,6 +71,9 @@ public class Constant implements Serializable {
     //网络请求服务器域名地址
     public static final String BASE_URL = "https://dev.dadoutek.com/smartlight/";
 
+    //长连接请求服务器域名地址
+    public static final String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
+
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY = "DB_NAME_KEY";
 
@@ -251,7 +254,7 @@ public class Constant implements Serializable {
     //连接器
     public static final Long DEVICE_TYPE_CONNECTOR = Long.valueOf(0x05);
 
-    //升级标记
+    //升级标记t
     public static final String UP_VERSION = "UP_VERSION";
     //网络授权分享人数
     public static final String SHARE_PERSON = "SHARE_PERSON";
@@ -263,4 +266,26 @@ public class Constant implements Serializable {
     public static final String IS_NEW_TRANSFER_CODE = "IS_NEW_TRANSFER_CODE";
     //是否是新生成的授权码
     public static final String IS_NEW_AUTHOR_CODE = "IS_NEW_AUTHOR_CODE";
+
+    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
+    public static final String WS_DEBUG_HOST = "/smartlight/test";
+    //虚拟主机号
+    public static final String WS_HOST = "/smartlight";
+    //二维码频道
+    public static final String WS_TOPIC_CODE = "/user/topic/code.parse";
+    //单点登录频道
+    public static final String WS_TOPIC_LOGIN = "/user/topic/user.login.state";
+    //单点登录key
+    public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
+    //是否显示区域弹框
+    public static final String IS_SHOW_REGION_DIALOG = "IS_SHOW_REGION_DIALOG";
+    //区域列表key
+    public static final String REGION_LIST="REGION_LIST";
+    //区域授权列表key
+    public static final String REGION_AUTHORIZE_LIST="REGION_AUTHORIZE_LIST";
+
+    //区域列别
+    public static final int REGION_TYPE=1;
+    //授权区域列别
+    public static final int REGION_AUTHORIZE_TYPE=2;
 }

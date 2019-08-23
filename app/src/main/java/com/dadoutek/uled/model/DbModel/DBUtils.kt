@@ -627,6 +627,8 @@ object DBUtils {
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
+            val groups = DBUtils.allGroups
+            Log.e("zcl","zcl******$groups")
         } else {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
             recordingChange(group.id,

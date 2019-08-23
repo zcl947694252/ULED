@@ -31,8 +31,9 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var user: DbUser
                 } else {
                     personTv.visibility = View.GONE
                 }
-
-                if ( user!!.id.toString() ==user!!.authorizer_user_id && item.id.toString() == user!!.last_region_id) {
+                //authorizer_user_id 300545  userID 300524
+                //Log.e("zcl","zcl自己区域判断*****${user!!.last_region_id}*******************${user!!.last_authorizer_user_id}$user")
+                if ( user!!.id.toString() ==user!!.last_authorizer_user_id && item.id.toString() == user!!.last_region_id) {
                     it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))

@@ -150,13 +150,12 @@ class SettingActivity : AppCompatActivity() {
      * 上传回调
      */
     internal var syncCallback: SyncCallback = object : SyncCallback {
-
         override fun start() {
-            showLoadingDialog(this@SettingActivity!!.getString(R.string.tip_start_sync))
+            showLoadingDialog(this@SettingActivity.getString(R.string.tip_start_sync))
         }
 
         override fun complete() {
-            ToastUtils.showLong(this@SettingActivity!!.getString(R.string.upload_data_success))
+            ToastUtils.showLong(this@SettingActivity.getString(R.string.upload_data_success))
             hideLoadingDialog()
         }
 
@@ -167,14 +166,14 @@ class SettingActivity : AppCompatActivity() {
     }
 
     //清空缓存初始化APP
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SetTextI18n")
     private fun emptyTheCache() {
-        val alertDialog = AlertDialog.Builder(this).setTitle(this!!.getString(R.string.empty_cache_title))
-                .setMessage(this!!.getString(R.string.empty_cache_tip))
-                .setPositiveButton(this!!.getString(android.R.string.ok)) { _, _ ->
+        val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.empty_cache_title))
+                .setMessage(getString(R.string.empty_cache_tip))
+                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                     TelinkLightService.Instance()?.idleMode(true)
                     clearData()
-                }.setNegativeButton(this!!.getString(R.string.btn_cancel)) { _, _ -> }.create()
+                }.setNegativeButton(getString(R.string.btn_cancel)) { _, _ -> }.create()
         alertDialog.show()
         val btn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
         btn.isEnabled = false

@@ -93,4 +93,17 @@ public class DbRegion {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "DbRegion{" +
+                "id=" + id +
+                ", controlMesh='" + controlMesh + '\'' +
+                ", controlMeshPwd='" + controlMeshPwd + '\'' +
+                ", installMesh='" + installMesh + '\'' +
+                ", installMeshPwd='" + installMeshPwd + '\'' +
+                ", belongAccount='" + belongAccount + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

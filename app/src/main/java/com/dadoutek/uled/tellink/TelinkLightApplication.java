@@ -63,7 +63,6 @@ public final class TelinkLightApplication extends TelinkApplication {
             mInstance = this;
         }
 
-
         Utils.init(this);
         LogUtils.getConfig().setBorderSwitch(false);
         if (!AppUtils.isAppDebug()) {

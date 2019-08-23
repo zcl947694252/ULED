@@ -114,7 +114,7 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     }
 
     private fun upDatePwd() {
-        toast("账户$phone----密码$password")
+        //toast("账户$phone----密码$password")
 
         NetworkFactory.getApi()
                 .putPassword(phone, NetworkFactory.md5(password))

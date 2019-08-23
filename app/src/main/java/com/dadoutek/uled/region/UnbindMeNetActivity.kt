@@ -51,6 +51,7 @@ class UnbindMeNetActivity : BaseActivity() {
     }
 
 
+    @SuppressLint("StringFormatMatches")
     private fun showUnbindDialog(position:Int) {
         unbindBean = list?.get(position)
         val builder = AlertDialog.Builder(this)
@@ -61,6 +62,7 @@ class UnbindMeNetActivity : BaseActivity() {
                     RegionModel.cancelAuthorize(it, it1.toInt())?.subscribe({
                         adapter?.remove(position)
                         adapter!!.notifyDataSetChanged()
+                        recycleview_title_title.text = getString(R.string.share_person_num_b, adapter!!.itemCount)
                         ToastUtils.showShort(getString(R.string.unbundling_success))
                     }, { ToastUtils.showShort(it.message) })
                 }

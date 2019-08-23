@@ -50,9 +50,10 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    /*区域新接口*/
     fun get(): Observable<MutableList<RegionBean>>? {
         return NetworkFactory.getApi()
-                .getRegionActivityList()
+                .gotRegionActivityList()
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
@@ -71,16 +72,17 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+
     fun getAuthorizerList(): Observable<MutableList<RegionAuthorizeBean>>? {
         return NetworkFactory.getApi()
-                .getAuthorizerList()
+                .gotAuthorizerList()
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    /*区域新接口*/
+
     fun addRegions(token: String, dbRegion: DbRegion, rid: Long?): Observable<Any>? {
         return NetworkFactory.getApi()
                 .addRegionNew(token, dbRegion, rid!!)
@@ -131,9 +133,9 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun parseQRCode(code: String): Observable<String>? {
+    fun parseQRCode(code: String,password: String): Observable<String>? {
         return NetworkFactory.getApi()
-                .parseQRCode(code)
+                .parseQRCode(code,password)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .doOnNext {

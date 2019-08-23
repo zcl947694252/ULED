@@ -349,7 +349,7 @@ class SyncDataPutOrGetUtils {
 
         private fun startGet(token: String,accountNow: String, syncCallBack: SyncCallback) {
             NetworkFactory.getApi()
-                    .getRegionList(token)
+                    .getOldRegionList(token)
                     .compose(NetworkTransformer())
                     .flatMap {
                         Log.d("itSize", it.size.toString())
@@ -364,6 +364,17 @@ class SyncDataPutOrGetUtils {
                         } else {
                             setupMeshCreat(accountNow)
                         }
+                        NetworkFactory.getApi()
+                                .gotAuthorizerList()
+                                .compose(NetworkTransformer())
+                    }.flatMap {
+                        SharedPreferencesHelper.putString(TelinkLightApplication.getContext(),Constant.REGION_AUTHORIZE_LIST,it.toString())
+                        NetworkFactory.getApi()
+                                .gotRegionActivityList()
+                                .compose(NetworkTransformer())
+                    }
+                    .flatMap {
+                       SharedPreferencesHelper.putString(TelinkLightApplication.getContext(),Constant.REGION_LIST,it.toString())
                         NetworkFactory.getApi()
                                 .getLightList(token)
                                 .compose(NetworkTransformer())
@@ -482,7 +493,7 @@ class SyncDataPutOrGetUtils {
 
         private fun setupMesh() {
             val regionList = DBUtils.regionAll
-            SharedPreferencesUtils.getLastUser();
+            SharedPreferencesUtils.getLastUser()
             //数据库有区域数据直接加载
             if (regionList.size != 0) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()

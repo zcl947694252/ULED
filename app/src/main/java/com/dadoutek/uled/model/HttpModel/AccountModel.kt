@@ -8,6 +8,7 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -28,6 +29,7 @@ object AccountModel {
                 .compose(NetworkTransformer())
                 .flatMap { response: String ->
                     account = response
+                    SharedPreferencesUtils.saveLastUser("$phone-$password-$account")
                     NetworkFactory.getApi()
                             .getsalt(response)
                             .compose(NetworkTransformer())
@@ -36,7 +38,6 @@ object AccountModel {
                     val salt = response
                     val md5Pwd = (NetworkFactory.md5(
                             NetworkFactory.md5(NetworkFactory.md5(password) + account) + salt))
-
                     NetworkFactory.getApi().login(account, md5Pwd)
                             .compose(NetworkTransformer())
                 }
@@ -47,7 +48,6 @@ object AccountModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
 
     fun smsLoginTwo(phone: String): Observable<DbUser> {
         return NetworkFactory.getApi()
@@ -126,7 +126,7 @@ object AccountModel {
 
         if (groups != null) {
             for (item in groups.get()) {
-                var dbGroup: DbGroup = DbGroup()
+                var dbGroup = DbGroup()
                 if (item.meshAddress == 0xffff) {
                     continue
                 }
@@ -151,7 +151,7 @@ object AccountModel {
         DaoSessionUser.destroySession()
         DaoSessionUser.getInstance()
 
-        if (user.authorizer_user_id==null)//不是切换区域就是登录
+        if (user.authorizer_user_id == null)//不是切换区域就是登录
             user.authorizer_user_id = user.id.toString()
 
         DBUtils.saveUser(user)

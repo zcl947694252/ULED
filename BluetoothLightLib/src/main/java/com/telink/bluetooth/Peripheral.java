@@ -297,7 +297,7 @@ public class Peripheral extends BluetoothGattCallback {
             commandContext = this.mInputCommandQueue.poll();
         }
 
-        if (commandContext == null)
+        if (commandContext == null||commandContext.command==null)
             return;
 
         commandType = commandContext.command.type;

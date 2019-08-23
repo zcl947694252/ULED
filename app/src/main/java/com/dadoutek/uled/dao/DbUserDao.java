@@ -35,6 +35,8 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         public final static Property Password = new Property(8, String.class, "password", false, "PASSWORD");
         public final static Property Last_region_id = new Property(9, String.class, "last_region_id", false, "LAST_REGION_ID");
         public final static Property Authorizer_user_id = new Property(10, String.class, "authorizer_user_id", false, "AUTHORIZER_USER_ID");
+        public final static Property Login_state_key = new Property(11, String.class, "login_state_key", false, "LOGIN_STATE_KEY");
+        public final static Property Last_authorizer_user_id = new Property(12, String.class, "last_authorizer_user_id", false, "LAST_AUTHORIZER_USER_ID");
     }
 
 
@@ -60,7 +62,9 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
                 "\"TOKEN\" TEXT," + // 7: token
                 "\"PASSWORD\" TEXT," + // 8: password
                 "\"LAST_REGION_ID\" TEXT," + // 9: last_region_id
-                "\"AUTHORIZER_USER_ID\" TEXT);"); // 10: authorizer_user_id
+                "\"AUTHORIZER_USER_ID\" TEXT," + // 10: authorizer_user_id
+                "\"LOGIN_STATE_KEY\" TEXT," + // 11: login_state_key
+                "\"LAST_AUTHORIZER_USER_ID\" TEXT);"); // 12: last_authorizer_user_id
     }
 
     /** Drops the underlying database table. */
@@ -127,6 +131,16 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         if (authorizer_user_id != null) {
             stmt.bindString(11, authorizer_user_id);
         }
+ 
+        String login_state_key = entity.getLogin_state_key();
+        if (login_state_key != null) {
+            stmt.bindString(12, login_state_key);
+        }
+ 
+        String last_authorizer_user_id = entity.getLast_authorizer_user_id();
+        if (last_authorizer_user_id != null) {
+            stmt.bindString(13, last_authorizer_user_id);
+        }
     }
 
     @Override
@@ -187,6 +201,16 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         if (authorizer_user_id != null) {
             stmt.bindString(11, authorizer_user_id);
         }
+ 
+        String login_state_key = entity.getLogin_state_key();
+        if (login_state_key != null) {
+            stmt.bindString(12, login_state_key);
+        }
+ 
+        String last_authorizer_user_id = entity.getLast_authorizer_user_id();
+        if (last_authorizer_user_id != null) {
+            stmt.bindString(13, last_authorizer_user_id);
+        }
     }
 
     @Override
@@ -207,7 +231,9 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // token
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // password
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // last_region_id
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // authorizer_user_id
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // authorizer_user_id
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // login_state_key
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // last_authorizer_user_id
         );
         return entity;
     }
@@ -225,6 +251,8 @@ public class DbUserDao extends AbstractDao<DbUser, Long> {
         entity.setPassword(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setLast_region_id(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setAuthorizer_user_id(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setLogin_state_key(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setLast_authorizer_user_id(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
      }
     
     @Override

@@ -252,8 +252,14 @@
         <item name="android:textColor">#333333</item>
     </style>
 
-    <declare-styleable name="VerCodeInputView">
+    <style name="transparent_dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
 
+
+    <declare-styleable name="VerCodeInputView">
         <attr name="box" format="integer" />
         <attr name="inputPadding" format="dimension"/>
         <attr name="child_v_padding" format="dimension"/>

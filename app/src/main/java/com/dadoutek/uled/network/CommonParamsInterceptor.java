@@ -68,11 +68,11 @@ public class CommonParamsInterceptor implements Interceptor {
         //在请求头加上键值对region-id:2即可获取区域2的数据，如果请求头中缺少这对键值对，后台默认region-id:1
         //以下情况使用的是区域一的数据
         //1、请求头缺少region-id  2、region-id:1   3、region-id乱传
-
-        if (user != null &&user.getAuthorizer_user_id()!=null&&!user.getAuthorizer_user_id().equals(""))
-            builder.addHeader("authorizer-user-id",user.getAuthorizer_user_id());
-        Log.e("zcl","zcl******authorizer-user-id=="+user.getAuthorizer_user_id());
-
+        if (user != null &&user.getLast_authorizer_user_id()!=null&&!user.getLast_authorizer_user_id().equals("")){
+            builder.addHeader("authorizer-user-id",user.getLast_authorizer_user_id());
+            Log.e("zcl","zcl******authorizer-user-id=="+user.getLast_authorizer_user_id());
+        }else
+            Log.e("zcl","zcl******authorizer-user-id==user是空的没有authorizer-user-id");
 
 
         if (token == null || token.isEmpty())

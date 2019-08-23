@@ -1,7 +1,6 @@
 package com.dadoutek.uled.tellink;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -55,12 +54,9 @@ public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity imp
                 dialogBuilder.setTitle("Error")
                         .setMessage("为扫描到设备，检测到定位未开启，是否打开定位？")
                         .setNegativeButton("忽略", null)
-                        .setPositiveButton("去打开", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                startActivityForResult(enableLocationIntent, ACTIVITY_REQUEST_CODE_LOCATION);
-                            }
+                        .setPositiveButton("去打开", (dialogInterface, i) -> {
+                            Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivityForResult(enableLocationIntent, ACTIVITY_REQUEST_CODE_LOCATION);
                         });
                 mErrorDialog = dialogBuilder.create();
             }
