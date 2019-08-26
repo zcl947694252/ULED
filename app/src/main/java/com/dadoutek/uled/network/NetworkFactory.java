@@ -45,7 +45,7 @@ public class NetworkFactory {
         if (okHttpClient == null) {
             okHttpClient = initHttpClient();
         }
-        if (api == null) {
+        if (null ==api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
                     //.baseUrl(Constant.BASE_URL)

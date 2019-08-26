@@ -17,12 +17,9 @@ class ServerResultFunc<T> : Function<Response<T>, T> {
                 response.t = "" as T
             }
         } else {
-            if (response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST) {
-                val b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
-                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, b)
-            }else{
-                ServerResultException.handleException(response)
-            }
+            var b = response.errorCode == ERROR_CANCEL_AUHORIZE || response.errorCode == ERROR_REGION_NOT_EXIST
+            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, b)
+            ServerResultException.handleException(response)
         }
         return response.t
     }

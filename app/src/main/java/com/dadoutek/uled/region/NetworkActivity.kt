@@ -401,6 +401,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_delete_net -> {
                 RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
+                    resetAllLight()// todo 失败的话怎么处理
                     PopUtil.dismiss(pop)
                     initData()
                 }, {
@@ -588,6 +589,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         viewAdd?.let {
             var name = it.findViewById<EditText>(R.id.pop_region_name)
             it.findViewById<Button>(R.id.btn_confirm).setOnClickListener {
+                if (name.text.toString()==""){
+                    ToastUtils.showShort(getString(R.string.please_input_region_name))
+                    return@setOnClickListener
+                }
                 isShowType = 1
                 addRegion(name.text)
                 PopUtil.dismiss(popAdd)

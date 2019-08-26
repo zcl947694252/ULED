@@ -13,6 +13,7 @@ import java.io.Serializable
  * 更新描述   ${TODO}
  */
 class RegionBean: Serializable {
+
     /**
      * count_light : 121
      * count_curtain : 0
@@ -48,6 +49,13 @@ class RegionBean: Serializable {
     var controlMeshPwd: String? = null
     var state: Int = 0
     var ref_users: List<RefUsersBean>? = null
+    var is_selected :Boolean? = false
+
+    constructor(name: String?) {
+        this.name = name
+    }
+
+    constructor()
 
 
     class CodeInfoBean :Serializable {

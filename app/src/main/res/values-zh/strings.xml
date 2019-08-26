@@ -802,4 +802,6 @@
     <string name="recevicer">接收者:</string>
     <string name="hint">提示</string>
     <string name="please_select_area">请选择区域</string>
+    <string name="please_input_region_name">请输入区域名称</string>
+    <string name="author_region_unAuthorized">用户解除了区域%2$s的授权</string>
 </resources>

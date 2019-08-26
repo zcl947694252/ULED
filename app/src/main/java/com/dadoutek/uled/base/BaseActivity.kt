@@ -18,10 +18,15 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.DbModel.DbCurtain
+import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.SplashActivity
@@ -30,9 +35,12 @@ import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
@@ -43,11 +51,12 @@ import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompHeader
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     zcl
  * 创建时间   2019/8/21 20:06
- * 描述	      ${19928748860 }$
+ * 描述	      ${19928748860   %1$s  %2$s  %1$d Android s代表string  d代表int  1-9  }$
  *
  * 更新者     $Author$
  * 更新时间   $Date$
@@ -55,6 +64,8 @@ import java.util.*
  */
 
 abstract class BaseActivity : AppCompatActivity() {
+    private var authorStompClient: Disposable? = null
+    private  var compositeDisposable: CompositeDisposable? = null
     private var pop: PopupWindow? = null
     private var popView: View? = null
     private var dialog: Dialog? = null
@@ -127,9 +138,18 @@ abstract class BaseActivity : AppCompatActivity() {
                 val type = codeBean.get("type") as Int
                 val account = codeBean.get("account")
                 Log.e(TAGS, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
-                makeCodeDialog(type, phone, account)
+                makeCodeDialog(type, phone, account, "")
             }
 
+            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe { topicMessage ->
+                Log.e(TAGS, "收到解除授权信息:$topicMessage")
+                val payloadCode = topicMessage.payload
+                val codeBean = JSONObject(payloadCode)
+                val phone = codeBean.get("authorizer_user_phone")
+                val regionName = codeBean.get("region_name")
+                Log.e(TAGS, "zcl***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
+                makeCodeDialog(2, phone, "",regionName)//2代表解除授权信息type
+            }
 
             loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe { topicMessage ->
                 payload = topicMessage.payload
@@ -159,20 +179,34 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun makeCodeDialog(type: Int, phone: Any, account: Any) {
+    @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
+    private fun makeCodeDialog(type: Int, phone: Any, account: Any, regionName: Any) {
         //移交码为0授权码为1
         var title: String? = null
-
+        var recever: String
 
         when (type) {
-            0 -> title = getString(R.string.author_account_receviced)
-            1 -> title = getString(R.string.author_region_receviced)
+            0 -> {
+                title = getString(R.string.author_account_receviced)
+                recever = getString(R.string.recevicer)
+            }
+            1 -> {
+                title = getString(R.string.author_region_receviced)
+                recever = getString(R.string.recevicer)
+            }
+            2 -> {
+                title = getString(R.string.author_region_unAuthorized,regionName)
+                recever = getString(R.string.author_region_receviced)
+            }
         }
+       //todo  订阅区分逻辑 授权者被授权按着
+
+
         runOnUiThread {
-            popView?.let {
+                popView?.let {
                 it.findViewById<TextView>(R.id.code_warm_title).text = title
-                it.findViewById<TextView>(R.id.code_warm_context).text = getString(R.string.recevicer) + phone
+
+                it.findViewById<TextView>(R.id.code_warm_context).text = string + phone
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
@@ -245,6 +279,7 @@ abstract class BaseActivity : AppCompatActivity() {
         codeStompClient?.dispose()
         loginStompClient?.isDisposed
         normalSubscribe?.dispose()
+        authorStompClient?.dispose()
         longOperation?.cancel(true)
 
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
@@ -319,4 +354,101 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
+
+    private val allLights: List<DbLight>
+        get() {
+            val groupList = DBUtils.groupList
+            val lightList = ArrayList<DbLight>()
+
+            for (i in groupList.indices) {
+                lightList.addAll(DBUtils.getLightByGroupID(groupList[i].id!!))
+            }
+            return lightList
+        }
+
+    private val allCutain: List<DbCurtain>
+        get() {
+            val groupList = DBUtils.groupList
+            val lightList = ArrayList<DbCurtain>()
+
+            for (i in groupList.indices) {
+                lightList.addAll(DBUtils.getCurtainByGroupID(groupList[i].id!!))
+            }
+            return lightList
+        }
+
+
+    private val allRely: List<DbConnector>
+        get() {
+            val groupList = DBUtils.groupList
+            val lightList = ArrayList<DbConnector>()
+
+            for (i in groupList.indices) {
+                lightList.addAll(DBUtils.getConnectorByGroupID(groupList[i].id!!))
+            }
+            return lightList
+        }
+
+    open fun resetAllLight() {
+        showLoadingDialog(getString(R.string.reset_all_now))
+        SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
+        val lightList = allLights
+        val curtainList = allCutain
+        val relyList = allRely
+        var meshAdre = ArrayList<Int>()
+        if (lightList.isNotEmpty()) {
+            for (k in lightList.indices) {
+                meshAdre.add(lightList[k].meshAddr)
+            }
+        }
+
+        if (curtainList.isNotEmpty()) {
+            for (k in curtainList.indices) {
+                meshAdre.add(curtainList[k].meshAddr)
+            }
+        }
+
+        if (relyList.isNotEmpty()) {
+            for (k in relyList.indices) {
+                meshAdre.add(relyList[k].meshAddr)
+            }
+        }
+
+        if (meshAdre.size > 0) {
+            Commander.resetLights(meshAdre, {
+                SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, false)
+                syncData()
+                this?.bnve?.currentItem = 0
+                null
+            }, {
+                SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, false)
+                null
+            })
+        }
+        if (meshAdre.isEmpty()) {
+            hideLoadingDialog()
+        }
+    }
+
+    private fun syncData() {
+        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+            override fun complete() {
+                hideLoadingDialog()
+                val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { aLong -> }
+
+                if (compositeDisposable!!.isDisposed) {
+                    compositeDisposable = CompositeDisposable()
+                }
+                compositeDisposable!!.add(disposable)
+            }
+
+            override fun error(msg: String) {
+                hideLoadingDialog()
+                ToastUtils.showShort(R.string.backup_failed)
+            }
+            override fun start() {}
+        })
+    }
 }

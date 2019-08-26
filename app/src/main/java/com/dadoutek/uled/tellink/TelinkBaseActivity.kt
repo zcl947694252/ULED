@@ -47,6 +47,7 @@ import ua.naiksoftware.stomp.dto.StompHeader
 import java.util.*
 
 open class TelinkBaseActivity : AppCompatActivity() {
+    private var authorStompClient: Disposable? = null
     private var pop: PopupWindow? = null
     private var popView: View? = null
     private var codeWarmDialog: AlertDialog? = null
@@ -291,9 +292,18 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 val type = codeBean.get("type") as Int
                 val account = codeBean.get("account")
                // Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
-                makeCodeDialog(type, phone, account)
+                makeCodeDialog(type, phone, account,"")
             }
 
+            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe { topicMessage ->
+                Log.e(TAG, "收到解除授权信息:$topicMessage")
+                val payloadCode = topicMessage.payload
+                val codeBean = JSONObject(payloadCode)
+                val phone = codeBean.get("authorizer_user_phone")
+                val regionName = codeBean.get("region_name")
+                Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
+                makeCodeDialog(2, phone, "",regionName)//2代表解除授权信息type
+            }
 
 
             loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe { topicMessage ->
@@ -338,6 +348,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         codeStompClient?.dispose()
         loginStompClient?.isDisposed
         normalSubscribe?.dispose()
+        authorStompClient?.dispose()
         longOperation?.cancel(true)
 
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
@@ -391,14 +402,17 @@ open class TelinkBaseActivity : AppCompatActivity() {
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun makeCodeDialog(type: Int, phone: Any, account: Any) {
+
+    @SuppressLint("SetTextI18n", "StringFormatInvalid")
+    private fun makeCodeDialog(type: Int, phone: Any, account: Any, regionName: Any) {
         //移交码为0授权码为1
         var title: String? = null
+
 
         when (type) {
             0 -> title = getString(R.string.author_account_receviced)
             1 -> title = getString(R.string.author_region_receviced)
+            2 -> title = getString(R.string.author_region_unAuthorized,phone)+regionName
         }
         runOnUiThread {
             popView?.let {
@@ -407,8 +421,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
-                    if (type == 0)
+                    if (type == 0) {
                         restartApplication()
+                    }
                 }
                 notifyWSData()
                 if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing)

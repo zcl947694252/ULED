@@ -273,6 +273,8 @@ public class Constant implements Serializable {
     public static final String WS_HOST = "/smartlight";
     //二维码频道
     public static final String WS_TOPIC_CODE = "/user/topic/code.parse";
+    //取消收授权频道
+    public static final String WS_AUTHOR_CODE = "/user/topic/authorization.cancel";
     //单点登录频道
     public static final String WS_TOPIC_LOGIN = "/user/topic/user.login.state";
     //单点登录key

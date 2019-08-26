@@ -70,7 +70,7 @@ public class CommonParamsInterceptor implements Interceptor {
         //1、请求头缺少region-id  2、region-id:1   3、region-id乱传
         if (user != null &&user.getLast_authorizer_user_id()!=null&&!user.getLast_authorizer_user_id().equals("")){
             builder.addHeader("authorizer-user-id",user.getLast_authorizer_user_id());
-            Log.e("zcl","zcl******authorizer-user-id=="+user.getLast_authorizer_user_id());
+            Log.e("zcl","zcl******Last_authorizer_user_id=="+user.getLast_authorizer_user_id());
         }else
             Log.e("zcl","zcl******authorizer-user-id==user是空的没有authorizer-user-id");
 

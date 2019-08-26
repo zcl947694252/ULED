@@ -1,7 +1,9 @@
 package com.dadoutek.uled.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
@@ -17,7 +19,9 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers import kotlinx.coroutines.GlobalScope import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.MediaType
 import okhttp3.RequestBody
 
@@ -51,12 +55,12 @@ class SyncDataPutOrGetUtils {
                             syncCallback.start()
                         }
                     }
-                        var observable: Observable<String>?= this.sendDataToServer(dbDataChangeList[i].tableName,
-                                dbDataChangeList[i].changeId,
-                                dbDataChangeList[i].changeType,
-                                dbUser!!.token, dbDataChangeList[i].id!!)
+                    var observable: Observable<String>? = this.sendDataToServer(dbDataChangeList[i].tableName,
+                            dbDataChangeList[i].changeId,
+                            dbDataChangeList[i].changeType,
+                            dbUser!!.token, dbDataChangeList[i].id!!)
 
-                        observable?.let { observableList.add(it) }
+                    observable?.let { observableList.add(it) }
 
 
 
@@ -64,7 +68,7 @@ class SyncDataPutOrGetUtils {
                         val observables = arrayOfNulls<Observable<String>>(observableList.size)
                         observableList.toArray(observables)
 
-                        if(observables.isNotEmpty()){
+                        if (observables.isNotEmpty()) {
                             Observable.mergeArrayDelayError<String>(*observables)
                                     .doFinally {
                                     }
@@ -74,6 +78,7 @@ class SyncDataPutOrGetUtils {
                                                 syncCallback.complete()
                                             }
                                         }
+
                                         override fun onSubscribe(d: Disposable) {
                                         }
 
@@ -86,7 +91,7 @@ class SyncDataPutOrGetUtils {
                                             }
                                         }
                                     })
-                        }else{
+                        } else {
                             GlobalScope.launch(Dispatchers.Main) {
                                 syncCallback.complete()
                             }
@@ -97,8 +102,8 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String,id: Long): Observable<String>? {
-            if(changeId!=null) {
+                                     token: String, id: Long): Observable<String>? {
+            if (changeId != null) {
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
@@ -248,19 +253,19 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val scene = DBUtils.getSceneByID(changeId)
-                               //("scene_add--id==" + changeId)
+                                //("scene_add--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.add(token, bodyScene
                                             , id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                               //("scene_delete--id==" + changeId)
+                                //("scene_delete--id==" + changeId)
                                 return SceneModel.delete(token,
                                         changeId.toInt(), id)
                             }
                             Constant.DB_UPDATE -> {
-                               //("scene_update--id==" + changeId)
+                                //("scene_update--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.update(token, changeId.toInt(), bodyScene, id)
                                 }
@@ -345,15 +350,16 @@ class SyncDataPutOrGetUtils {
             startGet(token, dbUser.account, syncCallBack)
         }
 
-        private var acc: String?=null
+        private var acc: String? = null
 
-        private fun startGet(token: String,accountNow: String, syncCallBack: SyncCallback) {
+        @SuppressLint("CheckResult")
+        private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
             NetworkFactory.getApi()
                     .getOldRegionList(token)
                     .compose(NetworkTransformer())
                     .flatMap {
                         Log.d("itSize", it.size.toString())
-                        acc=accountNow
+                        acc = accountNow
                         for (item in it) {
                             DBUtils.saveRegion(item, true)
                         }
@@ -364,17 +370,6 @@ class SyncDataPutOrGetUtils {
                         } else {
                             setupMeshCreat(accountNow)
                         }
-                        NetworkFactory.getApi()
-                                .gotAuthorizerList()
-                                .compose(NetworkTransformer())
-                    }.flatMap {
-                        SharedPreferencesHelper.putString(TelinkLightApplication.getContext(),Constant.REGION_AUTHORIZE_LIST,it.toString())
-                        NetworkFactory.getApi()
-                                .gotRegionActivityList()
-                                .compose(NetworkTransformer())
-                    }
-                    .flatMap {
-                       SharedPreferencesHelper.putString(TelinkLightApplication.getContext(),Constant.REGION_LIST,it.toString())
                         NetworkFactory.getApi()
                                 .getLightList(token)
                                 .compose(NetworkTransformer())
@@ -423,7 +418,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveGradient(item, true)
                             for (i in item.colorNodes.indices) {
-                                 //("是不是空的"+item.id)
+                                //("是不是空的"+item.id)
                                 val k = i + 1
                                 DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
                             }
@@ -453,24 +448,37 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
-                    object : NetworkObserver<List<DbScene>>() {
-                        override fun onNext(item: List<DbScene>) {
-                            //登录后同步数据完成再上传一次数据
-                            syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
-                            SharedPreferencesUtils.saveCurrentUserList(accountNow)
-//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                            GlobalScope.launch(Dispatchers.Main) {
-                                syncCallBack.complete()
-                            }
+                    {
+                        //登录后同步数据完成再上传一次数据
+                        syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                        SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            syncCallBack.complete()
                         }
+                    }, {
+                GlobalScope.launch(Dispatchers.Main) {
+                    syncCallBack.error(it.message)
+                    ToastUtils.showLong(it.message)
+                }
+                    /*  object : NetworkObserver<List<DbScene>>() {
+                          override fun onNext(item: List<DbScene>) {
+                              //登录后同步数据完成再上传一次数据
+                              syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                              SharedPreferencesUtils.saveCurrentUserList(accountNow)
+  //                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+                              GlobalScope.launch(Dispatchers.Main) {
+                                  syncCallBack.complete()
+                              }
+                          }
 
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            GlobalScope.launch(Dispatchers.Main) {
-                                syncCallBack.error(e.message)
-                            }
-                        }
-                    }
+                          override fun onError(e: Throwable) {
+                              super.onError(e)
+                              GlobalScope.launch(Dispatchers.Main) {
+                                  syncCallBack.error(e.message)
+                              }
+                          }
+                      }*/
+            }
             )
         }
 
@@ -482,11 +490,11 @@ class SyncDataPutOrGetUtils {
             }
 
             override fun complete() {
-               //("putSuccess:" + "上传成功")
+                //("putSuccess:" + "上传成功")
             }
 
             override fun error(msg: String) {
-               //("GetDataError:" + msg)
+                //("GetDataError:" + msg)
             }
 
         }
@@ -509,7 +517,7 @@ class SyncDataPutOrGetUtils {
                 application.setupMesh(mesh)
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
                 return
-            }else{
+            } else {
                 setupMeshCreat(this!!.acc!!)
             }
         }

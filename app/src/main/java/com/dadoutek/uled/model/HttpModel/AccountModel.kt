@@ -151,8 +151,8 @@ object AccountModel {
         DaoSessionUser.destroySession()
         DaoSessionUser.getInstance()
 
-        if (user.authorizer_user_id == null)//不是切换区域就是登录
-            user.authorizer_user_id = user.id.toString()
+        if (user.last_authorizer_user_id == null)//不是切换区域就是登录
+            user.last_authorizer_user_id = user.id.toString()
 
         DBUtils.saveUser(user)
         user.password = userPassword

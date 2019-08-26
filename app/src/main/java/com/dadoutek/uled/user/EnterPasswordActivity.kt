@@ -22,20 +22,23 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.HttpModel.RegionModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.region.adapter.MultiItemAdapter
-import com.dadoutek.uled.region.bean.MultiRegionBean
+import com.dadoutek.uled.region.adapter.RegionAuthorizeDialogAdapter
+import com.dadoutek.uled.region.adapter.RegionDialogAdapter
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.dadoutek.uled.util.ToastUtil
@@ -51,8 +54,16 @@ import org.jetbrains.anko.toast
  * 登录界面 输入密码
  */
 class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
+    private var popConfirm: TextView? = null
+    private var mAuthorList: MutableList<RegionAuthorizeBean>? = null
+    private var mList: MutableList<RegionBean>? = null
+    private var regionBeanAuthorize: RegionAuthorizeBean? = null
+    private var regionBean: RegionBean? = null
+    private var poptitle: TextView? = null
+    private var poptitleAuthorize: TextView? = null
     private var pop: PopupWindow? = null
     private var popRecycle: RecyclerView? = null
+    private var popRecycleAuthorize: RecyclerView? = null
     private var popTitle: TextView? = null
     private var loadDialog: Dialog? = null
     private var mWakeLock: PowerManager.WakeLock? = null
@@ -61,6 +72,10 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private var isPassword = false
     private var editPassWord: String? = null
     private var dbUser: DbUser? = null
+    private var whoClick: Int = 0
+    private var NONE: Int = 0
+    private var ME: Int = 1
+    private var AUTHOR: Int = 2
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,16 +84,28 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         type = intent.extras!!.getString("USER_TYPE")
 
         makePop()
-
         initViewType()
         initView()
     }
 
     private fun makePop() {
         var popView = LayoutInflater.from(this).inflate(R.layout.pop_region_check, null)
-        popRecycle = popView.findViewById(R.id.template_recycleView)
+        poptitle = popView.findViewById(R.id.region_dialog_me_net_num)
+        poptitleAuthorize = popView.findViewById(R.id.region_dialog_authorize_net_num)
+        popRecycle = popView.findViewById(R.id.region_dialog_me_recycleview)
+        popRecycleAuthorize = popView.findViewById(R.id.region_dialog_authorize_recycleview)
+
+        popConfirm = popView.findViewById(R.id.region_dialog_confirm)
+
+        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        popRecycleAuthorize?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+        popConfirm?.setOnClickListener {
+            showLoadingDialog(getString(R.string.logging_tip))
+            downLoadDataAndChangeDbUser()
+        }
         pop?.let {
             it.isFocusable = true // 设置PopupWindow可获得焦点
             it.isTouchable = true // 设置PopupWindow可触摸补充：
@@ -180,6 +207,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             AccountModel.login(phone!!, editPassWord!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
+                            Log.e("zcl","zcl登录成功返回******"+dbUser)
                             SharedPreferencesHelper.putString(this@EnterPasswordActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
@@ -187,6 +215,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             SharedPreferencesUtils.setUserLogin(true)
                             //("logging: " + "登录成功" + dbUser.toString())
                         }
+
                         override fun onError(e: Throwable) {
                             super.onError(e)
                             hideLoadingDialog()
@@ -200,38 +229,137 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     var isSuccess: Boolean = true
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
+
         override fun start() {}
         override fun complete() {
             if (isSuccess)
-                syncComplet() }
+                syncComplet()
+        }
 
+        @SuppressLint("CheckResult")
         override fun error(msg: String) {
             val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance()
                     .mContext, Constant.IS_SHOW_REGION_DIALOG, false)
-            Log.e("zcl", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----------$dbUser")
+            Log.e("EnterPasswordActivity", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----")
 
 
             if (ishowRegionDialog) {
-                val authorList = SharedPreferencesHelper.getObject(this@EnterPasswordActivity, Constant.REGION_AUTHORIZE_LIST) as List<RegionAuthorizeBean>
-                val list = SharedPreferencesHelper.getObject(this@EnterPasswordActivity, Constant.REGION_LIST) as List<RegionBean>
-
-                val arrayList = arrayListOf<MultiRegionBean>()
-
-
-                arrayList.add(MultiRegionBean(Constant.REGION_TYPE, list))
-                arrayList.add(MultiRegionBean(Constant.REGION_AUTHORIZE_TYPE,authorList))
-                Log.e("zcl", "zcl*****同步返回授权问题boolean*****$list-----------$authorList-----${arrayList.size}")
-
-                popRecycle?.layoutManager = LinearLayoutManager(this@EnterPasswordActivity, LinearLayoutManager.VERTICAL, false)
-                popRecycle?.adapter = MultiItemAdapter(arrayList)
-
-                pop?.showAtLocation(window.decorView,Gravity.CENTER,0,100)
+                initMe()
+                initAuthor()
+//                val arrayList = arrayListOf<MultiRegionBean>()
+//                arrayList.add(MultiRegionBean(Constant.REGION_TYPE, list))
+//                arrayList.add(MultiRegionBean(Constant.REGION_AUTHORIZE_TYPE,authorList))
+//                val itemAdapter = MultiItemAdapter(arrayList)
+//                popRecycle?.adapter = itemAdapter
+//                itemAdapter.bindToRecyclerView(popRecycle)
+                pop?.showAtLocation(window.decorView, Gravity.CENTER, 0, 100)
             }
             isSuccess = false
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
         }
     }
+
+    @SuppressLint("CheckResult")
+    private fun initAuthor() {
+        RegionModel.getAuthorizerList()?.subscribe {
+            setAuthorizeRegion(it)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun initMe() {
+        RegionModel.get()?.subscribe {
+            setMeRegion(it)
+        }
+    }
+
+    @SuppressLint("StringFormatMatches")
+    private fun setAuthorizeRegion(authorList: MutableList<RegionAuthorizeBean>) {
+        poptitleAuthorize?.text = getString(R.string.received_net_num, authorList.size)
+        mAuthorList = authorList
+        if (authorList.isNotEmpty()) {
+            val itemAdapter = RegionAuthorizeDialogAdapter(R.layout.region_dialog_item, mAuthorList)
+            popRecycle?.adapter = itemAdapter
+            itemAdapter.setOnItemClickListener { _, _, position ->
+                regionBeanAuthorize = authorList[position]
+                when (whoClick) {
+                    NONE -> itemAdapter.data[position].is_selected = true
+                    //上次点击的自己不用便利其他人
+                    AUTHOR -> for (i in itemAdapter.data.indices)
+                        itemAdapter.data[i].is_selected = i == position
+
+                    //上次点击个人区域 这次自己 个人全是false
+                    ME -> initMe()
+                }
+                itemAdapter.notifyDataSetChanged()
+                whoClick = AUTHOR
+            }
+        }
+    }
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    private fun setMeRegion(list: MutableList<RegionBean>) {
+        poptitle?.text = getString(R.string.me_net_num, list.size)
+        mList = list
+        if (list.isNotEmpty()) {
+            var itemAdapter = RegionDialogAdapter(R.layout.region_dialog_item, mList!!)
+            popRecycle?.adapter = itemAdapter
+            itemAdapter.setOnItemClickListener { adapter, view, position ->
+                regionBean = list[position]
+                when (whoClick) {
+                    NONE -> itemAdapter.data[position].is_selected = true
+
+                    //上次点击的自己不用便利其他人
+                    ME -> for (i in itemAdapter.data.indices)
+                        itemAdapter.data[i].is_selected = i == position
+
+                    //上次点击收授权区域 这次自己 授权全是false
+                    AUTHOR -> initAuthor()
+                }
+                itemAdapter.notifyDataSetChanged()
+                whoClick = ME
+            }
+        }
+    }
+
+    private fun downLoadDataAndChangeDbUser() {
+        if (regionBean == null && regionBeanAuthorize == null) {
+            ToastUtils.showShort(getString(R.string.please_select_area))
+            return
+        }
+
+
+        var lastUser = DBUtils.lastUser
+
+        lastUser?.let {
+            //更新user
+            when (whoClick) {
+                1 -> {
+                    it.last_region_id = regionBean?.id.toString()
+                    it.last_authorizer_user_id = regionBean?.authorizer_id.toString()
+                }
+                2 -> {
+                    it.last_region_id = regionBeanAuthorize?.id.toString()
+                    it.last_authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
+                }
+            }
+            DBUtils.saveUser(lastUser)
+            Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id+"--------------------"+DBUtils.lastUser?.last_region_id)
+            PopUtil.dismiss(pop)
+
+
+            DBUtils.deleteLocalData()
+            //判断是否用户是首次在这个手机登录此账号，是则同步数据
+            SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
+            SharedPreferencesUtils.setUserLogin(true)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+
+            hideLoadingDialog()
+            startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
+        }
+    }
+
 
     private fun syncComplet() {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
