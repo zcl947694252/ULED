@@ -124,20 +124,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         return false
     }
 
-    private fun initOnLayoutListener() {
-        val view = this.window.decorView
-        val viewTreeObserver = view.viewTreeObserver
-        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-//                lazyLoad()
-            }
-        })
-    }
-
-    private fun lazyLoad() {
-        step0Guide()
-    }
 
     private fun step0Guide() {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)

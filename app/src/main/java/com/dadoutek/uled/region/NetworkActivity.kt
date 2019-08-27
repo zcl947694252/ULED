@@ -104,11 +104,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         getQrInfo()
 
         mBuild = AlertDialog.Builder(this@NetworkActivity)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CARMER)
-            }
-        }
     }
 
     @SuppressLint("CheckResult")
@@ -227,6 +222,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         Log.e(TAG, "zcl******me**${list!!.size}")
         region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
         adapter = AreaItemAdapter(R.layout.item_area_net, list!!, lastUser)
+        Log.e("zcl_NetworkActivity", "zcl***设置adapter***$lastUser")
         adapter!!.setOnItemChildClickListener { _, view, position ->
             isShowType = 1
             setClickAction(position, view, list!!)
@@ -400,13 +396,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-                RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
-                    resetAllLight()// todo 失败的话怎么处理
-                    PopUtil.dismiss(pop)
-                    initData()
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
+                if (regionBean!!.count_all<=0){
+                    RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
+                        //resetAllLight()// todo 失败的话怎么处理
+                        PopUtil.dismiss(pop)
+                        initData()
+                    }, {
+                        ToastUtils.showShort(it.message)
+                    })
+                }else{
+                    ToastUtils.showLong(getString(R.string.please_restore_device))
+                }
             }
             R.id.pop_share_net -> {
                 lookAndMakeAuthorCode()
@@ -625,11 +625,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
             val lastUser = lastUser!!
-            if (regionBean!!.id.toString() == lastUser.last_region_id && regionBean!!.id.toString() == lastUser.last_region_id)//使用中不能删除
-                if (lastUser.last_authorizer_user_id == null || regionBean!!.authorizer_id == lastUser.last_authorizer_user_id.toInt()) {
+            //使用中不能删除
+            //2                                                "2"                         300551                                   "300551"
+            val b = regionBean!!.id.toString() == lastUser.last_region_id.toString()
+            val b1 = regionBean!!.authorizer_id.toString() == lastUser.last_authorizer_user_id.toString()
+
+            Log.e("zcl", "zcl***tankuang***$b-----------$b1")
+
+            if (b && b1){// 2 300551
                     it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                    it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
                     it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+                    it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
                 } else {
                     it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
                     it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
@@ -639,9 +645,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
                 it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
                 it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
-            } else {
-                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
-                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
             }
 
             if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
@@ -678,7 +681,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-    fun checkNetworkAndSyncRegion(activity: Activity?) {
+    private fun checkNetworkAndSyncRegion(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -749,7 +752,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             //更新last—region-id
             DBUtils.saveUser(it)
             //下拉数据
-            SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGet)
+            SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallbackGets)
 
             view?.findViewById<LinearLayout>(R.id.pop_unbind_net_ly)?.isClickable = false
             view?.findViewById<ImageView>(R.id.pop_unbind_net)?.setImageResource(R.mipmap.icon_untied)
@@ -783,7 +786,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
 
-    var syncCallbackGet: SyncCallback = object : SyncCallback {
+    var syncCallbackGets: SyncCallback = object : SyncCallback {
         override fun start() {}
         override fun complete() {
             Log.e(TAG, "zcl******下拉数据成功")
@@ -841,7 +844,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_CARMER) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openScan()
+                var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+                startActivityForResult(intent, REQUEST_CODE)
             } else {
                 ToastUtils.showShort(getString(R.string.fail_parse_qr))
             }
@@ -849,8 +853,17 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun openScan() {
-        var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
-        startActivityForResult(intent, REQUEST_CODE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CARMER)
+            }else{
+                var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+                startActivityForResult(intent, REQUEST_CODE)
+            }
+        }else{
+            var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+            startActivityForResult(intent, REQUEST_CODE)
+        }
     }
 
     override fun onResume() {
@@ -869,7 +882,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     override fun notifyWSTransferData() {
         super.notifyWSTransferData()
-
     }
 
 }

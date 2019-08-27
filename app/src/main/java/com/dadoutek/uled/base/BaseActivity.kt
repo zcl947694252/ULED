@@ -27,6 +27,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.SplashActivity
@@ -60,12 +61,13 @@ import java.util.concurrent.TimeUnit
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${//GlobalScope.launch { delay(1000) } //todo 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程}$
  */
 
 abstract class BaseActivity : AppCompatActivity() {
+    private var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
-    private  var compositeDisposable: CompositeDisposable? = null
+    private var compositeDisposable: CompositeDisposable? = null
     private var pop: PopupWindow? = null
     private var popView: View? = null
     private var dialog: Dialog? = null
@@ -107,6 +109,7 @@ abstract class BaseActivity : AppCompatActivity() {
         initView()
         initData()
         initListener()
+        initOnLayoutListener()
     }
 
     abstract fun setLayoutID(): Int
@@ -142,13 +145,32 @@ abstract class BaseActivity : AppCompatActivity() {
             }
 
             authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe { topicMessage ->
-                Log.e(TAGS, "收到解除授权信息:$topicMessage")
                 val payloadCode = topicMessage.payload
                 val codeBean = JSONObject(payloadCode)
                 val phone = codeBean.get("authorizer_user_phone")
                 val regionName = codeBean.get("region_name")
-                Log.e(TAGS, "zcl***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
-                makeCodeDialog(2, phone, "",regionName)//2代表解除授权信息type
+                val authorizerUserId = codeBean.get("authorizer_user_id")
+                val rid = codeBean.get("rid")
+                Log.e(TAGS, "zcl***收到解除授权信息***获取消息$payloadCode------------$phone----------------$regionName-----------")
+                val user = DBUtils.lastUser
+
+                user?.let {
+                    Log.e("zcl_BaseActivity", "zcl****判断**${user.last_authorizer_user_id == authorizerUserId}------${user.last_region_id == rid}------authorizerUserId--$authorizerUserId-----$rid")
+                    if (user.last_authorizer_user_id == authorizerUserId.toString() && user.last_region_id == rid.toString()) {
+                        user.last_region_id = 1.toString()
+                        user.last_authorizer_user_id = user.id.toString()
+
+                        DBUtils.deleteAllData()
+                        //创建数据库
+                        AccountModel.initDatBase(it)
+                        //更新last—region-id
+                        DBUtils.saveUser(user)
+                        //下拉数据
+                        Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
+                        SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                    }
+                }
+                makeCodeDialog(2, phone, "", regionName)//2代表解除授权信息type
             }
 
             loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe { topicMessage ->
@@ -179,11 +201,13 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+
+
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
     private fun makeCodeDialog(type: Int, phone: Any, account: Any, regionName: Any) {
         //移交码为0授权码为1
         var title: String? = null
-        var recever: String
+        var recever: String? = null
 
         when (type) {
             0 -> {
@@ -195,18 +219,18 @@ abstract class BaseActivity : AppCompatActivity() {
                 recever = getString(R.string.recevicer)
             }
             2 -> {
-                title = getString(R.string.author_region_unAuthorized,regionName)
-                recever = getString(R.string.author_region_receviced)
+                title = getString(R.string.author_region_unAuthorized, regionName)
+                recever = getString(R.string.licensor)
             }
         }
-       //todo  订阅区分逻辑 授权者被授权按着
+        //todo  订阅区分逻辑 授权者被授权按着
 
 
         runOnUiThread {
-                popView?.let {
+            popView?.let {
                 it.findViewById<TextView>(R.id.code_warm_title).text = title
 
-                it.findViewById<TextView>(R.id.code_warm_context).text = string + phone
+                it.findViewById<TextView>(R.id.code_warm_context).text = recever + phone
 
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
@@ -215,37 +239,38 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
                 notifyWSData()
-                if (!this@BaseActivity.isFinishing && !pop!!.isShowing)
+                if (!this@BaseActivity.isFinishing && !pop!!.isShowing&&!Constant.isTelBase)
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }
         }
 
 
-        if (type == 0) {
-            //修改密码
-            val user = SharedPreferencesUtils.getLastUser()
-            DBUtils.deleteAllData()
-            user?.let {
-                val split = user.split("-")
-                if (split.size < 3)
-                    return@let
-                Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
+        when (type) {
+            0 -> { //修改密码
+                val user = SharedPreferencesUtils.getLastUser()
+                DBUtils.deleteAllData()
+                user?.let {
+                    val split = user.split("-")
+                    if (split.size < 3)
+                        return@let
+                    Log.e("zcl", "zcl***修改密码***" + split[0] + "------" + split[1] + ":===" + split[2] + "====" + account)
 
-                NetworkFactory.getApi()
-                        .putPassword(account.toString(), NetworkFactory.md5(split[1]))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            Log.e("zcl", "zcl修改密码******${it.message}")
-                            SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
-                            codeStompClient?.dispose()
-                            loginStompClient?.isDisposed
-                            normalSubscribe?.dispose()
-                            longOperation?.cancel(true)
-                            TelinkLightService.Instance()?.disconnect()
-                            TelinkLightService.Instance()?.idleMode(true)
-                            SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
-                        }
+                    NetworkFactory.getApi()
+                            .putPassword(account.toString(), NetworkFactory.md5(split[1]))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                Log.e("zcl", "zcl修改密码******${it.message}")
+                                SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
+                                codeStompClient?.dispose()
+                                loginStompClient?.isDisposed
+                                normalSubscribe?.dispose()
+                                longOperation?.cancel(true)
+                                TelinkLightService.Instance()?.disconnect()
+                                TelinkLightService.Instance()?.idleMode(true)
+                                SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
+                            }
+                }
             }
         }
     }
@@ -256,9 +281,19 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        Constant.isTelBase = false
         if (SharedPreferencesHelper.getBoolean(this@BaseActivity, Constant.IS_LOGIN, false)) {
             longOperation = LongOperation()
             longOperation!!.execute()
+        }
+    }
+
+    fun initOnLayoutListener() {
+        var view = window.decorView
+        var viewTreeObserver = view.viewTreeObserver
+        viewTreeObserver.addOnGlobalLayoutListener {
+            isRuning = true
+            view.viewTreeObserver.removeOnGlobalLayoutListener({})
         }
     }
 
@@ -267,9 +302,17 @@ abstract class BaseActivity : AppCompatActivity() {
         codeStompClient?.dispose()
         loginStompClient?.isDisposed
         normalSubscribe?.dispose()
+        isRuning = false
         longOperation?.cancel(true)
     }
 
+
+    internal var syncCallbackGet: SyncCallback = object : SyncCallback {
+        override fun start() {}
+        override fun complete() {}
+        override fun error(msg: String) {
+        }
+    }
 
     /**
      * 检查网络上传数据
@@ -355,7 +398,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
 
-    private val allLights: List<DbLight>
+    val allLights: List<DbLight>
         get() {
             val groupList = DBUtils.groupList
             val lightList = ArrayList<DbLight>()
@@ -366,7 +409,7 @@ abstract class BaseActivity : AppCompatActivity() {
             return lightList
         }
 
-    private val allCutain: List<DbCurtain>
+    val allCutain: List<DbCurtain>
         get() {
             val groupList = DBUtils.groupList
             val lightList = ArrayList<DbCurtain>()
@@ -378,7 +421,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
 
-    private val allRely: List<DbConnector>
+    val allRely: List<DbConnector>
         get() {
             val groupList = DBUtils.groupList
             val lightList = ArrayList<DbConnector>()
@@ -395,6 +438,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
+
         var meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
             for (k in lightList.indices) {
@@ -418,11 +462,9 @@ abstract class BaseActivity : AppCompatActivity() {
             Commander.resetLights(meshAdre, {
                 SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, false)
                 syncData()
-                this?.bnve?.currentItem = 0
-                null
+                this.bnve?.currentItem = 0
             }, {
                 SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, false)
-                null
             })
         }
         if (meshAdre.isEmpty()) {
@@ -436,7 +478,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 hideLoadingDialog()
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { aLong -> }
+                        .subscribe { }
 
                 if (compositeDisposable!!.isDisposed) {
                     compositeDisposable = CompositeDisposable()
@@ -448,6 +490,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 hideLoadingDialog()
                 ToastUtils.showShort(R.string.backup_failed)
             }
+
             override fun start() {}
         })
     }

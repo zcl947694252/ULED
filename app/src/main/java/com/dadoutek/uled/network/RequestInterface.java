@@ -161,14 +161,15 @@ public interface RequestInterface {
 
     //组相关接口
     //添加组
-    @POST("group/add/{region_id}/{gid}")
+    //@POST("group/add/{region_id}/{gid}")
+    @POST("group/add/{gid}")
     Observable<Response<String>> addGroup(@Header("token") String token,
                                           @Body DbGroup dbGroup,
 //                                          @Field("meshAddr") int meshAddr,
 //                                          @Field("name") String name,
 //                                          @Field("brightness") int brightness,
 //                                          @Field("colorTemperature") int colorTemperature,
-                                          @Path("region_id") int region_id,
+                                          //@Path("region_id") int region_id,
                                           @Path("gid") int gid);
 
     //获取组列表
@@ -397,9 +398,9 @@ public interface RequestInterface {
 
     @GET("app/getNewVersion")
     Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero, @Query("lang") int zero_one);
-
+    //用于检测是都注册
     @GET("auth/isRegister")
-    Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);
+    Observable<Response<Boolean>> isRegister(@Query("phone") String phoneNumber);
 
     //59、解析码
     //http://dev.dadoutek.com/smartlight/auth/code/parse

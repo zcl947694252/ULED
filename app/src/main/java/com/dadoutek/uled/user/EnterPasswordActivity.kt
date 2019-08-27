@@ -207,7 +207,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             AccountModel.login(phone!!, editPassWord!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
-                            Log.e("zcl","zcl登录成功返回******"+dbUser)
+                            Log.e("zcl", "zcl登录成功返回******$dbUser")
                             SharedPreferencesHelper.putString(this@EnterPasswordActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据

@@ -511,7 +511,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             img_function1?.visibility = View.VISIBLE
 
             isDelete = false
-            adaper!!.changeState(isDelete)
+            adaper?.changeState(isDelete)
             for (i in scenesListData!!.indices) {
                 if (scenesListData!![i].isSelected) {
                     scenesListData!![i].isSelected = false

@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Bundle
 import android.os.Handler
@@ -137,17 +138,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-    internal var isClickExlogin = false
     var listSnackbar: ArrayList<Snackbar>? = null
-    private var isState = false
-    var islowVersion: Boolean = false
-    var b1: Boolean = false
+
     private val mReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-                val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-                when (state) {
+                when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                     BluetoothAdapter.STATE_ON -> {
                         TelinkLightService.Instance().idleMode(true)
                         retryConnectCount = 0
@@ -164,20 +161,23 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-        var list = DBUtils.getAllUser()
-//        com.xiaomi.market.sdk.Log.d("dataSize1", list.size.toString())
 
         detectUpdate()
         checkVersionAvailable()
-
+        requestCarmer()
         listSnackbar = kotlin.collections.ArrayList(4)
 
         this.setContentView(R.layout.activity_main)
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         isCreate = true
+    }
+
+    private fun requestCarmer() {
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.CAMERA), 0)
+        }
     }
 
     /**
@@ -209,7 +209,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             AlertDialog.Builder(this@MainActivity)
                     .setCancelable(false)
                     .setMessage(getString(R.string.version_disabled))
-                    .setPositiveButton(R.string.exit) { dialog, which ->
+                    .setPositiveButton(R.string.exit) { _, _ ->
                         LogOutAndExitApp()
                     }
 
@@ -538,10 +538,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun initBottomNavigation() {
-        deviceFragment = DeviceListFragment()
+       // deviceFragment = DeviceListFragment()
+        newDeviceFragment = NewDevieFragment()
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
-        newDeviceFragment = NewDevieFragment()
         meFragment = MeFragment()
         val fragments: List<Fragment> = listOf(newDeviceFragment, groupFragment, sceneFragment, meFragment)
         val vpAdapter = ViewPagerAdapter(supportFragmentManager, fragments)

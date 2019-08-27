@@ -858,7 +858,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         initClick();
     }
 
-    private void initOnLayoutListener() {
+     public void initOnLayoutListener() {
         final View view = getWindow().getDecorView();
         final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

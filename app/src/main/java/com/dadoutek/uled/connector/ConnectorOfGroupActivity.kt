@@ -163,12 +163,12 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         finish()
     }
 
-    private fun initOnLayoutListener() {
+     override fun initOnLayoutListener() {
         val view = getWindow().getDecorView()
         val viewTreeObserver = view.getViewTreeObserver()
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this)
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
                 lazyLoad()
             }
         })

@@ -1257,54 +1257,55 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
         val showBrightness = w
         var showW = ws
-        Thread {
 
+        GlobalScope.launch {//todo 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程
             try {
-
-                if (w!! > Constant.MAX_VALUE) {
+                if (w > Constant.MAX_VALUE)
                     w = Constant.MAX_VALUE
-                }
-                if (ws > Constant.MAX_VALUE) {
+
+                if (ws > Constant.MAX_VALUE)
                     ws = Constant.MAX_VALUE
-                }
+
                 if (ws == -1) {
                     ws = 0
                     showW = 0
                 }
 
-                var addr = 0
-                if (currentShowGroupSetPage) {
-                    addr = group?.meshAddr!!
-                } else {
-                    addr = light?.meshAddr!!
-                }
+                var addr: Int
+                addr = if (currentShowGroupSetPage)
+                    group?.meshAddr!!
+                else
+                    light?.meshAddr!!
 
                 val opcode: Byte = Opcode.SET_LUM
                 val opcodeW: Byte = Opcode.SET_W_LUM
 
                 val paramsW: ByteArray = byteArrayOf(ws.toByte())
-                val params: ByteArray = byteArrayOf(w!!.toByte())
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr!!, paramsW)
+                val params: ByteArray = byteArrayOf(w.toByte())
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
 
-                Thread.sleep(80)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
+                //Thread.sleep(80)
+                delay(80)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                delay(80)
 
-                Thread.sleep(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
 
                 if (currentShowGroupSetPage) {
-                    group?.brightness = showBrightness!!
+                    group?.brightness = showBrightness
                     group?.color = color
                 } else {
-                    light?.brightness = showBrightness!!
+                    light?.brightness = showBrightness
                     light?.color = color
                 }
 
-               //("changedff2" + opcode + "--" + addr + "--" + brightness)
+                //("changedff2" + opcode + "--" + addr + "--" + brightness)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+        }
+
+       // Thread {}.start()
 
         sbBrightness?.progress = showBrightness!!
         sb_w_bright_num.text = showBrightness.toString() + "%"
@@ -1502,13 +1503,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
-        Thread {
+        GlobalScope.launch {
             val dbLight = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
             if (dbLight != null && dbLight.macAddr == "0") {
                 dbLight.macAddr = deviceInfo.macAddress
                 DBUtils.updateLight(dbLight)
             }
-        }.start()
+        }
 
         if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
 //            connect(deviceInfo.macAddress)
@@ -1541,27 +1542,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
-
-//        val deviceInfo = event.args
-//
-//        when (deviceInfo.status) {
-//            LightAdapter.STATUS_LOGIN -> {
-//                hideLoadingDialog()
-//                isLoginSuccess = true
-//                mConnectTimer?.dispose()
-//            }
-//            LightAdapter.STATUS_LOGOUT -> {
-//                autoConnect()
-//                mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-//                        .subscribe { aLong ->
-//                            com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
-////                            showLoadingDialog()
-//                            ToastUtils.showLong(getString(R.string.connect_failed))
-//                            finish()
-//                        }
-//            }
-//        }
-
         val deviceInfo = event.args
 
         when (deviceInfo.status) {
@@ -1686,17 +1666,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
                 addScanListeners()
                 TelinkLightService.Instance()?.startScan(params)
-//                startScanTimeout()
                 startCheckRSSITimer()
-
-//                            } else {
-//                                //没有授予权限
-//                                DialogUtils.showNoBlePermissionDialog(this, {
-//                                    retryConnectCount = 0
-//                                    startScan()
-//                                }, { finish() })
-//                            }
-//                        }
             }
     }
 
@@ -1713,7 +1683,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                       //"onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -1736,22 +1705,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun onLeScanTimeout() {
-       //"onErrorReport: onLeScanTimeout")
-//        hideLoadingDialog()
-//        ToastUtil.showToast(this,getString(R.string.connect_failed))
-//        if (mConnectSnackBar) {
-//        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
-//        }
-//        } else {
-//        retryConnect()
-//        TelinkLightService.Instance()?.idleMode(true)
-//        LeBluetooth.getInstance().stopScan()
-//        startScan()
-//        }
-
     }
 
     @SuppressLint("CheckResult")
@@ -1777,8 +1733,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             e.printStackTrace()
         }
     }
-
-//    private fun showIsConnect
 
     /**
      * 自动重连

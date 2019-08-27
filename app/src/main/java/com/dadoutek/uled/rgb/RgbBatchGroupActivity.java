@@ -17,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -856,18 +855,6 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         initData();
         initView();
         initClick();
-    }
-
-    private void initOnLayoutListener() {
-        final View view = getWindow().getDecorView();
-        final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                lazyLoad();
-            }
-        });
     }
 
     public void lazyLoad() {

@@ -115,6 +115,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         supportActionBar?.title = getString(R.string.user_login_title)
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onPause() {
         super.onPause()
         if (this.mWakeLock != null) {
@@ -122,6 +123,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onResume() {
         super.onResume()
         detectUpdate()

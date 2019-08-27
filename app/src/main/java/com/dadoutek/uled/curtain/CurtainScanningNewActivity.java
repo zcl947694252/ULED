@@ -943,7 +943,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         startScan(0);
     }
 
-    private void initOnLayoutListener() {
+     public void initOnLayoutListener() {
         final View view = getWindow().getDecorView();
         final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {

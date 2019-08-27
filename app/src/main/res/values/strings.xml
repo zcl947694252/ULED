@@ -879,6 +879,8 @@
     <string name="hint">Hint</string>
     <string name="please_select_area">Please select area</string>
     <string name="please_input_region_name">Please enter a zone name</string>
-    <string name="author_region_unAuthorized">User disauthorized zone %2$s</string>
+    <string name="author_region_unAuthorized">The authorizer disauthorized the zone %1$s</string>
+    <string name="licensor">Licensor:</string>
+    <string name="please_restore_device">Please restore all devices in the area to factory Settings before deleting the area</string>
 
 </resources>

@@ -74,10 +74,6 @@ class NewDevieFragment : BaseFragment() {
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getViewThis(inflater)
         initToolBar(view)
@@ -88,11 +84,6 @@ class NewDevieFragment : BaseFragment() {
             initOnLayoutListener()
         }
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
     }
 
     override fun onResume() {
@@ -176,8 +167,7 @@ class NewDevieFragment : BaseFragment() {
     private fun guide2(): Controller? {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
         if (guideShowCurrentPage) {
-            var guide3: TextView? = null
-            guide3 = install_device
+            var guide3: TextView? = install_device
 
             return GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
                     .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
@@ -235,6 +225,7 @@ class NewDevieFragment : BaseFragment() {
 
             recyclerView?.itemAnimator = DefaultItemAnimator()
             newDeviceAdapter?.onItemClickListener = onItemClickListener
+            recyclerView?:return
             newDeviceAdapter?.bindToRecyclerView(recyclerView)
         }
     }
@@ -394,7 +385,7 @@ class NewDevieFragment : BaseFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is CallbackLinkMainActAndFragment) {
-            callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
+            callbackLinkMainActAndFragment = context
         }
     }
 

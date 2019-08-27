@@ -41,7 +41,6 @@ public class NetworkFactory {
 
 
     public static RequestInterface getApi() {
-
         if (okHttpClient == null) {
             okHttpClient = initHttpClient();
         }

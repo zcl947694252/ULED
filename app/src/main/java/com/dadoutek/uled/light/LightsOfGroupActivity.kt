@@ -141,7 +141,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         initOnLayoutListener()
     }
 
-    private fun initOnLayoutListener() {
+     override fun initOnLayoutListener() {
         val view = getWindow().getDecorView()
         val viewTreeObserver = view.getViewTreeObserver()
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {

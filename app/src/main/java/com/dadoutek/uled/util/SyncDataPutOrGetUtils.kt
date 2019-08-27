@@ -3,6 +3,7 @@ package com.dadoutek.uled.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -33,6 +34,8 @@ class SyncDataPutOrGetUtils {
         /********************************同步数据之上传数据 */
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
+
+
 
             Thread {
 
@@ -70,8 +73,7 @@ class SyncDataPutOrGetUtils {
 
                         if (observables.isNotEmpty()) {
                             Observable.mergeArrayDelayError<String>(*observables)
-                                    .doFinally {
-                                    }
+                                    .doFinally {}
                                     .subscribe(object : NetworkObserver<String?>() {
                                         override fun onComplete() {
                                             GlobalScope.launch(Dispatchers.Main) {
@@ -86,6 +88,7 @@ class SyncDataPutOrGetUtils {
                                         }
 
                                         override fun onError(e: Throwable) {
+                                            LogUtils.d(e.localizedMessage)
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.error(e.cause.toString())
                                             }
@@ -104,19 +107,23 @@ class SyncDataPutOrGetUtils {
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
                                      token: String, id: Long): Observable<String>? {
             if (changeId != null) {
+                Log.e("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
                             Constant.DB_ADD -> {//todo 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
-
-                                return group?.let { GroupMdodel.add(token, it, group.belongRegionId, id, changeId) }!!
+//                                GroupMdodel.add(token, group!!, /*group!!.belongRegionId,*/ id, changeId)?.subscribe(
+//                                        { Log.e("zcl", "zcl******$it"); }, {
+//                                    Log.e("zcl", "zcl******${it.localizedMessage}")
+//                                })
+                                return group?.let { GroupMdodel.add(token, it, /*group.belongRegionId, */id, changeId) }!!
                             }
                             Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val group = DBUtils.getGroupByID(changeId)
                                 return group?.let {
-                                    return GroupMdodel.add(token, group, group.belongRegionId, id, changeId)!!
+                                    return GroupMdodel.add(token, group, /*group.belongRegionId, */id, changeId)!!
                                 }
                             }
                         }
@@ -460,24 +467,24 @@ class SyncDataPutOrGetUtils {
                     syncCallBack.error(it.message)
                     ToastUtils.showLong(it.message)
                 }
-                    /*  object : NetworkObserver<List<DbScene>>() {
-                          override fun onNext(item: List<DbScene>) {
-                              //登录后同步数据完成再上传一次数据
-                              syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
-                              SharedPreferencesUtils.saveCurrentUserList(accountNow)
-  //                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                              GlobalScope.launch(Dispatchers.Main) {
-                                  syncCallBack.complete()
-                              }
+                /*  object : NetworkObserver<List<DbScene>>() {
+                      override fun onNext(item: List<DbScene>) {
+                          //登录后同步数据完成再上传一次数据
+                          syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                          SharedPreferencesUtils.saveCurrentUserList(accountNow)
+//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+                          GlobalScope.launch(Dispatchers.Main) {
+                              syncCallBack.complete()
                           }
+                      }
 
-                          override fun onError(e: Throwable) {
-                              super.onError(e)
-                              GlobalScope.launch(Dispatchers.Main) {
-                                  syncCallBack.error(e.message)
-                              }
+                      override fun onError(e: Throwable) {
+                          super.onError(e)
+                          GlobalScope.launch(Dispatchers.Main) {
+                              syncCallBack.error(e.message)
                           }
-                      }*/
+                      }
+                  }*/
             }
             )
         }

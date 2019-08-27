@@ -290,4 +290,6 @@ public class Constant implements Serializable {
     public static final int REGION_TYPE=1;
     //授权区域列别
     public static final int REGION_AUTHORIZE_TYPE=2;
+    //判断是否是telbase类
+    public static boolean isTelBase =true;
 }

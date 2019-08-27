@@ -20,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -703,7 +702,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         }
         disableEventListenerInGrouping();
 
-        initOnLayoutListener();
     }
 
     OnRecyclerviewItemLongClickListener onRecyclerviewItemLongClickListener = (v, position) -> {
@@ -938,18 +936,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         initView();
         initClick();
         startScan(0);
-    }
-
-    private void initOnLayoutListener() {
-        final View view = getWindow().getDecorView();
-        final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                lazyLoad();
-            }
-        });
     }
 
     public void lazyLoad() {

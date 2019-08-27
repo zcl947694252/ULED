@@ -148,8 +148,11 @@ public class DbUser {
                 ", password='" + password + '\'' +
                 ", last_region_id='" + last_region_id + '\'' +
                 ", authorizer_user_id='" + authorizer_user_id + '\'' +
+                ", login_state_key='" + login_state_key + '\'' +
+                ", last_authorizer_user_id='" + last_authorizer_user_id + '\'' +
                 '}';
     }
+
     public String getLogin_state_key() {
         return this.login_state_key;
     }

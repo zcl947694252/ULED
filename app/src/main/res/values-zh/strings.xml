@@ -803,5 +803,7 @@
     <string name="hint">提示</string>
     <string name="please_select_area">请选择区域</string>
     <string name="please_input_region_name">请输入区域名称</string>
-    <string name="author_region_unAuthorized">用户解除了区域%2$s的授权</string>
+    <string name="author_region_unAuthorized">授权者解除了区域%1$s的授权</string>
+    <string name="licensor">授权者:</string>
+    <string name="please_restore_device">请先将区域下所有设备恢复出厂设置后再删除该区域</string>
 </resources>

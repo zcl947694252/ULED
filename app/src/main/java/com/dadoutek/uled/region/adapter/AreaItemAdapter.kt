@@ -24,7 +24,6 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var user: DbUser
                     it.setText(R.id.item_area_title, item.name + mContext.getString(R.string.total_device, item.count_all))
 
                 val b = item.ref_users != null && item.ref_users!!.isNotEmpty()
-
                 if (b) {
                     personTv.text = mContext.getString(R.string.share_person, item.ref_users!!.size)
                     personTv.visibility = View.VISIBLE
@@ -37,10 +36,12 @@ class AreaItemAdapter(layoutResId: Int, data: List<RegionBean>, var user: DbUser
                     it.setText(R.id.item_area_state, mContext.getString(R.string.in_use))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_nine))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.blue_background))
+                            .setTextColor(R.id.item_area_share_person, mContext.getColor(R.color.blue_background))
                 } else {
                     it.setText(R.id.item_area_state, mContext.getString(R.string.use))
                             .setTextColor(R.id.item_area_state, mContext.getColor(R.color.black_three))
                             .setTextColor(R.id.item_area_title, mContext.getColor(R.color.black_three))
+                            .setTextColor(R.id.item_area_share_person, mContext.getColor(R.color.black_three))
                 }
             }
         }

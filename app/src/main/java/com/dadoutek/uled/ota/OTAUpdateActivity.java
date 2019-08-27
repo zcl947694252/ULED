@@ -353,7 +353,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      * hasLow Confirm OTA needed
      */
     private void start() {
-
         boolean hasHigh = false;
         boolean hasLow = false;
         for (DbLight light : onlineLights) {
@@ -379,9 +378,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             } else {
                 startScan();
             }
-
-
-//            }
         } else {
             text_info.setVisibility(View.VISIBLE);
             text_info.setText(R.string.the_last_version);
