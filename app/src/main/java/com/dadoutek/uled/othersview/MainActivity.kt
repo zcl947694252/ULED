@@ -538,7 +538,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun initBottomNavigation() {
-       // deviceFragment = DeviceListFragment()
+        deviceFragment = DeviceListFragment()//暂时无用
         newDeviceFragment = NewDevieFragment()
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
