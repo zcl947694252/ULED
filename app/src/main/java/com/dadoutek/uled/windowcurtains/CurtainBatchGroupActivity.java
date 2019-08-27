@@ -4,10 +4,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,19 +35,15 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
-import com.dadoutek.uled.connector.ConnectorBatchGroupActivity;
 import com.dadoutek.uled.connector.ScanningConnectorActivity;
-import com.dadoutek.uled.group.BatchGroupActivity;
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -284,7 +279,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+                  TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
                 }));
     }
 
@@ -361,7 +356,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-//        TelinkLightService.Instance().idleMode(true);
+//      TelinkLightService.Instance().idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -428,7 +423,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
 
-//                TelinkLightService.Instance().idleMode(true);
+//              TelinkLightService.Instance().idleMode(true);
                 //目前测试调到主页
                 doFinish();
             } else {
@@ -808,7 +803,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 //                LeBluetooth.getInstance().stopScan();
-//                TelinkLightService.Instance().idleMode(true);
+//              TelinkLightService.Instance().idleMode(true);
 
                 startConnect = true;
 
@@ -826,7 +821,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 new Thread(() -> {
                     try {
                         Thread.sleep(300);
-                        TelinkLightService.Instance().autoConnect(connectParams);
+                      TelinkLightService.Instance().autoConnect(connectParams);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -839,14 +834,14 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
             refreshNotifyParams.setRefreshRepeatCount(1);
             refreshNotifyParams.setRefreshInterval(2000);
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
+          TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
         }
     }
 
     private static final int TIME_OUT_CONNECT = 15;
 
     public void connectDevice(String mac) {
-        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
+      TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
     }
 
     @Override
@@ -863,7 +858,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
         initClick();
     }
 
-    private void initOnLayoutListener() {
+     public void initOnLayoutListener() {
         final View view = getWindow().getDecorView();
         final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -1329,7 +1324,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void onNError(final DeviceEvent event) {
 
-        TelinkLightService.Instance().idleMode(true);
+      TelinkLightService.Instance().idleMode(true);
         TelinkLog.d("DeviceScanningActivity#onNError");
         onLeScanTimeout();
     }
@@ -1339,9 +1334,9 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
      * （扫描结束）
      */
     private void onLeScanTimeout() {
-//        TelinkLightService.Instance()
+//        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
-        TelinkLightService.Instance().idleMode(true);
+      TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);
         if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
             scanSuccess();
@@ -1468,6 +1463,6 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
 //        log("login");
         String account = DBUtils.INSTANCE.getLastUser().getAccount();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16);
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
+      TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
     }
 }

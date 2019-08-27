@@ -16,6 +16,10 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="com.xiaomi.market.sdk.UPDATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.autofocus"/>
+
     <uses-permission
         android:name="android.permission.DEVICE_POWER"
         tools:ignore="ProtectedPermissions" />
@@ -40,7 +44,7 @@
         <activity android:name=".user.EnterConfirmationCodeActivity"
             android:screenOrientation="portrait" android:configChanges="orientation|keyboardHidden|screenSize"
             android:launchMode="singleInstance"/>
-        <activity android:name=".othersview.NetworkActivity"
+        <activity android:name=".region.NetworkActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".user.EnterPasswordActivity"
             android:screenOrientation="portrait"/>
@@ -324,6 +328,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".user.DeveloperActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".region.SettingActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".region.UnbindMeNetActivity"
             android:screenOrientation="portrait" />
     </application>
 

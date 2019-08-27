@@ -33,7 +33,7 @@ public class OtaDeviceListActivity extends TelinkBaseActivity implements Adapter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance()?.).idleMode(true);
 //        setContentView(R.layout.activity_ota_device_list);
 //        mApp = (TelinkLightApplication) this.getApplication();
 //        mDevices = DBUtils.INSTANCE.getAllLight();

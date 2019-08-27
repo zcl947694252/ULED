@@ -24,7 +24,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
@@ -83,12 +82,12 @@ import io.reactivex.schedulers.Schedulers;
  * 在OTA升级过程中会保存此时现在的所有设备信息（onlineLights），
  * 如果是从MainActivity页面跳转而来（1.自动连接的设备有上报MeshOTA进度信息；2主动连接之前本地保存的设备），需要读取一次版本信息\n
  * 并初始化onlineLights
- * 1. {@link MainActivity#onNotificationEvent(NotificationEvent)}；
- * 2. {@link MainActivity#onDeviceStatusChanged(DeviceEvent)}；
+ * 1. {@link MainActivity#//onNotificationEvent(NotificationEvent)}；
+ * 2. {@link MainActivity#//onDeviceStatusChanged(DeviceEvent)}；
  * <p>
- * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity#sendGetDeviceOtaStateCommand()},
- * \n\t 并通过 {@link OTAUpdateActivity#onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
- * 在continue MeshOTA和MeshOTA模式下 {@link OTAUpdateActivity#MODE_CONTINUE_MESH_OTA},{@link OTAUpdateActivity#MODE_MESH_OTA}
+ * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity#//sendGetDeviceOtaStateCommand()},
+ * \n\t 并通过 {@link OTAUpdateActivity#//onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
+ * 在continue MeshOTA和MeshOTA模式下 {@link OTAUpdateActivity#//MODE_CONTINUE_MESH_OTA},{@link OTAUpdateActivity#//MODE_MESH_OTA}
  * <p>
  * <p>
  * 校验通过后，会开始动作
@@ -195,7 +194,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
 ////                    tv_log.scrollTo(0, scroll_amount);
                         sv_log.fullScroll(View.FOCUS_DOWN);
 ////                    ((ScrollView) tv_log.getParent()).fullScroll(ScrollView.FOCUS_DOWN);
-                        LogUtils.d("\n" + time + ":" + msg.obj.toString());
+                       //("\n" + time + ":" + msg.obj.toString());
                     }
                     break;
             }
@@ -631,6 +630,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
     private void parseFile() {
         try {
             byte[] version = new byte[4];
+            Log.e("zcl","zcl******mPath"+mPath);
             InputStream stream = new FileInputStream(mPath);
             int length = stream.available();
             mFirmwareData = new byte[length];

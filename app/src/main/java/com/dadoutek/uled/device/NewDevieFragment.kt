@@ -6,7 +6,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,10 +73,6 @@ class NewDevieFragment : BaseFragment() {
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getViewThis(inflater)
@@ -168,8 +167,7 @@ class NewDevieFragment : BaseFragment() {
     private fun guide2(): Controller? {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_GROUPLIST_KEY, false)
         if (guideShowCurrentPage) {
-            var guide3: TextView? = null
-            guide3 = install_device
+            var guide3: TextView? = install_device
 
             return GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
                     .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
@@ -197,7 +195,7 @@ class NewDevieFragment : BaseFragment() {
     }
 
     private fun initView(view: View?) {
-        recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
+        recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
         newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
         recyclerView?.itemAnimator = DefaultItemAnimator()
 
@@ -222,40 +220,16 @@ class NewDevieFragment : BaseFragment() {
             }
 
             allDeviceList = ArrayList()
-            val layoutmanager = LinearLayoutManager(activity)
-//        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView!!.layoutManager = GridLayoutManager(this.activity, 2)
+            recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
             newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
 
-//        val decoration = DividerItemDecoration(activity!!,
-//                DividerItemDecoration
-//                        .VERTICAL)=
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-//                .divider)))
-//        //添加分割线
-//        recyclerView?.addItemDecoration(decoration)
-//            recyclerView?.addItemDecoration(SpaceItemDecoration(32))
             recyclerView?.itemAnimator = DefaultItemAnimator()
-
-            newDeviceAdapter!!.setOnItemClickListener(onItemClickListener)
-//        adapter!!.addFooterView(getFooterView())
-            newDeviceAdapter!!.bindToRecyclerView(recyclerView)
+            newDeviceAdapter?.onItemClickListener = onItemClickListener
+            recyclerView?:return
+            newDeviceAdapter?.bindToRecyclerView(recyclerView)
         }
-//            deviceTypeList = ArrayList<String>()
-//            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
-//            for(installDeviceModel in installList){
-//                deviceTypeList!!.add(installDeviceModel.deviceType)
-//            }
-//
-//            allDeviceList = ArrayList()
-//        }
     }
 
-//    allDeviceList!!.add(DBUtils.getAllNormalLight())
-//    allDeviceList!!.add(DBUtils.getAllRGBLight())
-//    allDeviceList!!.add(DBUtils.getAllSwitch())
-//    allDeviceList!!.add(DBUtils.getAllSensor())
-//    allDeviceList!!.add(DBUtils.getAllCurtain())
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         var intent: Intent? = null
@@ -301,7 +275,7 @@ class NewDevieFragment : BaseFragment() {
     private fun getViewThis(inflater: LayoutInflater): View? {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.fragment_new_device, null)
-        recyclerView = view.findViewById<RecyclerView>(R.id.deviceTypeList)
+        recyclerView = view.findViewById(R.id.deviceTypeList)
         return view
     }
 
@@ -411,7 +385,7 @@ class NewDevieFragment : BaseFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is CallbackLinkMainActAndFragment) {
-            callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
+            callbackLinkMainActAndFragment = context
         }
     }
 

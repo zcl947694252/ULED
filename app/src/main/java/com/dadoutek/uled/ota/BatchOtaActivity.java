@@ -1,8 +1,6 @@
 package com.dadoutek.uled.ota;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,12 +17,11 @@ import android.widget.Toast;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
+import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.othersview.FileSelectActivity;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
-import com.dadoutek.uled.model.DeviceInfo;
-import com.dadoutek.uled.model.Mesh;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -124,8 +121,8 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
         super.onDestroy();
         TelinkLog.LOG2FILE_ENABLE = false;
         mApp.removeEventListener(this);
-        TelinkLightService.Instance().startScan(null);
-        TelinkLightService.Instance().idleMode(true);
+       TelinkLightService.Instance().startScan(null);
+       TelinkLightService.Instance().idleMode(true);
     }
 
     @Override
@@ -197,8 +194,8 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
         params.setTimeoutSeconds(20);
         /*params.set(Parameters.PARAM_MESH_NAME, this.selectedDevice.meshName);
         params.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, 10);*/
-        TelinkLightService.Instance().idleMode(true);
-        TelinkLightService.Instance().startScan(params);
+       TelinkLightService.Instance().idleMode(true);
+       TelinkLightService.Instance().startScan(params);
     }
 
     /**
@@ -216,20 +213,20 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
         deviceInfo.macAddress = macAddress;
         deviceInfo.firmware = mFirmwareData;
         params.setDeviceInfo(deviceInfo);
-        TelinkLightService.Instance().idleMode(false);
-        TelinkLightService.Instance().startOta(params);*/
+       TelinkLightService.Instance().idleMode(false);
+       TelinkLightService.Instance().startOta(params);*/
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                //TelinkLightService.Instance().sendCommandNoResponse((byte) 0xD0, 0x0000, new byte[]{0x01, 0x00, 0x00});
-                TelinkLightService.Instance().startOta(mFirmwareData);
+                //TelinkLightService.Instance()?.).sendCommandNoResponse((byte) 0xD0, 0x0000, new byte[]{0x01, 0x00, 0x00});
+               TelinkLightService.Instance().startOta(mFirmwareData);
             }
         }, 500);
     }
 
     private void login() {
         Mesh currentMesh = this.mApp.getMesh();
-        TelinkLightService.Instance().login(Strings.stringToBytes(currentMesh.getName(), 16), Strings.stringToBytes(currentMesh.getPassword(), 16));
+       TelinkLightService.Instance().login(Strings.stringToBytes(currentMesh.getName(), 16), Strings.stringToBytes(currentMesh.getPassword(), 16));
     }
 
     private List<DeviceHolder> getSelectedDevices() {
@@ -289,7 +286,7 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
                 startOta();
                 break;
             case LeScanEvent.LE_SCAN_TIMEOUT:
-                TelinkLog.d(type + "    模式 : " + TelinkLightService.Instance().getMode());
+                TelinkLog.d(type + "    模式 : " +TelinkLightService.Instance().getMode());
                 startOta();
                 break;
         }
@@ -311,11 +308,11 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
                     onOtaProgress(deviceInfo.macAddress, deviceInfo.progress);
                 } else if (status == LightAdapter.STATUS_CONNECTED) {
                     //获取版本
-                    TelinkLightService.Instance().getFirmwareVersion();
+                   TelinkLightService.Instance().getFirmwareVersion();
                 } else if (status == LightAdapter.STATUS_LOGOUT) {
                     TelinkLog.d("-------------------------");
                     TelinkLog.d("断开连接 : " + event.getArgs().macAddress);
-                    TelinkLog.d("模式 : " + TelinkLightService.Instance().getMode());
+                    TelinkLog.d("模式 : " +TelinkLightService.Instance().getMode());
                     //com.telink.bluetooth.light.DeviceInfo deviceInfo = event.getArgs();
                     onOtaFailure(event.getArgs().macAddress);
                 } else if (status == LightAdapter.STATUS_OTA_COMPLETED) {
@@ -349,8 +346,8 @@ public class BatchOtaActivity extends TelinkBaseActivity implements EventListene
         DeviceHolder holder = findDeviceHolder(mac);
         if (holder != null && !holder.completed && holder.failureCount < maxRetry) {
             notFound = false;
-            TelinkLightService.Instance().idleMode(true);
-            TelinkLightService.Instance().connect(mac, 10);
+           TelinkLightService.Instance().idleMode(true);
+           TelinkLightService.Instance().connect(mac, 10);
         }
     }
 

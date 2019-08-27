@@ -43,16 +43,6 @@ public class QRCodeDataOperator {
 
         Gson gson = new Gson();
         return gson.toJson(tmpMesh);
-        /*JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("n", tmpMesh.n);
-            jsonObject.put("p", tmpMesh.p);
-//            jsonObject.put("d", tmpMesh.d);
-            jsonObject.putOpt("d", tmpMesh.d);
-            return jsonObject.toString();
-        }catch (Exception e){
-            return null;
-        }*/
     }
 
     public boolean parseData(String data) {

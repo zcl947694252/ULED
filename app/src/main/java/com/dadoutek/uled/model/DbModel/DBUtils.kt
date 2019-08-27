@@ -18,7 +18,7 @@ import java.util.*
 object DBUtils {
 
     val lastUser: DbUser?
-         get() {
+        get() {
             val list = DaoSessionInstance.getInstance().dbUserDao.queryBuilder().orderDesc(DbUserDao.Properties.Id).list()
             return if (list.size == 0) {
                 null
@@ -26,19 +26,37 @@ object DBUtils {
         }
 
     val lastRegion: DbRegion
-         get() {
+        get() {
             val list = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().orderDesc(DbRegionDao.Properties.Id).list()
             return list[0]
         }
 
-    val allLight: List<DbLight>//普通等
-         get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
+    val allLight: List<DbLight>
+        //普通等
+        get() = DaoSessionInstance.getInstance().dbLightDao.loadAll()
 
-    val allCurtain:List<DbCurtain>//窗帘
-         get()=DaoSessionInstance.getInstance().dbCurtainDao.loadAll()
+    val allCurtain: List<DbCurtain>
+        //窗帘
+        get() = DaoSessionInstance.getInstance().dbCurtainDao.loadAll()
 
-    val allRely :List<DbConnector>//蓝牙接收器
-        get()=DaoSessionInstance.getInstance().dbConnectorDao.loadAll()
+    val allRely: List<DbConnector>
+        //蓝牙接收器
+        get() = DaoSessionInstance.getInstance().dbConnectorDao.loadAll()
+
+    val sceneList: MutableList<DbScene>
+        //人体感应器
+        get() {
+            val allGIndex = -1
+            val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()
+
+            return qb.where(
+                    DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
+                    .list()
+        }
+
+    val swtichList: MutableList<DbSwitch>
+        //开关
+        get() = DaoSessionInstance.getInstance().dbSwitchDao.loadAll()
 
     val groupList: MutableList<DbGroup>
         get() {
@@ -48,83 +66,79 @@ object DBUtils {
             return qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion())).list()
         }
 
-    val swtichList: MutableList<DbSwitch>
-        get()=DaoSessionInstance.getInstance().dbSwitchDao.loadAll()
 
+    fun getgroupListWithType(context: Context): ArrayList<ItemTypeGroup> {
+        val allGIndex = -1
+        val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
+        var itemTypeGroup: ItemTypeGroup? = null
 
+        val allList = ArrayList<ItemTypeGroup>()
 
-     fun getgroupListWithType(context: Context) : ArrayList<ItemTypeGroup> {
-            val allGIndex = -1
-            val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
-            var itemTypeGroup : ItemTypeGroup?=null
-            
-            val allList = ArrayList<ItemTypeGroup>()
-            
-            val listAll = getAllGroupsOrderByIndex()
-            val normalList = ArrayList<DbGroup>()
-            val allLightList = ArrayList<DbGroup>()
-            val rgbList = ArrayList<DbGroup>()
-            val curtainList = ArrayList<DbGroup>()
-            val otherList = ArrayList<DbGroup>()
-            val connectorList=ArrayList<DbGroup>()
-         
-            for(group in listAll){
-              when(group.deviceType){
-                  Constant.DEVICE_TYPE_DEFAULT_ALL->{
-                      otherList.add(group)
-                  }
-                  Constant.DEVICE_TYPE_LIGHT_NORMAL->{
-                      normalList.add(group)
-                  }
-                  Constant.DEVICE_TYPE_LIGHT_RGB->{
-                      rgbList.add(group)
-                  }
-                  Constant.DEVICE_TYPE_CURTAIN->{
-                      curtainList.add(group)
-                  }
-                  Constant.DEVICE_TYPE_NO->{
-                      allLightList.add(group)
-                  }
-                  Constant.DEVICE_TYPE_CONNECTOR->{
-                      connectorList.add(group)
-                  }
-                  else->{
-                      otherList.add(group)
-                  }
-              }
+        val listAll = getAllGroupsOrderByIndex()
+        val normalList = ArrayList<DbGroup>()
+        val allLightList = ArrayList<DbGroup>()
+        val rgbList = ArrayList<DbGroup>()
+        val curtainList = ArrayList<DbGroup>()
+        val otherList = ArrayList<DbGroup>()
+        val connectorList = ArrayList<DbGroup>()
+
+        for (group in listAll) {
+            when (group.deviceType) {
+                Constant.DEVICE_TYPE_DEFAULT_ALL -> {
+                    otherList.add(group)
+                }
+                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                    normalList.add(group)
+                }
+                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                    rgbList.add(group)
+                }
+                Constant.DEVICE_TYPE_CURTAIN -> {
+                    curtainList.add(group)
+                }
+                Constant.DEVICE_TYPE_NO -> {
+                    allLightList.add(group)
+                }
+                Constant.DEVICE_TYPE_CONNECTOR -> {
+                    connectorList.add(group)
+                }
+                else -> {
+                    otherList.add(group)
+                }
             }
-
-         if(allLightList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.allLight),allLightList,R.drawable.icon_light_on)
-             allList.add(itemTypeGroup)
-         }
-
-         if(normalList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.normal_light),normalList,R.drawable.icon_light_on)
-             allList.add(itemTypeGroup)
-         }
-
-         if(rgbList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.rgb_light),rgbList,R.drawable.icon_light_on)
-             allList.add(itemTypeGroup)
-         }
-
-         if(curtainList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.curtain),curtainList,R.drawable.curtain_on)
-             allList.add(itemTypeGroup)
-         }
-
-         if(otherList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.not_type),otherList)
-             allList.add(itemTypeGroup)
-         }
-
-         if(connectorList.size>0){
-             itemTypeGroup= ItemTypeGroup(context.getString(R.string.connector),connectorList,R.drawable.curtain_on)
-             allList.add(itemTypeGroup)
-         }
-        return allList
         }
+
+        if (allLightList.size > 0) {
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.allLight), allLightList, R.drawable.icon_light_on)
+            allList.add(itemTypeGroup)
+        }
+
+        if (normalList.size > 0) {
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.normal_light), normalList, R.drawable.icon_light_on)
+            allList.add(itemTypeGroup)
+        }
+
+        if (rgbList.size > 0) {
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.rgb_light), rgbList, R.drawable.icon_light_on)
+            allList.add(itemTypeGroup)
+        }
+
+        if (curtainList.size > 0) {
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.curtain), curtainList, R.drawable.curtain_on)
+            allList.add(itemTypeGroup)
+        }
+
+        if (otherList.size > 0) {
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.not_type), otherList)
+            allList.add(itemTypeGroup)
+        }
+
+        if (connectorList.size > 0) {
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.connector), connectorList, R.drawable.curtain_on)
+            allList.add(itemTypeGroup)
+        }
+        return allList
+    }
 
 //    
 //    fun getGroupListNew() : MutableList<DbGroup>{
@@ -136,15 +150,6 @@ object DBUtils {
 //                .list()
 //    }
 
-    val sceneList: MutableList<DbScene>
-         get() {
-            val allGIndex = -1
-            val qb = DaoSessionInstance.getInstance().dbSceneDao.queryBuilder()
-
-            return qb.where(
-                    DbSceneDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
-                    .list()
-        }
 
     val diyGradientList: MutableList<DbDiyGradient>
         get() {
@@ -155,7 +160,7 @@ object DBUtils {
 
     //未分组
     val groupNull: DbGroup?
-         get() {
+        get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
             val list = qb.where(
@@ -171,20 +176,20 @@ object DBUtils {
         }
 
     val sceneAll: List<DbScene>
-         get() = DaoSessionInstance.getInstance().dbSceneDao.loadAll()
+        get() = DaoSessionInstance.getInstance().dbSceneDao.loadAll()
 
     val regionAll: List<DbRegion>
-         get() = DaoSessionInstance.getInstance().dbRegionDao.loadAll()
+        get() = DaoSessionInstance.getInstance().dbRegionDao.loadAll()
 
     val dataChangeAll: List<DbDataChange>
-         get() = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
+        get() = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 
     fun getdataChangeAll(): List<DbDataChange> {
         return DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
     }
 
     val dataChangeAllHaveAboutLight: Boolean
-         get() {
+        get() {
             val list = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
             for (i in list.indices) {
                 if (list[i].tableName == "DB_LIGHT") {
@@ -217,13 +222,13 @@ object DBUtils {
         }
 
     val allGroups: MutableList<DbGroup>
-         get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
+        get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().list()
 
     val deleteGroups: List<DbDeleteGroup>
-         get() = DaoSessionInstance.getInstance().dbDeleteGroupDao.queryBuilder().list()
+        get() = DaoSessionInstance.getInstance().dbDeleteGroupDao.queryBuilder().list()
 
-    val allGroupsExceptCurtain:MutableList<DbGroup>
-    get()=DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbLightDao.Properties.ProductUUID.notEq(DeviceType.SMART_CURTAIN)).list()
+    val allGroupsExceptCurtain: MutableList<DbGroup>
+        get() = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbLightDao.Properties.ProductUUID.notEq(DeviceType.SMART_CURTAIN)).list()
 
 
     private//去掉所有组，避免影响判断
@@ -262,9 +267,9 @@ object DBUtils {
 
     /********************************************查询 */
 
-    fun getAllUser():ArrayList<DbUser>{
-        val query=DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Channel.eq(DeviceType.USER_CHANNEL)).build()
-        return  ArrayList(query.list())
+    fun getAllUser(): ArrayList<DbUser> {
+        val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Channel.eq(DeviceType.USER_CHANNEL)).build()
+        return ArrayList(query.list())
     }
 
     fun getAllRGBLight(): ArrayList<DbLight> {
@@ -274,35 +279,35 @@ object DBUtils {
 
     fun getAllNormalLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
-                .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD),DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
+                .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
         return ArrayList(query.list())
     }
 
     fun getAllSwitch(): ArrayList<DbSwitch> {
         val query = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder()
                 .whereOr(DbSwitchDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH)
-                        ,DbSwitchDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
-                        ,DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
-                        ,DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.NORMAL_SWITCH2)
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
         return ArrayList(query.list())
     }
 
-    fun getAllSensor(): ArrayList<DbSensor>{
+    fun getAllSensor(): ArrayList<DbSensor> {
         val query = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder()
                 .whereOr(DbSensorDao.Properties.ProductUUID.eq(DeviceType.NIGHT_LIGHT)
-                        ,DbSensorDao.Properties.ProductUUID.eq(DeviceType.SENSOR)
-                        ).build()
+                        , DbSensorDao.Properties.ProductUUID.eq(DeviceType.SENSOR)
+                ).build()
         return ArrayList(query.list())
     }
 
-    fun getAllCurtains(): ArrayList<DbCurtain>{
+    fun getAllCurtains(): ArrayList<DbCurtain> {
         val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
                 .where(DbCurtainDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN)
                 ).build()
         return ArrayList(query.list())
     }
 
-    fun getAllConnctor():ArrayList<DbConnector>{
+    fun getAllConnctor(): ArrayList<DbConnector> {
         val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
                 .where(DbConnectorDao.Properties.ProductUUID.eq(DeviceType.SMART_CONNECTOR)
                 ).build()
@@ -319,17 +324,17 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getActionBySceneId(id: Long,address: Int): DbSceneActions? {
+    fun getActionBySceneId(id: Long, address: Int): DbSceneActions? {
         val query = DaoSessionInstance.getInstance().dbSceneActionsDao.queryBuilder().where(DbSceneActionsDao.Properties.BelongSceneId.eq(id)).build()
-        val list=ArrayList(query.list())
-        for(i in list.indices){
-            if(list[i].groupAddr == address){
+        val list = ArrayList(query.list())
+        for (i in list.indices) {
+            if (list[i].groupAddr == address) {
                 return list[i]
             }
         }
         return null
     }
-    
+
     fun getColorNodeListByDynamicModeId(id: Long): ArrayList<DbColorNode> {
         val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.BelongDynamicChangeId.eq(id)).build()
         return ArrayList(query.list())
@@ -337,38 +342,38 @@ object DBUtils {
 
     fun getGroupNameByID(id: Long?): String {
         val group = DaoSessionInstance.getInstance().dbGroupDao.load(id)
-        if(group!=null){
+        if (group != null) {
             return group.name
         }
-        return  "null"
+        return "null"
     }
 
 
     fun getGroupByID(id: Long): DbGroup? {
-        val group:DbGroup? = DaoSessionInstance.getInstance().dbGroupDao.load(id)
-            return group
+        val group: DbGroup? = DaoSessionInstance.getInstance().dbGroupDao.load(id)
+        return group
     }
 
-    fun getUserPhone(phone:String): DbUser?{
+    fun getUserPhone(phone: String): DbUser? {
         val dbUser = DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Phone.eq(phone)).unique()
-        if(dbUser!=null){
+        if (dbUser != null) {
             return dbUser
         }
         return null
     }
 
-    fun getLightMesAddr(mesAddr:Int): DbLight?{
+    fun getLightMesAddr(mesAddr: Int): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(mesAddr.toLong())
     }
 
-    fun getCurtainMesAddr(mesAddr:Int): DbCurtain?{
+    fun getCurtainMesAddr(mesAddr: Int): DbCurtain? {
         return DaoSessionInstance.getInstance().dbCurtainDao.load(mesAddr.toLong())
     }
 
     fun getConnectorByID(id: Long): DbConnector? {
         return DaoSessionInstance.getInstance().dbConnectorDao.load(id)
     }
-    
+
     fun getLightByID(id: Long): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
     }
@@ -389,7 +394,7 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbRegionDao.load(id)
     }
 
-    
+
     fun getSceneByID(id: Long): DbScene? {
         return DaoSessionInstance.getInstance().dbSceneDao.load(id)
     }
@@ -397,25 +402,24 @@ object DBUtils {
     fun getGradientByID(id: Long): DbDiyGradient? {
         return DaoSessionInstance.getInstance().dbDiyGradientDao.load(id)
     }
-    
+
     fun getSceneActionsByID(id: Long): DbSceneActions {
         return DaoSessionInstance.getInstance().dbSceneActionsDao.load(id)
     }
 
-    
+
     fun getUserByID(id: Long): DbUser {
         return DaoSessionInstance.getInstance().dbUserDao.load(id)
     }
 
-    
+
     fun getCurrentRegion(id: Long): DbRegion? {
         return DaoSessionInstance.getInstance().dbRegionDao.load(id)
     }
 
-    
+
     fun getLightByMeshAddr(meshAddr: Int): DbLight? {
-        val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().
-                where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbLightList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -425,8 +429,7 @@ object DBUtils {
     }
 
     fun getCurtainByMeshAddr(meshAddr: Int): DbCurtain? {
-        val dbCurtianList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().
-                where(DbCurtainDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbCurtianList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbCurtianList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -436,8 +439,7 @@ object DBUtils {
     }
 
     fun getRelyByMeshAddr(meshAddr: Int): DbConnector? {
-        val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().
-                where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbRelyList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -447,8 +449,7 @@ object DBUtils {
     }
 
     fun getSwitchByMacAddr(macAddr: String): DbSwitch? {
-        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().
-                where(DbSwitchDao.Properties.MacAddr.eq(macAddr)).list()
+        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MacAddr.eq(macAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -458,8 +459,7 @@ object DBUtils {
     }
 
     fun getSwitchByMesAddr(meshAddr: Int): DbSwitch? {
-        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().
-                where(DbSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -469,8 +469,7 @@ object DBUtils {
     }
 
     fun getSensorByMacAddr(macAddr: String): DbSensor? {
-        val dbLightList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().
-                where(DbSensorDao.Properties.MacAddr.eq(macAddr)).list()
+        val dbLightList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MacAddr.eq(macAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
             ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
@@ -484,14 +483,14 @@ object DBUtils {
         return dbLightList
     }
 
-    
+
     fun getGroupByMesh(mesh: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
         Log.d("datasave", "getGroupByMesh: $mesh")
         return dbGroup
     }
 
-    fun getGroupByName(name:String):DbGroup{
+    fun getGroupByName(name: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.Name.eq(name)).unique()
         Log.d("datasave", "getGroupByMesh: $name")
         return dbGroup
@@ -521,18 +520,18 @@ object DBUtils {
     fun getGroupByMesh(mesh: Int): DbGroup? {
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
         Log.d("datasave", "getGroupByMesh: $mesh")
-        if(dbGroupLs.size>0){
+        if (dbGroupLs.size > 0) {
             return dbGroupLs[0]
         }
         return null
     }
 
-    fun getLightMeshAddr(meshAddr: Int):ArrayList<DbLight>{
+    fun getLightMeshAddr(meshAddr: Int): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).build()
         return ArrayList(query.list())
     }
 
-    fun getCurtainMeshAddr(meshAddr: Int):ArrayList<DbCurtain>{
+    fun getCurtainMeshAddr(meshAddr: Int): ArrayList<DbCurtain> {
         val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).build()
         return ArrayList(query.list())
     }
@@ -542,12 +541,12 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getConnectorByGroupID(id:Long):ArrayList<DbConnector>{
+    fun getConnectorByGroupID(id: Long): ArrayList<DbConnector> {
         val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())
     }
 
-    fun getLightByGroupName(name:String):ArrayList<DbLight>{
+    fun getLightByGroupName(name: String): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.Name.eq(name)).build()
         return ArrayList(query.list())
     }
@@ -557,9 +556,9 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getLightByGroupMesh(mesh: Int): ArrayList<DbLight> ?{
-        val group= getGroupByMesh(mesh)
-        if(group!=null){
+    fun getLightByGroupMesh(mesh: Int): ArrayList<DbLight>? {
+        val group = getGroupByMesh(mesh)
+        if (group != null) {
             val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(group.id)).build()
             return ArrayList(query.list())
         }
@@ -627,6 +626,8 @@ object DBUtils {
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
         if (isFromServer) {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
+            val groups = DBUtils.allGroups
+            Log.e("zcl", "zcl******$groups")
         } else {
             DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
             recordingChange(group.id,
@@ -744,9 +745,9 @@ object DBUtils {
 
     fun saveSceneActions(sceneActions: DbSceneActions) {
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(sceneActions)
-                recordingChange(sceneActions.getId(),
-                        DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
-                        Constant.DB_ADD)
+        recordingChange(sceneActions.getId(),
+                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+                Constant.DB_ADD)
     }
 
     fun saveGradient(dbDiyGradient: DbDiyGradient, isFromServer: Boolean) {
@@ -776,23 +777,23 @@ object DBUtils {
         actions.brightness = sceneActions.brightness
         actions.colorTemperature = sceneActions.colorTemperature
         actions.groupAddr = sceneActions.groupAddr
-        actions.color=sceneActions.color
-        actions.deviceType=sceneActions.deviceType
-        actions.isOn=sceneActions.isOn
+        actions.color = sceneActions.color
+        actions.deviceType = sceneActions.deviceType
+        actions.isOn = sceneActions.isOn
 
         DaoSessionInstance.getInstance().dbSceneActionsDao.save(actions)
     }
 
     fun saveColorNodes(colorNode: DbColorNode, id: Long?,
-                         gradientId: Long) {
+                       gradientId: Long) {
         val colorNodeNew = DbColorNode()
         val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
 
-        colorNodeNew.belongDynamicChangeId =gradientId
-        colorNodeNew.index=colorNode.index
-        colorNodeNew.brightness=colorNode.brightness
-        colorNodeNew.colorTemperature=colorNode.colorTemperature
-        colorNodeNew.rgbw=colorNode.rgbw
+        colorNodeNew.belongDynamicChangeId = gradientId
+        colorNodeNew.index = colorNode.index
+        colorNodeNew.brightness = colorNode.brightness
+        colorNodeNew.colorTemperature = colorNode.colorTemperature
+        colorNodeNew.rgbw = colorNode.rgbw
 
         DaoSessionInstance.getInstance().dbColorNodeDao.save(colorNodeNew)
     }
@@ -809,16 +810,16 @@ object DBUtils {
 
     fun updateGroupList(groups: MutableList<DbGroup>) {
         DaoSessionInstance.getInstance().dbGroupDao.updateInTx(groups)
-        for(group in groups){
+        for (group in groups) {
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
                     Constant.DB_UPDATE)
         }
     }
 
-    fun updateSceneList(group:MutableList<DbScene>){
+    fun updateSceneList(group: MutableList<DbScene>) {
         DaoSessionInstance.getInstance().dbSceneDao.updateInTx(group)
-        for(group in group){
+        for (group in group) {
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbSceneDao.tablename,
                     Constant.DB_UPDATE)
@@ -839,7 +840,7 @@ object DBUtils {
                 Constant.DB_UPDATE)
     }
 
-    fun updateSwicth(switch: DbSwitch){
+    fun updateSwicth(switch: DbSwitch) {
         DaoSessionInstance.getInstance().dbSwitchDao.update(switch)
         recordingChange(switch.id,
                 DaoSessionInstance.getInstance().dbSwitchDao.tablename,
@@ -852,6 +853,7 @@ object DBUtils {
                 DaoSessionInstance.getInstance().dbConnectorDao.tablename,
                 Constant.DB_UPDATE)
     }
+
     fun updateLightsLocal(lights: MutableList<DbLight>) {
         DaoSessionInstance.getInstance().dbLightDao.updateInTx(lights)
     }
@@ -860,7 +862,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbLightDao.update(light)
     }
 
-    fun updateRelayLocal(relay: DbConnector){
+    fun updateRelayLocal(relay: DbConnector) {
         DaoSessionInstance.getInstance().dbConnectorDao.update(relay)
     }
 
@@ -928,14 +930,14 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
-    fun deleteConnector(dbConnector: DbConnector){
+    fun deleteConnector(dbConnector: DbConnector) {
         DaoSessionInstance.getInstance().dbConnectorDao.delete(dbConnector)
         recordingChange(dbConnector.id,
                 DaoSessionInstance.getInstance().dbConnectorDao.tablename,
                 Constant.DB_DELETE)
     }
 
-    fun deleteUser(dbUser:DbUser){
+    fun deleteUser(dbUser: DbUser) {
         DaoSessionUser.getInstance().dbUserDao.delete(dbUser)
     }
 
@@ -947,7 +949,7 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
-    fun deleteCurtain(dbCurtain: DbCurtain){
+    fun deleteCurtain(dbCurtain: DbCurtain) {
         DaoSessionInstance.getInstance().dbCurtainDao.delete(dbCurtain)
         recordingChange(dbCurtain.id,
                 DaoSessionInstance.getInstance().dbCurtainDao.tablename,
@@ -955,7 +957,7 @@ object DBUtils {
         )
     }
 
-    fun deleteSwitch(dbSwitch: DbSwitch){
+    fun deleteSwitch(dbSwitch: DbSwitch) {
         DaoSessionInstance.getInstance().dbSwitchDao.delete(dbSwitch)
         recordingChange(dbSwitch.id,
                 DaoSessionInstance.getInstance().dbSwitchDao.tablename,
@@ -963,14 +965,13 @@ object DBUtils {
         )
     }
 
-    fun deleteSensor(dbSensor: DbSensor){
+    fun deleteSensor(dbSensor: DbSensor) {
         DaoSessionInstance.getInstance().dbSensorDao.delete(dbSensor)
         recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
                 Constant.DB_DELETE
         )
     }
-
 
 
     fun deleteSceneActionsList(sceneActionslist: List<DbSceneActions>) {
@@ -1005,7 +1006,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
     }
 
-    fun deleteAll(){
+    fun deleteAll() {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
@@ -1037,7 +1038,7 @@ object DBUtils {
 
     fun addNewGroup(name: String, groups: MutableList<DbGroup>, context: Context) {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-        if (!checkReachedTheLimit(groups,name)) {
+        if (!checkReachedTheLimit(groups, name)) {
             val newMeshAdress: Int
             var group = DbGroup()
             newMeshAdress = groupAdress
@@ -1051,8 +1052,8 @@ object DBUtils {
             //新增数据库保存
             saveGroup(group, false)
 
-            group= DBUtils.getGroupByMesh(newMeshAdress)!!
-            if(group!=null){
+            group = DBUtils.getGroupByMesh(newMeshAdress)!!
+            if (group != null) {
                 recordingChange(group.id,
                         DaoSessionInstance.getInstance().dbGroupDao.tablename,
                         Constant.DB_ADD)
@@ -1061,9 +1062,9 @@ object DBUtils {
         }
     }
 
-    fun addNewGroupWithType(name: String, groups: MutableList<DbGroup>,type: Long,context: Context) {
+    fun addNewGroupWithType(name: String, groups: MutableList<DbGroup>, type: Long, context: Context) {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-        if (!checkReachedTheLimit(groups,name)) {
+        if (!checkReachedTheLimit(groups, name)) {
             val newMeshAdress: Int
             var group = DbGroup()
             newMeshAdress = groupAdress
@@ -1092,65 +1093,65 @@ object DBUtils {
 
     fun getDefaultNewGroupName(): String {
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-        val gpList=groupList
+        val gpList = groupList
         val gpNameList = ArrayList<String>()
-        for(i in gpList.indices){
+        for (i in gpList.indices) {
             gpNameList.add(gpList[i].name)
         }
 
-        var count=gpList.size-1
-        while (true){
+        var count = gpList.size - 1
+        while (true) {
             count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.group) +count
-                if(!gpNameList.contains(newName)){
-                   return newName
-                }
-        }
-    }
-
-    fun getDefaultNewSceneName(): String {
-        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-        val scList= sceneList
-        val scNameList = ArrayList<String>()
-        for(i in scList.indices){
-            scNameList.add(scList[i].name)
-        }
-
-        var count=scList.size
-        while (true){
-            count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) +count
-                if(!scNameList.contains(newName)){
-                    return newName
-                }
-        }
-    }
-
-    fun getDefaultModeName(): String {
-        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
-        val dyList= diyGradientList
-        val scNameList = ArrayList<String>()
-        for(i in dyList.indices){
-            scNameList.add(dyList[i].name)
-        }
-
-        var count=dyList.size
-        while (true){
-            count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.mode_str) +count
-            if(!scNameList.contains(newName)){
+            val newName = TelinkLightApplication.getInstance().getString(R.string.group) + count
+            if (!gpNameList.contains(newName)) {
                 return newName
             }
         }
     }
 
-    private fun checkReachedTheLimit(groups: List<DbGroup>,name:String): Boolean {
-        if (groups.size>Constant.MAX_GROUP_COUNT ) {
+    fun getDefaultNewSceneName(): String {
+        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        val scList = sceneList
+        val scNameList = ArrayList<String>()
+        for (i in scList.indices) {
+            scNameList.add(scList[i].name)
+        }
+
+        var count = scList.size
+        while (true) {
+            count++
+            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) + count
+            if (!scNameList.contains(newName)) {
+                return newName
+            }
+        }
+    }
+
+    fun getDefaultModeName(): String {
+        //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
+        val dyList = diyGradientList
+        val scNameList = ArrayList<String>()
+        for (i in dyList.indices) {
+            scNameList.add(dyList[i].name)
+        }
+
+        var count = dyList.size
+        while (true) {
+            count++
+            val newName = TelinkLightApplication.getInstance().getString(R.string.mode_str) + count
+            if (!scNameList.contains(newName)) {
+                return newName
+            }
+        }
+    }
+
+    private fun checkReachedTheLimit(groups: List<DbGroup>, name: String): Boolean {
+        if (groups.size > Constant.MAX_GROUP_COUNT) {
             ToastUtils.showLong(R.string.group_limit)
             return true
         }
-        for(i in groups.indices){
-            if(groups[i].name==name){
+        for (i in groups.indices) {
+            if (groups[i].name == name) {
                 ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
                 return true
             }
@@ -1160,7 +1161,7 @@ object DBUtils {
     }
 
     //检查是否重复
-    
+
     fun checkRepeat(groups: List<DbGroup>, context: Context, newName: String): Boolean {
         for (k in groups.indices) {
             if (groups[k].name == newName) {
@@ -1177,7 +1178,7 @@ object DBUtils {
      *
      * @return group对象
      */
-    
+
     fun createAllLightControllerGroup() {
         val groupAllLights = DbGroup()
         groupAllLights.name = TelinkLightApplication.getInstance().getString(R.string.allLight)
@@ -1187,7 +1188,7 @@ object DBUtils {
         groupAllLights.deviceType = 1
         groupAllLights.color = TelinkLightApplication.getInstance().resources.getColor(R.color.gray)
         groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
-        groupAllLights.id=1
+        groupAllLights.id = 1
         val list = groupList
         DaoSessionInstance.getInstance().dbGroupDao.insert(groupAllLights)
         recordingChange(groupAllLights.id,
@@ -1208,7 +1209,7 @@ object DBUtils {
      * @param changeTable 变化数据所属表
      * @param operating   所执行的操作
      */
-    
+
     fun recordingChange(changeIndex: Long?, changeTable: String, operating: String) {
         val dataChangeList = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 
@@ -1240,7 +1241,7 @@ object DBUtils {
                         dataChangeList[i].changeType = operating
                         updateDbchange(dataChangeList[i])
                         break
-                    }else if(dataChangeList[i].changeType == operating){
+                    } else if (dataChangeList[i].changeType == operating) {
                         break
                     }
                 } else if (i == dataChangeList.size - 1) {
@@ -1260,8 +1261,7 @@ object DBUtils {
 
 
     fun getSensorByMeshAddr(meshAddr: Int): DbSensor? {
-        val sensorDbList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().
-                where(DbSensorDao.Properties.MeshAddr.eq(meshAddr)).list()
+        val sensorDbList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (sensorDbList.size > 0) {
             sensorDbList[0]
         } else null

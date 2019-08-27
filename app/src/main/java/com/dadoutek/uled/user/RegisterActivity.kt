@@ -25,6 +25,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.HttpModel.AccountModel
+import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkFactory.md5
@@ -32,7 +33,10 @@ import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -40,6 +44,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_register.*
+import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -90,7 +95,6 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
             dbUser = DbUser()
             register_completed.setText(R.string.btn_ok)
         }
-//        SMSSDK.registerEventHandler(eventHandler)
         SMSSDK.registerEventHandler(eventHandler)
     }
 
@@ -109,10 +113,18 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         return
                     }
 
-                    SMSSDK.getVerificationCode(countryCode, userName)
+                    UpdateModel.isRegister(userName!!)?.subscribe({
 
-                    regist_frist_progress.visibility=   View.VISIBLE
-                    register_completed.isClickable = false
+                            if (!it) {
+                                goSkipActivity()
+                                SMSSDK.getVerificationCode(countryCode, userName)
+
+                                regist_frist_progress.visibility = View.VISIBLE
+                                register_completed.isClickable = false
+                            }else{
+                                ToastUtils.showShort(getString(R.string.account_exist))
+                            }
+                    },{})
 
                 } else {
                     ToastUtils.showLong(getString(R.string.net_work_error))
@@ -143,7 +155,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 val result = msg.arg2
                 val data = msg.obj
 
-                regist_frist_progress.visibility=   View.GONE
+                regist_frist_progress.visibility = View.GONE
                 register_completed.isClickable = true
 
                 if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
@@ -151,17 +163,19 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                         // TODO 处理成功得到验证码的结果
                         // 请注意，此时只是完成了发送验证码的请求，验证码短信还需要几秒钟之后才送达
                         ToastUtils.showLong(R.string.send_message_success)
-                       // timing()
-                        var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
-                        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
-                        intent.putExtra("country_code",countryCode)
-                        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
-                        startActivity(intent)
+                        // timing()
+                        goSkipActivity()
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-                            ToastUtils.showLong(a.localizedMessage)
+                            try {
+                                val a = (data as Throwable)
+                                val jsonObject = JSONObject(a.localizedMessage)
+                                val message = jsonObject.opt("detail").toString()
+                                ToastUtils.showLong(message)
+                            } catch (ex: Exception) {
+                                ex.printStackTrace()
+                            }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
@@ -172,6 +186,20 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                 false
             }).sendMessage(msg)
         }
+    }
+
+    private fun goSkipActivity() {
+        var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
+        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
+        intent.putExtra("country_code", countryCode)
+        intent.putExtra("phone", edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+        startActivity(intent)
+        //todo 测试注册
+        // val intent = Intent(this@RegisterActivity, InputPwdActivity::class.java)
+        // intent.putExtra("phone", edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+        // intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
+        // startActivity(intent)
+        // finish()
     }
 
     private fun eyePasswordAgain() {
@@ -299,13 +327,13 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     hideLoadingDialog()
                     showLoadingDialog(getString(R.string.logging_tip))
                     AccountModel.login(userName!!, userPassWord!!)
-    }
+                }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : NetworkObserver<DbUser>() {
                     override fun onNext(dbUser: DbUser) {
 
-                        LogUtils.d("logging: " + "登录成功")
+                        //("logging: " + "登录成功")
                         DBUtils.deleteLocalData()
 //                        ToastUtils.showLong(R.string.login_success)
                         hideLoadingDialog()
@@ -333,7 +361,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+            //("GetDataError:$msg")
         }
     }
 
@@ -382,7 +410,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
         override fun onNext(stringResponse: Response<String>) {
             if (stringResponse.errorCode == 0) {
-                LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                //("logging" + stringResponse.errorCode + "获取成功account")
                 dbUser!!.account = stringResponse.t
                 updatePassword()
             } else {
@@ -404,7 +432,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         override fun onNext(stringResponse: Response<DbUser>) {
             hideLoadingDialog()
             if (stringResponse.errorCode == 0) {
-                LogUtils.d("logging" + stringResponse.errorCode + "更改成功")
+                //("logging" + stringResponse.errorCode + "更改成功")
                 ToastUtils.showLong(R.string.tip_update_password_success)
                 finish()
             } else {

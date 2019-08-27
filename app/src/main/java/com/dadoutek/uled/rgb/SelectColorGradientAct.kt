@@ -7,45 +7,22 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
-import android.widget.TextView
-import com.blankj.utilcode.util.LogUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DbColorNode
-import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
-import com.dadoutek.uled.util.OtherUtils
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
-import kotlinx.android.synthetic.main.activity_select_color_gradient.color_b
-import kotlinx.android.synthetic.main.activity_select_color_gradient.color_g
-import kotlinx.android.synthetic.main.activity_select_color_gradient.color_picker
-import kotlinx.android.synthetic.main.activity_select_color_gradient.color_r
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_add
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_less
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_num
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_add
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_less
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_num
-import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import top.defaults.colorpicker.ColorObserver
-import java.util.ArrayList
-import javax.xml.transform.Result
 
 class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private var colorNode: DbColorNode? = null
@@ -290,7 +267,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                 val params: ByteArray = byteArrayOf(w!!.toByte())
 
 //                Thread.sleep(80)
-//                TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
 
                 Thread.sleep(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
@@ -303,7 +280,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 //                    light?.color = color
 //                }
 
-//                LogUtils.d("changedff2" + opcode + "--" + addr + "--" + brightness)
+//               //("changedff2" + opcode + "--" + addr + "--" + brightness)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
@@ -378,10 +355,10 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         if (isOnceSet) {
             for (i in 0..3) {
                 Thread.sleep(50)
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
             }
         } else {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
         }
     }
 
@@ -393,7 +370,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
             this.onValueChange(seekBar, seekBar.progress, true)
-            LogUtils.d("seekBarstop" + seekBar.progress)
+           //("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {

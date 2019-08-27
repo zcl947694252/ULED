@@ -137,8 +137,8 @@
 //                if (connectDevice != null) {
 //                    this.connectMeshAddress = connectDevice.meshAddress
 //                    //                this.showToast("login success");
-//                    if (TelinkLightService.Instance().mode == LightAdapter.MODE_AUTO_CONNECT_MESH) {
-//                        mHandler.postDelayed(Runnable { TelinkLightService.Instance().sendCommandNoResponse(0xE4.toByte(), 0xFFFF, byteArrayOf()) }, (3 * 1000).toLong())
+//                    if (TelinkLightService.Instance()?.).mode == LightAdapter.MODE_AUTO_CONNECT_MESH) {
+//                        mHandler.postDelayed(Runnable { TelinkLightService.Instance()?.).sendCommandNoResponse(0xE4.toByte(), 0xFFFF, byteArrayOf()) }, (3 * 1000).toLong())
 //                    }
 //
 //                    if (TelinkLightApplication.getApp().mesh.isOtaProcessing && foreground) {
@@ -176,7 +176,7 @@
 //        this.deviceFragment.notifyDataSetChanged()
 //
 //        if (TelinkLightApplication.getApp().mesh.isOtaProcessing) {
-//            TelinkLightService.Instance().idleMode(true)
+//            TelinkLightService.Instance()?.).idleMode(true)
 //            if (mTimeoutBuilder == null) {
 //                mTimeoutBuilder = AlertDialog.Builder(this)
 //                mTimeoutBuilder.setTitle("AutoConnect Fail")

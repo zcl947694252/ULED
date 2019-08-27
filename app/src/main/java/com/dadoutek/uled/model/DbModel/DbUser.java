@@ -1,8 +1,8 @@
 package com.dadoutek.uled.model.DbModel;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 
 /**
  * Created by hejiajun on 2018/5/16.
@@ -30,10 +30,18 @@ public class DbUser {
     private String password;
     //区域id
     private String last_region_id;
-    @Generated(hash = 1735856997)
-    public DbUser(Long id, String avatar, String channel, String email, String name,
-                  String account, String phone, String token, String password,
-                  String last_region_id) {
+    //区域切换者id  在请求头加上键值对authorizer-user-id:80即可获取id为80用户的数据，如果请求头中缺少这对键值对，后台默认authorizer-user-id：自己用户的id。
+    private String authorizer_user_id;
+    //单点登录标识
+    private String login_state_key;
+
+    private  String last_authorizer_user_id;
+
+
+    @Generated(hash = 1528423653)
+    public DbUser(Long id, String avatar, String channel, String email, String name, String account, String phone,
+            String token, String password, String last_region_id, String authorizer_user_id,
+            String login_state_key, String last_authorizer_user_id) {
         this.id = id;
         this.avatar = avatar;
         this.channel = channel;
@@ -44,6 +52,9 @@ public class DbUser {
         this.token = token;
         this.password = password;
         this.last_region_id = last_region_id;
+        this.authorizer_user_id = authorizer_user_id;
+        this.login_state_key = login_state_key;
+        this.last_authorizer_user_id = last_authorizer_user_id;
     }
     @Generated(hash = 762027100)
     public DbUser() {
@@ -108,6 +119,20 @@ public class DbUser {
     public void setLast_region_id(String last_region_id) {
         this.last_region_id = last_region_id;
     }
+    public String getAuthorizer_user_id() {
+        return this.authorizer_user_id;
+    }
+    public void setAuthorizer_user_id(String authorizer_user_id) {
+        this.authorizer_user_id = authorizer_user_id;
+    }
+
+    public String getLast_authorizer_user_id() {
+        return last_authorizer_user_id;
+    }
+
+    public void setLast_authorizer_user_id(String last_authorizer_user_id) {
+        this.last_authorizer_user_id = last_authorizer_user_id;
+    }
 
     @Override
     public String toString() {
@@ -122,6 +147,16 @@ public class DbUser {
                 ", token='" + token + '\'' +
                 ", password='" + password + '\'' +
                 ", last_region_id='" + last_region_id + '\'' +
+                ", authorizer_user_id='" + authorizer_user_id + '\'' +
+                ", login_state_key='" + login_state_key + '\'' +
+                ", last_authorizer_user_id='" + last_authorizer_user_id + '\'' +
                 '}';
+    }
+
+    public String getLogin_state_key() {
+        return this.login_state_key;
+    }
+    public void setLogin_state_key(String login_state_key) {
+        this.login_state_key = login_state_key;
     }
 }

@@ -80,7 +80,6 @@ public final class DeviceListFragment extends Fragment {
     private static final int REQ_CHANGE_MESH_NAME = 0x01;
 
     private OnClickListener clickListener = new OnClickListener() {
-
         @Override
         public void onClick(View v) {
             if (v == btnAllOn) {

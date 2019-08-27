@@ -81,8 +81,8 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                 if (DBUtils.INSTANCE.getAllLight().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutLight() && DBUtils.INSTANCE.getAllCurtain().size()==0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutCurtain() && DBUtils.INSTANCE.getAllRely().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutRelay()) {
                     if (isClickExlogin) {
                         SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
-                        TelinkLightService.Instance().disconnect();
-                        TelinkLightService.Instance().idleMode(true);
+                TelinkLightService.Instance().disconnect();
+                TelinkLightService.Instance().idleMode(true);
 
                         restartApplication();
                     }
@@ -133,8 +133,8 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
         public void complete() {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(mContenxt, "IS_LOGIN", false);
-                TelinkLightService.Instance().disconnect();
-                TelinkLightService.Instance().idleMode(true);
+        TelinkLightService.Instance().disconnect();
+        TelinkLightService.Instance().idleMode(true);
                 restartApplication();
             } else {
 
@@ -152,7 +152,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
-                                TelinkLightService.Instance().idleMode(true);
+                        TelinkLightService.Instance().idleMode(true);
                                 dismiss();
                                 restartApplication();
                             }

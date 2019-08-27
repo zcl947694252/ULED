@@ -302,7 +302,7 @@ public class AutoTextSizeEditText extends AppCompatEditText {
         if (layout.getHeight() > availableSpace.bottom) {
             return false;
         }
-//        LogUtils.d("layout.getHeight() = " + SizeUtils.px2dp(layout.getHeight()) + " dp");
+//       //("layout.getHeight() = " + SizeUtils.px2dp(layout.getHeight()) + " dp");
 
         return true;
     }

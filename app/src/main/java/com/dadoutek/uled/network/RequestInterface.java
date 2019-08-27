@@ -15,6 +15,10 @@ import com.dadoutek.uled.model.DbModel.DbSwitchChild;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
+import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
+import com.dadoutek.uled.region.bean.RegionBean;
+import com.dadoutek.uled.region.bean.ShareCodeBean;
+import com.dadoutek.uled.region.bean.TransferData;
 
 import java.util.List;
 
@@ -33,7 +37,13 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
- * Created by hejiajun on 2018/5/16.
+ * 创建者     zcl
+ * 创建时间   2019/8/7 11:54
+ * 描述	      ${TODO}$
+ * <p>
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${使用post传递body参数一种是使用@body传递封装的Requestbody对象 一种是使用@FormUrlEncoded+@Field表单模式}$
  */
 
 public interface RequestInterface {
@@ -52,6 +62,7 @@ public interface RequestInterface {
 
     //获取salt值
     @GET("auth/salt")
+    //@Headers("Content-Type:application/text; charset=utf-8")
     Observable<Response<String>> getsalt(@Query("account") String account);
 
     @FormUrlEncoded
@@ -74,28 +85,48 @@ public interface RequestInterface {
 
     //添加区域
     @POST("region/add/{rid}")
-    Observable<Response<String>> addRegion(@Header("token") String token,
-                                           @Body DbRegion dbRegion,
-//                                           @Field("controlMesh") String controlMesh,
-//                                           @Field("controlMeshPwd") String controlMeshPwd,
-//                                           @Field("installMesh") String installMesh,
-//                                           @Field("installMeshPwd") String installMeshPwd,
-                                           @Path("rid") int rid);
+    Observable<Response<String>> addRegion(@Header("token") String token, @Body DbRegion dbRegion,
+                                           @Path("rid") int rid);  //添加区域
 
-    //获取区域列表
+    //添加区域
+    @POST("region/add/{rid}")
+    Observable<Response<Object>> addRegionNew(@Header("token") String token, @Body DbRegion dbRegion,
+                                              @Path("rid") long rid);
+
+    // http://47.107.227.130/smartlight/ auth/authorization/code/generate/{rid}
+    //https://dev.dadoutek.com/smartlight/
+    //获取区域授权码
+    @GET("auth/authorization/code/generate/{rid}")
+    Observable<Response<ShareCodeBean>> regionAuthorizationCode(@Path("rid") long rid);
+
+    //使一个授权码过期
+    //请求URL：DELETE  http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/{rid}/{type}
+    @DELETE("auth/authorization/code/remove/{rid}/{type}")
+    Observable<Response<ShareCodeBean>> authorizationCodeExpired(@Path("rid") long rid, @Path("type") long type);
+
+    //获取区域列表 (已过期) 仅用于获取自己的区域
     @GET("region/list")
-    Observable<Response<List<DbRegion>>> getRegionList(@Header("token") String token);
+    Observable<Response<List<DbRegion>>> getOldRegionList(@Header("token") String token);
+
+
+
+
+    //47.获取区域列表 区域activity内使用
+    // http://dev.dadoutek.com/smartlight/auth/region/list
+    @GET("auth/region/list")
+    Observable<Response<List<RegionBean>>> gotRegionActivityList();
+
+    //53授权区域列表
+    //http://dev.dadoutek.com/smartlight/auth/authorization/authorizer-region/list
+    @GET("auth/authorization/authorizer-region/list")
+    Observable<Response<List<RegionAuthorizeBean>>> gotAuthorizerList();
 
     //更新区域
     @POST("region/add/{rid}")
     Observable<Response<String>> updateRegion(@Header("token") String token,
                                               @Path("rid") int rid,
-                                              @Body DbRegion dbRegion
-//                                              @Query("controlMesh") String controlMesh,
-//                                              @Query("controlMeshPwd") String controlMeshPwd,
-//                                              @Query("installMesh") String dadousmart,
-//                                              @Query("installMeshPwd") String 123
-    );
+                                              @Body DbRegion dbRegion);
+
 
     //删除区域
     //    @HTTP(method = "DELETE", path = "api/ext/soybean/region/remove", hasBody = true)
@@ -103,17 +134,42 @@ public interface RequestInterface {
     Observable<Response<String>> deleteRegion(@Header("token") String token,
                                               @Path("rid") int rid);
 
-    //组相关接口
+    //57、授权码过期
+    //使一个授权码过期
+    //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/{rid}/{type}
+    //DELETE
+    //区域id和码种类type，在url中
+    //http://dev.dadoutek.com/smartlight/auth/authorization/code/remove/1/1
+    @DELETE("auth/authorization/code/remove/{rid}/{type}")
+    Observable<Response<String>> removeAuthorizeCode(@Path("rid") Long rid, @Path("type") int type); //57、授权码过期
 
+    /**
+     * 58、移交码过期
+     * 使一个移交码过期
+     * http://dev.dadoutek.com/smartlight/auth/transfer/code/remove
+     * DELETE
+     */
+    @DELETE("auth/transfer/code/remove")
+    Observable<Response<String>> removeTransferCode();
+
+    //6、清除当前区域和其下数据
+    //清除当前区域和其下数据，区域本身(除区域一)也会被删除。
+    //http://dev.dadoutek.com/smartlight/auth/region/clear
+    //DELETE
+    @DELETE("auth/region/clear/{rid}")
+    Observable<Response<String>> removeRegion(@Path("rid") int rid);
+
+    //组相关接口
     //添加组
-    @POST("group/add/{region_id}/{gid}")
+    //@POST("group/add/{region_id}/{gid}")
+    @POST("group/add/{gid}")
     Observable<Response<String>> addGroup(@Header("token") String token,
                                           @Body DbGroup dbGroup,
 //                                          @Field("meshAddr") int meshAddr,
 //                                          @Field("name") String name,
 //                                          @Field("brightness") int brightness,
 //                                          @Field("colorTemperature") int colorTemperature,
-                                          @Path("region_id") int region_id,
+                                          //@Path("region_id") int region_id,
                                           @Path("gid") int gid);
 
     //获取组列表
@@ -341,8 +397,71 @@ public interface RequestInterface {
                                                                @Query("currentVersion") String version);
 
     @GET("app/getNewVersion")
-    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero,@Query("lang") int zero_one);
-
+    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero, @Query("lang") int zero_one);
+    //用于检测是都注册
     @GET("auth/isRegister")
-    Observable<Response<Object>> isRegister(@Query("phone") String phoneNumber);
+    Observable<Response<Boolean>> isRegister(@Query("phone") String phoneNumber);
+
+    //59、解析码
+    //http://dev.dadoutek.com/smartlight/auth/code/parse
+    //POST
+    //content-type : application/json
+    //token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+    //code	是	string	码的值
+    //password	是	string
+    //{"code":"dadoueyJhbGciOiJIUzI1NiJ9.eyJhdXRob3JpemVyX2lkIjoyNjQ0NywicmVnaW9uX2lkIjoxLCJsZXZlbCI6MX0.ys4q7YTbaDD56IaDHUfqJftl86_yFWKHWkgH1zFYwHosmartlight"}
+
+    @FormUrlEncoded
+    @POST("auth/code/parse")
+    Observable<Response<String>> parseQRCode(@Field("code") String code,@Field("password") String password);
+
+    /**
+     * 62、取消授权(主动方:授权者)
+     * 取消一个区域对一个用户的授权。如:A授权了区域1给B，B接受了。有一天A不想让B用区域1了，A调用这个接口
+     * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/{ref_id}/{rid}
+     * DELETE
+     * ref_id为被授权者id
+     * rid为区域id
+     * http://dev.dadoutek.com/smartlight/auth/authorization/cancel/300600/1
+     */
+    @DELETE("auth/authorization/cancel/{ref_id}/{rid}")
+    Observable<Response<String>> cancelAuthorize(@Path("ref_id") int ref_id, @Path("rid") int rid);
+
+    /**
+     * 61、解除授权(主动方:被授权者)
+     * 解除授权关系。主动方为被授权者。如：A授权了区域1给B，B接受了。有一天B不想要了。B调用这个接口
+     * http://dev.dadoutek.com/smartlight/auth/authorization/release/{authorizer_id}/{rid}
+     * DELETE
+     * authorizer_id授权用户id
+     * rid区域id
+     * http://dev.dadoutek.com/smartlight/auth/authorization/release/300430/1
+     */
+    @DELETE("auth/authorization/release/{authorizer_id}/{rid}")
+    Observable<Response<String>> dropAuthorize(@Path("authorizer_id") int authorizer_id, @Path("rid") int rid);
+
+    /**
+     * 56、生成移交码
+     * http://dev.dadoutek.com/smartlight/auth/transfer/code/generate
+     * GET
+     */
+    @GET("auth/transfer/code/generate")
+    Observable<Response<TransferData>> makeTransferCode();
+
+    /**
+     * 59、获取区域授权码信息(新增)
+     * http://dev.dadoutek.com/smartlight/auth/authorization/code/info/{rid}
+     * GET
+     * http://dev.dadoutek.com/smartlight/auth/authorization/code/info/1
+     */
+    @GET("auth/authorization/code/info/{rid}")
+    Observable<Response<ShareCodeBean>> mlookAuthroizeCode(@Path("rid") Long rid);
+
+    /**
+     * 60、获取用户移交码信息(新增)
+     * http://dev.dadoutek.com/smartlight/auth/transfer/code/info
+     * GET
+     */
+    @GET("auth/transfer/code/info")
+    Observable<Response<TransferData>> mlookTransferCode();
+
 }

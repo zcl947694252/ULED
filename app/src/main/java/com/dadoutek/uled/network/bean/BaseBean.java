@@ -12,8 +12,51 @@ import java.io.Serializable;
  * 更新描述   ${TODO}
  */
 public class BaseBean<T> implements Serializable {
-    private T  data;
+    /**
+     * data : null
+     * errorCode : 0
+     * message : add region succeed!
+     * serverTime : 1564489496087
+     */
+    private T data;
     private int errorCode;
     private String message;
     private long serverTime;
+    private boolean isSucess;
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public long getServerTime() {
+        return serverTime;
+    }
+
+    public void setServerTime(long serverTime) {
+        this.serverTime = serverTime;
+    }
+
+    public boolean isSucess() {
+        return errorCode==0;
+    }
 }

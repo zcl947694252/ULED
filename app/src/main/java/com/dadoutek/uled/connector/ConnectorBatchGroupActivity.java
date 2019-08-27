@@ -4,10 +4,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -36,18 +35,14 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
-import com.dadoutek.uled.group.BatchGroupActivity;
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbColorNode;
 import com.dadoutek.uled.model.DbModel.DbConnector;
-import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
-import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
@@ -62,7 +57,6 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
-import com.dadoutek.uled.windowcurtains.CurtainBatchGroupActivity;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -361,7 +355,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-//        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance()?.).idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -428,7 +422,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 showToast(getString(R.string.group_completed));
                 //页面跳转前进行分组数据保存
 
-//                TelinkLightService.Instance().idleMode(true);
+//                TelinkLightService.Instance()?.).idleMode(true);
                 //目前测试调到主页
                 doFinish();
             } else {
@@ -817,7 +811,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 //                LeBluetooth.getInstance().stopScan();
-//                TelinkLightService.Instance().idleMode(true);
+//                TelinkLightService.Instance()?.).idleMode(true);
 
                 startConnect = true;
 
@@ -872,7 +866,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         initClick();
     }
 
-    private void initOnLayoutListener() {
+     public void initOnLayoutListener() {
         final View view = getWindow().getDecorView();
         final ViewTreeObserver viewTreeObserver = view.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -1348,7 +1342,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
      * （扫描结束）
      */
     private void onLeScanTimeout() {
-//        TelinkLightService.Instance()
+//        TelinkLightService.Instance()?.)
         LeBluetooth.getInstance().stopScan();
         TelinkLightService.Instance().idleMode(true);
         this.btnScan.setBackgroundResource(R.color.primary);

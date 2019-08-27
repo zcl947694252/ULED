@@ -12,7 +12,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -30,13 +29,6 @@ import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
 import kotlinx.android.synthetic.main.activity_config_light_light.*
-import kotlinx.android.synthetic.main.activity_config_light_light.configPirRoot
-import kotlinx.android.synthetic.main.activity_config_light_light.fabConfirm
-import kotlinx.android.synthetic.main.activity_config_light_light.spSwitchMode
-import kotlinx.android.synthetic.main.activity_config_light_light.tietMinimumBrightness
-import kotlinx.android.synthetic.main.activity_config_light_light.tvPSVersion
-import kotlinx.android.synthetic.main.activity_config_light_light.versionLayoutPS
-import kotlinx.android.synthetic.main.activity_config_pir.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -340,18 +332,18 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+               //("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+       TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
         Thread.sleep(300)
 
         if (canSendGroup) {
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+           TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
@@ -387,19 +379,19 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
+               //("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
         }
 
         if (canSendGroup) {
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+           TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
 
         Thread.sleep(300)
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+       TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
@@ -492,15 +484,15 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun doFinish() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+       TelinkLightService.Instance()?.idleMode(true)
+       TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
     private fun configureComplete() {
         saveSensor()
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+       TelinkLightService.Instance()?.idleMode(true)
+       TelinkLightService.Instance()?.disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -678,8 +670,8 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
     }
 
     private fun getModeValue(): Int {
-        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
-        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
+       //("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+       //("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 }

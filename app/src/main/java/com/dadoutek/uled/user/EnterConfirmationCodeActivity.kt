@@ -22,7 +22,6 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -54,6 +53,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         timing()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initViewType() {
         countryCode = this.intent.extras!!.getString("country_code")
         phone = this.intent.extras!!.getString("phone")
@@ -91,7 +91,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         }
     }
 
-    val eventHandler = object : EventHandler() {
+    private val eventHandler = object : EventHandler() {
         override fun afterEvent(event: Int, result: Int, data: Any?) {
             // afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
             val msg = Message()
@@ -111,12 +111,14 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-
-                            val jsonObject = JSONObject(a.localizedMessage)
-                            val message = jsonObject.opt("detail").toString()
-                            ToastUtils.showLong(message)
-
+                            try {
+                                val a = (data as Throwable)
+                                val jsonObject = JSONObject(a.localizedMessage)
+                                val message = jsonObject.opt("detail").toString()
+                                ToastUtils.showLong(message)
+                            }catch (ex:Exception){
+                               ex.printStackTrace()
+                            }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
@@ -145,8 +147,14 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                     } else {
                         // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
-                            val a = (data as Throwable)
-                            ToastUtils.showLong(a.localizedMessage)
+                            try {
+                                val a = (data as Throwable)
+                                val jsonObject = JSONObject(a.localizedMessage)
+                                val message = jsonObject.opt("detail").toString()
+                                ToastUtils.showLong(message)
+                            }catch (ex:Exception){
+                                ex.printStackTrace()
+                            }
                         } else {
                             val a = (data as Throwable)
                             a.printStackTrace()
@@ -161,7 +169,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         }
     }
 
-    fun submitCode(country: String, phone: String, code: String) {
+    private fun submitCode(country: String, phone: String, code: String) {
         SMSSDK.submitVerificationCode(country, phone, code)
     }
 
@@ -208,7 +216,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     private fun verificationLogin() {
         if (!StringUtils.isTrimEmpty(phone)) {
             showLoadingDialog(getString(R.string.logging_tip))
-            LogUtils.e("logging: " + "登录错误")
+            //("logging: " + "登录错误")
             AccountModel.smsLoginTwo(phone!!)
                     .subscribe(object : NetworkObserver<DbUser>() {
                         override fun onNext(dbUser: DbUser) {
@@ -217,12 +225,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                             showLoadingDialog(getString(R.string.sync_now))
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                            LogUtils.e("logging: " + "登录成功错误")
+                            //("logging: " + "登录成功错误")
                         }
 
                         override fun onError(e: Throwable) {
                             super.onError(e)
-                            LogUtils.e("logging: " + "登录错误" + e.message)
+                            //("logging: " + "登录错误" + e.message)
                             hideLoadingDialog()
                         }
                     })
@@ -239,7 +247,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
             finish()
         }
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+           //("GetDataError:$msg")
         }
     }
 

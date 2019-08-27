@@ -268,7 +268,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                .subscribeOn(Schedulers.io())
 //                .observeOn(AndroidSchedulers.mainThread())
 //                .subscribe(aLong -> {
-//                    TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+//                    TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, dstAddress, params);
 //                }));
 //    }
 //
@@ -374,7 +374,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //        if (updateList != null && updateList.size() > 0) {
 //            checkNetworkAndSync();
 //        }
-////        TelinkLightService.Instance().idleMode(true);
+////        TelinkLightService.Instance()?.).idleMode(true);
 //        this.mApplication.removeEventListener(this);
 //        this.updateList = null;
 //        mDisposable.dispose();  //销毁时取消订阅.
@@ -433,7 +433,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                showToast(getString(R.string.group_completed));
 //                //页面跳转前进行分组数据保存
 //
-////                TelinkLightService.Instance().idleMode(true);
+////                TelinkLightService.Instance()?.).idleMode(true);
 //                //目前测试调到主页
 //                doFinish();
 //            } else {
@@ -736,10 +736,10 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //     * 此处用作设备登录
 //     */
 //    private void autoConnect() {
-//        if (TelinkLightService.Instance() != null) {
-//            if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+//        if (TelinkLightService.Instance()?.) != null) {
+//            if (TelinkLightService.Instance()?.).getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 //                showLoadingDialog(getResources().getString(R.string.connecting_tip));
-//                TelinkLightService.Instance().idleMode(true);
+//                TelinkLightService.Instance()?.).idleMode(true);
 //
 //                String account = DBUtils.INSTANCE.getLastUser().getAccount();
 //
@@ -751,7 +751,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                connectParams.autoEnableNotification(true);
 //
 //                //连接，如断开会自动重连
-//                TelinkLightService.Instance().autoConnect(connectParams);
+//                TelinkLightService.Instance()?.).autoConnect(connectParams);
 //            }
 //
 //            //刷新Notify参数
@@ -759,7 +759,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //            refreshNotifyParams.setRefreshRepeatCount(2);
 //            refreshNotifyParams.setRefreshInterval(2000);
 //            //开启自动刷新Notify
-//            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
+//            TelinkLightService.Instance()?.).autoRefreshNotify(refreshNotifyParams);
 //        }
 //    }
 //
@@ -886,7 +886,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //    protected void onResume() {
 //        super.onResume();
 //        //检测service是否为空，为空则重启
-//        if (TelinkLightService.Instance() == null) {
+//        if (TelinkLightService.Instance()?.) == null) {
 //            mApplication.startLightService(TelinkLightService.class);
 //        }
 //    }
@@ -1079,13 +1079,13 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //        int dstAddress = light.getMeshAddr();
 //        byte[] params = new byte[]{0x08, 0x01};
 //
-//        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-//        TelinkLightService.Instance().updateNotification();
+//        TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, dstAddress, params);
+//        TelinkLightService.Instance()?.).updateNotification();
 //    }
 //
 //    private void onErrorReport(ErrorReportInfo info) {
 ////        retryConnect()
-//        LogUtils.d("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+//       //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
 //    }
 //
 //
@@ -1117,7 +1117,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //            groupAddress = groupAddress | 0x8000;
 //
 //            if (groupingGroup.getMeshAddr() == groupAddress) {
-//                LogUtils.d(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
+//               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
 //                groupingSuccess = true;
 //            }
 //        }
@@ -1129,7 +1129,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //
 //    private void onNError(final DeviceEvent event) {
 //
-//        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance()?.).idleMode(true);
 //        TelinkLog.d("DeviceScanningActivity#onNError");
 //        onLeScanTimeout();
 //    }
@@ -1139,9 +1139,9 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //     * （扫描结束）
 //     */
 //    private void onLeScanTimeout() {
-////        TelinkLightService.Instance()
+////        TelinkLightService.Instance()?.)
 //        LeBluetooth.getInstance().stopScan();
-//        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance()?.).idleMode(true);
 //        this.btnScan.setBackgroundResource(R.color.primary);
 //        if (adapter.getCount() > 0) {//表示目前已经搜到了至少有一个设备
 //            scanSuccess();
@@ -1162,14 +1162,14 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                        startTimer();
 //                        if (grouping) {
 ////                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-//                            LogUtils.d("Grouping");
+//                           //("Grouping");
 //                            return;
 //                        }
 //                        handleIfSupportBle();
-//                        TelinkLightService.Instance().idleMode(true);
+//                        TelinkLightService.Instance()?.).idleMode(true);
 //                        if (mApplication.isEmptyMesh()) {
 ////                            Toast.makeText(this, "Empty Mesh", Toast.LENGTH_SHORT).show();
-//                            LogUtils.d("Empty Mesh");
+//                           //("Empty Mesh");
 //                            return;
 //                        }
 //                        List<ScanFilter> scanFilters = new ArrayList<>();
@@ -1195,7 +1195,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                        scanPb.setVisibility(View.VISIBLE);
 //                        mDisposable.add(Observable.timer(delay, TimeUnit.MILLISECONDS, Schedulers.io())
 //                                .subscribe(aLong -> {
-//                                    TelinkLightService.Instance().startScan(params);
+//                                    TelinkLightService.Instance()?.).startScan(params);
 //                                }));
 //
 //                    } else {
@@ -1267,7 +1267,7 @@ package com.dadoutek.uled.rgb;//package com.dadoutek.uled.rgb;
 //                        params.setNewPassword(NetworkFactory.md5(
 //                                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
 //                        params.setUpdateDeviceList(deviceInfo);
-//                        TelinkLightService.Instance().updateMesh(params);
+//                        TelinkLightService.Instance()?.).updateMesh(params);
 //                    }));
 //        }
 //    }

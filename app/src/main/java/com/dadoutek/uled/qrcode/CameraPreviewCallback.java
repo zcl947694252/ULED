@@ -17,9 +17,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public final class CameraPreviewCallback implements Camera.PreviewCallback {
+public final class CameraPreviewCallback /*implements Camera.PreviewCallback */{
 
-    public static final String TAG = CameraPreviewCallback.class.getSimpleName();
+   /* public static final String TAG = CameraPreviewCallback.class.getSimpleName();
 
     public static final int MESSAGE_POST_PROGRESS = 1;
     public static final int MESSAGE_POST_RESULT = 2;
@@ -69,13 +69,13 @@ public final class CameraPreviewCallback implements Camera.PreviewCallback {
         return this.mResult;
     }
 
-    /*public int getTotalPacket() {
+    *//*public int getTotalPacket() {
         return mTotalPacket;
     }
 
     public int getTotalItem() {
         return mTotalItem;
-    }*/
+    }*//*
 
     public void start() {
         this.mDecodeThread.awake();
@@ -93,17 +93,17 @@ public final class CameraPreviewCallback implements Camera.PreviewCallback {
         this.mResult = null;
     }
 
-   /* public void clearPackets() {
+   *//* public void clearPackets() {
         this.packets.clear();
         this.mTotalItem = 0;
         this.mTotalPacket = 0;
-    }*/
+    }*//*
 
-    /*private boolean isCompleted() {
+    *//*private boolean isCompleted() {
         Map<Integer, JsonPacket> packets = this.getPackets();
         int size = packets.size();
         return size >= this.getTotalPacket();
-    }*/
+    }*//*
 
     private void post(QRDecoder decoder, byte[] data, Camera camera, Rect cropRect) {
         TaskContext context = new TaskContext();
@@ -144,11 +144,11 @@ public final class CameraPreviewCallback implements Camera.PreviewCallback {
             mHandler.sendEmptyMessage(MESSAGE_POST_DATA_ERROR);
         }
 
-        /*if (mResult.split("\\+").length < 15) {
+        *//*if (mResult.split("\\+").length < 15) {
 
         } else {
 
-        }*/
+        }*//*
     }
 
     private static class TaskContext {
@@ -197,5 +197,5 @@ public final class CameraPreviewCallback implements Camera.PreviewCallback {
                 }
             }
         }
-    }
+    }*/
 }

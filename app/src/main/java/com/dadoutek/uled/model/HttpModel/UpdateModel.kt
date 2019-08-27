@@ -32,7 +32,7 @@ object UpdateModel {
 
     }
 
-    fun isRegister(phone: String): Observable<Any>? {
+    fun isRegister(phone: String): Observable<Boolean>? {
         return NetworkFactory.getApi()
                 .isRegister(phone)
                 .compose(NetworkTransformer())

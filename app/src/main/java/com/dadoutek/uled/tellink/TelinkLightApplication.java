@@ -17,12 +17,12 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.FileSystem;
-import com.dadoutek.uled.util.LogUtil;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.TelinkLog;
 import com.tencent.bugly.crashreport.CrashReport;
+import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -57,11 +57,11 @@ public final class TelinkLightApplication extends TelinkApplication {
         CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", false);
         DaoSessionInstance.checkAndUpdateDatabase();
         DaoSessionUser.checkAndUpdateDatabase();
+        ZXingLibrary.initDisplayOpinion(this);
 
         if (null == mInstance) {
             mInstance = this;
         }
-
 
         Utils.init(this);
         LogUtils.getConfig().setBorderSwitch(false);
@@ -104,7 +104,7 @@ public final class TelinkLightApplication extends TelinkApplication {
                 String name = dbRegion.getControlMesh();
                 String pwd = dbRegion.getControlMeshPwd();
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                    LogUtils.d("mesh.setPassword = " + name);
+                   //("mesh.setPassword = " + name);
                     mesh = new Mesh();
                     mesh.setName(name);
                     mesh.setPassword(name);

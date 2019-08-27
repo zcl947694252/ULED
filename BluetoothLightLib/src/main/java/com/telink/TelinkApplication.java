@@ -13,7 +13,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -43,7 +42,7 @@ public class TelinkApplication extends Application {
     private static TelinkApplication mThis;
 
     protected final EventBus<String> mEventBus = new EventBus<>();
-    protected Context mContext;
+    public Context mContext;
     public boolean serviceStarted;
     protected boolean serviceConnected;
     protected final ServiceConnection mServiceConnection = new ServiceConnection() {

@@ -22,11 +22,9 @@ import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.acitvity_phone_verification.*
@@ -35,6 +33,7 @@ import kotlinx.android.synthetic.main.activity_verification_code.btn_send_verifi
 import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.*
+import kotlinx.android.synthetic.main.activity_register.ccp as ccp1
 
 /**uu
  * 手机号短信登录第一步
@@ -43,9 +42,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
     private lateinit var dbUser: DbUser
     private var countryCode: String? = null
-    private val mCompositeDisposable = CompositeDisposable()
-    private val TIME_INTERVAL: Long = 60
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +52,8 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
 
     private fun initView() {
-        countryCode = country_code_picker.selectedCountryCode
-        country_code_picker.setOnCountryChangeListener { countryCode = country_code_picker.selectedCountryCode }
+        countryCode = ccp.selectedCountryCode
+        ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         btn_register.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
         sms_login.setOnClickListener(this)
@@ -70,12 +66,12 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         when (v?.id) {
             R.id.btn_register -> register()
             R.id.btn_send_verification -> verificationCode()
-            R.id.sms_login -> {
+            R.id.sms_login ->{
                 if (TextUtils.isEmpty(edit_user_phone.editableText.toString())) {
                     toast(getString(R.string.please_phone_number))
                     return
                 }
-                //login()
+            //login()
                 getAccount()
             }
             R.id.password_login -> passwordLogin()
@@ -141,14 +137,14 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
     private fun login() {
         var intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
         intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
-        intent.putExtra("country_code", countryCode)
-        intent.putExtra("phone", edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
+        intent.putExtra("country_code",countryCode)
+        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
         startActivity(intent)
     }
 
     private fun getAccount() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
-            val userName = edit_user_phone.editableText.toString().trim { it <= ' ' }
+            val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
                     .replace(" ".toRegex(), "")
             if (TextUtils.isEmpty(userName)) {
                 toast(getString(R.string.please_phone_number))
@@ -161,16 +157,16 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                         .getAccount(userName, dbUser!!.channel)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Response<String>> {
+                        .subscribe(object: Observer<Response<String>> {
                             override fun onSubscribe(d: Disposable) {}
                             override fun onNext(stringResponse: Response<String>) {
                                 if (stringResponse.errorCode == 0) {
-                                    LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                                   //("logging" + stringResponse.errorCode + "获取成功account")
                                     dbUser!!.account = stringResponse.t
                                     verificationCode()
                                     val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
                                     intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
-                                    intent.putExtra("country_code", countryCode)
+                                    intent.putExtra("country_code",countryCode)
                                     intent.putExtra("phone", userName)
                                     intent.putExtra("account", dbUser!!.account)
                                     startActivity(intent)
@@ -178,13 +174,11 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                     ToastUtils.showLong(stringResponse.message)
                                 }
                             }
-
                             override fun onError(e: Throwable) {
                                 hideLoadingDialog()
                                 Toast.makeText(this@VerificationCodeActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
-                                LogUtils.e("zcl**********************$e")
+                                //("zcl**********************$e")
                             }
-
                             override fun onComplete() {}
                         })
             }
@@ -195,7 +189,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
 
     val eventHandler = object : EventHandler() {
-        //afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
+            //afterEvent会在子线程被调用，因此如果后续有UI相关操作，需要将数据发送到UI线程
         override fun afterEvent(event: Int, result: Int, data: Any?) {
             val msg = Message()
             msg.arg1 = event
@@ -207,16 +201,18 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 val data = msg.obj
                 if (event == SMSSDK.EVENT_GET_VERIFICATION_CODE) {
                     if (result == SMSSDK.RESULT_COMPLETE) {
+                        // TODO 处理成功得到验证码的结果
                         ToastUtils.showLong(R.string.send_message_success)
                     } else {
+                        // TODO 处理错误的结果
                         if (result == SMSSDK.RESULT_ERROR) {
                             try {
                                 val a = (data as Throwable)
                                 val jsonObject = JSONObject(a.localizedMessage)
                                 val message = jsonObject.opt("detail").toString()
                                 ToastUtils.showLong(message)
-                            } catch (exception: Exception){
-                                LogUtils.d("exception = $exception")
+                            }catch (ex:Exception){
+                                ex.printStackTrace()
                             }
                         } else {
                             val a = (data as Throwable)
@@ -242,7 +238,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         }
 
         override fun error(msg: String) {
-            LogUtils.d("GetDataError:$msg")
+           //("GetDataError:$msg")
         }
 
     }
@@ -262,7 +258,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
     private fun verificationCode() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
             val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
-            LogUtils.e("zcl**********************$phoneNum")
+            //("zcl**********************$phoneNum")
             if (StringUtils.isEmpty(phoneNum)) {
                 ToastUtils.showShort(R.string.phone_cannot_be_empty)
             } else {

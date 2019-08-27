@@ -332,9 +332,9 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //     * 此处用作设备登录
 //     */
 //    private void autoConnect() {
-//        if (TelinkLightService.Instance() != null) {
+//        if (TelinkLightService.Instance()?.) != null) {
 //
-//            if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+//            if (TelinkLightService.Instance()?.).getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 //
 //
 //                if (this.mApplication.isEmptyMesh())
@@ -346,7 +346,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //                Mesh mesh = this.mApplication.getMesh();
 //
 //                if (TextUtils.isEmpty(mesh.name) || TextUtils.isEmpty(mesh.password)) {
-//                    TelinkLightService.Instance().idleMode(true);
+//                    TelinkLightService.Instance()?.).idleMode(true);
 //                    return;
 //                }
 //
@@ -366,7 +366,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //                    saveLog("Action: AutoConnect:NULL");
 //                }
 //                //自动重连
-//                TelinkLightService.Instance().autoConnect(connectParams);
+//                TelinkLightService.Instance()?.).autoConnect(connectParams);
 //            }
 //
 //            //刷新Notify参数
@@ -374,7 +374,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //            refreshNotifyParams.setRefreshRepeatCount(2);
 //            refreshNotifyParams.setRefreshInterval(2000);
 //            //开启自动刷新Notify
-//            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams);
+//            TelinkLightService.Instance()?.).autoRefreshNotify(refreshNotifyParams);
 //        }
 //    }
 //
@@ -409,7 +409,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //                mDataManager.updateLights(nowLightList);
 //
 //
-//                TelinkLightService.Instance().idleMode(true);
+//                TelinkLightService.Instance()?.).idleMode(true);
 //                //目前测试调到主页
 //                if (ActivityUtils.isActivityExistsInStack(MainActivity.class))
 //                    ActivityUtils.finishToActivity(MainActivity.class, false, true);
@@ -753,7 +753,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //                        Manifest.permission.BLUETOOTH_ADMIN).subscribe(granted -> {
 //                    if (granted) {
 //                        handleIfSupportBle();
-//                        TelinkLightService.Instance().idleMode(true);
+//                        TelinkLightService.Instance()?.).idleMode(true);
 //                        mHandler.postDelayed(() -> {
 //                            if (mApplication.isEmptyMesh())
 //                                return;
@@ -765,7 +765,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //                            params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND);
 //                            params.setScanMode(true);
 //                            //                params.setScanMac("FF:FF:7A:68:6B:7F");
-//                            TelinkLightService.Instance().startScan(params);
+//                            TelinkLightService.Instance()?.).startScan(params);
 //
 //                            Log.d("ScanningTest", "start scan");
 //                            startTimer();
@@ -811,7 +811,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //                DeviceInfo deviceInfo = event.getArgs();
 //                deviceInfo.meshAddress = meshAddress;
 //                params.setUpdateDeviceList(deviceInfo);
-//                TelinkLightService.Instance().updateMesh(params);
+//                TelinkLightService.Instance()?.).updateMesh(params);
 //            }
 //        }, 200);
 //
@@ -823,7 +823,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //     * （扫描结束）
 //     */
 //    private void onLeScanTimeout() {
-//        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance()?.).idleMode(true);
 //        this.btnScan.setBackgroundResource(R.color.primary);
 //
 ////        Log.d("ScanningTest", "onLeScanTimeout count = " + adapter.getCount());
@@ -952,7 +952,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //
 //    private void onNError(final DeviceEvent event) {
 //
-//        TelinkLightService.Instance().idleMode(true);
+//        TelinkLightService.Instance()?.).idleMode(true);
 //        TelinkLog.d("DeviceScanningActivity#onNError");
 //
 //        AlertDialog.Builder builder = new AlertDialog.Builder(DeviceScanningActivity.this);
@@ -996,8 +996,8 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //        int dstAddress = light.meshAddress;
 //        byte[] params = new byte[]{0x08, 0x01};
 //
-//        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
-//        TelinkLightService.Instance().updateNotification();
+//        TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, dstAddress, params);
+//        TelinkLightService.Instance()?.).updateNotification();
 //    }
 //
 //    private void checkSelectLamp(Light light) {
@@ -1015,7 +1015,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //        byte[] params = new byte[]{0x01, (byte) (groupAddress & 0xFF),
 //                (byte) (groupAddress >> 8 & 0xFF)};
 //        params[0] = 0x01;
-//        TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+//        TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, dstAddress, params);
 //    }
 //
 //    private void sendGroupData(Light light, Group group, int index) {
@@ -1030,7 +1030,7 @@ package com.dadoutek.uled.othersview;//package com.dadoutek.uled.activity;
 //
 //        if (group.checked) {
 //            params[0] = 0x01;
-//            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params);
+//            TelinkLightService.Instance()?.).sendCommandNoResponse(opcode, dstAddress, params);
 //
 //        }
 //    }

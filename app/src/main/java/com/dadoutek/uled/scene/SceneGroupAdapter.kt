@@ -20,7 +20,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.OtherUtils
-import kotlinx.android.synthetic.main.fragment_rgb_group_setting.*
 import java.util.*
 
 /**
@@ -645,14 +644,14 @@ class SceneGroupAdapter
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 addImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress > 0) {
@@ -693,14 +692,14 @@ class SceneGroupAdapter
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 lessImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress < 100) {
@@ -742,14 +741,14 @@ class SceneGroupAdapter
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 addImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress > 0) {
@@ -791,14 +790,14 @@ class SceneGroupAdapter
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 lessImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_TEMPERATURE
                 params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress > 0) {
@@ -840,14 +839,14 @@ class SceneGroupAdapter
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 addImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress > 0) {
@@ -888,14 +887,14 @@ class SceneGroupAdapter
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 lessImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.brightness = seekBar!!.progress
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress < 100) {
@@ -936,14 +935,14 @@ class SceneGroupAdapter
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 lessImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress < 100) {
@@ -984,14 +983,14 @@ class SceneGroupAdapter
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             } else {
                 addImage!!.isEnabled = true
                 brightnText!!.text = seekBar!!.progress.toString() + "%"
                 itemGroup.temperature = seekBar!!.progress
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(seekBar!!.progress.toByte())
-                TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
             }
 
             if (seekBar!!.progress < 100) {
@@ -1148,6 +1147,6 @@ class SceneGroupAdapter
         } else {
             params = byteArrayOf(progressCmd.toByte())
         }
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
     }
 }

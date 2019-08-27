@@ -33,7 +33,6 @@ import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.blankj.utilcode.util.UriUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
@@ -48,7 +47,6 @@ import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
-import com.dadoutek.uled.util.StringUtils;
 import com.dinuscxj.progressbar.CircleProgressBar;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
@@ -90,6 +88,8 @@ import io.reactivex.schedulers.Schedulers;
  * 在OTA升级过程中会保存此时现在的所有设备信息（onlineLights），
  * 如果是从MainActivity页面跳转而来（1.自动连接的设备有上报MeshOTA进度信息；2主动连接之前本地保存的设备），需要读取一次版本信息\n
  * 并初始化onlineLights
+ *
+ * todo UriUtils.uri2File(uri) 该方法会报参数类型不对 使用时请解决
  * 1. {@link MainActivity#onNotificationEvent(NotificationEvent)}；
  * 2. {@link MainActivity#onDeviceStatusChanged(DeviceEvent)}；
  * <p>
@@ -290,18 +290,6 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
         tv_log = (TextView) findViewById(R.id.tv_log);
         sv_log = (ScrollView) findViewById(R.id.sv_log);
         tv_version = (TextView) findViewById(R.id.tv_version);
-
-/*
-        if (!SharedPreferencesUtils.getUpdateFilePath().isEmpty()) {
-            mFile = SharedPreferencesUtils.getUpdateFilePath();
-            tvFile.setText(getString(R.string.select_file, mFile));
-            btn_start_update.setVisibility(View.VISIBLE);
-            local_version.setVisibility(View.VISIBLE);
-            local_version.setText(getString(R.string.local_version, dbLight.version));
-            server_version.setVisibility(View.VISIBLE);
-            server_version.setText(getString(R.string.server_version, StringUtils.versionResolutionURL(mFile, 2)));
-        }
-*/
     }
 
     private void initToolbar() {
@@ -585,8 +573,6 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
         }
     }
 
-    AlertDialog.Builder mScanTimeoutDialog;
-
     private void log(String log) {
         msgHandler.obtainMessage(MSG_LOG, log).sendToTarget();
     }
@@ -687,8 +673,8 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-            Uri uri = data.getData();
-            mFile = UriUtils.uri2File(uri);
+            final Uri uri = data.getData();
+           // mFile = UriUtils.uri2File(uri);
 //            mFile = getPath(this, uri);
             tvFile.setText(getString(R.string.select_file, mFile));
 //            SharedPreferencesUtils.saveUpdateFilePath(mFile);

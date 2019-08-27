@@ -45,7 +45,7 @@ public class CopyDataBaseFile {
             String databaseFilename = DATABASE_PATH + dbName;
             checkDB = SQLiteDatabase.openDatabase(databaseFilename, null, SQLiteDatabase.OPEN_READWRITE);
         } catch (SQLiteException e) {
-            LogUtils.e("CopyDataBaseFile -> 复制数据库出错------------------>");
+            //("CopyDataBaseFile -> 复制数据库出错------------------>");
         }
         return checkDB != null ? true : false;
     }

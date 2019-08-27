@@ -607,7 +607,7 @@ class RGBLightFragmentList : BaseFragment() {
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                    LogUtils.d("retry delete group timeout")
+                   //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
@@ -623,7 +623,7 @@ class RGBLightFragmentList : BaseFragment() {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     override fun onDestroy() {

@@ -8,6 +8,7 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.SharedPreferencesUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -17,10 +18,10 @@ import kotlinx.coroutines.launch
 
 //看起来像存放静态方法的静态类，实际上就是单例模式。
 object AccountModel {
-    var userPassword:String?=null
+    var userPassword: String? = null
     fun login(phone: String, password: String): Observable<DbUser> {
-        userPassword=password
-       var userphone =phone
+        userPassword = password
+        var userphone = phone
         lateinit var account: String
 
         return NetworkFactory.getApi()
@@ -28,16 +29,18 @@ object AccountModel {
                 .compose(NetworkTransformer())
                 .flatMap { response: String ->
                     account = response
+                    SharedPreferencesUtils.saveLastUser("$phone-$password-$account")
                     NetworkFactory.getApi()
                             .getsalt(response)
-                            .compose(NetworkTransformer())}
+                            .compose(NetworkTransformer())
+                }
                 .flatMap { response: String ->
                     val salt = response
                     val md5Pwd = (NetworkFactory.md5(
                             NetworkFactory.md5(NetworkFactory.md5(password) + account) + salt))
-
                     NetworkFactory.getApi().login(account, md5Pwd)
-                            .compose(NetworkTransformer()) }
+                            .compose(NetworkTransformer())
+                }
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     initDatBase(it)
@@ -45,7 +48,6 @@ object AccountModel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
 
     fun smsLoginTwo(phone: String): Observable<DbUser> {
         return NetworkFactory.getApi()
@@ -124,7 +126,7 @@ object AccountModel {
 
         if (groups != null) {
             for (item in groups.get()) {
-                var dbGroup: DbGroup = DbGroup()
+                var dbGroup = DbGroup()
                 if (item.meshAddress == 0xffff) {
                     continue
                 }
@@ -139,7 +141,7 @@ object AccountModel {
         }
     }
 
-    private fun initDatBase(user: DbUser) {
+    fun initDatBase(user: DbUser) {
         //首先保存当前数据库名
         SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.account)
 
@@ -149,9 +151,13 @@ object AccountModel {
         DaoSessionUser.destroySession()
         DaoSessionUser.getInstance()
 
+        if (user.last_authorizer_user_id == null)//不是切换区域就是登录
+            user.last_authorizer_user_id = user.id.toString()
+
         DBUtils.saveUser(user)
-        user.password= userPassword
-        if(DBUtils.getUserPhone(user.phone)==null){
+        user.password = userPassword
+
+        if (DBUtils.getUserPhone(user.phone) == null) {
             DBUtils.saveUserDao(user)
         }
     }

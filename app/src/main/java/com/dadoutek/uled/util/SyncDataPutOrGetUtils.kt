@@ -1,7 +1,10 @@
 package com.dadoutek.uled.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.*
@@ -32,11 +35,14 @@ class SyncDataPutOrGetUtils {
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
 
+
+
             Thread {
 
                 val dbDataChangeList = DBUtils.dataChangeAll
 
                 val dbUser = DBUtils.lastUser
+
                 if (dbDataChangeList.size == 0) {
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
@@ -82,6 +88,7 @@ class SyncDataPutOrGetUtils {
                                         }
 
                                         override fun onError(e: Throwable) {
+                                            LogUtils.d(e.localizedMessage)
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.error(e.cause.toString())
                                             }
@@ -100,19 +107,23 @@ class SyncDataPutOrGetUtils {
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
                                      token: String, id: Long): Observable<String>? {
             if (changeId != null) {
+                Log.e("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
                             Constant.DB_ADD -> {//todo 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
-
-                                return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
+//                                GroupMdodel.add(token, group!!, /*group!!.belongRegionId,*/ id, changeId)?.subscribe(
+//                                        { Log.e("zcl", "zcl******$it"); }, {
+//                                    Log.e("zcl", "zcl******${it.localizedMessage}")
+//                                })
+                                return group?.let { GroupMdodel.add(token, it, /*group.belongRegionId, */id, changeId) }!!
                             }
                             Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val group = DBUtils.getGroupByID(changeId)
-                                if (group != null) {
-                                    return GroupMdodel.add(token, group!!, group.belongRegionId, id, changeId)!!
+                                return group?.let {
+                                    return GroupMdodel.add(token, group, /*group.belongRegionId, */id, changeId)!!
                                 }
                             }
                         }
@@ -122,7 +133,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val light = DBUtils.getLightByID(changeId)
-                                return LightModel.add(token, light!!, id, changeId)
+                                return light?.let { LightModel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
                                 return LightModel.delete(token,
@@ -131,7 +142,7 @@ class SyncDataPutOrGetUtils {
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getLightByID(changeId)
 
-                                if (light != null) {
+                                light?.let {
                                     return LightModel.update(token, light,
                                             id, changeId.toInt())
                                 }
@@ -142,7 +153,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val light = DBUtils.getConnectorByID(changeId)
-                                return ConnectorModel.add(token, light!!, id, changeId)
+                                return light?.let { ConnectorModel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
                                 return ConnectorModel.delete(token,
@@ -150,7 +161,7 @@ class SyncDataPutOrGetUtils {
                             }
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getConnectorByID(changeId)
-                                if (light != null) {
+                                light?.let {
                                     return ConnectorModel.update(token, light,
                                             id, changeId.toInt())
                                 }
@@ -162,7 +173,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
-                                return SwitchMdodel.add(token, switch!!, id, changeId)
+                                return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
                                 return SwitchMdodel.delete(token,
@@ -170,7 +181,7 @@ class SyncDataPutOrGetUtils {
                             }
                             Constant.DB_UPDATE -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
-                                if (switch != null) {
+                                switch?.let {
                                     return SwitchMdodel.update(token,
                                             switch, changeId.toInt(), id)
                                 }
@@ -181,9 +192,8 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
-                                if (sensor != null) {
-                                    return SensorMdodel.add(token, sensor, id, changeId)
-                                }
+
+                                return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
                                 return SensorMdodel.delete(token,
@@ -191,10 +201,7 @@ class SyncDataPutOrGetUtils {
                             }
                             Constant.DB_UPDATE -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
-                                if (sensor != null) {
-                                    return SensorMdodel.update(token,
-                                            sensor, changeId.toInt(), id)
-                                }
+                                sensor?.let { return SensorMdodel.update(token, sensor, changeId.toInt(), id) }
                             }
                         }
                     }
@@ -202,7 +209,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val curtain = DBUtils.getCurtainByID(changeId)
-                                return CurtainMdodel.add(token, curtain!!, id, changeId)
+                                return curtain?.let { CurtainMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
                                 return CurtainMdodel.delete(token,
@@ -223,6 +230,7 @@ class SyncDataPutOrGetUtils {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.add(token, region, id, changeId)
                             }
+
                             Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(),
                                     id)
                             Constant.DB_UPDATE -> {
@@ -238,8 +246,8 @@ class SyncDataPutOrGetUtils {
                         lateinit var postInfoStr: String
                         var bodyScene: RequestBody? = null
                         if (scene != null && type != Constant.DB_DELETE) {
-                            val body: DbSceneBody = DbSceneBody()
-                            val gson: Gson = Gson()
+                            val body = DbSceneBody()
+                            val gson = Gson()
                             body.name = scene.name
                             body.belongRegionId = scene.belongRegionId
                             body.actions = DBUtils.getActionsBySceneId(changeId)
@@ -252,19 +260,19 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val scene = DBUtils.getSceneByID(changeId)
-                                LogUtils.d("scene_add--id==" + changeId)
+                                //("scene_add--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.add(token, bodyScene
                                             , id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                LogUtils.d("scene_delete--id==" + changeId)
+                                //("scene_delete--id==" + changeId)
                                 return SceneModel.delete(token,
                                         changeId.toInt(), id)
                             }
                             Constant.DB_UPDATE -> {
-                                LogUtils.d("scene_update--id==" + changeId)
+                                //("scene_update--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.update(token, changeId.toInt(), bodyScene, id)
                                 }
@@ -295,14 +303,12 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
-                                LogUtils.d("scene_add--id==" + changeId)
                                 if (bodyGradient != null) {
                                     return GradientModel.add(token, bodyGradient
                                             , id, changeId)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                LogUtils.d("scene_delete--id==" + changeId)
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
@@ -310,7 +316,6 @@ class SyncDataPutOrGetUtils {
                                         body, id)
                             }
                             Constant.DB_UPDATE -> {
-                                LogUtils.d("scene_update--id==" + changeId)
                                 if (bodyGradient != null) {
                                     return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
                                 }
@@ -354,9 +359,10 @@ class SyncDataPutOrGetUtils {
 
         private var acc: String? = null
 
+        @SuppressLint("CheckResult")
         private fun startGet(token: String, accountNow: String, syncCallBack: SyncCallback) {
             NetworkFactory.getApi()
-                    .getRegionList(token)
+                    .getOldRegionList(token)
                     .compose(NetworkTransformer())
                     .flatMap {
                         Log.d("itSize", it.size.toString())
@@ -419,7 +425,7 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveGradient(item, true)
                             for (i in item.colorNodes.indices) {
-                                LogUtils.e("是不是空的" + item.id)
+                                //("是不是空的"+item.id)
                                 val k = i + 1
                                 DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
                             }
@@ -442,31 +448,44 @@ class SyncDataPutOrGetUtils {
                         for (item in it) {
                             DBUtils.saveScene(item, true)
                             for (i in item.actions.indices) {
-                                LogUtils.e("是不是空的2" + item.id)
+                                //("是不是空的2"+item.id)
                                 val k = i + 1
                                 DBUtils.saveSceneActions(item.actions[i], k.toLong(), item.id)
                             }
                         }
                     }
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
-                    object : NetworkObserver<List<DbScene>>() {
-                        override fun onNext(item: List<DbScene>) {
-                            //登录后同步数据完成再上传一次数据
-                            syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
-                            SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                    {
+                        //登录后同步数据完成再上传一次数据
+                        syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                        SharedPreferencesUtils.saveCurrentUserList(accountNow)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            syncCallBack.complete()
+                        }
+                    }, {
+                GlobalScope.launch(Dispatchers.Main) {
+                    syncCallBack.error(it.message)
+                    ToastUtils.showLong(it.message)
+                }
+                /*  object : NetworkObserver<List<DbScene>>() {
+                      override fun onNext(item: List<DbScene>) {
+                          //登录后同步数据完成再上传一次数据
+                          syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                          SharedPreferencesUtils.saveCurrentUserList(accountNow)
 //                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
-                            GlobalScope.launch(Dispatchers.Main) {
-                                syncCallBack.complete()
-                            }
-                        }
+                          GlobalScope.launch(Dispatchers.Main) {
+                              syncCallBack.complete()
+                          }
+                      }
 
-                        override fun onError(e: Throwable) {
-                            super.onError(e)
-                            GlobalScope.launch(Dispatchers.Main) {
-                                syncCallBack.error(e.message)
-                            }
-                        }
-                    }
+                      override fun onError(e: Throwable) {
+                          super.onError(e)
+                          GlobalScope.launch(Dispatchers.Main) {
+                              syncCallBack.error(e.message)
+                          }
+                      }
+                  }*/
+            }
             )
         }
 
@@ -478,18 +497,18 @@ class SyncDataPutOrGetUtils {
             }
 
             override fun complete() {
-                LogUtils.d("putSuccess:" + "上传成功")
+                //("putSuccess:" + "上传成功")
             }
 
             override fun error(msg: String) {
-                LogUtils.d("GetDataError:" + msg)
+                //("GetDataError:" + msg)
             }
 
         }
 
         private fun setupMesh() {
             val regionList = DBUtils.regionAll
-            SharedPreferencesUtils.getLastUser();
+            SharedPreferencesUtils.getLastUser()
             //数据库有区域数据直接加载
             if (regionList.size != 0) {
 //            val usedRegionID=SharedPreferencesUtils.getCurrentUseRegion()

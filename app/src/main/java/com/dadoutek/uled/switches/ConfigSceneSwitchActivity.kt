@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -155,8 +154,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 showConfigSuccessDialog()
             }
         } else {
-            TelinkLightService.Instance().idleMode(true)
-            TelinkLightService.Instance().disconnect()
+            TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.disconnect()
         }
     }
 
@@ -173,8 +172,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                             saveSwitch()
                         }
 //                        saveSwitch()
-                        TelinkLightService.Instance().idleMode(true)
-                        TelinkLightService.Instance().disconnect()
+                        TelinkLightService.Instance()?.idleMode(true)
+                        TelinkLightService.Instance()?.disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
                     }
                     .show()
@@ -270,7 +269,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
-                    if (TelinkLightService.Instance().isLogin) {
+                    if (TelinkLightService.Instance()!=null&&TelinkLightService.Instance().isLogin) {
                         progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()
@@ -284,15 +283,15 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
     private fun configureComplete() {
         this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
@@ -316,13 +315,13 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        com.dadoutek.uled.util.LogUtils.d("蓝牙未开启")
+                       //("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        com.dadoutek.uled.util.LogUtils.d("无法收到广播包以及响应包")
+                       //("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        com.dadoutek.uled.util.LogUtils.d("未扫到目标设备")
+                       //("未扫到目标设备")
                     }
                 }
                 showDisconnectSnackBar()
@@ -331,10 +330,10 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        com.dadoutek.uled.util.LogUtils.d("未读到att表")
+                       //("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        com.dadoutek.uled.util.LogUtils.d("未建立物理连接")
+                       //("未建立物理连接")
 
                     }
                 }
@@ -344,16 +343,16 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        com.dadoutek.uled.util.LogUtils.d("value check失败： 密码错误")
+                       //("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("read login data 没有收到response")
+                       //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        com.dadoutek.uled.util.LogUtils.d("write login data 没有收到response")
+                       //("write login data 没有收到response")
                     }
                 }
-                LogUtils.d("onError login")
+               //("onError login")
                 showDisconnectSnackBar()
 
             }
@@ -361,7 +360,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun showDisconnectSnackBar() {
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
                 .string.device_disconnected), getString(R.string.reconnect)) {
             reconnect()
@@ -391,7 +390,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R
                 .string.connecting))
 
-        TelinkLightService.Instance().autoConnect(connectParams)
+        TelinkLightService.Instance()?.autoConnect(connectParams)
 
     }
 
@@ -431,7 +430,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 } else {
                     showDisconnectSnackBar()
 
-                    LogUtils.d("Disconnected")
+                   //("Disconnected")
                 }
             }
         }
@@ -473,7 +472,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     0x00)
 
 
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH,
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH,
                     mDeviceInfo.meshAddress,
                     paramBytes)
 

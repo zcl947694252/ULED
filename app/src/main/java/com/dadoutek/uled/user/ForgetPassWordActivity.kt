@@ -17,7 +17,6 @@ import com.dadoutek.uled.model.DbModel.DbUser
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
 import io.reactivex.Observer
@@ -102,18 +101,24 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(object: Observer<Response<String>> {
                             override fun onSubscribe(d: Disposable) {}
-
                             override fun onNext(stringResponse: Response<String>) {
                                 hideLoadingDialog()
                                 if (stringResponse.errorCode == 0) {
-                                    LogUtils.d("logging" + stringResponse.errorCode + "获取成功account")
+                                   //("logging" + stringResponse.errorCode + "获取成功account")
                                     dbUser!!.account = stringResponse.t
+                                    //正式代码走短信验证
                                     val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
                                     intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
                                     intent.putExtra("country_code",countryCode)
                                     intent.putExtra("phone", userName)
                                     intent.putExtra("account", dbUser!!.account)
                                     startActivity(intent)
+                                    //调试程序直接修改
+                                   // val intent = Intent(this@ForgetPassWordActivity, InputPwdActivity::class.java)
+                                   // intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
+                                   // intent.putExtra("phone",  dbUser!!.account)
+                                   // startActivity(intent)
+                                   // finish()
                                 } else {
                                     //ToastUtils.showLong(R.string.get_account_fail)
                                     ToastUtils.showLong(stringResponse.message)
@@ -122,7 +127,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                             override fun onError(e: Throwable) {
                                 hideLoadingDialog()
                                 Toast.makeText(this@ForgetPassWordActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
-                                LogUtils.e("zcl**********************${e.toString()}")
+                                //("zcl**********************${e.toString()}")
                             }
                             override fun onComplete() {}
                         })

@@ -35,7 +35,12 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
-import com.dadoutek.uled.othersview.*
+import com.dadoutek.uled.othersview.AboutSomeQuestionsActivity
+import com.dadoutek.uled.othersview.BaseFragment
+import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.SplashActivity
+import com.dadoutek.uled.region.NetworkActivity
+import com.dadoutek.uled.region.SettingActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperActivity
@@ -79,8 +84,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         override fun complete() {
             if (isClickExlogin) {
                 SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                TelinkLightService.Instance().disconnect()
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.disconnect()
+                TelinkLightService.Instance()?.idleMode(true)
 
                 restartApplication()
             } else {
@@ -90,7 +95,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
 
         override fun error(msg: String) {
-            LogUtils.d(msg)
+            //(msg)
             ToastUtils.showLong(msg)
             if (isClickExlogin) {
                 AlertDialog.Builder(activity)
@@ -98,7 +103,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                             SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                            TelinkLightService.Instance().idleMode(true)
+                            TelinkLightService.Instance()?.idleMode(true)
                             dialog.dismiss()
                             restartApplication()
                         }
@@ -219,7 +224,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 }
             } else {
                 if (bluetooth_image != null) {
-                    bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                    bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
                     bluetooth_image.isEnabled = false
                 }
             }
@@ -254,6 +259,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         instructions?.setOnClickListener(this)
         rlRegion?.setOnClickListener(this)
         developer?.setOnClickListener(this)
+        setting?.setOnClickListener(this)
     }
 
     private fun initView(view: View) {
@@ -263,9 +269,13 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         updateIte!!.visibility = View.GONE
 
         userIcon!!.setBackgroundResource(R.mipmap.ic_launcher)
-        userName!!.text = DBUtils.lastUser!!.phone
+        userName!!.text = DBUtils.lastUser?.phone
         isVisableDeveloper()
 
+        makePop()
+    }
+
+    private fun makePop() {
         //todo 恢复出厂设置
         var popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
         cancel = popView.findViewById(R.id.btn_cancel)
@@ -275,17 +285,17 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             it.setOnClickListener { PopUtil.dismiss(pop) }
         }
         confirm?.setOnClickListener {
-            Log.e("zcl","zcl******确定")
             PopUtil.dismiss(pop)
             //恢复出厂设置
             if (TelinkLightApplication.getInstance().connectDevice != null)
                 resetAllLight()
-            else
+            else {
                 ToastUtils.showShort(R.string.device_not_connected)
+            }
         }
-
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        pop.isOutsideTouchable = true
+        confirm?.isClickable = false
+        pop!!.isOutsideTouchable = true
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
@@ -314,7 +324,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             when (action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
                     if (bluetooth_image != null) {
-                        bluetooth_image.setImageResource(R.drawable.bluetooth_yse)
+                        bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
                         bluetooth_image.isEnabled = false
                     }
                 }
@@ -376,6 +386,10 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 var intent = Intent(activity, DeveloperActivity::class.java)
                 startActivity(intent)
             }
+            R.id.setting -> {
+                var intent = Intent(activity, SettingActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
@@ -429,7 +443,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         var num = 5 - it as Long
-                        LogUtils.e("zcl**********************num$num")
+                        //("zcl**********************num$num")
                         if (num == 0L) {
                             confirm?.isClickable = true
                             confirm?.text = getString(R.string.btn_ok)
@@ -439,6 +453,19 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                         }
                     }
         pop.showAtLocation(view, Gravity.CENTER, 0, 0)
+        /*val builder = AlertDialog.Builder(activity)
+        builder.setTitle(R.string.tip_reset_sure)
+        builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
+
+        builder.setPositiveButton(android.R.string.ok) { dialog, which ->
+            if (TelinkLightApplication.getInstance().connectDevice != null)
+                resetAllLight()
+            else {
+                ToastUtils.showShort(R.string.device_not_connected)
+            }
+        }
+        val dialog = builder.create()
+        dialog.show()*/
     }
 
 
@@ -448,10 +475,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
-        //val allSensor = DBUtils.getAllSensor()
-
         var meshAdre = ArrayList<Int>()
-
         if (lightList.isNotEmpty()) {
             for (k in lightList.indices) {
                 meshAdre.add(lightList[k].meshAddr)
@@ -469,15 +493,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 meshAdre.add(relyList[k].meshAddr)
             }
         }
-/*
-        if (allSensor.isNotEmpty()) {
-            for (k in allSensor.indices) {
-                meshAdre.add(allSensor[k].meshAddr)
-            }
-        }*/
 
         if (meshAdre.size > 0) {
-            //重置所以灯可以直接发0xffff可以恢复所有灯 但是有的灯可能收不到 单独发送meshAddr比较稳定
             Commander.resetLights(meshAdre, {
                 SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
@@ -511,10 +528,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 ToastUtils.showShort(R.string.backup_failed)
             }
 
-            override fun start() {
-            }
+            override fun start() {}
         })
-
     }
 
 
@@ -522,18 +537,23 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         isClickExlogin = true
         val b1 = (DBUtils.allLight.isEmpty() && !DBUtils.dataChangeAllHaveAboutLight && DBUtils.allCurtain.isEmpty()
                 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.isEmpty() && !DBUtils.dataChangeAllHaveAboutRelay)
-        if (b1) {
-            if (isClickExlogin) {
-                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                TelinkLightService.Instance().disconnect()
-                TelinkLightService.Instance().idleMode(true)
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
+                if (isClickExlogin) {
+                    SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+                    TelinkLightService.Instance()?.disconnect()
+                    TelinkLightService.Instance()?.idleMode(true)
 
-                restartApplication()
+                    restartApplication()
+                }
+                hideLoadingDialog()
+                Log.e("zcl", "zcl******推出上传其区域数据"+(it.id.toString() == it.last_authorizer_user_id))
+            } else {
+                checkNetworkAndSync(activity)
             }
-            hideLoadingDialog()
-        } else {
-            checkNetworkAndSync(activity)
         }
+
     }
 
 
@@ -541,38 +561,31 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-            val alertDialog = AlertDialog.Builder(activity)
-                    .setTitle(R.string.developer_mode_on)
-                    .setIcon(android.R.drawable.ic_dialog_info)
-                    .setPositiveButton(getString(R.string.open_mode)) { dialog, which ->
-                        LogUtils.getConfig().setLog2FileSwitch(true)
-                        LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                        SharedPreferencesUtils.setDeveloperModel(true)
 
-                        startActivity(Intent(context, DeveloperActivity::class.java))
-                        developer.visibility = View.VISIBLE
+            LogUtils.getConfig().setLog2FileSwitch(true)
+            LogUtils.getConfig().setDir(LOG_PATH_DIR)
+            SharedPreferencesUtils.setDeveloperModel(!SharedPreferencesUtils.isDeveloperModel())
+            if (SharedPreferencesUtils.isDeveloperModel())
+                TmtUtils.midToastLong(activity, getString(R.string.developer_mode_open))
+            else
+                TmtUtils.midToastLong(activity, getString(R.string.developer_mode_close))
 
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton(getString(R.string.close_mode)) { dialog, which ->
-                        LogUtils.getConfig().setLog2FileSwitch(false)
-                        LogUtils.getConfig().setDir(LOG_PATH_DIR)
-                        SharedPreferencesUtils.setDeveloperModel(false)
-                        developer.visibility = View.GONE
-                        dialog.dismiss()
-                    }.create()
-            alertDialog.setCancelable(false)
-            alertDialog.show()
+            if (SharedPreferencesUtils.isDeveloperModel()) {
+                startActivity(Intent(context, DeveloperActivity::class.java))
+                developer.visibility = View.VISIBLE
+            } else
+                developer.visibility = View.GONE
         }
     }
 
     //清空缓存初始化APP
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SetTextI18n")
     private fun emptyTheCache() {
+
         val alertDialog = AlertDialog.Builder(activity).setTitle(activity!!.getString(R.string.empty_cache_title))
                 .setMessage(activity!!.getString(R.string.empty_cache_tip))
                 .setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
-                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     clearData()
                 }.setNegativeButton(activity!!.getString(R.string.btn_cancel)) { dialog, which -> }.create()
         alertDialog.show()
@@ -622,8 +635,8 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
 
             override fun onError(e: Throwable) {
-                super.onError(e)
                 ToastUtils.showLong(R.string.clear_fail)
+                super.onError(e)
                 hideLoadingDialog()
             }
         })
@@ -641,13 +654,13 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         private val PERMISSIONS_STORAGE = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         fun verifyStoragePermissions(activity: Activity?) {
+            // Check if we have write permission
             val permission = ActivityCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 // We don't have permission so prompt the user
                 ActivityCompat.requestPermissions(
-                        activity,
-                        PERMISSIONS_STORAGE,
-                        REQUEST_EXTERNAL_STORAGE
+                        activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE
                 )
             } else {
                 DBManager.getInstance().copyDatabaseToSDCard(activity)

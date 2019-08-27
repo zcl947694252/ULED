@@ -25,14 +25,14 @@ MobSDK {
     signingConfigs {
         release {
             //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
-            storeFile file('..\\dadou.key')
+            storeFile file('.\\..\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
             keyPassword 'dadoutek2018'
         }
         debug {
             //storeFile file('C:\\AndroidProjects\\ULED\\dadou.key')
-            storeFile file('..\\dadou.key')
+            storeFile file('.\\..\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
             keyPassword 'dadoutek2018'
@@ -44,8 +44,8 @@ MobSDK {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 251
-        versionName  "3.0.8"
+        versionCode 248
+        versionName  "3.0.5"
 
         multiDexEnabled true
 
@@ -94,7 +94,7 @@ repositories {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 21
+    schemaVersion 25
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
@@ -104,12 +104,16 @@ greendao {
 dependencies {
     //compile(name: "libTelinkLight", ext: "aar")
     //    compile 'com.android.support:support-v4:26.1.0'
-    implementation 'com.blankj:utilcode:1.25.5'
+    implementation 'com.blankj:utilcode:1.20.3'
     implementation project(':BluetoothLightLib')
     implementation project(path: ':guide')
 
-    implementation 'com.google.zxing:core:3.3.0'
-    implementation 'com.google.zxing:android-core:3.3.0'
+    /**
+     * 二维码
+     */
+    implementation 'cn.yipianfengye.android:zxing-library:2.2'
+
+
     //noinspection GradleCompatible
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
@@ -159,6 +163,10 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
     implementation 'com.allenliu.versionchecklib:library:2.2.0'
 
-//    implementation 'com.github.wanglu1209:WPopup:lastReleases'
-//    implementation 'actionsheet:1.0.3'
+
+    /**
+     * 长连接websocket
+     */
+    //implementation "org.java-websocket:Java-WebSocket:1.4.0"
+    implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
 }

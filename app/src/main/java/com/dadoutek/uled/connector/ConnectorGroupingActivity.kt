@@ -17,22 +17,21 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.DeviceGroupingAdapter
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.*
+import com.dadoutek.uled.model.DbModel.DBUtils
+import com.dadoutek.uled.model.DbModel.DbConnector
+import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import kotlinx.android.synthetic.main.activity_set_diy_color.*
 import java.util.*
 
 
@@ -115,7 +114,6 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             }
         } else {
             //                Toast.makeText(mApplication, "", Toast.LENGTH_SHORT).show();
-            LogUtils.d("group is null")
         }
     }
     //        }
@@ -159,7 +157,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params: ByteArray
         params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     /**
@@ -173,7 +171,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
                     (groupAddress shr 8 and 0xFF).toByte())
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         }
     }
 
@@ -253,10 +251,10 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
         if (dstAddress != null) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         }
 
-        TelinkLightService.Instance().updateNotification()
+        TelinkLightService.Instance()?.updateNotification()
     }
 
     override fun onDestroy() {
@@ -265,16 +263,16 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun getDeviceGroup() {
-        TelinkLightService.Instance().updateNotification()
+        TelinkLightService.Instance()?.updateNotification()
         val opcode = 0xDD.toByte()
         val dstAddress = lights!!.meshAddr
         val params = byteArrayOf(0x08, 0x01)
 
         if (dstAddress != null) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         }
 
-        TelinkLightService.Instance().updateNotification()
+        TelinkLightService.Instance()?.updateNotification()
 
     }
 
@@ -286,7 +284,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         params[0] = 0x01
 
         if (dstAddress != null) {
-            TelinkLightService.Instance().sendCommandNoResponse(opcode, dstAddress, params)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         }
 
         lights!!.belongGroupId = group.id

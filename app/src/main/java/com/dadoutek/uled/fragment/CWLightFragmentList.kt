@@ -21,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemLongClickListener
@@ -594,7 +593,7 @@ class CWLightFragmentList : BaseFragment() {
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                    LogUtils.d("retry delete group timeout")
+                   //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
@@ -609,7 +608,7 @@ class CWLightFragmentList : BaseFragment() {
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
         val params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, lightMeshAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     override fun onDestroy() {
@@ -627,7 +626,7 @@ class CWLightFragmentList : BaseFragment() {
                 startPos = pos
                 endPos = 0
 
-                com.dadoutek.uled.util.LogUtils.d("indexchange----start:$pos")
+               //"indexchange----start:$pos")
             }
 
             override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
@@ -637,10 +636,10 @@ class CWLightFragmentList : BaseFragment() {
             override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
                 //                viewHolder.getItemId();
                 endPos = pos
-                com.dadoutek.uled.util.LogUtils.d("indexchange----end:$pos")
+               //"indexchange----end:$pos")
 
                 updateGroupList(list, startPos, endPos)
-                com.dadoutek.uled.util.LogUtils.d("indexchange----start:$startPos--end:$endPos")
+               //"indexchange----start:$startPos--end:$endPos")
             }
         }
 

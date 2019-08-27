@@ -10,7 +10,7 @@
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bnve"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +48,7 @@
     <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
         android:id="@+id/bnve"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="49dp"
         android:layout_alignParentBottom="true"
         android:background="@color/background_color"
         app:itemIconTint="@color/selector_item_color"

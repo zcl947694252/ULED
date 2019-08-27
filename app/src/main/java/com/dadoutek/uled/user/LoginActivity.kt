@@ -34,7 +34,6 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.LogUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.ToastUtil
 import com.telink.TelinkApplication
@@ -78,7 +77,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         if (phoneList!!.size == 0) {
             date_phone.visibility = View.GONE
         }
-//        detectUpdate()
 
         initData()
         initView()
@@ -117,6 +115,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         supportActionBar?.title = getString(R.string.user_login_title)
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onPause() {
         super.onPause()
         if (this.mWakeLock != null) {
@@ -124,6 +123,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
     }
 
+    @SuppressLint("WakelockTimeout")
     override fun onResume() {
         super.onResume()
         detectUpdate()
@@ -164,6 +164,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         } else
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
     }
+
 
     override fun onClick(v: View?) {
         when (v?.id) {
@@ -424,7 +425,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             isSuccess = false
             hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
-            LogUtils.d("GetDataError:" + msg)
         }
     }
 

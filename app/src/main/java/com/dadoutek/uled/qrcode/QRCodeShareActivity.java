@@ -1,14 +1,16 @@
 package com.dadoutek.uled.qrcode;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 
 public final class QRCodeShareActivity extends TelinkBaseActivity {
@@ -18,6 +20,7 @@ public final class QRCodeShareActivity extends TelinkBaseActivity {
     QRCodeGenerator mQrCodeGenerator;
     private final static int Request_Code_Scan = 1;
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +31,7 @@ public final class QRCodeShareActivity extends TelinkBaseActivity {
         title.setText("Share");
         findViewById(R.id.act_share_other).setOnClickListener(v -> startActivityForResult(new Intent(QRCodeShareActivity.this, QRCodeScanActivity.class), Request_Code_Scan));
 
-        mGeneratorHandler = new Handler() {
+       /* mGeneratorHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -40,30 +43,15 @@ public final class QRCodeShareActivity extends TelinkBaseActivity {
                 }
             }
         };
-
         mQrCodeGenerator = new QRCodeGenerator(mGeneratorHandler);
-        mQrCodeGenerator.execute();
-        /*DisplayMetrics metrics = new DisplayMetrics();
-        this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        int size = (int) metrics.density * 300;
-
-        QREncoder.Builder builder = new QREncoder.Builder();
-        builder.setBackground(0xFFFFFFFF);
-        builder.setCodeColor(0xFF000000);
-        builder.setCharset("UTF-8");
-        builder.setWidth(size);
-        builder.setHeight(size);
-        builder.setPadding(2);
-        builder.setLevel(ErrorCorrectionLevel.L);
-        QREncoder encoder = builder.build();
-
-        this.mGenerator = new QRCodeGeneratorTask();
-        this.mGenerator.setPlaceSort(null);
-        this.mGenerator.setEncoder(encoder);
-        this.mGenerator.setHandler(this.mHandler);
-        this.mGenerator.execute();*/
-
-//        this.mAdapter.setDataSource(this.mGenerator.getResult());
+        mQrCodeGenerator.execute();*/
+        /**
+         * 生成不带logo的二维码图片
+         */
+        QRCodeDataOperator dataProvider = new QRCodeDataOperator();
+        String src = dataProvider.provideStr();
+        Bitmap mBitmap = CodeUtils.createImage(src, 400, 400, null);
+        qr_image.setImageBitmap(mBitmap);
     }
 
 
@@ -72,17 +60,11 @@ public final class QRCodeShareActivity extends TelinkBaseActivity {
         super.onDestroy();
     }
 
-    private static class QRCodeImageHolder {
-        public ImageView image;
-        public TextView name;
-    }
-
-
-    @Override
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Request_Code_Scan && resultCode == RESULT_OK) {
             finish();
         }
-    }
+    }*/
 }

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network
 
+import android.util.Log
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import io.reactivex.Observer
@@ -9,13 +10,12 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 
 
-abstract class NetworkObserver<t>() : Observer<t> {
+abstract class NetworkObserver<t>: Observer<t> {
 
     override fun onSubscribe(d: Disposable) {
-
     }
     override fun onError(e: Throwable) {
-
+        Log.e("zcl", "zcl_NetworkObserver******onError${e.localizedMessage}")
         //HTTP错误
         if (e is HttpException) {
             ToastUtils.showShort(R.string.network_error)
@@ -30,8 +30,6 @@ abstract class NetworkObserver<t>() : Observer<t> {
             ToastUtils.showShort(R.string.unknown_network_error)
         }
     }
-
-
     override fun onComplete() {
     }
 }

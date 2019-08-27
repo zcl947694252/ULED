@@ -1,6 +1,5 @@
 package com.dadoutek.uled.othersview
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -19,7 +18,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemClickListener
@@ -33,7 +31,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.tellink.TelinkBaseActivity
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.ToastUtil
@@ -49,7 +46,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * 人体感应器连接后设置界面
+ * 人体感应器
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
@@ -63,9 +60,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     private val CMD_CLOSE_LIGHT = 0X00
     private val CMD_CONTROL_GROUP = 0X02
     private var switchMode = 0X01
-    lateinit var secondsList: Array<String>
     private var selectTime = 10
-    private var currentPageIsEdit = false
     private var showGroupList: MutableList<ItemGroup>? = null
     /**
      * 显示选择分组下拉的数据
@@ -125,7 +120,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         newItemGroup.enableCheck = true
                         newItemGroup.gpName = showCheckListData!![0].name
                         newItemGroup.groupAress = showCheckListData!![0].meshAddr
-
                         it.add(newItemGroup)
                         showDataListView()
                     }
@@ -152,8 +146,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun doFinish() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
@@ -176,7 +170,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             dstAdress = mDeviceInfo!!.meshAddress
             Commander.getDeviceVersion(dstAdress,
                     successCallback = {
-                        //                        versionLayoutPS.visibility = View.VISIBLE
                         tvPSVersion.text = it
                         var version = tvPSVersion.text.toString()
                         var num = version.substring(2, 3)
@@ -185,9 +178,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             isVisibility()
                         }
                     },
-                    failedCallback = {
-                        //                        versionLayoutPS.visibility = View.GONE
-                    })
+                    failedCallback = {})
+        } else {
         }
     }
 
@@ -209,7 +201,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         view18.visibility = View.VISIBLE
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.triggering_conditions -> {
@@ -236,23 +227,23 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                any.setOnClickListener(View.OnClickListener {
+                any.setOnClickListener {
                     triggering_conditions_text.text = getString(R.string.any_environment)
                     modeTriggerCondition = 0
                     popupWindow.dismiss()
-                })
+                }
 
-                darker.setOnClickListener(View.OnClickListener {
+                darker.setOnClickListener {
                     triggering_conditions_text.text = getString(R.string.dark_environment)
                     modeTriggerCondition = 1
                     popupWindow.dismiss()
-                })
+                }
 
-                veryDark.setOnClickListener(View.OnClickListener {
+                veryDark.setOnClickListener {
                     triggering_conditions_text.text = getString(R.string.very_dark_environment)
                     modeTriggerCondition = 2
                     popupWindow.dismiss()
-                })
+                }
 
             }
 
@@ -297,34 +288,25 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     val textGp = EditText(this)
                     textGp.inputType = InputType.TYPE_CLASS_NUMBER
                     textGp.maxLines = 3
-                    trigger_time_text.text = getString(R.string.custom_brightness)
                     StringUtils.initEditTextFilter(textGp)
                     AlertDialog.Builder(this)
                             .setTitle(R.string.target_brightness)
                             .setView(textGp)
-                            .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                                var targetLight = textGp.text.toString()
-                                if (targetLight == ""){
-                                    ToastUtil.showToast(this, getString(R.string.brightness_cannot_null))
-                                    return@setPositiveButton
-                                }
-
-                                var brin = targetLight.toInt()
-
+                            .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                                var brin = textGp.text.toString().toInt()
                                 if (brin == 0) {
                                     ToastUtil.showToast(this, getString(R.string.brightness_cannot))
                                     return@setPositiveButton
                                 }
-
                                 if (brin > 100) {
                                     ToastUtil.showToast(this, getString(R.string.brightness_cannot_be_greater_than))
                                     return@setPositiveButton
                                 }
-
                                 trigger_time_text.text = textGp.text.toString() + "%"
                                 modeStartUpMode = MODE_START_UP_MODE_OPEN
+                                dialog.dismiss()
                             }
-                            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+                            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
 
                     val timer = Timer()
                     timer.schedule(object : TimerTask() {
@@ -708,10 +690,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun configDevice() {
-        //获取人体感应灯version
         var version = tvPSVersion.text.toString()
-        if (version.length<=3)
-            return
         var num = version.substring(2, 3)
         if (num.toDouble() >= 3.0) {
             var time = editText.text.toString()
@@ -749,9 +728,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             }
 
             Thread {
-                val mApplication = this.application as TelinkLightApplication
-                val mesh = mApplication.getMesh()
-
                 GlobalScope.launch(Dispatchers.Main) {
                     showLoadingDialog(getString(R.string.configuring_switch))
                 }
@@ -765,7 +741,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             configureComplete()
                         },
                         failedCallback = {
-                            snackbar(window.decorView, getString(R.string.pace_fail))
+                            snackbar(sensor_root, getString(R.string.pace_fail))
                             hideLoadingDialog()
                         })
 
@@ -776,13 +752,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                 return
             }
 
-            Thread {
-                val mApplication = this.application as TelinkLightApplication
-                val mesh = mApplication.getMesh()
-
-                GlobalScope.launch(Dispatchers.Main) {
-                    showLoadingDialog(getString(R.string.configuring_switch))
-                }
+            Thread { GlobalScope.launch(Dispatchers.Main) {
+                    showLoadingDialog(getString(R.string.configuring_switch)) }
 
                 configLightlight()
                 Thread.sleep(300)
@@ -793,13 +764,12 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                             configureComplete()
                         },
                         failedCallback = {
-                            snackbar(window.decorView, getString(R.string.pace_fail))
+                            snackbar(sensor_root, getString(R.string.pace_fail))
                             hideLoadingDialog()
                         })
 
             }.start()
         }
-//       finish()
     }
 
     private fun configLightlight() {
@@ -811,32 +781,29 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                 DeviceType.NIGHT_LIGHT.toByte(),
                 switchMode.toByte(), timeL, timeH
         )
-        val paramBytesGroup: ByteArray
-        paramBytesGroup = byteArrayOf(
+        val paramBytesGroup = byteArrayOf(
                 DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0
         )
 
         var canSendGroup = true
         for (i in showGroupList!!.indices) {
             if (showGroupList!![i].groupAress == 0xffff) {
-//                canSendGroup=false
                 paramBytesGroup[i + 2] = 0xFF.toByte()
                 break
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
         }
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
         Thread.sleep(300)
 
         if (canSendGroup) {
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
@@ -846,13 +813,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun configureComplete() {
         saveSensor()
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
     private fun saveSensor() {
-        var dbSensor = DbSensor()
+        var dbSensor: DbSensor = DbSensor()
         DBUtils.saveSensor(dbSensor, false)
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.index = dbSensor.id.toInt()
@@ -866,7 +833,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
         DBUtils.recordingChange(dbSensor.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_ADD)
     }
 
     private fun getControlGroup(): String? {
@@ -888,14 +856,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         val timeL: Byte = (selectTime and 0xff).toByte()
         var mode = getModeValue()
         var paramBytes: ByteArray? = null
-//        val paramBytes = byteArrayOf(
-//                switchMode.toByte(), 0x00, 0x00,
-//                tiet_Delay.text.toString().toInt().toByte(),
-//                tietMinimumBrightness.text.toString().toInt().toByte(),
-////                triggerLux.toByte(),
-//                mode.toByte()
-//        )
-
         when {
             trigger_time_text.text.toString() == getString(R.string.light_on) -> paramBytes = byteArrayOf(
                     switchMode.toByte(), 0x00, 0x00,
@@ -924,33 +884,30 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
-        val paramBytesGroup: ByteArray
-        paramBytesGroup = byteArrayOf(
+        val paramBytesGroup = byteArrayOf(
                 DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0
         )
 
         var canSendGroup = true
         for (i in showGroupList!!.indices) {
             if (showGroupList!![i].groupAress == 0xffff) {
-//                canSendGroup=false
                 paramBytesGroup[i + 2] = 0xFF.toByte()
                 break
             } else {
                 val groupL: Byte = (showGroupList!![i].groupAress and 0xff).toByte()
                 paramBytesGroup[i + 2] = groupL
-                LogUtils.d("groupL=" + groupL + "" + "-----" + showGroupList!![i].groupAress)
             }
         }
 
         if (canSendGroup) {
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                     mDeviceInfo.meshAddress,
                     paramBytesGroup)
         }
 
         Thread.sleep(300)
 
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
@@ -985,8 +942,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun getModeValue(): Int {
-        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
-        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 

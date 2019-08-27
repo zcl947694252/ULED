@@ -1,6 +1,5 @@
 package com.dadoutek.uled.service
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Service
 import android.bluetooth.le.ScanFilter
@@ -8,24 +7,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import android.view.View
-import android.widget.RelativeLayout
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
-import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-
 import com.dadoutek.uled.model.Light
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
-import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.LogUtils
-import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.LeScanEvent
@@ -39,12 +31,9 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.design.indefiniteSnackbar
-import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 /**
@@ -150,7 +139,7 @@ class SendLightsInfo : Service(), EventListener<String> {
 //                    GlobalScope.launch(Dispatchers.Main) {
 ////                        hideLocationServiceDialog()
 //                    }
-//                    mTelinkLightService = TelinkLightService.Instance()
+//                    mTelinkLightService = TelinkLightService.Instance()?.)
 //                    if (TelinkLightApplication.getInstance().connectDevice == null) {
 //                        while (TelinkApplication.getInstance()?.serviceStarted == true) {
 //                            GlobalScope.launch(Dispatchers.Main) {
@@ -179,13 +168,13 @@ class SendLightsInfo : Service(), EventListener<String> {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (!(mScanDisposal?.isDisposed ?: false)) {
-                LogUtils.d("startScanLight_LightOfGroup")
+               //"startScanLight_LightOfGroup")
 //                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
 //                        Manifest.permission.BLUETOOTH_ADMIN)
 //                        .subscribeOn(Schedulers.io())
 //                        .subscribe {
 //                            if (it) {
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数
                 val account = DBUtils.lastUser?.account
@@ -206,7 +195,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                 params.setScanMode(false)
 
                 addScanListeners()
-                TelinkLightService.Instance().startScan(params)
+                TelinkLightService.Instance()?.startScan(params)
                 startCheckRSSITimer()
 
 //                            } else {
@@ -233,7 +222,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                        LogUtils.d("onLeScanTimeout()")
+                       //"onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -244,7 +233,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                           //"connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -266,7 +255,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                             //授予了权限
                             if (TelinkLightService.Instance() != null) {
 //                                progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
                             }
 //                        } else {
@@ -290,10 +279,10 @@ class SendLightsInfo : Service(), EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-        LogUtils.d("onErrorReport: onLeScanTimeout")
+       //"onErrorReport: onLeScanTimeout")
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-//        TelinkLightService.Instance().idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true)
 //        LeBluetooth.getInstance().stopScan()
 //        startScan()
 //        }
@@ -310,12 +299,12 @@ class SendLightsInfo : Service(), EventListener<String> {
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
         } else {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
 //            if (!scanPb.isShown) {
 //                retryConnectCount = 0
 //                connectFailedDeviceMacList.clear()
@@ -328,7 +317,7 @@ class SendLightsInfo : Service(), EventListener<String> {
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 
