@@ -814,9 +814,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun login() {
-        val account = DBUtils.lastUser?.account
-        val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
+        val meshName = DBUtils.lastUser?.controlMeshName
+        val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 

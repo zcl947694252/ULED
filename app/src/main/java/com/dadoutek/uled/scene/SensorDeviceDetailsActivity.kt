@@ -31,14 +31,12 @@ import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSensor
-import com.dadoutek.uled.model.InstallDeviceModel
-import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.othersview.HumanBodySensorActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -502,11 +500,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
     private fun autoConnectSensor() {
         //自动重连参数
-        val account = DBUtils.lastUser!!.account
         val connectParams = Parameters.createAutoConnectParameters()
-        connectParams.setMeshName(account)
+        connectParams.setMeshName( DBUtils.lastUser?.controlMeshName)
         connectParams.setConnectMac(currentLight!!.macAddr)
-        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16))
+        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5( DBUtils.lastUser?.controlMeshName) +  DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
 
         //连接，如断开会自动重连
@@ -622,7 +619,12 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         }
         isClick = NORMAL_SENSOR
         settingType = NORMAL_SENSOR
-        startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo)
+
+        if (deviceInfo.productUUID == DeviceType.SENSOR) {//3.0人体感应器
+            startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo)
+        } else if (deviceInfo.productUUID == DeviceType.NIGHT_LIGHT) {//2.0
+            startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "1")
+        }
     }
 
     fun autoConnect() {
@@ -689,11 +691,11 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                 TelinkLightService.Instance().idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
-                                val account = DBUtils.lastUser?.account
+                                val meshName = DBUtils.lastUser?.controlMeshName
 
                                 val scanFilters = java.util.ArrayList<ScanFilter>()
                                 val scanFilter = ScanFilter.Builder()
-                                        .setDeviceName(account)
+                                        .setDeviceName(meshName)
                                         .build()
                                 scanFilters.add(scanFilter)
 
@@ -707,9 +709,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                                 params.setScanMode(false)
 
-                                params.setMeshName(account)
+                                params.setMeshName(meshName)
                                 //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                                params.setOutOfMeshName(account)
+                                params.setOutOfMeshName(meshName)
                                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                                 params.setScanMode(false)
 
@@ -828,9 +830,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun login() {
-        val account = DBUtils.lastUser?.account
-        val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
+        val meshName = DBUtils.lastUser?.controlMeshName
+        val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 

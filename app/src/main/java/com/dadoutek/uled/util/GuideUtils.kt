@@ -3,7 +3,6 @@ package com.dadoutek.uled.util
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Rect
 import android.graphics.RectF
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity

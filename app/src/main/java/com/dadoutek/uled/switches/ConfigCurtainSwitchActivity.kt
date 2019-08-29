@@ -453,12 +453,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
-        } else {
-            params.setNewPassword(mesh?.password)
-        }
 
         params.setUpdateDeviceList(mDeviceInfo)
         val groupAddress = mGroupArrayList.get(mAdapter.selectedPos).meshAddr

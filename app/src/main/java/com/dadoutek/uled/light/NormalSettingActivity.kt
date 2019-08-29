@@ -167,18 +167,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         }
 
                     }
-//                        val opcode: Byte
-//                        var params: ByteArray
-//                        opcode = Opcode.SET_TEMPERATURE
-//                        params = byteArrayOf(light_current.colorTemperature.toByte())
-
-//                        if (light_current.colorTemperature > Constant.MAX_VALUE) {
-//                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        } else {
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        }
-//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         } else {
@@ -211,19 +199,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             device_light_add.setImageResource(R.drawable.icon_puls)
                         }
                     }
-
-//                        val opcode: Byte
-//                        var params: ByteArray
-//                        opcode = Opcode.SET_TEMPERATURE
-//                        params = byteArrayOf(light_current.colorTemperature.toByte())
-
-//                        if (light_current.colorTemperature > Constant.MAX_VALUE) {
-//                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        } else {
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        }
-//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         }
@@ -262,18 +237,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             device_light_add.setImageResource(R.drawable.icon_puls)
                         }
                     }
-//                        val opcode: Byte
-//                        var params: ByteArray
-//                        opcode = Opcode.SET_LUM
-//                        params = byteArrayOf(0x05, light_current.brightness.toByte())
-//
-//                        if (light_current.brightness > Constant.MAX_VALUE) {
-//                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        } else {
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        }
-//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         } else {
@@ -306,19 +269,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                             device_light_add.setImageResource(R.drawable.icon_puls)
                         }
                     }
-
-//                        val opcode: Byte
-//                        var params: ByteArray
-//                        opcode = Opcode.SET_LUM
-//                        params = byteArrayOf(0x05, light_current.brightness.toByte())
-//
-//                        if (light_current.brightness > Constant.MAX_VALUE) {
-//                            params = byteArrayOf(Constant.MAX_VALUE.toByte())
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        } else {
-//                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
-//                        }
-//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light_current.meshAddr, params)
                 }
             }
         }
@@ -2010,7 +1960,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         }
 
                         Log.e("TAG", progress.toString())
-//                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                         if (isStopTracking) {
                             if (currentShowPageGroup) {
                                 var group_current = DBUtils.getGroupByID(group!!.id)
@@ -2148,7 +2097,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
      */
     private fun autoConnect() {
 
-        if (TelinkLightService.Instance()!= null) {
+        if (TelinkLightService.Instance() != null) {
 
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
@@ -2165,18 +2114,11 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     return
                 }
 
-                val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY, "dadou")
-
                 //自动重连参数
                 val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(mesh?.name)
-                if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                    connectParams.setPassword(NetworkFactory.md5(
-                            NetworkFactory.md5(mesh?.password) + account))
-                } else {
-                    connectParams.setPassword(mesh?.password)
-                }
+                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
+
                 connectParams.autoEnableNotification(true)
 
                 // 之前是否有在做MeshOTA操作，是则继续

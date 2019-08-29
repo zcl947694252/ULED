@@ -53,7 +53,7 @@ public final class LeScanParameters extends Parameters {
      * @return
      */
     public LeScanParameters setTimeoutSeconds(int value) {
-        this.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, value);
+        this.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, 20);
         return this;
     }
 

@@ -126,7 +126,7 @@ class NewDevieFragment : BaseFragment() {
             GuideUtils.resetGroupListGuide(activity!!)
             val guide0 = toolbar!!.findViewById<TextView>(R.id.toolbarTv)
             GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide0, R.layout.view_guide_0, getString(R.string.group_list_guide0), View.OnClickListener {}, GuideUtils.END_GROUPLIST_KEY, activity!!)
+                    .addGuidePage(GuideUtils.addGuidePage(guide0, R.layout.view_guide_0, getString(R.string.group_list_guide0), View.OnClickListener{}, GuideUtils.END_GROUPLIST_KEY, activity!!)
                             .setOnLayoutInflatedListener { view, controller ->
                                 val normal = view.findViewById<TextView>(R.id.normal_light)
                                 normal.setOnClickListener {
@@ -170,11 +170,13 @@ class NewDevieFragment : BaseFragment() {
             var guide3: TextView? = install_device
 
             return GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
-                    .addGuidePage(GuideUtils.addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener {
-                        install_device?.performClick()
-                    }, GuideUtils.END_GROUPLIST_KEY, activity!!))
+                    .addGuidePage(GuideUtils.run {
+                        addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2),View.OnClickListener{ install_device?.performClick() }, END_GROUPLIST_KEY, activity!!)
+                    })
                     .show()
         }
+
+
         return null
     }
 
@@ -280,10 +282,6 @@ class NewDevieFragment : BaseFragment() {
     }
 
     private val onClick = View.OnClickListener {
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
         hidePopupMenu()
         when (it.id) {
             R.id.install_device -> {

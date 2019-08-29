@@ -300,18 +300,23 @@ open class TelinkBaseActivity : AppCompatActivity() {
             headersLogin.add(StompHeader("id", DBUtils.lastUser?.id.toString()))
             headersLogin.add(StompHeader("destination", Constant.WS_DEBUG_HOST))
 
-            codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe { topicMessage ->
-                //Log.e(TAG, "收到解析二维码信息:$topicMessage")
-                val payloadCode = topicMessage.payload
-                val codeBean = JSONObject(payloadCode)
-                val phone = codeBean.get("ref_user_phone")
-                val type = codeBean.get("type") as Int
-                val account = codeBean.get("account")
-                // Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
-                makeCodeDialog(type, phone, account, "")
-            }
+            codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe(
+                    { topicMessage ->
+                        //Log.e(TAG, "收到解析二维码信息:$topicMessage")
+                        val payloadCode = topicMessage.payload
+                        val codeBean = JSONObject(payloadCode)
+                        val phone = codeBean.get("ref_user_phone")
+                        val type = codeBean.get("type") as Int
+                        val account = codeBean.get("account")
+                        // Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
+                        makeCodeDialog(type, phone, account, "")
+                    },
+                    {
+                        ToastUtils.showShort(it.localizedMessage)
+                    }
+            )
 
-            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe { topicMessage ->
+            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe({ topicMessage ->
                 Log.e(TAG, "收到解除授权信息:$topicMessage")
                 val payloadCode = topicMessage.payload
                 val codeBean = JSONObject(payloadCode)
@@ -336,10 +341,12 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     }
                 }
                 makeCodeDialog(2, phone, "", regionName)//2代表解除授权信息type
-            }
+            },{
+                ToastUtils.showShort(it.localizedMessage)
+            })
 
 
-            loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe { topicMessage ->
+            loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe ({ topicMessage ->
                 payload = topicMessage.payload
                 //Log.e(TAG, "收到信息:$topicMessage")
                 var key = SharedPreferencesHelper.getString(this@TelinkBaseActivity, Constant.LOGIN_STATE_KEY, "no_have_key")
@@ -347,15 +354,19 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 if (payload == key)
                     return@subscribe
                 checkNetworkAndSync(this@TelinkBaseActivity)
-            }
+            },{
+                ToastUtils.showShort(it.localizedMessage)
+            })
 
-            normalSubscribe = mStompClient!!.lifecycle().subscribe { lifecycleEvent ->
+            normalSubscribe = mStompClient!!.lifecycle().subscribe ({ lifecycleEvent ->
                 when (lifecycleEvent.type) {
                     LifecycleEvent.Type.OPENED -> Log.e(TAG, "zcl******Stomp connection opened")
                     LifecycleEvent.Type.ERROR -> Log.e(TAG, "zcl******Error" + lifecycleEvent.exception)
                     LifecycleEvent.Type.CLOSED -> Log.e(TAG, "zcl******Stomp connection closed")
                 }
-            }
+            },{
+                ToastUtils.showShort(it.localizedMessage)
+            })
             return "Executed"
         }
 

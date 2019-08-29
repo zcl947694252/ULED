@@ -37,6 +37,9 @@ import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
+/**
+ * 人体感应器3.0设置详情
+ */
 class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener, EventListener<String> {
 
     private lateinit var telinkApplication: TelinkApplication
@@ -135,11 +138,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun autoConnectSensor() {
         //自动重连参数
-        val account = DBUtils.lastUser!!.account
         val connectParams = Parameters.createAutoConnectParameters()
-        connectParams.setMeshName(account)
+        connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
         connectParams.setConnectMac(mDeviceInfo.macAddress)
-        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16))
+        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
 
         //连接，如断开会自动重连

@@ -47,6 +47,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
@@ -884,14 +885,16 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
 
                 startConnect = true;
 
-                String account = DBUtils.INSTANCE.getLastUser().getAccount();
+                DbUser lastUser = DBUtils.INSTANCE.getLastUser();
+                if (lastUser==null)
+                    return;
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
-                connectParams.setMeshName(account);
+                connectParams.setMeshName(lastUser.getControlMeshName());
                 connectParams.setConnectMac(bestRssiDevice.macAddress);
                 connectParams.setPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(account) + account).substring(0, 16));
+                        NetworkFactory.md5(lastUser.getControlMeshName()) + lastUser.getControlMeshName()).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连

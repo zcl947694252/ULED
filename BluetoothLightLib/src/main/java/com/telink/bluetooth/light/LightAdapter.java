@@ -1373,10 +1373,12 @@ public class LightAdapter {
 
 
     private final class EventLoopTask implements Runnable {
-
+        /**
+         * 增加搜索时间
+         */
         private boolean pause;
         private long lastUpdateTime;
-        private int waitSeconds = 5 * 1000;
+        private int waitSeconds = 10 * 1000;
 
         @Override
         public void run() {

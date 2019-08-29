@@ -933,9 +933,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun login() {
-        val account = DBUtils.lastUser?.account
-        val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
+        val meshName = DBUtils.lastUser?.controlMeshName
+        val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
 
@@ -944,15 +944,10 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-//        if (mConnectSnackBar) {
-//        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
         TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan()
-//        }
-//        } else {
-//            retryConnect()
-//        }
+
 
     }
 }

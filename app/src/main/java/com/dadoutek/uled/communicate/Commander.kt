@@ -565,14 +565,13 @@ object Commander : EventListener<String> {
         if (TelinkLightService.Instance()!= null) {
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 TelinkLightService.Instance()?.idleMode(true);
-                val account = DBUtils.lastUser!!.account
 
                 //自动重连参数
                 val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(account)
+                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
                 connectParams.setConnectMac(macAddress)
                 connectParams.setPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(account) + account).substring(0, 16))
+                        NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
                 connectParams.autoEnableNotification(true)
 
                 //连接，如断开会自动重连
@@ -584,7 +583,6 @@ object Commander : EventListener<String> {
                         e.printStackTrace()
                     }
                 }.start()
-                //                connectDevice(bestRssiDevice.macAddress);
             }
 
             //刷新Notify参数

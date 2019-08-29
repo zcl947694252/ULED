@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit
  * 人体感应器扫描新设备/已连接设备
  */
 class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
-    private val SCAN_TIMEOUT_SECOND: Int = 8
+    private val SCAN_TIMEOUT_SECOND: Int = 20
     private val CONNECT_TIMEOUT_SECONDS: Int = 5
     private val MAX_RETRY_CONNECT_TIME = 3
 
@@ -342,6 +342,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
         if (isSupportInstallOldDevice) {
             if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
+
                 startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
             } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
                 startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "1")

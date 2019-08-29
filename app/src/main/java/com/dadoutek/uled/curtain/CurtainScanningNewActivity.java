@@ -48,6 +48,7 @@ import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbCurtain;
 import com.dadoutek.uled.model.DbModel.DbGroup;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
@@ -85,7 +86,6 @@ import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.bluetooth.light.Parameters;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
-import com.telink.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -888,14 +888,14 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 startConnect = true;
 
-                String account = DBUtils.INSTANCE.getLastUser().getAccount();
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
-                connectParams.setMeshName(account);
+                DbUser lastUser = DBUtils.INSTANCE.getLastUser();
+                connectParams.setMeshName(lastUser.getControlMeshName());
                 connectParams.setConnectMac(bestRssiDevice.macAddress);
                 connectParams.setPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(account) + account).substring(0, 16));
+                        NetworkFactory.md5(lastUser.getControlMeshName()) + lastUser.getControlMeshName()).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
@@ -1685,18 +1685,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
             case LightAdapter.STATUS_LOGOUT:
                 isLoginSuccess = false;
                 break;
-//                case LightAdapter.STATUS_CONNECTED:
-//                    if(startConnect){
-//                        login();
-//                    }
-//                    break;
         }
     }
 
-    private void login() {
-//        log("login");
-        String account = DBUtils.INSTANCE.getLastUser().getAccount();
-        String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16);
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
-    }
 }

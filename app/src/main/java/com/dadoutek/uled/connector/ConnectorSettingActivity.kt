@@ -121,10 +121,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             R.id.btn_rename -> renameGroup()
 
             R.id.btnOTA -> {
-                if(txtTitle.text.toString()!=null && txtTitle.text.toString() !=""){
+                if (txtTitle.text.toString() != null && txtTitle.text.toString() != "") {
                     checkPermission()
-                }else{
-                    Toast.makeText(this,R.string.number_no,Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -192,7 +192,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_light_confirm)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
 
-                    if ( TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null &&TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                    if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val opcode = Opcode.KICK_OUT
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light!!.getMeshAddr(), null)
                         DBUtils.deleteConnector(light!!)
@@ -274,7 +274,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                   //("retry delete group timeout")
+                    //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
@@ -462,13 +462,13 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                       // ("蓝牙未开启")
+                        // ("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                       // ("无法收到广播包以及响应包")
+                        // ("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                       // ("未扫到目标设备")
+                        // ("未扫到目标设备")
                     }
                 }
 
@@ -476,7 +476,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                       // ("未读到att表")
+                        // ("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
                         //("未建立物理连接")
@@ -489,13 +489,13 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                      //  ("value check失败： 密码错误")
+                        //  ("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                       //("read login data 没有收到response")
+                        //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                       // ("write login data 没有收到response")
+                        // ("write login data 没有收到response")
                     }
                 }
 
@@ -739,7 +739,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
      */
     private fun autoConnect() {
 
-        if (TelinkLightService.Instance()!= null) {
+        if (TelinkLightService.Instance() != null) {
 
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
@@ -757,17 +757,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     return
                 }
 
-                val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY, "dadou")
-
                 //自动重连参数
                 val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(mesh?.name)
-                if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account))
-                } else {
-                    connectParams.setPassword(mesh?.password)
-                }
+                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
+
                 connectParams.autoEnableNotification(true)
 
                 // 之前是否有在做MeshOTA操作，是则继续

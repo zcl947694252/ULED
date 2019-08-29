@@ -133,7 +133,7 @@ abstract class BaseActivity : AppCompatActivity() {
             headersLogin.add(StompHeader("id", DBUtils.lastUser!!.id.toString()))
             headersLogin.add(StompHeader("destination", Constant.WS_DEBUG_HOST))
 
-            codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe { topicMessage ->
+            codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe ({ topicMessage ->
                 Log.e(TAGS, "收到解析二维码信息:$topicMessage")
                 val payloadCode = topicMessage.payload
                 val codeBean = JSONObject(payloadCode)
@@ -142,9 +142,9 @@ abstract class BaseActivity : AppCompatActivity() {
                 val account = codeBean.get("account")
                 Log.e(TAGS, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
                 makeCodeDialog(type, phone, account, "")
-            }
+            },{ToastUtils.showShort(it.localizedMessage)})
 
-            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe { topicMessage ->
+            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe ({ topicMessage ->
                 val payloadCode = topicMessage.payload
                 val codeBean = JSONObject(payloadCode)
                 val phone = codeBean.get("authorizer_user_phone")
@@ -171,9 +171,9 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
                 makeCodeDialog(2, phone, "", regionName)//2代表解除授权信息type
-            }
+            },{ToastUtils.showShort(it.localizedMessage)})
 
-            loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe { topicMessage ->
+            loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe ({ topicMessage ->
                 payload = topicMessage.payload
                 Log.e(TAGS, "收到信息:$topicMessage")
                 var key = SharedPreferencesHelper.getString(this@BaseActivity, Constant.LOGIN_STATE_KEY, "no_have_key")
@@ -181,16 +181,16 @@ abstract class BaseActivity : AppCompatActivity() {
                 if (payload == key)
                     return@subscribe
                 checkNetworkAndSync(this@BaseActivity)
-            }
+            },{ToastUtils.showShort(it.localizedMessage)})
 
-            normalSubscribe = mStompClient!!.lifecycle().subscribe { lifecycleEvent ->
+            normalSubscribe = mStompClient!!.lifecycle().subscribe( { lifecycleEvent ->
                 when (lifecycleEvent.type) {
                     LifecycleEvent.Type.OPENED -> Log.e(TAGS, "zcl******Stomp connection opened")
                     LifecycleEvent.Type.ERROR -> Log.e(TAGS, "zcl******Error" + lifecycleEvent.exception)
                     LifecycleEvent.Type.CLOSED -> Log.e(TAGS, "zcl******Stomp connection closed")
                     else -> Log.e(TAGS, "zcl******Stomp connection no get")
                 }
-            }
+            },{ToastUtils.showShort(it.localizedMessage)})
             return "Executed"
         }
 

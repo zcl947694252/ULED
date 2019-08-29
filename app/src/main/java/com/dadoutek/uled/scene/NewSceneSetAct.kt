@@ -117,7 +117,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         if (guideShowCurrentPage) {
             GuideUtils.guideBuilder(this, GuideUtils.ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
                     .addGuidePage(GuideUtils.addGuidePage(edit_name, R.layout.view_guide_simple_scene_set0, getString(R.string.add_scene_guide_0),
-                            View.OnClickListener { step1Guide() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                            View.OnClickListener{ step1Guide() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -127,9 +127,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val guide1 = sceneEditListAdapter!!.getViewByPosition(0, R.id.group_check_state)
             GuideUtils.guideBuilder(this, GuideUtils.STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
                     .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_1),
-                            View.OnClickListener {
-                                changeCheck(0)
-                            }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                            View.OnClickListener{ changeCheck(0) }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -139,7 +137,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val guide1 = confirm
             GuideUtils.guideBuilder(this, GuideUtils.STEP9_GUIDE_ADD_SCENE_SURE)
                     .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_2),
-                            View.OnClickListener { guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
+                            View.OnClickListener{ guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }
     }
 
@@ -149,8 +147,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val guide6 = confirm
             GuideUtils.guideBuilder(this, GuideUtils.STEP13_GUIDE_ADD_SCENE_SAVE)
                     .addGuidePage(GuideUtils.addGuidePage(guide6, R.layout.view_guide_simple_scene_set1, getString(R.string.add_scene_guide_6),
-                            View.OnClickListener {
-                                guide6.performClick()
+                            View.OnClickListener{ guide6.performClick()
                                 GuideUtils.changeCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, true)
                             }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
         }

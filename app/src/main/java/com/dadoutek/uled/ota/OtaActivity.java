@@ -173,7 +173,7 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
     private void startScan() {
         LeScanParameters params = Parameters.createScanParameters();
         params.setMeshName(this.selectedDevice.meshName);
-        params.setTimeoutSeconds(10);
+        params.setTimeoutSeconds(20);
         /*params.set(Parameters.PARAM_MESH_NAME, this.selectedDevice.meshName);
         params.set(Parameters.PARAM_SCAN_TIMEOUT_SECONDS, 10);*/
         TelinkLightService.Instance().startScan(params);

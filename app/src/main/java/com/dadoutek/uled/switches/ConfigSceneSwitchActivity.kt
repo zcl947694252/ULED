@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
 
-private const val CONNECT_TIMEOUT = 5
+private const val CONNECT_TIMEOUT = 20
 
 class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 

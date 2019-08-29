@@ -1563,9 +1563,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun login() {
-        val account = DBUtils.lastUser?.account
-        val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16))
+        val meshName = DBUtils.lastUser?.controlMeshName
+        val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
+                , Strings.stringToBytes(pwd, 16))
         ToastUtil.showToast(this, getString(R.string.connect_success))
         hideLoadingDialog()
     }
@@ -1687,18 +1688,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     return
                 }
 
-                val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.DB_NAME_KEY, "dadou")
-
                 //自动重连参数
                 val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(mesh?.name)
-                if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                    connectParams.setPassword(NetworkFactory.md5(
-                            NetworkFactory.md5(account) + account))
-                } else {
-                    connectParams.setPassword(mesh?.password)
-                }
+                connectParams.setMeshName( DBUtils.lastUser?.controlMeshName)
+
+                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(
+                            DBUtils.lastUser?.controlMeshName) +  DBUtils.lastUser?.controlMeshName))
+
                 connectParams.autoEnableNotification(true)
 
                 // 之前是否有在做MeshOTA操作，是则继续

@@ -176,12 +176,7 @@
         <activity
             android:name=".ota.OtaActivity"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".ota.OtaDeviceListActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ota.BatchOtaActivity"
-            android:screenOrientation="portrait" />
+
         <activity
             android:name=".othersview.LogInfoActivity"
             android:screenOrientation="portrait" />

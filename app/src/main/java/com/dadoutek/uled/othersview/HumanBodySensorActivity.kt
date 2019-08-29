@@ -46,7 +46,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * 人体感应器
+ * 创建者     zcl
+ * 创建时间   2019/8/29 16:03
+ * 描述	      ${人体感应器2.0版本设置界面}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
