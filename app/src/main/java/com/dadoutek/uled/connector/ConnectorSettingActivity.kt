@@ -749,8 +749,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 if (this.mApp?.isEmptyMesh != false)
                     return
 
-                //                Lights.getInstance().clear();
-                this.mApp?.refreshLights()
 
                 val mesh = this.mApp?.getMesh()
 
@@ -797,6 +795,5 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
         } else {
             return super.onKeyDown(keyCode, event)
         }
-
     }
 }

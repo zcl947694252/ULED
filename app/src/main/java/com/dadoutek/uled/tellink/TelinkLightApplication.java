@@ -15,6 +15,7 @@ import com.dadoutek.uled.model.DaoSessionInstance;
 import com.dadoutek.uled.model.DaoSessionUser;
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
+import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
@@ -97,22 +98,27 @@ public final class TelinkLightApplication extends TelinkApplication {
         long currentRegionID = SharedPreferencesUtils.getCurrentUseRegion();
 
 
+        // 此处直接赋值是否可以 --->原逻辑 保存旧的区域信息 保存 区域id  通过区域id查询 再取出name pwd  直接赋值
+        //切换区域记得断开连接
+
         if (currentRegionID != -1) {
             DbRegion dbRegion = DBUtils.INSTANCE.getCurrentRegion(currentRegionID);
+            //if (dbRegion != null) {
+            DbUser lastUser = DBUtils.INSTANCE.getLastUser();
+            if (lastUser == null) return;
+            String name = lastUser.getControlMeshName();//dbRegion.getControlMesh();
+            String pwd = lastUser.getControlMeshPwd();//dbRegion.getControlMeshPwd();
 
-            if (dbRegion != null) {
-                String name = dbRegion.getControlMesh();
-                String pwd = dbRegion.getControlMeshPwd();
-                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
-                   //("mesh.setPassword = " + name);
-                    mesh = new Mesh();
-                    mesh.setName(name);
-                    mesh.setPassword(name);
-                    mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
-                    mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
-                    setupMesh(mesh);
-                }
+            if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
+                //("mesh.setPassword = " + name);
+                mesh = new Mesh();
+                mesh.setName(name);
+                mesh.setPassword(name);
+                mesh.setFactoryName(Constant.DEFAULT_MESH_FACTORY_NAME);
+                mesh.setFactoryPassword(Constant.DEFAULT_MESH_FACTORY_PASSWORD);
+                setupMesh(mesh);
             }
+            //}
         }
 
         //启动LightService
@@ -146,25 +152,6 @@ public final class TelinkLightApplication extends TelinkApplication {
 
     public void setupMesh(Mesh mesh) {
         this.mesh = mesh;
-        refreshLights();
-    }
-
-    public void refreshLights() {
-//        if (mesh != null && mesh.devices != null) {
-//            Lights.getInstance().clear();
-//            Light light;
-//            for (DeviceInfo deviceInfo : mesh.devices) {
-//                light = new Light();
-//                light.meshAddress = deviceInfo.meshAddress;
-//                light.brightness = 0;
-//                light.status = ConnectionStatus.OFFLINE;
-//                light.textColor = this.getResources().getColor(
-//                        R.color.black);
-//                light.updateIcon();
-//
-//                Lights.getInstance().add(light);
-//            }
-//        }
     }
 
 

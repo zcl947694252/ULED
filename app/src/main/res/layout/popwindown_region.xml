@@ -30,7 +30,7 @@
                 android:id="@+id/imageView14"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
                 android:src="@drawable/icon_name"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
                 android:id="@+id/pop_net_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/btn_ok"
                 android:textColor="@color/black_three"
                 android:textSize="18sp"
@@ -52,8 +52,8 @@
                 android:id="@+id/pop_equipment_num"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="20dp"
                 android:text="@string/equipment_quantity"
                 android:textColor="@color/blue_background"
                 android:textSize="15sp"
@@ -85,9 +85,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -97,8 +97,8 @@
                     android:id="@+id/pop_user_net"
                     android:layout_width="55dp"
                     android:layout_height="55dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginRight="12dp"
                     android:src="@drawable/icon_use"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -118,9 +118,9 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -145,9 +145,9 @@
                 android:id="@+id/pop_unbind_net_ly"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -213,7 +213,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="25dp"
+                android:layout_marginLeft="25dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
@@ -237,7 +237,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="25dp"
+                android:layout_marginLeft="25dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
                 android:orientation="vertical" />
@@ -248,7 +248,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="21dp"
-            android:layout_marginStart="@dimen/dp_15"
+            android:layout_marginLeft="@dimen/dp_15"
             android:layout_marginBottom="23dp"
             android:text="@string/in_use"
             android:textColor="@color/black_three"
@@ -266,15 +266,15 @@
         android:layout_alignParentBottom="true"
         android:background="@color/white"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
-            android:id="@+id/pop_qr_net"
+            android:id="@+id/pop_qr_area_name"
             android:layout_width="match_parent"
             android:layout_height="28dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
             android:gravity="center"
             android:text="TextView"
             android:textColor="@color/black_three"
@@ -285,7 +285,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/pop_qr_net_user"
+            android:id="@+id/pop_qr_area_user"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -296,7 +296,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.487"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pop_qr_net" />
+            app:layout_constraintTop_toBottomOf="@id/pop_qr_area_name" />
 
         <ImageView
             android:id="@+id/pop_qr_img"
@@ -361,5 +361,5 @@
         android:layout_width="match_parent"
         android:layout_height="447dp"
         android:layout_above="@+id/pop_net_ly"
-        android:layout_marginBottom="0dp" />
+        android:layout_marginBottom="2dp" />
 </RelativeLayout>

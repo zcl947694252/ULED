@@ -453,12 +453,9 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
                         Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(account) + account))
+            params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
             params.setNewPassword(mesh?.password)
         }

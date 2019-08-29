@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
             android:background="@drawable/icon_top_tab_back"
             android:contentDescription="@null" />
 
@@ -29,8 +29,8 @@
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
             android:gravity="center_vertical"
             android:singleLine="true"
             android:text="@string/device_list_header"

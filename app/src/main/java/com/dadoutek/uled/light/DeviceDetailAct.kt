@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -29,10 +30,12 @@ import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
-import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
@@ -49,7 +52,6 @@ import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.*
-import com.telink.bluetooth.light.DeviceInfo
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -70,7 +72,13 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by hejiajun on 2018/4/24.
+ * 创建者     zcl
+ * 创建时间   2019/8/28 17:34
+ * 描述	      ${设备内容列表 从首页设备fragment点击跳入 以及扫描设备按钮}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
  */
 
 private const val MAX_RETRY_CONNECT_TIME = 5
@@ -79,65 +87,40 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
-
     private var type: Int? = null
     private lateinit var lightsData: MutableList<DbLight>
-
     private var inflater: LayoutInflater? = null
-
     private var adaper: DeviceDetailListAdapter? = null
-
     private val SCENE_MAX_COUNT = 16
     private var currentLight: DbLight? = null
-
     private var positionCurrent: Int = 0
-
-//    private lateinit var lightList: MutableList<DbLight>
-
     private var canBeRefresh = true
-
-//    private lateinit var group: DbGroup
-
     private val REQ_LIGHT_SETTING: Int = 0x01
-
     private var acitivityIsAlive = true
-
     private var mTelinkLightService: TelinkLightService? = null
-
     private var retryConnectCount = 0
-
     private var bestRSSIDevice: DeviceInfo? = null
-
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var mApplication: TelinkLightApplication? = null
-
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
-
     private var isRgbClick = false
-
     private var installId = 0
-
     private lateinit var stepOneText: TextView
     private lateinit var stepTwoText: TextView
     private lateinit var stepThreeText: TextView
     private lateinit var switchStepOne: TextView
     private lateinit var switchStepTwo: TextView
     private lateinit var swicthStepThree: TextView
-
     private var connectMeshAddress: Int = 0
-
     private var lastOffset: Int = 0//距离
-
     private var lastPosition: Int = 0//第几个item
-
     private var sharedPreferences: SharedPreferences? = null
 
     override fun onPostResume() {
@@ -149,23 +132,18 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun addListeners() {
         addScanListeners()
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
-//            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
-            }
+            LeScanEvent.LE_SCAN_TIMEOUT -> LogUtils.e("zcl连接超时了")
+            LeScanEvent.LE_SCAN_COMPLETED -> LogUtils.e("zcl连接结束了")
+            NotificationEvent.GET_ALARM -> {}
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
-//            NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
@@ -174,28 +152,20 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun onServiceConnected(event: ServiceEvent) {
-//       //"onServiceConnected")
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-       //"onServiceDisconnected")
         TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
     }
 
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
-            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
-               //"This is switch")
-                true
-            }
-            else -> {
-                false
-            }
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> true
+            else -> false
         }
     }
 
     private fun onErrorReport(info: ErrorReportInfo) {
-//       //"onErrorReport current device mac = ${bestRSSIDevice?.macAddress}")
         if (bestRSSIDevice != null) {
 //            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
         }
@@ -203,13 +173,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                       //"蓝牙未开启")
+                        LogUtils.d("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                       //"无法收到广播包以及响应包")
+                        LogUtils.d("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                       //"未扫到目标设备")
+                        LogUtils.d("未扫到目标设备")
                     }
                 }
 
@@ -217,10 +187,10 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                       //"未读到att表")
+                        LogUtils.d("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                       //"未建立物理连接")
+                        LogUtils.d("未建立物理连接")
                     }
                 }
                 retryConnect()
@@ -229,13 +199,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                       //"value check失败： 密码错误")
+                        LogUtils.d("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                       //"read login data 没有收到response")
+                        LogUtils.d("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                       //"write login data 没有收到response")
+                        LogUtils.d("write login data 没有收到response")
                     }
                 }
                 retryConnect()
@@ -245,8 +215,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     /**
-     * 处理扫描事件
-     *
+     * 处理扫描设备详情
      * @param event
      */
     @Synchronized
@@ -263,16 +232,15 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             }
         }.start()
 
-        if (!isSwitch(deviceInfo.productUUID) && !connectFailedDeviceMacList.contains(deviceInfo.macAddress)) {
-//            connect(deviceInfo.macAddress)
+        if (!isSwitch(deviceInfo.productUUID)) {
             if (bestRSSIDevice != null) {
                 //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                 if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                   //"changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                    LogUtils.d("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                     bestRSSIDevice = deviceInfo
                 }
-            } else {
-               //"RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+            } else {on
+                LogUtils.d("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                 bestRSSIDevice = deviceInfo
             }
 
@@ -281,14 +249,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun onDeviceStatusChanged(event: DeviceEvent) {
-
         val deviceInfo = event.args
-
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
-
-               TelinkLightService.Instance()?.enableNotification()
-               TelinkLightService.Instance()?.updateNotification()
+                TelinkLightService.Instance()?.enableNotification()
+                TelinkLightService.Instance()?.updateNotification()
                 GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
@@ -300,8 +265,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
-//                scanPb.visibility = View.GONE
-//                adapter?.notifyDataSetChanged()
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -309,10 +272,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             }
             LightAdapter.STATUS_CONNECTING -> {
                 Log.d("connectting", "444")
-//                scanPb.visibility = View.VISIBLE
             }
             LightAdapter.STATUS_CONNECTED -> {
-                TelinkLightService.Instance()?:return
+                TelinkLightService.Instance() ?: return
                 if (!TelinkLightService.Instance()!!.isLogin)
                     login()
                 hideLoadingDialog()
@@ -326,10 +288,9 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun onNError(event: DeviceEvent) {
-//        ToastUtils.showLong(getString(R.string.connect_fail))
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-       TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
         val builder = AlertDialog.Builder(this)
@@ -374,57 +335,42 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun initView() {
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-        val layoutmanager = LinearLayoutManager(this)
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
-//        val decoration = DividerItemDecoration(this!!, DividerItemDecoration .VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
-//                .divider)))
-//        recyclerView!!.addItemDecoration(decoration)
-        //添加Item变化动画
         recycleView!!.itemAnimator = DefaultItemAnimator()
-
 
         recycleView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-
                 super.onScrollStateChanged(recyclerView, newState)
-
-                if (recyclerView.layoutManager != null) {
-
+                if (recyclerView.layoutManager != null)
                     getPositionAndOffset()
-
-                }
-
             }
-
         })
 
+        /**
+         *单个设备列表适配器页面设置
+         */
         adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-            currentLight = lightsData?.get(position)
+            currentLight = lightsData[position]
             positionCurrent = position
 
-            val opcode = Opcode.LIGHT_ON_OFF
-
-            when (view.id) {
-                R.id.img_light -> {
-                    canBeRefresh = true
-                    //todo 添加未连接提示
-                    mTelinkLightService = TelinkLightService.Instance()
-                    if (mTelinkLightService?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
-                        while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                            GlobalScope.launch(Dispatchers.Main) {
-                                retryConnectCount = 0
-                                connectFailedDeviceMacList.clear()
-                                if (TelinkApplication.getInstance()?.connectDevice == null)
-                                    startScan(false)
-                            }
-                            break
-                        }
-                    } else {
+            mTelinkLightService = TelinkLightService.Instance()
+            if (mTelinkLightService?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
+                while (TelinkApplication.getInstance()?.serviceStarted == true) {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        retryConnectCount = 0
+                        connectFailedDeviceMacList.clear()
+                        if (TelinkApplication.getInstance()?.connectDevice == null)
+                            startScan(false)
+                        LogUtils.e("zcl设备列表页重连开始扫描设备")
+                    }
+                    break
+                }
+            } else
+                when (view.id) {
+                    R.id.img_light -> {
+                        canBeRefresh = true
+                        //todo 添加未连接提示
                         if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
                             if (currentLight!!.productUUID == DeviceType.SMART_CURTAIN) {//开窗
                                 Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
@@ -455,20 +401,19 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             adapter?.notifyDataSetChanged()
                         }
                     }
-                }
 
-                R.id.tv_setting -> {
-                    var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
-                    if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
-                        intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                    R.id.tv_setting -> {
+                        var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
+                        if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
+                            intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
+                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+                        }
+                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
+                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                        startActivityForResult(intent, REQ_LIGHT_SETTING)
                     }
-                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
-                    intent.putExtra(Constant.GROUP_ARESS_KEY, currentLight!!.meshAddr)
-                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                    startActivityForResult(intent, REQ_LIGHT_SETTING)
                 }
-            }
         }
         adaper!!.bindToRecyclerView(recycleView)
 
@@ -601,12 +546,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
         installDialog?.show()
 
-        Thread {
-            Thread.sleep(100)
-            GlobalScope.launch(Dispatchers.Main) {
-                //                guide3(install_device_recyclerView)
-            }
-        }.start()
     }
 
     val INSTALL_NORMAL_LIGHT = 0
@@ -615,7 +554,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     val INSTALL_SENSOR = 3
     val INSTALL_CURTAIN = 4
     val INSTALL_CONNECTOR = 5
-    val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+    private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         var intent: Intent? = null
         //点击任何一个选项跳转页面都隐藏引导
 //        val controller=guide2()
@@ -755,7 +694,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         android.app.AlertDialog.Builder(this)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -796,13 +735,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
                 startActivityForResult(intent, 0)
             }
-            Constant.INSTALL_LIGHT_OF_CW -> {
+            Constant.INSTALL_LIGHT_OF_CW -> {//暂时无用
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
                 intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
                 startActivityForResult(intent, 0)
             }
-            Constant.INSTALL_LIGHT_OF_RGB -> {
+            Constant.INSTALL_LIGHT_OF_RGB -> {//暂时无用没有其他调用
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                 intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
@@ -844,14 +783,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.setOnClickListener(View.OnClickListener {
+                    batchGroup.setOnClickListener {
                         val intent = Intent(this,
                                 BatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "all_light")
                         startActivity(intent)
-                    })
+                    }
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
@@ -897,14 +836,14 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.setOnClickListener(View.OnClickListener {
+                    batchGroup.setOnClickListener {
                         val intent = Intent(this,
                                 RgbBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("lightType", "all_light")
                         startActivity(intent)
-                    })
+                    }
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
@@ -932,7 +871,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         }
                     }
 
-
                     if (no_group.size > 0) {
                         for (i in no_group.indices) {
                             lightsData.add(no_group[i])
@@ -952,7 +890,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.setOnClickListener(View.OnClickListener {
+                    batchGroup.setOnClickListener {
                         val intent = Intent(this,
                                 BatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -960,7 +898,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         intent.putExtra("lightType", "cw_light")
                         intent.putExtra("cw_light_group_name", cwLightGroup)
                         startActivity(intent)
-                    })
+                    }
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
@@ -1008,7 +946,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.setOnClickListener(View.OnClickListener {
+                    batchGroup.setOnClickListener {
                         val intent = Intent(this,
                                 RgbBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -1016,7 +954,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                         intent.putExtra("lightType", "rgb_light")
                         intent.putExtra("rgb_light_group_name", rgbLightGroup)
                         startActivity(intent)
-                    })
+                    }
                 } else {
                     recycleView.visibility = View.GONE
                     no_device_relativeLayout.visibility = View.VISIBLE
@@ -1025,21 +963,12 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
                         if (dialog_device?.visibility == View.GONE) {
                             showPopupMenu()
-                        } else {
-//                            hidePopupMenu()
                         }
                     }
                 }
             }
         }
-//        lightList = ArrayList()
-//        if (group.meshAddr == 0xffff) {
-//            //            lightList = DBUtils.getAllLight();
-////            lightList=DBUtils.getAllLight()
-//            filter("", false)
-//        } else {
-//            lightsData = DBUtils.getLightByGroupID(group.id)
-//        }
+
     }
 
     private fun showPopupMenu() {
@@ -1052,23 +981,11 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         acitivityIsAlive = false
         mScanDisposal?.dispose()
         if (TelinkLightApplication.getInstance().connectDevice == null) {
-           TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
-//        this.mApplication?.removeEventListener(this)
     }
 
-    private fun filter(groupName: String?, isSearch: Boolean) {
-        val list = DBUtils.groupList
-//        val nameList : ArrayList<String> = ArrayList()
-        if (lightsData != null && lightsData!!.size > 0) {
-            lightsData!!.clear()
-        }
-
-//        for(i in list.indices){
-//            nameList.add(list[i].name)
-//        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -1132,11 +1049,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun getNewData(): MutableList<DbLight> {
-//        if (currentLight!!.meshAddr == 0xffff) {
-//            //            lightList = DBUtils.getAllLight();
-////            lightList=DBUtils.getAllLight()
-//            filter("", false)
-//        } else {
         when (type) {
             Constant.INSTALL_NORMAL_LIGHT -> {
                 lightsData = DBUtils.getAllNormalLight()
@@ -1145,13 +1057,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 lightsData = DBUtils.getAllRGBLight()
             }
         }
-//    }
-
-//        if (currentLight!!.meshAddr == 0xffff) {
-//            toolbar.title = getString(R.string.allLight) + " (" + lightsData.size + ")"
-//        } else {
-//            toolbar.title = (currentLight!!.name ?: "")
-//        }
         return lightsData
     }
 
@@ -1223,20 +1128,20 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (acitivityIsAlive || mScanDisposal?.isDisposed != true) {
-               //"startScanLight_LightOfGroup")
+                //"startScanLight_LightOfGroup")
 
                 // ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                 if (!isRetry)
                     TmtUtils.midToastLong(this, getString(R.string.bluetooth_open_connet))
 
-               TelinkLightService.Instance()?.idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数
-                val account = DBUtils.lastUser?.account
+                val meshName = DBUtils.lastUser?.controlMeshName
 
                 val scanFilters = ArrayList<ScanFilter>()
                 val scanFilter = ScanFilter.Builder()
-                        .setDeviceName(account)
+                        .setDeviceName(meshName)
                         .build()
                 scanFilters.add(scanFilter)
 
@@ -1244,13 +1149,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
                     params.setScanFilters(scanFilters)
                 }
-                params.setMeshName(account)
-                params.setOutOfMeshName(account)
+                params.setMeshName(meshName)
+                params.setOutOfMeshName(meshName)
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)
 
                 addScanListeners()
-               TelinkLightService.Instance()?.startScan(params)
+                TelinkLightService.Instance()?.startScan(params)
                 startCheckRSSITimer()
             }
     }
@@ -1268,7 +1173,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                       //"onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -1279,7 +1183,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                           //"connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                            Log.e("zcl","connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -1291,8 +1195,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     @SuppressLint("CheckResult")
-    private fun
-            connect(mac: String) {
+    private fun connect(mac: String) {
         try {
             mCheckRssiDisposal?.dispose()
             mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
@@ -1302,7 +1205,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                             //授予了权限
                             if (TelinkLightService.Instance() != null) {
                                 progressBar?.visibility = View.VISIBLE
-                               TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
+                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             }
                         } else {
                             //没有授予权限
@@ -1326,7 +1229,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             else
                 login()
         } else {
-           TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             retryConnectCount = 0
             connectFailedDeviceMacList.clear()
             startScan(true)
@@ -1336,7 +1239,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
-       TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
         ToastUtil.showToast(this, getString(R.string.connect_success))
         hideLoadingDialog()
@@ -1348,8 +1251,8 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-       //"onErrorReport: onLeScanTimeout")
-       TelinkLightService.Instance()?.idleMode(true)
+        //"onErrorReport: onLeScanTimeout")
+        TelinkLightService.Instance()?.idleMode(true)
         LeBluetooth.getInstance().stopScan()
         startScan(true)
     }
@@ -1358,7 +1261,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         super.onStop()
         this.mApplication!!.removeEventListener(this)
         if (TelinkLightService.Instance() != null)
-           TelinkLightService.Instance()?.disableAutoRefreshNotify()
+            TelinkLightService.Instance()?.disableAutoRefreshNotify()
     }
 
     private fun getPositionAndOffset() {

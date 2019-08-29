@@ -850,10 +850,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun configNewlight() {
-//        val spGroup = groupConvertSpecialValue(groupAddr)
-        val groupH: Byte = (mSelectGroupAddr shr 8 and 0xff).toByte()
-        val timeH: Byte = (selectTime shr 8 and 0xff).toByte()
-        val timeL: Byte = (selectTime and 0xff).toByte()
         var mode = getModeValue()
         var paramBytes: ByteArray? = null
         when {
@@ -866,8 +862,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
             )
             trigger_time_text.text.toString() == getString(R.string.light_off) -> paramBytes = byteArrayOf(
                     switchMode.toByte(), 0x00, 0x00,
-                    editText.text.toString().toInt().toByte(),
-                    0x00,
+                    editText.text.toString().toInt().toByte(), 0x00,
                     modeTriggerCondition.toByte(),
                     mode.toByte()
             )
@@ -901,15 +896,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
         if (canSendGroup) {
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                    mDeviceInfo.meshAddress,
-                    paramBytesGroup)
+                    mDeviceInfo.meshAddress, paramBytesGroup)
         }
 
         Thread.sleep(300)
 
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT,
-                mDeviceInfo.meshAddress,
-                paramBytes)
+                mDeviceInfo.meshAddress, paramBytes)
 
         Thread.sleep(300)
     }

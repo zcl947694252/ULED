@@ -19,6 +19,8 @@ import java.util.List;
 
 /**
  * Created by hejiajun on 2018/3/28.
+ *
+ * 顶部tool添加组适配器
  */
 
 public class GroupsRecyclerViewAdapter extends RecyclerView.Adapter<GroupsRecyclerViewAdapter.ViewHolder> implements View.OnClickListener, View.OnLongClickListener {

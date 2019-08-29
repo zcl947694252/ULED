@@ -108,8 +108,9 @@ public interface RequestInterface {
     @GET("region/list")
     Observable<Response<List<DbRegion>>> getOldRegionList(@Header("token") String token);
 
-
-
+    //8、获取单个区域(又有改动)
+    @GET("region/get/{uid}/{rid}")
+    Observable<Response<DbRegion>> getRegionInfo(@Path("uid") String uid,@Path("rid") String rid);
 
     //47.获取区域列表 区域activity内使用
     // http://dev.dadoutek.com/smartlight/auth/region/list

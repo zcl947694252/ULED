@@ -94,7 +94,7 @@ repositories {
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 25
+    schemaVersion 26
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
@@ -120,7 +120,7 @@ dependencies {
     //compile project(':BluetoothStorageLib')
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.tencent.bugly:crashreport:2.8.6'
@@ -140,7 +140,7 @@ dependencies {
     implementation 'org.greenrobot:greendao:3.2.2'
     implementation 'io.github.yuweiguocn:GreenDaoUpgradeHelper:v2.2.1'
     // add library
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'

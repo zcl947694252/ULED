@@ -13,7 +13,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
-import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
@@ -21,7 +20,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.method.ScrollingMovementMethod
-import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -100,7 +98,7 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 
 /**
- * 首页
+ * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
@@ -162,7 +160,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("InvalidWakeLockTag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         detectUpdate()
         checkVersionAvailable()
         requestCarmer()
@@ -172,6 +169,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         isCreate = true
+
+        addEventListeners()
     }
 
     private fun requestCarmer() {
@@ -229,7 +228,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     //防止viewpager嵌套fragment,fragment放置后台时间过长,fragment被系统回收了
     override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable("android:support:fragments", null)
+        //outState.putParcelable("android:support:fragments", null)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -622,22 +621,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     fun addEventListeners() {
         // 监听各种事件
-        addScanListeners()
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
 
         this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-//        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
         this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
         this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-//        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     override fun onPostResume() {
         super.onPostResume()
-        addEventListeners()
         autoConnect()
     }
 
@@ -696,11 +692,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         TelinkLightService.Instance().idleMode(true)
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
-                        val account = DBUtils.lastUser?.account
-//                        LogUtils.e("zcl**********************扫描账号$account")
+                       // val account = DBUtils.lastUser?.account
+                        val meshName = DBUtils.lastUser?.controlMeshName
+
+                        LogUtils.e("zcl**********************扫描账号$meshName")
                         val scanFilters = ArrayList<ScanFilter>()
                         val scanFilter = ScanFilter.Builder()
-                                .setDeviceName(account)
+                                .setDeviceName(meshName)
                                 .build()
                         scanFilters.add(scanFilter)
 
@@ -708,21 +706,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         if (!AppUtils.isExynosSoc()) {
                             params.setScanFilters(scanFilters)
                         }
-                        params.setMeshName(account)
-                        params.setOutOfMeshName(account)
+                        params.setMeshName(meshName)
+                        params.setOutOfMeshName(meshName)
                         params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                         params.setScanMode(false)
 
-                        addScanListeners()
-                        startScanTimeout()
+                        startScanTimeout()//重新订阅超时时间
                         TelinkLightService.Instance().startScan(params)
                         startCheckRSSITimer()
-
-
-//                        if (mConnectSnackBar?.isShown != true && mScanSnackBar?.isShown != true) {
-//                            mScanSnackBar = indefiniteSnackbar(root, getString(R.string.scanning_devices))
-//                            setSnackLocation(mScanSnackBar!!)
-//                        }
                     } else {
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, {
@@ -745,16 +736,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribe {
                     if (it) {
                         //授予了权限
-                        if (TelinkLightService.Instance() != null) {
+                        val instance = TelinkLightService.Instance()
+                        if (instance != null) {
                             progressBar?.visibility = View.VISIBLE
                             mScanTimeoutDisposal?.dispose()
-                            TelinkLightService.Instance().connect(mac, CONNECT_TIMEOUT)
-//                            startConnectTimer()
-//
-//                            if (mConnectSnackBar?.isShown != true) {
-//                                mConnectSnackBar = indefiniteSnackbar(root, getString(R.string.connecting))
-//                                setSnackLocation(mConnectSnackBar!!)
-//                            }
+                            instance.connect(mac, CONNECT_TIMEOUT)
                         }
                     } else {
                         //没有授予权限
@@ -843,28 +829,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun setSnack() {
         if (mNotFoundSnackBar?.isShown != true) {
-//            mNotFoundSnackBar = indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-//                retryConnectCount = 0
-//                connectFailedDeviceMacList.clear()
-//                startScan()
-//            }
-//            setSnackLocation(mNotFoundSnackBar!!)
             progressBar.visibility = GONE
         }
     }
 
-    private fun setSnackLocation(snackbar: Snackbar) {
-        snackbar.dismiss()
-        if (listSnackbar!!.contains(snackbar))
-            return
-        snackbar.let {
-            var cl = CoordinatorLayout.LayoutParams(it.view.layoutParams.width, it.view.layoutParams.height)
-            cl.gravity = Gravity.BOTTOM//设置显示位置居中
-            cl.bottomMargin = DensityUtil.dip2px(this, 60F)
-            it.view.layoutParams = cl
-            listSnackbar!!.add(snackbar)
-        }
-    }
+
 
 
     /**
@@ -918,12 +887,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 
-    private fun addScanListeners() {
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-    }
-
     private fun onDeviceStatusChanged(event: DeviceEvent) {
 
         val deviceInfo = event.args
@@ -941,12 +904,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     mScanSnackBar?.dismiss()
                     mConnectSnackBar?.dismiss()
                     delay(300)
-
-               /*     if (mConnectSuccessSnackBar?.isShown != true) {
-                        mConnectSuccessSnackBar = snackbar(root, R.string.connect_success)
-                        setSnackLocation(mConnectSuccessSnackBar!!)
-                    }
-                    mConnectSnackBar?.dismiss()*/
                 }
 
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
@@ -1033,7 +990,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         if ((productUUID and 0xff) == 0x05) {
                             dbLightNew?.productUUID = 0x05
                         }
-                        dbLightNew.setConnectionStatus(connectionStatus.value)
+                        dbLightNew.connectionStatus = connectionStatus.value
                         dbLightNew.updateIcon()
                         dbLightNew.belongGroupId = DBUtils.groupNull?.id
                         dbLightNew.color = 0
@@ -1074,9 +1031,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-    private fun onServiceConnected(event: ServiceEvent) {
-//        LogUtils.d("onServiceConnected")
-    }
+    private fun onServiceConnected(event: ServiceEvent) {}
 
     private fun onServiceDisconnected(event: ServiceEvent) {
         LogUtils.d("onServiceDisconnected")
@@ -1093,14 +1048,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
-//            LeScanEvent.LE_SCAN_COMPLETED -> onLeScanTimeout()
             NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
             NotificationEvent.GET_ALARM -> { }
             DeviceEvent.STATUS_CHANGED -> {
                 progressBar.visibility = GONE
                 this.onDeviceStatusChanged(event as DeviceEvent)
             }
-//            MeshEvent.OFFLINE -> this.onMeshOffline(event as MeshEvent)
             ServiceEvent.SERVICE_CONNECTED -> {
                 this.onServiceConnected(event as ServiceEvent)
             }
@@ -1166,6 +1119,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
+    /**
+     * 报错log打印
+     */
     private fun onErrorReport(info: ErrorReportInfo) {
         if (bestRSSIDevice != null) {
 //            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)

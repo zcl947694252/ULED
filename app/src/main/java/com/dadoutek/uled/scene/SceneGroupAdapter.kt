@@ -75,38 +75,18 @@ class SceneGroupAdapter
         docOne.setChecked(true, if (item.color == 0)
             TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
         else
-            (0xff0000 shl 8) or (item.color and 0xffffff))
+        //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
+        //右移n位，指 按2进制的 位 右移n位， （等于 除以 2的n次方），低于最低位的数则丢掉 。
+        //位与是指两个二进制数按对应的位上的两个二进制数相乘，口诀是有0出0，11出1，如10 & 01=00。
+            (0x00ff0000 shl 8) or (item.color and 0xffffff))
+        //   0001fe00    16711680  ff000000                              0x4FFFE0  0xff0fff00
 
+        Log.e("zcl", "zclSceneGroupAdapter*****************${0xff0000 shl 8}*****************" + { item.color and 0xffffff })
         dot.setChecked(true, TelinkLightApplication.getInstance().resources.getColor(R.color.color_000000))
 
 
-//        docTwo.setChecked(true, if (item.twoCircle == 0)
-//            TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
-//        else
-//            (0xff0000 shl 8) or (item.twoCircle and 0xffffff))
-//
-//        docThree.setChecked(true, if (item.threeCircle == 0)
-//            TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
-//        else
-//            (0xff0000 shl 8) or (item.threeCircle and 0xffffff))
-//
-//        docFour.setChecked(true, if (item.fourCircle == 0)
-//            TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
-//        else
-//            (0xff0000 shl 8) or (item.fourCircle and 0xffffff))
-
-
-//        if(DBUtils.getCurtainName(item.gpName).size==0){
         helper.setText(R.id.name_gp, item.gpName)
-////        }
-//        helper.setBackgroundColor(R.id.dot_one, if (item.color == 0)
-//            TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
-//        else
-//            (0xff0000 shl 8) or (item.color and 0xffffff))
-//        if(sbBrightnessRGB.progress.toString()!="-1" || sbBrightnessRGB.progress.toString()!="-2"){
-//            helper.setText(R.id.sbBrightness_num, sbBrightnessRGB.progress.toString() + "%")
-//            helper.setText(R.id.sb_w_bright_num, sbWBrightRGB.progress.toString() + "%")
-//        }else{
+
 
         if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
             helper.setProgress(R.id.sbBrightness, item.brightness)
@@ -166,43 +146,36 @@ class SceneGroupAdapter
             }
         }
 
-//        if (sbBrightnessRGB!!.progress.toString() == "-1") {
-//            helper.setChecked(R.id.rg_xx, true)
-//        } else {
-//            helper.setChecked(R.id.rg_yy, true)
-//        }
-//        }
-//
         if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
             helper.setGone(R.id.textView7, true)
             helper.setGone(R.id.oval, true)
             helper.setGone(R.id.rgb_scene, true)
             helper.setGone(R.id.cw_scene, false)
             helper.setGone(R.id.switch_scene, false)
-            helper.setGone(R.id.scene_curtain,false)
-            helper.setGone(R.id.scene_relay,false)
+            helper.setGone(R.id.scene_curtain, false)
+            helper.setGone(R.id.scene_relay, false)
         } else if (OtherUtils.isNormalGroup(DBUtils.getGroupByMesh(item.groupAress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
             helper.setGone(R.id.cw_scene, true)
             helper.setGone(R.id.switch_scene, false)
-            helper.setGone(R.id.scene_curtain,false)
-            helper.setGone(R.id.scene_relay,false)
+            helper.setGone(R.id.scene_curtain, false)
+            helper.setGone(R.id.scene_relay, false)
         } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(item.groupAress))) {
             helper.setGone(R.id.textView7, false)
             helper.setGone(R.id.oval, false)
             helper.setGone(R.id.rgb_scene, false)
             helper.setGone(R.id.cw_scene, false)
             helper.setGone(R.id.switch_scene, true)
-            helper.setGone(R.id.scene_curtain,false)
-            helper.setGone(R.id.scene_relay,true)
+            helper.setGone(R.id.scene_curtain, false)
+            helper.setGone(R.id.scene_relay, true)
             if (item.isNo) {
                 helper.setChecked(R.id.rg_xx, true)
-                helper.setImageResource(R.id.scene_relay,R.drawable.scene_acceptor_yes)
+                helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
             } else {
                 helper.setChecked(R.id.rg_yy, true)
-                helper.setImageResource(R.id.scene_relay,R.drawable.scene_acceptor_no)
+                helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
             }
         } else if (OtherUtils.isCurtain(DBUtils.getGroupByMesh(item.groupAress))) {
             helper.setGone(R.id.textView7, false)
@@ -210,14 +183,14 @@ class SceneGroupAdapter
             helper.setGone(R.id.rgb_scene, false)
             helper.setGone(R.id.cw_scene, false)
             helper.setGone(R.id.switch_scene, true)
-            helper.setGone(R.id.scene_relay,false)
-            helper.setGone(R.id.scene_curtain,true)
+            helper.setGone(R.id.scene_relay, false)
+            helper.setGone(R.id.scene_curtain, true)
             if (item.isNo) {
                 helper.setChecked(R.id.rg_xx, true)
-                helper.setImageResource(R.id.scene_curtain,R.drawable.scene_curtain_yes)
+                helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
             } else {
                 helper.setChecked(R.id.rg_yy, true)
-                helper.setImageResource(R.id.scene_curtain,R.drawable.scene_curtain_no)
+                helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_no)
             }
         } else {
             helper.setGone(R.id.textView7, false)
@@ -263,22 +236,22 @@ class SceneGroupAdapter
         }
 
         addBrightnessRGB!!.setOnTouchListener { v, event ->
-            addRGBBrightness(event,position)
+            addRGBBrightness(event, position)
             true
         }
 
         lessBrightnessRGB!!.setOnTouchListener { v, event ->
-            lessRGBBrightness(event,position)
+            lessRGBBrightness(event, position)
             true
         }
 
         addWhiteLightRGB!!.setOnTouchListener { v, event ->
-            addRGBWhiteLight(event,position)
+            addRGBWhiteLight(event, position)
             true
         }
 
         lessWhiteLightRGB!!.setOnTouchListener { v, event ->
-            lessRGBWhiteLight(event,position)
+            lessRGBWhiteLight(event, position)
             true
         }
 
@@ -973,7 +946,7 @@ class SceneGroupAdapter
             val itemGroup = data[pos]
             var params: ByteArray
 
-            if (seekBar!!.progress >100) {
+            if (seekBar!!.progress > 100) {
                 addImage!!.isEnabled = false
                 onBtnTouch = false
             } else if (seekBar!!.progress == 100) {

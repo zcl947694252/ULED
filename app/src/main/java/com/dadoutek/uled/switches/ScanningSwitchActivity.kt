@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
@@ -624,16 +625,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
-        val mesh = this.mApplication.mesh
         val meshAddress = Constant.SWITCH_PIR_ADDRESS
         val deviceInfo: DeviceInfo = leScanEvent.args
-
         if (meshAddress == -1) {
-
             this.doFinish()
             return
         }
-
         when (leScanEvent.args.productUUID) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,DeviceType.SMART_CURTAIN_SWITCH -> {
                 val MAX_RSSI = 81
@@ -642,160 +639,17 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     if (bestRSSIDevice != null) {
                         //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
                         if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
-                           //("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                           LogUtils.e("changeToScene to device with better RSSI  new meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                             bestRSSIDevice = deviceInfo
                         }
                     } else {
-                       //("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
+                        LogUtils.e("RSSI  meshAddr = ${deviceInfo.meshAddress} rssi = ${deviceInfo.rssi}")
                         bestRSSIDevice = deviceInfo
                     }
-
-//                    scanDisposable?.dispose()
-//                    LeBluetooth.getInstance().stopScan()
-//                    bestRSSIDevice = leScanEvent.args
-////                params.setUpdateDeviceList(bestRSSIDevice)
-//                    connect()
-//                    progressBtn.text = getString(R.string.connecting)
                 } else {
                     ToastUtils.showLong(getString(R.string.rssi_low))
                 }
             }
         }
     }
-
-//    private fun getVersion() {
-//        var dstAdress = 0
-//            dstAdress = bestRSSIDevice!!.meshAddress
-//            Commander.getDeviceVersion(dstAdress,
-//                    successCallback = {
-////                        localVersion=it
-////                        versionLayout.visibility = View.VISIBLE
-//                        localVersion = it
-//                        dbSwitch.version=it
-////                        tvLightVersion.text = it
-////                        tvOta!!.visibility = View.VISIBLE
-////                        if(it!!.startsWith("STS")){
-////                        isGlassSwitch=true
-////                            otaSwitch()
-//                        checkPermission()
-////                    }
-//                    },
-//                    failedCallback = {
-////                        versionLayout.visibility = View.GONE
-////                        tvOta!!.visibility = View.GONE
-//                    })
-//        }
-
-//    private fun checkPermission() {
-////        if(light!!.macAddr.length<16){
-////            ToastUtils.showLong(getString(R.string.bt_error))
-////        }else{
-//        mDisposable.add(
-//                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-//                    if (granted!!) {
-//                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
-//                        if(isBoolean){
-//                            transformView()
-//                        }else {
-//                            OtaPrepareUtils.instance().gotoUpdateView(this@ScanningSwitchActivity, localVersion, otaPrepareListner)
-//                        }
-//                    } else {
-//                        ToastUtils.showLong(R.string.update_permission_tip)
-//                    }
-//                })
-////        }
-//    }
-
-//    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
-//
-//        override fun downLoadFileStart() {
-//            showLoadingDialog(getString(R.string.get_update_file))
-//        }
-//
-//        override fun startGetVersion() {
-//            showLoadingDialog(getString(R.string.verification_version))
-//        }
-//
-//        override fun getVersionSuccess(s: String) {
-//            //            ToastUtils.showLong(.string.verification_version_success);
-//            hideLoadingDialog()
-//        }
-//
-//        override fun getVersionFail() {
-//            ToastUtils.showLong(R.string.verification_version_fail)
-//            hideLoadingDialog()
-//        }
-//
-//
-//        override fun downLoadFileSuccess() {
-//            hideLoadingDialog()
-//            transformView()
-//        }
-//
-//        override fun downLoadFileFail(message: String) {
-//            hideLoadingDialog()
-//            ToastUtils.showLong(R.string.download_pack_fail)
-//        }
-//    }
-
-//    private fun transformView() {
-//        setGroupForSwitch()
-////        dbSwitch.macAddr= bestRSSIDevice!!.macAddress
-////        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-////        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
-////        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
-//////        DBUtils.saveSwitch(dbSwitch,false)
-////        val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
-////        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
-////        startActivity(intent)
-////        finish()
-//    }
-//
-//
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        mDisposable.dispose()
-//    }
-
-//    private fun setGroupForSwitch() {
-//        val mesh = this.mApplication.mesh
-//        val params = Parameters.createUpdateParameters()
-//        if (BuildConfig.DEBUG) {
-//            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-//        } else {
-//            params.setOldMeshName(mesh.factoryName)
-//        }
-//        params.setOldPassword(mesh.factoryPassword)
-//        params.setNewMeshName(mesh.name)
-//        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-//                Constant.DB_NAME_KEY, "dadou")
-//        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-//                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-//            params.setNewPassword(NetworkFactory.md5(
-//                    NetworkFactory.md5(mesh?.password) + account))
-//        } else {
-//            params.setNewPassword(mesh?.password)
-//        }
-//
-//        params.setUpdateDeviceList(bestRSSIDevice)
-//        val groupAddress = bestRSSIDevice!!.meshAddress
-//        val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
-//                (groupAddress shr 8 and 0xFF).toByte())
-//        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, bestRSSIDevice!!.meshAddress,
-//                paramBytes)
-//        otaUpdate()
-//    }
-
-//    private fun otaUpdate() {
-//         dbSwitch.macAddr= bestRSSIDevice!!.macAddress
-//        dbSwitch.meshAddr=Constant.SWITCH_PIR_ADDRESS
-//        dbSwitch.productUUID= bestRSSIDevice!!.productUUID
-//        dbSwitch.name= StringUtils.getSwitchPirDefaultName(bestRSSIDevice!!.productUUID)
-////        DBUtils.saveSwitch(dbSwitch,false)
-//        val intent = Intent(this@ScanningSwitchActivity, OTASwitchActivity::class.java)
-//        intent.putExtra(Constant.UPDATE_LIGHT, dbSwitch)
-//        startActivity(intent)
-//        finish()
-//    }
 }

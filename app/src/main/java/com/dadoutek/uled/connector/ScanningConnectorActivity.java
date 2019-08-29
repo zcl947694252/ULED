@@ -1550,7 +1550,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         params.setOldPassword(mesh.getFactoryPassword());
         params.setNewMeshName(mesh.getName());
         params.setNewPassword(NetworkFactory.md5(
-                NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+                NetworkFactory.md5(mesh.getName()) + mesh.getName()).substring(0, 16));
         params.setUpdateDeviceList(deviceInfo);
         TelinkLightService.Instance().updateMesh(params);
 

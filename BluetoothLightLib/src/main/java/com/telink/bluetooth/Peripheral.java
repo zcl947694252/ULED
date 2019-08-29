@@ -297,20 +297,17 @@ public class Peripheral extends BluetoothGattCallback {
             commandContext = this.mInputCommandQueue.poll();
         }
 
-        if (commandContext == null||commandContext.command==null)
+        if (commandContext == null || commandContext.command == null)
             return;
 
-        commandType = commandContext.command.type;
-
+            commandType = commandContext.command.type;
         if (commandType != Command.CommandType.ENABLE_NOTIFY && commandType != Command.CommandType.DISABLE_NOTIFY) {
             synchronized (mOutputCommandQueue) {
                 this.mOutputCommandQueue.add(commandContext);
             }
 
-//            synchronized (this.mProcessLock) {
             if (!this.processing.get())
                 this.processing.set(true);
-//            }
         }
 
         int delay = commandContext.command.delay;
@@ -326,14 +323,12 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     synchronized private void processCommand(CommandContext commandContext) {
-
-        if(commandContext!=null){
+        if (commandContext != null) {
             Command command = commandContext.command;
-            if (command==null){
+            if (command == null)
                 return;
-            }
-            Command.CommandType commandType = command.type;
 
+            Command.CommandType commandType = command.type;
             TelinkLog.d("processCommand : " + command.toString());
 
             switch (commandType) {
@@ -366,7 +361,6 @@ public class Peripheral extends BluetoothGattCallback {
                     break;
             }
         }
-
     }
 
     private void commandCompleted() {
@@ -511,23 +505,23 @@ public class Peripheral extends BluetoothGattCallback {
                             writeType);
             if (characteristic != null) {
 
-                if(data.length>20){
-                    sendData(data,characteristic,writeType);
-                    isOutOfSize=true;
-                }else{
-                    isOutOfSize=false;
+                if (data.length > 20) {
+                    sendData(data, characteristic, writeType);
+                    isOutOfSize = true;
+                } else {
+                    isOutOfSize = false;
                     characteristic.setValue(data);
-                characteristic.setWriteType(writeType);
+                    characteristic.setWriteType(writeType);
 
-                if(data.length>11){
+                    if (data.length > 11) {
 //                    Log.d("seekBarChangeC","--------"+success+"：："+data[10]);
-                }
+                    }
 
-                if (!this.gatt.writeCharacteristic(characteristic)) {
-                    success = false;
-                    errorMsg = "write characteristic error";
-                    Log.d("myerror", "writeCharacteristic: ");
-                   }
+                    if (!this.gatt.writeCharacteristic(characteristic)) {
+                        success = false;
+                        errorMsg = "write characteristic error";
+                        Log.d("myerror", "writeCharacteristic: ");
+                    }
                 }
 
             } else {
@@ -781,7 +775,7 @@ public class Peripheral extends BluetoothGattCallback {
                                       BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicWrite(gatt, characteristic, status);
 
-        if(packetInteration<packetSize&&isOutOfSize){
+        if (packetInteration < packetSize && isOutOfSize) {
             characteristic.setValue(packets[packetInteration]);
             gatt.writeCharacteristic(characteristic);
             packetInteration++;
@@ -797,7 +791,7 @@ public class Peripheral extends BluetoothGattCallback {
             TelinkLog.d("onCharacteristicWrite newStatus : " + status);
 
             this.commandCompleted();
-        }else{
+        } else {
             this.cancelCommandTimeoutTask();
 
             if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -812,12 +806,12 @@ public class Peripheral extends BluetoothGattCallback {
         }
     }
 
-    private int packetSize=0;
-    private int packetInteration=0;
-    private boolean isOutOfSize=false;
+    private int packetSize = 0;
+    private int packetInteration = 0;
+    private boolean isOutOfSize = false;
     private byte[][] packets;
 
-    public void sendData(byte[] data,BluetoothGattCharacteristic characteristicData,int writeType) {
+    public void sendData(byte[] data, BluetoothGattCharacteristic characteristicData, int writeType) {
         int chunksize = 20; //20 byte chunk
         packetSize = (int) Math.ceil(data.length / (double) chunksize); //make this variable public so we can access it on the other function
 
@@ -908,19 +902,19 @@ public class Peripheral extends BluetoothGattCallback {
 
         if (status == BluetoothGatt.GATT_SUCCESS) {
 //            this.supportedMTU = mtu;//local var to record MTU size
-            Log.d("mtu changed-->", "onMtuChanged: "+mtu);
+            Log.d("mtu changed-->", "onMtuChanged: " + mtu);
         }
-        TelinkLog.d("mtu changed : " + mtu+"    status=="+status);
+        TelinkLog.d("mtu changed : " + mtu + "    status==" + status);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public boolean setMTU(int mtu){
-        Log.d("BLE","setMTU "+mtu);
+    public boolean setMTU(int mtu) {
+        Log.d("BLE", "setMTU " + mtu);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            if(mtu>20){
-                boolean ret =   gatt.requestMtu(mtu);
-                Log.d("BLE","requestMTU "+mtu+" ret="+ret);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (mtu > 20) {
+                boolean ret = gatt.requestMtu(mtu);
+                Log.d("BLE", "requestMTU " + mtu + " ret=" + ret);
                 return ret;
             }
         }

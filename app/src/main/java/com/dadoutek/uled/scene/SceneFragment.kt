@@ -517,7 +517,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     scenesListData!![i].isSelected = false
                 }
             }
-            adaper!!.notifyDataSetChanged()
+            adaper?.notifyDataSetChanged()
         }
     }
 

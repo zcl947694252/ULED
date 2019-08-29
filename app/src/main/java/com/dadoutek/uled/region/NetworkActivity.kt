@@ -35,6 +35,7 @@ import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
 import com.dadoutek.uled.region.adapter.AreaItemAdapter
 import com.dadoutek.uled.region.bean.RegionBean
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
@@ -101,7 +102,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         initToolBar()
         makePop()
         initListener()
-        getQrInfo()
+        getQrInfo()//查看提交吗信息如果存在授权码就直接提示它去取消授权码
 
         mBuild = AlertDialog.Builder(this@NetworkActivity)
     }
@@ -388,7 +389,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             }
             R.id.pop_qr_cancel -> {
                 if (isTransferCode)
-                    RegionModel.removeTransferCode()!!.subscribe { setCancel() }
+                    RegionModel.removeTransferCode()!!.subscribe( { setCancel() },{ToastUtils.showShort(it.message)})
                 PopUtil.dismiss(pop)
             }
             R.id.pop_user_net -> {
@@ -447,6 +448,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun lookAndMakeAuthorCode() {
+
         lookAuthorizeCode(regionBean!!.id, this).subscribe({
             mExpire = it.expire.toLong()
             Log.e(TAG, "zcl****判断**" + (it.code == ""))
@@ -495,6 +497,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun setQR(it: String) {
         var mBitmap = CodeUtils.createImage(it, DensityUtil.dip2px(this, 231f), DensityUtil.dip2px(this, 231f), null)
         view?.findViewById<ImageView>(R.id.pop_qr_img)?.setImageBitmap(mBitmap)
+        view?.findViewById<TextView>(R.id.pop_qr_area_name)?.text = lastUser?.phone
     }
 
     @SuppressLint("SetTextI18n")
@@ -567,6 +570,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         viewAdd = View.inflate(this, R.layout.popwindown_add_region, null)
 
         pop = PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        pop?.setOnDismissListener {
+            isShowType = 3
+            initData()
+        }
         //添加区域pop
         popAdd = PopupWindow(viewAdd, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
@@ -574,13 +581,15 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         setPopSetting(popAdd!!)
 
         view?.let {
+            it.findViewById<TextView>(R.id.pop_qr_area_user).text = getString(R.string.cur_network_owner)+lastUser!!.phone
+            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser?.phone
+
             it.findViewById<ImageView>(R.id.pop_view).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_user_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_delete_net).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_share_net).setOnClickListener(this)
             it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).setOnClickListener(this)
             it.findViewById<ImageView>(R.id.pop_update_net).setOnClickListener(this)
-            it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser?.phone
             it.findViewById<TextView>(R.id.pop_qr_cancel).setOnClickListener(this)
             it.findViewById<LinearLayout>(R.id.pop_qr_ly).setOnClickListener(this)
             it.findViewById<TextView>(R.id.pop_qr_undo).setOnClickListener(this)
@@ -623,6 +632,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             return
         view?.let {
             it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
+            it.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
             it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
             val lastUser = lastUser!!
             //使用中不能删除
@@ -729,6 +739,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun downLoadDataAndChangeDbUser() {
+        TelinkLightService.Instance()?.disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+
         //创建数据库
         var lastUser = lastUser
 
@@ -738,10 +751,16 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 1 -> {
                     it.last_region_id = regionBean?.id.toString()
                     it.last_authorizer_user_id = regionBean?.authorizer_id.toString()
+                   // it.controlMeshName = regionBean?.controlMesh
+                    //it.controlMeshPwd = regionBean?.controlMeshPwd
+                   // it.account =regionBean?.controlMesh
                 }
                 2 -> {
                     it.last_region_id = regionBeanAuthorize?.id.toString()
                     it.last_authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
+                    //it.controlMeshName = regionBeanAuthorize?.controlMesh
+                   // it.controlMeshPwd = regionBeanAuthorize?.controlMeshPwd
+                   //it.account =regionBeanAuthorize?.controlMesh
                 }
             }
 
@@ -778,10 +797,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     })
             dialog.dismiss()
         }
-        builder.setPositiveButton(getString(R.string.cancel)) { dialog, _ ->
-            dialog.dismiss()
-        }
-
+        builder.setPositiveButton(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
         builder.create().show()
     }
 

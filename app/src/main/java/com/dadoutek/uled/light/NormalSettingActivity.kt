@@ -2158,9 +2158,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 if (this.mApp?.isEmptyMesh != false)
                     return
 
-                //                Lights.getInstance().clear();
-                this.mApp?.refreshLights()
-
                 val mesh = this.mApp?.getMesh()
 
                 if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {

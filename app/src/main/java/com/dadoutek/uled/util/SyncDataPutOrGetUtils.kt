@@ -34,11 +34,7 @@ class SyncDataPutOrGetUtils {
         /********************************同步数据之上传数据 */
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
-
-
-
             Thread {
-
                 val dbDataChangeList = DBUtils.dataChangeAll
 
                 val dbUser = DBUtils.lastUser
@@ -88,7 +84,7 @@ class SyncDataPutOrGetUtils {
                                         }
 
                                         override fun onError(e: Throwable) {
-                                            LogUtils.d(e.localizedMessage)
+                                            LogUtils.d(e)
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 syncCallback.error(e.cause.toString())
                                             }
@@ -378,6 +374,24 @@ class SyncDataPutOrGetUtils {
                             setupMeshCreat(accountNow)
                         }
                         NetworkFactory.getApi()
+                                .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
+                                .compose(NetworkTransformer())
+
+                    }
+                    .flatMap {
+                        //保存最后的区域信息到application
+                        val application = DeviceHelper.getApplication() as TelinkLightApplication
+                        val mesh = application.mesh
+                        mesh.name = it.controlMesh
+                        mesh.password = it.controlMeshPwd
+                        mesh.factoryName = it.installMesh
+                        mesh.factoryPassword = it.installMeshPwd
+                        DBUtils.lastUser?.controlMeshName = it.controlMesh
+                        DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+                        application.setupMesh(mesh)
+                        Log.e("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.lastUser+"------------------"+mesh)
+                        DBUtils.saveUser(DBUtils.lastUser!!)
+                        NetworkFactory.getApi()
                                 .getLightList(token)
                                 .compose(NetworkTransformer())
                     }
@@ -464,6 +478,7 @@ class SyncDataPutOrGetUtils {
                         }
                     }, {
                 GlobalScope.launch(Dispatchers.Main) {
+                    it?:return@launch
                     syncCallBack.error(it.message)
                     ToastUtils.showLong(it.message)
                 }

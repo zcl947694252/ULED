@@ -47,7 +47,7 @@
         <TextView
             android:id="@+id/tvLightVersion"
             android:text="1.0.0"
-            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
             android:textColor="@color/white"
             android:textSize="12sp"
             android:layout_width="wrap_content"

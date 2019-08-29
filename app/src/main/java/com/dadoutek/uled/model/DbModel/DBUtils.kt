@@ -772,7 +772,6 @@ object DBUtils {
     fun saveSceneActions(sceneActions: DbSceneActions, id: Long?,
                          sceneId: Long) {
         val actions = DbSceneActions()
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
         actions.belongSceneId = sceneId
         actions.brightness = sceneActions.brightness
         actions.colorTemperature = sceneActions.colorTemperature
@@ -787,7 +786,6 @@ object DBUtils {
     fun saveColorNodes(colorNode: DbColorNode, id: Long?,
                        gradientId: Long) {
         val colorNodeNew = DbColorNode()
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
 
         colorNodeNew.belongDynamicChangeId = gradientId
         colorNodeNew.index = colorNode.index

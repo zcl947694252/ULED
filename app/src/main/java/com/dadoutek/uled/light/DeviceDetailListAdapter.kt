@@ -10,6 +10,15 @@ import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 
+/**
+ * 创建者     zcl
+ * 创建时间   2019/8/29 9:39
+ * 描述	      ${补充描述 设备图标适配器}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
+ */
 class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
 
     override fun convert(helper: BaseViewHolder, scene: DbLight) {

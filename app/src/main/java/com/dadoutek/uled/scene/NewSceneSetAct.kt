@@ -10,10 +10,8 @@ import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.SeekBar
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -54,17 +52,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var guideShowCurrentPage = false
     private val DATA_LIST_KEY = "DATA_LIST_KEY"
     private val SCENE_KEY = "SCENE_KEY"
-    private var isStatue: String? = null
-    private var isNo = true
-
-    internal var downTime: Long = 0//Button被按下时的时间
-    internal var thisTime: Long = 0//while每次循环时的时间
-    internal var onBtnTouch = false//Button是否被按下
-    internal var tvValue = 0//TextView中的值
-
-    private var seekBar: SeekBar? = null
-
-    private var isEditText: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -205,15 +192,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         initScene()
     }
 
-    fun initChangeState() {
-//        var list=DBUtils.allGroups
-//        showCheckListData=ArrayList<DbGroup>()
-//        for(h in list.indices){
-//            if(!OtherUtils.isCurtain(list[h])){
-//                showCheckListData!!.add(list[h])
-//        }
-//        }
-//        showCheckListData = DBUtils.allGroups
+    private fun initChangeState() {
         showCheckListData = DBUtils.allGroups
         if (showGroupList!!.size != 0) {
             for (i in showCheckListData!!.indices) {
@@ -237,11 +216,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initScene() {
         if (isResult) {
-            if (isChangeScene) {
+            if (isChangeScene)
                 initChangeView()
-            } else {
+            else
                 initCreateView()
-            }
             showDataListView()
         } else {
             if (isChangeScene) {
@@ -253,20 +231,16 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
-
         confirm.setOnClickListener(this)
         StringUtils.initEditTextFilter(edit_name)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar.setNavigationOnClickListener {
             if (currentPageIsEdit) {
-                if (currentPageIsEdit && !isToolbar) {
+                if (currentPageIsEdit && !isToolbar)
                     showExitSaveDialog()
-                } else {
+                else
                     finish()
-                }
-            } else {
-                showExitSaveDialog()
-            }
+            } else showExitSaveDialog()
         }
     }
 
@@ -289,14 +263,13 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initChangeView() {
         toolbar.setTitle(R.string.edit_scene)
-//        tv_scene_name.text = resources.getString(R.string.scene_name_show,scene!!.name)
         editSceneName = scene!!.name
     }
 
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         when (view.id) {
             R.id.btn_delete -> delete(adapter, position)
-            R.id.dot_one-> changeToColorSelect(position)
+            R.id.dot_one -> changeToColorSelect(position)
             R.id.rg_xx -> open(position)
             R.id.rg_yy -> close(position)
         }
@@ -320,12 +293,12 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        outState?.putSerializable(DATA_LIST_KEY, showGroupList!!)
+        /*outState?.putSerializable(DATA_LIST_KEY, showGroupList!!)
         if (isChangeScene) {
             outState?.putParcelable(SCENE_KEY, scene!!)
         }
         super.onSaveInstanceState(outState)
-        LogUtils.d("onSaveInstanceState")
+        LogUtils.d("onSaveInstanceState")*/
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -341,14 +314,14 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    internal var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+    private var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         changeCheck(position)
     }
 
-    fun changeCheck(position: Int) {
-        val item = showCheckListData!!.get(position)
+    private fun changeCheck(position: Int) {
+        val item = showCheckListData!![position]
         if (item.enableCheck) {
-            showCheckListData!!.get(position).checked = !item.checked
+            showCheckListData!![position].checked = !item.checked
             changeCheckedViewData()
             sceneEditListAdapter?.notifyDataSetChanged()
         }
@@ -372,11 +345,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_group_list_view.layoutManager = layoutmanager
         this.sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList!!)
-//        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         recyclerView_group_list_view?.addItemDecoration(SpacesItemDecorationScene(40))
-        //添加分割线
-//        recyclerView_group_list_view.addItemDecoration(decoration)
         recyclerView_group_list_view.itemAnimator!!.changeDuration = 0
         sceneGroupAdapter?.bindToRecyclerView(recyclerView_group_list_view)
 
@@ -399,8 +368,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         tv_function1.visibility = View.GONE
         edit_name.setSelection(edit_name.text.toString().length)
 
-//        btn_sure_edit.setOnClickListener(this)
-
         edit_name!!.isFocusable = true
         edit_name.isFocusableInTouchMode = true
         edit_name.requestFocus()
@@ -418,11 +385,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView_select_group_list_view.layoutManager = layoutmanager
-//        for(h in showCheckListData!!.indices){
-//            if(!OtherUtils.isCurtain(showCheckListData!![h])){
-//                scenceList!!.add(showCheckListData!![h])
-//            }
-//        }
+
         this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, this!!.showCheckListData!!)
         var list = ArrayList<DbGroup>()
         for (h in showCheckListData!!.indices) {
@@ -431,10 +394,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
         this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list!!)
-//        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
-//        //添加分割线
-//        recyclerView_select_group_list_view.addItemDecoration(decoration)
+
         sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
         sceneEditListAdapter?.onItemClickListener = onItemClickListenerCheck
     }
@@ -471,29 +431,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.tv_function1 -> changeEditView()
             R.id.confirm -> save()
-//            R.id.btn_sure_edit ->{
-//                if(isEditText){
-//                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//                    val v = window.peekDecorView()
-//                    if (null != v) {
-//                        imm.hideSoftInputFromWindow(v.windowToken, 0)
-//                    }
-//                    isEditText = false
-//                }else{
-//                    val timer = Timer()
-//                    timer.schedule(object : TimerTask() {
-//                        override fun run() {
-//                            val inputManager = edit_name.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//                            inputManager.showSoftInput(edit_name, 0)
-//                        }
-//                    }, 200)
-//                    isEditText = true
-//                }
-//            }
-
-//            R.id.edit_name -> {
-//                isEditText = false
-//            }
         }
     }
 
@@ -510,7 +447,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private fun saveCurrenEditResult() {
         if (checkName()) {
             editSceneName = edit_name.text.toString()
-//            tv_scene_name.text = resources.getString(R.string.scene_name_show,editSceneName)
             val oldResultItemList = ArrayList<ItemGroup>()
             val newResultItemList = ArrayList<ItemGroup>()
 
@@ -637,7 +573,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.deviceType = 0x05
                     sceneActions.isOn = item.isNo
                     DBUtils.saveSceneActions(sceneActions)
-                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))){
+                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(item.groupAress))) {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = item.brightness
                     sceneActions.colorTemperature = item.temperature
@@ -646,7 +582,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.deviceType = 0x06
 
                     DBUtils.saveSceneActions(sceneActions)
-                }else{
+                } else {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = item.brightness
                     sceneActions.colorTemperature = item.temperature
@@ -721,10 +657,10 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02) //接收器关是2
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
-                } else if(type == LIGHT_RGB){
+                } else if (type == LIGHT_RGB) {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
-                }else {
+                } else {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
@@ -766,7 +702,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val itemGroups = showGroupList
             val nameList = java.util.ArrayList<Int>()
 
-            scene?.setName(name)
+            scene?.name = name
             DBUtils.updateScene(scene!!)
             val idAction = scene?.getId()!!
 
@@ -798,7 +734,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
 
                     nameList.add(itemGroups.get(i).groupAress)
                     DBUtils.saveSceneActions(sceneActions)
-                } else if(OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))){
+                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
@@ -808,7 +744,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.deviceType = 0x06
                     nameList.add(itemGroups.get(i).groupAress)
                     DBUtils.saveSceneActions(sceneActions)
-                }else {
+                } else {
                     sceneActions.belongSceneId = idAction
                     sceneActions.brightness = itemGroups.get(i).brightness
                     sceneActions.colorTemperature = itemGroups.get(i).temperature
@@ -885,7 +821,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //接收器关是2
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
-            }else if(type == LIGHT_RGB){
+            } else if (type == LIGHT_RGB) {
                 params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), list[i].brightness.toByte(), temperature)
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
             } else {

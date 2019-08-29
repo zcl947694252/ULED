@@ -752,9 +752,9 @@
     <string name="password_you_set_again">Please confirm the login password you set again.</string>
     <string name="password_you_set">Please enter the login password you set.</string>
     <string name="equipment_quantity">Equipment Quantity：</string>
-    <string name="use_the_works">Use Network</string>
-    <string name="delete_network">Delete Network</string>
-    <string name="share_network">Share Network</string>
+    <string name="use_the_works">Use Area</string>
+    <string name="delete_network">Delete Area</string>
+    <string name="share_network">Share Area</string>
     <string name="update_name">Update Name</string>
     <string name="current_account">Current account:</string>
     <string name="all">All</string>
@@ -863,7 +863,7 @@
     <string name="cancel_authorization">Authorized user cancels authorization</string>
     <string name="authorization_exprize">The QR code has expired</string>
     <string name="unauthorization_leve">Unauthorized authorization level</string>
-    <string name="region_one_code">A single region can generate only one code at a time</string>
+    <string name="region_one_code">A single region can generate only one code at a time. Please cancel the authorization code or transfer code first</string>
     <string name="can_not_parse">Unable to parse </string>
     <string name="can_not_parse_mine">Unable to parse self-generated code</string>
 

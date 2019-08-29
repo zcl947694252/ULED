@@ -120,14 +120,12 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                                    // startActivity(intent)
                                    // finish()
                                 } else {
-                                    //ToastUtils.showLong(R.string.get_account_fail)
                                     ToastUtils.showLong(stringResponse.message)
                                 }
                             }
                             override fun onError(e: Throwable) {
                                 hideLoadingDialog()
                                 Toast.makeText(this@ForgetPassWordActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
-                                //("zcl**********************${e.toString()}")
                             }
                             override fun onComplete() {}
                         })

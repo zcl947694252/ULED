@@ -9,7 +9,7 @@
         android:id="@+id/imageView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
+        android:layout_marginRight="12dp"
         android:background="@drawable/triangle_up"
         app:layout_constraintEnd_toEndOf="@+id/linearLayout"
         tools:ignore="MissingConstraints" />
@@ -18,7 +18,7 @@
         android:id="@+id/linearLayout"
         android:layout_width="135dp"
         android:layout_height="155dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:background="@drawable/popwindow_install_background"
         android:clickable="true"
         android:elevation="10dp"

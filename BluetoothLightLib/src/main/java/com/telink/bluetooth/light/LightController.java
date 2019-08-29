@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 
 import com.telink.bluetooth.Command;
 import com.telink.bluetooth.Peripheral;
@@ -701,12 +700,14 @@ public final class LightController extends EventBus<Integer> implements LightPer
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.COMMAND);
 
         Command command = Command.newInstance();
-        command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE : Command.CommandType.WRITE;
-        command.data = data;
-        command.serviceUUID = serviceUUID;
-        command.characteristicUUID = characteristicUUID;
-        command.tag = tag;
-        command.delay = delay;
+        if (command!=null){
+            command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE : Command.CommandType.WRITE;
+            command.data = data;
+            command.serviceUUID = serviceUUID;
+            command.characteristicUUID = characteristicUUID;
+            command.tag = tag;
+            command.delay = delay;
+        }
 
         return this.sendCommand(callback, command);
     }

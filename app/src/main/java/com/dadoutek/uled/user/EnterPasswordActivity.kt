@@ -240,18 +240,12 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         override fun error(msg: String) {
             val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance()
                     .mContext, Constant.IS_SHOW_REGION_DIALOG, false)
-            Log.e("EnterPasswordActivity", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----")
+            Log.e("EnterPasswordActivity", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----"+msg)
 
 
             if (ishowRegionDialog) {
                 initMe()
                 initAuthor()
-//                val arrayList = arrayListOf<MultiRegionBean>()
-//                arrayList.add(MultiRegionBean(Constant.REGION_TYPE, list))
-//                arrayList.add(MultiRegionBean(Constant.REGION_AUTHORIZE_TYPE,authorList))
-//                val itemAdapter = MultiItemAdapter(arrayList)
-//                popRecycle?.adapter = itemAdapter
-//                itemAdapter.bindToRecyclerView(popRecycle)
                 pop?.showAtLocation(window.decorView, Gravity.CENTER, 0, 100)
             }
             isSuccess = false
@@ -262,16 +256,16 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     @SuppressLint("CheckResult")
     private fun initAuthor() {
-        RegionModel.getAuthorizerList()?.subscribe {
+        RegionModel.getAuthorizerList()?.subscribe({
             setAuthorizeRegion(it)
-        }
+        }) { ToastUtils.showShort(it.message) }
     }
 
     @SuppressLint("CheckResult")
     private fun initMe() {
-        RegionModel.get()?.subscribe {
+        RegionModel.get()?.subscribe ({
             setMeRegion(it)
-        }
+        }) {ToastUtils.showShort(it.message)}
     }
 
     @SuppressLint("StringFormatMatches")

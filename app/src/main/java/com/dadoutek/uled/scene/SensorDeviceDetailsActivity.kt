@@ -237,7 +237,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         val view = View.inflate(this, R.layout.dialog_install_list, null)
         val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
         val install_device_recyclerView = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
-        close_install_list.setOnClickListener { v -> installDialog?.dismiss() }
+        close_install_list.setOnClickListener { installDialog?.dismiss() }
 
         val installList: java.util.ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
 

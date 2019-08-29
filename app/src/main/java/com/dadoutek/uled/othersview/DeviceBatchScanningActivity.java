@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -176,7 +177,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         params.setOldMeshName(mesh.getFactoryName());
         params.setOldPassword(mesh.getFactoryPassword());
         params.setNewMeshName(mesh.getName());
-        params.setNewPassword(mesh.getPassword());
+        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getName()) + mesh.getName()).substring(0, 16));
 
         /*DeviceInfo deviceInfo = event.getArgs();
         deviceInfo.meshAddress = meshAddress;*/

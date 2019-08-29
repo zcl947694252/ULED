@@ -711,11 +711,12 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                 TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
-                                val account = DBUtils.lastUser?.account
+                               // val account = DBUtils.lastUser?.account
+                                val meshName = DBUtils.lastUser?.controlMeshName
 
                                 val scanFilters = java.util.ArrayList<ScanFilter>()
                                 val scanFilter = ScanFilter.Builder()
-                                        .setDeviceName(account)
+                                        .setDeviceName(meshName)
                                         .build()
                                 scanFilters.add(scanFilter)
 
@@ -723,8 +724,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                 if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
                                     params.setScanFilters(scanFilters)
                                 }
-                                params.setMeshName(account)
-                                params.setOutOfMeshName(account)
+                                params.setMeshName(meshName)
+                                params.setOutOfMeshName(meshName)
                                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                                 params.setScanMode(false)
 

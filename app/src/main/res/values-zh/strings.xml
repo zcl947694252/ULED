@@ -442,8 +442,8 @@
     <string name="btn_jump_over">跳过</string>
     <string name="reset_boot_tutorial">重新查看引导页</string>
     <string name="select_device_tip">请选择需要安装的设备</string>
-    <string name="normal_light">可变色温灯</string>
-    <string name="rgb_light">RGB灯具</string>
+    <string name="normal_light">冷暖灯</string>
+    <string name="rgb_light">全彩灯</string>
     <string name="i_know_tip">我知道了!</string>
 
     <string name="warning">警告</string>
@@ -470,8 +470,8 @@
     <string name="allLight">所有灯</string>
     <string name="group_list_on">开</string>
     <string name="group_list_off">关</string>
-    <string name="normal_light_title">可变色温灯</string>
-    <string name="rgb_title">RGB灯具</string>
+    <string name="normal_light_title">冷暖灯</string>
+    <string name="rgb_title">全彩灯</string>
     <string name="switch_title">开关</string>
     <string name="apply_scene">点击此处即可应用场景</string>
 
@@ -686,9 +686,9 @@
     <string name="password_you_set_again">请再次确认您设置的登录密码</string>
     <string name="password_you_set">请输入您设置的登录密码</string>
     <string name="equipment_quantity">设备数量：</string>
-    <string name="use_the_works">使用网络</string>
-    <string name="delete_network">删除网络</string>
-    <string name="share_network">分享网络</string>
+    <string name="use_the_works">使用区域</string>
+    <string name="delete_network">删除区域</string>
+    <string name="share_network">分享区域</string>
     <string name="update_name">修改名称</string>
     <string name="current_account">当前账号:</string>
     <string name="all">全部</string>
@@ -732,7 +732,7 @@
     <string name="input_pwd">输入密码</string>
     <string name="area">区域</string>
     <string name="refresh_qr_code">刷新二维码</string>
-    <string name="cur_network_owner">当前网络拥有者:</string>
+    <string name="cur_network_owner">当前区域拥有者:</string>
     <string name="developer">开发者模式</string>
     <string name="update_version">新版本升级</string>
     <string name="version_disabled">当前版本不可用</string>
@@ -764,15 +764,15 @@
     <string name="QR_cancel">撤销二维码</string>
     <string name="QR_canceled">当前二维码已撤销</string>
     <string name="QR_expired">二维码已失效,请重新生成</string>
-    <string name="unbind_network">解绑网络</string>
+    <string name="unbind_network">解绑区域</string>
     <string name="more">更多</string>
     <string name="change_region">确定切换到区域</string>
     <string name="total_device">(共%1$s个设备)</string>
     <string name="share_person">分享人数: %1$s人</string>
     <string name="to_receive">待接收</string>
     <string name="see_more">查看更多</string>
-    <string name="me_net_num">个人网络(%1$s个)</string>
-    <string name="received_net_num">已接收网络(%1$s个)</string>
+    <string name="me_net_num">个人(%1$s个)</string>
+    <string name="received_net_num">已接收(%1$s个)</string>
     <string name="pick_up">收起</string>
     <string name="see_qr">查看二维码</string>
     <string name="input_new_region_name">请输入新的区域名称</string>
@@ -788,7 +788,7 @@
     <string name="cancel_authorization">授权用户取消授权</string>
     <string name="authorization_exprize">二维码已过期</string>
     <string name="unauthorization_leve">未收录的授权等级</string>
-    <string name="region_one_code">单个区域同时只能生成一种码</string>
+    <string name="region_one_code">单个区域同时只能生成一种码,请先取消授权码或移交码</string>
     <string name="can_not_parse">无法解析</string>
     <string name="can_not_parse_mine">不能解析自己生成的码</string>
     <string name="accept_authrozation">该用户已接受授权</string>

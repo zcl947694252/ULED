@@ -20,7 +20,7 @@ public class DbUser {
     private String email;
     //用户名
     private String name;
-    //用户账号
+    //用户账号--切换区域以后用户账号变为mesname
     private String account;
     //用户手机号
     private String phone;
@@ -36,12 +36,17 @@ public class DbUser {
     private String login_state_key;
 
     private  String last_authorizer_user_id;
+    //切换区域后设备登录使用的账户
+    private String controlMeshName;
+    //切换区域后设备登录使用的密码
+    private String controlMeshPwd;
 
 
-    @Generated(hash = 1528423653)
+    @Generated(hash = 2027603692)
     public DbUser(Long id, String avatar, String channel, String email, String name, String account, String phone,
             String token, String password, String last_region_id, String authorizer_user_id,
-            String login_state_key, String last_authorizer_user_id) {
+            String login_state_key, String last_authorizer_user_id, String controlMeshName,
+            String controlMeshPwd) {
         this.id = id;
         this.avatar = avatar;
         this.channel = channel;
@@ -55,6 +60,8 @@ public class DbUser {
         this.authorizer_user_id = authorizer_user_id;
         this.login_state_key = login_state_key;
         this.last_authorizer_user_id = last_authorizer_user_id;
+        this.controlMeshName = controlMeshName;
+        this.controlMeshPwd = controlMeshPwd;
     }
     @Generated(hash = 762027100)
     public DbUser() {
@@ -134,6 +141,25 @@ public class DbUser {
         this.last_authorizer_user_id = last_authorizer_user_id;
     }
 
+    public String getLogin_state_key() {
+        return this.login_state_key;
+    }
+    public void setLogin_state_key(String login_state_key) {
+        this.login_state_key = login_state_key;
+    }
+    public String getControlMeshName() {
+        return this.controlMeshName;
+    }
+    public void setControlMeshName(String controlMeshName) {
+        this.controlMeshName = controlMeshName;
+    }
+    public String getControlMeshPwd() {
+        return this.controlMeshPwd;
+    }
+    public void setControlMeshPwd(String controlMeshPwd) {
+        this.controlMeshPwd = controlMeshPwd;
+    }
+
     @Override
     public String toString() {
         return "DbUser{" +
@@ -150,13 +176,8 @@ public class DbUser {
                 ", authorizer_user_id='" + authorizer_user_id + '\'' +
                 ", login_state_key='" + login_state_key + '\'' +
                 ", last_authorizer_user_id='" + last_authorizer_user_id + '\'' +
+                ", controlMeshName='" + controlMeshName + '\'' +
+                ", controlMeshPwd='" + controlMeshPwd + '\'' +
                 '}';
-    }
-
-    public String getLogin_state_key() {
-        return this.login_state_key;
-    }
-    public void setLogin_state_key(String login_state_key) {
-        this.login_state_key = login_state_key;
     }
 }

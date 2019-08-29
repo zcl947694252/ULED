@@ -468,18 +468,15 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                        Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-            params.setNewPassword(NetworkFactory.md5(
-                    NetworkFactory.md5(account) + account))
+
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+            params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
             params.setNewPassword(mesh?.password)
         }
 
         params.setUpdateDeviceList(mDeviceInfo)
-        val groupAddress = mGroupArrayList.get(mAdapter.selectedPos).meshAddr
+        val groupAddress = mGroupArrayList[mAdapter.selectedPos].meshAddr
         val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddress shr 8 and 0xFF).toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_GROUP, mDeviceInfo.meshAddress,

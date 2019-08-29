@@ -23,7 +23,7 @@
         android:id="@+id/view2"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:layout_marginStart="72dp"
+        android:layout_marginLeft="72dp"
         android:background="#ffffff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/add_device_image"

@@ -152,7 +152,7 @@
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
     <string name="title_scanning_lights_num">已扫到 %1$d 个灯</string>
-    <string name="title_scanned_lights_num">扫描完毕(已扫到%1$d个灯)</string>
+    <string name="title_scanned_lights_num">扫描完毕：%1$d个灯</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>
     <string name="empty_cache_tip">清除数据前需要对灯物理恢复,开始清除数据？</string>
@@ -325,10 +325,10 @@
     <string name="by_light_reset_mesage">我已经对灯物理恢复出厂设置,开始初始化APP数据？</string>
     <string name="question_1">2.如何恢复出厂设置？</string>
     <string name="question_1_anser1">（1）软件恢复：该方式将通过App直接对灯进行恢复出厂设置,该方式请先确保灯处于连接可控状态</string>
-    <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源1秒，断开电源6s，重复约5-6次，直至灯闪烁。
-        开关：接上电源，同时按住开关4个按键中的左上按键与右下按键。期间蓝灯会常亮。
-        传感器：接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。
-        窗帘：接上电源7秒，断开电源7秒，重复约5-6次。</string>
+    <string name="qustion_2_anser2">（2）物理恢复：灯：接上电源6秒，断开电源6s，重复约5-6次，直至灯闪烁。
+        开关：接上电源，同时按住开关4个按键中的左上按键与右下按键。期间蓝灯会闪烁。
+        传感器：接上电源3秒，断开电源3秒，重复约5-6次，直至传感器闪烁。
+        窗帘：用尖锐物顶住背后的按钮约5秒直至灯闪，放开，再顶住约5秒。</string>
     <string name="common_question">常见问题</string>
     <string name="question_2">3.部分华为手机存在蓝牙不稳定</string>
     <string name="question2_answer">华为 WAS-AL00,华为P9不建议作为控制终端</string>
@@ -344,7 +344,7 @@
     <string name="phone_cannot_be_empty">手机号不能为空</string>
     <string name="delete_group_failed">删除分组失败</string>
     <string name="deleting">删除中…</string>
-    <string name="move_out_some_lights_in_group_failed">部分组里的灯移出组失败</string>
+    <string name="move_out_some_lights_in_group_failed">部分组里的设备移出组失败</string>
     <string name="delay_minute">延时(分)</string>
     <string name="delay_seconds">延时(秒)</string>
     <string name="minimum_brightness_percentage">最终亮度(%)</string>
@@ -371,7 +371,7 @@
     <string name="input_groupAdress">请输入组名</string>
     <string name="not_find_pir">未找到传感器</string>
     <string name="max_tip_brightness">最终亮度不能大于99%</string>
-    <string name="time_max_tip">延时不能超过30分钟</string>
+    <string name="time_max_tip">延时最大不能超过255分钟或255秒</string>
     <string name="ota_str">固件升级</string>
     <string name="first_address">第一：https://www.coolapk.com/apk/181682</string>
     <string name="second_address">第二：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
@@ -442,8 +442,8 @@
     <string name="btn_jump_over">跳过</string>
     <string name="reset_boot_tutorial">重新查看引导页</string>
     <string name="select_device_tip">请选择需要安装的设备</string>
-    <string name="normal_light">可变色温灯</string>
-    <string name="rgb_light">RGB灯具</string>
+    <string name="normal_light">冷暖灯</string>
+    <string name="rgb_light">全彩灯</string>
     <string name="i_know_tip">我知道了!</string>
 
     <string name="warning">警告</string>
@@ -470,8 +470,8 @@
     <string name="allLight">所有灯</string>
     <string name="group_list_on">开</string>
     <string name="group_list_off">关</string>
-    <string name="normal_light_title">可变色温灯</string>
-    <string name="rgb_title">RGB灯具</string>
+    <string name="normal_light_title">冷暖灯</string>
+    <string name="rgb_title">全彩灯</string>
     <string name="switch_title">开关</string>
     <string name="apply_scene">点击此处即可应用场景</string>
 
@@ -488,12 +488,12 @@
     <string name="name_can_not_null">名字不能为空</string>
     <string name="sure_delete">确定要删除此场景吗？</string>
     <string name="w_bright">白光亮度:</string>
-    <string name="light_light">小夜灯</string>
-    <string name="light_light_tip">请先把小夜灯调整到配置模式</string>
-    <string name="light_light_title">小夜灯</string>
+    <string name="light_light">人体感应器</string>
+    <string name="light_light_tip">请先把人体感应器调整到配置模式</string>
+    <string name="light_light_title">人体感应器</string>
     <string name="delay_time">延时时间</string>
     <string name="tip_night_light_group_limite_tip">最高只能添加8个分组</string>
-    <string name="night_light_title">小夜灯</string>
+    <string name="night_light_title">人体感应器</string>
     <string name="current_select_group">当前选择的分组:</string>
     <string name="selected">选中</string>
     <string name="unSelect">未选中</string>
@@ -544,7 +544,7 @@
     <string name="switch_name">开关</string>
     <string name="switch_describe">例如：调光调色开关,场景开关,玻璃开关</string>
     <string name="sensor">传感器</string>
-    <string name="sensor_describe">例如：小夜灯,PIR</string>
+    <string name="sensor_describe">例如：人体感应器,PIR</string>
     <string name="add_device">添加设备</string>
     <string name="update_name_gp">修改组名</string>
     <string name="curtain">窗帘</string>
@@ -560,7 +560,7 @@
     <string name="switch_tip4">开关底部右边的指示灯会常亮</string>
     <string name="install_tip5">如果遇到问题,请尝试以下步骤复位设备:</string>
     <string name="guide_tip_reset_light">灯：接上电源6秒，断开电源6秒，重复5-6次，直至灯闪烁。</string>
-    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会常亮。\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右下按键和开关键。期间蓝灯会常亮。</string>
+    <string name="guide_tip_reset_switch">面板开关：接上电源，同时按住开关按键中的左上按键和右下按键。期间蓝灯会闪烁。\n玻璃开关:接上电源，同时按住开光案件中的左上按键,右下按键和开关键。期间蓝灯会闪烁。</string>
     <string name="guide_tip_reset_sensor">接上电源1秒，断开电源1秒，重复约5-6次，直至传感器闪烁。</string>
     <string name="guide_tip_reset_curtain">窗帘：长按窗帘底部按键5秒，指示灯常亮，松手，再长按按键，直到指示灯闪烁3次。</string>
     <string name="guide_tip_reset_relay">蓝牙接收器：长按接收器的白色按钮5秒，直至蓝牙接收器闪烁。</string>
@@ -586,7 +586,7 @@
     <string name="device_list">设备</string>
     <string name="scan_curtain_num">总计：当前扫描出了 %1$s 个窗帘</string>
     <string name="title_curtain_lights_num">已扫到 %1$d 个窗帘</string>
-    <string name="title_curtain_lights_num_total">扫描完毕(已扫到%1$d个窗帘)</string>
+    <string name="title_curtain_lights_num_total">扫描完毕：%1$d个窗帘</string>
     <string name="delete_switch_confirm">确定删除此开关？</string>
     <string name="delete_switch_success">删除成功</string>
     <string name="have_curtain_no_group_tip">还有窗帘没有分组，请完成分组操作</string>
@@ -604,8 +604,8 @@
     <string name="connector">蓝牙接收器</string>
     <string name="scan_connector_num">总计：当前扫描出了 %1$s 个蓝牙接收器</string>
     <string name="title_connector_lights_num">已扫到 %1$d 个蓝牙接收器</string>
-    <string name="title_connector_lights_num_total">扫描完毕(已扫到%1$d个蓝牙接收器)</string>
-    <string name="have_connector_no_group_tip">还有链接器没有分组，请完成分组操作</string>
+    <string name="title_connector_lights_num_total">扫描完毕：%1$d个蓝牙接收器</string>
+    <string name="have_connector_no_group_tip">还有蓝牙接收器没有分组，请完成分组操作</string>
     <string name="grouping_connector_wait_tip">当前有%1$s个蓝牙接收器正在分组，请稍候！</string>
     <string name="selected_connector_tip">至少选择一个链接器进行分组</string>
     <string name="connector_fail_tip">有链接器分组失败，请检查并重试！</string>
@@ -686,29 +686,67 @@
     <string name="password_you_set_again">请再次确认您设置的登录密码</string>
     <string name="password_you_set">请输入您设置的登录密码</string>
     <string name="equipment_quantity">设备数量：</string>
-    <string name="use_the_works">使用网络</string>
-    <string name="delete_network">删除网络</string>
-    <string name="share_network">分享网络</string>
+    <string name="use_the_works">使用区域</string>
+    <string name="delete_network">删除区域</string>
+    <string name="share_network">分享区域</string>
     <string name="update_name">修改名称</string>
-    <string name="current_account">当前账号</string>
+    <string name="current_account">当前账号:</string>
     <string name="all">全部</string>
     <string name="developer_mode_on">是否开启/关闭开发者模式</string>
     <string name="open_mode">开启</string>
     <string name="close_mode">关闭</string>
     <string name="password_cannot">密码不能为空</string>
+    <string name="any_environment">全天</string>
+    <string name="dark_environment">白天</string>
+    <string name="very_dark_environment">夜晚</string>
+    <string name="light_on">触发时开灯</string>
+    <string name="light_off">触发时关灯</string>
+    <string name="minute">分钟</string>
+    <string name="second">秒</string>
+    <string name="moment">瞬间</string>
+    <string name="gradient">渐变</string>
+    <string name="human_body">人体感应器</string>
+    <string name="custom_brightness">自定义亮度</string>
+    <string name="target_brightness">请输入目标亮度</string>
+    <string name="triggering_conditions">触&#160;&#160;&#160;发&#160;&#160;&#160;条&#160;&#160;&#160;件&#160;&#160;&#160;:</string>
+    <string name="trigger_after">触&#160;&#160;&#160;&#160;&#160;发&#160;&#160;&#160;&#160;&#160;后&#160;&#160;&#160;&#160;&#160;&#160;:</string>
+    <string name="overtime_time">超&#160;&#160;&#160;时&#160;&#160;&#160;时&#160;&#160;&#160;间&#160;&#160;&#160;:</string>
+    <string name="light_open_mode">亮度变化方式&#160;&#160;&#160;&#160;:</string>
+    <string name="choose_group">选&#160;&#160;&#160;择&#160;&#160;&#160;分&#160;&#160;&#160;组&#160;&#160;&#160;&#160;:</string>
+    <string name="brightness_cannot">亮度不能为0</string>
+    <string name="brightness_cannot_be_greater_than">亮度不能大于100</string>
+    <string name="delay_time_unit">延时时间单位</string>
+    <string name="trigger_mode_text">触&#160;&#160;&#160;发&#160;&#160;&#160;方&#160;&#160;&#160;式&#160;&#160;&#160;:</string>
+    <string name="delay_time_unit_text">延时时间单位&#160;&#160;&#160;:</string>
+    <string name="ten_second">10秒</string>
+    <string name="twenty_second">20秒</string>
+    <string name="thirty_second">30秒</string>
+    <string name="forty_second">40秒</string>
+    <string name="fifty_second">50秒</string>
+    <string name="one_minute">1分钟</string>
+    <string name="two_minute">2分钟</string>
+    <string name="three_minute">3分钟</string>
+    <string name="four_minute">4分钟</string>
+    <string name="five_minute">5分钟</string>
+    <string name="auto_regist_account">登录后自动注册账号</string>
+    <string name="input_pwd">输入密码</string>
+    <string name="area">区域</string>
+    <string name="refresh_qr_code">刷新二维码</string>
+    <string name="cur_network_owner">当前区域拥有者:</string>
     <string name="developer">开发者模式</string>
-    <string name="version_disabled">您的版本不可用请升级即将跳转升级界面</string>
+    <string name="update_version">新版本升级</string>
+    <string name="version_disabled">当前版本不可用</string>
     <string name="syncing_relogin">同步数据中请重新登录</string>
     <string name="in_use">使用中</string>
     <string name="use">使用</string>
-    <string name="creater_name">创建者: +</string>
+    <string name="creater_name">创 建 者: +</string>
     <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
     <string name="input_region_name">请输入区域名称</string>
     <string name="developer_mode_open">开发者模式已开启</string>
     <string name="apply">应用</string>
     <string name="in_apply">应用中</string>
     <string name="scene_apply_success">场景应用成功</string>
-    <string name="network">网络</string>
+    <string name="network">授权管理</string>
     <string name="transfer_accounts">移交账号</string>
     <string name="start_change_region">开始切换区域</string>
     <string name="error_change_region">切换区域失败</string>
@@ -726,22 +764,22 @@
     <string name="QR_cancel">撤销二维码</string>
     <string name="QR_canceled">当前二维码已撤销</string>
     <string name="QR_expired">二维码已失效,请重新生成</string>
-    <string name="unbind_network">解绑网络</string>
+    <string name="unbind_network">解绑区域</string>
     <string name="more">更多</string>
     <string name="change_region">确定切换到区域</string>
-    <string name="total_device">\"(共%1$s个设备)\"</string>
+    <string name="total_device">(共%1$s个设备)</string>
     <string name="share_person">分享人数: %1$s人</string>
     <string name="to_receive">待接收</string>
     <string name="see_more">查看更多</string>
-    <string name="me_net_num">个人网络(100个)</string>
-    <string name="received_net_num">已接收网络(%1$s个)</string>
+    <string name="me_net_num">个人(%1$s个)</string>
+    <string name="received_net_num">已接收(%1$s个)</string>
     <string name="pick_up">收起</string>
     <string name="see_qr">查看二维码</string>
     <string name="input_new_region_name">请输入新的区域名称</string>
     <string name="share_person_num_b">分享人数: (%1$s人)</string>
     <string name="unbond">解除绑定</string>
     <string name="warm_unbind_config">确定要解除对%1$s的授权吗？</string>
-    <string name="warm_unbind_authorize_config">确定要移除%1$s该授权区域吗？</string>
+    <string name="warm_unbind_authorize_config">确定要移除%1$s授权区域吗？</string>
     <string name="parse_result">Parse the result :%1$s</string>
     <string name="fail_parse_qr">解析二维码失败</string>
     <string name="unbundling_success">解绑成功</string>
@@ -750,7 +788,7 @@
     <string name="cancel_authorization">授权用户取消授权</string>
     <string name="authorization_exprize">二维码已过期</string>
     <string name="unauthorization_leve">未收录的授权等级</string>
-    <string name="region_one_code">单个区域同时只能生成一种码</string>
+    <string name="region_one_code">单个区域同时只能生成一种码,请先取消授权码或移交码</string>
     <string name="can_not_parse">无法解析</string>
     <string name="can_not_parse_mine">不能解析自己生成的码</string>
     <string name="accept_authrozation">该用户已接受授权</string>

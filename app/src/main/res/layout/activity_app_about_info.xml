@@ -16,7 +16,7 @@
             <TextView
                 android:id="@+id/Instruction_manual"
                 android:layout_marginTop="20dp"
-                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
                 android:layout_height="wrap_content"
                 android:text="@string/instruction_manual"
                 android:autoLink="web"
@@ -33,16 +33,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/primary"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="20dp"
                     android:textSize="18sp"
                     android:text="@string/question0"
                     />
 
                 <TextView
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="start"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
@@ -51,9 +51,9 @@
                     />
 
                 <TextView
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="start"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
@@ -63,9 +63,9 @@
 
                 <TextView
                     android:id="@+id/address_test"
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="start"
                     android:visibility="gone"
                     android:layout_width="300dp"
@@ -85,16 +85,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/primary"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="20dp"
                     android:textSize="18sp"
                     android:text="@string/question_1"
                     />
 
                 <TextView
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="start"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
@@ -102,9 +102,9 @@
                     />
 
                 <TextView
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="left"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
@@ -123,16 +123,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/primary"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="20dp"
                     android:textSize="18sp"
                     android:text="@string/question_2"
                     />
 
                 <TextView
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="left"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
@@ -150,16 +150,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/primary"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_marginTop="20dp"
                     android:textSize="18sp"
                     android:text="@string/question_3"
                     />
 
                 <TextView
-                    android:layout_marginStart="35dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
                     android:gravity="left"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"

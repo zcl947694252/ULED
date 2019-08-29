@@ -73,7 +73,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="11dp"
+                    android:layout_marginRight="11dp"
                     android:src="@drawable/icon_select_down_pir"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -119,7 +119,7 @@
                 android:id="@+id/trigger_time"
                 android:layout_width="190dp"
                 android:layout_height="30dp"
-                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
                 android:background="@drawable/human_body_sensor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -142,7 +142,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="11dp"
+                    android:layout_marginRight="11dp"
                     android:src="@drawable/icon_select_down_pir"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -188,7 +188,7 @@
                 android:id="@+id/editText"
                 android:layout_width="107dp"
                 android:layout_height="30dp"
-                android:layout_marginEnd="13dp"
+                android:layout_marginRight="13dp"
                 android:background="@drawable/human_body_sensor"
                 android:gravity="center"
                 android:inputType="number"
@@ -215,7 +215,7 @@
                     android:id="@+id/time_type_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="13dp"
+                    android:layout_marginLeft="13dp"
                     android:text="@string/minute"
                     android:textColor="@color/blue_background"
                     android:textSize="15sp"
@@ -226,7 +226,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="11dp"
+                    android:layout_marginRight="11dp"
                     android:src="@drawable/icon_select_down_pir"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -294,7 +294,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="11dp"
+                    android:layout_marginRight="11dp"
                     android:src="@drawable/icon_select_down_pir"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -366,7 +366,7 @@
                     <!--android:id="@+id/textView31"-->
                     <!--android:layout_width="wrap_content"-->
                     <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginEnd="11dp"-->
+                    <!--android:layout_marginRight="11dp"-->
                     <!--android:text="%"-->
                     <!--android:textColor="@color/blue_background"-->
                     <!--android:textSize="15sp"-->
@@ -435,7 +435,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="11dp"
+                    android:layout_marginRight="11dp"
                     android:src="@drawable/icon_select_down_pir"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -501,7 +501,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="11dp"
+                    android:layout_marginRight="11dp"
                     android:src="@drawable/icon_select_down_pir"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -580,7 +580,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
                 android:text="@string/select_group"
                 android:textColor="@color/black_nine"
                 android:textSize="15sp"
@@ -605,8 +605,8 @@
             android:id="@+id/sensor_update"
             android:layout_width="match_parent"
             android:layout_height="44dp"
-            android:layout_marginStart="38dp"
-            android:layout_marginEnd="38dp"
+            android:layout_marginLeft="38dp"
+            android:layout_marginRight="38dp"
             android:layout_marginBottom="36dp"
             android:background="@drawable/btn_rec_blue_bt"
             android:elevation="10dp"

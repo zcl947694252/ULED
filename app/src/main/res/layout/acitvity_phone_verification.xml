@@ -19,7 +19,7 @@
     <!--android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content"-->
     <!--android:layout_centerVertical="true"-->
-    <!--android:layout_marginStart="20dp"-->
+    <!--android:layout_marginLeft="20dp"-->
     <!--android:layout_above="@+id/center_layout"-->
     <!--/>-->
 
@@ -28,8 +28,8 @@
         android:id="@+id/ccp"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="24dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="180dp"
         app:ccp_countryPreference="CN,AU"
         app:ccp_defaultNameCode="CN"
@@ -41,7 +41,7 @@
         android:id="@+id/edit_phone_number"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/ccp"
         app:layout_constraintTop_toTopOf="@+id/ccp">
@@ -59,7 +59,7 @@
         android:id="@+id/btn_send_verification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="112dp"
         android:text="@string/send_verification"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,8 +69,8 @@
         android:id="@+id/edit_verification"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginLeft="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btn_send_verification"
         app:layout_constraintTop_toTopOf="@+id/btn_send_verification">

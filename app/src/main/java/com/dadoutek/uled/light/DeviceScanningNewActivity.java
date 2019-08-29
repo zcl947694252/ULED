@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.communicate.Commander;
@@ -85,7 +86,6 @@ import com.telink.bluetooth.light.NotificationInfo;
 import com.telink.bluetooth.light.Parameters;
 import com.telink.util.Event;
 import com.telink.util.EventListener;
-import com.telink.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,7 +109,13 @@ import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
 /**
- * Created by hejiajun on 2018/5/21.
+ * 创建者     zcl
+ * 创建时间   2019/8/28 18:37
+ * 描述	      ${搜索全彩灯设备}$
+ * <p>
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
  */
 public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
@@ -288,7 +294,10 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void startBlink(DbLight light) {
         DbGroup group;
         if (light != null) {
-            DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId());
+            Long groupId = light.getBelongGroupId();
+            if (groupId == null)
+                return;
+            DbGroup groupOfTheLight = DBUtils.INSTANCE.getGroupByID(groupId);
             if (groupOfTheLight == null)
                 group = groups.get(0);
             else
@@ -467,9 +476,11 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
                             //让选中的灯停下来别再发闪的命令了。
                             stopBlink(getCurrentSelectLights().get(i));
                         }
-                    }doFinish();
+                    }
+                    doFinish();
                 })
-                .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {}))
+                .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
+                }))
                 .setMessage(R.string.exit_tips_in_group)
                 .show());
     }
@@ -871,7 +882,6 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
     private void autoConnect() {
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
 
@@ -881,13 +891,13 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
                 startConnect = true;
 
-                String account = DBUtils.INSTANCE.getLastUser().getAccount();
+                String meshName = DBUtils.INSTANCE.getLastUser().getControlMeshName();
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
-                connectParams.setMeshName(account);
+                connectParams.setMeshName(meshName);
 //                connectParams.setConnectMac(bestRssiDevice.macAddress);
-                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
@@ -1449,6 +1459,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
 
     private void onErrorReport(ErrorReportInfo info) {
 //        retryConnect()
+        LogUtils.d("stateCode----"+info.stateCode+"-------stateCode-------"+info.stateCode);
         //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
     }
 
@@ -1638,13 +1649,14 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
         //更新参数
         updateMeshStatus = UPDATE_MESH_STATUS.UPDATING_MESH;
         deviceInfo.meshAddress = meshAddress;
-        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou");
+       /* String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                Constant.DB_NAME_KEY, "dadou");*/
+
         LeUpdateParameters params = Parameters.createUpdateParameters();
         params.setOldMeshName(mesh.getFactoryName());
         params.setOldPassword(mesh.getFactoryPassword());
         params.setNewMeshName(mesh.getName());
-        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16));
+        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getName()) + mesh.getName()).substring(0, 16));
         params.setUpdateDeviceList(deviceInfo);
         TelinkLightService.Instance().updateMesh(params);
 
@@ -1768,19 +1780,7 @@ public class DeviceScanningNewActivity extends TelinkMeshErrorDealActivity
             case LightAdapter.STATUS_LOGOUT:
                 isLoginSuccess = false;
                 break;
-//                case LightAdapter.STATUS_CONNECTED:
-//                    if(startConnect){
-//                        login();
-//                    }
-//                    break;
-        }
     }
-
-    private void login() {
-//        log("login");
-        String account = DBUtils.INSTANCE.getLastUser().getAccount();
-        String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16);
-        TelinkLightService.Instance().login(Strings.stringToBytes(account, 16), Strings.stringToBytes(pwd, 16));
     }
 
 }

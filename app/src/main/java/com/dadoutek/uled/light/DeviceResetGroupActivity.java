@@ -168,7 +168,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
     private TextView tvStopScan;
 
-    List<DbLight> lightsData= null;
+    List<DbLight> lightsData = null;
 
     //灯的mesh地址
     private int dstAddress;
@@ -182,7 +182,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
     private boolean guideShowCurrentPage = false;
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
-    private long allLightId=0;
+    private long allLightId = 0;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -384,8 +384,8 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
     private void doFinish() {
 
-        if(groupIsChange){
-            if(DBUtils.INSTANCE.getSceneAll().size()>0){
+        if (groupIsChange) {
+            if (DBUtils.INSTANCE.getSceneAll().size() > 0) {
                 ToastUtils.showLong(R.string.tip_change_gp_reset_scene);
             }
         }
@@ -504,7 +504,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
 
     private void setGroupOneByOne(DbGroup dbGroup, List<DbLight> selectLights, int index) {
-        groupIsChange=true;
+        groupIsChange = true;
         DbLight dbLight = selectLights.get(index);
         int lightMeshAddr = dbLight.getMeshAddr();
         Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), new Function0<Unit>() {
@@ -569,7 +569,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
     private void updateGroupResult(DbLight light, DbGroup group) {
         for (int i = 0; i < nowLightList.size(); i++) {
             if (light.getMeshAddr() == nowLightList.get(i).getMeshAddr()) {
-                if (light.getBelongGroupId()!=allLightId) {
+                if (light.getBelongGroupId() != allLightId) {
                     nowLightList.get(i).hasGroup = true;
                     nowLightList.get(i).setBelongGroupId(group.getId());
                     nowLightList.get(i).setName(getString(R.string.unnamed));
@@ -641,7 +641,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
      */
     private boolean isAllLightsGrouped() {
         for (int j = 0; j < nowLightList.size(); j++) {
-            if (nowLightList.get(j).getBelongGroupId()==allLightId) {
+            if (nowLightList.get(j).getBelongGroupId() == allLightId) {
                 return false;
             }
         }
@@ -774,13 +774,12 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 TelinkLightService.Instance().idleMode(true);
 
-                String account = DBUtils.INSTANCE.getLastUser().getAccount();
+                String meshName = DBUtils.INSTANCE.getLastUser().getControlMeshName();
 
                 //自动重连参数
                 LeAutoConnectParameters connectParams = Parameters.createAutoConnectParameters();
-                connectParams.setMeshName(account);
-                connectParams.setPassword(NetworkFactory.md5(
-                        NetworkFactory.md5(account) + account).substring(0, 16));
+                connectParams.setMeshName(meshName);
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16));
                 connectParams.autoEnableNotification(true);
 
                 //连接，如断开会自动重连
@@ -861,7 +860,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         scanPb.setVisibility(View.GONE);
 
         lightNumLayout.setVisibility(View.GONE);
-        tvStopScan=toolbar.findViewById(R.id.tv_function1);
+        tvStopScan = toolbar.findViewById(R.id.tv_function1);
         tvStopScan.setText(R.string.stop_scan);
         tvStopScan.setOnClickListener(onClick);
         tvStopScan.setVisibility(View.GONE);
@@ -871,7 +870,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         startGrouping();
     }
 
-    private View.OnClickListener onClick= v -> {
+    private View.OnClickListener onClick = v -> {
         stopTimer();
         onLeScanTimeout();
     };
@@ -944,9 +943,9 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         }
 
 
-        if(scanRGBLight){
+        if (scanRGBLight) {
             lightsData = DBUtils.INSTANCE.getAllRGBLight();
-        }else{
+        } else {
             lightsData = DBUtils.INSTANCE.getAllNormalLight();
         }
 
@@ -1049,9 +1048,9 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
             DbLight light = this.getItem(position);
 
-            if(light.getBelongGroupId()!=1){
+            if (light.getBelongGroupId() != 1) {
                 holder.txtName.setText(DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName());
-            }else{
+            } else {
                 holder.txtName.setText(R.string.not_grouped);
             }
 
@@ -1102,12 +1101,12 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         }
 
         public void setLights(List<DbLight> lights) {
-            this.lights=lights;
+            this.lights = lights;
         }
     }
 
     private String getDeviceName(DbLight light) {
-        if (light.getBelongGroupId()!=allLightId) {
+        if (light.getBelongGroupId() != allLightId) {
             return DBUtils.INSTANCE.getGroupNameByID(light.getBelongGroupId());
         } else {
             return getString(R.string.not_grouped);
@@ -1165,7 +1164,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
     private void onErrorReport(ErrorReportInfo info) {
 //        retryConnect()
-       //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
+        //("onErrorReport type = " + info.stateCode + "error code = " + info.errorCode);
     }
 
 
@@ -1197,7 +1196,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
             groupAddress = groupAddress | 0x8000;
 
             if (groupingGroup.getMeshAddr() == groupAddress) {
-               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
+                //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x", groupAddress, groupingLight.getMeshAddr()));
                 groupingSuccess = true;
             }
         }
@@ -1243,14 +1242,14 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
                         startTimer();
                         if (grouping) {
 //                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-                           //("Grouping");
+                            //("Grouping");
                             return;
                         }
                         handleIfSupportBle();
                         TelinkLightService.Instance().idleMode(true);
                         if (mApplication.isEmptyMesh()) {
 //                            Toast.makeText(this, "Empty Mesh", Toast.LENGTH_SHORT).show();
-                           //("Empty Mesh");
+                            //("Empty Mesh");
                             return;
                         }
 
@@ -1338,37 +1337,40 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
 
 //        Log.d(TAG, "onDeviceStatusChanged_onLeScan: " + deviceInfo.meshAddress + "" +
 //                "------" + deviceInfo.macAddress);
+
+        //todo
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI) {
-                            //更新参数
-                            deviceInfo.meshAddress = meshAddress;
-                            String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                    Constant.DB_NAME_KEY, "dadou");
-                            LeUpdateParameters params = Parameters.createUpdateParameters();
-                            params.setOldMeshName(mesh.getFactoryName());
-                            params.setOldPassword(mesh.getFactoryPassword());
-                            params.setNewMeshName(mesh.getName());
-                            params.setNewPassword(NetworkFactory.md5(
-                                    NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
-                            params.setUpdateDeviceList(deviceInfo);
-                            TelinkLightService.Instance().updateMesh(params);
+                //更新参数
+                deviceInfo.meshAddress = meshAddress;
+                         /*   String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                                    Constant.DB_NAME_KEY, "dadou");*/
+
+                LeUpdateParameters params = Parameters.createUpdateParameters();
+                params.setOldMeshName(mesh.getFactoryName());
+                params.setOldPassword(mesh.getFactoryPassword());
+                params.setNewMeshName(mesh.getName());
+                //  params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
+                //切换区域赋值新的密码
+                params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getName()) + mesh.getName()).substring(0, 16));
+                params.setUpdateDeviceList(deviceInfo);
+                TelinkLightService.Instance().updateMesh(params);
             }
         } else {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID ==
                     DeviceType.LIGHT_NORMAL && deviceInfo.rssi < MAX_RSSI) {
-                            //更新参数
-                            deviceInfo.meshAddress = meshAddress;
-                            String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                                    Constant.DB_NAME_KEY, "dadou");
-                            LeUpdateParameters params = Parameters.createUpdateParameters();
-                            params.setOldMeshName(mesh.getFactoryName());
-                            params.setOldPassword(mesh.getFactoryPassword());
-                            params.setNewMeshName(mesh.getName());
-                            params.setNewPassword(NetworkFactory.md5(
-                                    NetworkFactory.md5(mesh.getPassword()) + account).substring(0, 16));
-                            params.setUpdateDeviceList(deviceInfo);
-                            TelinkLightService.Instance().updateMesh(params);
+                //更新参数
+                deviceInfo.meshAddress = meshAddress;
+               /* String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                        Constant.DB_NAME_KEY, "dadou");*/
+                LeUpdateParameters params = Parameters.createUpdateParameters();
+                params.setOldMeshName(mesh.getFactoryName());
+                params.setOldPassword(mesh.getFactoryPassword());
+                params.setNewMeshName(mesh.getName());
+                params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.getName()) + mesh.getName()).substring(0, 16));
+                params.setUpdateDeviceList(deviceInfo);
+                TelinkLightService.Instance().updateMesh(params);
             }
         }
     }
@@ -1377,7 +1379,7 @@ public class DeviceResetGroupActivity extends TelinkMeshErrorDealActivity
         if (productUUID == DeviceType.LIGHT_RGB ||
                 productUUID == DeviceType.LIGHT_NORMAL ||
                 productUUID == DeviceType.LIGHT_NORMAL_OLD
-                ) {
+        ) {
             return true;
         } else {
             return false;

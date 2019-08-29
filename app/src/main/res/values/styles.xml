@@ -206,7 +206,7 @@
         <item name="android:background">@drawable/btn_rec_blue</item>
         <item name="android:layout_width">55dp</item>
         <item name="android:layout_height">25dp</item>
-        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
@@ -219,7 +219,7 @@
         <item name="android:background">@drawable/get_code_btn</item>
         <item name="android:layout_width">80dp</item>
         <item name="android:layout_height">25dp</item>
-        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:layout_marginRight">4dp</item>
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
