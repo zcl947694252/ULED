@@ -10,11 +10,35 @@ import java.io.Serializable;
 
 public class Constant implements Serializable {
 
-//    public static final String NEW_MESH_NAME="987654";
-//    public static final String NEW_MESH_PASSWORD="123";
-//
-//    public static final String DEFAULT_MESH_FACTORY_NAME="TestLocas";
-//    public static final String DEFAULT_MESH_FACTORY_PASSWORD="123";
+    //正式服务器
+    //#define HTTPSERVER @"https://dev.dadoutek.com/smartlight_java"
+    //#define SOCKETSERVER @"ws://dev.dadoutek.com/smartlight_java/websocket-endpoint"
+
+    //网络请求服务器域名地址
+    public static final String BASE_URL = "https://dev.dadoutek.com/smartlight/";
+    //网络请求服务器java域名地址
+    public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
+    //网络请求服务器测试地址
+    public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
+
+    //长连接测试请求服务器域名地址
+    public static final String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
+
+    //长连接测试请求服务器域名地址
+    public static final String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
+
+    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
+    public static final String WS_DEBUG_HOST = "/smartlight/test";
+    //虚拟主机号
+    public static final String WS_HOST = "/smartlight";
+    //二维码频道
+    public static final String WS_TOPIC_CODE = "/user/topic/code.parse";
+    //取消收授权频道
+    public static final String WS_AUTHOR_CODE = "/user/topic/authorization.cancel";
+    //单点登录频道
+    public static final String WS_TOPIC_LOGIN = "/user/topic/user.login.state";
+    //单点登录key
+    public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
 
     public static final int MAX_GROUP_COUNT = 250;
     public static final int MAX_VALUE = 99;
@@ -62,11 +86,8 @@ public class Constant implements Serializable {
     //本地保存是否当前手机登陆过
     public static final String IS_LOGIN = "IS_LOGIN";
 
-    //网络请求服务器测试地址
-    public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
-
     //网络请求服务器正式地址
-//    public static final String BASE_URL = "http://47.107.227.130/smartlight/";
+    //public static final String BASE_URL = "http://47.107.227.130/smartlight/";
 
 
     //用于标记当前数据库名的本地存储
@@ -262,33 +283,7 @@ public class Constant implements Serializable {
     //是否是新生成的授权码
     public static final String IS_NEW_AUTHOR_CODE = "IS_NEW_AUTHOR_CODE";
 
-    // //正式服务器
-    //#define HTTPSERVER @"https://dev.dadoutek.com/smartlight_java"
-    //#define SOCKETSERVER @"ws://dev.dadoutek.com/smartlight_java/websocket-endpoint"
 
-    //网络请求服务器java域名地址
-    public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
-
-    //网络请求服务器域名地址
-    public static final String BASE_URL = "https://dev.dadoutek.com/smartlight/";
-
-    //长连接请求服务器域名地址
-    public static final String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
-
-
-    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
-    public static final String WS_DEBUG_HOST = "/smartlight/test";
-
-    //虚拟主机号
-    public static final String WS_HOST = "/smartlight";
-    //二维码频道
-    public static final String WS_TOPIC_CODE = "/user/topic/code.parse";
-    //取消收授权频道
-    public static final String WS_AUTHOR_CODE = "/user/topic/authorization.cancel";
-    //单点登录频道
-    public static final String WS_TOPIC_LOGIN = "/user/topic/user.login.state";
-    //单点登录key
-    public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
     //是否显示区域弹框
     public static final String IS_SHOW_REGION_DIALOG = "IS_SHOW_REGION_DIALOG";
     //区域列表key

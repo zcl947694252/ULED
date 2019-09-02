@@ -64,7 +64,6 @@ import java.util.concurrent.TimeUnit
  * 创建时间   2019/8/28 18:37
  * 描述	      ${搜索全彩灯设备}$
  *
- *
  * 更新者     $Author$
  * 更新时间   $Date$
  * 更新描述   ${TODO}$
@@ -1043,7 +1042,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 }
             } else {
                 for (i in list.indices) {
+                    LogUtils.e("zcl----isNormalGroup----"+list[i])
                     if (OtherUtils.isNormalGroup(list[i])) {
+                        groups!!.add(list[i])
+                    }
+                }
+                for (i in list.indices) {
+                    LogUtils.e("zcl----isAllRightGroup----"+list[i])
+                    if (OtherUtils.isAllRightGroup(list[i])) {
+                        groups!!.add(list[i])
+                    }
+                }
+                for (i in list.indices) {
+                    LogUtils.e("zcl----isDefaultGroup----"+list[i])
+                    if (OtherUtils.isDefaultGroup(list[i])) {
                         groups!!.add(list[i])
                     }
                 }

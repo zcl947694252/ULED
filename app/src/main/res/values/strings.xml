@@ -295,7 +295,6 @@
     <string name="add_scene_gp_tip">Please Choose a Group</string>
     <string name="group_fail_tip">There is a light grouped failed, please check and try again!</string>
     <string name="one_click_reset">Reset all lights</string>
-    <string name="disconected">Not connected</string>
     <string name="reset_all_now">Restoring factory settings</string>
     <string name="reset_fail_tip1">There are no lights, please check if the lights are installed</string>
     <string name="tip_reset_sure">Confirm all lights reset？</string>

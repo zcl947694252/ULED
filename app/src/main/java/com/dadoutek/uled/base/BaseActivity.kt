@@ -123,7 +123,7 @@ abstract class BaseActivity : AppCompatActivity() {
             //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
             var headers = ArrayList<StompHeader>()
             headers.add(StompHeader("user-id", DBUtils.lastUser!!.id.toString()))
-            headers.add(StompHeader("host", Constant.WS_DEBUG_HOST))
+            headers.add(StompHeader("host", Constant.WS_HOST))
 
             mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_BASE_URL)
             mStompClient!!.connect(headers)
@@ -131,7 +131,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
             var headersLogin = ArrayList<StompHeader>()
             headersLogin.add(StompHeader("id", DBUtils.lastUser!!.id.toString()))
-            headersLogin.add(StompHeader("destination", Constant.WS_DEBUG_HOST))
+            headersLogin.add(StompHeader("destination", Constant.WS_HOST))
 
             codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe ({ topicMessage ->
                 Log.e(TAGS, "收到解析二维码信息:$topicMessage")

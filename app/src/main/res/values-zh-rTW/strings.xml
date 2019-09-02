@@ -294,7 +294,6 @@
     <string name="add_scene_gp_tip">请选择需要的分组</string>
     <string name="group_fail_tip">有灯分组失败，请检查并重试！</string>
     <string name="one_click_reset">恢复出厂设置</string>
-    <string name="disconected">未连接</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="reset_fail_tip1">当前没有任何灯,请检查是否安装过灯</string>
     <string name="tip_reset_sure">确定要将所有灯恢复出厂设置吗？</string>

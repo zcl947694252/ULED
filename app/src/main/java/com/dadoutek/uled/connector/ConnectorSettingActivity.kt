@@ -374,7 +374,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
-                },{}))
+                }))
 //        }
     }
 

@@ -484,36 +484,36 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         showLoadingDialog(getString(R.string.connecting))
         LeBluetooth.getInstance().stopScan()
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
-            if (granted) {
-                bestRSSIDevice = null   //扫描前置空信号最好设备。
-                TelinkLightService.Instance()?.idleMode(true)
-                val mesh = mApplication!!.mesh
-                //扫描参数
-                val params = LeScanParameters.create()
-                if (BuildConfig.DEBUG) {
-                    params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
-                } else {
-                    params.setMeshName(mesh.factoryName)
-                }
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
+                    if (granted) {
+                        bestRSSIDevice = null   //扫描前置空信号最好设备。
+                        TelinkLightService.Instance()?.idleMode(true)
+                        val mesh = mApplication!!.mesh
+                        //扫描参数
+                        val params = LeScanParameters.create()
+                        if (BuildConfig.DEBUG) {
+                            params.setMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                        } else {
+                            params.setMeshName(mesh.factoryName)
+                        }
 
-                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
-                    params.setScanFilters(getScanFilters())
-                }
-                //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
-                if (isSupportInstallOldDevice) {
-                    params.setMeshName(mesh.name)
-                    params.setOutOfMeshName(mesh.name)
-                }
-                params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                params.setScanMode(false)
+                        if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                            params.setScanFilters(getScanFilters())
+                        }
+                        //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
+                        if (isSupportInstallOldDevice) {
+                            params.setMeshName(mesh.name)
+                            params.setOutOfMeshName(mesh.name)
+                        }
+                        params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
+                        params.setScanMode(false)
 
-                this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
-                this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-                startCheckRSSITimerSwitch()
-                TelinkLightService.Instance()?.startScan(params)
-            }
-        },{})
+                        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
+                        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+                        startCheckRSSITimerSwitch()
+                        TelinkLightService.Instance()?.startScan(params)
+                    }
+                }
     }
 
     private fun startCheckRSSITimerSwitch() {
@@ -561,7 +561,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                             startConnectTimer()
                         }
                     }
-                },{})
+                })
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {

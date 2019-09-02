@@ -911,11 +911,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     fun addEventListeners() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
-////        this.mApplication?.addEventListener(NotificationEvent.GET_ALARM, this)
-//        this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
-//        this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
-////        this.mApplication?.addEventListener(MeshEvent.OFFLINE, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
@@ -1007,7 +1002,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
-                }) {})
+                }))
     }
 
     private fun transformView() {
