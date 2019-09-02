@@ -93,12 +93,16 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 更新描述   ${TODO}$
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
+
     private var isClick: Int = 0//
     private var settingType: Int = 0 //0是正常连接 1是点击修改 2是点击删除
+
 
     private val NORMAL_SENSOR: Int = 0 //0是正常连接 1是点击修改 2是点击删除
     private val RECOVER_SENSOR: Int = 1 //0是正常连接 1是点击修改 2是点击删除
     private val RESET_SENSOR: Int = 2 //0是正常连接 1是点击修改 2是点击删除
+    private val OTA_SENSOR: Int = 3//3是oat
+
     val INSTALL_NORMAL_LIGHT = 0
     val INSTALL_RGB_LIGHT = 1
     val INSTALL_SWITCH = 2
@@ -261,15 +265,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
         installDialog?.setOnShowListener {}
 
-        if (isGuide) {
+        if (isGuide)
             installDialog?.setCancelable(false)
-        }
 
         installDialog?.show()
 
-            GlobalScope.launch(Dispatchers.Main) {
-               delay(100)
-            }
+        GlobalScope.launch(Dispatchers.Main) {
+            delay(100)
+        }
     }
 
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, view, position ->
@@ -437,10 +440,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             var rename = views.findViewById<TextView>(R.id.rename)
 
             rename.visibility = View.GONE
-            ota.visibility = View.GONE
+            ota.visibility = View.VISIBLE
             group.visibility = View.VISIBLE
             group.text = getString(R.string.switch_grouping)
-            
+
             group.setOnClickListener {
                 settingType = if (TelinkLightApplication.getInstance().connectDevice == null) {
                     autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
@@ -459,11 +462,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 showResetConfirmDialog()
             }
             ota.setOnClickListener {
-                val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-                intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
-                intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
-                // intent.putExtra(Constant.OTA_Version,currentLight?.meshAddr)
-                startActivity(intent)
+                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
+                    isClick = OTA_SENSOR //记录点击状态
+                    settingType = NORMAL_SENSOR//记录作用
+                } else {
+                    TelinkLightService.Instance().idleMode(true)
+                    TelinkLightService.Instance().disconnect()
+                    isClick = OTA_SENSOR
+                    settingType = NORMAL_SENSOR
+                }
+                popupWindow!!.dismiss()
             }
         }
     }
@@ -500,9 +509,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     private fun autoConnectSensor() {
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
-        connectParams.setMeshName( DBUtils.lastUser?.controlMeshName)
+        connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
         connectParams.setConnectMac(currentLight!!.macAddr)
-        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5( DBUtils.lastUser?.controlMeshName) +  DBUtils.lastUser?.controlMeshName).substring(0, 16))
+        connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
 
         //连接，如断开会自动重连
@@ -511,6 +520,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
         refreshNotifyParams.setRefreshRepeatCount(3)
         refreshNotifyParams.setRefreshInterval(1000)
+        ToastUtils.showShort(getString(R.string.connecting))
         //开启自动刷新Notify
         TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
     }
@@ -537,7 +547,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 Log.e("zcl", "zcl******LE_SCAN_COMPLETED")
                 progressBar_sensor.visibility = View.GONE
             }
-
             DeviceEvent.CURRENT_CONNECT_CHANGED -> Log.e("zcl", "zcl******CURRENT_CONNECT_CHANGED")
 
             DeviceEvent.STATUS_CHANGED -> {
@@ -547,33 +556,37 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     LightAdapter.STATUS_LOGIN -> {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
                         Log.e("zcl", "zcl***STATUS_LOGIN***$isClick")
-                        when (isClick) {
-                            RECOVER_SENSOR -> {//重新配置
-                                Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe { relocationSensor() }
+                        when (isClick) {//重新配置
+                            RECOVER_SENSOR -> Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe { relocationSensor() }
+                            OTA_SENSOR -> {//人体感应器ota
+                                val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
+                                intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
+                                intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
+                                startActivity(intent)
+                                isClick = NORMAL_SENSOR
                             }
-                            RESET_SENSOR -> {//恢复出厂设置
-                                resetSensor()
-                            }
+                            RESET_SENSOR -> resetSensor() //恢复出厂设置
+
                         }
                     }
                     LightAdapter.STATUS_LOGOUT -> {
                         Log.e("zcl", "zcl***STATUS_LOGOUT***$settingType-----$isClick-----")
                         when (settingType) {
-                            NORMAL_SENSOR -> {//断开其他灯的连接回调判断
-                                when (isClick) {
-                                    RESET_SENSOR -> {//恢复出厂设置
-                                        if (TelinkLightApplication.getInstance().connectDevice == null) {
+                            NORMAL_SENSOR -> {// 断开其他灯的连接回调判断
+                                when (isClick) {//恢复出厂设置
+                                    RESET_SENSOR ->  if (TelinkLightApplication.getInstance().connectDevice == null)
+                                        autoConnectSensor()
+
+                                    OTA_SENSOR -> {//OTA
+                                        if (TelinkLightApplication.getInstance().connectDevice == null)
                                             autoConnectSensor()
-                                           // progressBar_sensor.visibility = View.VISIBLE
-                                        }
                                     }
                                     RECOVER_SENSOR -> {//断联通知重新配置
                                         Log.e("zcl", "zcl**重新配置****" + { TelinkLightApplication.getInstance().connectDevice == null })
-                                            relocationSensor()
+                                        relocationSensor()
                                     }
                                 }
                             }
-
                             RESET_SENSOR -> {//恢复出厂设置成功后
                                 Toast.makeText(this@SensorDeviceDetailsActivity, R.string.delete_switch_success, Toast.LENGTH_LONG).show()
                                 DBUtils.deleteSensor(currentLight!!)
@@ -583,18 +596,14 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                                 if (mConnectDevice != null) {
                                     Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice?.meshAddress)
                                     Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + currentLight?.meshAddr)
-                                    if (currentLight?.meshAddr == mConnectDevice?.meshAddress) {
-                                        Thread {
-                                            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-                                            Thread.sleep(1000)
-                                            if (this@SensorDeviceDetailsActivity == null ||
-                                                    this@SensorDeviceDetailsActivity.isDestroyed ||
+
+                                    if (currentLight?.meshAddr == mConnectDevice?.meshAddress)
+                                        GlobalScope.launch { //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+                                            delay(1000)
+                                            if (this@SensorDeviceDetailsActivity == null || this@SensorDeviceDetailsActivity.isDestroyed ||
                                                     this@SensorDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                            } else {
-                                                autoConnect()
-                                            }
-                                        }.start()
-                                    }
+                                            } else autoConnect()
+                                        }
                                 }
                             }
                         }

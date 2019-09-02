@@ -3,6 +3,7 @@ package com.dadoutek.uled.user
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -22,7 +23,9 @@ import android.text.method.PasswordTransformationMethod
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
@@ -30,7 +33,10 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.HttpModel.UpdateModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.VersionBean
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -74,9 +80,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         setContentView(R.layout.activity_login)
         phoneList = DBUtils.getAllUser()
         Log.d("dataSize", phoneList!!.size.toString())
-        if (phoneList!!.size == 0) {
+        if (phoneList!!.size == 0)
             date_phone.visibility = View.GONE
-        }
 
         initData()
         initView()
@@ -127,11 +132,43 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     override fun onResume() {
         super.onResume()
         detectUpdate()
+        haveNewVersion()
+
         if (mWakeLock != null) {
             mWakeLock!!.acquire()
         }
     }
 
+    @SuppressLint("CheckResult")
+    private fun haveNewVersion() {
+        val info = this.packageManager.getPackageInfo(this.packageName, 0)
+        LogUtils.e("zcl**********************VersionBean${info.versionName}")
+        UpdateModel.getVersion(info.versionName)!!.subscribe({
+            object : NetworkObserver<VersionBean>() {
+                override fun onNext(t: VersionBean) {
+                    LogUtils.e("zcl**********************VersionBean$t")
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    ToastUtils.showLong(R.string.get_server_version_fail)
+                }
+            }
+        }, {})
+
+    }
+
+    private fun getMyVersion(): String? {
+        //获取包管理器
+        try {
+            val packageInfo = packageManager.getPackageInfo(packageName, 0)
+            //返回版本号
+            return packageInfo.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        return null
+    }
 
     private fun initListener() {
         btn_login.setOnClickListener(this)

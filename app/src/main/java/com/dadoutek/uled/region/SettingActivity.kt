@@ -113,7 +113,6 @@ class SettingActivity : AppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
                         var num = 5 - it as Long
-                        //("zcl**********************num$num")
                         if (num == 0L) {
                             confirm?.isClickable = true
                             confirm?.text = getString(R.string.btn_ok)
@@ -122,6 +121,9 @@ class SettingActivity : AppCompatActivity() {
                             confirm?.text = getString(R.string.btn_ok) + "(" + num + "s)"
                         }
                     }
+        else
+            confirm?.isClickable = true
+
         pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
     }
 
@@ -272,7 +274,7 @@ class SettingActivity : AppCompatActivity() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
         //val lightList = allLights
-        val  lightList  = DBUtils.getAllNormalLight()
+        val lightList = DBUtils.getAllNormalLight()
         val allRGBLight = DBUtils.getAllRGBLight()
 
         lightList.addAll(allRGBLight)

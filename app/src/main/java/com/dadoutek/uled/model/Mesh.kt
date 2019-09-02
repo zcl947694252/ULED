@@ -103,13 +103,11 @@ class Mesh : Serializable {
                 return true
             }
         }
-
         return false
     }
 
     fun saveOrUpdate(context: Context): Boolean {
         return FileSystem.writeAsObject(context, "$name.$password", this)
-        //        return FileSystem.writeAsObject("telink.meshs", this);
     }
 
     companion object {

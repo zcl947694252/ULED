@@ -429,8 +429,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     }
                 } else {
                     showDisconnectSnackBar()
-
-                   //("Disconnected")
                 }
             }
         }

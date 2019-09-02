@@ -991,7 +991,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        }else{
         mDisposable.add(
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe({
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe {
                     if (it!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
@@ -1002,7 +1002,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
-                }))
+                })
     }
 
     private fun transformView() {

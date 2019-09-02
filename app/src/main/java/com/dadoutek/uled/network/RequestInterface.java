@@ -396,9 +396,6 @@ public interface RequestInterface {
 //    @HTTP(method = "GET",path = "app/isAvailable",hasBody = true)
     Observable<Response<ResponseVersionAvailable>> isAvailavle(@Query("platform") int device,
                                                                @Query("currentVersion") String version);
-
-    @GET("app/getNewVersion")
-    Observable<Response<VersionBean>> getVersion(@Query("currentVersion") String version, @Query("platform") int zero, @Query("lang") int zero_one);
     //用于检测是都注册
     @GET("auth/isRegister")
     Observable<Response<Boolean>> isRegister(@Query("phone") String phoneNumber);
@@ -464,5 +461,18 @@ public interface RequestInterface {
      */
     @GET("auth/transfer/code/info")
     Observable<Response<TransferData>> mlookTransferCode();
+
+
+    /**
+     * 42、获取最新版本       GET
+     * 获取app最新版本，app更新升级检查
+     * http://dev.dadoutek.com/smartlight/app/getNewVersion
+     * currentVersion	是	string	当前app版本，满足x.x.x
+     * platform	是	int	平台标识，安卓0，ios1
+     * lang	否	int	语言标识，中文0，英文1。后台默认0
+     */
+    @GET("app/getNewVersion")
+    Observable<Response<VersionBean>> haveNewVerison(@Query("currentVersion") String currentVersion
+            ,@Query("platform") int AndroidZero ,@Query("lang") int zhOrEnglish);
 
 }

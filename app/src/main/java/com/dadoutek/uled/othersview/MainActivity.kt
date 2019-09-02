@@ -473,7 +473,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     CreateDialog(t)
                     LogUtils.e("zcl**********************VersionBean$t")
                 }
-
                 override fun onError(e: Throwable) {
                     super.onError(e)
                     ToastUtils.showLong(R.string.get_server_version_fail)

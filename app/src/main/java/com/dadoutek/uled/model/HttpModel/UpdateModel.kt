@@ -24,7 +24,7 @@ object UpdateModel {
         // language==zh 英文 language==en
         var languageType: Int = if (Locale.getDefault().language.contains("zh")) 0 else 1
         return NetworkFactory.getApi()
-                .getVersion(version, 0, languageType)
+                .haveNewVerison(version, 0, languageType)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {}
