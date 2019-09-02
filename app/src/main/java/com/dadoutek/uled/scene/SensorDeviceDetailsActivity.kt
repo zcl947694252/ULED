@@ -72,6 +72,7 @@ import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.startActivity
@@ -266,11 +267,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
         installDialog?.show()
 
-        Thread {
-            Thread.sleep(100)
             GlobalScope.launch(Dispatchers.Main) {
+               delay(100)
             }
-        }.start()
     }
 
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, view, position ->

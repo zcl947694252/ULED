@@ -253,6 +253,9 @@ object Commander : EventListener<String> {
     }
 
 
+    /**
+     * 修改设备分组
+     */
     fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
         mLightAddr = dstAddr

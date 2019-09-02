@@ -48,12 +48,16 @@ public class CommonParamsInterceptor implements Interceptor {
 
         DbUser user = DBUtils.INSTANCE.getLastUser();
         Log.e("zcl", "zcl*******method---" + method);
-
         //添加请求头
         builder.addHeader("Content-Type", TEXT);
 
         String token = request.header("token");
         String tokenNow = user == null ? "" : user.getToken();
+        if (user!=null){
+            if ("".equals(user.getControlMeshName())||user.getControlMeshName()==null)
+                user.setControlMeshName(user.getAccount());
+            DBUtils.INSTANCE.saveUser(user);
+        }
 
         String oldToken = tokenNow;
         String last_region_id = user != null && user.getLast_region_id() != null && !TextUtils.isEmpty(user.getLast_region_id()) ? user.getLast_region_id() : "1";

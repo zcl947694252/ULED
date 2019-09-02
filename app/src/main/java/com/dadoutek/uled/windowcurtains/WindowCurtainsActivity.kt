@@ -331,11 +331,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     private fun updateGroup() {
         val intent = Intent(this,
                 CurtainGroupingActivity::class.java)
+        if (curtain==null){
+            ToastUtils.showShort(getString(R.string.please_connect_curtain))
+            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance().disconnect()
+            return
+        }
         intent.putExtra("curtain", curtain)
         intent.putExtra(Constant.TYPE_VIEW, Constant.CURTAINS_KEY)
         intent.putExtra("gpAddress", ctAdress)
         intent.putExtra("uuid", curtain!!.productUUID)
-        intent.putExtra("belongId", curtain!!.belongGroupId)
         startActivity(intent)
 
     }

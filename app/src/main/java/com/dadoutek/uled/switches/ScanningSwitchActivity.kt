@@ -104,12 +104,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val b =TelinkLightService.Instance()!=null&& !TelinkLightService.Instance()!!.isLogin
         mIntervalCheckConnection = Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
+                .subscribe({
                     //如果已经断连或者检测超过10次，直接完成。
                     if (b || it > 10) {
                         onInited()
                     }
-                }
+                },{})
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
@@ -194,7 +194,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private fun startScan() {
         LeBluetooth.getInstance().stopScan()
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
             if (granted) {
 
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
@@ -222,36 +222,19 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
                 this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
 
-
                 startCheckRSSITimer()
                 TelinkLightService.Instance()?.startScan(params)
-
-//                if(isOTA){
-                    if(isSupportInstallOldDevice){
-                        progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                        progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                    }else{
-                        progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-                        progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-                    }
-//                }
-//                else {
-//                    otaBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-//                    otaBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-//                }
-
-
-//                scanDisposable?.dispose()
-//                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
-//                        .SECONDS)
-//                        .subscribe {
-//                            onLeScanTimeout()
-//                        }
-
+                if(isSupportInstallOldDevice){
+                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                }else{
+                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
+                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
+                }
             } else {
 
             }
-        }
+        },{})
     }
 
     private fun startCheckRSSITimer() {
@@ -466,17 +449,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         mScanTimeoutDisposal?.dispose()
-//        scanDisposable?.dispose()
-//        if(isOTA){
+
             if(isSupportInstallOldDevice){
                 progressOldBtn.progress = 100  //进度控件显示成完成状态
             }else{
                 progressBtn.progress = 100  //进度控件显示成完成状态
             }
-//        }
-//        else{
-//            otaBtn.progress=100
-//        }
 
 
         if(isSupportInstallOldDevice){
@@ -498,21 +476,12 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!)
             }
         }
-//        if(isOTA){
-
-//        }
-//        else {
-//            getVersion()
-//        }
     }
 
 
     private fun showConnectFailed() {
         mApplication.removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
-
-       //("showConnectFailed")
-//        if(isOTA){
             if(isSupportInstallOldDevice){
                 progressOldBtn.progress = -1    //控件显示Error状态
                 progressOldBtn.text = getString(R.string.connect_failed)
@@ -520,34 +489,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 progressBtn.progress = -1    //控件显示Error状态
                 progressBtn.text = getString(R.string.connect_failed)
             }
-//        }
-//        else{
-//            otaBtn.progress = -1    //控件显示Error状态
-//            otaBtn.text = getString(R.string.connect_failed)
-//        }
-
     }
 
 
-//    private fun connect() {
-//        Thread {
-//           //("connected33")
-//            mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
-//            mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
-//            TelinkLightService.Instance()?.connect(bestRSSIDevice?.macAddress, CONNECT_TIMEOUT_SECONDS)
-//        }.start()
-//
-//        GlobalScope.launch(Dispatchers.Main) {
-//            connectDisposable?.dispose()    //取消掉上一个超时计时器
-//            connectDisposable = Observable.timer(CONNECT_TIMEOUT_SECONDS.toLong(), TimeUnit
-//                    .SECONDS, AndroidSchedulers.mainThread())
-//                    .subscribe {
-//                       //("timeout retryConnect")
-//                        retryConnect()
-//                    }
-//        }
-//
-//    }
+
 
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
@@ -590,9 +535,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    retryConnect()
-                }
+                .subscribe({ retryConnect() },{})
     }
 
     /**

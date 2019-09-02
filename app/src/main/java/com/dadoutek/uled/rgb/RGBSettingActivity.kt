@@ -210,11 +210,21 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val intent = Intent(this,
                 LightGroupingActivity::class.java)
         intent.putExtra("light", light)
-        intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-        intent.putExtra("uuid", light!!.productUUID)
-        intent.putExtra("belongId", light!!.belongGroupId)
-        intent.putExtra("gpAddress", light!!.meshAddr)
-        Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
+
+        if (light==null){
+            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance().disconnect()
+            return
+        }
+
+        light?.let {
+            intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+            intent.putExtra("uuid", it.productUUID)
+            intent.putExtra("gpAddress", it.meshAddr)
+            Log.d("addLight", it.productUUID.toString() + "," + it.meshAddr)
+        }
+
         startActivity(intent)
     }
 
@@ -250,6 +260,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
+                        if (light!=null)
                         DBUtils.updateLight(light!!)
                         toolbar.title = light?.name
                         dialog.dismiss()

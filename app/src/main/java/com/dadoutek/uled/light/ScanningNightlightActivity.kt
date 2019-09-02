@@ -108,7 +108,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
     @SuppressLint("CheckResult")
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe( { granted ->
             if (granted) {
                 Thread {
                     TelinkLightService.Instance()?.idleMode(true)
@@ -144,13 +144,11 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
                             }
                 }.start()
 
-               //("pir开始扫描")
+                //("pir开始扫描")
                 progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                 progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-            } else {
-
             }
-        }
+        },{})
     }
 
     private fun retryConnect() {
@@ -325,10 +323,10 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
                     .SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                       //("timeout retryConnect")
+                    .subscribe ({
+                        //("timeout retryConnect")
                         retryConnect()
-                    }
+                    },{})
         }
 
     }

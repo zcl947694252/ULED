@@ -190,14 +190,15 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                    toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
                    batchGroup.setText(R.string.batch_group)
-                   batchGroup.setOnClickListener(View.OnClickListener {
+                   batchGroup.visibility = View.GONE
+                   batchGroup.setOnClickListener {
                        val intent = Intent(this,
                                CurtainBatchGroupActivity::class.java)
                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                        intent.putExtra("curtain","all_curtain")
                        startActivity(intent)
-                   })
+                   }
                }else {
                    recycleView.visibility=View.GONE
                    no_device_relativeLayout.visibility=View.VISIBLE

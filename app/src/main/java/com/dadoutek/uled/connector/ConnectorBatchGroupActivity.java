@@ -469,17 +469,14 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     private void setGroupOneByOne(DbGroup dbGroup, List<DbConnector> selectLights, int index) {
         DbConnector dbLight = selectLights.get(index);
         int lightMeshAddr = dbLight.getMeshAddr();
-        Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                dbLight.setBelongGroupId(dbGroup.getId());
-                updateGroupResult(dbLight, dbGroup);
-                if (index + 1 > selectLights.size() - 1)
-                    completeGroup(selectLights);
-                else
-                    setGroupOneByOne(dbGroup, selectLights, index + 1);
-                return null;
-            }
+        Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), () -> {
+            dbLight.setBelongGroupId(dbGroup.getId());
+            updateGroupResult(dbLight, dbGroup);
+            if (index + 1 > selectLights.size() - 1)
+                completeGroup(selectLights);
+            else
+                setGroupOneByOne(dbGroup, selectLights, index + 1);
+            return null;
         }, new Function0<Unit>() {
             @Override
             public Unit invoke() {

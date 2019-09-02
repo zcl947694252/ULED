@@ -299,11 +299,15 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        codeStompClient?.dispose()
-        loginStompClient?.isDisposed
-        normalSubscribe?.dispose()
+        releseStomp()
         isRuning = false
+    }
+
+    private fun releseStomp() {
         longOperation?.cancel(true)
+        normalSubscribe?.dispose()
+        loginStompClient?.dispose()
+        codeStompClient?.dispose()
     }
 
 

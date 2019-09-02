@@ -222,11 +222,16 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
     private fun updateGroup() {
         val intent = Intent(this,
                 ConnectorGroupingActivity::class.java)
+        if (light==null){
+            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance().disconnect()
+            return
+        }
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
         intent.putExtra("light", light)
         intent.putExtra("gpAddress", gpAddress)
         intent.putExtra("uuid", light!!.productUUID)
-        intent.putExtra("belongId", light!!.belongGroupId)
         Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
         startActivity(intent)
         this!!.finish()
@@ -358,7 +363,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 //        }else{
         mDisposable.add(
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe({ granted ->
                     if (granted!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
@@ -369,7 +374,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
-                })
+                },{}))
 //        }
     }
 
@@ -518,11 +523,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             LightAdapter.STATUS_LOGOUT -> {
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .subscribe { aLong ->
+                        .subscribe({
                             com.blankj.utilcode.util.LogUtils.d("STATUS_LOGOUT")
                             showLoadingDialog(getString(R.string.connect_failed))
                             finish()
-                        }
+                        },{})
             }
         }
     }

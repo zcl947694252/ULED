@@ -683,24 +683,6 @@ class GroupListFragment : BaseFragment() {
             }
 
             initBottomNavigation()
-
-//            val layoutmanager = LinearLayoutManager(activity)
-////            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-//            recyclerView?.layoutManager = layoutmanager
-//            this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
-//
-////            val decoration = DividerItemDecoration(activity,
-////                    DividerItemDecoration
-////                            .VERTICAL)
-////            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-////                    .divider)))
-//            //添加分割线
-////            recyclerView?.addItemDecoration(decoration)
-//            recyclerView?.itemAnimator = DefaultItemAnimator()
-//
-////          adapter!!.addFooterView(getFooterView())
-//            adapter!!.bindToRecyclerView(recyclerView)
-//            setMove()
         }
     }
 
@@ -715,7 +697,7 @@ class GroupListFragment : BaseFragment() {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
-                    when (view!!.getId()) {
+                    when (view!!.id) {
                         R.id.btn_on -> {
                             Commander.openOrCloseLights(dstAddr, true)
                             updateLights(true, group)
@@ -939,7 +921,7 @@ class GroupListFragment : BaseFragment() {
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
-                .subscribe {
+                .subscribe ({
                     var lightList: MutableList<DbLight> = ArrayList()
 
                     if (group.meshAddr == 0xffff) {
@@ -968,76 +950,8 @@ class GroupListFragment : BaseFragment() {
                         }
                         DBUtils.updateLightLocal(dbLight)
                     }
-                }
+                },{})
     }
-
-//    fun loadData(): List<DbGroup> {
-//        var showList = mutableListOf<DbGroup>()
-//
-//        val dbOldGroupList = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(), Constant.OLD_INDEX_DATA) as? ArrayList<DbGroup>
-//
-//        //如果有调整过顺序取本地数据，否则取数据库数据
-//        if (dbOldGroupList != null && dbOldGroupList.size > 0) {
-//            showList = dbOldGroupList
-//        } else {
-//            showList = DBUtils.groupList
-//        }
-//        return showList
-//    }
-
-//    fun refreshData() {
-//        val mOldDatas: List<DbGroup>? = showList
-//        val mNewDatas: List<DbGroup>? = loadData()
-//        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-//            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-//                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-//                (newItemPosition)?.id) ?: false;
-//            }
-//
-//            override fun getOldListSize(): Int {
-//                return mOldDatas?.size ?: 0
-//            }
-//
-//            override fun getNewListSize(): Int {
-//                return mNewDatas?.size ?: 0
-//            }
-//
-//            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-//                val beanOld = mOldDatas?.get(oldItemPosition)
-//                val beanNew = mNewDatas?.get(newItemPosition)
-//                return if (!beanOld?.name.equals(beanNew?.name)) {
-//                    return false//如果有内容不同，就返回false
-//                } else true
-//
-//            }
-//        }, true)
-//        showList = mNewDatas
-//        adapter?.setNewData(showList)
-//        adapter?.let { diffResult.dispatchUpdatesTo(it) }
-//    }
-
-//    private fun setMove() {
-//        val onItemDragListener = object : OnItemDragListener {
-//            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {}
-//
-//            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
-//                                          target: RecyclerView.ViewHolder, to: Int) {
-//            }
-//
-//            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
-//                //                viewHolder.getItemId();
-//                val list = adapter!!.data
-//                SharedPreferencesHelper.putObject(activity, Constant.OLD_INDEX_DATA, list)
-//            }
-//        }
-//
-//        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(adapter)
-//        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
-//        itemTouchHelper.attachToRecyclerView(recyclerView)
-//
-//        adapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
-//        adapter!!.setOnItemDragListener(onItemDragListener)
-//    }
 
     fun notifyDataSetChanged() {
         this.adapter!!.notifyDataSetChanged()

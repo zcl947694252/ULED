@@ -101,8 +101,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 import static com.dadoutek.uled.model.Constant.VENDOR_ID;
@@ -533,33 +531,27 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private void setGroupOneByOne(DbGroup dbGroup, List<DbConnector> selectLights, int index) {
         DbConnector dbLight = selectLights.get(index);
         int lightMeshAddr = dbLight.getMeshAddr();
-        Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                dbLight.setBelongGroupId(dbGroup.getId());
-                updateGroupResult(dbLight, dbGroup);
+        Commander.INSTANCE.addGroup(lightMeshAddr, dbGroup.getMeshAddr(), () -> {
+            dbLight.setBelongGroupId(dbGroup.getId());
+            updateGroupResult(dbLight, dbGroup);
+            if (index + 1 > selectLights.size() - 1)
+                completeGroup(selectLights);
+            else
+                setGroupOneByOne(dbGroup, selectLights, index + 1);
+            return null;
+        }, () -> {
+            dbLight.setBelongGroupId(allLightId);
+            ToastUtils.showLong(R.string.connector_fail_tip);
+            updateGroupResult(dbLight, dbGroup);
+            if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
+                ToastUtils.showLong("断开连接");
+            } else {
                 if (index + 1 > selectLights.size() - 1)
                     completeGroup(selectLights);
                 else
                     setGroupOneByOne(dbGroup, selectLights, index + 1);
-                return null;
             }
-        }, new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                dbLight.setBelongGroupId(allLightId);
-                ToastUtils.showLong(R.string.connector_fail_tip);
-                updateGroupResult(dbLight, dbGroup);
-                if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
-                    ToastUtils.showLong("断开连接");
-                } else {
-                    if (index + 1 > selectLights.size() - 1)
-                        completeGroup(selectLights);
-                    else
-                        setGroupOneByOne(dbGroup, selectLights, index + 1);
-                }
-                return null;
-            }
+            return null;
         });
 
     }

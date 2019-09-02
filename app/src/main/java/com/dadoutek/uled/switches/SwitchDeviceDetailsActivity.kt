@@ -484,9 +484,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         showLoadingDialog(getString(R.string.connecting))
         LeBluetooth.getInstance().stopScan()
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
             if (granted) {
-
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication!!.mesh
@@ -511,37 +510,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
                 this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
                 this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-
-
                 startCheckRSSITimerSwitch()
                 TelinkLightService.Instance()?.startScan(params)
-
-//                if(isOTA){
-//                if(isSupportInstallOldDevice){
-//                    progressOldBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-//                    progressOldBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-//                }else{
-//                    progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-//                    progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-//                }
-//                }
-//                else {
-//                    otaBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
-//                    otaBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
-//                }
-
-
-//                scanDisposable?.dispose()
-//                scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit
-//                        .SECONDS)
-//                        .subscribe {
-//                            onLeScanTimeout()
-//                        }
-
-            } else {
-
             }
-        }
+        },{})
     }
 
     private fun startCheckRSSITimerSwitch() {
@@ -578,7 +550,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun connectSwitch(macAddress: String?) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe {
+                .subscribe ({
                     if (it) {
                         //授予了权限
                         if (TelinkLightService.Instance()!= null) {
@@ -587,23 +559,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                             mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this@SwitchDeviceDetailsActivity)
                             TelinkLightService.Instance()?.connect(macAddress, CONNECT_TIMEOUT)
                             startConnectTimer()
-
-//                            if(isOTA){
-//                            if(isSupportInstallOldDevice){
-//                                progressOldBtn.text = getString(R.string.connecting)
-//                            }else{
-//                                progressBtn.text = getString(R.string.connecting)
-//                            }
-//                            }
-//                            else{
-//                                otaBtn.text = getString(R.string.connecting)
-//                            }
                         }
-                    } else {
-                        //没有授予权限
-//                        DialogUtils.showNoBlePermissionDialog(this, { connect(macAddress) }, { finish() })
                     }
-                }
+                },{})
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {
@@ -701,17 +659,16 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
-            if (acitivityIsAlive || !(mScanDisposal?.isDisposed ?: false)) {
-               //("startScanLight_LightOfGroup")
+            if (acitivityIsAlive || mScanDisposal?.isDisposed != true) {
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
-                        .subscribe {
+                        .subscribe ({
                             if (it) {
                                 TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                                 //扫描参数
-                               // val account = DBUtils.lastUser?.account
+                                // val account = DBUtils.lastUser?.account
                                 val meshName = DBUtils.lastUser?.controlMeshName
 
                                 val scanFilters = java.util.ArrayList<ScanFilter>()
@@ -740,7 +697,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                                     startScan()
                                 }, { finish() })
                             }
-                        }
+                        },{})
             }
     }
 
@@ -759,7 +716,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -804,7 +760,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             mCheckRssiDisposal?.dispose()
             mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
-                    .subscribe {
+                    .subscribe ({
                         if (it) {
                             //授予了权限
                             if (TelinkLightService.Instance()!= null) {
@@ -816,7 +772,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                             //没有授予权限
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
-                    }
+                    },{})
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -827,9 +783,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
+                .subscribe( {
                     retryConnect()
-                }
+                },{})
     }
 
     /**

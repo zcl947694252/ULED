@@ -46,4 +46,13 @@ public class ItemTypeGroup {
     public void setIcon(int icon) {
         this.icon = icon;
     }
+
+    @Override
+    public String toString() {
+        return "ItemTypeGroup{" +
+                "name='" + name + '\'' +
+                ", list=" + list +
+                ", icon=" + icon +
+                '}';
+    }
 }

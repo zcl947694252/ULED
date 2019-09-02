@@ -46,7 +46,6 @@ import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.light.DeviceListFragment
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -99,13 +98,15 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 
 /**
  * 首页  修改mes那么后  如果旧有用户不登陆 会报错直接崩溃 因为调用后的mesname是空的
+ *
+ * 首页设备
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
-    private lateinit var deviceFragment: DeviceListFragment
+    //private lateinit var deviceFragment: DeviceListFragment
     private lateinit var newDeviceFragment: NewDevieFragment
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
@@ -113,6 +114,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     //防止内存泄漏
     internal var mDisposable = CompositeDisposable()
+    private var mConnectDisposal: Disposable? = null
+    private var mScanTimeoutDisposal: Disposable? = null
+
     private var mApplication: TelinkLightApplication? = null
     private var connectMeshAddress: Int = 0
     private val mDelayHandler = Handler()
@@ -123,8 +127,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private var mScanSnackBar: Snackbar? = null
     private var mNotFoundSnackBar: Snackbar? = null
 
-    private var mConnectDisposal: Disposable? = null
-    private var mScanTimeoutDisposal: Disposable? = null
     private var mTelinkLightService: TelinkLightService? = null
     private var isCreate = false
     private var guideShowCurrentPage = false
@@ -465,7 +467,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getVersion() {
         val info = this.packageManager.getPackageInfo(this.packageName, 0)
         LogUtils.e("zcl**********************VersionBean${info.versionName}")
-        UpdateModel.getVersion(info.versionName)!!.subscribe {
+        UpdateModel.getVersion(info.versionName)!!.subscribe( {
             object : NetworkObserver<VersionBean>() {
                 override fun onNext(t: VersionBean) {
                     CreateDialog(t)
@@ -477,7 +479,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     ToastUtils.showLong(R.string.get_server_version_fail)
                 }
             }
-        }
+        },{})
 
     }
 
@@ -537,7 +539,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun initBottomNavigation() {
-        deviceFragment = DeviceListFragment()//暂时无用
+        //deviceFragment = DeviceListFragment()//暂时无用
         newDeviceFragment = NewDevieFragment()
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
@@ -687,12 +689,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
                 .subscribeOn(Schedulers.io())
-                .subscribe {
+                .subscribe({
                     if (it) {
                         TelinkLightService.Instance().idleMode(true)
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
-                       // val account = DBUtils.lastUser?.account
+                        // val account = DBUtils.lastUser?.account
                         val meshName = DBUtils.lastUser?.controlMeshName
 
                         LogUtils.e("zcl**********************扫描账号$meshName")
@@ -721,7 +723,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             startScan()
                         }, { finish() })
                     }
-                }
+                },{})
     }
 
 
@@ -733,7 +735,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun connect(mac: String) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe {
+                .subscribe ({
                     if (it) {
                         //授予了权限
                         val instance = TelinkLightService.Instance()
@@ -746,16 +748,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                     }
-                }
+                }) {}
     }
 
     private fun startScanTimeout() {
         mScanTimeoutDisposal?.dispose()
         mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
-                .subscribe {
+                .subscribe ({
                     TelinkLightService.Instance()?.idleMode(false)      //use this stop scan
                     onLeScanTimeout()
-                }
+                },{})
     }
 
 
@@ -948,7 +950,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                    runOnUiThread {/* deviceFragment.notifyDataSetChanged() */}
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbLight()
@@ -978,7 +980,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                    runOnUiThread { /*deviceFragment.notifyDataSetChanged()*/ }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbConnector()
@@ -1004,7 +1006,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    runOnUiThread { deviceFragment.notifyDataSetChanged() }
+                    runOnUiThread { /*deviceFragment.notifyDataSetChanged()*/ }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbCurtain()

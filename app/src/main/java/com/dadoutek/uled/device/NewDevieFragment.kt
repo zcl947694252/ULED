@@ -1,6 +1,5 @@
 package com.dadoutek.uled.device
 
-//import com.dadoutek.uled.light.DeviceDetailAct
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
@@ -240,7 +239,7 @@ class NewDevieFragment : BaseFragment() {
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
             }
-            Constant.INSTALL_RGB_LIGHT -> {
+            Constant.INSTALL_RGB_LIGHT -> {//跳转多彩灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_RGB_LIGHT)
             }

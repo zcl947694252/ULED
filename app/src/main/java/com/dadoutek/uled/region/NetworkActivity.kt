@@ -700,8 +700,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     ) { _, _ ->
                         // 跳转到设置界面
                         activity.startActivityForResult(Intent(
-                                Settings.ACTION_WIRELESS_SETTINGS),
-                                0)
+                                Settings.ACTION_WIRELESS_SETTINGS), 0)
                     }.create().show()
         } else {
             val lastUser = lastUser

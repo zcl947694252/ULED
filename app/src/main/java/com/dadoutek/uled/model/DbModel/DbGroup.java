@@ -194,4 +194,25 @@ public class DbGroup implements Serializable{
     public void setStatus(int status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "DbGroup{" +
+                "id=" + id +
+                ", meshAddr=" + meshAddr +
+                ", name='" + name + '\'' +
+                ", brightness=" + brightness +
+                ", colorTemperature=" + colorTemperature +
+                ", belongRegionId=" + belongRegionId +
+                ", deviceType=" + deviceType +
+                ", index=" + index +
+                ", color=" + color +
+                ", checked=" + checked +
+                ", enableCheck=" + enableCheck +
+                ", selected=" + selected +
+                ", textColor=" + textColor +
+                ", status=" + status +
+                ", isSeek=" + isSeek +
+                '}';
+    }
 }

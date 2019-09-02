@@ -62,14 +62,11 @@ object DBUtils {
         get() {
             val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
-
             return qb.where(DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion())).list()
         }
 
 
     fun getgroupListWithType(context: Context): ArrayList<ItemTypeGroup> {
-        val allGIndex = -1
-        val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
         var itemTypeGroup: ItemTypeGroup? = null
 
         val allList = ArrayList<ItemTypeGroup>()
@@ -140,20 +137,9 @@ object DBUtils {
         return allList
     }
 
-//    
-//    fun getGroupListNew() : MutableList<DbGroup>{
-//        val allGIndex = -1
-//        val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
-//
-//        return qb.where(
-//                DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
-//                .list()
-//    }
-
 
     val diyGradientList: MutableList<DbDiyGradient>
         get() {
-            val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbDiyGradientDao.queryBuilder()
             return qb.list()
         }
@@ -161,7 +147,6 @@ object DBUtils {
     //未分组
     val groupNull: DbGroup?
         get() {
-            val allGIndex = -1
             val qb = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder()
             val list = qb.where(
                     DbGroupDao.Properties.BelongRegionId.eq(SharedPreferencesUtils.getCurrentUseRegion()))
@@ -517,6 +502,9 @@ object DBUtils {
     }
 
 
+    /**
+     * 一个mesh地址对应一个组
+     */
     fun getGroupByMesh(mesh: Int): DbGroup? {
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
         Log.d("datasave", "getGroupByMesh: $mesh")

@@ -150,9 +150,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-//        intent = Intent(this, ConnectorDeviceDetailActivity::class.java)
-//        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_RELAY_OF)
-//        intent.putExtra("relay_name",group.name)
+
         val intent = Intent(this,
                 ConnectorBatchGroupActivity::class.java)
         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -343,7 +341,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             var batchGroup= toolbar.findViewById<TextView>(R.id.tv_function1)
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
             batchGroup.setText(R.string.batch_group)
-            batchGroup.setOnClickListener(View.OnClickListener {
+            batchGroup.setOnClickListener({
                 val intent = Intent(this,
                         ConnectorBatchGroupActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)

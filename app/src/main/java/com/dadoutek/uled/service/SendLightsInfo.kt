@@ -75,12 +75,6 @@ class SendLightsInfo : Service(), EventListener<String> {
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-//                GlobalScope.launch(Dispatchers.Main) {
-//                    var root = this@DeviceDetailAct.findViewById<RelativeLayout>(R.id.root)
-//                    root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
-//                        LeBluetooth.getInstance().enable(applicationContext)
-//                    }
-//                }
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {

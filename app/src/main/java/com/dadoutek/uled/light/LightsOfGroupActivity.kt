@@ -76,7 +76,13 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 /**
- * Created by hejiajun on 2018/4/24.
+ * 创建者     zcl
+ * 创建时间   2019/8/30 18:46
+ * 描述	      ${点击组名跳转搜索设备}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${TODO}$
  */
 
 private const val MAX_RETRY_CONNECT_TIME = 5
@@ -180,9 +186,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun addDevice() {
         if (strLight == "cw_light") {
-//            val intent = Intent(this, DeviceDetailAct::class.java)
-//            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_CW)
-//            intent.putExtra("cw_light_name", group.name)
             val intent = Intent(this,
                     BatchGroupActivity::class.java)
             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -191,9 +194,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             intent.putExtra("cw_light_group_name", group.name)
             startActivity(intent)
         } else if (strLight == "rgb_light") {
-//            val intent = Intent(this, DeviceDetailAct::class.java)
-//            intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_LIGHT_OF_RGB)
-//            intent.putExtra("rgb_light_name", group.name)
             val intent = Intent(this,
                     RgbBatchGroupActivity::class.java)
             intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -375,7 +375,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                 toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                 batchGroup.setText(R.string.batch_group)
-                batchGroup.setOnClickListener(View.OnClickListener {
+                batchGroup.visibility = View.GONE
+                batchGroup.setOnClickListener {
                     val intent = Intent(this,
                             BatchGroupActivity::class.java)
                     intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -383,12 +384,13 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     intent.putExtra("lightType", "cw_light_group")
                     intent.putExtra("group", group.id.toInt())
                     startActivity(intent)
-                })
+                }
             } else if (strLight == "rgb_light") {
                 var batchGroup = toolbar.findViewById<TextView>(R.id.tv_function1)
                 toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.VISIBLE
                 batchGroup.setText(R.string.batch_group)
-                batchGroup.setOnClickListener(View.OnClickListener {
+                batchGroup.visibility = View.GONE
+                batchGroup.setOnClickListener {
                     val intent = Intent(this,
                             BatchGroupActivity::class.java)
                     intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -396,7 +398,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     intent.putExtra("lightType", "rgb_light_group")
                     intent.putExtra("group", group.id.toInt())
                     startActivity(intent)
-                })
+                }
             }
         } else {
             toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility = View.GONE
@@ -760,7 +762,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
-                        .subscribe {
+                        .subscribe ({
                             if (it) {
                                 TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
@@ -786,7 +788,6 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                 TelinkLightService.Instance()?.startScan(params)
                                 startCheckRSSITimer()
 
-
                             } else {
                                 //没有授予权限
                                 DialogUtils.showNoBlePermissionDialog(this, {
@@ -794,7 +795,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                     startScan()
                                 }, { finish() })
                             }
-                        }
+                        },{})
             }
     }
 
@@ -803,9 +804,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    retryConnect()
-                }
+                .subscribe ({ retryConnect() },{})
     }
 
     private fun stopConnectTimer() {
@@ -818,20 +817,19 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
             mCheckRssiDisposal?.dispose()
             mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
-                    .subscribe {
+                    .subscribe( {
                         if (it) {
                             //授予了权限
                             if (TelinkLightService.Instance()!= null) {
                                 progressBar?.visibility = View.VISIBLE
                                 TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
-
                             }
                         } else {
                             //没有授予权限
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
-                    }
+                    },{})
         } catch (e: Exception) {
             e.printStackTrace()
         }

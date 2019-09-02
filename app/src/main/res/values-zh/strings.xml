@@ -806,4 +806,6 @@
     <string name="author_region_unAuthorized">授权者解除了区域%1$s的授权</string>
     <string name="licensor">授权者:</string>
     <string name="please_restore_device">请先将区域下所有设备恢复出厂设置后再删除该区域</string>
+    <string name="please_connect_normal_light">请连接冷暖灯</string>
+    <string name="please_connect_curtain">请连接窗帘</string>
 </resources>

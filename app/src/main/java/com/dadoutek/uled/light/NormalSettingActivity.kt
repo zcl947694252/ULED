@@ -277,7 +277,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
-                .subscribe {
+                .subscribe({
                     var lightList: MutableList<DbLight> = ArrayList()
 
                     if (group.meshAddr == 0xffff) {
@@ -299,7 +299,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         }
                         DBUtils.updateLightLocal(dbLight)
                     }
-                }
+                }, {})
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -932,19 +932,23 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         this.mApplication?.removeEventListener(this)
     }
 
-    private fun updateGroup() {
-        val intent = Intent(this,
-                LightGroupingActivity::class.java)
+    private fun updateGroup() {//更新分组 断开提示
+        val intent = Intent(this, LightGroupingActivity::class.java)
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-        light?.let {
-            intent.putExtra("light", it)
-            intent.putExtra("gpAddress", gpAddress)
-            intent.putExtra("uuid", it.productUUID)
-            intent.putExtra("belongId", it.belongGroupId)
-            Log.d("addLight", it.productUUID.toString() + "," + it.meshAddr)
-            startActivity(intent)
-            this!!.finish()
+
+        if (light==null){
+            ToastUtils.showShort(getString(R.string.please_connect_normal_light))
+            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance().disconnect()
+            return
         }
+        intent.putExtra("light", light)
+        intent.putExtra("gpAddress", gpAddress)
+        intent.putExtra("uuid", light!!.productUUID)
+        Log.d("addLight", light!!.productUUID.toString() + "," + light!!.meshAddr)
+        startActivity(intent)
+        this.finish()
+
     }
 
     override fun performed(event: Event<String>?) {
@@ -992,8 +996,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //        }else{
         mDisposable.add(
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    if (granted!!) {
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe({
+                    if (it!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             transformView()
@@ -1003,8 +1007,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     } else {
                         ToastUtils.showLong(R.string.update_permission_tip)
                     }
-                })
-//        }
+                }) {})
     }
 
     private fun transformView() {
@@ -1107,19 +1110,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             LightAdapter.STATUS_LOGOUT -> {
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .subscribe { aLong ->
-                            //("STATUS_LOGOUT")
-//                            showLoadingDialog(getString(R.string.connecting))
+                        .subscribe{ aLong ->
                             ToastUtil.showToast(this, getString(R.string.connecting))
-//                            finish()
                         }
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE)//requestFeature() must be called before adding content必须放在者否则八错
         super.onCreate(savedInstanceState)
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         this.setContentView(R.layout.activity_device_setting)
         initType()
         this.mApplication = this.application as TelinkLightApplication

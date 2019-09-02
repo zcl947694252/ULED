@@ -882,5 +882,7 @@
     <string name="author_region_unAuthorized">The authorizer disauthorized the zone %1$s</string>
     <string name="licensor">Licensor:</string>
     <string name="please_restore_device">Please restore all devices in the area to factory Settings before deleting the area</string>
+    <string name="please_connect_normal_light">Please connect the  lights</string>
+    <string name="please_connect_curtain">Please connect the curtain</string>
 
 </resources>

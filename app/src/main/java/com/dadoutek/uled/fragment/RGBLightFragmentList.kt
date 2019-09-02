@@ -362,13 +362,6 @@ class RGBLightFragmentList : BaseFragment() {
                 }
             }
 
-            /*R.id.group_name -> {
-                intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                intent.putExtra("group", currentLight)
-                intent.putExtra("light", "rgb_light")
-                startActivityForResult(intent, 2)
-            }*/
-
             R.id.selected_group -> {
                 if (currentLight.isSelected) {
                     currentLight.isSelected = false

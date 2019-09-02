@@ -546,7 +546,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.setOnClickListener(View.OnClickListener {
+                    batchGroup.visibility = View.GONE
+                    batchGroup.setOnClickListener({
                         val intent = Intent(this,
                                 ConnectorBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
@@ -601,7 +602,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     toolbar!!.findViewById<TextView>(R.id.tv_function1).visibility=View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     batchGroup.setText(R.string.batch_group)
-                    batchGroup.setOnClickListener(View.OnClickListener {
+                    batchGroup.visibility = View.GONE
+                    batchGroup.setOnClickListener({
                         val intent = Intent(this,
                                 ConnectorBatchGroupActivity::class.java)
                         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)

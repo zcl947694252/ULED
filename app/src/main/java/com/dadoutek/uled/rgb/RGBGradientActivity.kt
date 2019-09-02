@@ -17,7 +17,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.SeekBar
-import com.dadoutek.uled.widget.ActionSheetDialog
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -32,12 +31,12 @@ import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.util.SpeedDialog
+import com.dadoutek.uled.widget.ActionSheetDialog
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_rgb_gradient.*
 import kotlinx.android.synthetic.main.toolbar.*
-import java.lang.Exception
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -271,9 +270,8 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun deleteDiyGradient() {
         var batchGroup = toolbar.findViewById<ImageView>(R.id.img_function2)
-
-        batchGroup.setOnClickListener(View.OnClickListener {
-
+        batchGroup.visibility = View.GONE
+        batchGroup.setOnClickListener {
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
             builder.setMessage(getString(R.string.delete_model))
             builder.setPositiveButton(android.R.string.ok) { dialog, which ->
@@ -289,7 +287,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             builder.setNeutralButton(R.string.cancel) { dialog, which -> }
             builder.create().show()
-        })
+        }
 
 
 //        batchGroup.setOnClickListener(View.OnClickListener {

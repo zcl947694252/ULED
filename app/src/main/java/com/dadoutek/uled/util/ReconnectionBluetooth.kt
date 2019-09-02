@@ -237,9 +237,8 @@ class ReconnectionBluetooth : EventListener<String> {
         mConnectDisposal = Observable.timer(CONNECT_TIMEOUT.toLong(), TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    //                    retryConnect()
-                }
+                .subscribe ({
+                },{})
     }
 
 

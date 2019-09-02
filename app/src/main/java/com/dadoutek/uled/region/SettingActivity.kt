@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 创建者     ZCL
  * 创建时间   2019/8/1 9:25
- * 描述	      ${TODO}
+ * 描述	      ${清除数据上传数据以及全部恢复出厂}
  *
  * 更新者     $Author$
  * 更新时间   $Date$
@@ -62,7 +62,7 @@ class SettingActivity : AppCompatActivity() {
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
-    private  var loadDialog: Dialog? = null
+    private var loadDialog: Dialog? = null
     private var compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,7 +142,8 @@ class SettingActivity : AppCompatActivity() {
                                 0)
                     }.create().show()
         } else {
-            SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
+            if (DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id)
+                SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
         }
     }
 
@@ -262,16 +263,22 @@ class SettingActivity : AppCompatActivity() {
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         confirm?.isClickable = false
-        pop!!.isOutsideTouchable = true
+        pop.isOutsideTouchable = true
         pop.isFocusable = true // 设置PopupWindow可获得焦点
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
+
     private fun resetAllLight() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
-        val lightList = allLights
+        //val lightList = allLights
+        val  lightList  = DBUtils.getAllNormalLight()
+        val allRGBLight = DBUtils.getAllRGBLight()
+
+        lightList.addAll(allRGBLight)
         val curtainList = allCutain
         val relyList = allRely
+
         var meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
             for (k in lightList.indices) {
@@ -307,13 +314,14 @@ class SettingActivity : AppCompatActivity() {
         }
     }
 
+
     private fun syncData() {
         SyncDataPutOrGetUtils.syncPutDataStart(this@SettingActivity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { aLong -> }
+                        .subscribe { }
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
                 }
@@ -324,6 +332,7 @@ class SettingActivity : AppCompatActivity() {
                 hideLoadingDialog()
                 ToastUtils.showShort(R.string.backup_failed)
             }
+
             override fun start() {}
         })
 

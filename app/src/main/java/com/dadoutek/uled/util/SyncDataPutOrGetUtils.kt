@@ -109,10 +109,6 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {//todo 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
-//                                GroupMdodel.add(token, group!!, /*group!!.belongRegionId,*/ id, changeId)?.subscribe(
-//                                        { Log.e("zcl", "zcl******$it"); }, {
-//                                    Log.e("zcl", "zcl******${it.localizedMessage}")
-//                                })
                                 return group?.let { GroupMdodel.add(token, it, /*group.belongRegionId, */id, changeId) }!!
                             }
                             Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
@@ -388,6 +384,7 @@ class SyncDataPutOrGetUtils {
                         mesh.factoryPassword = it.installMeshPwd
                         DBUtils.lastUser?.controlMeshName = it.controlMesh
                         DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+                        SharedPreferencesUtils.saveCurrentUseRegion(it.id)
                         application.setupMesh(mesh)
                         Log.e("zcl","zcl下拉数据更新******mesh信息"+ DBUtils.lastUser+"------------------"+mesh)
                         DBUtils.saveUser(DBUtils.lastUser!!)
@@ -535,7 +532,6 @@ class SyncDataPutOrGetUtils {
                 mesh.password = dbRegion.belongAccount
                 mesh.factoryName = dbRegion.installMesh
                 mesh.factoryPassword = dbRegion.installMeshPwd
-//            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
                 application.setupMesh(mesh)
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id!!)
                 return
@@ -561,7 +557,6 @@ class SyncDataPutOrGetUtils {
             mesh.password = dbRegio.controlMeshPwd
             mesh.factoryName = dbRegio.installMesh
             mesh.factoryPassword = dbRegio.installMeshPwd
-//        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
             application.setupMesh(mesh)
         }
     }
