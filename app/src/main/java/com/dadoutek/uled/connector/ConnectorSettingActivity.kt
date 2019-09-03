@@ -755,7 +755,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                     return
 
 
-                val mesh = this.mApp?.getMesh()
+                val mesh = this.mApp?.mesh
 
                 if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
                     TelinkLightService.Instance()?.idleMode(true)

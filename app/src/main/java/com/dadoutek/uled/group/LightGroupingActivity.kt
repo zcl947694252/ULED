@@ -58,12 +58,11 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 if (!isStartGroup) {
                     isStartGroup = true
                     showLoadingDialog(getString(R.string.grouping))
-                    object : Thread({
 
+                    object : Thread({
                         for (i in 0..1) {
-                            allocDeviceGroup(group,
-                                    //如果修改分组成功,才改数据库之类的操作
-                                    {
+                            //如果修改分组成功,才改数据库之类的操作
+                            allocDeviceGroup(group, {
                                         val sceneIds = getRelatedSceneIds(group.meshAddr)
                                         for (i in 0..1) {
                                             deletePreGroup(lights!!.meshAddr)
@@ -106,19 +105,18 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                             sleep(100)
                         }
                     }) {
-
                     }.start()
                 }
             }
+        }else{
+            Log.e("zcl","zcl*****空的*")
         }
     }
-    //        }
 
     private val mHandler = @SuppressLint("HandlerLeak")
     object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-
             when (msg.what) {
                 UPDATE -> adapter!!.notifyDataSetChanged()
             }
@@ -199,24 +197,11 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-//        this.type=this.intent.getStringExtra(Constant.TYPE_VIEW)
-//        if(type.equals(Constant.CURTAINS_KEY)){
-//            this.curtain=this.intent.extras?.get("curtain")as DbCurtain
-//        }else if(type.equals(Constant.LIGHT_KEY)){
-//            this.light = this.intent.extras?.get("light") as DbLight
-//        }
-
         this.type = this.intent.getStringExtra(Constant.TYPE_VIEW)
-//        this.productUuid=this.intent.getIntExtra("uuid",0)
-//        this.address=this.intent.getIntExtra("gpAddress",0)
-//        this.beLongId=this.intent.getLongExtra("belongId",0)
         this.lights = this.intent.extras?.get("light") as DbLight
-//        Log.d("message", productUuid!!.toString()+"====>"+address!!.toString()+"--->"+beLongId!!.toString())
-
         groupsInit = ArrayList()
         val list = DBUtils.groupList
         filter(list)
-//        groupsInit = DBUtils.groupList
     }
 
     private fun filter(list: MutableList<DbGroup>) {
@@ -237,6 +222,10 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             if (OtherUtils.isDefaultGroup(list[i])) {
                 groupsInit?.add(list[i])
             }
+
+           /* if (OtherUtils.isAllRightGroup(list[i])) {
+                groupsInit?.add(list[i])
+            }*/
         }
     }
 
@@ -275,7 +264,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
      *  start to group
      */
     private fun allocDeviceGroup(group: DbGroup, successCallback: () -> Unit, failedCallback: () -> Unit) {
-
         Commander.addGroup(group.meshAddr, group.meshAddr, {
             successCallback.invoke()
         }, {

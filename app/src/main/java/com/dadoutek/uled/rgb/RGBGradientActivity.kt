@@ -312,7 +312,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     stopGradient()
                     Thread.sleep(200)
                     Commander.applyDiyGradient(dstAddress, diyGradientList!![position].id.toInt(),
-                            diyGradientList!![position].speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                            diyGradientList!![position].speed, firstLightAddress)
 
                 }.start()
                 diyPosition = position

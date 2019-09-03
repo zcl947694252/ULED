@@ -1,5 +1,6 @@
 package com.dadoutek.uled.communicate
 
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbCurtain
@@ -24,6 +25,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -264,10 +266,10 @@ object Commander : EventListener<String> {
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
         val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
                 (groupAddr shr 8 and 0xFF).toByte())
-        Thread {
-            Thread.sleep(200)
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-        }.start()
+
+        GlobalScope.launch {
+            delay(200)
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)}
 
         Observable.interval(0, 300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -296,7 +298,8 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
-                       //("addGroup error: ${e.message}")
+                       LogUtils.e("addGroup error: ${e.message}")
+                       LogUtils.e("addGroup error: ${e.message}")
                     }
                 })
     }
@@ -419,15 +422,17 @@ object Commander : EventListener<String> {
         val gradientActionType = 0x02
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        GlobalScope.launch {
         for (i in 0..2) {
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-            Thread.sleep(50)
+            //Thread.sleep(50)//当阻塞方法收到中断请求的时候就会抛出InterruptedException异常
+            kotlinx.coroutines.delay(50)
+        }
         }
     }
 
     //加载自定义渐变
-    fun applyDiyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit1,
-                         failedCallback: () -> Unit1) {
+    fun applyDiyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //开始自定义渐变
         val gradientActionType = 0x04

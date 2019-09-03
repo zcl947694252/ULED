@@ -145,7 +145,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private String mPath;
     private SimpleDateFormat mTimeFormat;
     private int successCount = 0;
-
+    DbUser user;
     private TextView otaProgress;
     private Toolbar toolbar;
     private TextView meshOtaProgress;
@@ -236,8 +236,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
         registerReceiver(mReceiver, filter);
-        DbUser user = DBUtils.INSTANCE.getLastUser();
-        if (user == null || TextUtils.isEmpty(user.getName()) || TextUtils.isEmpty(user.getPassword())) {
+        user = DBUtils.INSTANCE.getLastUser();
+        if (user == null || TextUtils.isEmpty(user.getControlMeshName()) || TextUtils.isEmpty(user.getControlMeshPwd())) {
             toast("Mesh Error!");
             finish();
             return;
@@ -488,7 +488,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void login() {
         log("login");
-        String meshName = DBUtils.INSTANCE.getLastUser().getControlMeshName();
+        String meshName =user.getControlMeshName();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16);
         TelinkLightService.Instance().login(Strings.stringToBytes(meshName, 16), Strings.stringToBytes(pwd, 16));
     }
@@ -718,14 +718,13 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
      * ****************************************泰凌微升级逻辑********************************************
      */
 
-
     /**
      * action startScan
      */
     private synchronized void startScan() {
         List<ScanFilter> scanFilters = new ArrayList<>();
         ScanFilter.Builder scanFilterBuilder = new ScanFilter.Builder();
-        scanFilterBuilder.setDeviceName(DBUtils.INSTANCE.getLastUser().getAccount());
+        scanFilterBuilder.setDeviceName(user.getControlMeshName());
         if (dbLight.getMacAddr().length() > 16) {
             scanFilterBuilder.setDeviceAddress(dbLight.getMacAddr());
         }
@@ -737,7 +736,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         if (!AppUtils.isExynosSoc()) {
             params.setScanFilters(scanFilters);
         }
-        params.setMeshName(mesh.getName());
+        params.setMeshName(user.getName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
         if (dbLight.getMacAddr().length() > 16) {
             params.setScanMac(dbLight.getMacAddr());
@@ -810,7 +809,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
     }
 
-
     boolean connectStart = false;
 
     private void onLeScan(LeScanEvent event) {
@@ -863,6 +861,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         runOnUiThread(() -> {
             text_info.setVisibility(View.VISIBLE);
             text_info.setText(R.string.update_fail);
+            select.setEnabled(true);
             mode = MODE_IDLE;
 //            TelinkLightApplication.getApp().removeEventListener(this);
             stopScanTimer();
@@ -985,7 +984,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                         startConnectTimer();
                     }
                 }
-
                 connectRetryCount++;
                 break;
 
@@ -1050,7 +1048,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void sendStartMeshOTACommand() {
         // save mesh info
-        String account = DBUtils.INSTANCE.getLastUser().getAccount();
+        String account = user.getControlMeshName();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account);
 
         mesh.setOtaDevice(new OtaDevice());
@@ -1115,7 +1113,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
 
-
     private String getPathFour(Context context, Uri uri) {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
@@ -1170,7 +1167,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
         return null;
     }
-
 
     public boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());

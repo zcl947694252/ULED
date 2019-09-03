@@ -46,8 +46,6 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
 
         val holder: GroupItemHolder
 
-        //            if (convertView == null) {
-
         convertView = inflater.inflate(R.layout.grouping_item, null)
 
         val txtName = convertView.findViewById<View>(R.id.txt_name) as TextView
@@ -56,10 +54,6 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
         holder.name = txtName
 
         convertView.tag = holder
-        //
-        //            } else {
-        //                holder = (GroupItemHolder) convertView.getTag();
-        //            }
 
         val group = this.getItem(position)
 
@@ -82,7 +76,6 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
             val layoutParams = AbsListView.LayoutParams(1, 1)
             convertView.layoutParams = layoutParams
         }
-
         return convertView
     }
 

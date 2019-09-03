@@ -192,7 +192,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
-            }else{
+            } else {
                 var newMeshAdress: Int
                 var dbSwitch: DbSwitch? = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
@@ -230,7 +230,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
             dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
             dbSwitch!!.productUUID = mDeviceInfo.productUUID
-            dbSwitch!!.index=switch.id.toInt()
+            dbSwitch!!.index = switch.id.toInt()
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         } else {
@@ -269,7 +269,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         AlertDialog.Builder(this)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok) { dialog, which ->
-                    if (TelinkLightService.Instance()!=null&&TelinkLightService.Instance().isLogin) {
+                    if (TelinkLightService.Instance() != null && TelinkLightService.Instance().isLogin) {
                         progressBar.visibility = View.VISIBLE
                         mIsDisconnecting = true
                         disconnect()
@@ -315,13 +315,13 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                       //("蓝牙未开启")
+                        //("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                       //("无法收到广播包以及响应包")
+                        //("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                       //("未扫到目标设备")
+                        //("未扫到目标设备")
                     }
                 }
                 showDisconnectSnackBar()
@@ -330,10 +330,10 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                       //("未读到att表")
+                        //("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                       //("未建立物理连接")
+                        //("未建立物理连接")
 
                     }
                 }
@@ -343,16 +343,16 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                       //("value check失败： 密码错误")
+                        //("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                       //("read login data 没有收到response")
+                        //("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                       //("write login data 没有收到response")
+                        //("write login data 没有收到response")
                     }
                 }
-               //("onError login")
+                //("onError login")
                 showDisconnectSnackBar()
 
             }
@@ -445,8 +445,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-      /*  val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
-                Constant.DB_NAME_KEY, "dadou")*/
+        /*  val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+                  Constant.DB_NAME_KEY, "dadou")*/
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
@@ -480,18 +480,17 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     @SuppressLint("RestrictedApi")
     private fun initView() {
         if (mSceneList.isEmpty()) {
-//            ToastUtils.showLong(getString(R.string.tip_switch))
             fab.visibility = View.GONE
             indefiniteSnackbar(configGroupRoot, R.string.tip_switch, android.R.string.ok) {
                 ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance().disconnect()
             }
             return
         }
         mAdapter = SwitchSceneGroupAdapter(R.layout.item_select_switch_scene_rv, mSwitchList, mSceneList, this)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
-//        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
-//        recyclerView.adapter = mAdapter
     }
 
     private fun initData() {

@@ -84,7 +84,6 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 更新描述   ${TODO}$
  */
 class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener {
-
     private var mApplication: TelinkLightApplication? = null
     private var retryConnectCount = 0
     private var stopTracking = false
@@ -107,48 +106,33 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
     private var currentShowGroupSetPage = true
-
     private var connectMeshAddress: Int = 0
-
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
-
     private var isExitGradient = false
-
     private var isDiyMode = true
-
     private var isPresetMode = true
-
     private var diyPosition: Int = 0
-
     private var isDelete = false
-
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
     private var currentShowIsDiy = false
-
     var type = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
-
     private var buildInModeList: ArrayList<ItemRgbGradient>? = null
     private var diyGradientList: MutableList<DbDiyGradient>? = null
     private var rgbGradientAdapter: RGBGradientAdapter? = null
     private var rgbDiyGradientAdapter: RGBDiyGradientAdapter? = null
     private var applyDisposable: Disposable? = null
-
     internal var downTime: Long = 0//Button被按下时的时间
     internal var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
     internal var tvValue = 0//TextView中的值
-
     private var redColor: Int? = null
     private var greenColor: Int? = null
     private var blueColor: Int? = null
-
     private var isTrue: Boolean = true
-
     private var bestRSSIDevice: DeviceInfo? = null
-
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
@@ -156,11 +140,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     private var acitivityIsAlive = true
 
-    fun removeGroup() {
+    private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     this.showLoadingDialog(getString(R.string.deleting))
-
                     deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                             successCallback = {
                                 this.hideLoadingDialog()
@@ -190,13 +173,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                         if (mConnectDevice != null) {
                             Log.d(this.javaClass.simpleName, "mConnectDevice.meshAddress = " + mConnectDevice!!.meshAddress)
                             Log.d(this.javaClass.simpleName, "light.getMeshAddr() = " + light!!.meshAddr)
-                            if (light!!.meshAddr == mConnectDevice!!.meshAddress) {
+                            if (light!!.meshAddr == mConnectDevice!!.meshAddress)
                                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
-                            }
                         }
                         this.finish()
-
-
                     } else {
                         ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                         this.finish()
@@ -207,11 +187,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun updateGroup() {
-        val intent = Intent(this,
-                LightGroupingActivity::class.java)
+        val intent = Intent(this, LightGroupingActivity::class.java)
         intent.putExtra("light", light)
 
-        if (light==null){
+        if (light == null) {
             ToastUtils.showShort(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance().idleMode(true)
             TelinkLightService.Instance().disconnect()
@@ -260,8 +239,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         light?.name = textGp.text.toString().trim { it <= ' ' }
-                        if (light!=null)
-                        DBUtils.updateLight(light!!)
+                        if (light != null)
+                            DBUtils.updateLight(light!!)
                         toolbar.title = light?.name
                         dialog.dismiss()
                     }
@@ -515,27 +494,20 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
-                    while (onBtnTouch) {
-                        thisTime = System.currentTimeMillis()
-                        if (thisTime - downTime >= 500) {
-                            tvValue++
-                            val msg = handler_brightness_less.obtainMessage()
-                            msg.arg1 = tvValue
-                            handler_brightness_less.sendMessage(msg)
-                            Log.e("TAG_TOUCH", tvValue++.toString())
-                            try {
-                                Thread.sleep(100)
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
-
-                        }
+            GlobalScope.launch {
+                while (onBtnTouch) {
+                    thisTime = System.currentTimeMillis()
+                    if (thisTime - downTime >= 500) {
+                        tvValue++
+                        val msg = handler_brightness_less.obtainMessage()
+                        msg.arg1 = tvValue
+                        handler_brightness_less.sendMessage(msg)
+                        Log.e("TAG_TOUCH", tvValue++.toString())
+                        delay(100)
                     }
                 }
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -554,27 +526,20 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
-                    while (onBtnTouch) {
-                        thisTime = System.currentTimeMillis()
-                        if (thisTime - downTime >= 500) {
-                            tvValue++
-                            val msg = handler_brightness_add.obtainMessage()
-                            msg.arg1 = tvValue
-                            handler_brightness_add.sendMessage(msg)
-                            Log.e("TAG_TOUCH", tvValue++.toString())
-                            try {
-                                Thread.sleep(100)
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
-
-                        }
+            GlobalScope.launch {
+                while (onBtnTouch) {
+                    thisTime = System.currentTimeMillis()
+                    if (thisTime - downTime >= 500) {
+                        tvValue++
+                        val msg = handler_brightness_add.obtainMessage()
+                        msg.arg1 = tvValue
+                        handler_brightness_add.sendMessage(msg)
+                        Log.e("TAG_TOUCH", tvValue++.toString())
+                        delay(100)
                     }
                 }
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -592,27 +557,21 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         if (event!!.action == MotionEvent.ACTION_DOWN) {
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
-                    while (onBtnTouch) {
-                        thisTime = System.currentTimeMillis()
-                        if (thisTime - downTime >= 500) {
-                            tvValue++
-                            val msg = handler_less.obtainMessage()
-                            msg.arg1 = tvValue
-                            handler_less.sendMessage(msg)
-                            Log.e("TAG_TOUCH", tvValue++.toString())
-                            try {
-                                Thread.sleep(100)
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
+            GlobalScope.launch {
+                while (onBtnTouch) {
+                    thisTime = System.currentTimeMillis()
+                    if (thisTime - downTime >= 500) {
+                        tvValue++
+                        val msg = handler_less.obtainMessage()
+                        msg.arg1 = tvValue
+                        handler_less.sendMessage(msg)
+                        Log.e("TAG_TOUCH", tvValue++.toString())
+                        delay(100)
 
-                        }
                     }
                 }
             }
-            t.start()
+
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -630,28 +589,19 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         if (event!!.action == MotionEvent.ACTION_DOWN) {
             downTime = System.currentTimeMillis()
             onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
-                    while (onBtnTouch) {
-                        thisTime = System.currentTimeMillis()
-                        if (thisTime - downTime >= 500) {
-                            tvValue++
-                            val msg = handler.obtainMessage()
-                            msg.arg1 = tvValue
-                            handler.sendMessage(msg)
-                            Log.e("TAG_TOUCH", tvValue++.toString())
-                            try {
-                                Thread.sleep(100)
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
-
-                        }
+            GlobalScope.launch {
+                while (onBtnTouch) {
+                    thisTime = System.currentTimeMillis()
+                    if (thisTime - downTime >= 500) {
+                        tvValue++
+                        val msg = handler.obtainMessage()
+                        msg.arg1 = tvValue
+                        handler.sendMessage(msg)
+                        Log.e("TAG_TOUCH", tvValue++.toString())
+                        delay(100)
                     }
                 }
             }
-            t.start()
-
         } else if (event.action == MotionEvent.ACTION_UP) {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
@@ -904,9 +854,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 applyDisposable?.dispose()
                 applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
                         .subscribe {
-                            for (i in 0..2) {
-                                stopGradient()
-                                Thread.sleep(50)
+                            GlobalScope.launch {
+                                for (i in 0..2) {
+                                    stopGradient()
+                                    delay(50)
+                                }
                             }
                             positionState = position + 1
                             Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
@@ -945,10 +897,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
             R.id.gradient_mode_set -> {
                 var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
-                    speed = it
-                    stopGradient()
-                    Thread.sleep(200)
-                    Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                    GlobalScope.launch {
+                        speed = it
+                        stopGradient()
+                        delay(200)
+                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                    }
+
                 })
                 dialog.show()
             }
@@ -1022,13 +977,13 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         when (view!!.getId()) {
             R.id.diy_mode_on -> {
                 //应用自定义渐变
-                Thread {
+                GlobalScope.launch {
                     stopGradient()
-                    Thread.sleep(200)
+                    delay(200)
                     Commander.applyDiyGradient(dstAddress, diyGradientList!![position].id.toInt(),
-                            diyGradientList!![position].speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                            diyGradientList!![position].speed, firstLightAddress)
+                }
 
-                }.start()
                 diyPosition = position
 
                 diyGradientList!![position].select = true
@@ -1099,7 +1054,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private fun deleteDiyGradient() {
         var batchGroup = toolbar.findViewById<ImageView>(R.id.img_function2)
 
-        batchGroup.setOnClickListener({
+        batchGroup.setOnClickListener {
 
             var listSize: ArrayList<DbDiyGradient>? = null
             listSize = ArrayList()
@@ -1129,7 +1084,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 builder.setNeutralButton(R.string.cancel) { dialog, which -> }
                 builder.create().show()
             }
-        })
+        }
     }
 
     private fun startDeleteGradientCmd(id: Long) {
@@ -1236,7 +1191,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val blue = color and 0x0000ff
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-        val showBrightness = light?.brightness?:0
+        val showBrightness = light?.brightness ?: 0
         var showW = ws
 
         GlobalScope.launch {
@@ -1385,7 +1340,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     override fun performed(event: Event<String>?) {
         when (event?.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-            NotificationEvent.GET_ALARM -> { }
+            NotificationEvent.GET_ALARM -> {
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
@@ -1701,10 +1657,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
                 //自动重连参数
                 val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName( DBUtils.lastUser?.controlMeshName)
+                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
 
-                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(
-                            DBUtils.lastUser?.controlMeshName) +  DBUtils.lastUser?.controlMeshName))
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(
+                        DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
 
                 connectParams.autoEnableNotification(true)
 
@@ -1896,10 +1852,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
         val showBrightness = brightness
         var showW = w
-        Thread {
 
+        GlobalScope.launch {
             try {
-
                 if (brightness!! > Constant.MAX_VALUE) {
                     brightness = Constant.MAX_VALUE
                 }
@@ -1925,10 +1880,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr!!, paramsW)
 
-                Thread.sleep(80)
+                delay(80)
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
 
-                Thread.sleep(80)
+                delay(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
 
                 if (currentShowGroupSetPage) {
@@ -1938,12 +1893,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     light?.brightness = showBrightness!!
                     light?.color = color
                 }
-
-                //("changedff2" + opcode + "--" + addr + "--" + brightness)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
+        }
+
 
         sbBrightness?.progress = showBrightness!!
         sb_w_bright_num.text = "$showBrightness%"
@@ -2092,11 +2046,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 light?.brightness = progress
             } else if (view === sb_w_bright) {
                 sb_w_bright_num.text = progress.toString() + "%"
-                light?.let {//保存颜色数据
-                    var w = ( progress and 0xff000000.toInt()) shr 24
-                    var r = Color.red(it.color )
+                light?.let {
+                    //保存颜色数据
+                    var w = (progress and 0xff000000.toInt()) shr 24
+                    var r = Color.red(it.color)
                     var g = Color.green(it.color)
-                    var b = Color.blue(it.color )
+                    var b = Color.blue(it.color)
                     it.color = (w shl 24) or (r shl 16) or (g shl 8) or b
                 }
             }
@@ -2276,16 +2231,14 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         if (fromUser) {
             if (r == 0 && g == 0 && b == 0) {
             } else {
-                Thread {
+                GlobalScope.launch {
                     if (currentShowGroupSetPage) {
                         group?.color = color
                     } else {
                         light?.color = color
                     }
-
                     changeColor(r.toByte(), g.toByte(), b.toByte(), false)
-
-                }.start()
+                }
             }
         }
     }

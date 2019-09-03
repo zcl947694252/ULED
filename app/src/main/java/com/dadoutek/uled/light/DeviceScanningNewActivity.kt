@@ -846,7 +846,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 if (b)
-                showLoadingDialog(resources.getString(R.string.connecting_tip))
+                    showLoadingDialog(resources.getString(R.string.connecting_tip))
                 closeAnimation()
                 startConnect = true
 
@@ -1042,19 +1042,19 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 }
             } else {
                 for (i in list.indices) {
-                    LogUtils.e("zcl----isNormalGroup----"+list[i])
+                    LogUtils.e("zcl----isNormalGroup----" + list[i])
                     if (OtherUtils.isNormalGroup(list[i])) {
                         groups!!.add(list[i])
                     }
                 }
-                for (i in list.indices) {
-                    LogUtils.e("zcl----isAllRightGroup----"+list[i])
+              /*  for (i in list.indices) {
+                    LogUtils.e("zcl----isAllRightGroup----" + list[i])
                     if (OtherUtils.isAllRightGroup(list[i])) {
                         groups!!.add(list[i])
                     }
-                }
+                }*/
                 for (i in list.indices) {
-                    LogUtils.e("zcl----isDefaultGroup----"+list[i])
+                    LogUtils.e("zcl----isDefaultGroup----" + list[i])
                     if (OtherUtils.isDefaultGroup(list[i])) {
                         groups!!.add(list[i])
                     }
@@ -1413,7 +1413,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     private fun onLeScan(event: LeScanEvent) {
         val mesh = this.mApplication!!.mesh
         val meshAddress = mesh.generateMeshAddr()
-
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip))
             if (adapter?.getLights() != null && adapter?.getLights()?.isNotEmpty()!!) {
@@ -1427,7 +1426,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         }
         val deviceInfo = event.args
         if (scanRGBLight) {
-            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID == DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI)
+            if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID == DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI && mesh != null)
                 updateMesh(deviceInfo, meshAddress, mesh)
         } else {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID == DeviceType.LIGHT_NORMAL && deviceInfo.rssi < MAX_RSSI)
@@ -1440,10 +1439,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         updateMeshStatus = UPDATE_MESH_STATUS.UPDATING_MESH
         deviceInfo.meshAddress = meshAddress
         val params = Parameters.createUpdateParameters()
+        val user = DBUtils.lastUser
         params.setOldMeshName(mesh.factoryName)
         params.setOldPassword(mesh.factoryPassword)
-        params.setNewMeshName(mesh.name)
-        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name!!).substring(0, 16))
+        params.setNewMeshName(user?.controlMeshName)
+        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16))
         params.setUpdateDeviceList(deviceInfo)
         TelinkLightService.Instance().updateMesh(params)
 
