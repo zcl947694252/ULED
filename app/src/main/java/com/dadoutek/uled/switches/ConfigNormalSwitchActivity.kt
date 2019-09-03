@@ -163,7 +163,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
         fab.setOnClickListener { view ->
-            if(TelinkLightApplication.getInstance().connectDevice==null){
+            if(TelinkLightApplication.getApp().connectDevice==null){
                 if(mConnectingSnackBar?.isShown != true){
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
@@ -469,7 +469,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
 
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
             params.setNewPassword(mesh?.password)
@@ -557,7 +557,7 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 //                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
 //                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
 //                    if (granted!!) {
-//                        var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(),Constant.IS_DEVELOPER_MODE,false)
+//                        var isBoolean: Boolean =SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(),Constant.IS_DEVELOPER_MODE,false)
 //                        if(isBoolean){
 //                            transformView()
 //                        }else {

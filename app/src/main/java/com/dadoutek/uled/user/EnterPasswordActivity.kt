@@ -250,7 +250,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             }
             isSuccess = false
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         }
     }
 
@@ -347,7 +347,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             //判断是否用户是首次在这个手机登录此账号，是则同步数据
             SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
             SharedPreferencesUtils.setUserLogin(true)
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 
             hideLoadingDialog()
             startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
@@ -356,7 +356,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
 
     private fun syncComplet() {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 
         startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
         hideLoadingDialog()

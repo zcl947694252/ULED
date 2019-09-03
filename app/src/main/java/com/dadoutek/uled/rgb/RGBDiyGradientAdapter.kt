@@ -1,7 +1,5 @@
 package com.dadoutek.uled.rgb
 
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -9,7 +7,6 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbColorNode
 import com.dadoutek.uled.model.DbModel.DbDiyGradient
 import com.dadoutek.uled.tellink.TelinkLightApplication
 
@@ -45,13 +42,13 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,interna
         if(item.select){
             gpOn.setImageResource(R.drawable.icon_open_group)
             gpOff.setImageResource(R.drawable.icon_down_group)
-            gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
-            gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
+            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
         }else{
             gpOn.setImageResource(R.drawable.icon_down_group)
             gpOff.setImageResource(R.drawable.icon_open_group)
-            gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
-            gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
+            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
+            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
         }
 
 

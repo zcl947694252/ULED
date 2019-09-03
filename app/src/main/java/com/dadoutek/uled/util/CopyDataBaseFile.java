@@ -26,7 +26,7 @@ import java.util.Calendar;
 public class CopyDataBaseFile {
     // 保存数据库的路径
     private final static String DATABASE_PATH = "/data/data/com.dadoutek.uled/databases/";
-    private final static String dbName = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+    private final static String dbName = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
             Constant.DB_NAME_KEY,"uled")+".db";;
     private Context context;
 
@@ -143,7 +143,7 @@ public class CopyDataBaseFile {
         try {
             os = new FileOutputStream(dbfile);// 得到数据库文件的写入流
             if (is == null) {
-//                is = TelinkLightApplication.getInstance().getApplicationContext().getResources().openRawResource(R.raw.hinteen);// 得到数据库文件的数据流
+//                is = TelinkLightApplication.Companion.getApp().getApplicationContext().getResources().openRawResource(R.raw.hinteen);// 得到数据库文件的数据流
             }
 
             byte[] buffer = new byte[8192];

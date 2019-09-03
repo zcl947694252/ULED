@@ -7,7 +7,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
 
@@ -23,10 +22,10 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
                 tvName.text = StringUtils.getConnectorName(scene)
             }
 
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getInstance().connectDevice.meshAddress == scene.getMeshAddr()) {
+                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {

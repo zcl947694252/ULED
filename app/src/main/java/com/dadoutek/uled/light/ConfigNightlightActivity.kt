@@ -522,7 +522,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
 //                    dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 //
 //                    DBUtils.recordingChange(dbSensor.id,
-//                            DaoSessionInstance.getInstance().dbSensorDao.tablename,
+//                            DaoSessionInstance.getApp().dbSensorDao.tablename,
 //                            Constant.DB_ADD)
 //                }
 //            }
@@ -612,7 +612,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             } else {
                 Thread {
                     val mApplication = this.application as TelinkLightApplication
-                    val mesh = mApplication.getMesh()
+                    val mesh = mApplication.mesh
 
                     if (showGroupList?.size != 0) {
                         GlobalScope.launch(Dispatchers.Main) {
@@ -642,7 +642,7 @@ class ConfigNightlightActivity : TelinkBaseActivity(), View.OnClickListener, Ada
             Thread {
 
                 val mApplication = this.application as TelinkLightApplication
-                val mesh = mApplication.getMesh()
+                val mesh = mApplication.mesh
 
                 if (showGroupList?.size != 0) {
                     GlobalScope.launch(Dispatchers.Main) {

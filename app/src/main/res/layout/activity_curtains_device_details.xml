@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:background="@color/white"
     android:id="@+id/root"
-    tools:context=".windowcurtains.CurtainsDeviceDetailsActivity">
+    tools:context=".curtains.CurtainsDeviceDetailsActivity">
 
     <include
         android:id="@+id/topView"

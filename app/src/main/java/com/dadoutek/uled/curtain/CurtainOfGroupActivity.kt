@@ -43,8 +43,8 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
 import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.windowcurtains.CurtainBatchGroupActivity
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
+import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -282,7 +282,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
@@ -597,7 +597,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                      GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                              GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
@@ -610,7 +610,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                     } else {
                          GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 
@@ -887,7 +887,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun onServiceDisconnected(event: ServiceEvent) {
         //"onServiceDisconnected")
-        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
     /**

@@ -99,8 +99,8 @@ public class QRCodeScanActivity extends TelinkBaseActivity /*implements ViewTree
         this.mDelayHandler.removeCallbacks(this.mAutoFocus);
         this.mPreviewCallback.stop();
         //
-        *//*Places.getInstance().clear();
-        List<PlaceSort> placeSortList = PlacesDbUtils.getInstance().getAllPlace();
+        *//*Places.getApp().clear();
+        List<PlaceSort> placeSortList = PlacesDbUtils.getApp().getAllPlace();
         if (placeSortList != null && placeSortList.size() > 0) {
             PlaceManage.changePlace(placeSortList.get(0));
         }*//*

@@ -3,7 +3,6 @@ package com.dadoutek.uled.switches
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -16,7 +15,7 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
             if(scene.name!=null){
                 helper.setText(R.id.light_name, scene.name)
             }else{
-                helper.setText(R.id.light_name, TelinkLightApplication.getInstance().getString(R.string.no_name))
+                helper.setText(R.id.light_name, TelinkLightApplication.getApp().getString(R.string.no_name))
             }
 
             helper.setText(R.id.name, StringUtils.getSwitchPirDefaultName(scene.productUUID))

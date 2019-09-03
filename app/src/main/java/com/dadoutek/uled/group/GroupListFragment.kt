@@ -51,7 +51,7 @@ import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.*
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -357,8 +357,8 @@ class GroupListFragment : BaseFragment() {
         }
 
         deviceName = ArrayList()
-        var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light), TelinkLightApplication.getInstance().getString(R.string.rgb_light),
-                TelinkLightApplication.getInstance().getString(R.string.curtain), TelinkLightApplication.getInstance().getString(R.string.connector))
+        var stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light), TelinkLightApplication.getApp().getString(R.string.rgb_light),
+                TelinkLightApplication.getApp().getString(R.string.curtain), TelinkLightApplication.getApp().getString(R.string.connector))
 
         for (i in stringName.indices) {
             var device = DbDeviceName()
@@ -385,7 +385,6 @@ class GroupListFragment : BaseFragment() {
         showList = gpList
 
         allGroup = DBUtils.getGroupByMesh(0xFFFF)
-
 
         if (allGroup != null) {
             if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
@@ -433,7 +432,7 @@ class GroupListFragment : BaseFragment() {
 //        setMove()
 
         application = activity!!.application as TelinkLightApplication
-        dataManager = DataManager(TelinkLightApplication.getInstance(),
+        dataManager = DataManager(TelinkLightApplication.getApp(),
                 application!!.mesh.name, application!!.mesh.password)
     }
 
@@ -565,7 +564,7 @@ class GroupListFragment : BaseFragment() {
         fragmentPosition = position
 
         deviceNameAdapter?.notifyDataSetChanged()
-//        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+//        SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
 //                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
@@ -630,10 +629,10 @@ class GroupListFragment : BaseFragment() {
                 totalNum?.text = getString(R.string.total) + (0) + getString(R.string.piece)
             }
 
-            var stringName = arrayOf(TelinkLightApplication.getInstance().getString(R.string.normal_light),
-                    TelinkLightApplication.getInstance().getString(R.string.rgb_light),
-                    TelinkLightApplication.getInstance().getString(R.string.curtain),
-                    TelinkLightApplication.getInstance().getString(R.string.connector))
+            var stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light),
+                    TelinkLightApplication.getApp().getString(R.string.rgb_light),
+                    TelinkLightApplication.getApp().getString(R.string.curtain),
+                    TelinkLightApplication.getApp().getString(R.string.connector))
 
             for (i in stringName.indices) {
                 var device = DbDeviceName()
@@ -662,7 +661,7 @@ class GroupListFragment : BaseFragment() {
                     btnOff?.setBackgroundResource(R.drawable.icon_down_group)
                     onText?.setTextColor(resources.getColor(R.color.white))
                     offText?.setTextColor(resources.getColor(R.color.black_nine))
-                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "on")
                         LocalBroadcastManager.getInstance(this!!.mContext!!)
@@ -673,7 +672,7 @@ class GroupListFragment : BaseFragment() {
                     btnOff?.setBackgroundResource(R.drawable.icon_open_group)
                     onText?.setTextColor(resources.getColor(R.color.black_nine))
                     offText?.setTextColor(resources.getColor(R.color.white))
-                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_ALL_LIGHT_MODE, false)) {
+                    if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "false")
                         LocalBroadcastManager.getInstance(this!!.mContext!!)
@@ -693,7 +692,7 @@ class GroupListFragment : BaseFragment() {
                 val dstAddr = group.meshAddr
                 var intent: Intent
 
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
@@ -760,7 +759,7 @@ class GroupListFragment : BaseFragment() {
                 showInstallDeviceList()
             }
             R.id.create_group -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -768,7 +767,7 @@ class GroupListFragment : BaseFragment() {
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -782,7 +781,7 @@ class GroupListFragment : BaseFragment() {
             }
 
             R.id.btn_on -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
@@ -803,7 +802,7 @@ class GroupListFragment : BaseFragment() {
             }
 
             R.id.btn_off -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
@@ -824,7 +823,7 @@ class GroupListFragment : BaseFragment() {
             }
 
             R.id.btn_set -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     checkConnect()
                 } else {
@@ -838,7 +837,7 @@ class GroupListFragment : BaseFragment() {
             R.id.img_function2 -> {
 //                val intent = Intent("delete")
 //                intent.putExtra("delete", "true")
-//                LocalBroadcastManager.getInstance(this!!.mContext!!)
+//                LocalBroadcastManager.getApp(this!!.mContext!!)
 //                        .sendBroadcast(intent)
                 var deleteList: ArrayList<DbGroup>? = null
                 deleteList = ArrayList()
@@ -902,7 +901,7 @@ class GroupListFragment : BaseFragment() {
 
     private fun checkConnect() {
         try {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (isFristUserClickCheckConnect) {
                     val activity = activity as MainActivity
                     activity.autoConnect()

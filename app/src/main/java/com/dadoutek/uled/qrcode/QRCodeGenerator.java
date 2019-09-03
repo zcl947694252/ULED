@@ -38,7 +38,7 @@ public class QRCodeGenerator extends AsyncTask<Void, Void, Bitmap> {
 
     private void initEncoder() {
         DisplayMetrics metrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) TelinkLightApplication.getApp().getSystemService(Context.WINDOW_SERVICE);
+        WindowManager windowManager = (WindowManager) TelinkLightApplication.Companion.getApp().getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(metrics);
         int size = (int) metrics.density * 350;
         QREncoder.Builder builder = new QREncoder.Builder();
@@ -63,7 +63,7 @@ public class QRCodeGenerator extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-//        QRCodeDataOperator provider = QRCodeDataOperator.getInstance();
+//        QRCodeDataOperator provider = QRCodeDataOperator.getApp();
 //        String src = provider.provide();
 //        JSONObject jsonObject = new JSONObject();
         QRCodeDataOperator dataProvider = new QRCodeDataOperator();

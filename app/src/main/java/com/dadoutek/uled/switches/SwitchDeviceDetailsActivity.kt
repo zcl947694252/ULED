@@ -198,7 +198,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     }
 
 //                    scanDisposable?.dispose()
-//                    LeBluetooth.getInstance().stopScan()
+//                    LeBluetooth.getApp().stopScan()
 //                    bestRSSIDevice = leScanEvent.args
 ////                params.setUpdateDeviceList(bestRSSIDevice)
 //                    connect()
@@ -306,7 +306,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun initView() {
 //        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val layoutmanager = LinearLayoutManager(this)
-        mConnectDevice = TelinkLightApplication.getInstance().connectDevice
+        mConnectDevice = TelinkLightApplication.getApp().connectDevice
         recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adapter = SwitchDeviceDetailsAdapter(R.layout.device_detail_adapter, switchData)
@@ -632,7 +632,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                         hideLocationServiceDialog()
                     }
                     mTelinkLightService = TelinkLightService.Instance()
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
@@ -645,7 +645,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
 //                            scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 
@@ -914,7 +914,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             }
             R.id.create_group -> {
                 dialog?.visibility = View.GONE
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -923,7 +923,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             R.id.create_scene -> {
                 dialog?.visibility = View.GONE
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {

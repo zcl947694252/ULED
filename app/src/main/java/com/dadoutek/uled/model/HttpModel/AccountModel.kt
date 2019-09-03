@@ -81,15 +81,15 @@ object AccountModel {
             delay(200L)
 
             //原有数据转化完成清空本地数据
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getApp(),
                     name + pwd + Constant.LIGHTS_KEY, null)
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putObject(TelinkLightApplication.getApp(),
                     name + pwd + Constant.GROUPS_KEY, null)
         }
     }
 
     private fun oldDataConvertToNewDataLight(name: String, pwd: String) {
-        val lights = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+        val lights = SharedPreferencesHelper.getObject(TelinkLightApplication.getApp(),
                 name + pwd + Constant.LIGHTS_KEY) as? Lights
 
         if (lights!!.get() != null && lights.get().size > 0) {
@@ -119,7 +119,7 @@ object AccountModel {
     }
 
     private fun oldDataConvertToNewDataGroup(name: String, pwd: String) {
-        val groups = SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+        val groups = SharedPreferencesHelper.getObject(TelinkLightApplication.getApp(),
                 name + pwd + Constant.GROUPS_KEY) as? Groups
 
         val dbRegion = DBUtils.lastRegion
@@ -143,7 +143,7 @@ object AccountModel {
 
     fun initDatBase(user: DbUser) {
         //首先保存当前数据库名
-        SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, user.account)
+        SharedPreferencesHelper.putString(TelinkLightApplication.getApp(), Constant.DB_NAME_KEY, user.account)
 
         //数据库分库
         DaoSessionInstance.destroySession()
@@ -163,7 +163,7 @@ object AccountModel {
     }
 
     private fun setIsLogin(isLogin: Boolean) {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, isLogin)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, isLogin)
     }
 
 /*
@@ -181,14 +181,14 @@ object AccountModel {
             mesh.password = dbRegion.controlMeshPwd
             mesh.factoryName = dbRegion.installMesh
             mesh.password = dbRegion.installMeshPwd
-//            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+//            mesh.saveOrUpdate(TelinkLightApplication.getApp())
             application.setupMesh(mesh)
             return
         }
 
         //数据库无区域数据（本地拿取，本地没有就给默认，本地有则同步本地到数据库然后清除本地）
-        val name = SharedPreferencesHelper.getMeshName(TelinkLightApplication.getInstance())
-        val pwd = SharedPreferencesHelper.getMeshPassword(TelinkLightApplication.getInstance())
+        val name = SharedPreferencesHelper.getMeshName(TelinkLightApplication.getApp())
+        val pwd = SharedPreferencesHelper.getMeshPassword(TelinkLightApplication.getApp())
 
         if (TextUtils.isEmpty(name) && TextUtils.isEmpty(pwd)) {
             //                Mesh mesh = (Mesh) FileSystem.readAsObject(this, name + "." + pwd);
@@ -198,19 +198,19 @@ object AccountModel {
             mesh.password = account
             mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
             mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
-//            mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+//            mesh.saveOrUpdate(TelinkLightApplication.getApp())
             application.setupMesh(mesh)
-//            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(), phone)
-//            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(), Constant.NEW_MESH_PASSWORD)
+//            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getApp(), phone)
+//            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getApp(), Constant.NEW_MESH_PASSWORD)
             saveToDataBase(mesh.factoryName!!, mesh.factoryPassword!!, mesh.name!!, mesh.password!!)
-            SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putString(TelinkLightApplication.getApp(),
                     Constant.USER_TYPE, Constant.USER_TYPE_NEW)
         } else {
             saveToDataBase(Constant.DEFAULT_MESH_FACTORY_NAME, Constant.DEFAULT_MESH_FACTORY_PASSWORD, name, pwd)
             oldDataConvertToNewData(name, pwd)
-            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getInstance(), null)
-            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getInstance(), null)
-            SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getApp(), null)
+            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getApp(), null)
+            SharedPreferencesHelper.putString(TelinkLightApplication.getApp(),
                     Constant.USER_TYPE, Constant.USER_TYPE_OLD)
         }
     }
@@ -218,7 +218,7 @@ object AccountModel {
 
 /*
     private fun saveToDataBase(factoryName: String, factoryPwd: String, mNewMeshName: String, mNewMeshPwd: String) {
-        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.DB_NAME_KEY, "dadou")
+        val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.DB_NAME_KEY, "dadou")
         val dbRegio = DbRegion()
         dbRegio.belongAccount = account
         dbRegio.controlMesh = mNewMeshName
@@ -234,7 +234,7 @@ object AccountModel {
         mesh.password = account
         mesh.factoryName = dbRegio.installMesh
         mesh.factoryPassword = dbRegio.installMeshPwd
-//        mesh.saveOrUpdate(TelinkLightApplication.getInstance())
+//        mesh.saveOrUpdate(TelinkLightApplication.getApp())
         application.setupMesh(mesh)
 
 //        DBUtils.createAllLightControllerGroup()

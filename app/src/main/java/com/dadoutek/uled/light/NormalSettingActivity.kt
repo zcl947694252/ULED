@@ -826,7 +826,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         val groups = DBUtils.allGroups
                         for (i in groups.indices) {
                             if (groups[i].name == name) {
-                                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                                 canSave = false
                                 break
                             }
@@ -993,7 +993,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe {
                     if (it!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             transformView()
                         } else {
@@ -1620,7 +1620,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         }
 
 //        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
-        mConnectDevice = TelinkLightApplication.getInstance().connectDevice
+        mConnectDevice = TelinkLightApplication.getApp().connectDevice
 //        sbBrightness?.progress = light!!.brightness
 //        tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
 //        sbTemperature?.progress = light!!.colorTemperature
@@ -1744,7 +1744,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             val groups = DBUtils.allGroups
             for (i in groups.indices) {
                 if (groups[i].name == name) {
-                    ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                    ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                     canSave = false
                     break
                 }
@@ -2102,7 +2102,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 if (this.mApp?.isEmptyMesh != false)
                     return
 
-                val mesh = this.mApp?.getMesh()
+                val mesh = this.mApp?.mesh
 
                 if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
                     TelinkLightService.Instance()?.idleMode(true)

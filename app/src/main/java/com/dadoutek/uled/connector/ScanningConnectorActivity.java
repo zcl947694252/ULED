@@ -53,7 +53,6 @@ import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.LogInfoActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
@@ -175,11 +174,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private List<DbConnector> updateList;
 
     private ArrayList<Integer> indexList = new ArrayList<>();
-
-    //对一个灯重复分组时记录上一次分组
-    private int originalGroupID = -1;
-
-    private Disposable mGroupingDisposable;
 
     private TextView tvStopScan;
 
@@ -408,8 +402,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         mDisposable.dispose();  //销毁时取消订阅.
         if (mTimer != null)
             mTimer.dispose();
-        if (mGroupingDisposable != null)
-            mGroupingDisposable.dispose();
         if (mConnectTimer != null)
             mConnectTimer.dispose();
 
@@ -543,7 +535,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
             dbLight.setBelongGroupId(allLightId);
             ToastUtils.showLong(R.string.connector_fail_tip);
             updateGroupResult(dbLight, dbGroup);
-            if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
+            if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
                 ToastUtils.showLong("断开连接");
             } else {
                 if (index + 1 > selectLights.size() - 1)
@@ -634,7 +626,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 arrayList.add(nowLightList.get(i));
                 indexList.add(i);
             } else if (nowLightList.get(i).selected && nowLightList.get(i).hasGroup) {
-                originalGroupID = Integer.parseInt(String.valueOf(nowLightList.get(i).getBelongGroupId()));
                 //如果所选灯已有分组，清空后再继续添加到新的分组
 //                nowLightList.get(i).belongGroups.clear();
                 arrayList.add(nowLightList.get(i));
@@ -833,7 +824,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
-        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
@@ -851,7 +842,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 }
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
-            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
@@ -872,7 +863,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
                 animationView.setVisibility(View.GONE);
-//                LeBluetooth.getInstance().stopScan();
+//                LeBluetooth.getApp().stopScan();
 //                TelinkLightService.Instance().idleMode(true);
 
                 startConnect = true;
@@ -1021,9 +1012,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
             if (v == btnScan) {
                 doFinish();
                 //stopScanAndUpdateMesh();
-            } else if (v.getId() == R.id.btn_log) {
-                startActivity(new Intent(ScanningConnectorActivity.this, LogInfoActivity.class));
-            }
+            } 
         }
     };
 
@@ -1130,7 +1119,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 if (i == groups.size() - 1) {
                     groups.get(i).checked = true;
                     currentGroupIndex = i;
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                    SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                             Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                 } else {
                     groups.get(i).checked = false;
@@ -1151,7 +1140,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
             mApplication.startLightService(TelinkLightService.class);
         }
 //
-//        if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+//        if(TelinkLightApplication.Companion.getApp().getConnectDevice()==null){
 //            autoConnect();
 //            mConnectTimer = createConnectTimeout();
 //        }
@@ -1538,7 +1527,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private void updateMesh(DeviceInfo deviceInfo, int meshAddress, Mesh mesh) {
         //更新参数
         deviceInfo.meshAddress = meshAddress;
-        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+        String account = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
                 Constant.DB_NAME_KEY, "dadou");
         LeUpdateParameters params = Parameters.createUpdateParameters();
         params.setOldMeshName(mesh.getFactoryName());

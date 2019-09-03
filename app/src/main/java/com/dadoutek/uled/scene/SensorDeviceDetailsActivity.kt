@@ -181,7 +181,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             }
             R.id.create_group -> {
                 dialog_pir?.visibility = View.GONE
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -190,7 +190,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             R.id.create_scene -> {
                 dialog_pir?.visibility = View.GONE
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -445,7 +445,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             group.text = getString(R.string.switch_grouping)
 
             group.setOnClickListener {
-                settingType = if (TelinkLightApplication.getInstance().connectDevice == null) {
+                settingType = if (TelinkLightApplication.getApp().connectDevice == null) {
                     autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
                     RECOVER_SENSOR
                 } else {
@@ -462,7 +462,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 showResetConfirmDialog()
             }
             ota.setOnClickListener {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
                     isClick = OTA_SENSOR //记录点击状态
                     settingType = NORMAL_SENSOR//记录作用
@@ -487,10 +487,10 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 .setView(textView)
                 .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
                     isClick = RESET_SENSOR
-                    val b = TelinkLightApplication.getInstance().connectDevice == null
+                    val b = TelinkLightApplication.getApp().connectDevice == null
 
                     Log.e("zcl", "zcl******$b")
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         settingType = RESET_SENSOR
                         autoConnectSensor()
                     } else {
@@ -574,15 +574,15 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         when (settingType) {
                             NORMAL_SENSOR -> {// 断开其他灯的连接回调判断
                                 when (isClick) {//恢复出厂设置
-                                    RESET_SENSOR ->  if (TelinkLightApplication.getInstance().connectDevice == null)
+                                    RESET_SENSOR ->  if (TelinkLightApplication.getApp().connectDevice == null)
                                         autoConnectSensor()
 
                                     OTA_SENSOR -> {//OTA
-                                        if (TelinkLightApplication.getInstance().connectDevice == null)
+                                        if (TelinkLightApplication.getApp().connectDevice == null)
                                             autoConnectSensor()
                                     }
                                     RECOVER_SENSOR -> {//断联通知重新配置
-                                        Log.e("zcl", "zcl**重新配置****" + { TelinkLightApplication.getInstance().connectDevice == null })
+                                        Log.e("zcl", "zcl**重新配置****" + { TelinkLightApplication.getApp().connectDevice == null })
                                         relocationSensor()
                                     }
                                 }
@@ -668,7 +668,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
      */
     private fun isStartScan() {
         mTelinkLightService = TelinkLightService.Instance()
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             while (TelinkApplication.getInstance()?.serviceStarted == true) {
                 GlobalScope.launch(Dispatchers.Main) {
                     retryConnectCount = 0
@@ -680,7 +680,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         } else {
             GlobalScope.launch(Dispatchers.Main) {
                 scanPb?.visibility = View.GONE
-                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
             }
         }
     }

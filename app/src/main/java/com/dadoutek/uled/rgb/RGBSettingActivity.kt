@@ -211,7 +211,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             transformView()
                         } else {
@@ -390,7 +390,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         color_picker.subscribe(colorObserver)
         this.color_picker!!.setOnTouchListener(this)
 
-        mConnectDevice = TelinkLightApplication.getInstance().connectDevice
+        mConnectDevice = TelinkLightApplication.getApp().connectDevice
 
         presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
@@ -1355,7 +1355,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
 
@@ -1644,10 +1644,10 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 ToastUtils.showLong(getString(R.string.connecting))
                 SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
-                if (this.mApp!!.isEmptyMesh())
+                if (this.mApp!!.isEmptyMesh)
                     return
 
-                val mesh = this.mApp?.getMesh()
+                val mesh = this.mApp?.mesh
 
                 if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
                     TelinkLightService.Instance()?.idleMode(true)
@@ -1981,7 +1981,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 //        canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
@@ -2361,7 +2361,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                         val groups = DBUtils.allGroups
                         for (i in groups.indices) {
                             if (groups[i].name == name) {
-                                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                                 canSave = false
                                 break
                             }

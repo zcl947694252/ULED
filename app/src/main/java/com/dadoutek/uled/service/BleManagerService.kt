@@ -160,7 +160,7 @@
 //    }
 //
 //    private fun onMeshOffline(event: MeshEvent) {
-//        val lights = Lights.getInstance().get()
+//        val lights = Lights.getApp().get()
 //        val it = lights.iterator()
 //        while (it.hasNext()) {
 //            val light = it.next()

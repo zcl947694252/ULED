@@ -23,7 +23,7 @@ class RGBDiyColorCheckAdapter(layoutResId: Int, data: List<DbColorNode>?) : Base
             helper?.setText(R.id.colorRec,item?.brightness.toString()+"%")
         }else{
             helper.setVisible(R.id.colorRec,true)
-            helper?.setText(R.id.colorRec,TelinkLightApplication.getInstance().getString(R.string.no_color))
+            helper?.setText(R.id.colorRec,TelinkLightApplication.getApp().getString(R.string.no_color))
         }
     }
 

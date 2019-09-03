@@ -42,9 +42,9 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
 
 
             if (showGroupList!!.size > 0) {
-                groupNum.text = TelinkLightApplication.getInstance().getString(R.string.total) + showGroupList!!.size + TelinkLightApplication.getInstance().getString(R.string.piece) + TelinkLightApplication.getInstance().getString(R.string.group)
+                groupNum.text = TelinkLightApplication.getApp().getString(R.string.total) + showGroupList!!.size + TelinkLightApplication.getApp().getString(R.string.piece) + TelinkLightApplication.getApp().getString(R.string.group)
             } else {
-                groupNum.text = TelinkLightApplication.getInstance().getString(R.string.total) + 0 + TelinkLightApplication.getInstance().getString(R.string.piece) + TelinkLightApplication.getInstance().getString(R.string.group)
+                groupNum.text = TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece) + TelinkLightApplication.getApp().getString(R.string.group)
             }
 
 

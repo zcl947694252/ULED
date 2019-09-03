@@ -284,7 +284,7 @@ class RelayFragmentList : BaseFragment() {
         recyclerView?.addItemDecoration(decoration)
         var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
         lin.setOnClickListener(View.OnClickListener {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
             } else {
                 addNewGroup()
@@ -321,7 +321,7 @@ class RelayFragmentList : BaseFragment() {
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
         var intent: Intent
-//        if (TelinkLightApplication.getInstance().connectDevice == null) {
+//        if (TelinkLightApplication.getApp().connectDevice == null) {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
@@ -401,7 +401,7 @@ class RelayFragmentList : BaseFragment() {
 /*
     private fun checkConnect() {
         try {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (isFristUserClickCheckConnect) {
                     val activity = activity as MainActivity
                     activity.autoConnect()
@@ -452,7 +452,7 @@ class RelayFragmentList : BaseFragment() {
 //            controller?.remove()
         when (it.id) {
 //            R.id.add_group_btn -> {
-//                if (TelinkLightApplication.getInstance().connectDevice == null) {
+//                if (TelinkLightApplication.getApp().connectDevice == null) {
 //                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //                } else {
 //                    addNewGroup()
@@ -561,7 +561,7 @@ class RelayFragmentList : BaseFragment() {
             recyclerView?.addItemDecoration(decoration)
             var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
             lin.setOnClickListener(View.OnClickListener {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()

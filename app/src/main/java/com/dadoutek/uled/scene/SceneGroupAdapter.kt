@@ -73,7 +73,7 @@ class SceneGroupAdapter
         lessWhiteLightRGB = helper.getView(R.id.sb_w_bright_less)
 
         docOne.setChecked(true, if (item.color == 0)
-            TelinkLightApplication.getInstance().resources.getColor(R.color.primary)
+            TelinkLightApplication.getApp().resources.getColor(R.color.primary)
         else
         //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
         //右移n位，指 按2进制的 位 右移n位， （等于 除以 2的n次方），低于最低位的数则丢掉 。
@@ -82,7 +82,7 @@ class SceneGroupAdapter
         //   0001fe00    16711680  ff000000                              0x4FFFE0  0xff0fff00
 
         Log.e("zcl", "zclSceneGroupAdapter*****************${0xff0000 shl 8}*****************" + { item.color and 0xffffff })
-        dot.setChecked(true, TelinkLightApplication.getInstance().resources.getColor(R.color.color_000000))
+        dot.setChecked(true, TelinkLightApplication.getApp().resources.getColor(R.color.color_000000))
 
 
         helper.setText(R.id.name_gp, item.gpName)

@@ -26,7 +26,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.light.DeviceResetGroupActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbConnector
@@ -176,7 +175,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         } else {
             sleepTime = 200
         }
-        b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), "isShowDot", false)
+        b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
         registerBluetoothReceiver()
     }
 
@@ -213,7 +212,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         } else {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (bluetooth_image != null) {
                     bluetooth_image.setImageResource(R.drawable.bluetooth_no)
                     bluetooth_image.isEnabled = true
@@ -287,7 +286,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         confirm?.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (TelinkLightApplication.getInstance().connectDevice != null)
+            if (TelinkLightApplication.getApp().connectDevice != null)
                 resetAllLight()
             else {
                 ToastUtils.showShort(R.string.device_not_connected)
@@ -373,7 +372,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             R.id.oneClickReset -> showSureResetDialogByApp()
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
 //            R.id.showGuideAgain -> showGuideAgainFun()
-            R.id.resetAllGroup -> gotoResetAllGroup()
+//            R.id.resetAllGroup -> gotoResetAllGroup()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
                 startActivity(intent)
@@ -393,28 +392,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun gotoResetAllGroup() {
-        showResetSelectTypeDialog()
-    }
-
-    private fun showResetSelectTypeDialog() {
-        val intent = Intent(activity, DeviceResetGroupActivity::class.java)
-        val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-        builder.setMessage(getString(R.string.please_select_light_type))
-        builder.setPositiveButton(R.string.rgb_light) { dialog, which ->
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-            startActivityForResult(intent, Activity.RESULT_OK)
-        }
-        builder.setNeutralButton(R.string.cancel) { dialog, which ->
-
-        }
-        builder.setNegativeButton(R.string.normal_light) { dialog, which ->
-            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-            startActivityForResult(intent, Activity.RESULT_OK)
-            Log.d("", "")
-        }
-        builder.create().show()
-    }
 
     // 如果没有网络，则弹出网络设置对话框
     fun checkNetworkAndSync(activity: Activity?) {
@@ -458,7 +435,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }
 
         builder.setPositiveButton(android.R.string.ok) { dialog, which ->
-            if (TelinkLightApplication.getInstance().connectDevice != null)
+            if (TelinkLightApplication.getApp().connectDevice != null)
                 resetAllLight()
             else {
                 ToastUtils.showShort(R.string.device_not_connected)

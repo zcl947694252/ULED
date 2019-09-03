@@ -37,7 +37,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
 
     private static DaoMaster daoMaster;
     private static DaoSession daoSession;
-    public static final String DBNAME = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+    public static final String DBNAME = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
             Constant.DB_NAME_KEY, "uled") + ".db";
 
     MyOpenHelper(Context context, String name) {

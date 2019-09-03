@@ -38,7 +38,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.windowcurtains.WindowCurtainsActivity
+import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -270,7 +270,7 @@ class CurtainFragmentList : BaseFragment() {
         recyclerView?.addItemDecoration(decoration)
         var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
         lin.setOnClickListener(View.OnClickListener {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
             } else {
                 addNewGroup()
@@ -309,7 +309,7 @@ class CurtainFragmentList : BaseFragment() {
         var currentLight = groupList[position]
         val dstAddr = currentLight.meshAddr
         var intent: Intent
-//        if (TelinkLightApplication.getInstance().connectDevice == null) {
+//        if (TelinkLightApplication.getApp().connectDevice == null) {
 //            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //            checkConnect()
 //        } else {
@@ -354,7 +354,7 @@ class CurtainFragmentList : BaseFragment() {
 /*
     private fun checkConnect() {
         try {
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (isFristUserClickCheckConnect) {
                     val activity = activity as MainActivity
                     activity.autoConnect()
@@ -405,7 +405,7 @@ class CurtainFragmentList : BaseFragment() {
 //            controller?.remove()
         when (it.id) {
 //            R.id.add_group_btn -> {
-//                if (TelinkLightApplication.getInstance().connectDevice == null) {
+//                if (TelinkLightApplication.getApp().connectDevice == null) {
 //                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
 //                } else {
 //                    addNewGroup()
@@ -513,7 +513,7 @@ class CurtainFragmentList : BaseFragment() {
             recyclerView?.addItemDecoration(decoration)
             var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
             lin.setOnClickListener(View.OnClickListener {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()

@@ -63,7 +63,7 @@
             android:name=".connector.ConnectorBatchGroupActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".windowcurtains.CurtainBatchGroupActivity"
+            android:name=".curtains.CurtainBatchGroupActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".rgb.RgbBatchGroupActivity"
@@ -99,7 +99,7 @@
             android:name=".scene.SensorDeviceDetailsActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".windowcurtains.CurtainsDeviceDetailsActivity"
+            android:name=".curtains.CurtainsDeviceDetailsActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".switches.SwitchDeviceDetailsActivity"
@@ -163,10 +163,6 @@
             android:label="@string/activity_device_scanning_label"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".othersview.AddMeshActivity"
-            android:label="@string/activity_mesh_add_lable"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".group.LightGroupingActivity"
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
@@ -178,25 +174,11 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".othersview.LogInfoActivity"
-            android:screenOrientation="portrait" />
-        <!--
-             <activity
-             android:name=".activity.OTAPrepareActivity"
-             android:screenOrientation="portrait" />
-        -->
-        <activity
             android:name=".ota.OTAUpdateActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".othersview.FileSelectActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".othersview.UserAllActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".light.OnlineStatusTestActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".qrcode.QRCodeScanActivity"
@@ -305,13 +287,10 @@
             android:name=".rgb.SelectColorGradientAct"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".light.DeviceResetGroupActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".tellink.TelinkBaseActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".windowcurtains.WindowCurtainsActivity"
+            android:name=".curtains.WindowCurtainsActivity"
             android:screenOrientation="portrait" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- /> -->

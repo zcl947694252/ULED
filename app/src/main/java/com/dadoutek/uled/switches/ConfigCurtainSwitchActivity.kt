@@ -18,7 +18,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
@@ -158,7 +157,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
         fab.setOnClickListener { view ->
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()

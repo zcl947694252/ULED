@@ -48,7 +48,6 @@ import com.dadoutek.uled.model.ItemTypeGroup;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.LogInfoActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -488,7 +487,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
             dbLight.setBelongGroupId(allLightId);
             ToastUtils.showLong(R.string.group_fail_tip);
             updateGroupResult(dbLight, dbGroup);
-            if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
+            if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
                 ToastUtils.showLong("断开连接");
             } else {
                 if (index + 1 > selectLights.size() - 1)
@@ -766,7 +765,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
-        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
@@ -784,7 +783,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 }
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
-            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
@@ -803,7 +802,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         if (TelinkLightService.Instance()!= null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
-//                LeBluetooth.getInstance().stopScan();
+//                LeBluetooth.getApp().stopScan();
 //                TelinkLightService.Instance().idleMode(true);
 
                 startConnect = true;
@@ -926,7 +925,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 doFinish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
-                startActivity(new Intent(RgbBatchGroupActivity.this, LogInfoActivity.class));
+//                startActivity(new Intent(RgbBatchGroupActivity.this, LogInfoActivity.class));
             }
         }
     };
@@ -949,7 +948,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
         List<DbLight> all_light =new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.getInstance().getString(R.string.not_grouped))) {
+            if (StringUtils.getLightName(list.get(i)).equals(TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped))) {
                 no_list.add(list.get(i));
             } else {
                 group_list.add(list.get(i));
@@ -1082,7 +1081,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                     if (this.groups.get(i).getName().equals(groupLight)) {
                         this.groups.get(i).checked = true;
                         currentGroupIndex = i;
-                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         this.groups.get(i).checked = false;
@@ -1099,7 +1098,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                     if (i ==0) {
                         this.groups.get(i).checked = true;
                         currentGroupIndex = i;
-                        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         this.groups.get(i).checked = false;

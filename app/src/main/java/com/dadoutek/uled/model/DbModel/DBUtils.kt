@@ -506,12 +506,13 @@ object DBUtils {
      * 一个mesh地址对应一个组
      */
     fun getGroupByMesh(mesh: Int): DbGroup? {
+        var dbGroup: DbGroup? = null
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
         Log.d("datasave", "getGroupByMesh: $mesh")
         if (dbGroupLs.size > 0) {
-            return dbGroupLs[0]
+            dbGroup = dbGroupLs[0]
         }
-        return null
+        return dbGroup?: createAllLightControllerGroup()    //如果获取不到所有灯这个组，就直接创建一个返回
     }
 
     fun getLightMeshAddr(meshAddr: Int): ArrayList<DbLight> {
@@ -653,7 +654,7 @@ object DBUtils {
         } else {
             DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
 //            recordingChange(sensor.id,
-//                    DaoSessionInstance.getInstance().dbSensorDao.tablename,
+//                    DaoSessionInstance.getApp().dbSensorDao.tablename,
 //                    Constant.DB_ADD)
         }
     }
@@ -664,7 +665,7 @@ object DBUtils {
         } else {
             DaoSessionInstance.getInstance().dbSwitchDao.save(dbSwitch)
 //            recordingChange(dbSwitch!!.id,
-//                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+//                    DaoSessionInstance.getApp().dbSwitchDao.tablename,
 //                    Constant.DB_ADD)
         }
     }
@@ -753,7 +754,7 @@ object DBUtils {
     fun saveColorNode(colorNode: DbColorNode) {
         DaoSessionInstance.getInstance().dbColorNodeDao.insertOrReplace(colorNode)
         //        recordingChange(sceneActions.getId(),
-        //                DaoSessionInstance.getInstance().getDbSceneActionsDao().getTablename(),
+        //                DaoSessionInstance.getApp().getDbSceneActionsDao().getTablename(),
         //                Constant.DB_ADD);
     }
 
@@ -999,7 +1000,7 @@ object DBUtils {
 
 
     fun deleteLocalData() {
-        //        DaoSessionInstance.getInstance().getDbUserDao().deleteAll();
+        //        DaoSessionInstance.getApp().getDbUserDao().deleteAll();
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteAll()
         DaoSessionInstance.getInstance().dbRegionDao.deleteAll()
@@ -1088,7 +1089,7 @@ object DBUtils {
         var count = gpList.size - 1
         while (true) {
             count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.group) + count
+            val newName = TelinkLightApplication.getApp().getString(R.string.group) + count
             if (!gpNameList.contains(newName)) {
                 return newName
             }
@@ -1106,7 +1107,7 @@ object DBUtils {
         var count = scList.size
         while (true) {
             count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.scene_name) + count
+            val newName = TelinkLightApplication.getApp().getString(R.string.scene_name) + count
             if (!scNameList.contains(newName)) {
                 return newName
             }
@@ -1124,7 +1125,7 @@ object DBUtils {
         var count = dyList.size
         while (true) {
             count++
-            val newName = TelinkLightApplication.getInstance().getString(R.string.mode_str) + count
+            val newName = TelinkLightApplication.getApp().getString(R.string.mode_str) + count
             if (!scNameList.contains(newName)) {
                 return newName
             }
@@ -1138,7 +1139,7 @@ object DBUtils {
         }
         for (i in groups.indices) {
             if (groups[i].name == name) {
-                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                 return true
             }
         }
@@ -1165,14 +1166,14 @@ object DBUtils {
      * @return group对象
      */
 
-    fun createAllLightControllerGroup() {
+    fun createAllLightControllerGroup(): DbGroup {
         val groupAllLights = DbGroup()
-        groupAllLights.name = TelinkLightApplication.getInstance().getString(R.string.allLight)
+        groupAllLights.name = TelinkLightApplication.getApp().getString(R.string.allLight)
         groupAllLights.meshAddr = 0xFFFF
         groupAllLights.brightness = 100
         groupAllLights.colorTemperature = 100
         groupAllLights.deviceType = 1
-        groupAllLights.color = TelinkLightApplication.getInstance().resources.getColor(R.color.gray)
+        groupAllLights.color = TelinkLightApplication.getApp().resources.getColor(R.color.gray)
         groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
         groupAllLights.id = 1
         val list = groupList
@@ -1183,9 +1184,10 @@ object DBUtils {
         //        for(int i=0;i<list.size();i++){
         //            if(list.get(i).getMeshAddr()!=0xffff){
         //                groupAllLights.setId(Long.valueOf(0));
-        //                DaoSessionInstance.getInstance().getDbGroupDao().save(groupAllLights);
+        //                DaoSessionInstance.getApp().getDbGroupDao().save(groupAllLights);
         //            }
         //        }
+        return groupAllLights
     }
 
     /**

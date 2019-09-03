@@ -364,7 +364,7 @@ class SyncDataPutOrGetUtils {
                         }
                         if (it.size != 0) {
                             setupMesh()
-                            SharedPreferencesHelper.putString(TelinkLightApplication.getInstance(),
+                            SharedPreferencesHelper.putString(TelinkLightApplication.getApp(),
                                     Constant.USER_TYPE, Constant.USER_TYPE_NEW)
                         } else {
                             setupMeshCreat(accountNow)
@@ -468,7 +468,7 @@ class SyncDataPutOrGetUtils {
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
                     {
                         //登录后同步数据完成再上传一次数据
-                        syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                        syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
                         SharedPreferencesUtils.saveCurrentUserList(accountNow)
                         GlobalScope.launch(Dispatchers.Main) {
                             syncCallBack.complete()
@@ -482,9 +482,9 @@ class SyncDataPutOrGetUtils {
                 /*  object : NetworkObserver<List<DbScene>>() {
                       override fun onNext(item: List<DbScene>) {
                           //登录后同步数据完成再上传一次数据
-                          syncPutDataStart(TelinkLightApplication.getInstance(), syncCallbackSY)
+                          syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
                           SharedPreferencesUtils.saveCurrentUserList(accountNow)
-//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
                           GlobalScope.launch(Dispatchers.Main) {
                               syncCallBack.complete()
                           }
@@ -541,7 +541,7 @@ class SyncDataPutOrGetUtils {
         }
 
         private fun setupMeshCreat(account: String) {
-            val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance()
+            val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp()
                     , Constant.DB_NAME_KEY, "dadou")
             val dbRegio = DbRegion()
             dbRegio.belongAccount = account

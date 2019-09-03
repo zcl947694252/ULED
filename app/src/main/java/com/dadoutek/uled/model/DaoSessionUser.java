@@ -21,7 +21,7 @@ public class DaoSessionUser {
 
         if (session == null) {
             //创建数据库shop.db"
-            MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.getInstance()
+            MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.Companion.getApp()
                     , name);
             //获取可写数据库
             SQLiteDatabase db = helper.getWritableDatabase();
@@ -42,7 +42,7 @@ public class DaoSessionUser {
         name = "user.db";
 
         //创建数据库shop.db"
-        MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.getInstance()
+        MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.Companion.getApp()
                 , name);
         //获取可写数据库
         SQLiteDatabase db = helper.getWritableDatabase();
