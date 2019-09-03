@@ -96,8 +96,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                                             finish()
                                         }
                                     },
-                                    {
-                                        runOnUiThread {
+                                    { runOnUiThread {
                                             hideLoadingDialog()
                                             ToastUtils.showShort(R.string.group_failed)
                                         }

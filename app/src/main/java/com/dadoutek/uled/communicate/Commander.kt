@@ -299,7 +299,6 @@ object Commander : EventListener<String> {
                         onComplete()
                         failedCallback.invoke()
                        LogUtils.e("addGroup error: ${e.message}")
-                       LogUtils.e("addGroup error: ${e.message}")
                     }
                 })
     }
@@ -336,7 +335,7 @@ object Commander : EventListener<String> {
                         }
                     }
                     override fun onError(e: Throwable) {
-                      //Log.e("zcl","zcl******${e.message}")
+                        LogUtils.e("zcl","zcl**********updateMeshName*******onError***${e.message}")
                     }
                 })
 

@@ -357,8 +357,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun guide3(install_device_recyclerView: RecyclerView): Controller? {
-        val listView = installDialog?.getListView()
-        installDialog?.getLayoutInflater()
+        installDialog?.layoutInflater
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_GROUPLIST_KEY, false)
         if (guideShowCurrentPage) {
             installDialog?.layoutInflater
@@ -432,7 +431,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun showDeviceListDialog(isGuide: Boolean, isClickRgb: Boolean) {
         showInstallDeviceList(isGuide, isClickRgb)
     }
-
 
     private fun syncDataAndExit() {
         if (!NetWorkUtils.isNetworkAvalible(this)) {
@@ -676,7 +674,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
 
         val deviceInfo = this.mApplication?.connectDevice
-
         if (deviceInfo != null) {
             this.connectMeshAddress = (this.mApplication?.connectDevice?.meshAddress
                     ?: 0x00) and 0xFF
@@ -725,7 +722,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 },{})
     }
 
-
     private fun stopConnectTimer() {
         mConnectDisposal?.dispose()
     }
@@ -734,7 +730,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun connect(mac: String) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe ({
+                .subscribe {
                     if (it) {
                         //授予了权限
                         val instance = TelinkLightService.Instance()
@@ -747,7 +743,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                     }
-                }) {}
+                }
     }
 
     private fun startScanTimeout() {
@@ -758,7 +754,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     onLeScanTimeout()
                 },{})
     }
-
 
     private fun startCheckRSSITimer() {
         mScanTimeoutDisposal?.dispose()
@@ -788,7 +783,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 })
     }
 
-
     private fun login() {
         val meshName = DBUtils.lastUser?.controlMeshName
         val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
@@ -798,7 +792,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun onNError(event: DeviceEvent) {
         SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
-
         TelinkLightService.Instance().idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
@@ -829,9 +822,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             progressBar.visibility = GONE
         }
     }
-
-
-
 
     /**
      * 检查是不是灯
@@ -874,7 +864,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         installDialog?.dismiss()
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         this.mDelayHandler.removeCallbacksAndMessages(null)
@@ -908,6 +897,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (connectDevice != null) {
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
+                ToastUtils.showShort(getString(R.string.connect_success))
             }
             LightAdapter.STATUS_LOGOUT -> {
                 LogUtils.d("status logout")

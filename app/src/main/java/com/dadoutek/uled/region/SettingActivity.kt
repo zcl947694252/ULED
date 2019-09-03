@@ -6,9 +6,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.os.Bundle
 import android.provider.Settings
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearLayoutManager.VERTICAL
 import android.view.Gravity
@@ -16,20 +14,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.PopupWindow
-import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbConnector
-import com.dadoutek.uled.model.DbModel.DbCurtain
-import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.HttpModel.UserModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkObserver
@@ -58,26 +52,24 @@ import java.util.concurrent.TimeUnit
  * 更新时间   $Date$
  * 更新描述   ${TODO}
  */
-class SettingActivity : AppCompatActivity() {
+class SettingActivity : BaseActivity() {
+    override fun setLayoutID(): Int {
+        return  R.layout.activity_setting
+    }
+
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
-    private var loadDialog: Dialog? = null
+    private var loadDialog1: Dialog? = null
     private var compositeDisposable = CompositeDisposable()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_setting)
-        initView()
-        initData()
-        initListener()
-    }
+  
 
-    private fun initListener() {
+    override fun initListener() {
 
     }
 
-    private fun initData() {
+    override fun initData() {
         val list = arrayListOf<SettingItemBean>()
         list.add(SettingItemBean(R.drawable.icon_clear_data, getString(R.string.chear_cache)))
         list.add(SettingItemBean(R.drawable.icon_local_data, getString(R.string.upload_data)))
@@ -95,7 +87,7 @@ class SettingActivity : AppCompatActivity() {
                     emptyTheCache()
                 }
                 1 -> {
-                    checkNetworkAndSync(this)
+                    checkNetworkAndSyncs(this)
                 }
                 2 -> {
                     showSureResetDialogByApp()
@@ -131,7 +123,7 @@ class SettingActivity : AppCompatActivity() {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-    fun checkNetworkAndSync(activity: Activity?) {
+     fun checkNetworkAndSyncs(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -233,7 +225,7 @@ class SettingActivity : AppCompatActivity() {
         })
     }
 
-    private fun initView() {
+    override fun initView() {
         image_bluetooth.visibility = View.GONE
         toolbar.title = getString(R.string.setting)
         toolbar.setNavigationIcon(R.mipmap.icon_return)
@@ -258,7 +250,7 @@ class SettingActivity : AppCompatActivity() {
             PopUtil.dismiss(pop)
             //恢复出厂设置
             if (TelinkLightApplication.getInstance().connectDevice != null)
-                resetAllLight()
+                resetAllLights()
             else {
                 ToastUtils.showShort(R.string.device_not_connected)
             }
@@ -270,7 +262,7 @@ class SettingActivity : AppCompatActivity() {
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
-    private fun resetAllLight() {
+     fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
         //val lightList = allLights
@@ -340,67 +332,11 @@ class SettingActivity : AppCompatActivity() {
 
     }
 
-    private val allLights: List<DbLight>
-        get() {
-            val groupList = DBUtils.groupList
-            val lightList = ArrayList<DbLight>()
-
-            for (i in groupList.indices) {
-                lightList.addAll(DBUtils.getLightByGroupID(groupList[i].id!!))
-            }
-            return lightList
-        }
-
-    private val allCutain: List<DbCurtain>
-        get() {
-            val groupList = DBUtils.groupList
-            val lightList = ArrayList<DbCurtain>()
-
-            for (i in groupList.indices) {
-                lightList.addAll(DBUtils.getCurtainByGroupID(groupList[i].id!!))
-            }
-            return lightList
-        }
 
 
-    private val allRely: List<DbConnector>
-        get() {
-            val groupList = DBUtils.groupList
-            val lightList = ArrayList<DbConnector>()
-
-            for (i in groupList.indices) {
-                lightList.addAll(DBUtils.getConnectorByGroupID(groupList[i].id!!))
-            }
-            return lightList
-        }
 
 
-    fun showLoadingDialog(content: String) {
-        val inflater = LayoutInflater.from(this)
-        val v = inflater.inflate(R.layout.dialogview, null)
 
-        val layout = v.findViewById<View>(R.id.dialog_view) as LinearLayout
-        val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
-        tvContent.text = content
-
-        if (loadDialog == null) {
-            loadDialog = Dialog(this!!,
-                    R.style.FullHeightDialog)
-        }
-        //loadDialog没显示才把它显示出来
-        if (!loadDialog!!.isShowing) {
-            loadDialog!!.setCancelable(false)
-            loadDialog!!.setCanceledOnTouchOutside(false)
-            loadDialog!!.setContentView(layout)
-            loadDialog!!.show()
-        }
-    }
-
-    fun hideLoadingDialog() {
-        if (loadDialog != null) {
-            loadDialog!!.dismiss()
-        }
-    }
 
     //重启app并杀死原进程
     private fun restartApplication() {

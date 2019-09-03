@@ -112,18 +112,16 @@ open class TelinkBaseActivity : AppCompatActivity() {
         mStompListener = mStompClient?.lifecycle()?.subscribe { t: LifecycleEvent? ->
             when (t) {
                 LifecycleEvent.Type.OPENED -> {
-                    LogUtils.d( "Stomp connection opened")
+                    LogUtils.d( "zcl_Stomp connection opened")
 
                 }
                 LifecycleEvent.Type.ERROR -> {
-                    LogUtils.d("lifecycleEvent.getException()")
+                    LogUtils.d("zcl_Stomp lifecycleEvent.getException()")
 
                 }
                 LifecycleEvent.Type.CLOSED -> {
-                    LogUtils.d(TAG, "Stomp connection closed")
+                    LogUtils.d(TAG, "zcl_Stomp connection closed")
                 }
-
-
             }
         }
     }
@@ -363,7 +361,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 val regionName = codeBean.get("region_name")
                 val authorizerUserId = codeBean.get("authorizer_user_id")
                 val rid = codeBean.get("rid")
-                Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
+                Log.e(TAG, "zcl_Stomp***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
                 val user = DBUtils.lastUser
                 user?.let {
                     if (user.last_authorizer_user_id == authorizerUserId && user.last_region_id == rid) {
@@ -375,7 +373,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         //更新last—region-id
                         DBUtils.saveUser(user)
                         //下拉数据
-                        Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
+                        Log.e("zclbaseActivity", "zcl_Stomp******" + DBUtils.lastUser)
                         SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                     }
                 }
@@ -387,9 +385,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
             loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe({ topicMessage ->
                 payload = topicMessage.payload
-                //Log.e(TAG, "收到信息:$topicMessage")
+                Log.e(TAG, "收到信息:$topicMessage")
                 var key = SharedPreferencesHelper.getString(this@TelinkBaseActivity, Constant.LOGIN_STATE_KEY, "no_have_key")
-                // Log.e(TAG, "zcl***login***获取消息$payload----------------------------" + { payload == key })
+                 Log.e(TAG, "zcl_denglu***login***获取消息$payload----------------------------" + { payload == key })
                 if (payload == key)
                     return@subscribe
                 checkNetworkAndSync(this@TelinkBaseActivity)
@@ -399,9 +397,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
             normalSubscribe = mStompClient!!.lifecycle().subscribe({ lifecycleEvent ->
                 when (lifecycleEvent.type) {
-                    LifecycleEvent.Type.OPENED -> Log.e(TAG, "zcl******Stomp connection opened")
-                    LifecycleEvent.Type.ERROR -> Log.e(TAG, "zcl******Error" + lifecycleEvent.exception)
-                    LifecycleEvent.Type.CLOSED -> Log.e(TAG, "zcl******Stomp connection closed")
+                    LifecycleEvent.Type.OPENED -> Log.e(TAG, "zcl_Stomp******Stomp connection opened")
+                    LifecycleEvent.Type.ERROR -> Log.e(TAG, "zcl_Stomp******Error" + lifecycleEvent.exception)
+                    LifecycleEvent.Type.CLOSED -> Log.e(TAG, "zcl_Stomp******Stomp connection closed")
                 }
             }, {
                 ToastUtils.showShort(it.localizedMessage)
