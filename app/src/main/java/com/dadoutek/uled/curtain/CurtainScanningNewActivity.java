@@ -54,7 +54,6 @@ import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.LogInfoActivity;
 import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
@@ -543,7 +542,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
             dbLight.setBelongGroupId(allLightId);
             ToastUtils.showLong(R.string.curtain_fail_tip);
             updateGroupResult(dbLight, dbGroup);
-            if (TelinkLightApplication.getInstance().getConnectDevice() == null) {
+            if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
                 ToastUtils.showLong("断开连接");
             } else {
                 if (index + 1 > selectLights.size() - 1)
@@ -836,7 +835,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
         add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
-        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
@@ -854,7 +853,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 }
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
-            SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                     Constant.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
@@ -875,7 +874,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
                 animationView.cancelAnimation();
                 animationView.setVisibility(View.GONE);
-//                LeBluetooth.getInstance().stopScan();
+//                LeBluetooth.getApp().stopScan();
 //                TelinkLightService.Instance().idleMode(true);
 
                 startConnect = true;
@@ -1036,7 +1035,6 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 doFinish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
-                startActivity(new Intent(CurtainScanningNewActivity.this, LogInfoActivity.class));
             }
         }
     };
@@ -1144,7 +1142,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                 if (i == groups.size() - 1) {
                     groups.get(i).checked = true;
                     currentGroupIndex = i;
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                    SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                             Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                 } else {
                     groups.get(i).checked = false;
@@ -1165,7 +1163,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
             mApplication.startLightService(TelinkLightService.class);
         }
 //
-//        if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+//        if(TelinkLightApplication.Companion.getApp().getConnectDevice()==null){
 //            autoConnect();
 //            mConnectTimer = createConnectTimeout();
 //        }
@@ -1556,7 +1554,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     private void updateMesh(DeviceInfo deviceInfo, int meshAddress, Mesh mesh){
         //更新参数
         deviceInfo.meshAddress = meshAddress;
-        String account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+        String account = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
                 Constant.DB_NAME_KEY, "dadou");
         LeUpdateParameters params = Parameters.createUpdateParameters();
         params.setOldMeshName(mesh.getFactoryName());

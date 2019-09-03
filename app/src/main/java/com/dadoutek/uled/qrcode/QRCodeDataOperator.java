@@ -18,7 +18,7 @@ import java.util.List;
 public class QRCodeDataOperator {
 
     public String provideStr() {
-        Mesh mesh = TelinkLightApplication.getApp().getMesh();
+        Mesh mesh = TelinkLightApplication.Companion.getApp().getMesh();
         if (mesh == null) {
             return "{}";
         }
@@ -50,7 +50,7 @@ public class QRCodeDataOperator {
         TmpMesh tmpMesh = gson.fromJson(data, TmpMesh.class);
         if (tmpMesh != null && !TextUtils.isEmpty(tmpMesh.n) && !TextUtils.isEmpty(tmpMesh.p)) {
             Mesh newMesh = new Mesh();
-            Mesh oldMesh = TelinkLightApplication.getApp().getMesh();
+            Mesh oldMesh = TelinkLightApplication.Companion.getApp().getMesh();
 
             newMesh.setName(tmpMesh.n);
             newMesh.setPassword(tmpMesh.p);
@@ -69,10 +69,10 @@ public class QRCodeDataOperator {
                     newMesh.getDevices().add(deviceInfo);
                 }
             }
-            newMesh.saveOrUpdate(TelinkLightApplication.getApp());
-            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.getApp(), newMesh.getName());
-            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.getApp(), newMesh.getPassword());
-            TelinkLightApplication.getApp().setupMesh(newMesh);
+            newMesh.saveOrUpdate(TelinkLightApplication.Companion.getApp());
+            SharedPreferencesHelper.saveMeshName(TelinkLightApplication.Companion.getApp(), newMesh.getName());
+            SharedPreferencesHelper.saveMeshPassword(TelinkLightApplication.Companion.getApp(), newMesh.getPassword());
+            TelinkLightApplication.Companion.getApp().setupMesh(newMesh);
             return true;
         }
 

@@ -1,7 +1,5 @@
-package com.dadoutek.uled.windowcurtains
+package com.dadoutek.uled.curtains
 
-import android.graphics.drawable.GradientDrawable
-import android.view.View
 import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
@@ -19,10 +17,10 @@ class CurtainDeviceDetailsAdapter(layoutResId: Int, data: List<DbCurtain>?) : Ba
 //            val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
             tvName.text = StringUtils.getCurtainName(scene)
 
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getInstance().connectDevice.meshAddress == scene.getMeshAddr()) {
+                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {

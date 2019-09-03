@@ -97,7 +97,7 @@ object Commander : EventListener<String> {
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getInstance()?.connectDevice?.meshAddress
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
                 ?: 0x00
 
         if (lightList.isNotEmpty()) {
@@ -153,7 +153,7 @@ object Commander : EventListener<String> {
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getInstance()?.connectDevice?.meshAddress
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp()?.connectDevice?.meshAddress
                 ?: 0x00
 
         if (lightList.isNotEmpty()) {
@@ -573,7 +573,7 @@ object Commander : EventListener<String> {
             if (version != "") {
                 mGetVersionSuccess = true
             }
-            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
+//            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         } else {
             version = Strings.bytesToString(data)
 //            val version = Strings.bytesToString(data)
@@ -585,7 +585,7 @@ object Commander : EventListener<String> {
             if (version != "") {
                 mGetVersionSuccess = true
             }
-            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
+//            TelinkLog.i("OTAPrepareActivity#GET_DEVICE_STATE#src:$meshAddress get version success: $version")
         }
     }
 

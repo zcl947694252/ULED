@@ -461,12 +461,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         override fun error(msg: String) {
             isSuccess = false
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, false)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         }
     }
 
     private fun syncComplet() {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.IS_LOGIN, true)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         transformView()
         hideLoadingDialog()
     }

@@ -179,28 +179,28 @@ public class StringUtils {
     public static String getLightName(DbLight light) {
         if (light.getBelongGroupId() != null) {
             if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()) == null) {
-                return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+                return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
             }
 
             //如果当前灯没分组  显示未分组
             if (DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getMeshAddr() == 0xffff) {
-                return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+                return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
             } else {
                 return DBUtils.INSTANCE.getGroupByID(light.getBelongGroupId()).getName();
             }
         } else {
-            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
     }
 
     public static String getConnectorName(DbConnector connector) {
         if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()) == null) {
-            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
 
         //如果当前灯没分组  显示未分组
         if (DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getMeshAddr() == 0xffff) {
-            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         } else {
             return DBUtils.INSTANCE.getGroupByID(connector.getBelongGroupId()).getName();
         }
@@ -210,12 +210,12 @@ public class StringUtils {
     public static String getCurtainName(DbCurtain curtain) {
 
         if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()) == null) {
-            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         }
 
         //如果当前灯没分组  显示未分组
         if (DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getMeshAddr() == 0xffff) {
-            return TelinkLightApplication.getInstance().getString(R.string.not_grouped);
+            return TelinkLightApplication.Companion.getApp().getString(R.string.not_grouped);
         } else {
             return DBUtils.INSTANCE.getGroupByID(curtain.getBelongGroupId()).getName();
         }

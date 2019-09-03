@@ -249,7 +249,7 @@ class SettingActivity : BaseActivity() {
         confirm?.setOnClickListener {
             PopUtil.dismiss(pop)
             //恢复出厂设置
-            if (TelinkLightApplication.getInstance().connectDevice != null)
+            if (TelinkLightApplication.getApp().connectDevice != null)
                 resetAllLights()
             else {
                 ToastUtils.showShort(R.string.device_not_connected)

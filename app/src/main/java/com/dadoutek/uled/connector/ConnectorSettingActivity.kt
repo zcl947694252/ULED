@@ -171,7 +171,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                         val groups = DBUtils.allGroups
                         for (i in groups.indices) {
                             if (groups[i].name == name) {
-                                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                                 canSave = false
                                 break
                             }
@@ -341,7 +341,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             val groups = DBUtils.allGroups
             for (i in groups.indices) {
                 if (groups[i].name == name) {
-                    ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                    ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                     canSave = false
                     break
                 }
@@ -365,7 +365,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe({ granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             transformView()
                         } else {
@@ -648,7 +648,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
 //        this.sbTemperature?.max = 100
 
 //        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
-        mConnectDevice = TelinkLightApplication.getInstance().connectDevice
+        mConnectDevice = TelinkLightApplication.getApp().connectDevice
 //        sbBrightness?.progress = light!!.brightness
 //        tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
 //        sbTemperature?.progress = light!!.colorTemperature

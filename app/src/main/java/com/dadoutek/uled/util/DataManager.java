@@ -61,7 +61,7 @@ public class DataManager {
         Groups groups = Groups.getInstance();
         groups.add(groupAllLights);
 
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
         return groupAllLights;
     }
@@ -96,24 +96,24 @@ public class DataManager {
             groups.add(group);
         }
 
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
 
         Log.d("test", "creatGroup: " + groups.size());
     }
 
     public void updateLights(Lights lights) {
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.LIGHTS_KEY, lights);
     }
 
     public void updateGroup(Groups groups) {
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
 
     public void saveGroups(List<DbGroup>groups){
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.GROUPS_KEY, groups);
     }
 
@@ -126,7 +126,7 @@ public class DataManager {
         for (int i = 0; i < groups.size(); i++) {
             if (groups.get(i).meshAddress == group.meshAddress) {
                 groups.set(i, group);
-                SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+                SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                         mMeshName + mPwd + Constant.GROUPS_KEY, groups);
             }
         }
@@ -138,7 +138,7 @@ public class DataManager {
 //     * @param position
 //     */
 //    public void updateGroup(Groups men_group,int position){
-//        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),Constant.GROUPS_KEY,groups);
+//        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),Constant.GROUPS_KEY,groups);
 //    }
 
     /**
@@ -168,7 +168,7 @@ public class DataManager {
             Groups.getInstance().add(group);
         }
 
-        SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.GROUPS_KEY, Groups.getInstance());
     }
 
@@ -190,7 +190,7 @@ public class DataManager {
             group.setColorTemperature(100);
             groups.add(group);
             //保留本地储存
-            SharedPreferencesHelper.putObject(TelinkLightApplication.getInstance(),
+            SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
                     mMeshName + mPwd + Constant.GROUPS_KEY, groups);
             //新增数据库保存
             DBUtils.INSTANCE.saveGroup(group,false);
@@ -228,7 +228,7 @@ public class DataManager {
 
     public Groups getGroups() {
         Groups groups;
-        groups = (Groups) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+        groups = (Groups) SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.GROUPS_KEY);
 
         if (groups != null && groups.size() > 0) {
@@ -241,7 +241,7 @@ public class DataManager {
 
     public List<Scenes> getScenesList() {
         List<Scenes> list;
-        list = (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+        list = (List<Scenes>) SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.SCENE_KEY);
 
         if (list != null && list.size() > 0) {
@@ -253,7 +253,7 @@ public class DataManager {
 
     public Lights getLights() {
         Lights lights;
-        lights = (Lights) SharedPreferencesHelper.getObject(TelinkLightApplication.getInstance(),
+        lights = (Lights) SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
                 mMeshName + mPwd + Constant.LIGHTS_KEY);
 
         if (lights != null) {
@@ -264,7 +264,7 @@ public class DataManager {
     }
 
     public boolean getConnectState(Context context) {
-        if (TelinkLightApplication.getInstance().getConnectDevice()==null) {
+        if (TelinkLightApplication.Companion.getApp().getConnectDevice()==null) {
             ToastUtils.showLong(context.getString(R.string.device_not_connected));
             return false;
         }

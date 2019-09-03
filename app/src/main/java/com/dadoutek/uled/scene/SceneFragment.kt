@@ -150,7 +150,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 showInstallDeviceList()
             }
             R.id.create_group -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -158,7 +158,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -606,7 +606,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
             R.id.add_scenes -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -621,7 +621,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
             R.id.add_new_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -640,7 +640,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         //                    if (scenesListData.size() >= SCENE_MAX_COUNT) {
         //                        ToastUtils.showLong(R.string.scene_16_tip);
         //                    } else {
-        //                        if(TelinkLightApplication.getInstance().getConnectDevice()==null){
+        //                        if(TelinkLightApplication.getApp().getConnectDevice()==null){
         //                            ToastUtils.showLong(R.string.device_not_connected);
         //                        }else{
         //                            Intent intent = new Intent(getActivity(), NewSceneSetAct.class);

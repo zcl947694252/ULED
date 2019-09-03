@@ -65,7 +65,6 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
                 finish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
-                startActivity(new Intent(DeviceBatchScanningActivity.this, LogInfoActivity.class));
             }
         }
     };

@@ -73,7 +73,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         initData()
         initView()
         initListener()
-        if (TelinkLightApplication.getInstance().connectDevice == null)
+        if (TelinkLightApplication.getApp().connectDevice == null)
             autoConnectSensor()
     }
 

@@ -106,7 +106,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
-    //private lateinit var deviceFragment: DeviceListFragment
     private lateinit var newDeviceFragment: NewDevieFragment
     private lateinit var groupFragment: GroupListFragment
     private lateinit var meFragment: MeFragment
@@ -451,7 +450,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         if (s.isUsable == false) {
                             syncDataAndExit()
                         }
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), "isShowDot", s.isUsable)
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
                     }
 
                     override fun onError(e: Throwable) {
@@ -536,7 +535,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
 
     private fun initBottomNavigation() {
-        //deviceFragment = DeviceListFragment()//暂时无用
         newDeviceFragment = NewDevieFragment()
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
@@ -667,7 +665,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     } else {
                         mNotFoundSnackBar?.dismiss()
                         progressBar?.visibility = GONE
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true)
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true)
                     }
                 }
             }
@@ -1022,7 +1020,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun onServiceDisconnected(event: ServiceEvent) {
         LogUtils.d("onServiceDisconnected")
-        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
 
@@ -1175,7 +1173,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
             val secondTime = System.currentTimeMillis()
-            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DELETE, false)
+            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, false)
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")

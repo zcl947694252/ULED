@@ -1,4 +1,4 @@
-package com.dadoutek.uled.windowcurtains
+package com.dadoutek.uled.curtains
 
 import android.Manifest
 import android.app.Activity
@@ -290,7 +290,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                         val groups = DBUtils.allGroups
                         for (i in groups.indices) {
                             if (groups[i].name == name) {
-                                ToastUtils.showLong(TelinkLightApplication.getInstance().getString(R.string.repeat_name))
+                                ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                                 canSave = false
                                 break
                             }
@@ -599,7 +599,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getInstance(), Constant.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             transformView()
                         } else {

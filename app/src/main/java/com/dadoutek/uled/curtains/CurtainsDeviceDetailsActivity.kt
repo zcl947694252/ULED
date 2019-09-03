@@ -1,4 +1,4 @@
-package com.dadoutek.uled.windowcurtains
+package com.dadoutek.uled.curtains
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -165,7 +165,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                    var list_group : java.util.ArrayList<DbCurtain> = ArrayList()
                    var no_group : java.util.ArrayList<DbCurtain> = ArrayList()
                    for(i in all_light_data.indices){
-                       if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                       if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getApp().getString(R.string.not_grouped)){
                            no_group.add(all_light_data[i])
                        }else{
                            list_group.add(all_light_data[i])
@@ -219,7 +219,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                 var list_group : ArrayList<DbCurtain> = ArrayList()
                 var no_group : ArrayList<DbCurtain> = ArrayList()
                 for(i in all_light_data.indices){
-                    if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getInstance().getString(R.string.not_grouped)){
+                    if(StringUtils.getCurtainName(all_light_data[i])==TelinkLightApplication.getApp().getString(R.string.not_grouped)){
                         no_group.add(all_light_data[i])
                     }else{
                         list_group.add(all_light_data[i])
@@ -321,7 +321,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             }
             R.id.create_group -> {
                 dialog_curtain?.visibility = View.GONE
-                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                if (TelinkLightApplication.getApp().connectDevice==null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -330,7 +330,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
             R.id.create_scene -> {
                 dialog_curtain?.visibility = View.GONE
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice==null) {
+                if (TelinkLightApplication.getApp().connectDevice==null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -734,7 +734,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                         hideLocationServiceDialog()
                     }
                     mTelinkLightService = TelinkLightService.Instance()
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
@@ -747,7 +747,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 

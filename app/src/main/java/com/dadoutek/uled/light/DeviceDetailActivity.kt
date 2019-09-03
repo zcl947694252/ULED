@@ -162,7 +162,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     private fun onServiceConnected(event: ServiceEvent) {}
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
     private fun isSwitch(uuid: Int): Boolean {
@@ -459,7 +459,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             }
             R.id.create_group -> {
                 dialog_device?.visibility = View.GONE
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -468,7 +468,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             R.id.create_scene -> {
                 dialog_device?.visibility = View.GONE
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -735,7 +735,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group: ArrayList<DbLight> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -786,7 +786,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group = ArrayList<DbLight>()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -835,7 +835,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group: ArrayList<DbLight> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -890,7 +890,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group: ArrayList<DbLight> = ArrayList()
                     for (i in all_light_data.indices) {
-                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getInstance().getString(R.string.not_grouped)) {
+                        if (StringUtils.getLightName(all_light_data[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped)) {
                             no_group.add(all_light_data[i])
                         } else {
                             list_group.add(all_light_data[i])
@@ -951,7 +951,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }

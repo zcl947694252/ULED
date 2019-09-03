@@ -21,9 +21,9 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?) : BaseQuickAdapte
         }
 
         if (item.checked) {
-            helper.itemView.setBackgroundColor(TelinkLightApplication.getInstance().resources.getColor(R.color.primary))
+            helper.itemView.setBackgroundColor(TelinkLightApplication.getApp().resources.getColor(R.color.primary))
         } else {
-            helper.itemView.setBackgroundColor(TelinkLightApplication.getInstance().resources.getColor(R.color.white))
+            helper.itemView.setBackgroundColor(TelinkLightApplication.getApp().resources.getColor(R.color.white))
         }
     }
 

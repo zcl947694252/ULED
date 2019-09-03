@@ -86,7 +86,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                         //                        hideLocationServiceDialog()
                     }
                     mTelinkLightService = TelinkLightService.Instance()
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
@@ -99,7 +99,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             //                            scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 
@@ -112,15 +112,15 @@ class SendLightsInfo : Service(), EventListener<String> {
     override fun onCreate() {
         super.onCreate()
 //        this.mApplication = this.application as TelinkLightApplication
-//        if (!LeBluetooth.getInstance().isSupport(applicationContext)) {
+//        if (!LeBluetooth.getApp().isSupport(applicationContext)) {
 //            Toast.makeText(this, "ble not support", Toast.LENGTH_SHORT).show()
 //            ActivityUtils.finishAllActivities()
 //        } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
-//            if (!LeBluetooth.getInstance().isEnabled) {
+//            if (!LeBluetooth.getApp().isEnabled) {
 ////                GlobalScope.launch(Dispatchers.Main) {
 ////                    var root = this@DeviceDetailAct.findViewById<RelativeLayout>(R.id.root)
 ////                    root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
-////                        LeBluetooth.getInstance().enable(applicationContext)
+////                        LeBluetooth.getApp().enable(applicationContext)
 ////                    }
 ////                }
 //            } else {
@@ -134,8 +134,8 @@ class SendLightsInfo : Service(), EventListener<String> {
 ////                        hideLocationServiceDialog()
 //                    }
 //                    mTelinkLightService = TelinkLightService.Instance()?.)
-//                    if (TelinkLightApplication.getInstance().connectDevice == null) {
-//                        while (TelinkApplication.getInstance()?.serviceStarted == true) {
+//                    if (TelinkLightApplication.getApp().connectDevice == null) {
+//                        while (TelinkApplication.getApp()?.serviceStarted == true) {
 //                            GlobalScope.launch(Dispatchers.Main) {
 //                                retryConnectCount = 0
 //                                connectFailedDeviceMacList.clear()
@@ -147,7 +147,7 @@ class SendLightsInfo : Service(), EventListener<String> {
 //                    } else {
 //                        GlobalScope.launch(Dispatchers.Main) {
 //                            //                            scanPb?.visibility = View.GONE
-//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+//                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
 //                        }
 //                    }
 //
@@ -277,7 +277,7 @@ class SendLightsInfo : Service(), EventListener<String> {
 //        if (mConnectSnackBar) {
 //        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
 //        TelinkLightService.Instance()?.idleMode(true)
-//        LeBluetooth.getInstance().stopScan()
+//        LeBluetooth.getApp().stopScan()
 //        startScan()
 //        }
 //        } else {

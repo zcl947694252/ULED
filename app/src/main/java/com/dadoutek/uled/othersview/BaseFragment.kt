@@ -82,7 +82,7 @@ open class BaseFragment : Fragment() {
             }
         }else{
             if(toolbar!=null){
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {

@@ -352,7 +352,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
@@ -707,7 +707,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
@@ -720,7 +720,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 
@@ -995,7 +995,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
     private fun onServiceDisconnected(event: ServiceEvent) {
         //"onServiceDisconnected")
-        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
     /**

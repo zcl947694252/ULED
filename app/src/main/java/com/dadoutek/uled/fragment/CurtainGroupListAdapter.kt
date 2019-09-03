@@ -26,16 +26,16 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
             }
 
             if(num==0){
-                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total)+0+ TelinkLightApplication.getInstance().getString(R.string.piece))
+                helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total)+0+ TelinkLightApplication.getApp().getString(R.string.piece))
             }else{
-                helper.setText(R.id.group_num, TelinkLightApplication.getInstance().getString(R.string.total)+num+ TelinkLightApplication.getInstance().getString(R.string.piece))
+                helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total)+num+ TelinkLightApplication.getApp().getString(R.string.piece))
             }
             if (group.textColor == 0)
                 group.textColor = mContext.resources
                         .getColor(R.color.black)
 //            Log.d("setAddress", group.meshAddr.toString())
             if (group.meshAddr == 0xffff) {
-                helper.setText(R.id.txt_name, TelinkLightApplication.getInstance().getString(R.string.allLight))
+                helper.setText(R.id.txt_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             } else {
                 helper.setText(R.id.txt_name, group.name)
 //                if(OtherUtils.isCurtain(group)){
@@ -63,7 +63,7 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
 //            }else{
 //                gpSet.setBackgroundResource(R.drawable.btn_rec_blue)
 //            }
-//            if(group.name==TelinkLightApplication.getInstance().getString(R.string.curtain)){
+//            if(group.name==TelinkLightApplication.getApp().getString(R.string.curtain)){
 //                helper.setVisible(R.id.btn_off,false)
 //                helper.setVisible(R.id.btn_on,false)
 //            }

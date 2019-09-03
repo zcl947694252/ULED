@@ -29,10 +29,10 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
             val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
             tvName.text = StringUtils.getLightName(scene)
 
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
-                if (TelinkLightApplication.getInstance().connectDevice.meshAddress == scene.getMeshAddr()) {
+                if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {

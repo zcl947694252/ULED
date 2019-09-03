@@ -5,7 +5,6 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.tellink.TelinkLightApplication
 
@@ -23,13 +22,13 @@ class RGBGradientAdapter(layoutResId: Int, data: List<ItemRgbGradient>?) : BaseI
         if (item.select) {
             gpOn.setImageResource(R.drawable.icon_open_group)
             gpOff.setImageResource(R.drawable.icon_down_group)
-            gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
-            gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
+            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
+            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
         } else {
             gpOn.setImageResource(R.drawable.icon_down_group)
             gpOff.setImageResource(R.drawable.icon_open_group)
-            gpOnText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.black_nine))
-            gpOffText.setTextColor(TelinkLightApplication.getInstance().getColor(R.color.white))
+            gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
+            gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
         }
 
         helper.setText(R.id.modeName, item.name)

@@ -319,7 +319,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
-        if (TelinkLightApplication.getInstance().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()
         }
@@ -630,7 +630,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     GlobalScope.launch(Dispatchers.Main) {
                         hideLocationServiceDialog()
                     }
-                    if (TelinkLightApplication.getInstance().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
@@ -643,7 +643,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 
@@ -914,7 +914,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
-        TelinkLightApplication.getInstance().startLightService(TelinkLightService::class.java)
+        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
     /**

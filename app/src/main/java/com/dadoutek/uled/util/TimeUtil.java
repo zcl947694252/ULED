@@ -140,7 +140,7 @@ public class TimeUtil {
 //     */
 //    public static int getWeek(String date) {
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-//        Calendar cl = Calendar.getInstance();
+//        Calendar cl = Calendar.getApp();
 //        try {
 //            cl.setTime(sdf.parse(date));
 //        } catch (ParseException e) {
@@ -153,7 +153,7 @@ public class TimeUtil {
 //    }
 //
 //    public static int getWeekNow() {
-//        Calendar c = Calendar.getInstance();
+//        Calendar c = Calendar.getApp();
 //        int i = c.get(Calendar.WEEK_OF_YEAR);
 //        return i;
 //    }

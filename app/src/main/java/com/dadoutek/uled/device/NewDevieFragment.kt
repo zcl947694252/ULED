@@ -37,7 +37,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.windowcurtains.CurtainsDeviceDetailsActivity
+import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
 import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -287,7 +287,7 @@ class NewDevieFragment : BaseFragment() {
                 showInstallDeviceList()
             }
             R.id.create_group -> {
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     addNewGroup()
@@ -295,7 +295,7 @@ class NewDevieFragment : BaseFragment() {
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getInstance().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {

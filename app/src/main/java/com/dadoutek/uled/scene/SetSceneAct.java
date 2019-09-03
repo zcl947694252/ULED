@@ -343,7 +343,7 @@ package com.dadoutek.uled.scene;//package com.dadoutek.uled.scene;
 //
 //        Intent intent = getIntent();
 //        scene = (DbScene) intent.getExtras().get(Constant.CURRENT_SELECT_SCENE);
-////        scene.__setDaoSession(DaoSessionInstance.getInstance());
+////        scene.__setDaoSession(DaoSessionInstance.getApp());
 //
 //        List<DbSceneActions> actions = DBUtils.INSTANCE.getActionsBySceneId(scene.getId());
 //

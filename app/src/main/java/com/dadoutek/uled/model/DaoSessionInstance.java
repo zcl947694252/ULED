@@ -20,13 +20,13 @@ public class DaoSessionInstance {
 
     public static DaoSession getInstance() {
         if (name == null) {
-            name = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+            name = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
                     Constant.DB_NAME_KEY, "uled") + ".db";
         }
 
         if (session == null) {
             //创建数据库shop.db"
-            MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.getInstance(), name);
+            MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.Companion.getApp(), name);
             //获取可写数据库
             SQLiteDatabase db = helper.getWritableDatabase();
             //获取数据库对象
@@ -42,17 +42,21 @@ public class DaoSessionInstance {
         name = null;
     }
 
-    public static void checkAndUpdateDatabase(){
-        name = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+    public static void checkAndUpdateDatabase() {
+        name = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
                 Constant.DB_NAME_KEY, "uled") + ".db";
 
         //创建数据库shop.db"
-        MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.getInstance(), name);
-        //获取可写数据库
-        SQLiteDatabase db = helper.getWritableDatabase();
-        //获取数据库对象
-        DaoMaster daoMaster = new DaoMaster(db);
-        //获取Dao对象管理者
-        session = daoMaster.newSession();
+        try {
+            MyOpenHelper helper = new MyOpenHelper(TelinkLightApplication.Companion.getApp(), name);
+            //获取可写数据库
+            SQLiteDatabase db = helper.getWritableDatabase();
+            //获取数据库对象
+            DaoMaster daoMaster = new DaoMaster(db);
+            //获取Dao对象管理者
+            session = daoMaster.newSession();
+        } catch (Exception e) {
+        }
+
     }
 }

@@ -102,7 +102,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
         fab.setOnClickListener { _ ->
             //            showLoadingDialog(getString(R.string.setting_switch))
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
@@ -445,9 +445,9 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        /*  val account = SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(),
+        /*  val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp(),
                   Constant.DB_NAME_KEY, "dadou")*/
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getInstance(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
             params.setNewPassword(mesh?.password)

@@ -118,15 +118,15 @@ object GuideUtils {
         builder.setPositiveButton(android.R.string.ok) { dialog, which ->
             controller.remove()
             if(jumpViewContent== END_GROUPLIST_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_GROUPLIST_KEY,true)
+                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_GROUPLIST_KEY,true)
             }else if(jumpViewContent== END_INSTALL_LIGHT_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_INSTALL_LIGHT_KEY,true)
+                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_INSTALL_LIGHT_KEY,true)
             }else if(jumpViewContent== END_ADD_SCENE_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_KEY,true)
+                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_ADD_SCENE_KEY,true)
             }else if(jumpViewContent== END_MAIN_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_MAIN_KEY,true)
+                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_MAIN_KEY,true)
             }else if(jumpViewContent== END_ADD_SCENE_SET_KEY){
-                changeCurrentViewIsEnd(TelinkLightApplication.getInstance(), END_ADD_SCENE_SET_KEY,true)
+                changeCurrentViewIsEnd(TelinkLightApplication.getApp(), END_ADD_SCENE_SET_KEY,true)
             }
             alertDialog?.dismiss()
         }
@@ -178,9 +178,9 @@ object GuideUtils {
     }
 
     fun testMode(){
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), END_ADD_SCENE_KEY,false)
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), END_GROUPLIST_KEY,false)
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getInstance(), END_INSTALL_LIGHT_KEY,false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), END_ADD_SCENE_KEY,false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), END_GROUPLIST_KEY,false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), END_INSTALL_LIGHT_KEY,false)
     }
     /**
      * 重置所有引导页

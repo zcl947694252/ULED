@@ -157,7 +157,7 @@ class ScanningNightlightActivity :TelinkBaseActivity(), EventListener<String> {
         if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
             showConnectFailed()
         } else {
-            if (TelinkLightApplication.getInstance().connectDevice == null)
+            if (TelinkLightApplication.getApp().connectDevice == null)
                 connect()   //重新进行连接
             else
                 login()   //重新进行登录

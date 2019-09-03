@@ -6,7 +6,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.bluetooth.le.ScanFilter
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
@@ -33,7 +32,6 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.othersview.LogInfoActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -192,7 +190,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         }
 
         groupsRecyclerViewAdapter!!.notifyDataSetChanged()
-        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
@@ -201,8 +199,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     private val clickListener = View.OnClickListener { v ->
         if (v === btn_scan) {
             doFinish()
-        } else if (v.id == R.id.btn_log) {
-            startActivity(Intent(this@DeviceScanningNewActivity, LogInfoActivity::class.java))
         }
     }
 
@@ -605,7 +601,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             dbLight.belongGroupId = allLightId
             ToastUtils.showLong(R.string.group_fail_tip)
             updateGroupResult(dbLight, dbGroup)
-            if (TelinkLightApplication.getInstance().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong("断开连接")
                 stopTimer()
                 onLeScanTimeout()
@@ -830,7 +826,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         add_group?.visibility = View.VISIBLE
         recycler_view_groups?.smoothScrollToPosition(groups!!.size - 1)
         groupsRecyclerViewAdapter!!.notifyDataSetChanged()
-        SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+        SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
@@ -1067,7 +1063,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 if (i == groups!!.size - 1) {
                     groups!![i].checked = true
                     currentGroupIndex = i
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getInstance(),
+                    SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
                             Constant.DEFAULT_GROUP_ID, currentGroupIndex)
                 } else {
                     groups!![i].checked = false
