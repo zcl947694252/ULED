@@ -78,7 +78,7 @@
             android:name=".switches.SwitchSettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ota.OTAUpdateSwitchActivity"
+            android:name=".ota.OTAUpdateCurtuinActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".group.BatchGroupActivity"
@@ -176,6 +176,9 @@
         <activity
             android:name=".ota.OtaActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ota.OTAUpdateSwitchActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".othersview.LogInfoActivity"

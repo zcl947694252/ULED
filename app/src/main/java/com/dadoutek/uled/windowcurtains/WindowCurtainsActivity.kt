@@ -23,7 +23,7 @@ import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.ota.OTAUpdateSwitchActivity
+import com.dadoutek.uled.ota.OTAUpdateCurtuinActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -645,7 +645,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
     }
 
     private fun transformView() {
-        val intent = Intent(this@WindowCurtainsActivity, OTAUpdateSwitchActivity::class.java)
+        val intent = Intent(this@WindowCurtainsActivity, OTAUpdateCurtuinActivity::class.java)
         intent.putExtra(Constant.UPDATE_LIGHT, curtain)
         startActivity(intent)
         finish()

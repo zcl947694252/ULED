@@ -18,6 +18,7 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -65,6 +66,7 @@ import java.util.concurrent.TimeUnit
  */
 
 abstract class BaseActivity : AppCompatActivity() {
+    private var mStompListener: Disposable? = null
     private var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
     private var compositeDisposable: CompositeDisposable? = null
@@ -110,6 +112,27 @@ abstract class BaseActivity : AppCompatActivity() {
         initData()
         initListener()
         initOnLayoutListener()
+        initStompStatusListener()
+    }
+
+    private fun initStompStatusListener() {
+        mStompListener = mStompClient?.lifecycle()?.subscribe { t: LifecycleEvent? ->
+            when (t) {
+                LifecycleEvent.Type.OPENED -> {
+                    LogUtils.d( "zcl_Stomp connection opened")
+
+                }
+                LifecycleEvent.Type.ERROR -> {
+                    LogUtils.d("zcl_Stomp lifecycleEvent.getException()")
+
+                }
+                LifecycleEvent.Type.CLOSED -> {
+                    LogUtils.d( "zcl_Stomp connection closed")
+                }
+
+
+            }
+        }
     }
 
     abstract fun setLayoutID(): Int
@@ -308,6 +331,7 @@ abstract class BaseActivity : AppCompatActivity() {
         normalSubscribe?.dispose()
         loginStompClient?.dispose()
         codeStompClient?.dispose()
+        mStompListener?.dispose()
     }
 
 

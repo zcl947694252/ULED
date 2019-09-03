@@ -105,6 +105,27 @@ open class TelinkBaseActivity : AppCompatActivity() {
             it.isTouchable = true // 设置PopupWindow可触摸补充：
             it.isOutsideTouchable = false
         }
+        initStompStatusListener()
+    }
+
+    private fun initStompStatusListener() {
+        mStompListener = mStompClient?.lifecycle()?.subscribe { t: LifecycleEvent? ->
+            when (t) {
+                LifecycleEvent.Type.OPENED -> {
+                    LogUtils.d( "zcl_Stomp connection opened")
+
+                }
+                LifecycleEvent.Type.ERROR -> {
+                    LogUtils.d("zcl_Stomp lifecycleEvent.getException()")
+
+                }
+                LifecycleEvent.Type.CLOSED -> {
+                    LogUtils.d(TAG, "zcl_Stomp connection closed")
+                }
+
+
+            }
+        }
     }
 
 

@@ -297,4 +297,9 @@ public class Constant implements Serializable {
     public static final int REGION_AUTHORIZE_TYPE=2;
     //判断是否是telbase类
     public static boolean isTelBase =true;
+    //进行OTA的设备类型
+    public static final String OTA_TYPE ="OTA_TYPE";
+
+    //进行OTA的设备类型为开关
+    public static final int SWITCH_TYPE = 3;
 }

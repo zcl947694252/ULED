@@ -106,7 +106,7 @@ import io.reactivex.schedulers.Schedulers;
  * <p>
  * Created by Administrator on 2017/4/20.
  */
-public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity implements EventListener<String> {
+public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implements EventListener<String> {
     @BindView(R.id.progress_view)
     CircleProgressBar progress_view;
     @BindView(R.id.text_info)
@@ -136,7 +136,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
     public static final int CONTINUE_BY_PREVIOUS = 0x22;
 
     private int continueType = 0;
-
+    DbUser lastUser;
     private static final int REQUEST_CODE_CHOOSE_FILE = 11;
 
     private PowerManager.WakeLock mWakeLock = null;
@@ -247,7 +247,8 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
         filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY - 1);
         registerReceiver(mReceiver, filter);
         mesh = TelinkLightApplication.getApp().getMesh();
-        if (mesh == null || TextUtils.isEmpty(mesh.getName()) || TextUtils.isEmpty(mesh.getPassword())) {
+        lastUser = DBUtils.INSTANCE.getLastUser();
+        if (lastUser == null || TextUtils.isEmpty(lastUser.getControlMeshName()) || TextUtils.isEmpty(lastUser.getControlMeshPwd())) {
             toast("Mesh Error!");
             finish();
             return;
@@ -611,7 +612,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
                     sendStopMeshOTACommand();
                     Mesh mesh = TelinkLightApplication.getApp().getMesh();
                     mesh.setOtaDevice(null);
-                    mesh.saveOrUpdate(OTAUpdateSwitchActivity.this);
+                    mesh.saveOrUpdate(OTAUpdateCurtuinActivity.this);
                     dialog.dismiss();
                     finish();
                 });
@@ -849,10 +850,11 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
+
         if(!AppUtils.isExynosSoc()){
             params.setScanFilters(scanFilters);
         }
-        params.setMeshName(mesh.getName());
+        params.setMeshName(lastUser.getControlMeshName());
         params.setTimeoutSeconds(TIME_OUT_SCAN);
         if(dbLight.getMacAddr().length()>16){
             params.setScanMac(dbLight.getMacAddr());
@@ -1171,7 +1173,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
     // start
     private void sendStartMeshOTACommand() {
         // save mesh info
-        String account = DBUtils.INSTANCE.getLastUser().getAccount();
+        String account = DBUtils.INSTANCE.getLastUser().getControlMeshName();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account);
 
         mesh.setOtaDevice(new OtaDevice());

@@ -130,7 +130,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     // 继续之前的OTA操作，连接指定设备
     public static final int CONTINUE_BY_PREVIOUS = 0x22;
-
     private int continueType = 0;
 
     private static final int REQUEST_CODE_CHOOSE_FILE = 11;
@@ -247,11 +246,11 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void initData() {
-        dbLight = (DbLight) getIntent().getSerializableExtra(Constant.UPDATE_LIGHT);
-        log("current-light-mesh" + dbLight.getMeshAddr());
-        onlineLights = new ArrayList<>();
-        onlineLights.add(dbLight);
-        log("onlineLights:" + onlineLights.size());
+            dbLight = (DbLight) getIntent().getSerializableExtra(Constant.UPDATE_LIGHT);
+            log("current-light-mesh" + dbLight.getMeshAddr());
+            onlineLights = new ArrayList<>();
+            onlineLights.add(dbLight);
+            log("onlineLights:" + onlineLights.size());
     }
 
     @Override
@@ -488,7 +487,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void login() {
         log("login");
-        String meshName =user.getControlMeshName();
+        String meshName = user.getControlMeshName();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16);
         TelinkLightService.Instance().login(Strings.stringToBytes(meshName, 16), Strings.stringToBytes(pwd, 16));
     }
@@ -684,7 +683,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         //intent.setType(“video/*;image/*”);//同时选择视频和图片
         intent.setType("*/*");//无类型限制
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-       // startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
+        // startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE);
     }
 
     private boolean hasLight(int meshAddress) {
@@ -1082,12 +1081,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         super.onActivityResult(requestCode, resultCode, data);
         //第一个是传递标记监听 第二个是回传标记监听
         if (requestCode == REQUEST_CODE_CHOOSE_FILE && resultCode == RESULT_OK) {
-                 Bundle b=data.getExtras(); //data为B中回传的Intent
-                  mPath=b.getString("path");//str即为回传的值
-                 tvFile.setText(mPath);
-                 parseFile();
+            Bundle b = data.getExtras(); //data为B中回传的Intent
+            mPath = b.getString("path");//str即为回传的值
+            tvFile.setText(mPath);
+            parseFile();
 
-             Log.e("zcl","返回数据是:"+requestCode+"---"+resultCode+"---mPath-"+mPath);
+            Log.e("zcl", "返回数据是:" + requestCode + "---" + resultCode + "---mPath-" + mPath);
             // Log.e("zcl","返回数据是:"+requestCode+"---"+resultCode+"----"+data.toString()+"----"+data.getDataString()+"----"+data.getData());
 
 //            if (resultCode == Activity.RESULT_OK) {
@@ -1179,8 +1178,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     public boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
+
     /**
      * 4.4
+     *
      * @param contentUri
      */
     public String getRealPathFromURI(Uri contentUri) {
