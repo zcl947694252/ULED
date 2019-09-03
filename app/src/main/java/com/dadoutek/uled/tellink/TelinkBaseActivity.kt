@@ -105,25 +105,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
             it.isTouchable = true // 设置PopupWindow可触摸补充：
             it.isOutsideTouchable = false
         }
-        initStompStatusListener()
-    }
-
-    private fun initStompStatusListener() {
-        mStompListener = mStompClient?.lifecycle()?.subscribe { t: LifecycleEvent? ->
-            when (t) {
-                LifecycleEvent.Type.OPENED -> {
-                    LogUtils.d( "zcl_Stomp connection opened")
-
-                }
-                LifecycleEvent.Type.ERROR -> {
-                    LogUtils.d("zcl_Stomp lifecycleEvent.getException()")
-
-                }
-                LifecycleEvent.Type.CLOSED -> {
-                    LogUtils.d(TAG, "zcl_Stomp connection closed")
-                }
-            }
-        }
     }
 
 
@@ -361,7 +342,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 val regionName = codeBean.get("region_name")
                 val authorizerUserId = codeBean.get("authorizer_user_id")
                 val rid = codeBean.get("rid")
-                Log.e(TAG, "zcl_Stomp***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
+                Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
                 val user = DBUtils.lastUser
                 user?.let {
                     if (user.last_authorizer_user_id == authorizerUserId && user.last_region_id == rid) {
@@ -373,7 +354,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                         //更新last—region-id
                         DBUtils.saveUser(user)
                         //下拉数据
-                        Log.e("zclbaseActivity", "zcl_Stomp******" + DBUtils.lastUser)
+                        Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
                         SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                     }
                 }
@@ -385,9 +366,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
             loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe({ topicMessage ->
                 payload = topicMessage.payload
-                Log.e(TAG, "收到信息:$topicMessage")
+                //Log.e(TAG, "收到信息:$topicMessage")
                 var key = SharedPreferencesHelper.getString(this@TelinkBaseActivity, Constant.LOGIN_STATE_KEY, "no_have_key")
-                 Log.e(TAG, "zcl_denglu***login***获取消息$payload----------------------------" + { payload == key })
+                // Log.e(TAG, "zcl***login***获取消息$payload----------------------------" + { payload == key })
                 if (payload == key)
                     return@subscribe
                 checkNetworkAndSync(this@TelinkBaseActivity)

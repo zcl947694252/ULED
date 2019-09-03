@@ -59,59 +59,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
             if (TelinkApplication.getInstance().connectDevice == null) {
                 ToastUtils.showLong(R.string.group_fail)
             } else {
-<<<<<<< HEAD
-                if (!isStartGroup) {
-                    isStartGroup = true
-                    showLoadingDialog(getString(R.string.grouping))
-
-                    object : Thread({
-                        for (i in 0..1) {
-                            //如果修改分组成功,才改数据库之类的操作
-                            allocDeviceGroup(group, {
-                                        val sceneIds = getRelatedSceneIds(group.meshAddr)
-                                        for (i in 0..1) {
-                                            deletePreGroup(lights!!.meshAddr)
-                                            sleep(100)
-                                        }
-
-                                        for (i in 0..1) {
-                                            deleteAllSceneByLightAddr(lights!!.meshAddr)
-                                            sleep(100)
-                                        }
-
-                                        for (sceneId in sceneIds) {
-                                            val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
-                                            if (action != null) {
-                                                for (i in 0..1) {
-                                                    Commander.addScene(sceneId, lights!!.meshAddr, action.color)
-                                                    sleep(100)
-                                                }
-                                            }
-                                        }
-
-                                        group.deviceType = lights!!.productUUID.toLong()
-                                        Log.d("message", "deviceType=" + group.deviceType.toString() + ",address=" + lights!!.meshAddr + ",productUUID=" + lights!!.productUUID)
-                                        Log.d("message", lights.toString())
-
-                                        DBUtils.updateGroup(group)
-                                        DBUtils.updateLight(lights!!)
-                                        runOnUiThread {
-                                            hideLoadingDialog()
-                                            ActivityUtils.finishActivity(RGBSettingActivity::class.java)
-                                            finish()
-                                        }
-                                    },
-                                    { runOnUiThread {
-                                            hideLoadingDialog()
-                                            ToastUtils.showShort(R.string.group_failed)
-                                        }
-                                    })
-                            sleep(100)
-                        }
-                    }) {
-                    }.start()
-                }
-=======
                 showLoadingDialog(getString(R.string.grouping))
 
                 object : Thread({
@@ -164,10 +111,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                     }
                 }) {
                 }.start()
->>>>>>> 6dad9cd38d8db32eac73076be36504f8276d0088
             }
-        } else {
-            Log.e("zcl", "zcl*****空的*")
         }
     }
 

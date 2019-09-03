@@ -18,7 +18,6 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -66,7 +65,6 @@ import java.util.concurrent.TimeUnit
  */
 
 abstract class BaseActivity : AppCompatActivity() {
-    private var mStompListener: Disposable? = null
     private var isRuning: Boolean = false
     private var authorStompClient: Disposable? = null
     private var compositeDisposable: CompositeDisposable? = null
@@ -112,26 +110,6 @@ abstract class BaseActivity : AppCompatActivity() {
         initData()
         initListener()
         initOnLayoutListener()
-        initStompStatusListener()
-    }
-
-
-    private fun initStompStatusListener() {
-        mStompListener = mStompClient?.lifecycle()?.subscribe { t: LifecycleEvent? ->
-            when (t) {
-                LifecycleEvent.Type.OPENED -> {
-                    LogUtils.d( "zcl_Stomp connection opened")
-
-                }
-                LifecycleEvent.Type.ERROR -> {
-                    LogUtils.d("zcl_Stomp lifecycleEvent.getException()")
-
-                }
-                LifecycleEvent.Type.CLOSED -> {
-                    LogUtils.d( "zcl_Stomp connection closed")
-                }
-            }
-        }
     }
 
     abstract fun setLayoutID(): Int
@@ -162,7 +140,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 val phone = codeBean.get("ref_user_phone")
                 val type = codeBean.get("type") as Int
                 val account = codeBean.get("account")
-                Log.e(TAGS, "zcl_Stomp***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
+                Log.e(TAGS, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
                 makeCodeDialog(type, phone, account, "")
             },{ToastUtils.showShort(it.localizedMessage)})
 
@@ -173,11 +151,11 @@ abstract class BaseActivity : AppCompatActivity() {
                 val regionName = codeBean.get("region_name")
                 val authorizerUserId = codeBean.get("authorizer_user_id")
                 val rid = codeBean.get("rid")
-                Log.e(TAGS, "zcl_Stomp***收到解除授权信息***获取消息$payloadCode------------$phone----------------$regionName-----------")
+                Log.e(TAGS, "zcl***收到解除授权信息***获取消息$payloadCode------------$phone----------------$regionName-----------")
                 val user = DBUtils.lastUser
 
                 user?.let {
-                    Log.e("zcl_BaseActivity", "zcl_Stomp****判断**${user.last_authorizer_user_id == authorizerUserId}------${user.last_region_id == rid}------authorizerUserId--$authorizerUserId-----$rid")
+                    Log.e("zcl_BaseActivity", "zcl****判断**${user.last_authorizer_user_id == authorizerUserId}------${user.last_region_id == rid}------authorizerUserId--$authorizerUserId-----$rid")
                     if (user.last_authorizer_user_id == authorizerUserId.toString() && user.last_region_id == rid.toString()) {
                         user.last_region_id = 1.toString()
                         user.last_authorizer_user_id = user.id.toString()
@@ -188,7 +166,7 @@ abstract class BaseActivity : AppCompatActivity() {
                         //更新last—region-id
                         DBUtils.saveUser(user)
                         //下拉数据
-                        Log.e("zclbaseActivity", "zcl_Stomp******" + DBUtils.lastUser)
+                        Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
                         SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
                     }
                 }
@@ -199,7 +177,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 payload = topicMessage.payload
                 Log.e(TAGS, "收到信息:$topicMessage")
                 var key = SharedPreferencesHelper.getString(this@BaseActivity, Constant.LOGIN_STATE_KEY, "no_have_key")
-                Log.e(TAGS, "zcl_Stomp***login***获取消息$payload----------------------------" + { payload == key })
+                Log.e(TAGS, "zcl***login***获取消息$payload----------------------------" + { payload == key })
                 if (payload == key)
                     return@subscribe
                 checkNetworkAndSync(this@BaseActivity)
@@ -207,10 +185,10 @@ abstract class BaseActivity : AppCompatActivity() {
 
             normalSubscribe = mStompClient!!.lifecycle().subscribe( { lifecycleEvent ->
                 when (lifecycleEvent.type) {
-                    LifecycleEvent.Type.OPENED -> Log.e(TAGS, "zcl_Stomp******Stomp connection opened")
-                    LifecycleEvent.Type.ERROR -> Log.e(TAGS, "zcl_Stomp******Error" + lifecycleEvent.exception)
-                    LifecycleEvent.Type.CLOSED -> Log.e(TAGS, "zcl_Stomp******Stomp connection closed")
-                    else -> Log.e(TAGS, "zcl_Stomp******Stomp connection no get")
+                    LifecycleEvent.Type.OPENED -> Log.e(TAGS, "zcl******Stomp connection opened")
+                    LifecycleEvent.Type.ERROR -> Log.e(TAGS, "zcl******Error" + lifecycleEvent.exception)
+                    LifecycleEvent.Type.CLOSED -> Log.e(TAGS, "zcl******Stomp connection closed")
+                    else -> Log.e(TAGS, "zcl******Stomp connection no get")
                 }
             },{ToastUtils.showShort(it.localizedMessage)})
             return "Executed"

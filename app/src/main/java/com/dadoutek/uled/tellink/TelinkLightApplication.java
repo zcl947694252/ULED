@@ -3,11 +3,14 @@ package com.dadoutek.uled.tellink;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.AppUtils;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.blankj.utilcode.util.Utils;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.model.Constant;
@@ -17,6 +20,7 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbRegion;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Mesh;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.util.FileSystem;
 import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.mob.MobSDK;
@@ -25,8 +29,16 @@ import com.telink.bluetooth.TelinkLog;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+
+import io.reactivex.disposables.Disposable;
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompClient;
+import ua.naiksoftware.stomp.dto.StompHeader;
 
 
 public final class TelinkLightApplication extends TelinkApplication {
@@ -46,6 +58,9 @@ public final class TelinkLightApplication extends TelinkApplication {
     static TelinkLightApplication mInstance = null;
 
     private Intent intent;
+    private StompClient mStompClient;
+    private Disposable codeStompClient;
+    private Object loginStompClient;
 
     public static Context getContext() {
         return mInstance;
@@ -67,23 +82,16 @@ public final class TelinkLightApplication extends TelinkApplication {
         Utils.init(this);
         LogUtils.getConfig().setBorderSwitch(false);
         if (!AppUtils.isAppDebug()) {
-//            LogUtils.getConfig().setLogSwitch(false);
-//            LogUtils.getConfig().setLog2FileSwitch(false);
         } else {
             LogUtils.getConfig().setLog2FileSwitch(true);
-            //        LogUtils.getConfig().setDir("/mnt/sdcard/log");
         }
-//        registerBluetoothReceiver();
         MobSDK.init(this);
-//        CrashReport.testJavaCrash();
 
         logInfo = new StringBuilder("log:");
         thiz = this;
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
 
-//        intent = new Intent(this,SendLightsInfo.class);
-//        startService(intent);
-
+        new me().execute();
     }
 
     public static TelinkLightApplication getApp() {
@@ -129,16 +137,9 @@ public final class TelinkLightApplication extends TelinkApplication {
     public void doDestroy() {
         TelinkLog.onDestroy();
         super.doDestroy();
-//        stopService(intent);
-//        unregisterBluetoothReceiver();
+
     }
 
-//    private void unregisterBluetoothReceiver(){
-//        if(mReceive != null){
-//            unregisterReceiver(mReceive);
-//            mReceive = null;
-//        }
-//    }
 
     public Mesh getMesh() {
         if (this.mesh == null) {
@@ -238,4 +239,54 @@ public final class TelinkLightApplication extends TelinkApplication {
         logInfo = new StringBuilder("log:");
     }
 
+    class me extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+            //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
+            ArrayList<StompHeader> headers = new ArrayList<StompHeader>();
+            headers.add(new StompHeader("user-id", DBUtils.INSTANCE.getLastUser().getId().toString()));
+            headers.add(new StompHeader("host", Constant.WS_HOST));
+
+            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_BASE_URL);
+            mStompClient.connect(headers);
+            mStompClient.withClientHeartbeat(25000).withServerHeartbeat(25000);
+
+            ArrayList<StompHeader> headersLogin = new ArrayList<>();
+            headersLogin.add(new StompHeader("id", DBUtils.INSTANCE.getLastUser().getId().toString()));
+            headersLogin.add(new StompHeader("destination", Constant.WS_HOST));
+
+
+            codeStompClient = mStompClient.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe(
+                    stompMessage ->{
+                        Log.e("", "收到解析二维码信息:$topicMessage");
+                        String payloadCode = stompMessage.getPayload();
+                        JSONObject  codeBean = new JSONObject(payloadCode);
+                        String phone = codeBean.get("ref_user_phone").toString();
+                        String type = codeBean.get("type").toString();
+                        Integer integer = Integer.valueOf(type);
+                        String account = codeBean.get("account").toString();
+                        Log.e("", "zcl_Stomp***解析二维码***获取消息"+payloadCode+"------------"+integer+"----------------$phone-----------$account");
+                    },throwable -> {
+                        ToastUtils.showShort(throwable.getLocalizedMessage());
+                    }
+
+            );
+
+            loginStompClient = mStompClient.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe(
+                    stompMessage ->{
+                        Log.e("", "收到登录信息:$topicMessage");
+
+                       String payloadCode = stompMessage.getPayload();
+                        String key = SharedPreferencesHelper.getString(mContext, Constant.LOGIN_STATE_KEY, "no_have_key");
+                        Log.e("", "zcl_Stomp***收到登录信息***获取消息"+payloadCode+"------------"+key+"--------------------------"+payloadCode.equals(key));
+                    },throwable -> {
+                        ToastUtils.showShort(throwable.getLocalizedMessage());
+                    }
+            );
+
+            return "Executed";
+        }
+    }
+    
 }

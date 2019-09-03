@@ -297,12 +297,7 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
-<<<<<<< HEAD
-                       LogUtils.e("addGroup error: ${e.message}")
-=======
                         LogUtils.e("addGroup error: ${e.message}")
-//                       LogUtils.e("addGroup error: ${e.message}")
->>>>>>> 6dad9cd38d8db32eac73076be36504f8276d0088
                     }
                 })
     }
@@ -339,10 +334,8 @@ object Commander : EventListener<String> {
                             emitter.onNext(mGotGroupAddr)
                             isFinish = true
                             emitter.onComplete()
-//                            isFinish = true
                         }
                     }
-
         }
     }
 
@@ -380,15 +373,9 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
-<<<<<<< HEAD
-                        LogUtils.e("zcl","zcl**********updateMeshName*******onError***${e.message}")
-=======
-                        //Log.e("zcl","zcl******${e.message}")
->>>>>>> 6dad9cd38d8db32eac73076be36504f8276d0088
+                        LogUtils.e("zcl", "zcl**********updateMeshName*******onError***${e.message}")
                     }
                 })
-
-
     }
 
 
