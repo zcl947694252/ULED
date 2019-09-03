@@ -33,10 +33,9 @@ import kotlin.experimental.and
 import kotlin.Unit as Unit1
 
 object Commander : EventListener<String> {
-    private var mApplication: TelinkLightApplication? = null
-    private var mGroupingAddr: Int = 0
-    private var mGroupAddr: Int = 0
-    private var mLightAddr: Int = 0
+    private var mTargetGroupAddr: Int = 0   //要把device分到的Group的地址
+    private var mGotGroupAddr: Int = 0  //从Device获取到的Group地址
+    private var mDstAddr: Int = 0
     private var mGroupSuccess: Boolean = false
     private var mResetSuccess: Boolean = false
     private var mGetVersionSuccess: Boolean = false
@@ -44,18 +43,17 @@ object Commander : EventListener<String> {
     private var version: String? = null
 
     init {
-        mApplication = TelinkLightApplication.getApp()
         //监听事件
-//        mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-//        mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        mApplication?.addEventListener(MeshEvent.UPDATE_COMPLETED, this)
-//        mApplication?.addEventListener(MeshEvent.ERROR, this)
+//        TelinkLightApplication.getApp()?.addEventListener(LeScanEvent.LE_SCAN, this)
+//        TelinkLightApplication.getApp()?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+//        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+//        TelinkLightApplication.getApp()?.addEventListener(MeshEvent.UPDATE_COMPLETED, this)
+//        TelinkLightApplication.getApp()?.addEventListener(MeshEvent.ERROR, this)
     }
 
     fun openOrCloseLights(groupAddr: Int, isOpen: Boolean) {
         val opcode = Opcode.LIGHT_ON_OFF
-        mGroupAddr = groupAddr
+        mTargetGroupAddr = groupAddr
         val params: ByteArray
 
         if (isOpen) {
@@ -65,7 +63,7 @@ object Commander : EventListener<String> {
             params = byteArrayOf(0x00, 0x64, 0x00)
         }
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mGroupAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mTargetGroupAddr, params)
     }
 
     /**
@@ -75,21 +73,21 @@ object Commander : EventListener<String> {
      */
     fun openOrCloseCurtain(groupAddr: Int, isOpen: Boolean, isPause: Boolean) {
         val opcode = Opcode.CURTAIN_ON_OFF
-        mGroupAddr = groupAddr
+        mTargetGroupAddr = groupAddr
         val params: ByteArray
 
-        if(isPause){
-            params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0B, 0x00, Opcode.CURTAIN_PACK_END)
-        }else{
+        if (isPause) {
+            params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
+        } else {
             if (isOpen) {
                 //0x64代表延时100ms保证开关同步
-                params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0A, 0x00, Opcode.CURTAIN_PACK_END)
+                params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
             } else {
-                params = byteArrayOf(Opcode.CURTAIN_PACK_START,0x0C, 0x00, Opcode.CURTAIN_PACK_END)
+                params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             }
         }
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mGroupAddr, params)
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mTargetGroupAddr, params)
     }
 
     @Synchronized
@@ -121,19 +119,19 @@ object Commander : EventListener<String> {
                     }
                     DBUtils.deleteAll()
                     Thread.sleep(sleepTime)
-                    for(k in lightList.indices)
-                        if(DBUtils.getLightByMeshAddr(lightList[k])!=null){
-                            var ligh=DBUtils.getLightByMeshAddr(lightList[k])
+                    for (k in lightList.indices)
+                        if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {
+                            var ligh = DBUtils.getLightByMeshAddr(lightList[k])
                             if (ligh != null) {
                                 DBUtils.deleteLight(ligh)
-                        }
-                        }else if(DBUtils.getCurtainByMeshAddr(lightList[k])!=null){
-                            var curtain=DBUtils.getCurtainByMeshAddr(lightList[k])
-                            if (curtain!= null) {
+                            }
+                        } else if (DBUtils.getCurtainByMeshAddr(lightList[k]) != null) {
+                            var curtain = DBUtils.getCurtainByMeshAddr(lightList[k])
+                            if (curtain != null) {
                                 DBUtils.deleteCurtain(curtain)
                             }
-                    }else if(DBUtils.getRelyByMeshAddr(lightList[k])!=null){
-                            var rely=DBUtils.getRelyByMeshAddr(lightList[k])
+                        } else if (DBUtils.getRelyByMeshAddr(lightList[k]) != null) {
+                            var rely = DBUtils.getRelyByMeshAddr(lightList[k])
                             if (rely != null) {
                                 DBUtils.deleteConnector(rely)
                             }
@@ -211,10 +209,10 @@ object Commander : EventListener<String> {
     }
 
     fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
-        mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
+        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
 
-        mLightAddr = lightMeshAddr
-        mGroupingAddr = 0xFFFF
+        mDstAddr = lightMeshAddr
+        mTargetGroupAddr = 0xFFFF
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表设置 组的指令
 //        val params = byteArrayOf(0x01, (groupMeshAddr and 0xFF).toByte(), //0x00 代表删除组
@@ -229,7 +227,7 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        mApplication?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -237,8 +235,8 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        val timeOut=30
-                       //("mGroupSuccess = $mGroupSuccess")
+                        val timeOut = 30
+                        //("mGroupSuccess = $mGroupSuccess")
                         if (t >= timeOut) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
                             failedCallback.invoke()
@@ -249,7 +247,7 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
-                       //(e.message)
+                        //(e.message)
                     }
                 })
     }
@@ -259,9 +257,9 @@ object Commander : EventListener<String> {
      * 修改设备分组
      */
     fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
-        mApplication?.addEventListener(NotificationEvent.GET_GROUP, this)
-        mLightAddr = dstAddr
-        mGroupingAddr = groupAddr
+        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
+        mDstAddr = dstAddr
+        mTargetGroupAddr = groupAddr
         mGroupSuccess = false
         val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
         val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
@@ -269,7 +267,8 @@ object Commander : EventListener<String> {
 
         GlobalScope.launch {
             delay(200)
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)}
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
+        }
 
         Observable.interval(0, 300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
@@ -278,7 +277,7 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        mApplication?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -298,16 +297,59 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
+<<<<<<< HEAD
                        LogUtils.e("addGroup error: ${e.message}")
+=======
+                        LogUtils.e("addGroup error: ${e.message}")
+//                       LogUtils.e("addGroup error: ${e.message}")
+>>>>>>> 6dad9cd38d8db32eac73076be36504f8276d0088
                     }
                 })
     }
 
 
+    /**
+     * 获取指定设备所属的组地址
+     * @param deviceAddr    目标设备地址。
+     * @return  返回组地址，例如 0x8001
+     */
+    fun getGroup(deviceAddr: Int): Observable<Int> {
+        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
+        mGotGroupAddr = 0
+        mDstAddr = deviceAddr
+        val params = byteArrayOf(0x08, 0x01)
+        GlobalScope.launch {
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.GET_GROUP, deviceAddr, params)
+        }
+        var isFinish: Boolean = false
+        return Observable.create<Int> { emitter ->
+            Observable.interval(200, 200, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .takeWhile {
+                        val ret = it < 10 * 200
+                        if (!ret) {
+                            isFinish = true
+                            emitter.onError(Throwable("timeout"))
+                        }
+                        !isFinish
+                    }
+                    .subscribe {
+                        if (mGotGroupAddr != 0) {
+                            emitter.onNext(mGotGroupAddr)
+                            isFinish = true
+                            emitter.onComplete()
+//                            isFinish = true
+                        }
+                    }
+
+        }
+    }
+
     fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.account, newMeshAddr: Int =
             Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mUpdateMeshSuccess = false
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
         TelinkLightService.Instance()?.adapter!!.mode = LightAdapter.MODE_UPDATE_MESH
         TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.newMeshAddress = newMeshAddr
@@ -320,11 +362,13 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        mApplication?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
                     }
+
                     override fun onSubscribe(d: Disposable) {
                         mDisposable = d
                     }
+
                     override fun onNext(t: Long) {
                         if (t >= 30) {   //10次 * 200 = 2000, 也就是超过了2s就超时
                             onComplete()
@@ -334,8 +378,13 @@ object Commander : EventListener<String> {
                             successCallback.invoke()
                         }
                     }
+
                     override fun onError(e: Throwable) {
+<<<<<<< HEAD
                         LogUtils.e("zcl","zcl**********updateMeshName*******onError***${e.message}")
+=======
+                        //Log.e("zcl","zcl******${e.message}")
+>>>>>>> 6dad9cd38d8db32eac73076be36504f8276d0088
                     }
                 })
 
@@ -369,17 +418,18 @@ object Commander : EventListener<String> {
 
     private fun onMeshEvent(event: MeshEvent) {
 //        ToastUtils.showShort(event.toString())
-       //("Error ${event.toString()}")
+        //("Error ${event.toString()}")
     }
 
     private fun onGetGroupEvent(event: NotificationEvent) {
         val info = event.args
+        LogUtils.d("onGetGroupEvent info = $info ")
 
         val srcAddress = info.src and 0xFF
         val params = info.params
 
-
-        if (srcAddress != mLightAddr) {
+        if (srcAddress != mDstAddr) {
+            //这说明这条回复不是刚刚发出去的指令的回复
             return
         }
 
@@ -387,17 +437,15 @@ object Commander : EventListener<String> {
         val len = params.size
 
         for (j in 0 until len) {
-
-            groupAddress = params[j].toInt()
-            if (mGroupingAddr != 0xFFFF) {
-                groupAddress = groupAddress or 0x8000
-            } else {
-                groupAddress = mGroupingAddr
+            groupAddress = (params[j].toInt() and 0xFFFF)
+            if (mTargetGroupAddr != 0xFFFF && groupAddress != 0xFFFF) {
+                mGotGroupAddr = groupAddress or 0x8000
             }
+//            else {
+//                mGotGroupAddr = mTargetGroupAddr
+//            }
 
-            if (mGroupingAddr == groupAddress) {
-//               //(String.format("grouping success, groupAddr = %x groupingLight.meshAddr = %x",
-//                        groupAddress, mLightAddr))
+            if (mTargetGroupAddr == mGotGroupAddr) {
                 mGroupSuccess = true
             }
         }
@@ -422,11 +470,11 @@ object Commander : EventListener<String> {
         val params: ByteArray
         params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         GlobalScope.launch {
-        for (i in 0..2) {
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
-            //Thread.sleep(50)//当阻塞方法收到中断请求的时候就会抛出InterruptedException异常
-            kotlinx.coroutines.delay(50)
-        }
+            for (i in 0..2) {
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
+                //Thread.sleep(50)//当阻塞方法收到中断请求的时候就会抛出InterruptedException异常
+                kotlinx.coroutines.delay(50)
+            }
         }
     }
 
@@ -477,9 +525,9 @@ object Commander : EventListener<String> {
 
     fun getDeviceVersion(dstAddr: Int, successCallback: (version: String?) -> Unit1,
                          failedCallback: () -> Unit1) {
-        mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
 
-        mLightAddr = dstAddr
+        mDstAddr = dstAddr
         mGetVersionSuccess = false
         var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
 
@@ -499,7 +547,7 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        mApplication?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -519,7 +567,7 @@ object Commander : EventListener<String> {
                     override fun onError(e: Throwable) {
                         onComplete()
                         failedCallback.invoke()
-                       //(e.message)
+                        //(e.message)
                     }
                 })
     }
@@ -558,7 +606,7 @@ object Commander : EventListener<String> {
         val data = notificationEvent.args.params
         for (i in data.indices) {
         }
-//        if(data[0].toInt()== mLightAddr){
+//        if(data[0].toInt()== mDstAddr){
         mResetSuccess = true
 //        }
     }
@@ -569,7 +617,7 @@ object Commander : EventListener<String> {
      */
     fun autoConnect(macAddress: String, successCallback: (version: String?) -> Unit1,
                     failedCallback: () -> Unit1) {
-        if (TelinkLightService.Instance()!= null) {
+        if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 TelinkLightService.Instance()?.idleMode(true);
 
