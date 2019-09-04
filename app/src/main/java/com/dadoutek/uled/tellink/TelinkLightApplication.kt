@@ -3,8 +3,6 @@ package com.dadoutek.uled.tellink
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.text.TextUtils
-import android.util.Log
-import android.widget.Toast
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -13,13 +11,13 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.hwangjr.rxbus.RxBus
 import com.mob.MobSDK
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
 import com.tencent.bugly.crashreport.CrashReport
 import com.uuzuche.lib_zxing.activity.ZXingLibrary
 import io.reactivex.disposables.Disposable
-import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,18 +30,13 @@ class TelinkLightApplication : TelinkApplication() {
         fun getApp(): TelinkLightApplication {
             return app!!
         }
-
     }
 
     private var stompLifecycleDisposable: Disposable? = null
     private lateinit var mStompManager: StompManager
     private var singleLoginTopicDisposable: Disposable? = null
-
-
-    private val intent: Intent? = null
-    private var mStompClient: StompClient? = null
-    private var codeStompClient: Disposable? = null
-    private var loginStompClient: Any? = null
+    var mCancelAuthorTopicDisposable: Disposable? = null
+    var paserCodedisposable: Disposable? = null
 
 
     val isEmptyMesh: Boolean
@@ -59,9 +52,6 @@ class TelinkLightApplication : TelinkApplication() {
     /**********************************************
      * Log api
      */
-
-    //    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-
     @SuppressLint("SdCardPath")
     override fun onCreate() {
         super.onCreate()
@@ -72,6 +62,7 @@ class TelinkLightApplication : TelinkApplication() {
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)
         initStompClient()
+        RxBus.get().register(this)
 
         LogUtils.getConfig().setBorderSwitch(false)
         if (!AppUtils.isAppDebug()) {
@@ -79,7 +70,6 @@ class TelinkLightApplication : TelinkApplication() {
             LogUtils.getConfig().setLog2FileSwitch(true)
         }
         MobSDK.init(this)
-
     }
 
     override fun doInit() {
@@ -87,8 +77,6 @@ class TelinkLightApplication : TelinkApplication() {
         //AES.Security = true;
 
         val currentRegionID = SharedPreferencesUtils.getCurrentUseRegion()
-
-
         // 此处直接赋值是否可以 --->原逻辑 保存旧的区域信息 保存 区域id  通过区域id查询 再取出name pwd  直接赋值
         //切换区域记得断开连接
 
@@ -110,7 +98,6 @@ class TelinkLightApplication : TelinkApplication() {
             }
             //}
         }
-
         //启动LightService
         this.startLightService(TelinkLightService::class.java)
     }
@@ -121,26 +108,51 @@ class TelinkLightApplication : TelinkApplication() {
         super.doDestroy()
     }
 
-
-    override fun onTerminate() {
-        super.onTerminate()
-        singleLoginTopicDisposable?.dispose()
-        stompLifecycleDisposable?.dispose()
+     fun disposableAllStomp() {
+       /* singleLoginTopicDisposable?.dispose()
+        mCancelAuthorTopicDisposable?.dispose()
+        paserCodedisposable?.dispose()
+        stompLifecycleDisposable?.dispose()*/
     }
 
 
-    private fun initStompClient() {
+    @SuppressLint("CheckResult")
+    open fun initStompClient() {
         if (SharedPreferencesHelper.getBoolean(this, Constant.IS_LOGIN, false)) {
             mStompManager = StompManager.get()
             mStompManager.initStompClient()
+
             singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
                 val key = SharedPreferencesHelper.getString(this, Constant.LOGIN_STATE_KEY, "no_have_key")
                 if (it != key) {
-                    LogUtils.d("It's time to logout ")
+                    LogUtils.e("zcl登出")
+                    val intent = Intent()
+                    intent.action = Constant.LOGIN_OUT
+                    intent.putExtra(Constant.LOGIN_OUT, key)
+                    sendBroadcast(intent)
                 }
             }, {
                 ToastUtils.showShort(it.localizedMessage)
             })
+
+
+            paserCodedisposable = mStompManager.parseQRCodeTopic().subscribe({
+                LogUtils.e("It's time to parse $it")
+                val intent = Intent()
+                intent.action = Constant.PARSE_CODE
+                intent.putExtra(Constant.PARSE_CODE,it)
+                sendBroadcast(intent)
+            }, {
+                ToastUtils.showShort(it.localizedMessage)
+            })
+
+            mCancelAuthorTopicDisposable = mStompManager.cancelAuthorization().subscribe({
+                LogUtils.e("It's time to cancel $it")
+                val intent = Intent()
+                intent.action = Constant.CANCEL_CODE
+                intent.putExtra(Constant.CANCEL_CODE, it)
+                sendBroadcast(intent)
+            }, { ToastUtils.showShort(it.localizedMessage) })
 
             stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
                 when (lifecycleEvent.type) {
@@ -151,10 +163,7 @@ class TelinkLightApplication : TelinkApplication() {
             }, {
                 ToastUtils.showShort(it.localizedMessage)
             })
-//            longOperation = LongOperation()
-//            longOperation!!.execute()
         }
-
     }
 
     fun setupMesh(mesh: Mesh) {
@@ -164,14 +173,8 @@ class TelinkLightApplication : TelinkApplication() {
     override fun saveLog(action: String) {
         val format = SimpleDateFormat("HH:mm:ss.S")
         val time = format.format(Calendar.getInstance().timeInMillis)
-//        logInfo!!.append("\n\t").append(time).append(":\t").append(action)
-        /*if (Looper.myLooper() == Looper.getMainLooper()) {
-            showToast(action);
-        }*/
-
         TelinkLog.w("SaveLog: $action")
-    }//        SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-    //        Date date = sdf.parse(dateInString);
-
-
+    }
 }
+
+

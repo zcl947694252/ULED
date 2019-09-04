@@ -399,7 +399,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             R.id.pop_delete_net -> {
                 if (regionBean!!.count_all<=0){
                     RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
-                        //resetAllLight()// todo 失败的话怎么处理
                         PopUtil.dismiss(pop)
                         initData()
                     }, {
@@ -894,9 +893,5 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         initData()
     }
 
-    @SuppressLint("CheckResult")
-    override fun notifyWSTransferData() {
-        super.notifyWSTransferData()
-    }
 
 }

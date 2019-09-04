@@ -169,4 +169,9 @@ dependencies {
      */
     //implementation "org.java-websocket:Java-WebSocket:1.4.0"
     implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
+
+    /**
+     * rxbus
+     */
+    implementation 'com.hwangjr.rxbus:rxbus:1.0.6'
 }

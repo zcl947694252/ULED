@@ -21,22 +21,6 @@ public class Constant implements Serializable {
     //网络请求服务器测试地址
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
 
-    //长连接测试请求服务器域名地址
-    public static final String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
-
-    //长连接测试请求服务器域名地址
-    public static final String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
-
-    //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
-    public static final String WS_DEBUG_HOST = "/smartlight/test";
-    //虚拟主机号
-    public static final String WS_HOST = "/smartlight";
-    //二维码频道
-    public static final String WS_TOPIC_CODE = "/user/topic/code.parse";
-    //取消收授权频道
-    public static final String WS_AUTHOR_CODE = "/user/topic/authorization.cancel";
-    //单点登录频道
-    public static final String WS_TOPIC_LOGIN = "/user/topic/user.login.state";
     //单点登录key
     public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
 
@@ -302,4 +286,14 @@ public class Constant implements Serializable {
 
     //进行OTA的设备类型为开关
     public static final int SWITCH_TYPE = 3;
+
+    //Stomp传递标识
+    public static final String STOMP = "LOGIN_OUT";
+    //rxbus 登出传递标识
+    public static final String LOGIN_OUT = "LOGIN_OUT";
+    //rxbus 解析码传递标识
+    public static final String PARSE_CODE = "PARSE_CODE";
+    //rxbus 取消码传递标识
+    public static final String CANCEL_CODE = "CANCEL_CODE";
+
 }

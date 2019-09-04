@@ -540,4 +540,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
     }
 
+    override fun loginOutMethod() {
+
+    }
 }

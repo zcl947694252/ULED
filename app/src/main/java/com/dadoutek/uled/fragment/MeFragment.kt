@@ -623,6 +623,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private fun restartApplication() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
+        TelinkLightApplication.getApp().disposableAllStomp()
     }
 
     companion object {

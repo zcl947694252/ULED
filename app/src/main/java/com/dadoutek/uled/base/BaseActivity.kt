@@ -4,8 +4,10 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
+import android.content.IntentFilter
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v7.app.AppCompatActivity
@@ -19,9 +21,7 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -32,28 +32,19 @@ import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.SplashActivity
+import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.json.JSONObject
-import ua.naiksoftware.stomp.Stomp
-import ua.naiksoftware.stomp.StompClient
-import ua.naiksoftware.stomp.dto.LifecycleEvent
-import ua.naiksoftware.stomp.dto.StompHeader
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     zcl
@@ -66,28 +57,26 @@ import java.util.concurrent.TimeUnit
  */
 
 abstract class BaseActivity : AppCompatActivity() {
-    private var mStompListener: Disposable? = null
-    private var isRuning: Boolean = false
-    private var authorStompClient: Disposable? = null
-    private var compositeDisposable: CompositeDisposable? = null
+    private lateinit var stompRecevice: StompReceiver
     private var pop: PopupWindow? = null
     private var popView: View? = null
-    private var dialog: Dialog? = null
-    private var codeWarmDialog: AlertDialog? = null
     var loadDialog: Dialog? = null
     val TAGS = "zcl_BaseActivity"
     private var singleLogin: AlertDialog? = null
-    private var longOperation: LongOperation? = null
-    private var normalSubscribe: Disposable? = null
-    private var payload: String? = null
-    private var loginStompClient: Disposable? = null
-    private var codeStompClient: Disposable? = null
-    private var mStompClient: StompClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutID())
+        makeDialogAndPop()
+        initView()
+        initData()
+        initListener()
+        initOnLayoutListener()
+        initStompReceiver()
+        Constant.isTelBase = false
+    }
 
+    private fun makeDialogAndPop() {
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
@@ -100,130 +89,20 @@ abstract class BaseActivity : AppCompatActivity() {
                 }.create()
 
         popView = LayoutInflater.from(this).inflate(R.layout.code_warm, null)
-
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         pop?.let {
             it.isFocusable = true // 设置PopupWindow可获得焦点
             it.isTouchable = true // 设置PopupWindow可触摸补充：
             it.isOutsideTouchable = false
         }
-
-        initView()
-        initData()
-        initListener()
-        initOnLayoutListener()
-        initStompStatusListener()
     }
 
-    private fun initStompStatusListener() {
-        mStompListener = mStompClient?.lifecycle()?.subscribe { t: LifecycleEvent? ->
-            when (t) {
-                LifecycleEvent.Type.OPENED -> {
-                    LogUtils.d( "zcl_Stomp connection opened")
-
-                }
-                LifecycleEvent.Type.ERROR -> {
-                    LogUtils.d("zcl_Stomp lifecycleEvent.getException()")
-
-                }
-                LifecycleEvent.Type.CLOSED -> {
-                    LogUtils.d( "zcl_Stomp connection closed")
-                }
-
-
-            }
-        }
-    }
 
     abstract fun setLayoutID(): Int
     abstract fun initView()
     abstract fun initData()
     abstract fun initListener()
-
-    inner class LongOperation : AsyncTask<String, Void, String>() {
-        @SuppressLint("CheckResult")
-        override fun doInBackground(vararg params: String): String {
-            //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
-            var headers = ArrayList<StompHeader>()
-            headers.add(StompHeader("user-id", DBUtils.lastUser!!.id.toString()))
-            headers.add(StompHeader("host", Constant.WS_HOST))
-
-            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_BASE_URL)
-            mStompClient!!.connect(headers)
-            mStompClient!!.withClientHeartbeat(25000).withServerHeartbeat(25000)
-
-            var headersLogin = ArrayList<StompHeader>()
-            headersLogin.add(StompHeader("id", DBUtils.lastUser!!.id.toString()))
-            headersLogin.add(StompHeader("destination", Constant.WS_HOST))
-
-            codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin).subscribe ({ topicMessage ->
-                Log.e(TAGS, "收到解析二维码信息:$topicMessage")
-                val payloadCode = topicMessage.payload
-                val codeBean = JSONObject(payloadCode)
-                val phone = codeBean.get("ref_user_phone")
-                val type = codeBean.get("type") as Int
-                val account = codeBean.get("account")
-                Log.e(TAGS, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
-                makeCodeDialog(type, phone, account, "")
-            },{ToastUtils.showShort(it.localizedMessage)})
-
-            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe ({ topicMessage ->
-                val payloadCode = topicMessage.payload
-                val codeBean = JSONObject(payloadCode)
-                val phone = codeBean.get("authorizer_user_phone")
-                val regionName = codeBean.get("region_name")
-                val authorizerUserId = codeBean.get("authorizer_user_id")
-                val rid = codeBean.get("rid")
-                Log.e(TAGS, "zcl***收到解除授权信息***获取消息$payloadCode------------$phone----------------$regionName-----------")
-                val user = DBUtils.lastUser
-
-                user?.let {
-                    Log.e("zcl_BaseActivity", "zcl****判断**${user.last_authorizer_user_id == authorizerUserId}------${user.last_region_id == rid}------authorizerUserId--$authorizerUserId-----$rid")
-                    if (user.last_authorizer_user_id == authorizerUserId.toString() && user.last_region_id == rid.toString()) {
-                        user.last_region_id = 1.toString()
-                        user.last_authorizer_user_id = user.id.toString()
-
-                        DBUtils.deleteAllData()
-                        //创建数据库
-                        AccountModel.initDatBase(it)
-                        //更新last—region-id
-                        DBUtils.saveUser(user)
-                        //下拉数据
-                        Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
-                        SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
-                    }
-                }
-                makeCodeDialog(2, phone, "", regionName)//2代表解除授权信息type
-            },{ToastUtils.showShort(it.localizedMessage)})
-
-            loginStompClient = mStompClient!!.topic(Constant.WS_TOPIC_LOGIN, headersLogin).subscribe ({ topicMessage ->
-                payload = topicMessage.payload
-                Log.e(TAGS, "收到信息:$topicMessage")
-                var key = SharedPreferencesHelper.getString(this@BaseActivity, Constant.LOGIN_STATE_KEY, "no_have_key")
-                Log.e(TAGS, "zcl***login***获取消息$payload----------------------------" + { payload == key })
-                if (payload == key)
-                    return@subscribe
-                checkNetworkAndSync(this@BaseActivity)
-            },{ToastUtils.showShort(it.localizedMessage)})
-
-            normalSubscribe = mStompClient!!.lifecycle().subscribe( { lifecycleEvent ->
-                when (lifecycleEvent.type) {
-                    LifecycleEvent.Type.OPENED -> Log.e(TAGS, "zcl******Stomp connection opened")
-                    LifecycleEvent.Type.ERROR -> Log.e(TAGS, "zcl******Error" + lifecycleEvent.exception)
-                    LifecycleEvent.Type.CLOSED -> Log.e(TAGS, "zcl******Stomp connection closed")
-                    else -> Log.e(TAGS, "zcl******Stomp connection no get")
-                }
-            },{ToastUtils.showShort(it.localizedMessage)})
-            return "Executed"
-        }
-
-        override fun onPostExecute(result: String) {}
-    }
-
-    open fun notifyWSData() {
-
-    }
-
+    open fun notifyWSData() {}
 
 
     @SuppressLint("SetTextI18n", "StringFormatInvalid", "StringFormatMatches")
@@ -246,8 +125,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 recever = getString(R.string.licensor)
             }
         }
-        //todo  订阅区分逻辑 授权者被授权按着
-
 
         runOnUiThread {
             popView?.let {
@@ -262,7 +139,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
                 notifyWSData()
-                if (!this@BaseActivity.isFinishing && !pop!!.isShowing&&!Constant.isTelBase)
+                if (!this@BaseActivity.isFinishing && !pop!!.isShowing && !Constant.isTelBase)
                     pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             }
         }
@@ -285,10 +162,6 @@ abstract class BaseActivity : AppCompatActivity() {
                             .subscribe {
                                 Log.e("zcl", "zcl修改密码******${it.message}")
                                 SharedPreferencesUtils.saveLastUser(split[0] + "-" + split[1] + "-" + account)
-                                codeStompClient?.dispose()
-                                loginStompClient?.isDisposed
-                                normalSubscribe?.dispose()
-                                longOperation?.cancel(true)
                                 TelinkLightService.Instance()?.disconnect()
                                 TelinkLightService.Instance()?.idleMode(true)
                                 SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
@@ -298,40 +171,12 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun notifyWSTransferData() {
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Constant.isTelBase = false
-        if (SharedPreferencesHelper.getBoolean(this@BaseActivity, Constant.IS_LOGIN, false)) {
-            longOperation = LongOperation()
-            longOperation!!.execute()
-        }
-    }
-
     fun initOnLayoutListener() {
         var view = window.decorView
         var viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
-            isRuning = true
             view.viewTreeObserver.removeOnGlobalLayoutListener({})
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        releseStomp()
-        isRuning = false
-    }
-
-    private fun releseStomp() {
-        longOperation?.cancel(true)
-        normalSubscribe?.dispose()
-        loginStompClient?.dispose()
-        codeStompClient?.dispose()
-        mStompListener?.dispose()
     }
 
 
@@ -347,11 +192,6 @@ abstract class BaseActivity : AppCompatActivity() {
      * 如果没有网络，则弹出网络设置对话框
      */
     fun checkNetworkAndSync(activity: Activity?) {
-        codeStompClient?.dispose()
-        loginStompClient?.isDisposed
-        normalSubscribe?.dispose()
-        authorStompClient?.dispose()
-        longOperation?.cancel(true)
 
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
@@ -380,10 +220,11 @@ abstract class BaseActivity : AppCompatActivity() {
         }
 
         override fun complete() {
+            hideLoadingDialog()
             SharedPreferencesHelper.putBoolean(this@BaseActivity, Constant.IS_LOGIN, false)
             TelinkLightService.Instance()?.disconnect()
             TelinkLightService.Instance()?.idleMode(true)
-            if (!this@BaseActivity.isFinishing)
+            if (!this@BaseActivity.isFinishing&&!singleLogin?.isShowing!!)
                 singleLogin!!.show()
         }
     }
@@ -394,7 +235,6 @@ abstract class BaseActivity : AppCompatActivity() {
         ActivityUtils.startActivity(SplashActivity::class.java)
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
-
 
     fun showLoadingDialog(content: String) {
         val inflater = LayoutInflater.from(this)
@@ -425,7 +265,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-
     val allLights: List<DbLight>
         get() {
             val groupList = DBUtils.groupList
@@ -448,7 +287,6 @@ abstract class BaseActivity : AppCompatActivity() {
             return lightList
         }
 
-
     val allRely: List<DbConnector>
         get() {
             val groupList = DBUtils.groupList
@@ -460,66 +298,54 @@ abstract class BaseActivity : AppCompatActivity() {
             return lightList
         }
 
-    open fun resetAllLight() {
-        showLoadingDialog(getString(R.string.reset_all_now))
-        SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
-        val lightList = allLights
-        val curtainList = allCutain
-        val relyList = allRely
-
-        var meshAdre = ArrayList<Int>()
-        if (lightList.isNotEmpty()) {
-            for (k in lightList.indices) {
-                meshAdre.add(lightList[k].meshAddr)
-            }
-        }
-
-        if (curtainList.isNotEmpty()) {
-            for (k in curtainList.indices) {
-                meshAdre.add(curtainList[k].meshAddr)
-            }
-        }
-
-        if (relyList.isNotEmpty()) {
-            for (k in relyList.indices) {
-                meshAdre.add(relyList[k].meshAddr)
-            }
-        }
-
-        if (meshAdre.size > 0) {
-            Commander.resetLights(meshAdre, {
-                SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, false)
-                syncData()
-                this.bnve?.currentItem = 0
-            }, {
-                SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, false)
-            })
-        }
-        if (meshAdre.isEmpty()) {
-            hideLoadingDialog()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(stompRecevice)
     }
 
-    private fun syncData() {
-        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-            override fun complete() {
-                hideLoadingDialog()
-                val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { }
+    private fun initStompReceiver() {
+        stompRecevice = StompReceiver()
+        val filter = IntentFilter()
+        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constant.CANCEL_CODE)
+        filter.addAction(Constant.PARSE_CODE)
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+        registerReceiver(stompRecevice, filter)
+    }
 
-                if (compositeDisposable!!.isDisposed) {
-                    compositeDisposable = CompositeDisposable()
+    inner class StompReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Constant.LOGIN_OUT -> {
+                    LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
+                    checkNetworkAndSync(this@BaseActivity)
                 }
-                compositeDisposable!!.add(disposable)
+                Constant.CANCEL_CODE -> {
+                    val cancelBean = intent.getSerializableExtra(Constant.CANCEL_CODE) as CancelAuthorMsg
+                    val user = DBUtils.lastUser
+                    user?.let {
+                        if (user.last_authorizer_user_id == cancelBean.authorizer_user_id.toString()
+                                && user.last_region_id == cancelBean.rid.toString()) {
+                            user.last_region_id = 1.toString()
+                            user.last_authorizer_user_id = user.id.toString()
+                            DBUtils.deleteAllData()
+                            AccountModel.initDatBase(it)
+                            //更新last—region-id
+                            DBUtils.saveUser(user)
+                            Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
+                            SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                        }
+                    }
+                    makeCodeDialog(2, cancelBean.authorizer_user_phone, "", cancelBean.region_name)//2代表解除授权信息type
+                    LogUtils.e("zcl_baseMe_______取消授权")
+                    LogUtils.e("zcl")
+                }
+                Constant.PARSE_CODE -> {
+                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
+                    Log.e(TAGS, "zcl_baseMe___________解析二维码")
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
+                }
             }
-
-            override fun error(msg: String) {
-                hideLoadingDialog()
-                ToastUtils.showShort(R.string.backup_failed)
-            }
-
-            override fun start() {}
-        })
+        }
     }
 }

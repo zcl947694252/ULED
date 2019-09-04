@@ -531,7 +531,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
     }
 
     private fun beginToOta() {
-        if (TelinkLightApplication.getInstance().connectDevice != null && TelinkLightApplication.getInstance().connectDevice.meshAddress == dbSwitch!!.meshAddr)
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbSwitch!!.meshAddr)
             startOTA()
         else
             startScan()
