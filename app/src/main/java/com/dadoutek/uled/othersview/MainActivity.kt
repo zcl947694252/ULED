@@ -16,6 +16,7 @@ import android.os.PersistableBundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -162,7 +163,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         detectUpdate()
-        checkVersionAvailable()
         requestCarmer()
         listSnackbar = kotlin.collections.ArrayList(4)
 
@@ -170,7 +170,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         isCreate = true
-
+        TelinkLightApplication.getApp().initStompClient()
         addEventListeners()
     }
 
@@ -187,6 +187,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         XiaomiUpdateAgent.setCheckUpdateOnlyWifi(false)
         XiaomiUpdateAgent.update(this)
     }
+
 
 
      var syncCallback: SyncCallback = object : SyncCallback {
@@ -387,12 +388,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
         isGuide = false
         installDialog?.dismiss()
-//        hidePopupMenu()
         when (position) {
             INSTALL_NORMAL_LIGHT -> {
                 installId = INSTALL_NORMAL_LIGHT
@@ -547,6 +544,20 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
+        viewPager.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(p0: Int) {
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
+                    override fun complete() {}
+                    override fun error(msg: String) {} })
+            }
+
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
+            }
+
+            override fun onPageSelected(p0: Int) {
+            }
+        })
     }
 
      fun transScene() {
@@ -580,6 +591,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onResume() {
         super.onResume()
+        checkVersionAvailable()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null) {
             mApplication?.startLightService(TelinkLightService::class.java)

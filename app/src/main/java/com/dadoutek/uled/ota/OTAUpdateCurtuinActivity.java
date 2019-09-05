@@ -42,7 +42,6 @@ import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.othersview.MainActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -89,24 +88,18 @@ import io.reactivex.schedulers.Schedulers;
  * 在OTA升级过程中会保存此时现在的所有设备信息（onlineLights），
  * 如果是从MainActivity页面跳转而来（1.自动连接的设备有上报MeshOTA进度信息；2主动连接之前本地保存的设备），需要读取一次版本信息\n
  * 并初始化onlineLights
- *
- * todo UriUtils.uri2File(uri) 该方法会报参数类型不对 使用时请解决
- * 1. {@link MainActivity#onNotificationEvent(NotificationEvent)}；
- * 2. {@link MainActivity#onDeviceStatusChanged(DeviceEvent)}；
- * <p>
- * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity#sendGetDeviceOtaStateCommand()},
- * \n\t 并通过 {@link OTAUpdateActivity#onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
- * 在continue MeshOTA和MeshOTA模式下 {@link OTAUpdateActivity#MODE_CONTINUE_MESH_OTA},{@link OTAUpdateActivity#MODE_MESH_OTA}
+ * 1. {@link MainActivity#//onNotificationEvent(NotificationEvent)}；
+ *  *  * 2. {@link MainActivity#//onDeviceStatusChanged(DeviceEvent)}；
+ *  *  * <p>s
+ *  *  * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity#sendGetDeviceOtaStateCommand},
+ *  *  * \n\t 并通过 {@link OTAUpdateActivity#onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
+ *  *  * 在continue MeshOTA和MeshOTA模式下 {@link OTAUpdateActivity#MODE_CONTINUE_MESH_OTA},{@link OTAUpdateActivity#MODE_MESH_OTA}
+ * todo UriUtils.uri2File(uri) 该方法会报参数类型不对 使用时请解
  * <p>
  * <p>
  * 校验通过后，会开始动作
- * <p>
- * <p>
- * Action Start by choose correct bin file!
- * <p>
- * Created by Administrator on 2017/4/20.
  */
-public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity implements EventListener<String> {
+public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implements EventListener<String> {
     @BindView(R.id.progress_view)
     CircleProgressBar progress_view;
     @BindView(R.id.text_info)
@@ -611,7 +604,7 @@ public class OTAUpdateSwitchActivity extends TelinkMeshErrorDealActivity impleme
                     sendStopMeshOTACommand();
                     Mesh mesh = TelinkLightApplication.Companion.getApp().getMesh();
                     mesh.setOtaDevice(null);
-                    mesh.saveOrUpdate(OTAUpdateSwitchActivity.this);
+                    mesh.saveOrUpdate(OTAUpdateCurtuinActivity.this);
                     dialog.dismiss();
                     finish();
                 });

@@ -653,9 +653,6 @@ object DBUtils {
             DaoSessionInstance.getInstance().dbSensorDao.insert(sensor)
         } else {
             DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
-//            recordingChange(sensor.id,
-//                    DaoSessionInstance.getApp().dbSensorDao.tablename,
-//                    Constant.DB_ADD)
         }
     }
 
@@ -664,9 +661,6 @@ object DBUtils {
             DaoSessionInstance.getInstance().dbSwitchDao.insert(dbSwitch)
         } else {
             DaoSessionInstance.getInstance().dbSwitchDao.save(dbSwitch)
-//            recordingChange(dbSwitch!!.id,
-//                    DaoSessionInstance.getApp().dbSwitchDao.tablename,
-//                    Constant.DB_ADD)
         }
     }
 

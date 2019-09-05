@@ -32,6 +32,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property ProductUUID = new Property(5, int.class, "productUUID", false, "PRODUCT_UUID");
         public final static Property Index = new Property(6, int.class, "index", false, "INDEX");
         public final static Property BelongGroupId = new Property(7, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
+        public final static Property Version = new Property(8, String.class, "version", false, "VERSION");
     }
 
 
@@ -54,7 +55,8 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"MAC_ADDR\" TEXT," + // 4: macAddr
                 "\"PRODUCT_UUID\" INTEGER NOT NULL ," + // 5: productUUID
                 "\"INDEX\" INTEGER NOT NULL ," + // 6: index
-                "\"BELONG_GROUP_ID\" INTEGER);"); // 7: belongGroupId
+                "\"BELONG_GROUP_ID\" INTEGER," + // 7: belongGroupId
+                "\"VERSION\" TEXT);"); // 8: version
     }
 
     /** Drops the underlying database table. */
@@ -94,6 +96,11 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(8, belongGroupId);
         }
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(9, version);
+        }
     }
 
     @Override
@@ -127,6 +134,11 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (belongGroupId != null) {
             stmt.bindLong(8, belongGroupId);
         }
+ 
+        String version = entity.getVersion();
+        if (version != null) {
+            stmt.bindString(9, version);
+        }
     }
 
     @Override
@@ -144,7 +156,8 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // macAddr
             cursor.getInt(offset + 5), // productUUID
             cursor.getInt(offset + 6), // index
-            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7) // belongGroupId
+            cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7), // belongGroupId
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // version
         );
         return entity;
     }
@@ -159,6 +172,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setProductUUID(cursor.getInt(offset + 5));
         entity.setIndex(cursor.getInt(offset + 6));
         entity.setBelongGroupId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
+        entity.setVersion(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
      }
     
     @Override

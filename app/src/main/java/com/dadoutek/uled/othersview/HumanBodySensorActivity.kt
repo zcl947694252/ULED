@@ -48,7 +48,7 @@ import kotlin.collections.ArrayList
 /**
  * 创建者     zcl
  * 创建时间   2019/8/29 16:03
- * 描述	      ${人体感应器2.0版本设置界面}$
+ * 描述	      ${人体感应器版本设置界面}$
  *
  * 更新者     $Author$
  * 更新时间   $Date$
@@ -56,6 +56,7 @@ import kotlin.collections.ArrayList
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
+    private var isConfirm: Boolean = false
     private lateinit var mDeviceInfo: DeviceInfo
 
     private var nightLightGroupRecycleViewAdapter: NightLightGroupRecycleViewAdapter? = null
@@ -97,6 +98,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
+        isConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
+
         showCheckListData = DBUtils.allGroups
 
         var lightGroup = DBUtils.allGroups
@@ -178,14 +181,19 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     successCallback = {
                         tvPSVersion.text = it
                         var version = tvPSVersion.text.toString()
-                        var num = version.substring(2, 3)
-                        if (num.toDouble() >= 3.0) {
+                        var num: String //N-3.1.1
+                        if (version.contains("N")) {
+                            num = version.substring(2, 3)
+                            if ("" != num && num.toDouble() >= 3.0) {
+                                isGone()
+                                isVisibility()//显示3.0新的人体感应器
+                            }
+                        } else if (version.contains("PR")) {
                             isGone()
-                            isVisibility()
+                            isVisibility()//显示3.0新的人体感应器
                         }
                     },
                     failedCallback = {})
-        } else {
         }
     }
 
@@ -697,85 +705,100 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun configDevice() {
         var version = tvPSVersion.text.toString()
-        var num = version.substring(2, 3)
-        if (num.toDouble() >= 3.0) {
-            var time = editText.text.toString()
-
-            if (time == "") {
-                ToastUtil.showToast(this, "超时时间为空")
-                return
+        var num: String //N-3.1.1
+        if (version.contains("N")) {
+            num = version.substring(2, 3)
+            if ("" != num && num.toDouble() >= 3.0) {
+                setThreeVersionOrPr()
+            } else {
+                setBlowThreeVersion()
             }
-
-            if (time_type_text.text.toString() == getString(R.string.second)) {
-                if (time.toInt() < 10) {
-                    ToastUtil.showToast(this, "超时时间不能小于10秒钟")
-                    return
-                }
-
-                if (time.toInt() > 255) {
-                    ToastUtil.showToast(this, "超时时间不能大于255秒钟")
-                    return
-                }
-            } else if (time_type_text.text.toString() == getString(R.string.minute)) {
-                if (time.toInt() < 1) {
-                    ToastUtil.showToast(this, "超时时间不能小于1分钟")
-                    return
-                }
-
-                if (time.toInt() > 255) {
-                    ToastUtil.showToast(this, "超时时间不能大于255分钟")
-                    return
-                }
-            }
-
-            if (showGroupList?.size == 0) {
-                ToastUtils.showLong(getString(R.string.config_night_light_select_group))
-                return
-            }
-
-            Thread {
-                GlobalScope.launch(Dispatchers.Main) {
-                    showLoadingDialog(getString(R.string.configuring_switch))
-                }
-
-                configNewlight()
-                Thread.sleep(300)
-
-                Commander.updateMeshName(
-                        successCallback = {
-                            hideLoadingDialog()
-                            configureComplete()
-                        },
-                        failedCallback = {
-                            snackbar(sensor_root, getString(R.string.pace_fail))
-                            hideLoadingDialog()
-                        })
-
-            }.start()
-        } else {
-            if (showGroupList?.size == 0) {
-                ToastUtils.showLong(getString(R.string.config_night_light_select_group))
-                return
-            }
-
-            Thread { GlobalScope.launch(Dispatchers.Main) {
-                    showLoadingDialog(getString(R.string.configuring_switch)) }
-
-                configLightlight()
-                Thread.sleep(300)
-
-                Commander.updateMeshName(
-                        successCallback = {
-                            hideLoadingDialog()
-                            configureComplete()
-                        },
-                        failedCallback = {
-                            snackbar(sensor_root, getString(R.string.pace_fail))
-                            hideLoadingDialog()
-                        })
-
-            }.start()
+        } else if (version.contains("PR")) {
+            setThreeVersionOrPr()
         }
+    }
+
+    private fun setBlowThreeVersion() {
+        if (showGroupList?.size == 0) {
+            ToastUtils.showLong(getString(R.string.config_night_light_select_group))
+            return
+        }
+
+        Thread {
+            GlobalScope.launch(Dispatchers.Main) {
+                showLoadingDialog(getString(R.string.configuring_switch))
+            }
+
+            configLightlight()
+            Thread.sleep(300)
+
+            Commander.updateMeshName(
+                    successCallback = {
+                        hideLoadingDialog()
+                        configureComplete()
+                    },
+                    failedCallback = {
+                        snackbar(sensor_root, getString(R.string.pace_fail))
+                        hideLoadingDialog()
+                    })
+
+        }.start()
+    }
+
+    private fun setThreeVersionOrPr() {
+        var time = editText.text.toString()
+
+        if (time == "") {
+            ToastUtil.showToast(this, "超时时间为空")
+            return
+        }
+
+        if (time_type_text.text.toString() == getString(R.string.second)) {
+            if (time.toInt() < 10) {
+                ToastUtil.showToast(this, "超时时间不能小于10秒钟")
+                return
+            }
+
+            if (time.toInt() > 255) {
+                ToastUtil.showToast(this, "超时时间不能大于255秒钟")
+                return
+            }
+        } else if (time_type_text.text.toString() == getString(R.string.minute)) {
+            if (time.toInt() < 1) {
+                ToastUtil.showToast(this, "超时时间不能小于1分钟")
+                return
+            }
+
+            if (time.toInt() > 255) {
+                ToastUtil.showToast(this, "超时时间不能大于255分钟")
+                return
+            }
+        }
+
+        if (showGroupList?.size == 0) {
+            ToastUtils.showLong(getString(R.string.config_night_light_select_group))
+            return
+        }
+
+        Thread {
+            GlobalScope.launch(Dispatchers.Main) {
+                showLoadingDialog(getString(R.string.configuring_switch))
+            }
+
+            configNewlight()
+            Thread.sleep(300)
+
+            Commander.updateMeshName(
+                    successCallback = {
+                        hideLoadingDialog()
+                        configureComplete()
+                    },
+                    failedCallback = {
+                        snackbar(sensor_root, getString(R.string.pace_fail))
+                        hideLoadingDialog()
+                    })
+
+        }.start()
     }
 
     private fun configLightlight() {
@@ -825,16 +848,25 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveSensor() {
-        var dbSensor: DbSensor = DbSensor()
-        DBUtils.saveSensor(dbSensor, false)
+        var dbSensor = DbSensor()
+
+        if (isConfirm) {
+            dbSensor.index = mDeviceInfo.id.toInt()
+            if ("none" != mDeviceInfo.id)
+                dbSensor.id = mDeviceInfo.id.toLong()
+        } else {//如果不是重新配置就保存进服务器
+            DBUtils.saveSensor(dbSensor, isConfirm)
+            dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
+        }
+
+
         dbSensor.controlGroupAddr = getControlGroup()
-        dbSensor.index = dbSensor.id.toInt()
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
 
-        DBUtils.saveSensor(dbSensor, false)
+        DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 

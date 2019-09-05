@@ -109,16 +109,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             }
             R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        (this as NormalSettingActivity).showLoadingDialog(getString(R.string.deleting))
+                        this.showLoadingDialog(getString(R.string.deleting))
 
                         deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                 successCallback = {
-                                    (this as NormalSettingActivity).hideLoadingDialog()
+                                    this.hideLoadingDialog()
                                     this?.setResult(Constant.RESULT_OK)
                                     this?.finish()
                                 },
                                 failedCallback = {
-                                    (this as NormalSettingActivity).hideLoadingDialog()
+                                    this.hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
                                 })
                     }
@@ -214,8 +214,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
             if (isSwitch) {
                 isBrightness = true
-//                    clickNum = 1
-//        light_sbBrightness?.progress = light!!.brightness
                 var light_current = DBUtils.getGroupByID(group!!.id)
                 if (light_current != null) {
                     light_sbBrightness?.progress = light_current.brightness
@@ -244,10 +242,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             brightness_text.setTextColor(resources.getColor(R.color.blue_background))
             temperature_btn.setImageResource(R.drawable.icon_unselected)
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
-//        light_sbBrightness?.progress = light!!.brightness
             if (isSwitch) {
                 isBrightness = true
-//                    clickNum = 1
                 var light_current = DBUtils.getLightByID(light!!.id)
                 if (light_current != null) {
                     light_sbBrightness?.progress = light_current.brightness
@@ -258,15 +254,19 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
                         device_light_minus.setImageResource(R.drawable.icon_minus_no)
                     } else {
-                        if (light_current.brightness <= 0) {
-                            device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
-                        } else if (light_current.brightness >= 100) {
-                            device_light_add.setImageResource(R.drawable.icon_puls_no)
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                        } else {
-                            device_light_minus.setImageResource(R.drawable.icon_minus)
-                            device_light_add.setImageResource(R.drawable.icon_puls)
+                        when {
+                            light_current.brightness <= 0 -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
+                            light_current.brightness >= 100 -> {
+                                device_light_add.setImageResource(R.drawable.icon_puls_no)
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                            }
+                            else -> {
+                                device_light_minus.setImageResource(R.drawable.icon_minus)
+                                device_light_add.setImageResource(R.drawable.icon_puls)
+                            }
                         }
                     }
                 }
@@ -281,7 +281,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     var lightList: MutableList<DbLight> = ArrayList()
 
                     if (group.meshAddr == 0xffff) {
-                        //            lightList = DBUtils.getAllLight();
                         val list = DBUtils.groupList
                         for (j in list.indices) {
                             lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
@@ -289,7 +288,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     } else {
                         lightList = DBUtils.getLightByGroupID(group.id)
                     }
-
 
                     for (dbLight: DbLight in lightList) {
                         if (isOpen) {
@@ -1007,13 +1005,14 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private fun transformView() {
         val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, light?.version)
         startActivity(intent)
         finish()
     }
 
     private fun getVersion() {
-        var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(light!!.meshAddr, { s ->
                 localVersion = s
@@ -1038,8 +1037,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 }
                 null
             })
-        } else {
-            dstAdress = 0
         }
     }
 
@@ -1123,22 +1120,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     override fun onResume() {
         super.onResume()
         addEventListeners()
-//        test()
     }
 
     private fun initType() {
         val type = intent.getStringExtra(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
-//            show_light_btn.visibility=View.GONE
-//            show_group_btn.visibility=View.VISIBLE
-//            initToolbarGroup()
             initDataGroup()
             initViewGroup()
         } else {
             currentShowPageGroup = false
-//            show_light_btn.visibility=View.VISIBLE
-//            show_group_btn.visibility=View.GONE
             initToolbarLight()
             initViewLight()
             getVersion()

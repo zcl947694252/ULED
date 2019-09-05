@@ -22,18 +22,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.CancelAuthorMsg
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbUser
+import com.dadoutek.uled.model.HttpModel.AccountModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
+import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.util.*
 import com.telink.bluetooth.LeBluetooth
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -58,7 +62,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     var singleLoginTopicDisposable: Disposable? = null
     var codeStompClient: Disposable? = null
     val TAG = "zcl"
-//    private var mStompClient: StompClient? = null
+    private lateinit var stompRecevice: StompReceiver
 
     private lateinit var mStompManager: StompManager
     protected var toast: Toast? = null
@@ -76,6 +80,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         foreground = true
         this.mApplication = this.application as TelinkLightApplication
         registerBluetoothReceiver()
+
+        initStompReceiver()
 
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
@@ -99,8 +105,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
             it.isOutsideTouchable = false
         }
     }
-
-
 
     //增加全局监听蓝牙开启状态
     private fun showOpenBluetoothDialog(context: Context) {
@@ -166,12 +170,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 }
             }
         }
-        if (SharedPreferencesHelper.getBoolean(this@TelinkBaseActivity, Constant.IS_LOGIN, false)) {
-//            longOperation = LongOperation()
-//            longOperation!!.execute()
-        }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -179,17 +178,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast!!.cancel()
         this.toast = null
         unregisterBluetoothReceiver()
-        mScanDisposal?.dispose()
-        singleLogin?.dismiss()
+        unregisterReceiver(stompRecevice)
 
-        releaseStomp()
-    }
-
-    private fun releaseStomp() {
-        mStompListener?.dispose()
-        stompLifecycleDisposable?.dispose()
-        singleLoginTopicDisposable?.dispose()
-        codeStompClient?.dispose()
     }
 
     open fun initOnLayoutListener() {
@@ -204,7 +194,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun showToast(s: CharSequence) {
         ToastUtils.showLong(s)
     }
-
 
     fun showLoadingDialog(content: String) {
         val inflater = LayoutInflater.from(this)
@@ -242,7 +231,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
     fun compileExChar(str: String): Boolean {
         return StringUtils.compileExChar(str)
     }
-
 
     inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
 
@@ -288,87 +276,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
             }
         }
     }
-
-
-/*
-    inner class LongOperation : AsyncTask<String, Void, String>() {
-        @RequiresApi(Build.VERSION_CODES.O)
-        @SuppressLint("CheckResult")
-        override fun doInBackground(vararg params: String): String {
-            //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight
-            var headers = ArrayList<StompHeader>()
-            headers.add(StompHeader("user-id", DBUtils.lastUser?.id.toString()))
-            headers.add(StompHeader("host", Constant.WS_HOST))
-
-            mStompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, Constant.WS_BASE_URL)
-            mStompClient!!.connect(headers)
-
-            mStompClient!!.withClientHeartbeat(25000).withServerHeartbeat(25000)
-
-            var headersLogin = ArrayList<StompHeader>()
-
-            headersLogin.add(StompHeader("id", DBUtils.lastUser?.id.toString()))
-            headersLogin.add(StompHeader("destination", Constant.WS_HOST))
-
-            codeStompClient = mStompClient!!.topic(Constant.WS_TOPIC_CODE, headersLogin)
-                    .subscribe(
-                            { topicMessage ->
-                                //Log.e(TAG, "收到解析二维码信息:$topicMessage")
-                                val payloadCode = topicMessage.payload
-                                val codeBean = JSONObject(payloadCode)
-                                val phone = codeBean.get("ref_user_phone")
-                                val type = codeBean.get("type") as Int
-                                val account = codeBean.get("account")
-                                // Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$type----------------$phone-----------$account")
-                                makeCodeDialog(type, phone, account, "")
-                            },
-                            {
-                                ToastUtils.showShort(it.localizedMessage)
-                            }
-                    )
-
-
-//            authorStompClient = mStompClient!!.topic(Constant.WS_AUTHOR_CODE, headersLogin).subscribe({ topicMessage ->
-//                Log.e(TAG, "收到解除授权信息:$topicMessage")
-//                val payloadCode = topicMessage.payload
-//                val codeBean = JSONObject(payloadCode)
-//                val phone = codeBean.get("authorizer_user_phone")
-//                val regionName = codeBean.get("region_name")
-//                val authorizerUserId = codeBean.get("authorizer_user_id")
-//                val rid = codeBean.get("rid")
-//                Log.e(TAG, "zcl***解析二维码***获取消息$payloadCode------------$phone----------------$regionName-----------")
-//                val user = DBUtils.lastUser
-//                user?.let {
-//                    if (user.last_authorizer_user_id == authorizerUserId && user.last_region_id == rid) {
-//                        user.last_region_id = 1.toString()
-//                        user.last_authorizer_user_id = user.id.toString()
-//                        DBUtils.deleteAllData()
-//                        //创建数据库
-//                        AccountModel.initDatBase(it)
-//                        //更新last—region-id
-//                        DBUtils.saveUser(user)
-//                        //下拉数据
-//                        Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
-//                        SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
-//                    }
-//                }
-//                makeCodeDialog(2, phone, "", regionName)//2代表解除授权信息type
-//            }, {
-//                ToastUtils.showShort(it.localizedMessage)
-//            })
-
-
-
-            return "Executed"
-        }
-
-        override fun onPostExecute(result: String) {}
-    }
-*/
-
     override fun onPause() {
         super.onPause()
-        releaseStomp()
         isRuning = false
         foreground = false
     }
@@ -379,11 +288,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
      * 如果没有网络，则弹出网络设置对话框
      */
     fun checkNetworkAndSync(activity: Activity?) {
-        codeStompClient?.dispose()
-        singleLoginTopicDisposable?.isDisposed
-        stompLifecycleDisposable?.dispose()
-        authorStompClient?.dispose()
-
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -398,9 +302,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
-
         override fun start() {}
         override fun complete() {}
 
@@ -423,9 +325,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.disconnect()
             TelinkLightService.Instance()?.idleMode(true)
             val b = this@TelinkBaseActivity.isFinishing
-            Log.e("zcl", "zcl***isFinishing***$b")
-            if (!b)
+            if (!b&&!singleLogin?.isShowing!!){
                 singleLogin!!.show()
+            }
         }
 
         override fun error(msg: String) {
@@ -434,14 +336,13 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-
     //重启app并杀死原进程
     open fun restartApplication() {
+        TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n", "StringFormatInvalid")
@@ -517,6 +418,55 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     open fun notifyWSData() {
 
+    }
+
+    private fun initStompReceiver() {
+        stompRecevice = StompReceiver()
+        val filter = IntentFilter()
+        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constant.CANCEL_CODE)
+        filter.addAction(Constant.PARSE_CODE)
+        filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+        registerReceiver(stompRecevice, filter)
+    }
+    inner class StompReceiver : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                Constant.LOGIN_OUT -> {
+                    LogUtils.e("zcl_baseMe___________收到登出消息")
+                    loginOutMethod()
+                }
+                Constant.CANCEL_CODE -> {
+                    val cancelBean = intent.getSerializableExtra(Constant.CANCEL_CODE) as CancelAuthorMsg
+                    val user = DBUtils.lastUser
+                    user?.let {
+                        if (user.last_authorizer_user_id == cancelBean.authorizer_user_id.toString()
+                                && user.last_region_id == cancelBean.rid.toString()) {
+                            user.last_region_id = 1.toString()
+                            user.last_authorizer_user_id = user.id.toString()
+                            DBUtils.deleteAllData()
+                            AccountModel.initDatBase(it)
+                            //更新last—region-id
+                            DBUtils.saveUser(user)
+                            Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
+                            SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                        }
+                    }
+                    makeCodeDialog(2, cancelBean.authorizer_user_phone, "", cancelBean.region_name)//2代表解除授权信息type
+                    LogUtils.e("zcl_baseMe___________收到取消消息")
+                }
+                Constant.PARSE_CODE -> {
+                    val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
+                    Log.e(TAG, "zcl_baseMe___________收到取消消息***解析二维码***")
+                    makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.account, "")
+                }
+            }
+        }
+    }
+
+     open fun loginOutMethod() {
+         checkNetworkAndSync(this@TelinkBaseActivity)
     }
 }
 

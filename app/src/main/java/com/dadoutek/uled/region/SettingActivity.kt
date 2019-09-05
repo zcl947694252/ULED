@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit
  */
 class SettingActivity : BaseActivity() {
     override fun setLayoutID(): Int {
-        return  R.layout.activity_setting
+        return R.layout.activity_setting
     }
 
     private var cancel: Button? = null
@@ -63,7 +63,6 @@ class SettingActivity : BaseActivity() {
     private var loadDialog1: Dialog? = null
     private var compositeDisposable = CompositeDisposable()
 
-  
 
     override fun initListener() {
 
@@ -123,7 +122,7 @@ class SettingActivity : BaseActivity() {
      * 检查网络上传数据
      * 如果没有网络，则弹出网络设置对话框
      */
-     fun checkNetworkAndSyncs(activity: Activity?) {
+    fun checkNetworkAndSyncs(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -262,14 +261,11 @@ class SettingActivity : BaseActivity() {
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
-     fun resetAllLights() {
+    fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
         //val lightList = allLights
-        val lightList = DBUtils.getAllNormalLight()
-        val allRGBLight = DBUtils.getAllRGBLight()
-
-        lightList.addAll(allRGBLight)
+        val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
 
@@ -316,9 +312,8 @@ class SettingActivity : BaseActivity() {
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { }
-                if (compositeDisposable.isDisposed) {
+                if (compositeDisposable.isDisposed)
                     compositeDisposable = CompositeDisposable()
-                }
                 compositeDisposable.add(disposable)
             }
 
@@ -329,17 +324,11 @@ class SettingActivity : BaseActivity() {
 
             override fun start() {}
         })
-
     }
-
-
-
-
-
-
 
     //重启app并杀死原进程
     private fun restartApplication() {
+        TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
     }

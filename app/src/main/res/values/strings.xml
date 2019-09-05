@@ -636,7 +636,7 @@
     <string name="title_curtain_lights_num">Scanning %1$d</string>
     <string name="title_curtain_lights_num_total">%1$d)</string>
 
-    <string name="delete_switch_confirm">Confirm the delete switch?</string>
+    <string name="delete_switch_confirm"> After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete switch?</string>
 
     <string name="delete_switch_success">Delete Success</string>
 

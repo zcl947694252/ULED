@@ -2,8 +2,6 @@ package com.dadoutek.uled.util;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Environment;
-import android.util.Log;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
@@ -21,7 +19,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 
 public class OtaPrepareUtils {
@@ -301,13 +298,16 @@ public class OtaPrepareUtils {
     //检查是否支持OTA 返回true支持  返回false不支持
     public Boolean checkSupportOta(String localVersion) {
         int localVersionNum = Integer.parseInt(StringUtils.versionResolution(localVersion, 1));
-        if ((localVersion.contains("L-") || localVersion.contains("LNS-")
+        boolean oldSuportVersion = (localVersion.contains("L-") || localVersion.contains("LNS-")
                 || localVersion.contains("LN-") || localVersion.contains("C-") || localVersion.contains("CS-")
                 || localVersion.contains("CR-") || localVersion.contains("LC-")
-                || localVersion.contains("LCS-") || localVersion.contains("L36-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum!=-1) {
+                || localVersion.contains("LCS-") || localVersion.contains("L36-")) && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
+        boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B");
+        if (oldSuportVersion||newSuport) {
             return true;
         } else {
             return false;
         }
+
     }
 }

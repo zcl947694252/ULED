@@ -44,6 +44,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
+
 class SendLightsInfo : Service(), EventListener<String> {
 
     internal var light: Light? = null
@@ -162,7 +163,7 @@ class SendLightsInfo : Service(), EventListener<String> {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
             if (!(mScanDisposal?.isDisposed ?: false)) {
-               //"startScanLight_LightOfGroup")
+                //"startScanLight_LightOfGroup")
 //                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
 //                        Manifest.permission.BLUETOOTH_ADMIN)
 //                        .subscribeOn(Schedulers.io())
@@ -216,7 +217,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                       //"onLeScanTimeout()")
+                        //"onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -227,7 +228,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                           //"connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
+                            //"connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
@@ -240,23 +241,11 @@ class SendLightsInfo : Service(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
-        try {
-//            mCheckRssiDisposal?.dispose()
-//            mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-//                    Manifest.permission.BLUETOOTH_ADMIN)
-//                    .subscribe {
-//                        if (it) {
-                            //授予了权限
-                            if (TelinkLightService.Instance() != null) {
-//                                progressBar?.visibility = View.VISIBLE
-                                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
-                                startConnectTimer()
-                            }
-//                        } else {
-//                            //没有授予权限
-////                            DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
-//                        }
-//                    }
+        try { //授予了权限
+            if (TelinkLightService.Instance() != null) {
+                TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
+                startConnectTimer()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -273,17 +262,7 @@ class SendLightsInfo : Service(), EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-       //"onErrorReport: onLeScanTimeout")
-//        if (mConnectSnackBar) {
-//        indefiniteSnackbar(root, R.string.not_found_light, R.string.retry) {
-//        TelinkLightService.Instance()?.idleMode(true)
-//        LeBluetooth.getApp().stopScan()
-//        startScan()
-//        }
-//        } else {
         retryConnect()
-//        }
-
     }
 
     /**
