@@ -586,7 +586,7 @@
     <string name="scan_curtain_num">总计：当前扫描出了 %1$s 个窗帘</string>
     <string name="title_curtain_lights_num">已扫到 %1$d 个窗帘</string>
     <string name="title_curtain_lights_num_total">扫描完毕：%1$d个窗帘</string>
-    <string name="delete_switch_confirm">确定删除此开关？</string>
+    <string name="delete_switch_confirm">删除后需要手动恢复该开关的出厂设置,确定删除此开关？</string>
     <string name="delete_switch_success">删除成功</string>
     <string name="have_curtain_no_group_tip">还有窗帘没有分组，请完成分组操作</string>
     <string name="grouping_curtain_wait_tip">当前有%1$s个窗帘正在分组，请稍候！</string>
@@ -807,4 +807,5 @@
     <string name="please_restore_device">请先将区域下所有设备恢复出厂设置后再删除该区域</string>
     <string name="please_connect_normal_light">请连接冷暖灯</string>
     <string name="please_connect_curtain">请连接窗帘</string>
+
 </resources>
