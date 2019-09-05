@@ -15,7 +15,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import butterknife.ButterKnife
-import butterknife.OnClick
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -472,7 +471,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         if (updateList != null && updateList!!.size > 0) {
             checkNetworkAndSync()
         }
-        //        TelinkLightService.Instance().idleMode(true);
         this.mApplication!!.removeEventListener(this)
         this.updateList = null
         mDisposable.dispose()  //销毁时取消订阅.
@@ -518,7 +516,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         //确定当前分组
         sureGroupingEvent()
 
-        toolbar!!.setNavigationOnClickListener { _ ->
+        toolbar!!.setNavigationOnClickListener {
             AlertDialog.Builder(this@DeviceScanningNewActivity)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         if (currentSelectLights.size > 0) {
@@ -761,12 +759,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         this.mApplication!!.removeEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
     }
 
-    @OnClick(R.id.add_group_layout)
-    fun onViewClicked() {
-        isGuide = false
-        addNewGroup()
-    }
-
     private fun addNewGroup() {
         val textGp = EditText(this)
         textGp.setText(DBUtils.getDefaultNewGroupName())
@@ -957,6 +949,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     private fun initClick() {
         this.btn_scan?.setOnClickListener(this.clickListener)
         this.btn_log?.setOnClickListener(this.clickListener)
+        add_group_layout.setOnClickListener {//全彩灯以及普通等扫描完毕添加组
+            isGuide = false
+            addNewGroup()}
     }
 
     private fun initView() {
@@ -991,7 +986,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         tvStopScan?.setOnClickListener(onClick)
         tvStopScan?.visibility = View.GONE
 
-        add_group_relativeLayout?.setOnClickListener { v -> addNewGroup() }
+        add_group_relativeLayout!!.setOnClickListener { v -> addNewGroup() }
     }
 
     @SuppressLint("ResourceType")
@@ -1003,9 +998,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         toolbar?.setNavigationContentDescription(R.drawable.navigation_back_white)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        return super.onCreateOptionsMenu(menu)
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -1043,12 +1035,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                         groups!!.add(list[i])
                     }
                 }
-              /*  for (i in list.indices) {
-                    LogUtils.e("zcl----isAllRightGroup----" + list[i])
-                    if (OtherUtils.isAllRightGroup(list[i])) {
-                        groups!!.add(list[i])
-                    }
-                }*/
+
                 for (i in list.indices) {
                     LogUtils.e("zcl----isDefaultGroup----" + list[i])
                     if (OtherUtils.isDefaultGroup(list[i])) {

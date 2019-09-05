@@ -646,7 +646,9 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
 
     private fun transformView() {
         val intent = Intent(this@WindowCurtainsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, curtain)
+        intent.putExtra(Constant.OTA_MAC, curtain?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, curtain?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, curtain?.version)
         startActivity(intent)
         finish()
     }

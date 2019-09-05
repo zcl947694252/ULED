@@ -404,8 +404,7 @@ object Commander : EventListener<String> {
 
 
     private fun onMeshEvent(event: MeshEvent) {
-//        ToastUtils.showShort(event.toString())
-        //("Error ${event.toString()}")
+
     }
 
     private fun onGetGroupEvent(event: NotificationEvent) {
@@ -428,9 +427,6 @@ object Commander : EventListener<String> {
             if (mTargetGroupAddr != 0xFFFF && groupAddress != 0xFFFF) {
                 mGotGroupAddr = groupAddress or 0x8000
             }
-//            else {
-//                mGotGroupAddr = mTargetGroupAddr
-//            }
 
             if (mTargetGroupAddr == mGotGroupAddr) {
                 mGroupSuccess = true

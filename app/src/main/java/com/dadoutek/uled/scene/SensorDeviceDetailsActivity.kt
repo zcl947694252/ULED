@@ -27,6 +27,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
@@ -43,10 +44,7 @@ import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.BleUtils
-import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.OtherUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -68,6 +66,7 @@ import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
+import kotlinx.android.synthetic.main.activity_window_curtains.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +76,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
-
 private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
@@ -559,11 +557,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         when (isClick) {//重新配置
                             RECOVER_SENSOR -> Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread()).subscribe { relocationSensor() }
                             OTA_SENSOR -> {//人体感应器ota
-                                val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-                                intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
-                                intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
-                                startActivity(intent)
-                                isClick = NORMAL_SENSOR
+                                getVersion()
                             }
                             RESET_SENSOR -> resetSensor() //恢复出厂设置
 
@@ -611,6 +605,34 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     }
                 }
             }
+        }
+    }
+
+    private fun getVersion() {
+        if (TelinkApplication.getInstance().connectDevice != null) {
+            Log.e("TAG",currentLight!!.meshAddr.toString())
+            Commander.getDeviceVersion(currentLight!!.meshAddr, { s ->
+                if(s!=""){
+                    if (versionText != null) {
+                        if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                            versionText.text = resources.getString(R.string.firmware_version, s)
+                            currentLight!!.version = s
+                            this.versionText.visibility = View.VISIBLE
+                        } else {
+                            versionText.text = resources.getString(R.string.firmware_version, s)
+                            currentLight!!.version = s
+                            this.versionText.visibility = View.VISIBLE
+                        }
+                    }
+                }
+                null
+            }, {null })
+            val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
+            intent.putExtra(Constant.OTA_MAC, currentLight?.macAddr)
+            intent.putExtra(Constant.OTA_MES_Add, currentLight?.meshAddr)
+             intent.putExtra(Constant.OTA_VERSION, currentLight?.version)
+            startActivity(intent)
+            isClick = NORMAL_SENSOR
         }
     }
 

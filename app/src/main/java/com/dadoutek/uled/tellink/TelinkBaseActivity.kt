@@ -39,9 +39,6 @@ import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.util.*
-import com.hwangjr.rxbus.annotation.Subscribe
-import com.hwangjr.rxbus.annotation.Tag
-import com.hwangjr.rxbus.thread.EventThread
 import com.telink.bluetooth.LeBluetooth
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -172,15 +169,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                 }
             }
-        }
-    }
-
-
-    @Subscribe(thread = EventThread.MAIN_THREAD,tags = [Tag(Constant.LOGIN_OUT)])
-    private fun getLoginOut(isLoginOut:Boolean){
-        if (isLoginOut){
-            LogUtils.e("zcl_baseTel___________收到登出消息$isLoginOut")
-            checkNetworkAndSync(this@TelinkBaseActivity)
         }
     }
 
@@ -350,9 +338,9 @@ open class TelinkBaseActivity : AppCompatActivity() {
 
     //重启app并杀死原进程
     open fun restartApplication() {
+        TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
-        TelinkLightApplication.getApp().disposableAllStomp()
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 

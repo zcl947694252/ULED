@@ -1,7 +1,6 @@
 package com.dadoutek.uled.network;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbUser;
@@ -47,14 +46,15 @@ public class CommonParamsInterceptor implements Interceptor {
         Request.Builder builder = request.newBuilder();
 
         DbUser user = DBUtils.INSTANCE.getLastUser();
-        Log.e("zcl", "zcl*******method---" + method);
+        //LogUtils.e("zcl", "zcl*******method---" + method);
+
         //添加请求头
         builder.addHeader("Content-Type", TEXT);
 
         String token = request.header("token");
         String tokenNow = user == null ? "" : user.getToken();
-        if (user!=null){
-            if ("".equals(user.getControlMeshName())||user.getControlMeshName()==null)
+        if (user != null) {
+            if ("".equals(user.getControlMeshName()) || user.getControlMeshName() == null)
                 user.setControlMeshName(user.getAccount());
             DBUtils.INSTANCE.saveUser(user);
         }
@@ -62,7 +62,7 @@ public class CommonParamsInterceptor implements Interceptor {
         String oldToken = tokenNow;
         String last_region_id = user != null && user.getLast_region_id() != null && !TextUtils.isEmpty(user.getLast_region_id()) ? user.getLast_region_id() : "1";
         builder.addHeader("region-id", last_region_id);
-        Log.e("zcl","zcl******region-id=="+last_region_id);
+        //LogUtils.e("zcl","zcl******region-id=="+last_region_id);
 
         //authorizer-user-id：80
         //在请求头加上键值对authorizer-user-id:80即可获取id为80用户的数据，如果请求头中缺少这对键值对，后台默认authorizer-user-id：自己用户的id。
@@ -72,18 +72,21 @@ public class CommonParamsInterceptor implements Interceptor {
         //在请求头加上键值对region-id:2即可获取区域2的数据，如果请求头中缺少这对键值对，后台默认region-id:1
         //以下情况使用的是区域一的数据
         //1、请求头缺少region-id  2、region-id:1   3、region-id乱传
-        if (user != null &&user.getLast_authorizer_user_id()!=null&&!user.getLast_authorizer_user_id().equals("")){
-            builder.addHeader("authorizer-user-id",user.getLast_authorizer_user_id());
-            Log.e("zcl","zcl******Last_authorizer_user_id=="+user.getLast_authorizer_user_id());
-        }else
-            Log.e("zcl","zcl******authorizer-user-id==user是空的没有authorizer-user-id");
+        if (user != null && user.getLast_authorizer_user_id() != null && !user.getLast_authorizer_user_id().equals("")) {
+            builder.addHeader("authorizer-user-id", user.getLast_authorizer_user_id());
+            //LogUtils.e("zcl","zcl****是空的没有authorizer-user-id**Last_authorizer_user_id=="+user.getLast_authorizer_user_id());
+        }
 
 
-        if (token == null || token.isEmpty())
-            builder.addHeader("token", oldToken);
+            if (token == null || "".equals(token)) {
+                builder.addHeader("token", oldToken);
+                //LogUtils.e("zcltoken设置user的token-----" + oldToken));
+            }
+               // LogUtils.e("zcltoken设置user的token-----"+builder.build().header("token"));
+
 
         RequestBody body = request.body();
-        Log.e("zcl","zcl**method.equals(GET)****"+method.equals("GET")+"00000000"+(method.equals("POST") || method.equals("DELETE"))+"----"+(body != null));
+        //LogUtils.e("zcl","zcl**method.equals(GET)****"+method.equals("GET")+"00000000"+(method.equals("POST") || method.equals("DELETE"))+"----"+(body != null));
         if (body != null) {
             MediaType mediaType = body.contentType();
             try {
@@ -98,7 +101,7 @@ public class CommonParamsInterceptor implements Interceptor {
                     if (body instanceof FormBody) { // form 表单
                         for (int i = 0; i < ((FormBody) body).size(); i++)
                             rootMap.put(((FormBody) body).encodedName(i), ((FormBody) body).encodedValue(i));
-                        Log.e("zcl", "zcl******rootMap" + rootMap.toString());
+                        //LogUtils.e("zcl", "zcl******rootMap" + rootMap.toString());
                         requestBody = RequestBody.create(MJSON, new JSONObject(rootMap).toString());
                     } else {
                         Buffer buffer = new Buffer();
@@ -106,7 +109,7 @@ public class CommonParamsInterceptor implements Interceptor {
                         String oldJsonParams = buffer.readUtf8();
                         requestBody = RequestBody.create(MJSON, oldJsonParams);
                         requestBody.writeTo(buffer);
-                        Log.e("zcl", "zcl******buffer" + buffer.readUtf8());
+                        //LogUtils.e("zcl", "zcl******buffer" + buffer.readUtf8());
                     }
                     builder.post(requestBody);
                 }

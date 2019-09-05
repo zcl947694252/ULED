@@ -328,9 +328,9 @@ class SettingActivity : BaseActivity() {
 
     //重启app并杀死原进程
     private fun restartApplication() {
+        TelinkLightApplication.getApp().releseStomp()
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
-        TelinkLightApplication.getApp().disposableAllStomp()
     }
 }
 

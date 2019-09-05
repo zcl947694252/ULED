@@ -282,6 +282,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private fun transformView() {
         val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
         intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, light?.version)
         startActivity(intent)
         finish()
     }

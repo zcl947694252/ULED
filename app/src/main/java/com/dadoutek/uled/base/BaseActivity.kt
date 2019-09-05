@@ -33,6 +33,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
+import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
@@ -233,6 +234,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun restartApplication() {
         ActivityUtils.finishAllActivities(true)
         ActivityUtils.startActivity(SplashActivity::class.java)
+        TelinkLightApplication.getApp().releseStomp()
         Log.e("zcl", "zcl******重启app并杀死原进程")
     }
 

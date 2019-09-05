@@ -170,7 +170,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mApplication = this.application as TelinkLightApplication
         initBottomNavigation()
         isCreate = true
-
+        TelinkLightApplication.getApp().initStompClient()
         addEventListeners()
     }
 

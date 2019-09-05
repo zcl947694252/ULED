@@ -11,7 +11,6 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.hwangjr.rxbus.RxBus
 import com.mob.MobSDK
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
@@ -62,7 +61,6 @@ class TelinkLightApplication : TelinkApplication() {
         DaoSessionInstance.checkAndUpdateDatabase()
         ZXingLibrary.initDisplayOpinion(this)
         initStompClient()
-        RxBus.get().register(this)
 
         LogUtils.getConfig().setBorderSwitch(false)
         if (!AppUtils.isAppDebug()) {
@@ -75,11 +73,9 @@ class TelinkLightApplication : TelinkApplication() {
     override fun doInit() {
         super.doInit()
         //AES.Security = true;
-
         val currentRegionID = SharedPreferencesUtils.getCurrentUseRegion()
         // 此处直接赋值是否可以 --->原逻辑 保存旧的区域信息 保存 区域id  通过区域id查询 再取出name pwd  直接赋值
         //切换区域记得断开连接
-
         if (currentRegionID != -1L) {
             val dbRegion = DBUtils.getCurrentRegion(currentRegionID)
             //if (dbRegion != null) {
@@ -106,15 +102,15 @@ class TelinkLightApplication : TelinkApplication() {
     override fun doDestroy() {
         TelinkLog.onDestroy()
         super.doDestroy()
+        releseStomp()
     }
 
-     fun disposableAllStomp() {
-       /* singleLoginTopicDisposable?.dispose()
-        mCancelAuthorTopicDisposable?.dispose()
+    open  fun releseStomp(){
+        stompLifecycleDisposable?.dispose()
+        singleLoginTopicDisposable?.dispose()
         paserCodedisposable?.dispose()
-        stompLifecycleDisposable?.dispose()*/
+        mCancelAuthorTopicDisposable?.dispose()
     }
-
 
     @SuppressLint("CheckResult")
     open fun initStompClient() {
@@ -154,11 +150,14 @@ class TelinkLightApplication : TelinkApplication() {
                 sendBroadcast(intent)
             }, { ToastUtils.showShort(it.localizedMessage) })
 
+
             stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
                 when (lifecycleEvent.type) {
                     LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
                     LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
-                    LifecycleEvent.Type.CLOSED -> LogUtils.d("zcl_Stomp******Stomp connection closed")
+                    LifecycleEvent.Type.CLOSED ->{
+                        LogUtils.d("zcl_Stomp******Stomp connection closed")
+                    }
                 }
             }, {
                 ToastUtils.showShort(it.localizedMessage)
@@ -175,6 +174,8 @@ class TelinkLightApplication : TelinkApplication() {
         val time = format.format(Calendar.getInstance().timeInMillis)
         TelinkLog.w("SaveLog: $action")
     }
+
+
 }
 
 

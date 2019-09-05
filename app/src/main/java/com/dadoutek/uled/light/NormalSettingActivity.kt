@@ -1005,13 +1005,14 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private fun transformView() {
         val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, light?.version)
         startActivity(intent)
         finish()
     }
 
     private fun getVersion() {
-        var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(light!!.meshAddr, { s ->
                 localVersion = s
@@ -1036,8 +1037,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 }
                 null
             })
-        } else {
-            dstAdress = 0
         }
     }
 
@@ -1121,22 +1120,16 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     override fun onResume() {
         super.onResume()
         addEventListeners()
-//        test()
     }
 
     private fun initType() {
         val type = intent.getStringExtra(Constant.TYPE_VIEW)
         if (type == Constant.TYPE_GROUP) {
             currentShowPageGroup = true
-//            show_light_btn.visibility=View.GONE
-//            show_group_btn.visibility=View.VISIBLE
-//            initToolbarGroup()
             initDataGroup()
             initViewGroup()
         } else {
             currentShowPageGroup = false
-//            show_light_btn.visibility=View.VISIBLE
-//            show_group_btn.visibility=View.GONE
             initToolbarLight()
             initViewLight()
             getVersion()

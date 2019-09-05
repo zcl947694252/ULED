@@ -296,4 +296,6 @@ public class Constant implements Serializable {
     //rxbus 取消码传递标识
     public static final String CANCEL_CODE = "CANCEL_CODE";
 
+    //OTA 升级版本
+    public static final String OTA_VERSION="OTA_VERSION";
 }

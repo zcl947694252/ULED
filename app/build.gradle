@@ -85,16 +85,10 @@ repositories {
         dirs 'libs'
     }
 }
-//kotlin {
-//    experimental {
-//        coroutines "enable"
-
-//    }
-//}
 
 greendao {
     //数据库的schema版本，也可以理解为数据库版本号
-    schemaVersion 26
+    schemaVersion 27
     //设置DaoMaster、DaoSession、Dao包名，也就是要放置这些类的包的全路径。
     daoPackage 'com.dadoutek.uled.dao'
     //设置DaoMaster、DaoSession、Dao目录
@@ -168,10 +162,6 @@ dependencies {
      * 长连接websocket
      */
     //implementation "org.java-websocket:Java-WebSocket:1.4.0"
-    implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
-
-    /**
-     * rxbus
-     */
-    implementation 'com.hwangjr.rxbus:rxbus:1.0.6'
+   // implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
+    implementation project(':stomplib')
 }

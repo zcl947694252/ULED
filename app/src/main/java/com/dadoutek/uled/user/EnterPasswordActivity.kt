@@ -213,7 +213,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
                             SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
-                            TelinkLightApplication.getApp().initStompClient()
                         }
 
                         override fun onError(e: Throwable) {
@@ -240,7 +239,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         override fun error(msg: String) {
             val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance()
                     .mContext, Constant.IS_SHOW_REGION_DIALOG, false)
-            Log.e("EnterPasswordActivity", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----"+msg)
+            Log.e("EnterPasswordActivity", "zcl*****同步返回授权问题boolean*****$ishowRegionDialog-----$msg")
 
 
             if (ishowRegionDialog) {
@@ -357,7 +356,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     private fun syncComplet() {
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-
         startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
         hideLoadingDialog()
     }
