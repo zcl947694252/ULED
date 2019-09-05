@@ -50,7 +50,15 @@ public class DeviceInfo implements Parcelable {
     public int productUUID;
     public int status;
     public int rssi;
-    public byte[] longTermKey = new byte[16];
+
+    /**
+     * 是否是重新配置 以及 desenor的id
+     */
+
+    public String id = "none";
+    public int isConfirm =0;
+
+    public byte[] longTermKey = new byte[20];
     /**
      * 设备的firmware版本
      */
@@ -60,6 +68,7 @@ public class DeviceInfo implements Parcelable {
     }
 
     public DeviceInfo(Parcel in) {
+        this.id = in.readString();
         this.macAddress = in.readString();
         this.deviceName = in.readString();
         this.meshName = in.readString();
@@ -68,6 +77,7 @@ public class DeviceInfo implements Parcelable {
         this.meshUUID = in.readInt();
         this.productUUID = in.readInt();
         this.status = in.readInt();
+        this.isConfirm = in.readInt();
         in.readByteArray(this.longTermKey);
     }
 
@@ -78,6 +88,7 @@ public class DeviceInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
         dest.writeString(this.macAddress);
         dest.writeString(this.deviceName);
         dest.writeString(this.meshName);
@@ -86,6 +97,7 @@ public class DeviceInfo implements Parcelable {
         dest.writeInt(this.meshUUID);
         dest.writeInt(this.productUUID);
         dest.writeInt(this.status);
+        dest.writeInt(this.isConfirm);
         dest.writeByteArray(this.longTermKey);
     }
 
@@ -100,6 +112,8 @@ public class DeviceInfo implements Parcelable {
                 ", productUUID=" + productUUID +
                 ", status=" + status +
                 ", rssi=" + rssi +
+                ", id='" + id + '\'' +
+                ", isConfirm=" + isConfirm +
                 ", longTermKey=" + Arrays.toString(longTermKey) +
                 ", firmwareRevision='" + firmwareRevision + '\'' +
                 '}';

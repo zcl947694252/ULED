@@ -298,4 +298,6 @@ public class Constant implements Serializable {
 
     //OTA 升级版本
     public static final String OTA_VERSION="OTA_VERSION";
+    //是否是重新配置
+    public static final String ISCONFIRM ="isConfirm";
 }

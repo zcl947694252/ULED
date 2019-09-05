@@ -240,8 +240,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         lightMeshAddr = getIntent().getIntExtra(Constant.OTA_MES_Add, 0);
         lightMacAddr = getIntent().getIntExtra(Constant.OTA_MAC, 0);
         lightVersion = getIntent().getStringExtra(Constant.OTA_VERSION);
-        if ("".equals(lightVersion))
+        boolean b = "".equals(lightVersion) || lightVersion == null;
+        btn_start_update.setClickable(!b);
+        if (b){
+            btn_start_update.setText(getString(R.string.get_server_version_fail));
             TmtUtils.midToastLong(this, getString(R.string.get_server_version_fail));
+        }
         log("current-light-mesh" + lightMeshAddr);
         autoConnect();
     }
@@ -249,7 +253,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     /**
      * 自动重连
      */
-
     private void autoConnect() {// todo 登录后的升级
         if (TelinkApplication.getInstance().getConnectDevice() == null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {

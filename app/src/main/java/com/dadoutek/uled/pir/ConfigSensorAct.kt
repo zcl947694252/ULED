@@ -38,7 +38,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.design.snackbar
 
 /**
- * 人体感应器3.0设置详情
+ * 老版本人体感应器设置详情
  */
 class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener, EventListener<String> {
 
