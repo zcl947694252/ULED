@@ -831,15 +831,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             buildInButton.setTextColor(resources.getColor(R.color.blue_background))
             buildInButton_image.setImageResource(R.drawable.icon_selected_rgb)
             layoutModePreset.visibility = View.VISIBLE
-            diyButton.setTextColor(resources.getColor(R.color.black_three))
-            diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isPresetMode = false
         } else {
             buildInButton.setTextColor(resources.getColor(R.color.black_three))
             buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             layoutModePreset.visibility = View.GONE
-            diyButton.setTextColor(resources.getColor(R.color.black_three))
-            diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isPresetMode = true
         }
         applyPresetView()
@@ -951,15 +947,11 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             diyButton.setTextColor(resources.getColor(R.color.blue_background))
             diyButton_image.setImageResource(R.drawable.icon_selected_rgb)
             layoutModeDiy.visibility = View.VISIBLE
-            buildInButton.setTextColor(resources.getColor(R.color.black_three))
-            buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isDiyMode = false
         } else {
             diyButton.setTextColor(resources.getColor(R.color.black_three))
             diyButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             layoutModeDiy.visibility = View.GONE
-            buildInButton.setTextColor(resources.getColor(R.color.black_three))
-            buildInButton_image.setImageResource(R.drawable.icon_unselected_rgb)
             isDiyMode = true
         }
         applyDiyView()
@@ -971,11 +963,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         builtDiyModeRecycleView!!.layoutManager = layoutmanager
         this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .black_ee)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decoration)
         rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
@@ -1052,7 +1041,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         refreshData()
         return@OnItemLongClickListener true
     }
-
 
     private fun refreshData() {
         rgbDiyGradientAdapter!!.notifyDataSetChanged()
@@ -1179,7 +1167,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             changeToDiyPage()
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun setColorPicker() {

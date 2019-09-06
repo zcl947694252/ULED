@@ -1170,23 +1170,15 @@ object DBUtils {
         groupAllLights.color = TelinkLightApplication.getApp().resources.getColor(R.color.gray)
         groupAllLights.belongRegionId = SharedPreferencesUtils.getCurrentUseRegion().toInt()
         groupAllLights.id = 1
-        val list = groupList
-        DaoSessionInstance.getInstance().dbGroupDao.insert(groupAllLights)
+        DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(groupAllLights)
         recordingChange(groupAllLights.id,
-                DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                Constant.DB_ADD)
-        //        for(int i=0;i<list.size();i++){
-        //            if(list.get(i).getMeshAddr()!=0xffff){
-        //                groupAllLights.setId(Long.valueOf(0));
-        //                DaoSessionInstance.getApp().getDbGroupDao().save(groupAllLights);
-        //            }
-        //        }
+                DaoSessionInstance.getInstance().dbGroupDao.tablename, Constant.DB_ADD)
+
         return groupAllLights
     }
 
     /**
      * 记录本地数据库变化
-     *
      * @param changeIndex 变化的位置
      * @param changeTable 变化数据所属表
      * @param operating   所执行的操作

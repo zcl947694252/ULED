@@ -325,11 +325,11 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName).substring(0, 16)
         }
         LogUtils.e("zcl**********************pwd$pwd" + "---------" + Strings.stringToBytes(pwd, 16).toString())
-        TelinkLightService.Instance().login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
+        TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16), Strings.stringToBytes(pwd, 16))
     }
 
     private fun onLogin() {
-        TelinkLightService.Instance().enableNotification()
+        TelinkLightService.Instance()?.enableNotification()
         mApplication.removeEventListener(this)
         connectDisposable?.dispose()
         scanDisposable?.dispose()
@@ -360,7 +360,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun showConnectFailed() {
         mApplication.removeEventListener(this)
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
 
         LogUtils.e("zcl  showConnectFailed")
         if (isSupportInstallOldDevice) {
@@ -377,7 +377,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         Thread {
             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSensorActivity)
             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSensorActivity)
-            TelinkLightService.Instance().connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
+            TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
             LogUtils.e("zcl开始连接")
         }.start()
 
@@ -398,7 +398,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun doFinish() {
         this.mApplication.removeEventListener(this)
         if (TelinkLightService.Instance() != null) {
-            TelinkLightService.Instance().idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
         }
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }

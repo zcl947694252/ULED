@@ -931,8 +931,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
         if (light==null){
             ToastUtils.showShort(getString(R.string.please_connect_normal_light))
-            TelinkLightService.Instance().idleMode(true)
-            TelinkLightService.Instance().disconnect()
+            TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.disconnect()
             return
         }
         intent.putExtra("light", light)

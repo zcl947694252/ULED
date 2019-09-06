@@ -93,7 +93,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     //对一个灯重复分组时记录上一次分组
     private var originalGroupID = -1
     private val mGroupingDisposable: Disposable? = null
-    private var tvStopScan: TextView? = null
     //灯的mesh地址
     private val dstAddress: Int = 0
     private var mConnectTimer: Disposable? = null
@@ -196,24 +195,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
 
     private var startConnect = false
 
-    private val clickListener = View.OnClickListener { v ->
-        if (v === btn_scan) {
-            doFinish()
-        }
-    }
-
     private val onClick = View.OnClickListener {
         stopTimer()
         closeAnimation()
-        if (TelinkLightService.Instance().isLogin) {
 
+        list_devices.visibility = View.VISIBLE
+        scanning_num.visibility = View.GONE
+        btn_stop_scan.visibility = View.GONE
+        if (getString(R.string.scanning) == scanning_num.text)
+            finish()
+
+        if (TelinkLightService.Instance().isLogin) {
             Observable.interval(0, 200, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                     .subscribe(object : Observer<Long> {
                         var disposable: Disposable? = null
                         override fun onSubscribe(d: Disposable) {
                             disposable = d
                         }
-
                         //updateMesh超时时间 50*200=10S
                         override fun onNext(t: Long) {
                             if (t >= 50) {
@@ -221,7 +219,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                                 scanSuccess()
                             } else {
                                 if (updateMeshStatus == UPDATE_MESH_STATUS.SUCCESS) {
-                                    tvStopScan!!.visibility = View.GONE
                                     if (nowLightList != null && nowLightList!!.size > 0) {
                                         nowLightList!!.clear()
                                     }
@@ -232,7 +229,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                                     startGrouping()
                                     disposable?.dispose()
                                 } else if (updateMeshStatus == UPDATE_MESH_STATUS.FAILED) {
-                                    tvStopScan!!.visibility = View.GONE
                                     if (nowLightList != null && nowLightList!!.size > 0) {
                                         nowLightList!!.clear()
                                     }
@@ -432,15 +428,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     //处理扫描成功后
     private fun scanSuccess() {
         //更新Title
-        tvStopScan?.visibility = View.GONE
         toolbar!!.title = getString(R.string.title_scanned_lights_num, adapter!!.count)
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
         if (nowLightList != null && nowLightList!!.size > 0) {
             nowLightList!!.clear()
         }
-        if (nowLightList != null)
-            nowLightList!!.addAll(adapter!!.getLights()!!)
+        if (nowLightList != null){
+            val elements = adapter?.getLights() ?: return
+            nowLightList?.addAll(elements)
+        }
 
         scanPb!!.visibility = View.GONE
 
@@ -449,8 +446,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         //倒计时，出问题了就超时。
         mConnectTimer = createConnectTimeout()
 
+        list_devices?.visibility = View.VISIBLE
         btn_add_groups?.visibility = View.VISIBLE
         btn_add_groups?.setText(R.string.start_group_bt)
+        scanning_num?.visibility = View.GONE
+        btn_stop_scan?.visibility = View.GONE
 
         btn_add_groups?.setOnClickListener { v ->
             if (isLoginSuccess) {
@@ -462,7 +462,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             } else {    //正在连接中
                 showLoadingDialog(resources.getString(R.string.connecting_tip))
                 closeAnimation()
-
             }
         }
 
@@ -769,7 +768,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         builder.setIcon(android.R.drawable.ic_dialog_info)
         builder.setView(textGp)
         builder.setCancelable(false)
-        builder.setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+        builder.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
             // 获取输入框的内容
             if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showShort(getString(R.string.rename_tip_check))
@@ -785,8 +784,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 dialog.dismiss()
                 val imm = this@DeviceScanningNewActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
-                guideStep2()
-            }
+                guideStep2()}
         }
         if (!isGuide) {
             builder.setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }
@@ -948,8 +946,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     }
 
     private fun initClick() {
-        this.btn_scan?.setOnClickListener(this.clickListener)
-        this.btn_log?.setOnClickListener(this.clickListener)
         add_group_layout.setOnClickListener {//全彩灯以及普通等扫描完毕添加组
             isGuide = false
             addNewGroup()}
@@ -960,6 +956,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         //监听事件
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication!!.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
         this.mApplication!!.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         this.mApplication!!.addEventListener(MeshEvent.UPDATE_COMPLETED, this)
         this.mApplication!!.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
@@ -968,24 +965,19 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         this.adapter = DeviceListAdapter()
 
         this.grouping_completed?.setBackgroundColor(resources.getColor(R.color.gray))
-        this.btn_scan?.isEnabled = false
-        this.btn_scan?.setBackgroundResource(R.color.gray)
         deviceListView = this.findViewById(R.id.list_devices)
         //修改
         deviceListView!!.adapter = adapter
 
         this.updateList = ArrayList()
 
-        btn_scan?.visibility = View.GONE
-        btn_log?.visibility = View.GONE
+        image_bluetooth?.visibility = View.GONE
         btn_add_groups?.visibility = View.GONE
         grouping_completed?.visibility = View.GONE
+        toolbar?.findViewById<TextView>(R.id.tv_function1)?.visibility = View.GONE
 
-        light_num_layout?.visibility = View.GONE
-        tvStopScan = toolbar?.findViewById(R.id.tv_function1)
-        tvStopScan?.setText(R.string.stop_scan)
-        tvStopScan?.setOnClickListener(onClick)
-        tvStopScan?.visibility = View.GONE
+        btn_stop_scan?.setText(R.string.stop_scan)
+        btn_stop_scan?.setOnClickListener(onClick)
 
         add_group_relativeLayout!!.setOnClickListener { v -> addNewGroup() }
     }
@@ -1021,8 +1013,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         if (groups == null) {
             groups = ArrayList()
             val list = DBUtils.groupList
-
-
+            
             if (scanRGBLight) {
                 for (i in list.indices) {
                     if (OtherUtils.isRGBGroup(list[i])) {
@@ -1194,6 +1185,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
 
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
+            LeScanEvent.LE_SCAN_COMPLETED -> {
+                list_devices.visibility = View.VISIBLE
+                scanning_num.visibility = View.GONE
+                btn_stop_scan?.visibility = View.GONE
+            }
             LeScanEvent.LE_SCAN_TIMEOUT -> {
                 stopTimer()
                 this.onLeScanTimeout()
@@ -1292,7 +1288,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     }
 
     private fun onNError(event: DeviceEvent) {
-
         TelinkLightService.Instance().idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
         onLeScanTimeout()
@@ -1305,7 +1300,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     private fun onLeScanTimeout() {
         LeBluetooth.getInstance().stopScan()
         TelinkLightService.Instance().idleMode(true)
-        this.btn_scan?.setBackgroundResource(R.color.primary)
+        list_devices.visibility = View.VISIBLE
         if (adapter!!.count > 0) {//表示目前已经搜到了至少有一个设备
             scanSuccess()
         } else {
@@ -1324,7 +1319,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 startTimer()
                 startAnimation()
                 handleIfSupportBle()
-                TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance()?.idleMode(true)
 
                 val scanFilters = ArrayList<ScanFilter>()
                 var manuData: ByteArray?
@@ -1439,6 +1434,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         return productUUID == DeviceType.LIGHT_RGB || productUUID == DeviceType.LIGHT_NORMAL || productUUID == DeviceType.LIGHT_NORMAL_OLD
     }
 
+    @SuppressLint("SetTextI18n")
     private fun addDevice(deviceInfo: DeviceInfo) {
         val meshAddress = deviceInfo.meshAddress and 0xFF
         var light = this.adapter!![meshAddress]
@@ -1447,8 +1443,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             light = DbLight()
             light.name = getString(R.string.unnamed)
             light.meshAddr = meshAddress
-            light.textColor = this.resources.getColor(
-                    R.color.black)
+            light.textColor = this.resources.getColor(R.color.black)
             light.belongGroupId = allLightId
             light.macAddr = deviceInfo.macAddress
             light.meshUUID = deviceInfo.meshUUID
@@ -1457,6 +1452,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             adapter?.let {
                 it.add(light)
                 it.notifyDataSetChanged()
+                scanning_num.text = getString(R.string.scanning_dot)+ (it.getLights()?.size ?:0)
                 this.list_devices?.smoothScrollToPosition(it.count - 1)
             }
         }
@@ -1503,7 +1499,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                     SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
                 }
                 toolbar?.title = getString(R.string.title_scanning_lights_num, adapter?.count)
-                tvStopScan?.visibility = View.VISIBLE
 
                 Log.d("ScanningTest", "update mesh success")
                 updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS

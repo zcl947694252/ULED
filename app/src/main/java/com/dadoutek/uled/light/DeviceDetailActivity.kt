@@ -76,9 +76,6 @@ import java.util.*
  */
 
 private const val MAX_RETRY_CONNECT_TIME = 5
-private const val CONNECT_TIMEOUT = 10
-private const val SCAN_TIMEOUT_SECOND: Int = 10
-private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClickListener {
     private var type: Int? = null
@@ -308,7 +305,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
 
     override fun onResume() {
         super.onResume()
-        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+       // type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initData()
         initView()
