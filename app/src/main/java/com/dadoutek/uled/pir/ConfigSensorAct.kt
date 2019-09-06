@@ -145,13 +145,13 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         connectParams.autoEnableNotification(true)
 
         //连接，如断开会自动重连
-        Thread { TelinkLightService.Instance().autoConnect(connectParams) }.start()
+        Thread { TelinkLightService.Instance()?.autoConnect(connectParams) }.start()
         //刷新Notify参数
         val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
         refreshNotifyParams.setRefreshRepeatCount(3)
         refreshNotifyParams.setRefreshInterval(1000)
         //开启自动刷新Notify
-        TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+        TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
     }
 
 
@@ -224,7 +224,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 triggerValue.toByte(),
                 mode.toByte()
         )
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_PIR,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_PIR,
                 mDeviceInfo.meshAddress,
                 paramBytes)
 
@@ -270,15 +270,15 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun doFinish() {
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         finish()
     }
 
     private fun configureComplete() {
         //saveSensor()
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 

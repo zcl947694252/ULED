@@ -70,7 +70,7 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
             if (getSocket() == null) {
                 throw new IllegalStateException("Not connected");
             } else {
-                if (stompMessage != null && !"".equals(stompMessage))
+                if (stompMessage != null && !"".equals(stompMessage.trim()))
                     Log.d(TAG, "Send STOMP message: " + stompMessage);
                 rawSend(stompMessage);
                 return null;
@@ -108,7 +108,7 @@ public abstract class AbstractConnectionProvider implements ConnectionProvider {
     }
 
     protected void emitMessage(String stompMessage) {
-        if (stompMessage != null && !"".equals(stompMessage))
+        if (stompMessage != null && !"".equals(stompMessage.trim()))
             Log.d(TAG, "Receive STOMP message: " + stompMessage);
         messagesStream.onNext(stompMessage);
     }

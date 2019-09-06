@@ -255,8 +255,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 connect()
             } else {
-                TelinkLightService.Instance().idleMode(true)
-                TelinkLightService.Instance().disconnect()
+                TelinkLightService.Instance()?.idleMode(true)
+                TelinkLightService.Instance()?.disconnect()
             }
         }
         delete.setOnClickListener {

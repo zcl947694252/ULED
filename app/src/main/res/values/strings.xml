@@ -265,6 +265,7 @@
     <string name="scanning_devices">Scanning devices</string>
     <string name="tip_add_group">Please add a group first</string>
     <string name="scanning">Scanning</string>
+    <string name="scanning_dot">Scanning:</string>
     <string name="scanned_x_devices">Scanned lights:%1$d</string>
     <string name="tip_used_name">The current name is already used</string>
     <string name="upload_data">Upload data</string>

@@ -259,10 +259,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    val guide2 = adaper!!.getViewByPosition(0, R.id.scene_name) as TextView?
-                    if (guide2 != null) {
+                    val guide2 = adaper!!.getViewByPosition(0, R.id.scene_apply) as TextView?
+                    if (guide2 != null) {//guide2代表拿取此处view的锚点区域  不代表使用该view
                         GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.STEP14_GUIDE_APPLY_SCENE)
-                                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple_scene_3, getString(R.string.apply_scene),
+                                .addGuidePage(GuideUtils.addGuidePage(guide2, R.layout.view_guide_simple_scene_2, getString(R.string.apply_scene),
                                         View.OnClickListener { v -> stepEndGuide2() }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
                     }
                 }

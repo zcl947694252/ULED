@@ -259,6 +259,7 @@
     <string name="scanning_devices">扫描设备中</string>
     <string name="tip_add_group">请先添加一个分组</string>
     <string name="scanning">扫描中</string>
+    <string name="scanning_dot">扫描中:</string>
     <string name="scanned_x_devices">已扫到:%1$d个灯</string>
     <string name="tip_used_name">当前名称已被使用</string>
     <string name="upload_data">上传本地数据</string>
