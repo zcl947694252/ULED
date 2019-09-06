@@ -4,74 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background_color"
-    >
-
-    <!--<include-->
-        <!--android:id="@+id/topView"-->
-        <!--layout="@layout/toolbar"/>-->
-
-            <!--<ScrollView-->
-            <!--android:id="@+id/scroll_view"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="0dp"-->
-            <!--android:background="@color/white"-->
-            <!--android:scrollbars="none"-->
-            <!--app:layout_constraintBottom_toTopOf="@+id/bottomBar"-->
-            <!--app:layout_constraintTop_toTopOf="parent">-->
-
-            <!--<android.support.constraint.ConstraintLayout-->
-                <!--android:id="@+id/bottom_view"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="42dp"-->
-                <!--android:background="@color/white"-->
-                <!--app:layout_constraintEnd_toEndOf="parent"-->
-                <!--app:layout_constraintStart_toStartOf="parent"-->
-                <!--app:layout_constraintTop_toBottomOf="@+id/topView"-->
-                <!--&gt;-->
-
-                <!--<TextView-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="1px"-->
-                    <!--android:background="@color/divider"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/normal_rgb"-->
-                    <!--android:layout_width="0dp"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:gravity="center"-->
-                    <!--android:text="@string/color_mode"-->
-                    <!--android:textColor="@android:color/darker_gray"-->
-                    <!--android:textSize="16sp"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintEnd_toStartOf="@id/dynamic_rgb"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<View-->
-                    <!--android:layout_width="1dp"-->
-                    <!--android:layout_height="42dp"-->
-                    <!--android:background="#eeeeee"-->
-                    <!--app:layout_constraintEnd_toEndOf="@+id/dynamic_rgb"-->
-                    <!--app:layout_constraintStart_toStartOf="@+id/normal_rgb"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/dynamic_rgb"-->
-                    <!--android:layout_width="0dp"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:gravity="center"-->
-                    <!--android:text="@string/gradient_mode"-->
-                    <!--android:textColor="@android:color/holo_blue_light"-->
-                    <!--android:textSize="16sp"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintEnd_toEndOf="parent"-->
-                    <!--app:layout_constraintStart_toEndOf="@id/normal_rgb"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-            <!--</android.support.constraint.ConstraintLayout>-->
+    android:background="@color/background_color">
 
     <View
         android:id="@+id/view7"

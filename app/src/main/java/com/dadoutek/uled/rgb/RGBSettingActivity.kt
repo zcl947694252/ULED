@@ -14,13 +14,16 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
-import android.support.v7.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.View.OnClickListener
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.SeekBar
+import android.widget.Toast
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -84,6 +87,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  * 更新描述   ${TODO}$
  */
 class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnTouchListener {
+    private var postionAndNum: ItemRgbGradient? = null
     private var mApplication: TelinkLightApplication? = null
     private var retryConnectCount = 0
     private var stopTracking = false
@@ -92,8 +96,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var group: DbGroup? = null
     private var mApp: TelinkLightApplication? = null
     private var mConnectTimer: Disposable? = null
-    private var isLoginSuccess = false
-    private var connectTimes = 0
     private var localVersion: String? = null
     private var light: DbLight? = null
     private var gpAddress: Int = 0
@@ -101,10 +103,8 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var dataManager: DataManager? = null
     private val mDisposable = CompositeDisposable()
     private var mRxPermission: RxPermissions? = null
-    private val remove: Button? = null
-    private val dialog: AlertDialog? = null
-    private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
+    val POSIONANDNUM = "POSIONANDNUM"
     private var currentShowGroupSetPage = true
     private var connectMeshAddress: Int = 0
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -115,7 +115,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var isDelete = false
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
-    private var currentShowIsDiy = false
     var type = Constant.TYPE_GROUP
     var speed = 50
     var positionState = 0
@@ -131,7 +130,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     private var redColor: Int? = null
     private var greenColor: Int? = null
     private var blueColor: Int? = null
-    private var isTrue: Boolean = true
     private var bestRSSIDevice: DeviceInfo? = null
     private var mConnectDisposal: Disposable? = null
     private var mScanDisposal: Disposable? = null
@@ -247,7 +245,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
-    internal var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
+    var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
 
         override fun downLoadFileStart() {
             showLoadingDialog(getString(R.string.get_update_file))
@@ -293,6 +291,16 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rgb_group_setting)
         this.mApplication = this.application as TelinkLightApplication
+        val s = SharedPreferencesHelper.getString(this, POSIONANDNUM,"")
+        postionAndNum = ItemRgbGradient()
+        if (s != null && "" != s){
+            val split = s.split("-")
+            if (split.size >= 2) {
+                postionAndNum!!.position = split[0].toInt()
+                postionAndNum!!.speed = split[1].toInt()
+            }
+            LogUtils.e("zcl","zcl渐变设置******"+postionAndNum.toString())
+        }
         initType()
         addEventListeners()
     }
@@ -338,7 +346,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
         light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
@@ -360,13 +368,16 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         btnStopGradient.setOnClickListener(this.clickListener)
         buildInModeList = ArrayList()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
+
         for (i in 0..10) {
             var item = ItemRgbGradient()
             item.name = presetGradientList[i]
+            item.select = postionAndNum?.position==i
             buildInModeList?.add(item)
         }
 
         diyGradientList = DBUtils.diyGradientList
+
 
         sb_w_bright_add!!.setOnTouchListener { _, event ->
             addWhiteBright(event)
@@ -414,6 +425,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         builtInModeRecycleView!!.layoutManager = layoutmanager
+        //渐变标准模式
         this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
         builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -426,6 +438,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         val layoutmanagers = LinearLayoutManager(this)
         layoutmanagers.orientation = LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanagers
+        //渐变模式自定义
         this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.activity_diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
 
@@ -493,7 +506,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     private fun lessBrightness(event: MotionEvent?) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             GlobalScope.launch {
@@ -525,7 +537,6 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     private fun addBrightness(event: MotionEvent?) {
         if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
             downTime = System.currentTimeMillis()
             onBtnTouch = true
             GlobalScope.launch {
@@ -863,17 +874,14 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                                 }
                             }
                             positionState = position + 1
-                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                         }
-                buildInModeList!![position].select = true
 
+                postionAndNum?.position = position
                 for (i in buildInModeList!!.indices) {
-                    if (i != position) {
-                        if (buildInModeList!![i].select) {
-                            buildInModeList!![i].select = false
-                        }
-                    }
+                    buildInModeList!![i].select = i == position
                 }
+
                 rgbGradientAdapter!!.notifyDataSetChanged()
 
                 for (i in diyGradientList!!.indices) {
@@ -898,14 +906,15 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             }
 
             R.id.gradient_mode_set -> {
+                speed = postionAndNum?.speed ?: 0
                 var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
                     GlobalScope.launch {
                         speed = it
                         stopGradient()
                         delay(200)
-                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                        postionAndNum?.speed = speed
+                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                     }
-
                 })
                 dialog.show()
             }
@@ -976,8 +985,9 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     private var onItemChildClickListenerDiy = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
 
-        when (view!!.getId()) {
+        when (view!!.id) {
             R.id.diy_mode_on -> {
+                postionAndNum?.position = 100
                 //应用自定义渐变
                 GlobalScope.launch {
                     stopGradient()
@@ -1722,6 +1732,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
         for (i in 0..10) {
             var item = ItemRgbGradient()
             item.name = presetGradientList[i]
+            item.select = i == postionAndNum?.position ?: 100//如果等于该postion则表示选中
             buildInModeList?.add(item)
         }
 
@@ -1979,11 +1990,12 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     override fun onDestroy() {
         super.onDestroy()
         mConnectTimer?.dispose()
-//        this.mApplication?.removeEventListener(this)
         mDisposable.dispose()
-//        canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
+        val s = postionAndNum?.position.toString() + "-" + postionAndNum?.speed
+        SharedPreferencesHelper.putString(this, POSIONANDNUM, s)
+        LogUtils.e("zcl渐变设置保存"+postionAndNum.toString()+"---------"+s)
         if (TelinkLightApplication.getApp().connectDevice == null) {
             TelinkLightService.Instance()?.idleMode(true)
             LeBluetooth.getInstance().stopScan()

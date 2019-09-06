@@ -61,8 +61,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun onLogin() {
-//        TelinkLightService.Instance()?.enableNotification()
-//        mApplication!!.removeEventListener(this)
         mScanTimeoutDisposal?.dispose()
         hideLoadingDialog()
         if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||

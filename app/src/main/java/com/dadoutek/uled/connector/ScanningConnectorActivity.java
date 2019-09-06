@@ -1422,14 +1422,14 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         animationView.setVisibility(View.VISIBLE);
                         if (grouping) {
 //                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-                           //("Grouping");
+                            //("Grouping");
                             return;
                         }
                         handleIfSupportBle();
                         TelinkLightService.Instance().idleMode(true);
                         if (mApplication.isEmptyMesh()) {
 //                            Toast.makeText(this, "Empty Mesh", Toast.LENGTH_SHORT).show();
-                           //("Empty Mesh");
+                            //("Empty Mesh");
                             return;
                         }
 
@@ -1472,7 +1472,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                             return null;
                         });
                     }
-                }));
+                },throwable -> {}));
 
     }
 
