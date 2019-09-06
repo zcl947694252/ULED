@@ -246,7 +246,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             if (positionState != 0) {
                 stopGradient()
                 Thread.sleep(200)
-                Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
             }
         }
     }
@@ -408,7 +408,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                                 Thread.sleep(50)
                             }
                             positionState = position + 1
-                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                         }
                 buildInModeList!![position].select = true
 
@@ -433,7 +433,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     speed = it
                     stopGradient()
                     Thread.sleep(200)
-                    Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress, successCallback = {}, failedCallback = {})
+                    Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                 })
                 dialog.show()
             }

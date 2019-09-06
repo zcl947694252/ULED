@@ -9,7 +9,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.TelinkApplication
-import com.telink.bluetooth.TelinkLog
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.MeshEvent
 import com.telink.bluetooth.event.NotificationEvent
@@ -445,8 +444,7 @@ object Commander : EventListener<String> {
     }
 
     //加载渐变
-    fun applyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int, successCallback: (version: String?) -> Unit1,
-                      failedCallback: () -> Unit1) {
+    fun applyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int) {
         var opcode = Opcode.APPLY_RGB_GRADIENT
         //开始内置渐变
         val gradientActionType = 0x02
@@ -456,7 +454,7 @@ object Commander : EventListener<String> {
             for (i in 0..2) {
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
                 //Thread.sleep(50)//当阻塞方法收到中断请求的时候就会抛出InterruptedException异常
-                kotlinx.coroutines.delay(50)
+               delay(50)
             }
         }
     }

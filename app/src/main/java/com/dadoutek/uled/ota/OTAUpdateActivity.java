@@ -31,7 +31,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.DbModel.DbLight;
 import com.dadoutek.uled.model.DbModel.DbUser;
 import com.dadoutek.uled.model.Mesh;
-import com.dadoutek.uled.model.OtaDevice;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.FileSelectActivity;
@@ -89,13 +88,12 @@ import io.reactivex.schedulers.Schedulers;
  * 2. {@link MainActivity#//onDeviceStatusChanged(DeviceEvent)}；
  * <p>s
  * 在开始OTA或者MeshOTA之前都会获取当前设备的OTA状态信息 {@link OTAUpdateActivity--sendGetDeviceOtaStateCommand},
- * \n\t 并通过 {@link OTAUpdateActivity#onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
+ * \n\t 并通过 {OTAUpdateActivity的onNotificationEvent(NotificationEvent)}返回状态， 处理不同模式下的不同状态
  * 在continue MeshOTA和MeshOTA模式下 {@link OTAUpdateActivity#MODE_CONTINUE_MESH_OTA},{@link OTAUpdateActivity#MODE_MESH_OTA}
- * <p>
  * <p>
  * 校验通过后，会开始动作
  * <p>
- * <p>
+ *  todo 人体感应器在线升级速度过快可能有bug
  * Action Start by choose correct bin file!
  * <p>
  * Created by Administrator on 2017/4/20.
@@ -248,6 +246,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         }
         log("current-light-mesh" + lightMeshAddr);
         autoConnect();
+
+        if (!SharedPreferencesUtils.isDeveloperModel())
+            mPath = SharedPreferencesUtils.getUpdateFilePath();
     }
 
     /**
@@ -317,6 +318,12 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         tv_log = findViewById(R.id.tv_log);
         sv_log = findViewById(R.id.sv_log);
         tv_version = findViewById(R.id.tv_version);
+
+        if (SharedPreferencesUtils.isDeveloperModel()){
+            select.setVisibility(View.VISIBLE);
+        }else{
+            select.setVisibility(View.GONE);
+        }
     }
 
     private void initToolbar() {
@@ -576,6 +583,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
         if (!AppUtils.isExynosSoc()) {
+
             params.setScanFilters(scanFilters);
         }
         params.setMeshName(user.getName());
@@ -814,28 +822,6 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 }
                 break;
         }
-    }
-
-    private void sendStartMeshOTACommand() {
-        String account = user.getControlMeshName();
-        String pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account);
-
-        Mesh mesh = TelinkLightApplication.Companion.getApp().getMesh();
-
-        mesh.setOtaDevice(new OtaDevice());
-        DeviceInfo curDevice = TelinkLightApplication.Companion.getApp().getConnectDevice();
-        mesh.getOtaDevice().mac = curDevice.macAddress;
-        mesh.getOtaDevice().meshName = account;
-        mesh.getOtaDevice().meshPwd = pwd;
-        mesh.saveOrUpdate(this);
-
-        visibleHandler.obtainMessage(View.VISIBLE, meshOtaProgress).sendToTarget();
-        byte opcode = (byte) 0xC6;
-        int address = 0x0000;
-        byte[] params = new byte[]{(byte) 0xFF, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address,
-                params);
-        log("SendCommand 0xC6 startMeshOTA");
     }
 
     // stop

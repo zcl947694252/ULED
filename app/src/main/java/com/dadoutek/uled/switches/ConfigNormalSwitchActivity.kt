@@ -490,16 +490,11 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         if(groupName!=null && groupName == "true"){
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
         }
-        val mesh = mApplication.mesh
-//        val dataManager = DataManager(this, mesh.name, mesh.password)
-        mGroupArrayList = ArrayList<DbGroup>()
+        mGroupArrayList = ArrayList()
         val groupList = DBUtils.groupList
-//        mGroupArrayList.add(dataManager.createAllLightControllerGroup()) //添加全控
 
         for (group in groupList) {
-//            if (group.containsLightList.size > 0 || group.meshAddress == 0xFFFF)
-//            group.checked = false
-            if(OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group)){
+            if(OtherUtils.isNormalGroup(group) || OtherUtils.isRGBGroup(group) || OtherUtils.isAllRightGroup(group)||OtherUtils.isConnector(group)){
                 group.checked = false
                 mGroupArrayList.add(group)
             }
@@ -513,7 +508,6 @@ class ConfigNormalSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         mAdapter.bindToRecyclerView(recyclerView)
-
     }
 
     val groupAdress: Int

@@ -14,7 +14,7 @@ import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.VENDOR_ID
-import com.dadoutek.uled.model.DbModel.DbSwitch
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
@@ -56,7 +56,13 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val MAX_RETRY_CONNECT_TIME = 1
 
-
+/**
+ * 描述	      ${搜索连接开关}$
+ *
+ * 更新者     $Author$
+ * 更新时间   $Date$
+ * 更新描述   ${为类添加标识}$
+ */
 class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var connectDisposable: Disposable? = null
@@ -69,7 +75,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var localVersion: String? = null
 
-//    private var scanDisposable: Disposable? = null
 
     private var mDeviceMeshName: String = Constant.PIR_SWITCH_MESH_NAME
 
@@ -83,9 +88,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     private var isSupportInstallOldDevice=false
 
-//    private var isOTA=true
-
-    private var dbSwitch=DbSwitch()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,7 +145,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         progressBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=false
-//            isOTA=true
             progressOldBtn.progress=0
             startScan()
         }
@@ -151,16 +152,9 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         progressOldBtn.onClick {
             retryConnectCount = 0
             isSupportInstallOldDevice=true
-//            isOTA=true
             progressBtn.progress=0
             startScan()
         }
-//        otaBtn.onClick {
-////            retryConnectCount = 0
-//            isOTA=false
-//            otaBtn.progress=0
-//            startScan()
-//        }
     }
 
     private fun getScanFilters(): MutableList<ScanFilter> {
@@ -231,8 +225,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     progressBtn.setMode(ActionProcessButton.Mode.ENDLESS)   //设置成intermediate的进度条
                     progressBtn.progress = 50   //在2-99之间随便设一个值，进度条就会开始动
                 }
-            } else {
-
             }
         },{})
     }
@@ -244,7 +236,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Long?> {
                     override fun onComplete() {
-                       //("onLeScanTimeout()")
                         onLeScanTimeout()
                     }
 
@@ -255,40 +246,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     override fun onNext(t: Long) {
                         if (bestRSSIDevice != null) {
                             mScanTimeoutDisposal?.dispose()
-                           //("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
                             connect(bestRSSIDevice!!.macAddress)
                         }
                     }
 
                     override fun onError(e: Throwable) {
                         Log.d("SawTest", "error = $e")
-
                     }
                 })
     }
 
-//    private fun retryConnect() {
-//        mRetryConnectCount++
-//       //("reconnect time = $mRetryConnectCount")
-//        if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
-//            showConnectFailed()
-//        } else {
-//            if (TelinkLightApplication.getApp().connectDevice == null)
-//                connect()   //重新进行连接
-//            else
-//                login()   //重新进行登录
-//        }
-//    }
-
-//    private fun retryLogin() {
-//        mRetryConnectCount++
-//       //("reconnect time = $mRetryConnectCount")
-//        if (mRetryConnectCount > MAX_RETRY_CONNECT_TIME) {
-//            showConnectFailed()
-//        } else {
-//            login()   //重新进行连接
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()
@@ -300,7 +267,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         super.onPause()
         mScanTimeoutDisposal?.dispose()
         connectDisposable?.dispose()
-//        scanDisposable?.dispose()
         mConnectDisposal?.dispose()
         this.mApplication.removeEventListener(this)
         stopConnectTimer()
@@ -309,16 +275,11 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     override fun performed(event: Event<String>?) {
         when (event?.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-//            LeScanEvent.LE_SCAN_TIMEOUT -> this.onLeScanTimeout()
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
-//            LeScanEvent.LE_SCAN_COMPLETED -> this.onLeScanTimeout()
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReport(info)
             }
-
-//            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
-//            MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
         }
     }
 
@@ -327,13 +288,13 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                       //("蓝牙未开启")
+                       LogUtils.e("蓝牙未开启")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                       //("无法收到广播包以及响应包")
+                       LogUtils.e("无法收到广播包以及响应包")
                     }
                     ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                       //("未扫到目标设备")
+                       LogUtils.e("未扫到目标设备")
                     }
                 }
 
@@ -341,10 +302,10 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                       //("未读到att表")
+                       LogUtils.e("未读到att表")
                     }
                     ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                       //("未建立物理连接")
+                       LogUtils.e("未建立物理连接")
 
                     }
                 }
@@ -354,16 +315,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
                     ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                       //("value check失败： 密码错误")
+                       LogUtils.e("value check失败： 密码错误")
                     }
                     ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                       //("read login data 没有收到response")
+                       LogUtils.e("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                       //("write login data 没有收到response")
+                       LogUtils.e("write login data 没有收到response")
                     }
                 }
-               //("onError login")
+               LogUtils.e("onError login")
                 retryConnect()
 
             }
@@ -371,10 +332,8 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScanTimeout() {
-       //("onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
             retryConnectCount = 0
-//            if(isOTA){
                 if(isSupportInstallOldDevice){
                     progressOldBtn.progress = -1   //控件显示Error状态
                     progressOldBtn.text = getString(R.string.not_found_switch)
@@ -382,12 +341,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     progressBtn.progress = -1   //控件显示Error状态
                     progressBtn.text = getString(R.string.not_found_switch)
                 }
-//            }
-//            else{
-//                otaBtn.progress = -1   //控件显示Error状态
-//                otaBtn.text = getString(R.string.not_found_switch)
-//            }
-
         }
     }
 
@@ -399,23 +352,17 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             LightAdapter.STATUS_LOGIN -> {
                 onLogin()
                 stopConnectTimer()
-               //("connected22")
             }
             LightAdapter.STATUS_LOGOUT -> {
-//                onLoginFailed()
-
                 GlobalScope.launch(Dispatchers.Main) {
-                    if (!mIsInited){
+                    if (!mIsInited)
                         onInited()
-                    }
                 }
             }
 
             LightAdapter.STATUS_CONNECTED -> {
                 connectDisposable?.dispose()
-
                 login()
-               //("connected11")
             }
         }
 
@@ -433,15 +380,14 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
 
-        if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
-            pwd = mesh.factoryPassword.toString()
+        pwd = if (mDeviceMeshName == Constant.PIR_SWITCH_MESH_NAME) {
+            mesh.factoryPassword.toString()
         } else {
-            pwd = NetworkFactory.md5(NetworkFactory.md5(mDeviceMeshName) + mDeviceMeshName)
-                    .substring(0, 16)
+            val meshName = DBUtils.lastUser?.controlMeshName
+            NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
         }
         TelinkLightService.Instance()?.login(Strings.stringToBytes(mDeviceMeshName, 16)
                 , Strings.stringToBytes(pwd, 16))
-
     }
 
     private fun onLogin() {
@@ -491,9 +437,6 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             }
     }
 
-
-
-
     @SuppressLint("CheckResult")
     private fun connect(mac: String) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
@@ -502,22 +445,16 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     if (it) {
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
-//                            progressBar?.visibility = View.VISIBLE
                             mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this@ScanningSwitchActivity)
                             mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this@ScanningSwitchActivity)
                             TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                             startConnectTimer()
 
-//                            if(isOTA){
                                 if(isSupportInstallOldDevice){
                                     progressOldBtn.text = getString(R.string.connecting)
                                 }else{
                                     progressBtn.text = getString(R.string.connecting)
                                 }
-//                            }
-//                            else{
-//                                otaBtn.text = getString(R.string.connecting)
-//                            }
                         }
                     } else {
                         //没有授予权限

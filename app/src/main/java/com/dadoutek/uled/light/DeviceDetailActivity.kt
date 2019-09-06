@@ -782,6 +782,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 var all_light_data = DBUtils.getAllRGBLight()
+                lightsData.clear()
                 if (all_light_data.size > 0) {
                     var list_group: ArrayList<DbLight> = ArrayList()
                     var no_group = ArrayList<DbLight>()
