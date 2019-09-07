@@ -293,8 +293,8 @@ class CurtainFragmentList : BaseFragment() {
         return@OnItemLongClickListener true
     }
 
-    private fun refreshData() {
-        groupAdapter!!.notifyDataSetChanged()
+    fun refreshData() {
+        groupAdapter?.notifyDataSetChanged()
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -426,9 +426,14 @@ class CurtainFragmentList : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_CURTAIN, activity!!)
+                        val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_CURTAIN)
+                        dbGroup?.let {
+                            groupList.add(it)
+                        }
                         isLong = true
                         dialog.dismiss()
+
+                        groupAdapter?.notifyDataSetChanged()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()

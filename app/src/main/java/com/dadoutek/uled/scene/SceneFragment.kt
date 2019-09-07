@@ -189,7 +189,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
@@ -453,7 +453,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     }
 
-    private fun refreshView() {
+    fun refreshView() {
         if (activity != null) {
             scenesListData = DBUtils.sceneList
             if (scenesListData!!.size > 0) {

@@ -57,13 +57,15 @@ object Commander : EventListener<String> {
         val params: ByteArray
 
         if (isOpen) {
-            //0x64代表延时100ms保证开关同步
+            //0x64代表延时100ms，从而保证多个灯同步开关
             params = byteArrayOf(0x01, 0x64, 0x00)
         } else {
             params = byteArrayOf(0x00, 0x64, 0x00)
         }
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mTargetGroupAddr, params)
+        GlobalScope.launch {
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mTargetGroupAddr, params)
+        }
     }
 
     /**

@@ -138,131 +138,30 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
 
 
-        <android.support.constraint.ConstraintLayout
-            android:id="@+id/constraintLayout4"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
+        <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+            android:id="@+id/bnve"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            app:elevation="0dp"
             android:background="@color/white"
+            app:itemTextColor="@color/selector_item_color"
+            app:labelVisibilityMode="labeled"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view5">
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3"
+            app:menu="@menu/menu_group_fragment_device_type" />
 
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerView_name"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginLeft="15dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <!--<TextView-->
-                    <!--android:id="@+id/cw_light_btn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="@string/normal_light"-->
-                    <!--android:textSize="15sp"-->
-                    <!--android:textColor="@color/blue_background"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintEnd_toEndOf="parent"-->
-                    <!--app:layout_constraintHorizontal_bias="0.04"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<ImageView-->
-                    <!--android:id="@+id/cw_light_image"-->
-                    <!--android:layout_width="22dp"-->
-                    <!--android:layout_height="2dp"-->
-                    <!--android:layout_marginTop="4dp"-->
-                    <!--android:src="@color/blue_background"-->
-                    <!--app:layout_constraintEnd_toEndOf="@+id/cw_light_btn"-->
-                    <!--app:layout_constraintStart_toStartOf="@+id/cw_light_btn"-->
-                    <!--app:layout_constraintTop_toBottomOf="@+id/cw_light_btn" />-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/rgb_light_btn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="@string/rgb_light"-->
-                    <!--android:textSize="15sp"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintEnd_toEndOf="parent"-->
-                    <!--app:layout_constraintHorizontal_bias="0.33"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<ImageView-->
-                    <!--android:id="@+id/rgb_light_image"-->
-                    <!--android:layout_width="22dp"-->
-                    <!--android:layout_height="2dp"-->
-                    <!--android:src="@color/blue_background"-->
-                    <!--android:layout_marginTop="4dp"-->
-                    <!--android:visibility="gone"-->
-                    <!--app:layout_constraintEnd_toEndOf="@+id/rgb_light_btn"-->
-                    <!--app:layout_constraintStart_toStartOf="@+id/rgb_light_btn"-->
-                    <!--app:layout_constraintTop_toBottomOf="@+id/rgb_light_btn" />-->
-
-
-                <!--<TextView-->
-                    <!--android:id="@+id/curtain_btn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="@string/curtain"-->
-                    <!--android:textSize="15sp"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintEnd_toEndOf="parent"-->
-                    <!--app:layout_constraintHorizontal_bias="0.61"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<ImageView-->
-                    <!--android:id="@+id/curtain_image"-->
-                    <!--android:layout_width="22dp"-->
-                    <!--android:layout_height="2dp"-->
-                    <!--android:src="@color/blue_background"-->
-                    <!--android:layout_marginTop="4dp"-->
-                    <!--android:visibility="gone"-->
-                    <!--app:layout_constraintEnd_toEndOf="@+id/curtain_btn"-->
-                    <!--app:layout_constraintStart_toStartOf="@+id/curtain_btn"-->
-                    <!--app:layout_constraintTop_toBottomOf="@+id/curtain_btn" />-->
-
-
-                <!--<TextView-->
-                    <!--android:id="@+id/relay_btn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="@string/connector"-->
-                    <!--android:textSize="15sp"-->
-                    <!--app:layout_constraintBottom_toBottomOf="parent"-->
-                    <!--app:layout_constraintEnd_toEndOf="parent"-->
-                    <!--app:layout_constraintHorizontal_bias="0.96"-->
-                    <!--app:layout_constraintStart_toStartOf="parent"-->
-                    <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-                <!--<ImageView-->
-                    <!--android:id="@+id/relay_image"-->
-                    <!--android:layout_width="22dp"-->
-                    <!--android:layout_height="2dp"-->
-                    <!--android:src="@color/blue_background"-->
-                    <!--android:layout_marginTop="4dp"-->
-                    <!--android:visibility="gone"-->
-                    <!--app:layout_constraintEnd_toEndOf="@+id/relay_btn"-->
-                    <!--app:layout_constraintStart_toStartOf="@+id/relay_btn"-->
-                    <!--app:layout_constraintTop_toBottomOf="@+id/relay_btn" />-->
-
-
-        </android.support.constraint.ConstraintLayout>
 
         <View
             android:id="@+id/view6"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#eeeeee"
+            app:layout_constraintBottom_toTopOf="@+id/list_groups"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
+            app:layout_constraintTop_toBottomOf="@+id/bnve" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/list_groups"

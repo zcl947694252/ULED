@@ -306,8 +306,8 @@ class RelayFragmentList : BaseFragment() {
         return@OnItemLongClickListener true
     }
 
-    private fun refreshData() {
-        groupAdapter!!.notifyDataSetChanged()
+    fun refreshData() {
+        groupAdapter?.notifyDataSetChanged()
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -327,7 +327,7 @@ class RelayFragmentList : BaseFragment() {
 //                    DBUtils.updateGroup(currentLight)
 
                 if (isLong) {
-                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, true)
                         currentLight.connectionStatus = ConnectionStatus.ON.value
                         DBUtils.updateGroup(currentLight)
@@ -343,7 +343,7 @@ class RelayFragmentList : BaseFragment() {
 //                    groupAdapter!!.notifyItemChanged(position)
 //                    DBUtils.updateGroup(currentLight)
                 if (isLong) {
-                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         Commander.openOrCloseLights(dstAddr, false)
                         currentLight.connectionStatus = ConnectionStatus.OFF.value
                         DBUtils.updateGroup(currentLight)
@@ -354,7 +354,7 @@ class RelayFragmentList : BaseFragment() {
             }
 
             R.id.btn_set -> {
-                if(isLong) {
+                if (isLong) {
                     if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_CONNECTOR && DBUtils.getConnectorByGroupID(currentLight.id).size != 0)) {
                         intent = Intent(mContext, ConnectorSettingActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
@@ -474,10 +474,15 @@ class RelayFragmentList : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_CONNECTOR, activity!!)
+                        val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_CONNECTOR)
+                        dbGroup?.let {
+                            groupList?.add(it)
+                        }
                         refreshAndMoveBottom()
                         isLong = true
                         dialog.dismiss()
+
+                        groupAdapter?.notifyDataSetChanged()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
@@ -608,7 +613,7 @@ class RelayFragmentList : BaseFragment() {
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                   //("retry delete group timeout")
+                    //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)

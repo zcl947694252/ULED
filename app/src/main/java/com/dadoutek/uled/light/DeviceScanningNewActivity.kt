@@ -776,9 +776,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             } else {
                 //往DB里添加组数据
                 if (scanRGBLight) {
-                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, groups!!, Constant.DEVICE_TYPE_LIGHT_RGB, this)
+                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_RGB)
                 } else {
-                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, groups!!, Constant.DEVICE_TYPE_LIGHT_NORMAL, this)
+                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_NORMAL)
                 }
 
                 refreshView()
@@ -1187,11 +1187,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
 
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_COMPLETED -> {
-                list_devices.visibility = View.VISIBLE
-                scanning_num.visibility = View.GONE
-                btn_stop_scan?.visibility = View.GONE
-            }
+
             LeScanEvent.LE_SCAN_TIMEOUT -> {
                 stopTimer()
                 this.onLeScanTimeout()

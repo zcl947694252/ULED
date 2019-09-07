@@ -13,94 +13,41 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.bluetooth.light.ConnectionStatus
 
-class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDelete: Boolean) : BaseItemDraggableAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
+/**
+ * 群组页面内的设备的List的Adapter
+ * @param isDelete      是否处于删除模式
+ */
+class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDelete: Boolean) : BaseItemDraggableAdapter<DbGroup, BaseViewHolder>(layoutResId, data) {
+
+
     override fun convert(helper: BaseViewHolder, group: DbGroup?) {
 
         if (group != null) {
-            var lightNum = 0
-            var relayNum = 0
-            var curtianNum = 0
-            var gpImageView = helper.getView<ImageView>(R.id.btn_on)
-            var gpSet = helper.getView<ImageView>(R.id.btn_set)
-            var gpOff = helper.getView<ImageView>(R.id.btn_off)
-            var gpOnText = helper.getView<TextView>(R.id.textView8)
-            var gpOffText = helper.getView<TextView>(R.id.textView11)
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB) {
-                lightNum = DBUtils.getLightByGroupID(group.id).size
-            }
-
-            if (group.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
-                curtianNum = DBUtils.getConnectorByGroupID(group.id).size
-            }
-
-            if (group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
-                relayNum = DBUtils.getConnectorByGroupID(group.id).size
-            }
-
+            val num = group.deviceCount //内含设备的数量
+            val gpImageView = helper.getView<ImageView>(R.id.btn_on)
+            val gpSet = helper.getView<ImageView>(R.id.btn_set)
+            val gpOff = helper.getView<ImageView>(R.id.btn_off)
+            val gpOnText = helper.getView<TextView>(R.id.textView8)
+            val gpOffText = helper.getView<TextView>(R.id.textView11)
             val deleteIcon = helper.getView<CheckBox>(R.id.selected_group)
+
             if (isDelete) {
                 deleteIcon.visibility = View.VISIBLE
             } else {
                 deleteIcon.visibility = View.GONE
             }
 
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB) {
-                if (lightNum == 0) {
-                    helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece))
-                } else {
-                    helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + lightNum + TelinkLightApplication.getApp().getString(R.string.piece))
-                }
-            } else if (group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
-                if (relayNum == 0) {
-                    helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece))
-                } else {
-                    helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + relayNum + TelinkLightApplication.getApp().getString(R.string.piece))
-                }
-            } else if (group.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
-                if (curtianNum == 0) {
-                    helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece))
-                } else {
-                    helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + curtianNum + TelinkLightApplication.getApp().getString(R.string.piece))
-                }
-            }else if(group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL){
-                helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + 0 + TelinkLightApplication.getApp().getString(R.string.piece))
-            }
+            helper.setText(R.id.group_num, TelinkLightApplication.getApp().getString(R.string.total) + num + TelinkLightApplication.getApp().getString(R.string.piece))
 
+            gpSet.setImageResource(R.drawable.icon_setting_group)
 
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && lightNum == 0 || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && lightNum == 0 || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR && relayNum == 0 || group.deviceType == Constant.DEVICE_TYPE_CURTAIN && curtianNum == 0) {
-                gpImageView.setImageResource(R.drawable.icon_open_group_no)
-                gpSet.setImageResource(R.drawable.icon_device_group)
-                gpOff.setImageResource(R.drawable.icon_down_group)
-            } else if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                gpImageView.setImageResource(R.drawable.icon_open_group_no)
-                gpSet.setImageResource(R.drawable.icon_device_group)
-                gpOff.setImageResource(R.drawable.icon_down_group)
-            } else {
-                    gpImageView.setImageResource(R.drawable.icon_open_group)
-                    gpSet.setImageResource(R.drawable.icon_setting_group)
-                    gpOff.setImageResource(R.drawable.icon_down_group)
-
-            }
-
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB ) {
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
                 if (group.connectionStatus == ConnectionStatus.ON.value) {
                     gpImageView.setImageResource(R.drawable.icon_open_group)
                     gpOff.setImageResource(R.drawable.icon_down_group)
                     gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
                     gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                }else if(group.connectionStatus == ConnectionStatus.OFF.value){
-                    gpImageView.setImageResource(R.drawable.icon_down_group)
-                    gpOff.setImageResource(R.drawable.icon_open_group)
-                    gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                    gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
-                }
-            }else if(group.deviceType == Constant.DEVICE_TYPE_CONNECTOR){
-                if (group.connectionStatus == ConnectionStatus.ON.value) {
-                    gpImageView.setImageResource(R.drawable.icon_open_group)
-                    gpOff.setImageResource(R.drawable.icon_down_group)
-                    gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
-                    gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
-                }else if(group.connectionStatus == ConnectionStatus.OFF.value){
+                } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
                     gpImageView.setImageResource(R.drawable.icon_down_group)
                     gpOff.setImageResource(R.drawable.icon_open_group)
                     gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
@@ -117,9 +64,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                 helper.setText(R.id.txt_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             } else {
                 helper.setText(R.id.txt_name, group.name)
-//                if(OtherUtils.isCurtain(group)){
-//                    helper.setText(R.id.btn_set)
-//                }
+
             }
 
             if (group.isSelected) {
@@ -128,30 +73,24 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal var isDe
                 helper.setChecked(R.id.selected_group, false)
             }
 
-//            if (group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
-//                gpImageView.setImageResource(R.drawable.icon_open_group_no)
-//                gpSet.setImageResource(R.drawable.icon_device_group)
-//            } else {
-//                gpImageView.setImageResource(R.drawable.icon_open_group)
-//                gpSet.setImageResource(R.drawable.icon_setting_group)
-//            }
-//            if(group.name==TelinkLightApplication.getApp().getString(R.string.curtain)){
-//                helper.setVisible(R.id.btn_off,false)
-//                helper.setVisible(R.id.btn_on,false)
-//            }
+
             helper.setTextColor(R.id.txt_name, group.textColor)
 //                    .addOnClickListener(R.id.txt_name)
-                .addOnClickListener(R.id.btn_on)
-                .addOnClickListener(R.id.btn_off)
-                .addOnClickListener(R.id.btn_set)
+                    .addOnClickListener(R.id.btn_on)
+                    .addOnClickListener(R.id.btn_off)
+                    .addOnClickListener(R.id.btn_set)
 //                    .addOnClickListener(R.id.group_name)
-                .addOnClickListener(R.id.selected_group)
-                .addOnClickListener(R.id.item_layout)
+                    .addOnClickListener(R.id.selected_group)
+                    .addOnClickListener(R.id.item_layout)
 //                    .addOnClickListener(R.id.add_group)
-    }
+        }
 
     }
 
+    /**
+     * 改变状态
+     * @param isDelete  是否处于删除状态
+     */
     fun changeState(isDelete: Boolean) {
         this.isDelete = isDelete
     }

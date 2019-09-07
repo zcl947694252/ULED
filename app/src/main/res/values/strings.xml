@@ -706,7 +706,7 @@
     <string name="add_group">Add group</string>
 
     <string name="total">Total</string>
-    <string name="piece">piece</string>
+    <string name="piece"></string>
 
     <string name="gradient_mode">Gradient mode</string>
     <string name="color_mode">Color mode</string>

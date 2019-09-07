@@ -2,7 +2,6 @@ package com.dadoutek.uled.model.DbModel
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
@@ -481,9 +480,14 @@ object DBUtils {
         return dbGroup
     }
 
-    fun getGroupsByDeviceType(type: Int): MutableList<DbGroup> {
-        val dbSwitches = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.DeviceType.eq(type)).list()
-        return dbSwitches
+    fun getGroupsByDeviceType(vararg types: Int): MutableList<DbGroup> {
+        val groups = mutableListOf<DbGroup>()
+        for (type in types) {
+            val group = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.DeviceType.eq(type)).list()
+            groups.addAll(group)
+
+        }
+        return groups
     }
 
     fun getAllGroupsOrderByIndex(): MutableList<DbGroup> {
@@ -1075,7 +1079,8 @@ object DBUtils {
         }
     }
 
-    fun addNewGroupWithType(name: String, groups: MutableList<DbGroup>, type: Long, context: Context) {
+    fun addNewGroupWithType(name: String, type: Long) : DbGroup?{
+        val groups = DBUtils.groupList
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
         if (!checkReachedTheLimit(groups, name)) {
             val newMeshAdress: Int
@@ -1101,7 +1106,10 @@ object DBUtils {
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
                     Constant.DB_ADD)
+
+            return group
         }
+        return null
     }
 
     fun getDefaultNewGroupName(): String {

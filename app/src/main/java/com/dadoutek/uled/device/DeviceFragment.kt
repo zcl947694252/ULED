@@ -83,10 +83,11 @@ class DeviceFragment : BaseFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser);
         if (userVisibleHint) {
-            val act = activity as MainActivity?
+//            val act = activity as MainActivity?
 //            act?.addEventListeners()
             initOnLayoutListener()
             refreshView()
+//            refreshView()
         }
     }
 
@@ -333,7 +334,7 @@ class DeviceFragment : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }

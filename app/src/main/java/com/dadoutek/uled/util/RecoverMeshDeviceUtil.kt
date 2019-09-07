@@ -67,8 +67,8 @@ object RecoverMeshDeviceUtil {
                     val needCreateDeviceMeshList = (createdDeviceList).map {
                         it.meshAddress
                     }
-                   val ret =  !addressList.contains(it.meshAddress) and !needCreateDeviceMeshList.contains(it.meshAddress)
-                    LogUtils.d("find meshAddr = ${it.meshAddress}  addressList = $addressList  needCreateDeviceMeshList = $needCreateDeviceMeshList    ret = $ret")
+                   val ret =  !addressList.contains(it.meshAddress) && !needCreateDeviceMeshList.contains(it.meshAddress)
+//                    LogUtils.d("find meshAddr = ${it.meshAddress}  addressList = $addressList  needCreateDeviceMeshList = $needCreateDeviceMeshList    ret = $ret")
                     ret
                 }
                 .map { deviceInfo ->

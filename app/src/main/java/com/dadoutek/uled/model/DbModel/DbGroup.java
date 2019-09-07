@@ -49,6 +49,10 @@ public class DbGroup implements Serializable{
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean isSeek = true;
+    
+    @Expose(serialize = false, deserialize = false)
+    @Transient
+    public int deviceCount = 0;
 
 
     @Generated(hash = 1966413977)
@@ -214,5 +218,13 @@ public class DbGroup implements Serializable{
                 ", status=" + status +
                 ", isSeek=" + isSeek +
                 '}';
+    }
+
+    public int getDeviceCount() {
+        return this.deviceCount;
+    }
+
+    public void setDeviceCount(int deviceCount) {
+        this.deviceCount = deviceCount;
     }
 }

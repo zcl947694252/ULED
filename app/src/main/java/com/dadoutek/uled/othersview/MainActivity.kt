@@ -657,6 +657,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPostResume() {
         super.onPostResume()
+        deviceFragment.refreshView()
+        groupFragment.refreshView()
+        sceneFragment.refreshView()
         autoConnect()
     }
 
@@ -679,30 +682,40 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     mTelinkLightService = TelinkLightService.Instance()
                     if (mTelinkLightService?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                            LogUtils.d("start Auto connect")
-                            GlobalScope.launch(Dispatchers.Main) {
-                                retryConnectCount = 0
-                                connectFailedDeviceMacList.clear()
-                                val meshName = DBUtils.lastUser!!.controlMeshName
+                            val disposable = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                                    Manifest.permission.BLUETOOTH_ADMIN)
+                                    .subscribeOn(Schedulers.io())
+                                    .subscribe({
 
-                                //自动重连参数
-                                val connectParams = Parameters.createAutoConnectParameters()
-                                connectParams.setMeshName(meshName)
-                                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
-                                connectParams.autoEnableNotification(true)
-                                //连接，如断开会自动重连
-                                Thread {
-                                    TelinkLightService.Instance().autoConnect(connectParams)
-                                }.start()
+                                        LogUtils.d("start Auto connect")
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            retryConnectCount = 0
+                                            connectFailedDeviceMacList.clear()
+                                            val meshName = DBUtils.lastUser!!.controlMeshName
 
-                                //刷新Notify参数
-                                val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-                                refreshNotifyParams.setRefreshRepeatCount(2)
-                                refreshNotifyParams.setRefreshInterval(1000)
-                                //开启自动刷新Notify
-                                TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+                                            //自动重连参数
+                                            val connectParams = Parameters.createAutoConnectParameters()
+                                            connectParams.setMeshName(meshName)
+                                            connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                                            connectParams.autoEnableNotification(true)
+                                            //连接，如断开会自动重连
+                                            Thread {
+                                                TelinkLightService.Instance().autoConnect(connectParams)
+                                            }.start()
 
-                            }
+                                            //刷新Notify参数
+                                            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+                                            refreshNotifyParams.setRefreshRepeatCount(2)
+                                            refreshNotifyParams.setRefreshInterval(1000)
+                                            //开启自动刷新Notify
+                                            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+
+                                        }
+                                    },
+                                            {
+                                                LogUtils.d(it)
+                                            })
+
                             break
                         }
 

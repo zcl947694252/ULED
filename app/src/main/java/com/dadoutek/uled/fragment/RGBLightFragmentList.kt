@@ -305,8 +305,8 @@ class RGBLightFragmentList : BaseFragment() {
         return@OnItemLongClickListener true
     }
 
-    private fun refreshData() {
-        groupAdapter!!.notifyDataSetChanged()
+    fun refreshData() {
+        groupAdapter?.notifyDataSetChanged()
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
@@ -331,19 +331,20 @@ class RGBLightFragmentList : BaseFragment() {
             }
             R.id.btn_off -> {
                 if (isLong) {
-                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL){
-                    Commander.openOrCloseLights(dstAddr, false)
-                    currentLight.connectionStatus = ConnectionStatus.OFF.value
-                    DBUtils.updateGroup(currentLight)
-                    groupAdapter!!.notifyItemChanged(position)
-                    updateLights(false, currentLight)
-                }}
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, false)
+                        currentLight.connectionStatus = ConnectionStatus.OFF.value
+                        DBUtils.updateGroup(currentLight)
+                        groupAdapter!!.notifyItemChanged(position)
+                        updateLights(false, currentLight)
+                    }
+                }
 
             }
 
             R.id.btn_set -> {
-                if(isLong) {
-                    if(currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                if (isLong) {
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
                         if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                             intent = Intent(mContext, RGBSettingActivity::class.java)
                             intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
@@ -457,10 +458,15 @@ class RGBLightFragmentList : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_LIGHT_RGB, activity!!)
+                        val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_RGB)
+                        dbGroup?.let {
+                            groupList?.add(it)
+                        }
                         refreshAndMoveBottom()
                         isLong = true
                         dialog.dismiss()
+
+                        groupAdapter?.notifyDataSetChanged()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
@@ -500,7 +506,7 @@ class RGBLightFragmentList : BaseFragment() {
             }
 
 
-            if(isDeleteTrue){
+            if (isDeleteTrue) {
                 isDelete = false
                 SharedPreferencesUtils.setDelete(false)
                 val intent = Intent("switch_fragment")
@@ -589,7 +595,7 @@ class RGBLightFragmentList : BaseFragment() {
                     this?.runOnUiThread {
                         failedCallback.invoke()
                     }
-                   //("retry delete group timeout")
+                    //("retry delete group timeout")
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)

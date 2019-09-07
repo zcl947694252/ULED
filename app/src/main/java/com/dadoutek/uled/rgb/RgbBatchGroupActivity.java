@@ -723,7 +723,7 @@ public class RgbBatchGroupActivity  extends TelinkMeshErrorDealActivity
                 ToastUtils.showShort(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_LIGHT_RGB,this);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_LIGHT_RGB);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);

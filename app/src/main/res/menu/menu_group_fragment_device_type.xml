@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bnve_normal_light"
+        android:title="@string/normal_light" />
+    <item
+        android:id="@+id/bnve_rgb_light"
+        android:title="@string/rgb_light" />
+    <item
+        android:id="@+id/bnve_curtain"
+        android:title="@string/curtain" />
+    <!--<item-->
+        <!--android:id="@+id/bnve_light"-->
+        <!--android:icon="@drawable/ic_bottom_lightbulb"-->
+        <!--android:title="@string/light" />-->
+    <item
+        android:id="@+id/bnve_relay"
+        android:title="@string/relay" />
+</menu>

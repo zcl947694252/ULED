@@ -766,7 +766,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showShort(getString(R.string.rename_tip_check));
             } else {
                 //往DB里添加组数据
-                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), groups, Constant.DEVICE_TYPE_LIGHT_NORMAL, this);
+                DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(), Constant.DEVICE_TYPE_LIGHT_NORMAL);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm = (InputMethodManager) BatchGroupActivity.this.getSystemService(Context.INPUT_METHOD_SERVICE);

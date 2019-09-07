@@ -28,16 +28,15 @@ import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
 import com.chad.library.adapter.base.listener.OnItemDragListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbLight
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.BaseFragment
-import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
@@ -46,6 +45,8 @@ import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -59,9 +60,10 @@ class CWLightFragmentList : BaseFragment() {
 
     private var no_group: ConstraintLayout? = null
 
-    private var groupAdapter: GroupListAdapter? = null
+    private var isDelete = false        //是否处于删除组的模式（长按组可进入）
+    private var groupList: ArrayList<DbGroup> = arrayListOf()
+    private var groupAdapter: GroupListAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
 
-    private var groupList: ArrayList<DbGroup>? = null
 
     private var isFristUserClickCheckConnect = true
 
@@ -75,9 +77,6 @@ class CWLightFragmentList : BaseFragment() {
 
     private var viewLineRecycler: View? = null
 
-    private var isDelete = false
-
-    private var groupListGroup: GroupListFragment? = null
 
     private var groupMesher: ArrayList<String>? = null
 
@@ -91,7 +90,7 @@ class CWLightFragmentList : BaseFragment() {
 
     private var layout: ConstraintLayout? = null
 
-    private var isDeleteTrue: Boolean = true
+    private var isDeleteTrue: Boolean = true        //是否处于删除模式
 
     private var isLong: Boolean = true
 
@@ -184,7 +183,7 @@ class CWLightFragmentList : BaseFragment() {
         LocalBroadcastManager.getInstance(this!!.mContext!!)
                 .sendBroadcast(intent)
         isDeleteTrue = false
-        refreshView()
+        initView()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -192,8 +191,13 @@ class CWLightFragmentList : BaseFragment() {
         isDeleteTrue = true
         isLong = true
         val view = getView(inflater)
-        this.initData()
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+//        initView()
+        this.initData()
     }
 
     private fun getView(inflater: LayoutInflater): View {
@@ -213,39 +217,23 @@ class CWLightFragmentList : BaseFragment() {
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
-       // refreshView()
+        // initView()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
-            val act = activity as MainActivity?
-//            act?.addEventListeners()
-
             isDeleteTrue = true
             isLong = true
-            refreshView()
-
+//            initView()
+            refreshData()
         }
     }
 
     private fun initData() {
-        groupList = ArrayList()
+        groupList.clear()
+        groupList.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD))
 
-        val listAll = DBUtils.getAllGroupsOrderByIndex()
-
-        for (group in listAll) {
-            when (group.deviceType) {
-                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                    if (group.meshAddr!=0xffff)
-                        groupList!!.add(group)
-                }
-                Constant.DEVICE_TYPE_DEFAULT_ALL -> {
-                    groupList!!.add(group)
-                }
-            }
-        }
-
-        if (groupList!!.size > 0) {
+        if (groupList.size > 0) {
             no_group?.visibility = View.GONE
             recyclerView?.visibility = View.VISIBLE
             addGroupBtn?.visibility = View.VISIBLE
@@ -270,11 +258,12 @@ class CWLightFragmentList : BaseFragment() {
         val layoutmanager = LinearLayoutManager(activity)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
+
         Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
             return@Comparator o1.name.compareTo(o2.name)
         })
 
-        this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
+//        this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         val decoration = DividerItemDecoration(activity,
                 DividerItemDecoration
                         .VERTICAL)
@@ -282,7 +271,8 @@ class CWLightFragmentList : BaseFragment() {
                 .divider)))
         //添加分割线
         recyclerView?.addItemDecoration(decoration)
-        var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+
+        val lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
         lin.setOnClickListener(View.OnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
@@ -290,12 +280,10 @@ class CWLightFragmentList : BaseFragment() {
                 addNewGroup()
             }
         })
-        groupAdapter!!.addFooterView(lin)
-        groupAdapter!!.onItemChildClickListener = onItemChildClickListener
-        groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
-        groupAdapter!!.bindToRecyclerView(recyclerView)
-
-//        setMove(rvDevice!!)
+        groupAdapter.addFooterView(lin)
+        groupAdapter.onItemChildClickListener = onItemChildClickListener
+        groupAdapter.onItemLongClickListener = onItemChildLongClickListener
+        groupAdapter.bindToRecyclerView(recyclerView)
     }
 
     var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
@@ -310,70 +298,91 @@ class CWLightFragmentList : BaseFragment() {
                         .sendBroadcast(intent)
             }
         }
-        groupAdapter!!.changeState(isDelete)
+        groupAdapter?.changeState(isDelete)
         refreshData()
         return@OnItemLongClickListener true
     }
 
-    private fun refreshData() {
-        groupAdapter!!.notifyDataSetChanged()
+    /**
+     * 刷新数据
+     */
+    fun refreshData() {
+        groupList.clear()
+        groupList.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD))
+        for (group in groupList) {
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB) {
+                group.deviceCount = DBUtils.getLightByGroupID(group.id).size
+            } else if (group.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
+                group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size
+            } else if (group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
+                group.deviceCount = DBUtils.getConnectorByGroupID(group.id).size
+            }
+        }
+
+        groupAdapter.notifyDataSetChanged()
     }
 
     var onItemChildClickListener = OnItemChildClickListener { _, view, position ->
-        groupList?.let {
-        var currentLight = it[position]
-        val dstAddr = currentLight.meshAddr
-        var intent: Intent
-        when (view!!.id) {
-            R.id.btn_on -> {
-                if (isLong) {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                        Commander.openOrCloseLights(dstAddr, true)
-                        currentLight.connectionStatus = ConnectionStatus.ON.value
-                        DBUtils.updateGroup(currentLight)
-                        groupAdapter!!.notifyItemChanged(position)
-                        updateLights(true, currentLight)
+        groupList.let {
+            val currentLight = it[position]
+            val dstAddr = currentLight.meshAddr
+            val intent: Intent
+            when (view!!.id) {
+                R.id.btn_on -> {
+                    if (isLong) {
+                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                            Commander.openOrCloseLights(dstAddr, true)
+                            currentLight.connectionStatus = ConnectionStatus.ON.value
+                            groupAdapter.notifyItemChanged(position)
+                            GlobalScope.launch {
+                                //子线程执行
+                                DBUtils.updateGroup(currentLight)
+                                updateLights(true, currentLight)
+                            }
+                        }
                     }
                 }
-            }
-            R.id.btn_off -> {
-                if (isLong) {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                        Commander.openOrCloseLights(dstAddr, false)
-                        currentLight.connectionStatus = ConnectionStatus.OFF.value
-                        DBUtils.updateGroup(currentLight)
-                        groupAdapter!!.notifyItemChanged(position)
-                        updateLights(false, currentLight)
+                R.id.btn_off -> {
+                    if (isLong) {
+                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                            Commander.openOrCloseLights(dstAddr, false)
+                            currentLight.connectionStatus = ConnectionStatus.OFF.value
+                            groupAdapter.notifyItemChanged(position)
+                            GlobalScope.launch {
+                                //子线程执行
+                                DBUtils.updateGroup(currentLight)
+                                updateLights(false, currentLight)
+                            }
+                        }
                     }
                 }
-            }
 
-            R.id.btn_set -> {
-                if (isLong) {
-                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                        intent = Intent(mContext, NormalSettingActivity::class.java)
-                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                R.id.btn_set -> {
+                    if (isLong) {
+                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                            intent = Intent(mContext, NormalSettingActivity::class.java)
+                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                            intent.putExtra("group", currentLight)
+                            startActivityForResult(intent, 2)
+                        }
+                    }
+                }
+
+                R.id.selected_group -> {
+                    currentLight.isSelected = !currentLight.isSelected
+                }
+
+                R.id.item_layout -> {
+                    if (isLong) {
+                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
                         intent.putExtra("group", currentLight)
+                        intent.putExtra("light", "cw_light")
                         startActivityForResult(intent, 2)
                     }
                 }
             }
-
-            R.id.selected_group -> {
-                currentLight.isSelected = !currentLight.isSelected
-            }
-
-            R.id.item_layout -> {
-                if (isLong) {
-                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                    intent.putExtra("group", currentLight)
-                    intent.putExtra("light", "cw_light")
-                    startActivityForResult(intent, 2)
-                }
-            }
-        }
 //        }
-    }
+        }
     }
 
 
@@ -385,6 +394,7 @@ class CWLightFragmentList : BaseFragment() {
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+                .observeOn(Schedulers.io())
                 .subscribe {
                     var lightList: MutableList<DbLight> = ArrayList()
 
@@ -445,223 +455,221 @@ class CWLightFragmentList : BaseFragment() {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_LIGHT_NORMAL, activity!!)
+                        val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_NORMAL)
+                        dbGroup?.let {
+                            groupList?.add(it)
+                        }
                         isLong = true
                         dialog.dismiss()
+                        groupAdapter?.notifyDataSetChanged()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
 
-    private fun refreshView() {
-        if (activity != null) {
-            groupList = ArrayList()
+    private fun initView() {
+//        if (activity != null) {
+//            val listAll = DBUtils.getAllGroupsOrderByIndex()
 
-            val listAll = DBUtils.getAllGroupsOrderByIndex()
-
-            groupList?.let {
-
-
-
-            for (group in listAll) {
-                when (group.deviceType) {
-                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                        if (group.meshAddr!=0xffff)
-                        it.add(group)
-                    }
-                    Constant.DEVICE_TYPE_DEFAULT_ALL -> {
-                        it.add(group)
-                    }
-                }
-            }
-
-
-            if (it.size > 0) {
-                no_group?.visibility = View.GONE
-                recyclerView?.visibility = View.VISIBLE
-                addGroupBtn?.visibility = View.VISIBLE
-                viewLine?.visibility = View.VISIBLE
-            } else {
-                no_group?.visibility = View.VISIBLE
-                recyclerView?.visibility = View.GONE
-                addGroupBtn?.visibility = View.GONE
-                viewLine?.visibility = View.GONE
-            }
-
-
-            if (isDeleteTrue) {
-                isDelete = false
-                SharedPreferencesUtils.setDelete(false)
-                val intent = Intent("switch_fragment")
-                intent.putExtra("switch_fragment", "true")
-                LocalBroadcastManager.getInstance(this!!.mContext!!)
-                        .sendBroadcast(intent)
-            }
-            for (i in it.indices) {
-                if (it[i].isSelected) {
-                    it[i].isSelected = false
-                }
-            }
-
-            }
-            refreshData()
-
-            addGroupBtn?.setOnClickListener(onClick)
-            addNewGroup?.setOnClickListener(onClick)
-
-            val layoutmanager = LinearLayoutManager(activity)
-            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-            recyclerView!!.layoutManager = layoutmanager
-
-            Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
-                return@Comparator o1.name.compareTo(o2.name)
-            })
-            this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
-            val decoration = DividerItemDecoration(activity,
-                    DividerItemDecoration
-                            .VERTICAL)
-            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                    .divider)))
-            //添加分割线
-            recyclerView?.addItemDecoration(decoration)
-            var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
-            lin.setOnClickListener {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                } else {
-                    addNewGroup()
-                }
-            }
-            groupAdapter!!.addFooterView(lin)
-            groupAdapter!!.onItemChildClickListener = onItemChildClickListener
-            groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
-            groupAdapter!!.bindToRecyclerView(recyclerView)
-//            setMove(rvDevice!!)
+//            groupList.let {
+//                for (group in listAll) {
+//                    when (group.deviceType) {
+//                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+//                            if (group.meshAddr != 0xffff)
+//                                groupList.add(group)
+//                        }
+//                        Constant.DEVICE_TYPE_DEFAULT_ALL -> {
+//                            groupList.add(group)
+//                        }
+//                    }
+//                }
+//
+//
+//                if (groupList.size > 0) {
+//                    no_group?.visibility = View.GONE
+//                    recyclerView?.visibility = View.VISIBLE
+//                    addGroupBtn?.visibility = View.VISIBLE
+//                    viewLine?.visibility = View.VISIBLE
+//                } else {
+//                    no_group?.visibility = View.VISIBLE
+//                    recyclerView?.visibility = View.GONE
+//                    addGroupBtn?.visibility = View.GONE
+//                    viewLine?.visibility = View.GONE
+//                }
+//
+//
+//                //如果处于删除模式则发广播出去通知父Fragment
+//                if (isDeleteTrue) {
+//                    isDelete = false
+//                    SharedPreferencesUtils.setDelete(false)
+//                    val intent = Intent("switch_fragment")
+//                    intent.putExtra("switch_fragment", "true")
+//                    LocalBroadcastManager.getInstance(this!!.mContext!!)
+//                            .sendBroadcast(intent)
+//                }
+//                for (i in groupList.indices) {
+//                    if (groupList[i].isSelected) {
+//                        groupList[i].isSelected = false
+//                    }
+//                }
+//                refreshData()
+//
+//                addGroupBtn?.setOnClickListener(onClick)
+//                addNewGroup?.setOnClickListener(onClick)
+//
+//                val layoutmanager = LinearLayoutManager(activity)
+//                layoutmanager.orientation = LinearLayoutManager.VERTICAL
+//                recyclerView!!.layoutManager = layoutmanager
+//
+//                Collections.sort(groupList, kotlin.Comparator { o1, o2 ->
+//                    return@Comparator o1.name.compareTo(o2.name)
+//                })
+//                this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
+//                val decoration = DividerItemDecoration(activity,
+//                        DividerItemDecoration
+//                                .VERTICAL)
+//                decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
+//                        .divider)))
+//                //添加分割线
+//                recyclerView?.addItemDecoration(decoration)
+//                var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
+//                lin.setOnClickListener {
+//                    if (TelinkLightApplication.getApp().connectDevice == null) {
+//                        ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+//                    } else {
+//                        addNewGroup()
+//                    }
+//                }
+//                groupAdapter!!.addFooterView(lin)
+//                groupAdapter!!.onItemChildClickListener = onItemChildClickListener
+//                groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
+//                groupAdapter!!.bindToRecyclerView(recyclerView)
+////            setMove(rvDevice!!)
+//            }
         }
-    }
 
-    /**
-     * 删除组，并且把组里的灯的组也都删除。
-     */
-    private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
-                            successCallback: () -> Unit, failedCallback: () -> Unit) {
-        Thread {
-            if (lights.count() != 0) {
-                val maxRetryCount = 3
-                if (retryCount <= maxRetryCount) {
-                    val light = lights[0]
-                    val lightMeshAddr = light.meshAddr
-                    Commander.deleteGroup(lightMeshAddr,
-                            successCallback = {
-                                light.belongGroupId = DBUtils.groupNull!!.id
-                                DBUtils.updateLight(light)
-                                lights.remove(light)
-                                //修改分组成功后删除场景信息。
-                                deleteAllSceneByLightAddr(light.meshAddr)
-                                Thread.sleep(100)
-                                if (lights.count() == 0) {
-                                    //所有灯都删除了分组
-                                    DBUtils.deleteGroupOnly(group)
-                                    this?.runOnUiThread {
-                                        successCallback.invoke()
+        /**
+         * 删除组，并且把组里的灯的组也都删除。
+         */
+        private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
+                                successCallback: () -> Unit, failedCallback: () -> Unit) {
+            Thread {
+                if (lights.count() != 0) {
+                    val maxRetryCount = 3
+                    if (retryCount <= maxRetryCount) {
+                        val light = lights[0]
+                        val lightMeshAddr = light.meshAddr
+                        Commander.deleteGroup(lightMeshAddr,
+                                successCallback = {
+                                    light.belongGroupId = DBUtils.groupNull!!.id
+                                    DBUtils.updateLight(light)
+                                    lights.remove(light)
+                                    //修改分组成功后删除场景信息。
+                                    deleteAllSceneByLightAddr(light.meshAddr)
+                                    Thread.sleep(100)
+                                    if (lights.count() == 0) {
+                                        //所有灯都删除了分组
+                                        DBUtils.deleteGroupOnly(group)
+                                        this?.runOnUiThread {
+                                            successCallback.invoke()
+                                        }
+                                    } else {
+                                        //还有灯要删除分组
+                                        deleteGroup(lights, group,
+                                                successCallback = successCallback,
+                                                failedCallback = failedCallback)
                                     }
-                                } else {
-                                    //还有灯要删除分组
-                                    deleteGroup(lights, group,
+                                },
+                                failedCallback = {
+                                    deleteGroup(lights, group, retryCount = retryCount + 1,
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)
-                                }
-                            },
-                            failedCallback = {
-                                deleteGroup(lights, group, retryCount = retryCount + 1,
-                                        successCallback = successCallback,
-                                        failedCallback = failedCallback)
-                            })
-                } else {    //超过了重试次数
-                    this?.runOnUiThread {
-                        failedCallback.invoke()
+                                })
+                    } else {    //超过了重试次数
+                        this?.runOnUiThread {
+                            failedCallback.invoke()
+                        }
+                        //("retry delete group timeout")
                     }
-                   //("retry delete group timeout")
+                } else {
+                    DBUtils.deleteGroupOnly(group)
+                    this?.runOnUiThread {
+                        successCallback.invoke()
+                    }
                 }
-            } else {
-                DBUtils.deleteGroupOnly(group)
-                this?.runOnUiThread {
-                    successCallback.invoke()
-                }
-            }
-        }.start()
+            }.start()
 
-    }
-
-    private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
-        val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params = byteArrayOf(0x00, 0xff.toByte())
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        localBroadcastManager.unregisterReceiver(br)
-    }
-
-    private fun setMove(recyclerViewChild: RecyclerView) {
-        var startPos = 0
-        var endPos = 0
-        val list = groupAdapter!!.data
-        val onItemDragListener = object : OnItemDragListener {
-            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
-
-                startPos = pos
-                endPos = 0
-
-               //"indexchange----start:$pos")
-            }
-
-            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
-                                          target: RecyclerView.ViewHolder, to: Int) {
-            }
-
-            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
-                //                viewHolder.getItemId();
-                endPos = pos
-               //"indexchange----end:$pos")
-
-                updateGroupList(list, startPos, endPos)
-               //"indexchange----start:$startPos--end:$endPos")
-            }
         }
 
-        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(groupAdapter)
-        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerViewChild)
-
-        groupAdapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
-        groupAdapter!!.setOnItemDragListener(onItemDragListener)
-    }
-
-    private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
-
-        var tempIndex = list[endPos].index
-
-        if (endPos < startPos) {
-            for (i in endPos..startPos) {
-                if (i == startPos) {
-                    list[i].index = tempIndex
-                } else {
-                    list[i].index = list[i + 1].index
-                }
-            }
-        } else if (endPos > startPos) {
-            for (i in endPos downTo startPos) {
-                if (i == startPos) {
-                    list[i].index = tempIndex
-                } else {
-                    list[i].index = list[i - 1].index
-                }
-            }
+        private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
+            val opcode = Opcode.SCENE_ADD_OR_DEL
+            val params = byteArrayOf(0x00, 0xff.toByte())
+            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         }
 
-        DBUtils.updateGroupList(list)
+        override fun onDestroy() {
+            super.onDestroy()
+            localBroadcastManager.unregisterReceiver(br)
+        }
+
+        private fun setMove(recyclerViewChild: RecyclerView) {
+            var startPos = 0
+            var endPos = 0
+            val list = groupAdapter!!.data
+            val onItemDragListener = object : OnItemDragListener {
+                override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+
+                    startPos = pos
+                    endPos = 0
+
+                    //"indexchange----start:$pos")
+                }
+
+                override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
+                                              target: RecyclerView.ViewHolder, to: Int) {
+                }
+
+                override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+                    //                viewHolder.getItemId();
+                    endPos = pos
+                    //"indexchange----end:$pos")
+
+                    updateGroupList(list, startPos, endPos)
+                    //"indexchange----start:$startPos--end:$endPos")
+                }
+            }
+
+            val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(groupAdapter)
+            val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
+            itemTouchHelper.attachToRecyclerView(recyclerViewChild)
+
+            groupAdapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
+            groupAdapter!!.setOnItemDragListener(onItemDragListener)
+        }
+
+        private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
+
+            var tempIndex = list[endPos].index
+
+            if (endPos < startPos) {
+                for (i in endPos..startPos) {
+                    if (i == startPos) {
+                        list[i].index = tempIndex
+                    } else {
+                        list[i].index = list[i + 1].index
+                    }
+                }
+            } else if (endPos > startPos) {
+                for (i in endPos downTo startPos) {
+                    if (i == startPos) {
+                        list[i].index = tempIndex
+                    } else {
+                        list[i].index = list[i - 1].index
+                    }
+                }
+            }
+
+            DBUtils.updateGroupList(list)
+        }
     }
-}
