@@ -26,6 +26,7 @@ import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.tellink.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
+import com.dadoutek.uled.util.MeshAddressGenerator;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.LeScanEvent;
@@ -69,6 +70,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
         }
     };
     private Handler mHandler = new Handler();
+    private MeshAddressGenerator mMeshAddressGenerator;
 
     @Override
     public void onBackPressed() {
@@ -82,6 +84,8 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.setContentView(R.layout.activity_device_scanning);
+
+        mMeshAddressGenerator = new MeshAddressGenerator();
 
         //监听事件
         this.mApplication = (TelinkLightApplication) this.getApplication();
@@ -163,7 +167,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
             return;
         }
         Mesh mesh = this.mApplication.getMesh();
-        int meshAddress = mesh.generateMeshAddr();
+        int meshAddress = mMeshAddressGenerator.getMeshAddress();
 
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));

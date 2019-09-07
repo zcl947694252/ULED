@@ -219,17 +219,11 @@ class CWLightFragmentList : BaseFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
-            act?.addEventListeners()
-            if (Constant.isCreat) {
-                isDeleteTrue = true
-                isLong = true
-                refreshAndMoveBottom()
-                Constant.isCreat = false
-            } else {
-                isDeleteTrue = true
-                isLong = true
-                refreshView()
-            }
+//            act?.addEventListeners()
+
+            isDeleteTrue = true
+            isLong = true
+            refreshView()
 
         }
     }
@@ -301,7 +295,7 @@ class CWLightFragmentList : BaseFragment() {
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter!!.bindToRecyclerView(recyclerView)
 
-//        setMove(recyclerView!!)
+//        setMove(rvDevice!!)
     }
 
     var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
@@ -452,7 +446,6 @@ class CWLightFragmentList : BaseFragment() {
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_LIGHT_NORMAL, activity!!)
-                        refreshAndMoveBottom()
                         isLong = true
                         dialog.dismiss()
                     }
@@ -460,10 +453,6 @@ class CWLightFragmentList : BaseFragment() {
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
-    private fun refreshAndMoveBottom() {
-        refreshView()
-//        recyclerView?.smoothScrollToPosition(showList!!.size)
-    }
 
     private fun refreshView() {
         if (activity != null) {
@@ -548,7 +537,7 @@ class CWLightFragmentList : BaseFragment() {
             groupAdapter!!.onItemChildClickListener = onItemChildClickListener
             groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
             groupAdapter!!.bindToRecyclerView(recyclerView)
-//            setMove(recyclerView!!)
+//            setMove(rvDevice!!)
         }
     }
 

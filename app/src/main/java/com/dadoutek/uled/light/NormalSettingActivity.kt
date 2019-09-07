@@ -596,7 +596,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         device_light_minus.setImageResource(R.drawable.icon_minus_no)
                         tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                         if (currentShowPageGroup) {
-                            var light_current = DBUtils.getGroupByID(group!!.id)
+                            val light_current = DBUtils.getGroupByID(group!!.id)
                             if (light_current != null) {
                                 light_current.brightness = light_sbBrightness.progress
                                 DBUtils.updateGroup(light_current)
@@ -604,7 +604,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //                                updateLights(progress, "brightness", group_current!!)
                             }
                         } else {
-                            var light_current = DBUtils.getLightByID(light!!.id)
+                            val light_current = DBUtils.getLightByID(light!!.id)
                             if (light_current != null) {
                                 light_current.brightness = light_sbBrightness.progress
                                 DBUtils.updateLight(light_current)
@@ -613,14 +613,14 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                     } else {
                         tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                         if (currentShowPageGroup) {
-                            var light_current = DBUtils.getGroupByID(group!!.id)
+                            val light_current = DBUtils.getGroupByID(group!!.id)
                             if (light_current != null) {
                                 light_current.brightness = light_sbBrightness.progress
                                 DBUtils.updateGroup(light_current)
                                 updateLights(light_current.brightness, "brightness", light_current)
                             }
                         } else {
-                            var light_current = DBUtils.getLightByID(light!!.id)
+                            val light_current = DBUtils.getLightByID(light!!.id)
                             if (light_current != null) {
                                 light_current.brightness = light_sbBrightness.progress
                                 DBUtils.updateLight(light_current)
@@ -711,7 +711,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                         device_light_add.setImageResource(R.drawable.icon_puls_no)
                         tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                         if (currentShowPageGroup) {
-                            var light_current = DBUtils.getGroupByID(group!!.id)
+                            val light_current = DBUtils.getGroupByID(group!!.id)
                             if (light_current != null) {
                                 light_current.brightness = light_sbBrightness.progress
                                 DBUtils.updateGroup(light_current)
@@ -719,7 +719,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 //                                updateLights(progress, "brightness", group_current!!)
                             }
                         } else {
-                            var light_current = DBUtils.getLightByID(light!!.id)
+                            val light_current = DBUtils.getLightByID(light!!.id)
                             if (light_current != null) {
                                 light_current.brightness = light!!.brightness
                                 DBUtils.updateLight(light_current)
@@ -929,7 +929,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         val intent = Intent(this, LightGroupingActivity::class.java)
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
 
-        if (light==null){
+        if (light == null) {
             ToastUtils.showShort(getString(R.string.please_connect_normal_light))
             TelinkLightService.Instance()?.idleMode(true)
             TelinkLightService.Instance()?.disconnect()
@@ -1102,7 +1102,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             LightAdapter.STATUS_LOGOUT -> {
                 autoConnect()
                 mConnectTimer = Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                        .subscribe{ aLong ->
+                        .subscribe { aLong ->
                             ToastUtil.showToast(this, getString(R.string.connecting))
                         }
             }
@@ -2084,36 +2084,27 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     private fun autoConnect() {
 
         if (TelinkLightService.Instance() != null) {
+            ToastUtils.showLong(getString(R.string.connecting))
 
-            if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+            if (this.mApp?.isEmptyMesh != false)
+                return
 
-                ToastUtils.showLong(getString(R.string.connecting))
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+            val mesh = this.mApp?.mesh
 
-                if (this.mApp?.isEmptyMesh != false)
-                    return
-
-                val mesh = this.mApp?.mesh
-
-                if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
-                    TelinkLightService.Instance()?.idleMode(true)
-                    return
-                }
-
-                //自动重连参数
-                val connectParams = Parameters.createAutoConnectParameters()
-                connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
-                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
-
-                connectParams.autoEnableNotification(true)
-
-                // 之前是否有在做MeshOTA操作，是则继续
-                if (mesh!!.isOtaProcessing) {
-                    connectParams.setConnectMac(mesh?.otaDevice!!.mac)
-                }
-                //自动重连
-                TelinkLightService.Instance()?.autoConnect(connectParams)
+            if (TextUtils.isEmpty(mesh?.name) || TextUtils.isEmpty(mesh?.password)) {
+                TelinkLightService.Instance()?.idleMode(true)
+                return
             }
+
+            //自动重连参数
+            val connectParams = Parameters.createAutoConnectParameters()
+            connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
+            connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName))
+
+            connectParams.autoEnableNotification(true)
+
+            //自动重连
+            TelinkLightService.Instance()?.autoConnect(connectParams)
 
             //刷新Notify参数
             val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
@@ -2124,14 +2115,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         }
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            setResult(Constant.RESULT_OK)
-            finish()
-            return false
-        } else {
-            return super.onKeyDown(keyCode, event)
-        }
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        setResult(Constant.RESULT_OK)
+        finish()
     }
 }

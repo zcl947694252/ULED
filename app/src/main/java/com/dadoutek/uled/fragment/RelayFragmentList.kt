@@ -94,7 +94,7 @@ class RelayFragmentList : BaseFragment() {
         this.mContext = this.activity
         setHasOptionsMenu(true)
         localBroadcastManager = LocalBroadcastManager
-                .getInstance(this!!.mContext!!)
+                .getInstance(this.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
@@ -130,7 +130,7 @@ class RelayFragmentList : BaseFragment() {
                     for (j in deleteList.indices) {
                         showLoadingDialog(getString(R.string.deleting))
                         Thread.sleep(300)
-                        deleteGroup(DBUtils.getConnectorByGroupID(deleteList[j].id), deleteList[j]!!,
+                        deleteGroup(DBUtils.getConnectorByGroupID(deleteList[j].id), deleteList[j],
                                 successCallback = {
                                     hideLoadingDialog()
                                     setResult(Constant.RESULT_OK)
@@ -214,17 +214,10 @@ class RelayFragmentList : BaseFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
-            act?.addEventListeners()
-            if (Constant.isCreat) {
-                isDeleteTrue = true
-                isLong = true
-                refreshAndMoveBottom()
-                Constant.isCreat = false
-            } else {
-                isDeleteTrue = true
-                isLong = true
-                refreshView()
-            }
+//            act?.addEventListeners()
+            isDeleteTrue = true
+            isLong = true
+            refreshView()
 
         }
     }
@@ -492,7 +485,7 @@ class RelayFragmentList : BaseFragment() {
 
     private fun refreshAndMoveBottom() {
         refreshView()
-//        recyclerView?.smoothScrollToPosition(showList!!.size)
+//        rvDevice?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun refreshView() {

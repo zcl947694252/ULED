@@ -78,7 +78,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
     private lateinit var curtain:MutableList<DbCurtain>
 
-//    private var recyclerView:RecyclerView?=null
+//    private var rvDevice:RecyclerView?=null
 
     private var adapter:CurtainDeviceDetailsAdapter?=null
 
@@ -154,7 +154,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 
 //        curtain=DBUtils.getAllCurtains()
         showList = ArrayList()
-//        recyclerView = findViewById<RecyclerView>(R.id.recycleView)
+//        rvDevice = findViewById<RecyclerView>(R.id.recycleView)
         showList = gpList
 
         curtain= ArrayList()
@@ -284,7 +284,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
 //                        .VERTICAL)
 //        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
 //                .divider)))
-//        recyclerView!!.addItemDecoration(decoration)
+//        rvDevice!!.addItemDecoration(decoration)
         //添加Item变化动画
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adapter = CurtainDeviceDetailsAdapter(R.layout.device_detail_adapter, curtain)
@@ -796,7 +796,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseActivity() , EventListener<Strin
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setMeshName(account)

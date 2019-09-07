@@ -94,7 +94,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 ////            facebook_btn.visibility = View.GONE
 ////            val layoutmanager = LinearLayoutManager(this)
 ////            layoutmanager.orientation = LinearLayoutManager.VERTICAL
-////            recyclerView!!.layoutManager = layoutmanager
+////            rvDevice!!.layoutManager = layoutmanager
 ////            this.adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
 ////
 ////            val decoration = DividerItemDecoration(this,
@@ -103,11 +103,11 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 ////            decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
 ////                    .divider)))
 ////            //添加分割线
-////            recyclerView?.addItemDecoration(decoration)
-////            recyclerView?.itemAnimator = DefaultItemAnimator()
+////            rvDevice?.addItemDecoration(decoration)
+////            rvDevice?.itemAnimator = DefaultItemAnimator()
 ////
 //////        adapter!!.addFooterView(getFooterView())
-////            adapter!!.bindToRecyclerView(recyclerView)
+////            adapter!!.bindToRecyclerView(rvDevice)
 ////            adapter!!.onItemChildClickListener = onItemChildClickListener
 ////            isPhone = false
 ////            date_phone.setImageResource(R.drawable.icon_up)

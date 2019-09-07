@@ -22,7 +22,7 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
-import com.dadoutek.uled.model.DeviceType.SMART_CONNECTOR
+import com.dadoutek.uled.model.DeviceType.SMART_RELAY
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
@@ -646,7 +646,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                     }
-                } else if (type == SMART_CONNECTOR) {
+                } else if (type == SMART_RELAY) {
                     if (list[i].isOn) {
                         params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01) //接收器开是1
                         TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
@@ -810,7 +810,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)
                 }
-            } else if (type == SMART_CONNECTOR) {
+            } else if (type == SMART_RELAY) {
                 if (list[i].isOn) {
                     params = byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //接收器开是1
                     TelinkLightService.Instance().sendCommandNoResponse(opcode, list[i].groupAddr, params)

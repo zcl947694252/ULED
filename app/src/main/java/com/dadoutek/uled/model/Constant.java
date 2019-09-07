@@ -223,7 +223,6 @@ public class Constant implements Serializable {
     public static String TAG_LightsOfGroupActivity = "LightsOfGroupActivity";
     public static String TAG_ConfigSensorAct = "TAG_ConfigSensorAct";
     //    public static String TAG_GroupListFragment = "GroupListFragment";
-    public static boolean isCreat = false;
 
     public static final int INSTALL_NORMAL_LIGHT = 0;
     public static final int INSTALL_RGB_LIGHT = 1;

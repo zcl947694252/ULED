@@ -159,7 +159,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 //                        .VERTICAL)
 //        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
 //                .divider)))
-//        recyclerView!!.addItemDecoration(decoration)
+//        rvDevice!!.addItemDecoration(decoration)
         //添加Item变化动画
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adaper = DeviceDetailConnectorAdapter(R.layout.device_detail_adapter, lightsData)
@@ -181,7 +181,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
             finish()
         }
 
-        toolbar.title=getString(R.string.connector) + " (" + lightsData.size + ")"
+        toolbar.title=getString(R.string.relay) + " (" + lightsData.size + ")"
 
     }
 
@@ -511,11 +511,11 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private fun initDate() {
-//        lightsData = DBUtils.getAllConnctor()
+//        lightsData = DBUtils.getAllRelay()
         lightsData= ArrayList()
         when(type){
             Constant.INSTALL_CONNECTOR -> {
-                var all_light_data = DBUtils.getAllConnctor()
+                var all_light_data = DBUtils.getAllRelay()
                 if (all_light_data.size > 0) {
                     var list_group : ArrayList<DbConnector> = ArrayList()
                     var no_group : ArrayList<DbConnector> = ArrayList()
@@ -571,7 +571,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
             }
 
             Constant.INSTALL_RELAY_OF ->{
-                var all_light_data = DBUtils.getAllConnctor()
+                var all_light_data = DBUtils.getAllRelay()
                 if (all_light_data.size > 0) {
                     var list_group : ArrayList<DbConnector> = ArrayList()
                     var no_group : ArrayList<DbConnector> = ArrayList()
@@ -711,7 +711,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         }, true)
         adaper?.let { diffResult.dispatchUpdatesTo(it) }
         lightsData = mNewDatas!!
-        toolbar.title=getString(R.string.connector) + " (" + lightsData.size + ")"
+        toolbar.title=getString(R.string.relay) + " (" + lightsData.size + ")"
         adaper!!.setNewData(lightsData)
 
     }
@@ -727,7 +727,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 //                lightsData = DBUtils.getAllNormalLight()
 //            }
 //            Constant.INSTALL_RGB_LIGHT -> {
-                lightsData = DBUtils.getAllConnctor()
+                lightsData = DBUtils.getAllRelay()
 //            }
 //        }
 //    }
@@ -824,7 +824,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setMeshName(account)

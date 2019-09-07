@@ -776,7 +776,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setMeshName(account)
@@ -898,7 +898,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     private fun onNError(event: DeviceEvent) {
 
 //        ToastUtils.showLong(getString(R.string.connect_fail))
-        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
@@ -971,7 +971,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
 
                 scanPb.visibility = View.GONE
                 adapter?.notifyDataSetChanged()
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+
             }
             LightAdapter.STATUS_LOGOUT -> {
                 retryConnect()
@@ -1006,7 +1006,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Searc
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
         val mesh = this.mApplication?.mesh
-        val meshAddress = mesh?.generateMeshAddr()
+//        val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
         Thread {

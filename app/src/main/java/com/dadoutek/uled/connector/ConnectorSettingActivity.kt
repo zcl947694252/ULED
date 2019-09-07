@@ -749,7 +749,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 ToastUtils.showLong(getString(R.string.connecting))
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
                 if (this.mApp?.isEmptyMesh != false)
                     return

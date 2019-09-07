@@ -137,7 +137,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.light_add_device_btns -> {
-                if(DBUtils.getAllConnctor().size == 0){
+                if(DBUtils.getAllRelay().size == 0){
                     intent = Intent(this, ScanningConnectorActivity::class.java)
                     intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
                     intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
@@ -465,7 +465,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             lightList[i].updateIcon()
         }
 
-        if(DBUtils.getAllConnctor().size == 0){
+        if(DBUtils.getAllRelay().size == 0){
             light_add_device_btns.text = getString(R.string.device_scan_scan)
         }else{
             light_add_device_btns.text = getString(R.string.add_device)
@@ -698,7 +698,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setMeshName(account)
@@ -821,7 +821,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun onNError(event: DeviceEvent) {
 
 //        ToastUtils.showLong(getString(R.string.connect_fail))
-        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
@@ -894,7 +894,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
                 scanPb.visibility = View.GONE
                 adapter?.notifyDataSetChanged()
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+
             }
             LightAdapter.STATUS_CONNECTING -> {
                 Log.d("connectting", "444")
@@ -925,7 +925,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
         val mesh = this.mApplication?.mesh
-        val meshAddress = mesh?.generateMeshAddr()
         val deviceInfo: DeviceInfo = event.args
 
         Thread {

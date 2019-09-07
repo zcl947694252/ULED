@@ -232,7 +232,7 @@ class ConnectorGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private fun filter(list: MutableList<DbGroup>) {
         groupsInit?.clear()
         for (i in list.indices) {
-            if (lights?.productUUID == DeviceType.SMART_CONNECTOR){
+            if (lights?.productUUID == DeviceType.SMART_RELAY){
                 if (OtherUtils.isConnector(list[i])) {
                     groupsInit?.add(list[i])
                 }

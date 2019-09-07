@@ -94,13 +94,6 @@ public class SharedPreferencesUtils {
                 Constant.IS_DEVELOPER_MODE, false);
     }
 
-    public static boolean getConnectState(Context context) {
-        if (!SharedPreferencesHelper.getBoolean(context, Constant.CONNECT_STATE_SUCCESS_KEY, false)) {
-            ToastUtils.showLong(context.getString(R.string.device_not_connected));
-            return false;
-        }
-        return true;
-    }
 
     public static void saveLastUser(String info) {
         SharedPreferencesHelper.putString(TelinkLightApplication.Companion.getApp(),
@@ -122,13 +115,5 @@ public class SharedPreferencesUtils {
                 Constant.UPDATE_FILE_ADRESS, "");
     }
 
-    public static void setShowGuideAgain(boolean model) {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.Companion.getApp(),
-                Constant.IS_SHOWGUIDE_AGAIN, model);
-    }
 
-    public static boolean isShowGuideAgain() {
-        return SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),
-                Constant.IS_SHOWGUIDE_AGAIN, false);
-    }
 }

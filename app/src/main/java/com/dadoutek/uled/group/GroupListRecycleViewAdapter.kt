@@ -53,7 +53,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
                  }
             }
             helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+curtainNum+")")
-        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.connector)){
+        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.relay)){
             var num:Int?=null
             var curtainNum:Int=0
             for(i in itemTypeGroup.list!!.indices){
@@ -79,7 +79,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
 //        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(mContext, R.color
 //                .divider)))
         //添加分割线
-////        recyclerView?.addItemDecoration(decoration)
+////        rvDevice?.addItemDecoration(decoration)
 //        recyclerViewChild?.itemAnimator = DefaultItemAnimator() as RecyclerView.ItemAnimator?
 
 //        adapter!!.setOnItemChildClickListener { adapter, view, position ->

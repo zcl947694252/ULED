@@ -967,7 +967,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
         this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
         this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
         this.inflater = this.getLayoutInflater();
-        List<DbConnector> list = DBUtils.INSTANCE.getAllConnctor();
+        List<DbConnector> list = DBUtils.INSTANCE.getAllRelay();
         List<DbConnector> no_list = new ArrayList<>();
         List<DbConnector> group_list = new ArrayList<>();
         List<DbConnector> all_light = new ArrayList<>();
@@ -1264,7 +1264,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
             DbConnector light = this.getItem(position);
 
             holder.txtName.setText(light.getName());
-            if (light.getProductUUID() == DeviceType.SMART_CONNECTOR) {
+            if (light.getProductUUID() == DeviceType.SMART_RELAY) {
                 holder.icon.setImageResource(R.drawable.icon_controller_open);
             } else {
                 holder.icon.setImageResource(R.drawable.icon_light_on);
@@ -1349,7 +1349,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     }
 
     private boolean checkIsCurtain(int productUUID) {
-        if (productUUID == DeviceType.SMART_CONNECTOR) {
+        if (productUUID == DeviceType.SMART_RELAY) {
             return true;
         } else {
             return false;
@@ -1407,7 +1407,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 new Thread(() -> this.mApplication.getMesh().saveOrUpdate(this)).start();
 
                 if (scanCURTAIN) {
-                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_CONNECTOR) {
+                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_RELAY) {
                         addDevice(deviceInfo);
                     }
                 } else {

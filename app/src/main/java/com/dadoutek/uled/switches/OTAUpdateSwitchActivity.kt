@@ -580,7 +580,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
         btn_start_update?.setText(R.string.start_scan)
         TelinkLightService.Instance().idleMode(true)
         val params = Parameters.createScanParameters()
-        if (!AppUtils.isExynosSoc()) {
+        if (!AppUtils.isExynosSoc) {
             params.setScanFilters(scanFilters)
         }
         params.setMeshName(user!!.name)

@@ -3,9 +3,9 @@ package com.dadoutek.uled.othersview;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.blankj.utilcode.util.ActivityUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
-import com.dadoutek.uled.model.DbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
@@ -44,24 +44,10 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
         mIsFirstData = SharedPreferencesHelper.getBoolean(SplashActivity.this, IS_FIRST_LAUNCH, true);
         mIsLogging = SharedPreferencesHelper.getBoolean(SplashActivity.this, Constant.IS_LOGIN, false);
 
-//        if (mIsFirstData) {
-//            initMesh();
-//            initGroupData();
-//            gotoLoginSetting(true);
-//            //把是否是第一次进入设为false
-////            SharedPreferencesHelper.putBoolean(SplashActivity.this, IS_FIRST_LAUNCH, false);
-//        } else {
-
-//        mIsLogging=true;
 
         if (mIsLogging) {
-            if(DBUtils.INSTANCE.getAllLight()!=null&& DBUtils.INSTANCE.getAllLight().size()==0){
-                startActivity(new Intent(this,MainActivity.class));
-                finish();
-            }else{
-                startActivity(new Intent(this, MainActivity.class));
-                finish();
-            }
+            ActivityUtils.startActivityForResult(this, MainActivity.class, 0);
+
         } else {
             gotoLoginSetting(false);
         }
@@ -71,15 +57,21 @@ public class SplashActivity extends TelinkMeshErrorDealActivity {
     private void gotoLoginSetting(Boolean isFrist) {
         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
         intent.putExtra(IS_FIRST_LAUNCH, isFrist);
-        startActivity(intent);
+        startActivityForResult(intent, 0);
         finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == RESULT_FIRST_USER) {
+            finish();
+        }
     }
 
     @Override
     protected void onLocationEnable() {
     }
-
-
 
 
 }

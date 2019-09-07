@@ -2,9 +2,11 @@ package com.dadoutek.uled.model
 
 import android.content.Context
 import android.text.TextUtils
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.util.FileSystem
 import com.telink.util.MeshUtils
+import com.telink.util.MeshUtils.DEVICE_ADDRESS_MIN
 import java.io.Serializable
 import java.util.*
 
@@ -15,40 +17,40 @@ class Mesh : Serializable {
     var factoryName: String? = null
     var factoryPassword: String? = null
     var otaDevice: OtaDevice? = null
+    private var lastMeshAddress: Int = 0
 
     //public String otaDevice;
 
     //    public List<Integer> allocDeviceAddress;
     var devices: MutableList<DeviceInfo>? = ArrayList()
 
-    /*int address = MeshUtils.allocDeviceAddress(this.allocDeviceAddress);
+/*
+    fun generateMeshAddr(): Int {
+        val lights = DBUtils.allLight.map { it.meshAddr }
+        val curtain = DBUtils.allCurtain.map { it.meshAddr }
+        val relay = DBUtils.allRely.map { it.meshAddr }
+        var meshAddress: Int = -1
 
-        if (address != -1) {
-            if (this.allocDeviceAddress == null)
-                this.allocDeviceAddress = new ArrayList<>();
-            this.allocDeviceAddress.add(address);
-        }
+        val addressList = mutableListOf<Int>()
+        addressList.addAll(lights)
+        addressList.addAll(curtain)
+        addressList.addAll(relay)
+        addressList.sortBy { it }
 
-        return address;*/
-    val deviceAddress: Int
-        get() {
-            val lights = DBUtils.allLight
-            if (lights == null || lights.size == 0) {
-                return 1
+
+        when {
+            addressList.isEmpty() -> meshAddress = DEVICE_ADDRESS_MIN
+            else -> {
+                LogUtils.d("generateMeshAddr addressList.last() = ${addressList.last()}")
+                meshAddress = addressList.last() + 1
             }
-
-            flag_index@ for (i in (MeshUtils.DEVICE_ADDRESS_MIN) until (MeshUtils.DEVICE_ADDRESS_MAX)) {
-                for (light in lights) {
-                    if (light.meshAddr == i) {
-                        continue@flag_index
-                    }
-                }
-                return i
-            }
-
-            return -1
         }
+        LogUtils.d("generateMeshAddr = $meshAddress")
+        return meshAddress
+    }
+*/
 
+/*
     fun generateMeshAddr(): Int {
         val lights = DBUtils.allLight
         val curtain = DBUtils.allCurtain
@@ -56,8 +58,9 @@ class Mesh : Serializable {
         var meshAddress: Int = -1
 
         when {
-            lights.isEmpty() && curtain.isEmpty()&&relay.isEmpty() -> meshAddress = 1
-            lights.size > MeshUtils.DEVICE_ADDRESS_MAX && curtain.size > MeshUtils.DEVICE_ADDRESS_MAX &&relay.size> MeshUtils.DEVICE_ADDRESS_MAX-> meshAddress = -1
+            lights.isEmpty() && curtain.isEmpty() && relay.isEmpty() -> meshAddress = 1
+            lights.size > MeshUtils.DEVICE_ADDRESS_MAX && curtain.size > MeshUtils.DEVICE_ADDRESS_MAX
+                    && relay.size > MeshUtils.DEVICE_ADDRESS_MAX -> meshAddress = -1
             else -> {
                 var address = lights.map { it.meshAddr }
                 var curtains = curtain.map { it.meshAddr }
@@ -73,6 +76,7 @@ class Mesh : Serializable {
         }
         return meshAddress
     }
+*/
 
     val isOtaProcessing: Boolean
         get() = if (name == null || password == null || otaDevice == null ||

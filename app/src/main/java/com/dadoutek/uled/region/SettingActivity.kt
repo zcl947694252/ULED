@@ -50,7 +50,6 @@ import java.util.concurrent.TimeUnit
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}
  */
 class SettingActivity : BaseActivity() {
     override fun setLayoutID(): Int {
@@ -261,6 +260,9 @@ class SettingActivity : BaseActivity() {
         pop.isTouchable = true // 设置PopupWindow可触摸补充：
     }
 
+    /**
+     * 所有灯恢复出厂设置
+     */
     fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
         SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
@@ -288,7 +290,7 @@ class SettingActivity : BaseActivity() {
             }
         }
 
-        if (meshAdre.size > 0) {
+//        if (meshAdre.size > 0) {
             Commander.resetLights(meshAdre, {
                 SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
                 syncData()
@@ -298,7 +300,7 @@ class SettingActivity : BaseActivity() {
                 SharedPreferencesHelper.putBoolean(this@SettingActivity, Constant.DELETEING, false)
                 null
             })
-        }
+//        }
         if (meshAdre.isEmpty()) {
             hideLoadingDialog()
         }
@@ -311,7 +313,9 @@ class SettingActivity : BaseActivity() {
                 hideLoadingDialog()
                 val disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { }
+                        .subscribe {
+
+                        }
                 if (compositeDisposable.isDisposed)
                     compositeDisposable = CompositeDisposable()
                 compositeDisposable.add(disposable)

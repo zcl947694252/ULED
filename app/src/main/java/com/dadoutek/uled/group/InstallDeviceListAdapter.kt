@@ -35,7 +35,7 @@ class InstallDeviceListAdapter(layoutResId: Int, data: List<InstallDeviceModel>?
             helper.setImageResource(R.id.add_device_image,R.drawable.icon_curtain_add_device)
             helper.setText(R.id.device_name,item.deviceType)
                     .setText(R.id.device_describe,item.deviceDescribeTion)
-        }else if(item.deviceType==TelinkLightApplication.getApp().getString(R.string.connector)){
+        }else if(item.deviceType==TelinkLightApplication.getApp().getString(R.string.relay)){
             helper.setImageResource(R.id.add_device_image,R.drawable.icon_acceptor_add_device)
             helper.setText(R.id.device_name,item.deviceType)
                     .setText(R.id.device_describe,item.deviceDescribeTion)

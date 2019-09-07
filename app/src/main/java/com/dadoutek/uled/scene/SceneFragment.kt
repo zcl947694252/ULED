@@ -29,7 +29,6 @@ import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.TmtUtils
 import kotlinx.android.synthetic.main.fragment_scene.*
@@ -232,7 +231,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             val guide1 = toolbar?.findViewById<View>(R.id.img_function1) as ImageView
             GuideUtils.guideBuilder(this, GuideUtils.STEP7_GUIDE_ADD_SCENE)
                     .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_scene_1, getString(R.string.scene_guide_1),
-                            View.OnClickListener{ guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, activity!!)).show()
+                            View.OnClickListener { guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, activity!!)).show()
         }
     }
 
@@ -246,7 +245,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     val guide2 = adaper!!.getViewByPosition(0, R.id.scene_edit) as TextView?
                     GuideUtils.guideBuilder(this@SceneFragment, GuideUtils.ADDITIONAL_GUIDE_SET_SCENE)
                             .addGuidePage(GuideUtils.addGuidePage(guide2!!, R.layout.view_guide_simple_scene_2, getString(R.string.click_update_scene),
-                                    View.OnClickListener{ v -> GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_SET_KEY, true) }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
+                                    View.OnClickListener { v -> GuideUtils.changeCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_SET_KEY, true) }, GuideUtils.END_ADD_SCENE_SET_KEY, activity!!)).show()
                 }
             })
         }
@@ -556,6 +555,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
+        val instance = TelinkLightService.Instance()
         when (item.itemId) {
 //            R.id.menu_delete -> {
 ////                if (isDelete) {
@@ -567,8 +567,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 ////                adaper!!.changeState(isDelete)
 ////                refreshData()
 ////            }
-            R.id.menu_install -> if (!SharedPreferencesUtils.getConnectState(activity)) {
-                //                    return;
+            R.id.menu_install -> if (!instance.isLogin) {
             } else {
                 if (scenesListData!!.size >= SCENE_MAX_COUNT) {
                     ToastUtils.showLong(R.string.scene_16_tip)

@@ -267,7 +267,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
                 //连接成功
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+
 
             }
             LightAdapter.STATUS_LOGOUT -> {
@@ -291,7 +291,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
     }
 
     private fun onNError(event: DeviceEvent) {
-        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
@@ -1119,7 +1119,7 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
                 retryConnectCount++
                 if (!b)
                     ToastUtils.showLong(getString(R.string.connecting))
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
                 if (this.mApplication?.isEmptyMesh != false)
                     return

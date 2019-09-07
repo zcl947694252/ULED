@@ -657,7 +657,7 @@
 
     <string name="delete_user">Make sure to delete the phone number？</string>
 
-    <string name="connector">Relay</string>
+    <string name="relay">Relay</string>
 
 
     <string name="scan_connector_num">Total: %1$s connector are currently scanned</string>

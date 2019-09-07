@@ -165,4 +165,5 @@ dependencies {
    // implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.4'
     implementation project(':stomplib')
     implementation "com.polidea.rxandroidble2:rxandroidble:1.10.1"
+    testImplementation 'junit:junit:4.12'
 }

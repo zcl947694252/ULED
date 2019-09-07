@@ -163,7 +163,7 @@ class ReconnectionBluetooth : EventListener<String> {
             scanFilters.add(scanFilter)
 
             val params = LeScanParameters.create()
-            if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+            if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                 params.setScanFilters(scanFilters)
             }
             params.setMeshName(account)

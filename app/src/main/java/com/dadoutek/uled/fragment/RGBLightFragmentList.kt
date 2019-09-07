@@ -214,18 +214,10 @@ class RGBLightFragmentList : BaseFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             val act = activity as MainActivity?
-            act?.addEventListeners()
-            if (Constant.isCreat) {
-                isDeleteTrue = true
-                isLong = true
-                refreshAndMoveBottom()
-                Constant.isCreat = false
-            } else {
-                isDeleteTrue = true
-                isLong = true
-                refreshView()
-            }
-
+//            act?.addEventListeners()
+            isDeleteTrue = true
+            isLong = true
+            refreshView()
         }
     }
 
@@ -476,7 +468,7 @@ class RGBLightFragmentList : BaseFragment() {
 
     private fun refreshAndMoveBottom() {
         refreshView()
-//        recyclerView?.smoothScrollToPosition(showList!!.size)
+//        rvDevice?.smoothScrollToPosition(showList!!.size)
     }
 
     private fun refreshView() {

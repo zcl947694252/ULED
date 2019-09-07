@@ -60,6 +60,7 @@ import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.GuideUtils;
+import com.dadoutek.uled.util.MeshAddressGenerator;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
@@ -174,6 +175,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
     private long allLightId = 0;
+    private MeshAddressGenerator mMeshAddressGenerator;
     private Button btn_stop_scan;
     private TextView scanning_num;
 
@@ -998,6 +1000,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     }
 
     private void initData() {
+        mMeshAddressGenerator = new MeshAddressGenerator();
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         if (DBUtils.INSTANCE.getGroupByMesh(0xffff) != null) {
@@ -1328,7 +1331,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         byte[] manuData = null;
 
                         if (scanCURTAIN) {
-                            manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.SMART_CONNECTOR};
+                            manuData = new byte[]{0, 0, 0, 0, 0, 0, DeviceType.SMART_RELAY};
                         }
 
                         byte[] manuDataMask = new byte[]{0, 0, 0, 0, 0, 0, (byte) 0xFF};
@@ -1341,7 +1344,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
-                        if (!AppUtils.isExynosSoc()) {
+                        if (!AppUtils.Companion.isExynosSoc()) {
                             params.setScanFilters(scanFilters);
                         }
                         params.setMeshName(mesh.getFactoryName());
@@ -1388,7 +1391,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private void onLeScan(final LeScanEvent event) {
 
         final Mesh mesh = this.mApplication.getMesh();
-        final int meshAddress = mesh.generateMeshAddr();
+        final int meshAddress = mMeshAddressGenerator.getMeshAddress();
 
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));
@@ -1407,7 +1410,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
 
         if (scanCURTAIN) {
             if (checkIsCurtain(deviceInfo.productUUID) && deviceInfo.productUUID ==
-                    DeviceType.SMART_CONNECTOR && deviceInfo.rssi < MAX_RSSI) {
+                    DeviceType.SMART_RELAY && deviceInfo.rssi < MAX_RSSI) {
                 updateMesh(deviceInfo, meshAddress, mesh);
             }
         }
@@ -1434,7 +1437,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     }
 
     private boolean checkIsCurtain(int productUUID) {
-        if (productUUID == DeviceType.SMART_CONNECTOR) {
+        if (productUUID == DeviceType.SMART_RELAY) {
             return true;
         } else {
             return false;
@@ -1492,7 +1495,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 new Thread(() -> ScanningConnectorActivity.this.mApplication.getMesh().saveOrUpdate(ScanningConnectorActivity.this)).start();
 
                 if (scanCURTAIN) {
-                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_CONNECTOR) {
+                    if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_RELAY) {
                         addDevice(deviceInfo);
                     }
                 } else {

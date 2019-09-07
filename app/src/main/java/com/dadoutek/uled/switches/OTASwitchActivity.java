@@ -750,7 +750,7 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
         btn_start_update.setText(R.string.start_scan);
         TelinkLightService.Instance().idleMode(true);
         LeScanParameters params = Parameters.createScanParameters();
-        if(!AppUtils.isExynosSoc()){
+        if(!AppUtils.Companion.isExynosSoc()){
             params.setScanFilters(scanFilters);
         }
         params.setMeshName(mesh.getName());

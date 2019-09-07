@@ -21,8 +21,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
-import com.blankj.utilcode.util.StringUtils
-import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.*
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
@@ -83,6 +82,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         setContentView(R.layout.activity_enter_password)
         type = intent.extras!!.getString("USER_TYPE")
 
+        LogUtils.d("App id = ${ProcessUtils.getCurrentProcessName()}")
+        LogUtils.d("activity stack size = ${ActivityUtils.getActivityList()}")
         makePop()
         initViewType()
         initView()
@@ -180,7 +181,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             R.id.forget_password -> {
                 var intent = Intent(this, ForgetPassWordActivity::class.java)
                 intent.putExtra("fromLogin", "forgetPassword")
-                startActivity(intent)
+                startActivityForResult(intent, 0)
             }
         }
     }
@@ -191,12 +192,19 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             val intent = Intent(this, AgainEnterPasswordActivity::class.java)
             intent.putExtra("phone", phone)
             intent.putExtra("password", editPassWord)
-            startActivity(intent)
+            startActivityForResult(intent, 0)
         } else {
             ToastUtil.showToast(this, getString(R.string.password_cannot))
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 0 && requestCode == RESULT_FIRST_USER) {
+            setResult(RESULT_FIRST_USER)
+            finish()
+        }
+    }
 
     @SuppressLint("CheckResult")
     private fun login() {
@@ -349,15 +357,20 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
 
             hideLoadingDialog()
-            startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
+            ActivityUtils.startActivity(this@EnterPasswordActivity, MainActivity::class.java)
+            ActivityUtils.finishAllActivities(false)
         }
     }
 
 
     private fun syncComplet() {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-        startActivity(Intent(this@EnterPasswordActivity, MainActivity::class.java))
         hideLoadingDialog()
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
+
+        ActivityUtils.startActivityForResult(this@EnterPasswordActivity, MainActivity::class.java, 0)
+        ActivityUtils.finishAllActivities(false)
+
+
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}

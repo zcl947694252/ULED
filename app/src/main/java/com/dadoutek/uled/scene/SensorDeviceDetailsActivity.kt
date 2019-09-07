@@ -736,7 +736,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
 
                                 //扫描参数
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)

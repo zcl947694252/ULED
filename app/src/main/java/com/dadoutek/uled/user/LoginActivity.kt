@@ -216,9 +216,9 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }
             }
             R.id.btn_register -> {
-                var intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                 intent.putExtra("fromLogin", "register")
-                startActivity(intent)
+                startActivityForResult(intent, 0)
             }
             R.id.forget_password -> forgetPassword()
             R.id.date_phone -> phoneList()
@@ -250,7 +250,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun verificationCode() {
         var intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
         intent.putExtra("type", Constant.TYPE_VERIFICATION_CODE)
-        startActivity(intent)
+        startActivityForResult(intent, 0)
     }
 
     private fun eyePassword() {
@@ -421,7 +421,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun forgetPassword() {
         var intent = Intent(this@LoginActivity, ForgetPassWordActivity::class.java)
         intent.putExtra("fromLogin", "forgetPassword")
-        startActivity(intent)
+        startActivityForResult(intent, 0)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -437,10 +437,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
         if (!StringUtils.isTrimEmpty(phone)) {
-            var intent = Intent(this, EnterPasswordActivity::class.java)
+            LogUtils.d("val intent = Intent(this, EnterPasswordActivity::class.java)")
+            val intent = Intent(this, EnterPasswordActivity::class.java)
             intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
             intent.putExtra("phone", phone)
-            startActivity(intent)
+            startActivityForResult(intent, 0)
         } else {
             ToastUtil.showToast(this, getString(R.string.phone_or_password_can_not_be_empty))
         }
@@ -472,31 +473,33 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun transformView() {
         if (DBUtils.allLight.isEmpty()) {
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-            finish()
+            startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
+//            finish()
         } else {
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            startActivityForResult(Intent(this@LoginActivity, MainActivity::class.java), 0)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        //退出MeshSetting后进入DeviceScanning
-        if (requestCode == REQ_MESH_SETTING) {
-            gotoDeviceScanning()
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_FIRST_USER) {
+                setResult(Activity.RESULT_FIRST_USER)
+                finish()
+            }
         }
     }
 
-    /**
-     * 进入引导流程，也就是进入DeviceActivity。
-     */
-    private fun gotoDeviceScanning() {
-        //首次进入APP才进入引导流程
-        val intent = Intent(this@LoginActivity, DeviceScanningNewActivity::class.java)
-        intent.putExtra("isInit", true)
-        startActivity(intent)
-        finish()
-    }
+//    /**
+//     * 进入引导流程，也就是进入DeviceActivity。
+//     */
+//    private fun gotoDeviceScanning() {
+//        //首次进入APP才进入引导流程
+//        val intent = Intent(this@LoginActivity, DeviceScanningNewActivity::class.java)
+//        intent.putExtra("isInit", true)
+//        startActivity(intent)
+//        finish()
+//    }
 
     companion object {
         private val REQ_MESH_SETTING = 0x01

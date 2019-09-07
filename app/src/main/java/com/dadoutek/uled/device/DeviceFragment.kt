@@ -7,8 +7,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,16 +16,18 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.connector.ConnectorDeviceDetailActivity
+import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
+import com.dadoutek.uled.device.model.DeviceItem
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.InstallDeviceModel
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -35,10 +35,10 @@ import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.curtains.CurtainsDeviceDetailsActivity
 import kotlinx.android.synthetic.main.fragment_new_device.*
+import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -51,61 +51,43 @@ import java.util.*
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ *
  */
-class NewDevieFragment : BaseFragment() {
-
-    private var inflater: LayoutInflater? = null
-    var recyclerView: RecyclerView? = null
-    var newDeviceAdapter: DeviceTypeRecycleViewAdapter? = null
-
-    private var deviceTypeList: ArrayList<String>? = null
-    private var allDeviceList: ArrayList<DbLight>? = null
+class DeviceFragment : BaseFragment() {
+    private var deviceTypeList: ArrayList<DeviceItem> = ArrayList()
+    private var deviceAdapter: DeviceTypeRecycleViewAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList)
     private var isGuide = false
-    private var toolbar: Toolbar? = null
     private var isRgbClick = false
     var firstShowGuide = true
     private var guideShowCurrentPage = false
     private val SCENE_MAX_COUNT = 16
 
-    //19-2-20 界面调整
-    private var install_device: TextView? = null
-    private var create_group: TextView? = null
-    private var create_scene: TextView? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = getViewThis(inflater)
+        val view = initLayout(inflater)
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         initToolBar(view)
         initData()
-        initView(view)
+        initView()
         if (firstShowGuide) {
             firstShowGuide = false
             initOnLayoutListener()
         }
-        return view
     }
 
-    override fun onResume() {
-        super.onResume()
-        refreshView()
-    }
+
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        if (isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (userVisibleHint) {
             val act = activity as MainActivity?
-            act?.addEventListeners()
+//            act?.addEventListeners()
             initOnLayoutListener()
-            if (Constant.isCreat) {
-                refreshAndMoveBottom()
-                Constant.isCreat = false
-            } else {
-                refreshView()
-            }
+            refreshView()
         }
-    }
-
-    private fun refreshAndMoveBottom() {
-        refreshView()
     }
 
     private fun initOnLayoutListener() {
@@ -124,8 +106,8 @@ class NewDevieFragment : BaseFragment() {
         if (guideShowCurrentPage) {
             GuideUtils.resetGroupListGuide(activity!!)
             val guide0 = toolbar!!.findViewById<TextView>(R.id.toolbarTv)
-            GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
-                    .addGuidePage(GuideUtils.addGuidePage(guide0, R.layout.view_guide_0, getString(R.string.group_list_guide0), View.OnClickListener{}, GuideUtils.END_GROUPLIST_KEY, activity!!)
+            GuideUtils.guideBuilder(this@DeviceFragment, GuideUtils.STEP0_GUIDE_SELECT_DEVICE_KEY)
+                    .addGuidePage(GuideUtils.addGuidePage(guide0, R.layout.view_guide_0, getString(R.string.group_list_guide0), View.OnClickListener {}, GuideUtils.END_GROUPLIST_KEY, activity!!)
                             .setOnLayoutInflatedListener { view, controller ->
                                 val normal = view.findViewById<TextView>(R.id.normal_light)
                                 normal.setOnClickListener {
@@ -153,7 +135,7 @@ class NewDevieFragment : BaseFragment() {
         if (guideShowCurrentPage) {
             val guide1 = toolbar!!.findViewById<ImageView>(R.id.img_function1)
 
-            GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
+            GuideUtils.guideBuilder(this@DeviceFragment, GuideUtils.STEP1_GUIDE_ADD_DEVICE_KEY)
                     .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_group1, getString(R.string.group_list_guide1), View.OnClickListener {
                         isGuide = true
                         showPopupMenu()
@@ -168,9 +150,9 @@ class NewDevieFragment : BaseFragment() {
         if (guideShowCurrentPage) {
             var guide3: TextView? = install_device
 
-            return GuideUtils.guideBuilder(this@NewDevieFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
+            return GuideUtils.guideBuilder(this@DeviceFragment, GuideUtils.STEP2_GUIDE_START_INSTALL_DEVICE)
                     .addGuidePage(GuideUtils.run {
-                        addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2),View.OnClickListener{ install_device?.performClick() }, END_GROUPLIST_KEY, activity!!)
+                        addGuidePage(guide3!!, R.layout.view_guide_simple_group2, getString(R.string.group_list_guide2), View.OnClickListener { install_device?.performClick() }, END_GROUPLIST_KEY, activity!!)
                     })
                     .show()
         }
@@ -180,7 +162,6 @@ class NewDevieFragment : BaseFragment() {
     }
 
     private fun initToolBar(view: View?) {
-        toolbar = view?.findViewById(R.id.toolbar)
         toolbar!!.setTitle(R.string.device_list)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
@@ -195,39 +176,29 @@ class NewDevieFragment : BaseFragment() {
         }
     }
 
-    private fun initView(view: View?) {
-        recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
-        newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
-        recyclerView?.itemAnimator = DefaultItemAnimator()
-
-        newDeviceAdapter!!.onItemClickListener = onItemClickListener
-        newDeviceAdapter!!.bindToRecyclerView(recyclerView)
 
 
-        install_device = view?.findViewById(R.id.install_device)
-        create_group = view?.findViewById(R.id.create_group)
-        create_scene = view?.findViewById(R.id.create_scene)
+    private fun initView() {
+        rvDevice?.layoutManager = GridLayoutManager(this.activity, 2)
+        rvDevice?.itemAnimator = DefaultItemAnimator()
+
+        deviceAdapter.onItemClickListener = onItemClickListener
+        deviceAdapter.bindToRecyclerView(rvDevice)
+
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
     }
 
-    private fun refreshView() {
+
+    /**
+     * 刷新UI
+     */
+    fun refreshView() {
+        LogUtils.d("refreshView")
         if (activity != null) {
-            deviceTypeList = ArrayList()
-            val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
-            for (installDeviceModel in installList) {
-                deviceTypeList!!.add(installDeviceModel.deviceType)
-            }
-
-            allDeviceList = ArrayList()
-            recyclerView?.layoutManager = GridLayoutManager(this.activity, 2)
-            newDeviceAdapter = DeviceTypeRecycleViewAdapter(R.layout.device_type_item, deviceTypeList!!)
-
-            recyclerView?.itemAnimator = DefaultItemAnimator()
-            newDeviceAdapter?.onItemClickListener = onItemClickListener
-            recyclerView?:return
-            newDeviceAdapter?.bindToRecyclerView(recyclerView)
+            initAdapterData()
+            deviceAdapter.notifyDataSetChanged()
         }
     }
 
@@ -263,20 +234,55 @@ class NewDevieFragment : BaseFragment() {
         startActivityForResult(intent, Activity.RESULT_OK)
     }
 
-    private fun initData() {
-        deviceTypeList = ArrayList()
-        val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(activity)
-        for (installDeviceModel in installList) {
-            deviceTypeList!!.add(installDeviceModel.deviceType)
-        }
 
-        allDeviceList = ArrayList()
+    /**
+     * 初始化RecyclerView的Adapter
+     */
+    private fun initAdapterData() {
+        deviceTypeList.clear()
+        deviceTypeList.add(DeviceItem(getString(R.string.normal_light),
+                DBUtils.getAllNormalLight().size,
+                DeviceType.LIGHT_NORMAL))
+
+        deviceTypeList.add(DeviceItem(getString(R.string.rgb_light),
+                DBUtils.getAllRGBLight().size,
+                DeviceType.LIGHT_RGB))
+
+
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_name),
+                DBUtils.getAllSwitch().size,
+                DeviceType.NORMAL_SWITCH))
+
+
+        deviceTypeList.add(DeviceItem(getString(R.string.sensor),
+                DBUtils.getAllSensor().size,
+                DeviceType.SENSOR))
+
+        deviceTypeList.add(DeviceItem(getString(R.string.curtain),
+                DBUtils.getAllCurtains().size,
+                DeviceType.SMART_CURTAIN))
+
+        deviceTypeList.add(DeviceItem(getString(R.string.relay),
+                DBUtils.getAllRelay().size,
+                DeviceType.SMART_RELAY))
+
+
     }
 
-    private fun getViewThis(inflater: LayoutInflater): View? {
-        this.inflater = inflater
+
+    /**
+     * 初始化所有数据
+     */
+    private fun initData() {
+        initAdapterData()
+    }
+
+
+    /**
+     * 初始化布局
+     */
+    private fun initLayout(inflater: LayoutInflater): View? {
         val view = inflater.inflate(R.layout.fragment_new_device, null)
-        recyclerView = view.findViewById(R.id.deviceTypeList)
         return view
     }
 

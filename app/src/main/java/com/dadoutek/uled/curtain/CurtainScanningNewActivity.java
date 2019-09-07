@@ -62,6 +62,7 @@ import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity;
 import com.dadoutek.uled.util.AppUtils;
 import com.dadoutek.uled.util.DialogUtils;
 import com.dadoutek.uled.util.GuideUtils;
+import com.dadoutek.uled.util.MeshAddressGenerator;
 import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
@@ -194,6 +195,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     private boolean isGuide = false;
     private LinearLayoutManager layoutmanager;
     private long allLightId = 0;
+    private MeshAddressGenerator mMeshAddressGenerator;
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -1117,6 +1119,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     }
 
     private void initData() {
+        mMeshAddressGenerator = new MeshAddressGenerator();
         Intent intent = getIntent();
         scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         if(DBUtils.INSTANCE.getGroupByMesh(0xffff)!=null){
@@ -1374,8 +1377,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
 
 
     private void onGetGroupEvent(NotificationEvent event) {
-        NotificationEvent e = event;
-        NotificationInfo info = e.getArgs();
+        NotificationInfo info = event.getArgs();
 
         int srcAddress = info.src & 0xFF;
         byte[] params = info.params;
@@ -1477,7 +1479,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
                         Mesh mesh = mApplication.getMesh();
                         //扫描参数
                         LeScanParameters params = LeScanParameters.create();
-                        if (!AppUtils.isExynosSoc()) {
+                        if (!AppUtils.Companion.isExynosSoc()) {
                             params.setScanFilters(scanFilters);
                         }
                         params.setMeshName(mesh.getFactoryName());
@@ -1524,7 +1526,7 @@ public class CurtainScanningNewActivity extends TelinkMeshErrorDealActivity
     private void onLeScan(final LeScanEvent event) {
 
         final Mesh mesh = this.mApplication.getMesh();
-        final int meshAddress = mesh.generateMeshAddr();
+        final int meshAddress = mMeshAddressGenerator.getMeshAddress();
 
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip));

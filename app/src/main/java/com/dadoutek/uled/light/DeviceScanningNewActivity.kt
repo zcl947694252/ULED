@@ -15,7 +15,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import butterknife.ButterKnife
-import butterknife.OnClick
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -64,9 +63,9 @@ import java.util.concurrent.TimeUnit
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private lateinit var mMeshAddressGenerator: MeshAddressGenerator
     private var mApplication: TelinkLightApplication? = null
     private var mRxPermission: RxPermissions? = null
     //防止内存泄漏
@@ -206,12 +205,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             finish()
 
         if (TelinkLightService.Instance().isLogin) {
+
             Observable.interval(0, 200, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                     .subscribe(object : Observer<Long> {
                         var disposable: Disposable? = null
                         override fun onSubscribe(d: Disposable) {
                             disposable = d
                         }
+
                         //updateMesh超时时间 50*200=10S
                         override fun onNext(t: Long) {
                             if (t >= 50) {
@@ -979,7 +980,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         btn_stop_scan?.setText(R.string.stop_scan)
         btn_stop_scan?.setOnClickListener(onClick)
 
-        add_group_relativeLayout!!.setOnClickListener { v -> addNewGroup() }
+        add_group_relativeLayout?.setOnClickListener { v -> addNewGroup() }
     }
 
     @SuppressLint("ResourceType")
@@ -1000,6 +1001,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     }
 
     private fun initData() {
+        mMeshAddressGenerator = MeshAddressGenerator()
         val intent = intent
         scanRGBLight = intent.getBooleanExtra(Constant.IS_SCAN_RGB_LIGHT, false)
 
@@ -1013,7 +1015,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         if (groups == null) {
             groups = ArrayList()
             val list = DBUtils.groupList
-            
+
             if (scanRGBLight) {
                 for (i in list.indices) {
                     if (OtherUtils.isRGBGroup(list[i])) {
@@ -1340,7 +1342,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 val mesh = mApplication!!.mesh
                 //扫描参数
                 val params = LeScanParameters.create()
-                if (!AppUtils.isExynosSoc()) {
+                if (!AppUtils.isExynosSoc) {
                     params.setScanFilters(scanFilters)
                 }
                 params.setMeshName(mesh.factoryName)
@@ -1391,7 +1393,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
      */
     private fun onLeScan(event: LeScanEvent) {
         val mesh = this.mApplication!!.mesh
-        val meshAddress = mesh.generateMeshAddr()
+        val meshAddress = mMeshAddressGenerator.meshAddress
+//        val meshAddress = 1
         if (meshAddress == -1) {
             ToastUtils.showLong(getString(R.string.much_lamp_tip))
             if (adapter?.getLights() != null && adapter?.getLights()?.isNotEmpty()!!) {

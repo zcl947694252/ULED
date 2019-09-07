@@ -45,6 +45,7 @@ import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.DialogUtils
 import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
+import com.dadoutek.uled.util.MeshAddressGenerator
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -82,6 +83,7 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener ,View.OnClickListener{
+//    private lateinit var mMeshAddressGenerator: MeshAddressGenerator
     private val REQ_LIGHT_SETTING: Int = 0x01
 
     private lateinit var group: DbGroup
@@ -289,6 +291,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     }
 
     private fun initData() {
+//        mMeshAddressGenerator = MeshAddressGenerator()
         curtainList = ArrayList()
         if (group.meshAddr == 0xffff) {
             //            curtainList = DBUtils.getAllLight();
@@ -666,7 +669,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                                 scanFilters.add(scanFilter)
 
                                 val params = LeScanParameters.create()
-                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                                     params.setScanFilters(scanFilters)
                                 }
                                 params.setMeshName(account)
@@ -788,7 +791,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private fun onNError(event: DeviceEvent) {
 
 //        ToastUtils.showLong(getString(R.string.connect_fail))
-        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
@@ -861,7 +864,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
                 scanPb.visibility = View.GONE
                 adapter?.notifyDataSetChanged()
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+
             }
             LightAdapter.STATUS_CONNECTING -> {
                 Log.d("connectting", "444")
@@ -897,8 +900,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
      */
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
-        val mesh = this.mApplication?.mesh
-        val meshAddress = mesh?.generateMeshAddr()
+//        val mesh = this.mApplication?.mesh
+//        val meshAddress = mMeshAddressGenerator.meshAddress
         val deviceInfo: DeviceInfo = event.args
 
         Thread {

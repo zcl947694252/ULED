@@ -131,7 +131,7 @@ object DBUtils {
         }
 
         if (connectorList.size > 0) {
-            itemTypeGroup = ItemTypeGroup(context.getString(R.string.connector), connectorList, R.drawable.curtain_on)
+            itemTypeGroup = ItemTypeGroup(context.getString(R.string.relay), connectorList, R.drawable.curtain_on)
             allList.add(itemTypeGroup)
         }
         return allList
@@ -234,11 +234,11 @@ object DBUtils {
             var id = 0
             for (i in 0x8001..33023) {
                 if (idList.contains(i)) {
-                    Log.d("sceneID", "getSceneId: " + "aaaaa")
+//                    Log.d("sceneID", "getSceneId: " + "aaaaa")
                     continue
                 } else {
                     id = i
-                    Log.d("sceneID", "getSceneId: bbbbb$id")
+//                    Log.d("sceneID", "getSceneId: bbbbb$id")
                     break
                 }
             }
@@ -292,9 +292,9 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
-    fun getAllConnctor(): ArrayList<DbConnector> {
+    fun getAllRelay(): ArrayList<DbConnector> {
         val query = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
-                .where(DbConnectorDao.Properties.ProductUUID.eq(DeviceType.SMART_CONNECTOR)
+                .where(DbConnectorDao.Properties.ProductUUID.eq(DeviceType.SMART_RELAY)
                 ).build()
         return ArrayList(query.list())
     }
@@ -471,13 +471,13 @@ object DBUtils {
 
     fun getGroupByMesh(mesh: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).unique()
-        Log.d("datasave", "getGroupByMesh: $mesh")
+//        Log.d("datasave", "getGroupByMesh: $mesh")
         return dbGroup
     }
 
     fun getGroupByName(name: String): DbGroup {
         val dbGroup = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.Name.eq(name)).unique()
-        Log.d("datasave", "getGroupByMesh: $name")
+//        Log.d("datasave", "getGroupByMesh: $name")
         return dbGroup
     }
 
@@ -559,14 +559,14 @@ object DBUtils {
 
     fun saveRegion(dbRegion: DbRegion, isFromServer: Boolean) {
         if (isFromServer) {
-            val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
-            if (dbRegionOld == null) {
+            val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).list()
+            if (dbRegionOld.isEmpty()) {
                 DaoSessionInstance.getInstance().dbRegionDao.insert(dbRegion)
             }
         } else {
             //判断原来是否保存过这个区域
-            val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).unique()
-            if (dbRegionOld == null) {//直接插入
+            val dbRegionOld = DaoSessionInstance.getInstance().dbRegionDao.queryBuilder().where(DbRegionDao.Properties.ControlMesh.eq(dbRegion.controlMesh)).list()
+            if (dbRegionOld.isEmpty()) {//直接插入
                 DaoSessionInstance.getInstance().dbRegionDao.insert(dbRegion)
                 //暂时用本地保存区域
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
@@ -577,7 +577,7 @@ object DBUtils {
                 //创建新区域首先创建一个所有灯的分组
                 createAllLightControllerGroup()
             } else {//更新数据库
-                dbRegion.id = dbRegionOld.id
+                dbRegion.id = dbRegionOld[0].id
                 DaoSessionInstance.getInstance().dbRegionDao.update(dbRegion)
                 //暂时用本地保存区域
                 SharedPreferencesUtils.saveCurrentUseRegion(dbRegion.id)
@@ -911,6 +911,38 @@ object DBUtils {
                 Constant.DB_DELETE)
     }
 
+
+    fun deleteAllNormalLight() {
+        val lights = getAllNormalLight()
+        for (light in lights) {
+            deleteLight(light)
+        }
+    }
+
+    fun deleteAllRGBLight() {
+        val lights = getAllRGBLight()
+        for (light in lights) {
+            deleteLight(light)
+        }
+    }
+
+    fun deleteAllConnector() {
+        val connectors = getAllRelay()
+        for (connector in connectors) {
+            deleteConnector(connector)
+        }
+    }
+
+    fun deleteAllCurtain() {
+        val curtains = getAllCurtains()
+        for (item in curtains) {
+            deleteCurtain(item)
+        }
+    }
+
+
+
+
     fun deleteConnector(dbConnector: DbConnector) {
         DaoSessionInstance.getInstance().dbConnectorDao.delete(dbConnector)
         recordingChange(dbConnector.id,
@@ -1138,18 +1170,6 @@ object DBUtils {
             }
         }
 
-        return false
-    }
-
-    //检查是否重复
-
-    fun checkRepeat(groups: List<DbGroup>, context: Context, newName: String): Boolean {
-        for (k in groups.indices) {
-            if (groups[k].name == newName) {
-                Toast.makeText(context, R.string.creat_group_fail_tip, Toast.LENGTH_LONG).show()
-                return true
-            }
-        }
         return false
     }
 

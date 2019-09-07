@@ -17,6 +17,8 @@ import com.telink.bluetooth.TelinkLog
 import com.tencent.bugly.crashreport.CrashReport
 import com.uuzuche.lib_zxing.activity.ZXingLibrary
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,10 +50,10 @@ class TelinkLightApplication : TelinkApplication() {
             field.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
             return field
         }
+
     /**********************************************
      * Log api
      */
-    @SuppressLint("SdCardPath")
     override fun onCreate() {
         super.onCreate()
         app = this
@@ -105,7 +107,7 @@ class TelinkLightApplication : TelinkApplication() {
         releseStomp()
     }
 
-    open  fun releseStomp(){
+    open fun releseStomp() {
         stompLifecycleDisposable?.dispose()
         singleLoginTopicDisposable?.dispose()
         paserCodedisposable?.dispose()
@@ -113,55 +115,57 @@ class TelinkLightApplication : TelinkApplication() {
     }
 
     @SuppressLint("CheckResult")
-    open fun initStompClient() {
-        if (SharedPreferencesHelper.getBoolean(this, Constant.IS_LOGIN, false)) {
-            mStompManager = StompManager.get()
-            mStompManager.initStompClient()
+    fun initStompClient() {
+        GlobalScope.launch {
+            if (SharedPreferencesHelper.getBoolean(this@TelinkLightApplication, Constant.IS_LOGIN, false)) {
+                mStompManager = StompManager.get()
+                mStompManager.initStompClient()
 
-            singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
-                val key = SharedPreferencesHelper.getString(this, Constant.LOGIN_STATE_KEY, "no_have_key")
-                if (it != key) {
-                    LogUtils.e("zcl登出")
-                    val intent = Intent()
-                    intent.action = Constant.LOGIN_OUT
-                    intent.putExtra(Constant.LOGIN_OUT, key)
-                    sendBroadcast(intent)
-                }
-            }, {
-                ToastUtils.showShort(it.localizedMessage)
-            })
-
-
-            paserCodedisposable = mStompManager.parseQRCodeTopic().subscribe({
-                LogUtils.e("It's time to parse $it")
-                val intent = Intent()
-                intent.action = Constant.PARSE_CODE
-                intent.putExtra(Constant.PARSE_CODE,it)
-                sendBroadcast(intent)
-            }, {
-                ToastUtils.showShort(it.localizedMessage)
-            })
-
-            mCancelAuthorTopicDisposable = mStompManager.cancelAuthorization().subscribe({
-                LogUtils.e("It's time to cancel $it")
-                val intent = Intent()
-                intent.action = Constant.CANCEL_CODE
-                intent.putExtra(Constant.CANCEL_CODE, it)
-                sendBroadcast(intent)
-            }, { ToastUtils.showShort(it.localizedMessage) })
-
-
-            stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
-                when (lifecycleEvent.type) {
-                    LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
-                    LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
-                    LifecycleEvent.Type.CLOSED ->{
-                        LogUtils.d("zcl_Stomp******Stomp connection closed")
+                singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
+                    val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
+                    if (it != key) {
+                        LogUtils.e("zcl登出")
+                        val intent = Intent()
+                        intent.action = Constant.LOGIN_OUT
+                        intent.putExtra(Constant.LOGIN_OUT, key)
+                        sendBroadcast(intent)
                     }
-                }
-            }, {
-                ToastUtils.showShort(it.localizedMessage)
-            })
+                }, {
+                    ToastUtils.showShort(it.localizedMessage)
+                })
+
+
+                paserCodedisposable = mStompManager.parseQRCodeTopic().subscribe({
+                    LogUtils.e("It's time to parse $it")
+                    val intent = Intent()
+                    intent.action = Constant.PARSE_CODE
+                    intent.putExtra(Constant.PARSE_CODE, it)
+                    sendBroadcast(intent)
+                }, {
+                    ToastUtils.showShort(it.localizedMessage)
+                })
+
+                mCancelAuthorTopicDisposable = mStompManager.cancelAuthorization().subscribe({
+                    LogUtils.e("It's time to cancel $it")
+                    val intent = Intent()
+                    intent.action = Constant.CANCEL_CODE
+                    intent.putExtra(Constant.CANCEL_CODE, it)
+                    sendBroadcast(intent)
+                }, { ToastUtils.showShort(it.localizedMessage) })
+
+
+                stompLifecycleDisposable = mStompManager.lifeCycle()?.subscribe({ lifecycleEvent ->
+                    when (lifecycleEvent.type) {
+                        LifecycleEvent.Type.OPENED -> LogUtils.d("zcl_Stomp******Stomp connection opened")
+                        LifecycleEvent.Type.ERROR -> LogUtils.d("zcl_Stomp******Error" + lifecycleEvent.exception)
+                        LifecycleEvent.Type.CLOSED -> {
+                            LogUtils.d("zcl_Stomp******Stomp connection closed")
+                        }
+                    }
+                }, {
+                    ToastUtils.showShort(it.localizedMessage)
+                })
+            }
         }
     }
 

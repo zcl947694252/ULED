@@ -6,10 +6,8 @@ import android.graphics.Color;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DbModel.DBUtils;
-import com.dadoutek.uled.model.DbModel.DbConnector;
 import com.dadoutek.uled.model.DbModel.DbGroup;
 import com.dadoutek.uled.model.DbModel.DbLight;
-import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.InstallDeviceModel;
 
 import java.util.ArrayList;
@@ -123,6 +121,12 @@ public class OtherUtils {
     }
 
 
+
+
+    /**
+     * 获取要安装的设备的名字和描述
+     * @return  要安装的设备的名字和描述的list
+     */
     public static ArrayList<InstallDeviceModel> getInstallDeviceList(Context context){
         ArrayList<InstallDeviceModel> list = new ArrayList<>();
         InstallDeviceModel installDeviceModel1=new InstallDeviceModel(context.getString(R.string.normal_light),context.getString(R.string.normal_light_describe));
@@ -130,7 +134,7 @@ public class OtherUtils {
         InstallDeviceModel installDeviceModel3=new InstallDeviceModel(context.getString(R.string.switch_name),context.getString(R.string.switch_describe));
         InstallDeviceModel installDeviceModel4=new InstallDeviceModel(context.getString(R.string.sensor),context.getString(R.string.sensor_describe));
         InstallDeviceModel installDeviceModel5=new InstallDeviceModel(context.getString(R.string.curtain),context.getString(R.string.smart_curtain));
-        InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.connector),context.getString(R.string.for_connector));
+        InstallDeviceModel installDeviceModel6=new InstallDeviceModel(context.getString(R.string.relay),context.getString(R.string.for_connector));
         list.add(installDeviceModel1);
         list.add(installDeviceModel2);
         list.add(installDeviceModel3);

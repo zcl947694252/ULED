@@ -854,7 +854,7 @@ public class LightAdapter {
 
         if (!ignoreStatus) {
             if (this.status.get() == newStatus) {
-                Log.d("Saw", "return cause same status, status = " + newStatus);
+//                Log.d("Saw", "return cause same status, status = " + newStatus);
                 return;
             }
         }

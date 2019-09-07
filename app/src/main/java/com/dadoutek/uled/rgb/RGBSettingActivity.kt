@@ -1472,7 +1472,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
 
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, true)
+
             }
             LightAdapter.STATUS_LOGOUT -> {
                 retryConnect()
@@ -1497,7 +1497,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
 
     private fun onNError(event: DeviceEvent) {
 
-        SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
@@ -1555,7 +1555,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
                 scanFilters.add(scanFilter)
 
                 val params = LeScanParameters.create()
-                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc()) {
+                if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                     params.setScanFilters(scanFilters)
                 }
                 params.setMeshName(account)
@@ -1642,7 +1642,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
             if (TelinkLightService.Instance()?.mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
 
                 ToastUtils.showLong(getString(R.string.connecting))
-                SharedPreferencesHelper.putBoolean(this, Constant.CONNECT_STATE_SUCCESS_KEY, false)
+
 
                 if (this.mApp!!.isEmptyMesh)
                     return

@@ -2,6 +2,7 @@ package com.dadoutek.uled.user
 
 import android.os.Bundle
 import android.view.View
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import kotlinx.android.synthetic.main.activity_again_enter_password.*
@@ -16,6 +17,8 @@ class AgainEnterPasswordActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_again_enter_password)
+
+        LogUtils.d("AgainEnterPasswordActivity")
         initView()
     }
 

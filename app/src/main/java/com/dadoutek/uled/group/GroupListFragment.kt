@@ -74,7 +74,7 @@ class GroupListFragment : BaseFragment() {
     private var gpList: List<ItemTypeGroup>? = null
     private var application: TelinkLightApplication? = null
     private var toolbar: Toolbar? = null
-    //    private var recyclerView: RecyclerView? = null
+    //    private var rvDevice: RecyclerView? = null
     internal var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 16
@@ -97,19 +97,11 @@ class GroupListFragment : BaseFragment() {
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
-    private var sharedPreferences: SharedPreferences? = null
-
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
     //是否正在引导
     private var isGuide = false
-    var firstShowGuide = true
     private var isFristUserClickCheckConnect = true
-    private var guideShowCurrentPage = false
-
-    internal var lastPosition: Int = 0
-
-    internal var lastOffset: Int = 0
 
     private var deviceNameAdapter: GroupNameAdapter? = null
 
@@ -157,7 +149,7 @@ class GroupListFragment : BaseFragment() {
         this.mContext = this.activity
         setHasOptionsMenu(true)
         localBroadcastManager = LocalBroadcastManager
-                .getInstance(this!!.mContext!!)
+                .getInstance(this.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("showPro")
         intentFilter.addAction("switch_fragment")
@@ -228,56 +220,17 @@ class GroupListFragment : BaseFragment() {
         return view
     }
 
-    private fun scrollToPosition() {
 
-        sharedPreferences = mContext!!.getSharedPreferences("key", Activity.MODE_PRIVATE)
-
-        lastOffset = sharedPreferences!!.getInt("lastOffset", 0)
-
-        lastPosition = sharedPreferences!!.getInt("lastPosition", 0)
-
-//        if (recyclerView!!.layoutManager != null && lastPosition >= 0) {
-//
-//            (recyclerView!!.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
-//
-//        }
-
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        isFristUserClickCheckConnect = true
-
-        refreshView()
-        scrollToPosition()
-    }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
-            val act = activity as MainActivity?
-            act?.addEventListeners()
-            if (Constant.isCreat) {
-                refreshAndMoveBottom()
-                Constant.isCreat = false
-            } else {
-                refreshView()
-            }
-
+            isFristUserClickCheckConnect = true
+//            val act = activity as MainActivity?
+//            act?.addEventListeners()
+            refreshView()
+        } else {
+            isFristUserClickCheckConnect = false
         }
-    }
-
-    override fun onHiddenChanged(hidden: Boolean) {
-        super.onHiddenChanged(hidden)
-
-        if (!hidden) {
-//            this.initData()
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        isFristUserClickCheckConnect = false
     }
 
     private fun getView(inflater: LayoutInflater): View {
@@ -347,8 +300,8 @@ class GroupListFragment : BaseFragment() {
         gpList = DBUtils.getgroupListWithType(activity!!)
 
 
-        var cwNum = DBUtils.getAllNormalLight().size
-        var rgbNum = DBUtils.getAllRGBLight().size
+        val cwNum = DBUtils.getAllNormalLight().size
+        val rgbNum = DBUtils.getAllRGBLight().size
 
         if (cwNum != 0 || rgbNum != 0) {
             totalNum?.text = getString(R.string.total) + (cwNum + rgbNum) + getString(R.string.piece)
@@ -357,16 +310,16 @@ class GroupListFragment : BaseFragment() {
         }
 
         deviceName = ArrayList()
-        var stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light), TelinkLightApplication.getApp().getString(R.string.rgb_light),
-                TelinkLightApplication.getApp().getString(R.string.curtain), TelinkLightApplication.getApp().getString(R.string.connector))
+        val stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light), TelinkLightApplication.getApp().getString(R.string.rgb_light),
+                TelinkLightApplication.getApp().getString(R.string.curtain), TelinkLightApplication.getApp().getString(R.string.relay))
 
         for (i in stringName.indices) {
-            var device = DbDeviceName()
+            val device = DbDeviceName()
             device.name = stringName[i]
             deviceName!!.add(device)
         }
 
-        initBottomNavigation()
+        initDeviceTypeNavigation()
 
         val layoutManager = LinearLayoutManager(activity)
         layoutManager.orientation = LinearLayoutManager.HORIZONTAL
@@ -403,7 +356,7 @@ class GroupListFragment : BaseFragment() {
 
 //        val layoutmanager = LinearLayoutManager(activity)
 //        layoutmanager.orientation = LinearLayoutManager.VERTICAL
-//        recyclerView!!.layoutManager = layoutmanager
+//        rvDevice!!.layoutManager = layoutmanager
 //        this.adapter = GroupListRecycleViewAdapter(R.layout.group_item, onItemChildClickListener, showList!!)
 //
 ////        val decoration = DividerItemDecoration(activity!!,
@@ -412,18 +365,18 @@ class GroupListFragment : BaseFragment() {
 ////        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
 ////                .divider)))
 ////        //添加分割线
-////        recyclerView?.addItemDecoration(decoration)
-//        recyclerView?.itemAnimator = DefaultItemAnimator()
+////        rvDevice?.addItemDecoration(decoration)
+//        rvDevice?.itemAnimator = DefaultItemAnimator()
 //
 ////        adapter!!.addFooterView(getFooterView())
-//        adapter!!.bindToRecyclerView(recyclerView)
+//        adapter!!.bindToRecyclerView(rvDevice)
 //
 ////        getPositionAndOffset()
 //
-//        recyclerView!!.setOnScrollListener(object : RecyclerView.OnScrollListener() {
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//                if (recyclerView!!.layoutManager != null) {
+//        rvDevice!!.setOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrollStateChanged(rvDevice: RecyclerView, newState: Int) {
+//                super.onScrollStateChanged(rvDevice, newState)
+//                if (rvDevice!!.layoutManager != null) {
 //                    getPositionAndOffset()
 //                }
 //            }
@@ -436,7 +389,10 @@ class GroupListFragment : BaseFragment() {
                 application!!.mesh.name, application!!.mesh.password)
     }
 
-    private fun initBottomNavigation() {
+    /**
+     * 初始化内部device的Navigation
+     */
+    private fun initDeviceTypeNavigation() {
         cwLightFragment = CWLightFragmentList()
         rgbLightFragment = RGBLightFragmentList()
         curtianFragment = CurtainFragmentList()
@@ -479,16 +435,7 @@ class GroupListFragment : BaseFragment() {
             }
 
             override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-//                Log.e("TAG_p0",p0.toString())
-//                if (!isFirst) {
-//                    updateData(0, true)
-//                    updateData(1, false)
-//                    updateData(2, false)
-//                    updateData(3, false)
-//                    isFirst = true
-//                    fragmentPosition = 0
-//                    deviceNameAdapter?.notifyDataSetChanged()
-//                }
+
             }
 
             override fun onPageSelected(p0: Int) {
@@ -568,11 +515,19 @@ class GroupListFragment : BaseFragment() {
 //                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
+    /**
+     * 更新数据
+     * @param position list的index
+     * @param checkStateChange  开关状态
+     */
     private fun updateData(position: Int, checkStateChange: Boolean) {
         deviceName!![position].checked = checkStateChange
     }
 
 
+    /**
+     * 添加新的组
+     */
     private fun addNewGroup() {
         val textGp = EditText(activity)
         StringUtils.initEditTextFilter(textGp)
@@ -583,14 +538,14 @@ class GroupListFragment : BaseFragment() {
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showShort(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, Constant.DEVICE_TYPE_DEFAULT_ALL, activity!!)
-                        refreshAndMoveBottom()
+                        refreshView()
                         dialog.dismiss()
                     }
                 }
@@ -604,11 +559,9 @@ class GroupListFragment : BaseFragment() {
         }, 200)
     }
 
-    private fun refreshAndMoveBottom() {
-        refreshView()
-//        recyclerView?.smoothScrollToPosition(showList!!.size)
-    }
-
+    /**
+     * 刷新数据
+     */
     private fun refreshView() {
         if (activity != null) {
             gpList = DBUtils.getgroupListWithType(activity!!)
@@ -620,8 +573,8 @@ class GroupListFragment : BaseFragment() {
 
             isFirst = false
 
-            var cwNum = DBUtils.getAllNormalLight().size
-            var rgbNum = DBUtils.getAllRGBLight().size
+            val cwNum = DBUtils.getAllNormalLight().size
+            val rgbNum = DBUtils.getAllRGBLight().size
 
             if (cwNum != 0 || rgbNum != 0) {
                 totalNum?.text = getString(R.string.total) + (cwNum + rgbNum) + getString(R.string.piece)
@@ -629,10 +582,10 @@ class GroupListFragment : BaseFragment() {
                 totalNum?.text = getString(R.string.total) + (0) + getString(R.string.piece)
             }
 
-            var stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light),
+            val stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light),
                     TelinkLightApplication.getApp().getString(R.string.rgb_light),
                     TelinkLightApplication.getApp().getString(R.string.curtain),
-                    TelinkLightApplication.getApp().getString(R.string.connector))
+                    TelinkLightApplication.getApp().getString(R.string.relay))
 
             for (i in stringName.indices) {
                 var device = DbDeviceName()
@@ -649,11 +602,11 @@ class GroupListFragment : BaseFragment() {
             toolbar!!.setTitle(R.string.group_title)
             SharedPreferencesUtils.setDelete(false)
 
-            val layoutManager = LinearLayoutManager(activity)
-            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-            deviceRecyclerView!!.layoutManager = layoutManager
-            deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
-            deviceRecyclerView!!.setAdapter(deviceNameAdapter)
+//            val layoutManager = LinearLayoutManager(activity)
+//            layoutManager.orientation = LinearLayoutManager.HORIZONTAL
+//            deviceRecyclerView!!.layoutManager = layoutManager
+//            deviceNameAdapter = GroupNameAdapter(deviceName, onRecyclerviewItemClickListener)
+//            deviceRecyclerView!!.setAdapter(deviceNameAdapter)
 
             if (allGroup != null) {
                 if (allGroup!!.connectionStatus == ConnectionStatus.ON.value) {
@@ -664,7 +617,7 @@ class GroupListFragment : BaseFragment() {
                     if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "on")
-                        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                        LocalBroadcastManager.getInstance(this.mContext!!)
                                 .sendBroadcast(intent)
                     }
                 } else if (allGroup!!.connectionStatus == ConnectionStatus.OFF.value) {
@@ -675,13 +628,13 @@ class GroupListFragment : BaseFragment() {
                     if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_ALL_LIGHT_MODE, false)) {
                         val intent = Intent("switch_here")
                         intent.putExtra("switch_here", "false")
-                        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                        LocalBroadcastManager.getInstance(this.mContext!!)
                                 .sendBroadcast(intent)
                     }
                 }
             }
 
-            initBottomNavigation()
+//            initDeviceTypeNavigation()
         }
     }
 

@@ -8,6 +8,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import com.dadoutek.uled.util.AppUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.MeshEvent
@@ -89,16 +90,15 @@ object Commander : EventListener<String> {
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, mTargetGroupAddr, params)
     }
 
-    @Synchronized
-    fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
-                    failedCallback: () -> Unit1) {
+
+    fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1,
+                       failedCallback: () -> Unit1){
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
         val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
                 ?: 0x00
-
         if (lightList.isNotEmpty()) {
             Thread {
                 //找到当前连接的灯的mesh地址
@@ -118,7 +118,7 @@ object Commander : EventListener<String> {
                     }
                     DBUtils.deleteAll()
                     Thread.sleep(sleepTime)
-                    for (k in lightList.indices)
+                    for (k in lightList.indices) {
                         if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {
                             var ligh = DBUtils.getLightByMeshAddr(lightList[k])
                             if (ligh != null) {
@@ -135,14 +135,62 @@ object Commander : EventListener<String> {
                                 DBUtils.deleteConnector(rely)
                             }
                         }
+                    }
+
                 }
                 GlobalScope.launch(Dispatchers.Main) {
                     successCallback.invoke()
                 }
             }.start()
         } else {
+            //就算数据里没设备，设备也有可能存在，这是就发指令让它恢复出厂设置
+            GlobalScope.launch {
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, null) //直连灯不响应此条命令0xFFFF的目标地址
+                delay(500)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, null) //延时后再给直连灯发恢复出厂设置指令
+            }
+
             failedCallback.invoke()
         }
+
+    }
+
+    @Synchronized
+    fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
+                    failedCallback: () -> Unit1) {
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
+                ?: 0x00
+
+
+
+        var isSupportFastResetFactory: Boolean = false
+        Commander.getDeviceVersion(connectDeviceMeshAddr,
+                {
+                    isSupportFastResetFactory = AppUtils.isSupportFastResetFactory(it)
+                    if (isSupportFastResetFactory) {
+                        GlobalScope.launch {
+                            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, null) //直连灯不响应此条命令0xFFFF的目标地址
+                            delay(500)
+                            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, null) //延时后再给直连灯发恢复出厂设置指令
+                            DBUtils.deleteAllNormalLight()
+                            DBUtils.deleteAllRGBLight()
+                            DBUtils.deleteAllConnector()
+                            DBUtils.deleteAllCurtain()
+                        }
+                        successCallback.invoke()
+                    } else {
+                        resetLightsOld(lightList, successCallback, failedCallback)
+
+                    }
+
+                },
+                {
+                    resetLightsOld(lightList, successCallback, failedCallback)
+
+                })
+
+
+
     }
 
     @Synchronized
@@ -408,9 +456,9 @@ object Commander : EventListener<String> {
 
     private fun onGetGroupEvent(event: NotificationEvent) {
         val info = event.args
-        LogUtils.d("onGetGroupEvent info = $info ")
+//        LogUtils.d("onGetGroupEvent info = $info ")
 
-        val srcAddress = info.src and 0xFF
+        val srcAddress = info.src
         val params = info.params
 
         if (srcAddress != mDstAddr) {
@@ -517,7 +565,8 @@ object Commander : EventListener<String> {
             params = byteArrayOf(0x00, 0x00)
         } else {
             opcode = Opcode.SEND_MESSAGE_BY_MESH
-            params = byteArrayOf(0x3c, TelinkApplication.getInstance().connectDevice.meshAddress.toByte())
+            val meshAddr = TelinkApplication.getInstance().connectDevice.meshAddress
+            params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
         }
 
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)

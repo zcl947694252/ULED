@@ -202,7 +202,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     params.setMeshName(mesh.factoryName)
                 }
 
-                if (!AppUtils.isExynosSoc()) {
+                if (!AppUtils.isExynosSoc) {
                     params.setScanFilters(getScanFilters())
                 }
                 //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
