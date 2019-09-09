@@ -703,12 +703,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                 TelinkLightService.Instance().autoConnect(connectParams)
                                             }.start()
 
-                                            //刷新Notify参数
-                                            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-                                            refreshNotifyParams.setRefreshRepeatCount(2)
-                                            refreshNotifyParams.setRefreshInterval(1000)
-                                            //开启自动刷新Notify
-                                            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+//                                            //刷新Notify参数
+//                                            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+//                                            refreshNotifyParams.setRefreshRepeatCount(2)
+//                                            refreshNotifyParams.setRefreshInterval(1000)
+//                                            //开启自动刷新Notify
+//                                            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
 
                                         }
                                     },

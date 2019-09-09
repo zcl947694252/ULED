@@ -25,7 +25,7 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.LightGroupingActivity
+import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -926,7 +926,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun updateGroup() {//更新分组 断开提示
-        val intent = Intent(this, LightGroupingActivity::class.java)
+        val intent = Intent(this, ChooseGroupForDevice::class.java)
         intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
 
         if (light == null) {

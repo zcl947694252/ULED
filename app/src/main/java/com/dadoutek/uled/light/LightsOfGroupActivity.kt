@@ -82,7 +82,7 @@ import kotlin.collections.ArrayList
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   显示X组里所有灯的页面
  */
 
 private const val MAX_RETRY_CONNECT_TIME = 5

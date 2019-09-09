@@ -3,7 +3,10 @@ package com.dadoutek.uled.group
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -25,13 +28,13 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.connector.ConnectorOfGroupActivity
 import com.dadoutek.uled.connector.ConnectorSettingActivity
 import com.dadoutek.uled.curtain.CurtainOfGroupActivity
+import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.fragment.CWLightFragmentList
 import com.dadoutek.uled.fragment.CurtainFragmentList
 import com.dadoutek.uled.fragment.RGBLightFragmentList
 import com.dadoutek.uled.fragment.RelayFragmentList
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.MyBaseQuickAdapterOnClickListner
-import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -48,12 +51,10 @@ import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.*
-import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_input_pwd.*
 import kotlinx.android.synthetic.main.fragment_group_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -160,7 +161,9 @@ class GroupListFragment : BaseFragment() {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
                     toolbar!!.title = ""
-                    setBack()
+                    changeEnableBackToolbar()
+                } else {
+                    restoreNormalToolbar()
                 }
                 if (switchFragment == "true") {
                     toolbar!!.setTitle(R.string.group_title)
@@ -190,19 +193,23 @@ class GroupListFragment : BaseFragment() {
         localBroadcastManager.registerReceiver(br, intentFilter)
     }
 
-    private fun setBack() {
+    private fun restoreNormalToolbar() {
+        val intent = Intent("back")
+        intent.putExtra("back", "true")
+        LocalBroadcastManager.getInstance(this!!.mContext!!)
+                .sendBroadcast(intent)
+        toolbar!!.setTitle(R.string.group_title)
+        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
+        toolbar!!.navigationIcon = null
+        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        SharedPreferencesUtils.setDelete(false)
+    }
+
+    private fun changeEnableBackToolbar() {
         toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar!!.setNavigationOnClickListener {
-            val intent = Intent("back")
-            intent.putExtra("back", "true")
-            LocalBroadcastManager.getInstance(this!!.mContext!!)
-                    .sendBroadcast(intent)
-            toolbar!!.setTitle(R.string.group_title)
-            toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-            toolbar!!.navigationIcon = null
-            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-            SharedPreferencesUtils.setDelete(false)
+            restoreNormalToolbar()
         }
     }
 
@@ -707,7 +714,7 @@ class GroupListFragment : BaseFragment() {
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
-                .subscribe ({
+                .subscribe({
                     var lightList: MutableList<DbLight> = ArrayList()
 
                     if (group.meshAddr == 0xffff) {
@@ -736,7 +743,7 @@ class GroupListFragment : BaseFragment() {
                         }
                         DBUtils.updateLightLocal(dbLight)
                     }
-                },{})
+                }, {})
     }
 
     fun notifyDataSetChanged() {

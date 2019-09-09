@@ -165,7 +165,7 @@
             android:label="@string/activity_device_scanning_label"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".group.LightGroupingActivity"
+            android:name=".group.ChooseGroupForDevice"
             android:label="@string/activity_device_grouping"
             android:screenOrientation="portrait" />
         <activity

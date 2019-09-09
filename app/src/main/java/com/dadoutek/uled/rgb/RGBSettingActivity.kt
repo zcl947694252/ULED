@@ -28,7 +28,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.group.LightGroupingActivity
+import com.dadoutek.uled.group.ChooseGroupForDevice
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.DbModel.DBUtils
@@ -185,7 +185,7 @@ class RGBSettingActivity : TelinkBaseActivity(), EventListener<String>, View.OnT
     }
 
     private fun updateGroup() {
-        val intent = Intent(this, LightGroupingActivity::class.java)
+        val intent = Intent(this, ChooseGroupForDevice::class.java)
         intent.putExtra("light", light)
 
         if (light == null) {

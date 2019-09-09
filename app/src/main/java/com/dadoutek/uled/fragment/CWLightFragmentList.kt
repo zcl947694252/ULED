@@ -90,10 +90,6 @@ class CWLightFragmentList : BaseFragment() {
 
     private var layout: ConstraintLayout? = null
 
-    private var isDeleteTrue: Boolean = true        //是否处于删除模式
-
-    private var isLong: Boolean = true
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +111,6 @@ class CWLightFragmentList : BaseFragment() {
                 val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
-                    isLong = true
                     groupAdapter!!.changeState(isDelete)
                     groupList?.let {
                         for (i in it.indices)
@@ -137,6 +132,8 @@ class CWLightFragmentList : BaseFragment() {
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
                                 successCallback = {
                                     setResult(Constant.RESULT_OK)
+                                    isDelete = false
+                                    refreshData()
                                 },
                                 failedCallback = {
                                     hideLoadingDialog()
@@ -182,14 +179,11 @@ class CWLightFragmentList : BaseFragment() {
         intent.putExtra("delete_true", "true")
         LocalBroadcastManager.getInstance(this!!.mContext!!)
                 .sendBroadcast(intent)
-        isDeleteTrue = false
         initView()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        isDeleteTrue = true
-        isLong = true
         val view = getView(inflater)
         return view
     }
@@ -222,8 +216,7 @@ class CWLightFragmentList : BaseFragment() {
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
-            isDeleteTrue = true
-            isLong = true
+//            isDeleteTrue = true
 //            initView()
             refreshData()
         }
@@ -289,10 +282,17 @@ class CWLightFragmentList : BaseFragment() {
     var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
         if (!isDelete) {
             isDelete = true
-            isLong = false
             SharedPreferencesUtils.setDelete(true)
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "true")
+            this!!.activity?.let {
+                LocalBroadcastManager.getInstance(it)
+                        .sendBroadcast(intent)
+            }
+        } else {
+            isDelete = false
+            val intent = Intent("showPro")
+            intent.putExtra("is_delete", "false")
             this!!.activity?.let {
                 LocalBroadcastManager.getInstance(it)
                         .sendBroadcast(intent)
@@ -309,6 +309,8 @@ class CWLightFragmentList : BaseFragment() {
     fun refreshData() {
         groupList.clear()
         groupList.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD))
+
+        //以下是检索组里有多少设备的代码
         for (group in groupList) {
             if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB) {
                 group.deviceCount = DBUtils.getLightByGroupID(group.id).size
@@ -319,6 +321,13 @@ class CWLightFragmentList : BaseFragment() {
             }
         }
 
+        if (groupList.size > 0) {
+            no_group?.visibility = View.GONE
+            recyclerView?.visibility = View.VISIBLE
+        } else {
+            no_group?.visibility = View.VISIBLE
+            recyclerView?.visibility = View.GONE
+        }
         groupAdapter.notifyDataSetChanged()
     }
 
@@ -329,42 +338,36 @@ class CWLightFragmentList : BaseFragment() {
             val intent: Intent
             when (view!!.id) {
                 R.id.btn_on -> {
-                    if (isLong) {
-                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                            Commander.openOrCloseLights(dstAddr, true)
-                            currentLight.connectionStatus = ConnectionStatus.ON.value
-                            groupAdapter.notifyItemChanged(position)
-                            GlobalScope.launch {
-                                //子线程执行
-                                DBUtils.updateGroup(currentLight)
-                                updateLights(true, currentLight)
-                            }
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, true)
+                        currentLight.connectionStatus = ConnectionStatus.ON.value
+                        groupAdapter.notifyItemChanged(position)
+                        GlobalScope.launch {
+                            //子线程执行
+                            DBUtils.updateGroup(currentLight)
+                            updateLights(true, currentLight)
                         }
                     }
                 }
                 R.id.btn_off -> {
-                    if (isLong) {
-                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
-                            Commander.openOrCloseLights(dstAddr, false)
-                            currentLight.connectionStatus = ConnectionStatus.OFF.value
-                            groupAdapter.notifyItemChanged(position)
-                            GlobalScope.launch {
-                                //子线程执行
-                                DBUtils.updateGroup(currentLight)
-                                updateLights(false, currentLight)
-                            }
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL) {
+                        Commander.openOrCloseLights(dstAddr, false)
+                        currentLight.connectionStatus = ConnectionStatus.OFF.value
+                        groupAdapter.notifyItemChanged(position)
+                        GlobalScope.launch {
+                            //子线程执行
+                            DBUtils.updateGroup(currentLight)
+                            updateLights(false, currentLight)
                         }
                     }
                 }
 
                 R.id.btn_set -> {
-                    if (isLong) {
-                        if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
-                            intent = Intent(mContext, NormalSettingActivity::class.java)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                            intent.putExtra("group", currentLight)
-                            startActivityForResult(intent, 2)
-                        }
+                    if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
+                        intent = Intent(mContext, NormalSettingActivity::class.java)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                        intent.putExtra("group", currentLight)
+                        startActivityForResult(intent, 2)
                     }
                 }
 
@@ -373,12 +376,10 @@ class CWLightFragmentList : BaseFragment() {
                 }
 
                 R.id.item_layout -> {
-                    if (isLong) {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("group", currentLight)
-                        intent.putExtra("light", "cw_light")
-                        startActivityForResult(intent, 2)
-                    }
+                    intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                    intent.putExtra("group", currentLight)
+                    intent.putExtra("light", "cw_light")
+                    startActivityForResult(intent, 2)
                 }
             }
 //        }
@@ -459,9 +460,8 @@ class CWLightFragmentList : BaseFragment() {
                         dbGroup?.let {
                             groupList?.add(it)
                         }
-                        isLong = true
                         dialog.dismiss()
-                        groupAdapter?.notifyDataSetChanged()
+                        refreshData()
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
@@ -547,129 +547,129 @@ class CWLightFragmentList : BaseFragment() {
 //                groupAdapter!!.bindToRecyclerView(recyclerView)
 ////            setMove(rvDevice!!)
 //            }
-        }
+    }
 
-        /**
-         * 删除组，并且把组里的灯的组也都删除。
-         */
-        private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
-                                successCallback: () -> Unit, failedCallback: () -> Unit) {
-            Thread {
-                if (lights.count() != 0) {
-                    val maxRetryCount = 3
-                    if (retryCount <= maxRetryCount) {
-                        val light = lights[0]
-                        val lightMeshAddr = light.meshAddr
-                        Commander.deleteGroup(lightMeshAddr,
-                                successCallback = {
-                                    light.belongGroupId = DBUtils.groupNull!!.id
-                                    DBUtils.updateLight(light)
-                                    lights.remove(light)
-                                    //修改分组成功后删除场景信息。
-                                    deleteAllSceneByLightAddr(light.meshAddr)
-                                    Thread.sleep(100)
-                                    if (lights.count() == 0) {
-                                        //所有灯都删除了分组
-                                        DBUtils.deleteGroupOnly(group)
-                                        this?.runOnUiThread {
-                                            successCallback.invoke()
-                                        }
-                                    } else {
-                                        //还有灯要删除分组
-                                        deleteGroup(lights, group,
-                                                successCallback = successCallback,
-                                                failedCallback = failedCallback)
+    /**
+     * 删除组，并且把组里的灯的组也都删除。
+     */
+    private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
+                            successCallback: () -> Unit, failedCallback: () -> Unit) {
+        Thread {
+            if (lights.count() != 0) {
+                val maxRetryCount = 3
+                if (retryCount <= maxRetryCount) {
+                    val light = lights[0]
+                    val lightMeshAddr = light.meshAddr
+                    Commander.deleteGroup(lightMeshAddr,
+                            successCallback = {
+                                light.belongGroupId = DBUtils.groupNull!!.id
+                                DBUtils.updateLight(light)
+                                lights.remove(light)
+                                //修改分组成功后删除场景信息。
+                                deleteAllSceneByLightAddr(light.meshAddr)
+                                Thread.sleep(100)
+                                if (lights.count() == 0) {
+                                    //所有灯都删除了分组
+                                    DBUtils.deleteGroupOnly(group)
+                                    this?.runOnUiThread {
+                                        successCallback.invoke()
                                     }
-                                },
-                                failedCallback = {
-                                    deleteGroup(lights, group, retryCount = retryCount + 1,
+                                } else {
+                                    //还有灯要删除分组
+                                    deleteGroup(lights, group,
                                             successCallback = successCallback,
                                             failedCallback = failedCallback)
-                                })
-                    } else {    //超过了重试次数
-                        this?.runOnUiThread {
-                            failedCallback.invoke()
-                        }
-                        //("retry delete group timeout")
-                    }
-                } else {
-                    DBUtils.deleteGroupOnly(group)
+                                }
+                            },
+                            failedCallback = {
+                                deleteGroup(lights, group, retryCount = retryCount + 1,
+                                        successCallback = successCallback,
+                                        failedCallback = failedCallback)
+                            })
+                } else {    //超过了重试次数
                     this?.runOnUiThread {
-                        successCallback.invoke()
+                        failedCallback.invoke()
                     }
+                    //("retry delete group timeout")
                 }
-            }.start()
-
-        }
-
-        private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
-            val opcode = Opcode.SCENE_ADD_OR_DEL
-            val params = byteArrayOf(0x00, 0xff.toByte())
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-        }
-
-        override fun onDestroy() {
-            super.onDestroy()
-            localBroadcastManager.unregisterReceiver(br)
-        }
-
-        private fun setMove(recyclerViewChild: RecyclerView) {
-            var startPos = 0
-            var endPos = 0
-            val list = groupAdapter!!.data
-            val onItemDragListener = object : OnItemDragListener {
-                override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
-
-                    startPos = pos
-                    endPos = 0
-
-                    //"indexchange----start:$pos")
-                }
-
-                override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
-                                              target: RecyclerView.ViewHolder, to: Int) {
-                }
-
-                override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
-                    //                viewHolder.getItemId();
-                    endPos = pos
-                    //"indexchange----end:$pos")
-
-                    updateGroupList(list, startPos, endPos)
-                    //"indexchange----start:$startPos--end:$endPos")
+            } else {
+                DBUtils.deleteGroupOnly(group)
+                this?.runOnUiThread {
+                    successCallback.invoke()
                 }
             }
+        }.start()
 
-            val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(groupAdapter)
-            val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
-            itemTouchHelper.attachToRecyclerView(recyclerViewChild)
-
-            groupAdapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
-            groupAdapter!!.setOnItemDragListener(onItemDragListener)
-        }
-
-        private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
-
-            var tempIndex = list[endPos].index
-
-            if (endPos < startPos) {
-                for (i in endPos..startPos) {
-                    if (i == startPos) {
-                        list[i].index = tempIndex
-                    } else {
-                        list[i].index = list[i + 1].index
-                    }
-                }
-            } else if (endPos > startPos) {
-                for (i in endPos downTo startPos) {
-                    if (i == startPos) {
-                        list[i].index = tempIndex
-                    } else {
-                        list[i].index = list[i - 1].index
-                    }
-                }
-            }
-
-            DBUtils.updateGroupList(list)
-        }
     }
+
+    private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
+        val opcode = Opcode.SCENE_ADD_OR_DEL
+        val params = byteArrayOf(0x00, 0xff.toByte())
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        localBroadcastManager.unregisterReceiver(br)
+    }
+
+    private fun setMove(recyclerViewChild: RecyclerView) {
+        var startPos = 0
+        var endPos = 0
+        val list = groupAdapter!!.data
+        val onItemDragListener = object : OnItemDragListener {
+            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+
+                startPos = pos
+                endPos = 0
+
+                //"indexchange----start:$pos")
+            }
+
+            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
+                                          target: RecyclerView.ViewHolder, to: Int) {
+            }
+
+            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+                //                viewHolder.getItemId();
+                endPos = pos
+                //"indexchange----end:$pos")
+
+                updateGroupList(list, startPos, endPos)
+                //"indexchange----start:$startPos--end:$endPos")
+            }
+        }
+
+        val itemDragAndSwipeCallback = ItemDragAndSwipeCallback(groupAdapter)
+        val itemTouchHelper = ItemTouchHelper(itemDragAndSwipeCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerViewChild)
+
+        groupAdapter!!.enableDragItem(itemTouchHelper, R.id.txt_name, true)
+        groupAdapter!!.setOnItemDragListener(onItemDragListener)
+    }
+
+    private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
+
+        var tempIndex = list[endPos].index
+
+        if (endPos < startPos) {
+            for (i in endPos..startPos) {
+                if (i == startPos) {
+                    list[i].index = tempIndex
+                } else {
+                    list[i].index = list[i + 1].index
+                }
+            }
+        } else if (endPos > startPos) {
+            for (i in endPos downTo startPos) {
+                if (i == startPos) {
+                    list[i].index = tempIndex
+                } else {
+                    list[i].index = list[i - 1].index
+                }
+            }
+        }
+
+        DBUtils.updateGroupList(list)
+    }
+}

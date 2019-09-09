@@ -12,7 +12,6 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
 import android.widget.GridView
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -32,11 +31,13 @@ import com.telink.TelinkApplication
 import com.telink.bluetooth.event.NotificationEvent
 import com.telink.util.Event
 import com.telink.util.EventListener
-import io.reactivex.android.schedulers.AndroidSchedulers
 import java.util.*
 
 
-class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
+/**
+ * 修改设备分组的页面（灯，接收器之类的）
+ */
+class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     companion object {
         private val UPDATE = 1
     }
@@ -46,7 +47,6 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     private var mGroupList: MutableList<DbGroup> = mutableListOf()
 
     private lateinit var mLight: DbLight
-    private var gpAdress: Int = 0
 
     private var listView: GridView? = null
 
@@ -181,7 +181,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
         initData()
         initView()
-//        this.getDeviceGroup()
+//        this.setGroupChecked()
     }
 
     private fun initView() {
@@ -203,7 +203,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
         this.mLight = this.intent.extras?.get("light") as DbLight
         val list = DBUtils.groupList
         filter(list)
-        getDeviceGroup()
+        setGroupChecked()
     }
 
     private fun filter(list: MutableList<DbGroup>) {
@@ -244,8 +244,19 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 //        this.mApplication!!.removeEventListener(this)
     }
 
-    private fun getDeviceGroup() {
+    /**
+     * 把所在的组，设置成checked，用来标识当前设备处于哪个分组
+     */
+    private fun setGroupChecked() {
+        for (group in mGroupList) {
+            group.checked = group.id == mLight.belongGroupId
+            if (group.checked) {
+                break
+            }
+        }
 
+/*
+        //通过指令，从设备里获取灯所在的组
         val disposable = Commander.getGroup(mLight.meshAddr)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -260,10 +271,13 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                             LogUtils.d(it)
                         }
                 )
+*/
     }
+
 
     /**
      *  start to group
+     *  设置设备分组
      */
     private fun allocDeviceGroup(group: DbGroup, successCallback: () -> Unit, failedCallback: () -> Unit) {
         Commander.addGroup(mLight.meshAddr, group.meshAddr, {
@@ -331,13 +345,16 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
 
+    /**
+     * 添加新的分组进列表
+     */
     private fun addNewGroup() {
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
         textGp.setSelection(textGp.getText().toString().length)
-        AlertDialog.Builder(this@LightGroupingActivity)
+        AlertDialog.Builder(this@ChooseGroupForDevice)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
@@ -356,6 +373,9 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
+    /**
+     * 刷新UI
+     */
     private fun refreshView() {
         val list = DBUtils.groupList
         filter(list)
@@ -367,7 +387,7 @@ class LightGroupingActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     override fun onBackPressed() {
-        val builder = AlertDialog.Builder(this@LightGroupingActivity)
+        val builder = AlertDialog.Builder(this@ChooseGroupForDevice)
         builder.setTitle(R.string.group_not_change_tip)
         builder.setPositiveButton(android.R.string.ok) { dialog, which -> finish() }
         builder.setNegativeButton(R.string.btn_cancel) { dialog, which -> }

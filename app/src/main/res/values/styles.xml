@@ -19,7 +19,8 @@
     </style>
 
     <style name="CustomCheckboxTheme" parent="@android:style/Widget.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/checkbox_style</item>
+        <item name="android:drawableStart">@drawable/checkbox_style</item>
+        <item name="android:button">@null</item>
     </style>
 
     <style name="FullHeightDialog" parent="Theme.AppCompat.Light.Dialog.MinWidth">
