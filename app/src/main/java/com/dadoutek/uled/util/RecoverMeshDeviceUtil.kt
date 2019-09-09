@@ -73,11 +73,12 @@ object RecoverMeshDeviceUtil {
                 }
                 .map { deviceInfo ->
                     createdDeviceList.add(deviceInfo)
-                    addDevicesToDb(deviceInfo)
+                    createDeviceIfNotExistInDb(deviceInfo)
                     createdDeviceList.size
 
                 }
                 .timeout(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
+                    LogUtils.d("findMeshDevice name complete. size = ${createdDeviceList.size}")
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
                 .takeLast(1)        //只onNext最后一次数据

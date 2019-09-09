@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.app.hubert.guide.util.LogUtil;
+import com.blankj.utilcode.util.LogUtils;
 import com.chad.library.adapter.base.BaseItemDraggableAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.dadoutek.uled.model.DbModel.DbLight;
@@ -49,7 +51,8 @@ public class LightsOfGroupRecyclerViewAdapter extends BaseItemDraggableAdapter<
         if(TelinkLightApplication.Companion.getApp().getConnectDevice() == null){
            tvName.setTextColor(mContext.getResources().getColor(R.color.black));
         }else{
-            if(TelinkLightApplication.Companion.getApp().getConnectDevice().meshAddress==item.getMeshAddr()){
+            if(TelinkLightApplication.Companion.getApp().getConnectDevice().meshAddress == item.getMeshAddr()){
+                LogUtils.d("pos = " + helper.getAdapterPosition() + " meshAddr = " + item.getMeshAddr());
                 tvName.setTextColor(mContext.getResources().getColor(R.color.primary));
                 tvLightName.setTextColor(mContext.getResources().getColor(R.color.primary));
             }else{

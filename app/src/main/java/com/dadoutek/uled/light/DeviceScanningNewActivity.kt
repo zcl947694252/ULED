@@ -775,12 +775,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 ToastUtils.showShort(getString(R.string.rename_tip_check))
             } else {
                 //往DB里添加组数据
+                val newGroup: DbGroup?
                 if (scanRGBLight) {
-                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_RGB)
+                    newGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_RGB)
                 } else {
-                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_NORMAL)
+                    newGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_LIGHT_NORMAL)
                 }
-
+                newGroup?.let {
+                    groups?.add(newGroup)
+                }
                 refreshView()
                 dialog.dismiss()
                 val imm = this@DeviceScanningNewActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

@@ -3,6 +3,7 @@ package com.dadoutek.uled.light
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -23,7 +24,6 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
 
     override fun convert(helper: BaseViewHolder, scene: DbLight) {
         if (scene != null) {
-
             val tvName = helper.getView<TextView>(R.id.name)
             val tvLightName = helper.getView<TextView>(R.id.light_name)
             val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
@@ -33,6 +33,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
                 tvName.setTextColor(mContext.resources.getColor(R.color.black))
             } else {
                 if (TelinkLightApplication.getApp().connectDevice.meshAddress == scene.getMeshAddr()) {
+                    LogUtils.d("pos = " + helper.adapterPosition + " meshAddr = " + scene.getMeshAddr())
                     tvName.setTextColor(mContext.resources.getColor(R.color.primary))
                     tvLightName.setTextColor(mContext.resources.getColor(R.color.primary))
                 } else {
