@@ -14,10 +14,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbSwitch
@@ -28,10 +30,7 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.BleUtils
-import com.dadoutek.uled.util.DialogUtils
-import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
@@ -61,6 +60,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun onLogin() {
         mScanTimeoutDisposal?.dispose()
+        this.mApplication?.removeEventListener(this)
         hideLoadingDialog()
         if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                 bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
@@ -118,7 +118,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private var currentSwitch: DbSwitch? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        addScanListeners()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_switch_device_details)
         this.mApplication = this.application as TelinkLightApplication
@@ -132,6 +131,19 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun initData() {
         switchData = DBUtils.getAllSwitch()
+        SyncDataPutOrGetUtils.syncPutDataStart(TelinkLightApplication.getApp(), object : SyncCallback {
+            override fun start() {
+                LogUtils.e("zcl____同步开关________start")
+            }
+
+            override fun complete() {
+                LogUtils.e("zcl____同步开关________complete")
+            }
+
+            override fun error(msg: String?) {
+                LogUtils.e("zcl____同步开关________error")
+            }
+        })
         if (switchData.size > 0) {
             no_device_relativeLayout.visibility = View.GONE
             recycleView.visibility = View.VISIBLE
@@ -241,7 +253,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             isclickOTA = false
 
             if (currentSwitch != null) {
-                 TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance().idleMode(true)
                 TelinkLightService.Instance().disconnect()
                 connect()
             }
@@ -316,7 +328,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         hideLoadingDialog()
         val deviceInfo = deviceEvent.args
-        mDeviceMeshName = deviceInfo.meshName?:getString(R.string.unnamed)
+        mDeviceMeshName = deviceInfo.meshName ?: getString(R.string.unnamed)
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 if (isOta) {
@@ -324,6 +336,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                 } else {
                     bestRSSIDevice = deviceInfo
                     onLogin()//判断进入那个开关设置界面
+
                     stopConnectTimer()
                     com.blankj.utilcode.util.LogUtils.d("connected22")
                 }
@@ -343,7 +356,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun getVersion() {
         Log.e("zcl", "zcl******进入")
-        isclickOTA =false
+        isclickOTA = false
         if (TelinkApplication.getInstance().connectDevice != null) {
             Log.e("TAG", currentLight!!.meshAddr.toString())
             Commander.getDeviceVersion(currentLight!!.meshAddr, { s ->
@@ -363,6 +376,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun autoConnectSwitch() {
+        this.mApplication?.removeEventListener(this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
@@ -370,20 +387,14 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
         connectParams.setTimeoutSeconds(10)
-        showLoadingDialog(getString(R.string.connecting))
+        this.runOnUiThread {
+            showLoadingDialog(getString(R.string.connecting))
+        }
 
         //连接，如断开会自动重连 自动登录 不用login
         GlobalScope.launch {
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
-    }
-
-    private fun addScanListeners() {
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     @SuppressLint("CheckResult")

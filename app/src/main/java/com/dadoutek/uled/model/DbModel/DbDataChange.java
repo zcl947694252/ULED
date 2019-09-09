@@ -11,13 +11,13 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity
 public class DbDataChange {
     @Id(autoincrement = true)
-    private Long id;
+    private Long id;//自增
 
-    private Long changeId;
+    private Long changeId;//变化行id
 
-    private String tableName;
+    private String tableName;//改变的表名
 
-    private String changeType;
+    private String changeType;  //数据改变操作类型  增删改查
 
     @Generated(hash = 668824277)
     public DbDataChange(Long id, Long changeId, String tableName,

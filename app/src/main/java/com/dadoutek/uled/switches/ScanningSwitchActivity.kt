@@ -351,6 +351,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         mDeviceMeshName = deviceInfo.meshName
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
+
                 onLogin()
                 stopConnectTimer()
             }
