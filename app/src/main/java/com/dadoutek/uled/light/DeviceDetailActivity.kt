@@ -221,7 +221,6 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
      */
     @Synchronized
     private fun onLeScan(event: LeScanEvent) {
-        val mesh = this.mApplication?.mesh
         val deviceInfo: DeviceInfo = event.args
 
         Thread {

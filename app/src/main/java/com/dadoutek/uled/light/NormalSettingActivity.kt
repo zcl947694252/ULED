@@ -798,9 +798,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (currentShowPageGroup) {
-            getMenuInflater().inflate(R.menu.menu_rgb_group_setting, menu)
+            menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
         } else {
-            getMenuInflater().inflate(R.menu.menu_rgb_light_setting, menu)
+            menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
         }
         return super.onCreateOptionsMenu(menu)
     }
@@ -984,9 +984,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
     }
 
     private fun checkPermission() {
-//        if(light!!.macAddr.length<16){
-//            ToastUtils.showLong(getString(R.string.bt_error))
-//        }else{
         mDisposable.add(
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe {
@@ -1136,40 +1133,20 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         }
     }
 
-    private fun initToolbarGroup() {
-        toolbar.title = ""
-        toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
-        setSupportActionBar(toolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
-    }
-
-
-    private fun test() {
-        for (i in 0..100) {
-            Thread {
-                Thread.sleep(1000)
-                getVersionTest()
-            }.start()
-        }
-    }
 
     var count = 0
     private fun getVersionTest() {
-        var dstAdress = 0
         if (TelinkApplication.getInstance().connectDevice != null) {
             Commander.getDeviceVersion(light!!.meshAddr, { s ->
                 localVersion = s
                 if (!localVersion!!.startsWith("LC")) {
-                    ToastUtils.showLong("版本号出错：" + localVersion)
+                    ToastUtils.showLong("版本号出错：$localVersion")
                     textTitle!!.visibility = View.VISIBLE
                     textTitle!!.text = resources.getString(R.string.firmware_version, localVersion)
                     light!!.version = localVersion
-//                    tvOta!!.visibility = View.VISIBLE
                 } else {
                     count++
-                    ToastUtils.showShort("版本号正确次数：" + localVersion)
+                    ToastUtils.showShort("版本号正确次数：$localVersion")
                     textTitle!!.visibility = View.GONE
                     tvOta!!.visibility = View.GONE
                 }
@@ -1181,23 +1158,13 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 }
                 null
             })
-        } else {
-            dstAdress = 0
         }
     }
 
     private fun initViewGroup() {
-//        editTitle.visibility = View.GONE
-//        titleCenterName.visibility = View.VISIBLE
         if (group != null) {
             if (group!!.meshAddr == 0xffff) {
-//                editTitle!!.setText(getString(R.string.allLight))
-////                titleCenterName!!.text = getString(R.string.allLight)
                 toolbar.title = getString(R.string.allLight)
-            } else {
-//                editTitle!!.setText(group!!.name)
-//                titleCenterName!!.text = group!!.name
-//                toolbar.title = group!!.name
             }
         }
 
@@ -1219,7 +1186,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             temperature_text.setTextColor(resources.getColor(R.color.black_nine))
             light_sbBrightness?.progress = group!!.brightness
             tv_Brightness.text = group!!.brightness.toString() + "%"
-//            clickNum = 1
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1229,12 +1195,9 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             brightness_text.setTextColor(resources.getColor(R.color.black_nine))
             light_sbBrightness?.progress = group!!.colorTemperature
             tv_Brightness.text = group!!.colorTemperature.toString() + "%"
-//            clickNum = 1
             isBrightness = false
         }
 
-
-//        light_sbBrightness?.progress = light!!.brightness
         var light_current = DBUtils.getGroupByID(group!!.id)
 
 
@@ -1255,19 +1218,22 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness!!.setOnTouchListener { v, event -> false }
             light_sbBrightness.isEnabled = true
             isSwitch = true
-            if (light_current!!.brightness <= 0) {
-                device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                device_light_add.setImageResource(R.drawable.icon_puls)
-            } else if (light_current.brightness >= 100) {
-                device_light_add.setImageResource(R.drawable.icon_puls_no)
-                device_light_minus.setImageResource(R.drawable.icon_minus)
-            } else {
-                device_light_minus.setImageResource(R.drawable.icon_minus)
-                device_light_add.setImageResource(R.drawable.icon_puls)
+            when {
+                light_current!!.brightness <= 0 -> {
+                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                    device_light_add.setImageResource(R.drawable.icon_puls)
+                }
+                light_current.brightness >= 100 -> {
+                    device_light_add.setImageResource(R.drawable.icon_puls_no)
+                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                }
+                else -> {
+                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                    device_light_add.setImageResource(R.drawable.icon_puls)
+                }
             }
             device_light_add.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-                    //                    tvValue = Integer.parseInt(textView.getText().toString());
                     downTime = System.currentTimeMillis()
                     onBtnTouch = true
                     val t = object : Thread() {
@@ -1345,14 +1311,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
                 true
             }
         }
-//        sbBrightness!!.progress = group!!.brightness
-//        tvBrightness.text = getString(R.string.device_setting_brightness, group!!.brightness.toString() + "")
-//        sbTemperature!!.progress = group!!.colorTemperature
-//        tvTemperature!!.text = getString(R.string.device_setting_temperature, group!!.colorTemperature.toString() + "")
-//
-//
         this.light_sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
-//        this.sbTemperature!!.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
     //所有灯控分组暂标为系统默认分组不做修改处理
@@ -1390,8 +1349,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
 
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
-//            R.id.toolbar_delete_group->{removeGroup()}
-//            R.id.toolbar_rename_group->{renameGp()}
             R.id.toolbar_rename_light -> {
                 renameGp()
             }
@@ -1407,7 +1364,7 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             R.id.toolbar_delete_group -> {
                 AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this)).setMessage(R.string.delete_group_confirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
-                            (this as NormalSettingActivity).showLoadingDialog(getString(R.string.deleting))
+                            this.showLoadingDialog(getString(R.string.deleting))
 
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
@@ -1460,11 +1417,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
         this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
-//        textTitle!!.text = ""
-//        editTitle!!.setText(light?.name)
-//        editTitle!!.visibility = View.GONE
-//        titleCenterName.visibility = View.VISIBLE
-//        titleCenterName.setText(light?.name)
         toolbar.title = light?.name
 
         mRxPermission = RxPermissions(this)
@@ -1482,7 +1434,6 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness?.progress = light!!.brightness
             tv_Brightness.text = light!!.brightness.toString() + "%"
 
-//            clickNum = 1
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1494,13 +1445,8 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_sbBrightness?.progress = light!!.colorTemperature
             tv_Brightness.text = light!!.colorTemperature.toString() + "%"
 
-//            clickNum = 1
             isBrightness = false
         }
-
-
-//        isBrightness = true
-//        clickNum = 1
 
         this.light_sbBrightness?.max = 100
         if (light!!.connectionStatus == ConnectionStatus.OFF.value) {
@@ -1519,19 +1465,22 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             light_switch.setImageResource(R.drawable.icon_light_open)
             light_sbBrightness!!.setOnTouchListener { v, event -> false }
             light_sbBrightness.isEnabled = true
-            if (light!!.brightness <= 0) {
-                device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                device_light_add.setImageResource(R.drawable.icon_puls)
-            } else if (light!!.brightness >= 100) {
-                device_light_add.setImageResource(R.drawable.icon_puls_no)
-                device_light_minus.setImageResource(R.drawable.icon_minus)
-            } else {
-                device_light_minus.setImageResource(R.drawable.icon_minus)
-                device_light_add.setImageResource(R.drawable.icon_puls)
+            when {
+                light!!.brightness <= 0 -> {
+                    device_light_minus.setImageResource(R.drawable.icon_minus_no)
+                    device_light_add.setImageResource(R.drawable.icon_puls)
+                }
+                light!!.brightness >= 100 -> {
+                    device_light_add.setImageResource(R.drawable.icon_puls_no)
+                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                }
+                else -> {
+                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                    device_light_add.setImageResource(R.drawable.icon_puls)
+                }
             }
             device_light_add.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_DOWN) {
-                    //                    tvValue = Integer.parseInt(textView.getText().toString());
                     downTime = System.currentTimeMillis()
                     onBtnTouch = true
                     val t = object : Thread() {
@@ -1610,64 +1559,12 @@ class NormalSettingActivity : TelinkBaseActivity(), EventListener<String>, TextV
             }
         }
 
-//        this.colorPicker.setOnColorChangeListener(this.colorChangedListener);
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
-//        sbBrightness?.progress = light!!.brightness
-//        tvBrightness.text = getString(R.string.device_setting_brightness, light?.brightness.toString() + "")
-//        sbTemperature?.progress = light!!.colorTemperature
-//        tvTemperature.text = getString(R.string.device_setting_temperature, light?.colorTemperature.toString() + "")
-
-//        sendInitCmd(light.getBrightness(),light.getColorTemperature());
 
         this.light_sbBrightness?.setOnSeekBarChangeListener(this.barChangeListener)
-//        this.sbTemperature?.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
     private fun renameGp() {
-//        val intent = Intent(this, RenameActivity::class.java)
-//        intent.putExtra("group", group)
-//        startActivity(intent)
-//        this?.finish()
-//        editTitle.visibility=View.VISIBLE
-//        titleCenterName.visibility=View.GONE
-//        isRenameState=true
-//        tvOta.setText(android.R.string.ok)
-//        editTitle?.setFocusableInTouchMode(true)
-//        editTitle?.setFocusable(true)
-//        editTitle?.requestFocus()
-//        //设置光标默认在最后
-//        editTitle.setSelection(editTitle.getText().toString().length)
-////        btn_sure_edit_rename.visibility = View.VISIBLE
-////        btn_sure_edit_rename.setOnClickListener {
-////            saveName()
-////            btn_sure_edit_rename.visibility = View.GONE
-////        }
-//        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-//        imm.showSoftInput(editTitle, InputMethodManager.SHOW_FORCED)
-//        editTitle?.setOnEditorActionListener(this)
-
-
-//        val textGp = EditText(this)
-//        StringUtils.initEditTextFilter(textGp)
-//        textGp.setText(light?.name)
-//        textGp.setSelection(textGp.getText().toString().length)
-//        android.app.AlertDialog.Builder(this@NormalSettingActivity)
-//                .setTitle(R.string.rename)
-//                .setView(textGp)
-//
-//                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-//                    // 获取输入框的内容
-//                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-//                        ToastUtils.showShort(getString(R.string.rename_tip_check))
-//                    } else {
-//                        light?.name = textGp.text.toString().trim { it <= ' ' }
-//                        DBUtils.updateLight(light!!)
-//                        titleCenterName.setText(light?.name)
-//                        dialog.dismiss()
-//                    }
-//                }
-//                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-
         val textGp = EditText(this)
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(light?.name)

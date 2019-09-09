@@ -664,7 +664,7 @@
     <string name="open_it">去开启</string>
     <string name="restart_it">去重启</string>
     <string name="i_see">我知道了</string>
-    <string name="switch_grouping">重新配置</string>
+    <string name="relocation">重新配置</string>
     <string name="please_rgb">请输入RGB值</string>
     <string name="cannot_rgb_null">RGB值不能为空</string>
     <string name="rgb_max">RGB值不能大于255</string>
@@ -739,7 +739,7 @@
     <string name="syncing_relogin">同步数据中请重新登录</string>
     <string name="in_use">使用中</string>
     <string name="use">使用</string>
-    <string name="creater_name">创 建 者: +</string>
+    <string name="creater_name">创 建 者: </string>
     <string name="bluetooth_open_connet">"当前处于未连接状态，重连中。。。"</string>
     <string name="input_region_name">请输入区域名称</string>
     <string name="developer_mode_open">开发者模式已开启</string>
@@ -808,5 +808,6 @@
     <string name="please_restore_device">请先将区域下所有设备恢复出厂设置后再删除该区域</string>
     <string name="please_connect_normal_light">请连接冷暖灯</string>
     <string name="please_connect_curtain">请连接窗帘</string>
+    <string name="scanning_timeout">扫描超时</string>
 
 </resources>

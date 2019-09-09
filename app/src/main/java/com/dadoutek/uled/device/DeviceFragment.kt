@@ -16,7 +16,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import com.app.hubert.guide.core.Controller
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -29,7 +28,6 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
-import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.SwitchDeviceDetailsActivity
@@ -63,8 +61,7 @@ class DeviceFragment : BaseFragment() {
     private val SCENE_MAX_COUNT = 16
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = initLayout(inflater)
-        return view
+        return initLayout(inflater)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -196,7 +193,6 @@ class DeviceFragment : BaseFragment() {
      * 刷新UI
      */
     fun refreshView() {
-        LogUtils.d("refreshView")
         if (activity != null) {
             initAdapterData()
             deviceAdapter.notifyDataSetChanged()

@@ -1,20 +1,10 @@
 package com.dadoutek.uled.util;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.dadoutek.uled.R;
@@ -40,6 +30,7 @@ public class Dot extends View {
         mPaint.setColor(getResources().getColor(R.color.colorGray));
     }
 
+    //Paint.ANTI_ALIAS_FLAG是使位图抗锯齿的标志
     private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     @Override
@@ -48,7 +39,7 @@ public class Dot extends View {
         int width = getWidth();
         int height = getHeight();
         int radius = Math.min(width, height) / 2;
-        mPaint.setShadowLayer(45, 0, 0, getContext().getResources().getColor(R.color.color_000000));
+        mPaint.setShadowLayer(45, 0, 0, getContext().getResources().getColor(R.color.white));
         canvas.drawCircle(width / 2, height / 2, radius, mPaint);
     }
 

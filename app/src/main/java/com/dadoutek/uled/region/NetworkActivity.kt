@@ -7,7 +7,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.constraint.ConstraintLayout
@@ -18,6 +17,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
@@ -40,11 +40,14 @@ import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.jakewharton.rxbinding2.view.RxView
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_network.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -61,11 +64,10 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${TODO}$
  */
 class NetworkActivity : BaseActivity(), View.OnClickListener {
+    private var disposableEnsure: Disposable? = null
+    private var disposableRequest: Disposable? = null
+    private lateinit var mRxPermission: RxPermissions
     var TAG = "zcl-NetworkActivity"
-    override fun setLayoutID(): Int {
-        return R.layout.activity_network
-    }
-
     private var isRefresh: Boolean = false
     private val REQUEST_CODE: Int = 1000
     private val REQUEST_CODE_CARMER: Int = 100
@@ -95,10 +97,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     var mExpire: Long = 0
     var isTransferCode = false
     private var isAddRegion = true
+    override fun setLayoutID(): Int {
+        return R.layout.activity_network
+    }
+
     override fun initView() {
         list = ArrayList()
         listAuthorize = ArrayList()
-
+        mRxPermission = RxPermissions(this)
         initToolBar()
         makePop()
         initListener()
@@ -125,6 +131,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         toolbar.setNavigationOnClickListener { finish() }
     }
 
+    @SuppressLint("CheckResult")
     override fun initListener() {
         img_function1.setOnClickListener {
             isAddRegion = true
@@ -136,6 +143,20 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         image_bluetooth.setOnClickListener {
             openScan()
         }
+         disposableEnsure = RxView.clicks(image_bluetooth)
+                .compose(mRxPermission.ensure(Manifest.permission.CAMERA))
+                .subscribe({
+                    if (it) {
+                        openScan()
+                    } else {
+                        disposableRequest = mRxPermission.request(Manifest.permission.CAMERA).subscribe({ t ->
+                            if (t)
+                                openScan()
+                            else
+                                ToastUtils.showShort(getString(R.string.permission_denfied))
+                        }, { t -> ToastUtils.showShort(t.localizedMessage) })
+                    }
+                }, { t -> ToastUtils.showShort(t.localizedMessage) })
 
         transfer_account.setOnClickListener {
             lookAndMaketransferCode()
@@ -182,7 +203,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult", "SetTextI18n")
     override fun initData() {
         if (lastUser != null) {
-            region_account_num.text = "+" + lastUser!!.phone
+            region_account_num.text = lastUser!!.phone
             Log.e(TAG, "zcl******isShowType****$isShowType" + "user${lastUser.toString()}")
             when (isShowType) {
                 1 -> RegionModel.get()?.subscribe({ it -> setMeData(it) }, {
@@ -387,9 +408,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     2 -> showUnbindDialog()
                 }
             }
-            R.id.pop_qr_cancel -> {
+            R.id.pop_qr_cancel -> {//取消弹框
                 if (isTransferCode)
-                    RegionModel.removeTransferCode()!!.subscribe( { setCancel() },{ToastUtils.showShort(it.message)})
+                    RegionModel.removeTransferCode()!!.subscribe({ setCancel() }, { ToastUtils.showShort(it.message) })
                 PopUtil.dismiss(pop)
             }
             R.id.pop_user_net -> {
@@ -397,14 +418,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 changeRegion()
             }
             R.id.pop_delete_net -> {
-                if (regionBean!!.count_all<=0){
+                if (regionBean!!.count_all <= 0) {
                     RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
                         PopUtil.dismiss(pop)
                         initData()
                     }, {
                         ToastUtils.showShort(it.message)
                     })
-                }else{
+                } else {
                     ToastUtils.showLong(getString(R.string.please_restore_device))
                 }
             }
@@ -418,25 +439,25 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 isAddRegion = false
                 popAdd?.let { showPop(it, Gravity.CENTER) }
             }
-            R.id.pop_qr_undo -> {
-                if (isRefresh) {
+            R.id.pop_qr_undo -> {//取消二维码
+                if (isRefresh) {//过期要生成
                     //刷新二维码
-                    if (isTransferCode)
+                        if (isTransferCode)
                         lookAndMaketransferCode()
-                    else {
+                    else
                         lookAndMakeAuthorCode()
-                    }
-
                 } else {
-                    //撤销二维码
+                    //是倒计时状态 撤销二维码
                     if (!isTransferCode)
                         RegionModel.removeAuthorizationCode(regionBean!!.id, regionBean!!.code_info!!.type)!!.subscribe({
+                            LogUtils.e("zcl取消网络授权成功")
                             setCancel()
                             setCreatShareCodeState()
                         }, { ToastUtils.showShort(it.message) })
                     else {
                         RegionModel.removeTransferCode()!!.subscribe {
                             //设置二维码失效状态 倒计时颜色状态
+                            LogUtils.e("zcl取消移交码成功")
                             setCancel()
                         }
                     }
@@ -447,10 +468,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun lookAndMakeAuthorCode() {
-
         lookAuthorizeCode(regionBean!!.id, this).subscribe({
             mExpire = it.expire.toLong()
-            Log.e(TAG, "zcl****判断**" + (it.code == ""))
+            Log.e(TAG, "zcl****是否有code判断**" + (it.code == ""))
             isTransferCode = false
             setQR(it.code)
             val expire = it.expire.toLong()
@@ -474,11 +494,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<TextView>(R.id.pop_qr_undo)?.isClickable = false
             it.findViewById<ImageView>(R.id.pop_qr_img)?.setImageResource(R.mipmap.icon_revoked)
             it.findViewById<TextView>(R.id.pop_qr_timer)?.visibility = View.GONE
+            it.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
 
             it.findViewById<View>(R.id.view19)?.visibility = View.GONE
             mCompositeDisposable.clear()
         }
-
     }
 
     private fun changeRegion() {
@@ -561,6 +581,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         view?.findViewById<ImageView>(R.id.pop_share_net)?.setImageResource(R.drawable.icon_share)
         view?.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
         view?.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.black_three)
+        isRefresh = true //二维码撤销 需要刷新
     }
 
     @SuppressLint("SetTextI18n")
@@ -580,7 +601,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         setPopSetting(popAdd!!)
 
         view?.let {
-            it.findViewById<TextView>(R.id.pop_qr_area_user).text = getString(R.string.cur_network_owner)+lastUser!!.phone
+            it.findViewById<TextView>(R.id.pop_qr_area_user).text = getString(R.string.cur_network_owner) + lastUser!!.phone
             it.findViewById<TextView>(R.id.pop_creater_name).text = getString(R.string.creater_name) + lastUser?.phone
 
             it.findViewById<ImageView>(R.id.pop_view).setOnClickListener(this)
@@ -597,7 +618,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         viewAdd?.let {
             var name = it.findViewById<EditText>(R.id.pop_region_name)
             it.findViewById<Button>(R.id.btn_confirm).setOnClickListener {
-                if (name.text.toString()==""){
+                if (name.text.toString() == "") {
                     ToastUtils.showShort(getString(R.string.please_input_region_name))
                     return@setOnClickListener
                 }
@@ -624,66 +645,72 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun setPopData(position: Int, list: MutableList<RegionBean>) {
         isShowType = 1
         regionBean = list[position]
-
         Log.e(TAG, "zcl******" + regionBean.toString())
 
         if (regionBean == null)
             return
-        view?.let {
-            it.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
-            it.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
-            it.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
-            val lastUser = lastUser!!
-            //使用中不能删除
-            //2                                                "2"                         300551                                   "300551"
-            val b = regionBean!!.id.toString() == lastUser.last_region_id.toString()
-            val b1 = regionBean!!.authorizer_id.toString() == lastUser.last_authorizer_user_id.toString()
+        view?.let { itView
+            ->
+            itView.findViewById<TextView>(R.id.pop_net_name).text = regionBean!!.name
+            itView.findViewById<TextView>(R.id.pop_qr_area_name).text = regionBean!!.name
+            itView.findViewById<TextView>(R.id.pop_equipment_num).text = getString(R.string.equipment_quantity) + list.size
+            //使用中不能删除 2
+            val b = regionBean!!.id.toString() == lastUser?.last_region_id.toString()
+            val b1 = regionBean!!.authorizer_id.toString() == lastUser?.last_authorizer_user_id.toString()
 
             Log.e("zcl", "zcl***tankuang***$b-----------$b1")
 
-            if (b && b1){// 2 300551
-                    it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                    it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
-                    it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
-                } else {
-                    it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
-                    it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
-                    it.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
-                }
+            if (b && b1) {// 2 300551
+                itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use_blue)
+                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete)
+            } else {
+                itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = true
+                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.mipmap.icon_delete_bb)
+                itView.findViewById<ImageView>(R.id.pop_user_net).setImageResource(R.drawable.icon_use)
+            }
 
             if (regionBean!!.id.toString() == "1") {//区域id为1不能删除只能清空数据
-                it.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
-                it.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
+                itView.findViewById<ImageView>(R.id.pop_delete_net).isClickable = false
+                itView.findViewById<ImageView>(R.id.pop_delete_net).setImageResource(R.drawable.icon_delete)
             }
 
             if (regionBean!!.ref_users?.size!! <= 0) {//没有授权不能进入解绑
-                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
-                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
+                itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = false
+                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied)
             } else {
-                it.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
-                it.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
+                itView.findViewById<LinearLayout>(R.id.pop_unbind_net_ly).isClickable = true
+                itView.findViewById<ImageView>(R.id.pop_unbind_net).setImageResource(R.mipmap.icon_untied_b)
             }
 
-            it.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
-            it.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
+            itView.findViewById<ImageView>(R.id.pop_update_net).isClickable = true
+            itView.findViewById<ImageView>(R.id.pop_update_net).setImageResource(R.drawable.icon_modify)
 
             mExpire = regionBean!!.code_info!!.expire.toLong()
             Log.e(TAG, "zcl****regionBean**${regionBean.toString()}")
+            itView.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
+            view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
+            view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
 
-            it.findViewById<ImageView>(R.id.pop_share_net).isClickable = true
-            if (mExpire > 0) {
-                it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_code)
-                it.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
-                regionBean!!.code_info!!.code?.let { it1 -> setQR(it1) }
-                downTimer(mExpire)
-            } else {
-                it.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
-                it.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
-            }
+            RegionModel.lookAuthorCodeState(regionBean!!.id)?.subscribe({
+                LogUtils.e("zcl_network-------授权码信息是否可用-------$it")
+                mExpire = it.expire.toLong()
+
+                isRefresh = mExpire <= 0 //过期或者撤销需要刷新
+
+                if (mExpire > 0) {
+                    itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.mipmap.icon_code)
+                    itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.see_qr)
+                } else {
+                    itView.findViewById<ImageView>(R.id.pop_share_net).setImageResource(R.drawable.icon_share)
+                    itView.findViewById<TextView>(R.id.pop_share_net_tv)?.text = getString(R.string.share_network)
+                }
+                showPop(pop!!, Gravity.BOTTOM)
+            }, {
+                ToastUtils.showShort(it.message)
+                showPop(pop!!, Gravity.BOTTOM)
+            })
         }
-        view?.findViewById<LinearLayout>(R.id.pop_qr_ly)?.visibility = View.GONE
-        view?.findViewById<ConstraintLayout>(R.id.pop_net_ly)?.visibility = View.VISIBLE
-        showPop(pop!!, Gravity.BOTTOM)
     }
 
     /**
@@ -698,8 +725,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     .setPositiveButton(android.R.string.ok
                     ) { _, _ ->
                         // 跳转到设置界面
-                        activity.startActivityForResult(Intent(
-                                Settings.ACTION_WIRELESS_SETTINGS), 0)
+                        activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
                     }.create().show()
         } else {
             val lastUser = lastUser
@@ -749,16 +775,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 1 -> {
                     it.last_region_id = regionBean?.id.toString()
                     it.last_authorizer_user_id = regionBean?.authorizer_id.toString()
-                   // it.controlMeshName = regionBean?.controlMesh
-                    //it.controlMeshPwd = regionBean?.controlMeshPwd
-                   // it.account =regionBean?.controlMesh
                 }
                 2 -> {
                     it.last_region_id = regionBeanAuthorize?.id.toString()
                     it.last_authorizer_user_id = regionBeanAuthorize?.authorizer_id.toString()
-                    //it.controlMeshName = regionBeanAuthorize?.controlMesh
-                   // it.controlMeshPwd = regionBeanAuthorize?.controlMeshPwd
-                   //it.account =regionBeanAuthorize?.controlMesh
                 }
             }
 
@@ -820,6 +840,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onDestroy()
         PopUtil.dismiss(pop)
         PopUtil.dismiss(popAdd)
+        disposableEnsure?.dispose()
+        disposableRequest?.dispose()
         mCompositeDisposable.dispose()
     }
 
@@ -867,17 +889,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun openScan() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_CARMER)
-            }else{
-                var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
-                startActivityForResult(intent, REQUEST_CODE)
-            }
-        }else{
-            var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
-            startActivityForResult(intent, REQUEST_CODE)
-        }
+        var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE)
     }
 
     override fun onResume() {
@@ -892,6 +905,5 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         isShowType = 3
         initData()
     }
-
 
 }

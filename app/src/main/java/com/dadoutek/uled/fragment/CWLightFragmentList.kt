@@ -103,7 +103,6 @@ class CWLightFragmentList : BaseFragment() {
         intentFilter.addAction("switch")
         intentFilter.addAction("switch_here")
         br = object : BroadcastReceiver() {
-
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val str = intent.getStringExtra("delete")
@@ -112,7 +111,7 @@ class CWLightFragmentList : BaseFragment() {
                 if (key == "true") {
                     isDelete = false
                     groupAdapter!!.changeState(isDelete)
-                    groupList?.let {
+                    groupList.let {
                         for (i in it.indices)
                             if (it[i].isSelected)
                                 it[i].isSelected = false
@@ -121,7 +120,6 @@ class CWLightFragmentList : BaseFragment() {
                 }
                 if (str == "true") {
                     deleteList = ArrayList()
-//                    Log.e("TAG_delete","删除")
                     groupList?.let {
                         for (i in it.indices)
                             if (it[i].isSelected)
@@ -173,7 +171,6 @@ class CWLightFragmentList : BaseFragment() {
     }
 
     private fun setResult(resulT_OK: Int) {
-//        hideLoadingDialog()
         Thread.sleep(300)
         val intent = Intent("delete_true")
         intent.putExtra("delete_true", "true")
@@ -190,7 +187,6 @@ class CWLightFragmentList : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        initView()
         this.initData()
     }
 
@@ -200,7 +196,6 @@ class CWLightFragmentList : BaseFragment() {
         val view = inflater.inflate(R.layout.group_list_fragment, null)
         no_group = view.findViewById(R.id.no_group)
         recyclerView = view.findViewById(R.id.group_recyclerView)
-//        addGroupBtn = view.findViewById(R.id.add_group_btn)
         addNewGroup = view.findViewById(R.id.add_device_btn)
         viewLine = view.findViewById(R.id.view)
         viewLineRecycler = view.findViewById(R.id.viewLine)
@@ -211,13 +206,10 @@ class CWLightFragmentList : BaseFragment() {
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
-        // initView()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
-//            isDeleteTrue = true
-//            initView()
             refreshData()
         }
     }
@@ -242,8 +234,7 @@ class CWLightFragmentList : BaseFragment() {
 
         val intent = Intent("switch_fragment")
         intent.putExtra("switch_fragment", "true")
-        LocalBroadcastManager.getInstance(this!!.mContext!!)
-                .sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
 
         addGroupBtn?.setOnClickListener(onClick)
         addNewGroup?.setOnClickListener(onClick)
@@ -256,30 +247,27 @@ class CWLightFragmentList : BaseFragment() {
             return@Comparator o1.name.compareTo(o2.name)
         })
 
-//        this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
-        val decoration = DividerItemDecoration(activity,
-                DividerItemDecoration
-                        .VERTICAL)
+        val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
                 .divider)))
         //添加分割线
         recyclerView?.addItemDecoration(decoration)
 
         val lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
-        lin.setOnClickListener(View.OnClickListener {
+        lin.setOnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
             } else {
                 addNewGroup()
             }
-        })
+        }
         groupAdapter.addFooterView(lin)
         groupAdapter.onItemChildClickListener = onItemChildClickListener
         groupAdapter.onItemLongClickListener = onItemChildLongClickListener
         groupAdapter.bindToRecyclerView(recyclerView)
     }
 
-    var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
+    private var onItemChildLongClickListener = OnItemLongClickListener { adapter, view, position ->
         if (!isDelete) {
             isDelete = true
             SharedPreferencesUtils.setDelete(true)

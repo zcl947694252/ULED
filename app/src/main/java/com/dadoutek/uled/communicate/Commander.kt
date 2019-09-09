@@ -94,7 +94,7 @@ object Commander : EventListener<String> {
 
 
     fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1,
-                       failedCallback: () -> Unit1){
+                       failedCallback: () -> Unit1) {
         val sleepTime: Long = 200
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
@@ -164,7 +164,6 @@ object Commander : EventListener<String> {
                 ?: 0x00
 
 
-
         var isSupportFastResetFactory: Boolean = false
         Commander.getDeviceVersion(connectDeviceMeshAddr,
                 {
@@ -190,7 +189,6 @@ object Commander : EventListener<String> {
                     resetLightsOld(lightList, successCallback, failedCallback)
 
                 })
-
 
 
     }
@@ -504,7 +502,7 @@ object Commander : EventListener<String> {
             for (i in 0..2) {
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
                 //Thread.sleep(50)//当阻塞方法收到中断请求的时候就会抛出InterruptedException异常
-               delay(50)
+                delay(50)
             }
         }
     }

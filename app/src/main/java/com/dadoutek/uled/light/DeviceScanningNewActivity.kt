@@ -15,7 +15,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import butterknife.ButterKnife
-import com.airbnb.lottie.LottieDrawable
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -205,7 +204,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         if (getString(R.string.scanning) == scanning_num.text)
             finish()
 
-        if (TelinkLightService.Instance().isLogin) {
+        val instance = TelinkLightService.Instance()
+        instance?:return@OnClickListener
+        if (instance.isLogin) {
 
             Observable.interval(0, 200, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                     .subscribe(object : Observer<Long> {
@@ -234,7 +235,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                                     if (nowLightList != null && nowLightList!!.size > 0) {
                                         nowLightList!!.clear()
                                     }
-                                    if (nowLightList != null)
+                                    if (nowLightList != null&&adapter!=null&&adapter!!.getLights()!=null)
                                         nowLightList!!.addAll(adapter!!.getLights()!!)
 
                                     scanPb!!.visibility = View.GONE
@@ -809,7 +810,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
     }
 
     private fun refreshView() {
-        currentGroupIndex = groups!!.size - 1
+        currentGroupIndex = groups?.size?:1 - 1
         for (i in groups!!.indices.reversed()) {
             groups!![i].checked = i == groups!!.size - 1
         }
@@ -820,7 +821,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         recycler_view_groups?.adapter = groupsRecyclerViewAdapter
         add_group_relativeLayout?.visibility = View.GONE
         add_group?.visibility = View.VISIBLE
-        recycler_view_groups?.smoothScrollToPosition(groups!!.size - 1)
+        recycler_view_groups?.smoothScrollToPosition(currentGroupIndex)
         groupsRecyclerViewAdapter!!.notifyDataSetChanged()
         SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex)
@@ -839,7 +840,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 if (b)
                     showLoadingDialog(resources.getString(R.string.connecting_tip))
-//                closeAnimation()
+                closeAnimation()
                 startConnect = true
 
                 val meshName = DBUtils.lastUser!!.controlMeshName
@@ -855,12 +856,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 }.start()
             }
 
-       /*     //刷新Notify参数
+            //刷新Notify参数
             val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
             refreshNotifyParams.setRefreshRepeatCount(2)
             refreshNotifyParams.setRefreshInterval(1000)
             //开启自动刷新Notify
-            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)*/
+            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
         }
     }
 
@@ -1028,14 +1029,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 }
             } else {
                 for (i in list.indices) {
-//                    LogUtils.e("zcl----isNormalGroup----" + list[i])
+                    LogUtils.e("zcl----isNormalGroup----" + list[i])
                     if (OtherUtils.isNormalGroup(list[i])) {
                         groups!!.add(list[i])
                     }
                 }
 
                 for (i in list.indices) {
-//                    LogUtils.e("zcl----isDefaultGroup----" + list[i])
+                    LogUtils.e("zcl----isDefaultGroup----" + list[i])
                     if (OtherUtils.isDefaultGroup(list[i])) {
                         groups!!.add(list[i])
                     }
@@ -1350,9 +1351,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(true)
                 scanPb?.visibility = View.GONE
-                mDisposable.add(Observable.timer(delay.toLong(), TimeUnit.MILLISECONDS)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(Schedulers.io())
+                mDisposable.add(Observable.timer(delay.toLong(), TimeUnit.MILLISECONDS, Schedulers.io())
                         .subscribe { TelinkLightService.Instance().startScan(params) })
 
             } else {
@@ -1397,17 +1396,17 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), AdapterView.OnI
         val mesh = this.mApplication!!.mesh
         val meshAddress = mMeshAddressGenerator.meshAddress
 //        val meshAddress = 1
-//        if (meshAddress == -1) {
-//            ToastUtils.showLong(getString(R.string.much_lamp_tip))
-//            if (adapter?.getLights() != null && adapter?.getLights()?.isNotEmpty()!!) {
-//                stopTimer()
-//                onLeScanTimeout()
-//                return
-//            } else {
-//                doFinish()
-//            }
-//            return
-//        }
+        if (meshAddress == -1) {
+            ToastUtils.showLong(getString(R.string.much_lamp_tip))
+            if (adapter?.getLights() != null && adapter?.getLights()?.isNotEmpty()!!) {
+                stopTimer()
+                onLeScanTimeout()
+                return
+            } else {
+                doFinish()
+            }
+            return
+        }
         val deviceInfo = event.args
         if (scanRGBLight) {
             if (checkIsLight(deviceInfo.productUUID) && deviceInfo.productUUID == DeviceType.LIGHT_RGB && deviceInfo.rssi < MAX_RSSI && mesh != null)

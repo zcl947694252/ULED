@@ -440,7 +440,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             rename.visibility = View.GONE
             ota.visibility = View.VISIBLE
             group.visibility = View.VISIBLE
-            group.text = getString(R.string.switch_grouping)
+            group.text = getString(R.string.relocation)
 
             group.setOnClickListener {
                 settingType = if (TelinkLightApplication.getApp().connectDevice == null) {

@@ -22,8 +22,8 @@ import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbScene
 import com.dadoutek.uled.model.DbModel.DbSceneActions
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
-import com.dadoutek.uled.model.DeviceType.SMART_RELAY
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
+import com.dadoutek.uled.model.DeviceType.SMART_RELAY
 import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.SelectColorAct
@@ -34,7 +34,13 @@ import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import kotlin.collections.ArrayList
-
+/**
+ * 描述	      ${设置场景颜色盘}$
+ *
+ * 更新者     zcl
+ * 更新时间
+ * 更新描述   ${设置场景颜色盘}$
+ */
 class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private var currentPageIsEdit = false
     private var scene: DbScene? = null
@@ -92,10 +98,9 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             val top = l[1]
             val bottom = top + v.height
             val right = left + v.width
-            return !(event.x > left && event.x < right
-                    && event.y > top && event.y < bottom)
+            return !(event.x > left && event.x < right && event.y > top && event.y < bottom)
         }
-        // 如果焦点不是EditText则忽略，这个发生在视图刚绘制完，第一个焦点不在EditText上，和用户用轨迹球选择其他的焦点
+        //如果焦点不是EditText则忽略，这个发生在视图刚绘制完，第一个焦点不在EditText上，和用户用轨迹球选择其他的焦点
         return false
     }
 
@@ -112,24 +117,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
 
-    private fun step0Guide() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
-        if (guideShowCurrentPage) {
-            GuideUtils.guideBuilder(this, GuideUtils.ADDITIONAL_SCENE_GUIDE_KEY_INPUT_NAME)
-                    .addGuidePage(GuideUtils.addGuidePage(edit_name, R.layout.view_guide_simple_scene_set0, getString(R.string.add_scene_guide_0),
-                            View.OnClickListener{ step1Guide() }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
-        }
-    }
 
-    private fun step1Guide() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
-        if (guideShowCurrentPage) {
-            val guide1 = sceneEditListAdapter!!.getViewByPosition(0, R.id.group_check_state)
-            GuideUtils.guideBuilder(this, GuideUtils.STEP8_GUIDE_ADD_SCENE_ADD_GROUP)
-                    .addGuidePage(GuideUtils.addGuidePage(guide1!!, R.layout.view_guide_simple, getString(R.string.add_scene_guide_1),
-                            View.OnClickListener{ changeCheck(0) }, GuideUtils.END_ADD_SCENE_KEY, this)).show()
-        }
-    }
 
     private fun step2Guide() {
         guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(this, GuideUtils.END_ADD_SCENE_KEY, false)
@@ -180,7 +168,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     itemGroup.isNo = actions[i].isOn
                     item.checked = true
                     showGroupList!!.add(itemGroup)
-                    groupMeshAddrArrayList.add(item.getMeshAddr())
+                    groupMeshAddrArrayList.add(item.meshAddr)
                 }
             }
         }
@@ -266,6 +254,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         when (view.id) {
             R.id.btn_delete -> delete(adapter, position)
+            R.id.dot_rgb -> changeToColorSelect(position)
             R.id.dot_one -> changeToColorSelect(position)
             R.id.rg_xx -> open(position)
             R.id.rg_yy -> close(position)
@@ -289,14 +278,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         startActivityForResult(intent, position)
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        /*outState?.putSerializable(DATA_LIST_KEY, showGroupList!!)
-        if (isChangeScene) {
-            outState?.putParcelable(SCENE_KEY, scene!!)
-        }
-        super.onSaveInstanceState(outState)
-        LogUtils.d("onSaveInstanceState")*/
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -513,26 +494,11 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
         setResult(Constant.RESULT_OK)
     }
 
-    private fun showChangeOtherGroupCloseDialog() {
-        val tipSaveDailogBuilder = AlertDialog.Builder(this)
-        tipSaveDailogBuilder.setMessage(getString(R.string.tip_save_scene_all_group))
-        tipSaveDailogBuilder.setNegativeButton(R.string.cancel) { dialog, which ->
-            saveAndFinish()
-        }
-
-        tipSaveDailogBuilder.setPositiveButton(android.R.string.ok) { dialog, which ->
-            showGroupList?.addAll(notCheckedGroupList!!)
-            saveAndFinish()
-        }
-
-        tipSaveDailogBuilder.create().show()
-    }
 
     private fun saveNewScene() {
         showLoadingDialog(getString(R.string.saving))
         Thread {
             val name = editSceneName
-            //        List<ItemGroup> itemGroups = adapter.getData();
             val itemGroups = showGroupList
 
             val dbScene = DbScene()
@@ -718,40 +684,38 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
                     sceneActions.isOn = itemGroups.get(i).isNo
 
 
-                    nameList.add(itemGroups.get(i).groupAress)
+                    nameList.add(itemGroups[i].groupAress)
                     DBUtils.saveSceneActions(sceneActions)
                 } else if (OtherUtils.isConnector(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.brightness = itemGroups[i].brightness
+                    sceneActions.colorTemperature = itemGroups[i].temperature
+                    sceneActions.groupAddr = itemGroups[i].groupAress
+                    sceneActions.setColor(itemGroups[i].color)
                     sceneActions.deviceType = 0x05
-                    sceneActions.isOn = itemGroups.get(i).isNo
+                    sceneActions.isOn = itemGroups[i].isNo
 
-                    nameList.add(itemGroups.get(i).groupAress)
+                    nameList.add(itemGroups[i].groupAress)
                     DBUtils.saveSceneActions(sceneActions)
-                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups.get(i).groupAress))) {
+                } else if (OtherUtils.isRGBGroup(DBUtils.getGroupByMesh(itemGroups[i].groupAress))) {
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.brightness = itemGroups[i].brightness
+                    sceneActions.colorTemperature = itemGroups[i].temperature
+                    sceneActions.groupAddr = itemGroups[i].groupAress
+                    sceneActions.setColor(itemGroups[i].color)
 
                     sceneActions.deviceType = 0x06
-                    nameList.add(itemGroups.get(i).groupAress)
+                    nameList.add(itemGroups[i].groupAress)
                     DBUtils.saveSceneActions(sceneActions)
                 } else {
                     sceneActions.belongSceneId = idAction
-                    sceneActions.brightness = itemGroups.get(i).brightness
-                    sceneActions.colorTemperature = itemGroups.get(i).temperature
-//                    sceneActions.brightness = itemGroups.get(i).temperature
-//                    sceneActions.colorTemperature = itemGroups.get(i).brightness
-                    sceneActions.groupAddr = itemGroups.get(i).groupAress
-                    sceneActions.setColor(itemGroups.get(i).color)
+                    sceneActions.brightness = itemGroups[i].brightness
+                    sceneActions.colorTemperature = itemGroups[i].temperature
+                    sceneActions.groupAddr = itemGroups[i].groupAress
+                    sceneActions.setColor(itemGroups[i].color)
                     sceneActions.deviceType = 0x04
 
-                    nameList.add(itemGroups.get(i).groupAress)
+                    nameList.add(itemGroups[i].groupAress)
                     DBUtils.saveSceneActions(sceneActions)
                 }
             }
@@ -791,14 +755,6 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
             var blue = color and 0x0000ff
             var w = color shr 24
 
-//            val minVal = 0x50.toByte()
-//            if (green and 0xff <= minVal)
-//                green = 0
-//            if (red and 0xff <= minVal)
-//                red = 0
-//            if (blue and 0xff <= minVal)
-//                blue = 0
-
             val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
             Log.d("RGBCOLOR", logStr)
             var type = list[i].deviceType
@@ -831,8 +787,7 @@ class NewSceneSetAct : TelinkBaseActivity(), View.OnClickListener {
     private fun deleteScene(id: Long) {
         if (isChange) {
             val opcode = Opcode.SCENE_ADD_OR_DEL
-            val params: ByteArray
-            params = byteArrayOf(0x00, id.toByte())
+            val params: ByteArray = byteArrayOf(0x00, id.toByte())
             try {
                 Thread.sleep(100)
                 TelinkLightService.Instance().sendCommandNoResponse(opcode, 0xFFFF, params)

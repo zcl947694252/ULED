@@ -8,7 +8,6 @@ import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.telink.bluetooth.light.ConnectionStatus
@@ -24,7 +23,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
         if (group != null) {
             val num = group.deviceCount //内含设备的数量
-            val gpImageView = helper.getView<ImageView>(R.id.btn_on)
+            val gpOn = helper.getView<ImageView>(R.id.btn_on)
             val gpSet = helper.getView<ImageView>(R.id.btn_set)
             val gpOff = helper.getView<ImageView>(R.id.btn_off)
             val gpOnText = helper.getView<TextView>(R.id.textView8)
@@ -41,14 +40,15 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
             gpSet.setImageResource(R.drawable.icon_setting_group)
 
-            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR) {
+            if (group.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL || group.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB
+                    || group.deviceType == Constant.DEVICE_TYPE_CONNECTOR||group.deviceType == Constant.DEVICE_TYPE_DEFAULT_ALL) {
                 if (group.connectionStatus == ConnectionStatus.ON.value) {
-                    gpImageView.setImageResource(R.drawable.icon_open_group)
+                    gpOn.setImageResource(R.drawable.icon_open_group)
                     gpOff.setImageResource(R.drawable.icon_down_group)
                     gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
                     gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
                 } else if (group.connectionStatus == ConnectionStatus.OFF.value) {
-                    gpImageView.setImageResource(R.drawable.icon_down_group)
+                    gpOn.setImageResource(R.drawable.icon_down_group)
                     gpOff.setImageResource(R.drawable.icon_open_group)
                     gpOnText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.black_nine))
                     gpOffText.setTextColor(TelinkLightApplication.getApp().getColor(R.color.white))
@@ -57,9 +57,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
 
             if (group.textColor == 0)
-                group.textColor = mContext.resources
-                        .getColor(R.color.black)
-//            Log.d("setAddress", group.meshAddr.toString())
+                group.textColor = mContext.resources.getColor(R.color.black)
             if (group.meshAddr == 0xffff) {
                 helper.setText(R.id.txt_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             } else {
@@ -75,14 +73,11 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
 
 
             helper.setTextColor(R.id.txt_name, group.textColor)
-//                    .addOnClickListener(R.id.txt_name)
                     .addOnClickListener(R.id.btn_on)
                     .addOnClickListener(R.id.btn_off)
                     .addOnClickListener(R.id.btn_set)
-//                    .addOnClickListener(R.id.group_name)
                     .addOnClickListener(R.id.selected_group)
                     .addOnClickListener(R.id.item_layout)
-//                    .addOnClickListener(R.id.add_group)
         }
 
     }

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -29,18 +29,19 @@ import com.dadoutek.uled.tellink.TelinkBaseActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
+import com.dadoutek.uled.util.DialogUtils
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
+import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.DeviceInfo
-import com.telink.bluetooth.light.ErrorReportInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
-import com.telink.util.Strings
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -59,11 +60,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun onLogin() {
-        LogUtils.d("onLogin productUUID = ${bestRSSIDevice?.productUUID}")
         mScanTimeoutDisposal?.dispose()
-
-        this.mApplication?.removeEventListener(this)
-
         hideLoadingDialog()
         if (bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH ||
                 bestRSSIDevice?.productUUID == DeviceType.NORMAL_SWITCH2) {
@@ -77,6 +74,34 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             finish()
         }
 
+    }
+
+    private fun onLeScan(leScanEvent: LeScanEvent) {
+        val meshAddress = Constant.SWITCH_PIR_ADDRESS
+        val deviceInfo: DeviceInfo = leScanEvent.args
+
+        if (meshAddress == -1) {
+            return
+        }
+
+        when (leScanEvent.args.productUUID) {
+            DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
+                val MAX_RSSI = 81
+                if (leScanEvent.args.rssi < MAX_RSSI) {
+
+                    if (bestRSSIDevice != null) {
+                        //扫到的灯的信号更好并且没有连接失败过就把要连接的灯替换为当前扫到的这个。
+                        if (deviceInfo.rssi > bestRSSIDevice?.rssi ?: 0) {
+                            bestRSSIDevice = deviceInfo
+                        }
+                    } else {
+                        bestRSSIDevice = deviceInfo
+                    }
+                } else {
+                    ToastUtils.showLong(getString(R.string.rssi_low))
+                }
+            }
+        }
     }
 
     private lateinit var switchData: MutableList<DbSwitch>
@@ -143,9 +168,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         adapter!!.bindToRecyclerView(recycleView)
 
         adapter!!.onItemChildClickListener = onItemChildClickListener
-        for (i in switchData?.indices!!) {
-            switchData!![i].updateIcon()
-        }
+        for (i in switchData.indices)
+            switchData[i].updateIcon()
 
         add_device_btn.setOnClickListener(this)
         toolbar.setNavigationIcon(R.drawable.navigation_back_white)
@@ -180,7 +204,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
         popupWindow.showAsDropDown(set)
         currentSwitch = switchData[position]
 
-        var group = views.findViewById<TextView>(R.id.switch_group)
+        var relocation = views.findViewById<TextView>(R.id.switch_group)
         var ota = views.findViewById<TextView>(R.id.ota)
         var delete = views.findViewById<TextView>(R.id.deleteBtn)
         var rename = views.findViewById<TextView>(R.id.rename)
@@ -193,7 +217,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
             val textGp = EditText(this)
             StringUtils.initEditTextFilter(textGp)
             textGp.setText(currentSwitch?.name)
-            textGp.setSelection(textGp.getText().toString().length)
+            textGp.setSelection(textGp.text.toString().length)
             android.app.AlertDialog.Builder(this@SwitchDeviceDetailsActivity)
                     .setTitle(R.string.rename)
                     .setView(textGp)
@@ -211,13 +235,15 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
                     .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
         }
 
-        group.setOnClickListener {
+        relocation.setOnClickListener {
             popupWindow.dismiss()
             isOta = false
-            isclickOTA = true
-            if (currentSwitch != null) {
-                connect()
+            isclickOTA = false
 
+            if (currentSwitch != null) {
+                 TelinkLightService.Instance().idleMode(true)
+                TelinkLightService.Instance().disconnect()
+                connect()
             }
         }
 
@@ -271,75 +297,45 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {
-//            LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
+            LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
+            LeScanEvent.LE_SCAN_COMPLETED -> this.onLeScan(event as LeScanEvent)
+            LeScanEvent.LE_SCAN_TIMEOUT -> {
+                ToastUtils.showShort(getString(R.string.scanning_timeout))
+                hideLoadingDialog()
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
+
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
-                onErrorReport(info)
-            }
-
-        }
-    }
-
-    private fun onErrorReport(info: ErrorReportInfo) {
-        when (info.stateCode) {
-            ErrorReportEvent.STATE_SCAN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        LogUtils.d("蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        LogUtils.d("无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        LogUtils.d("未扫到目标设备")
-                    }
-                }
-
-            }
-            ErrorReportEvent.STATE_CONNECT -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        LogUtils.d("未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        LogUtils.d("未建立物理连接")
-                    }
-                }
-//                retryConnect()
-
-            }
-            ErrorReportEvent.STATE_LOGIN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        LogUtils.d("value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        LogUtils.d("read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-                        LogUtils.d("write login data 没有收到response")
-                    }
-                }
-//                retryConnect()
+                onErrorReportNormal(info)
+                hideLoadingDialog()
             }
         }
     }
-
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
+        hideLoadingDialog()
         val deviceInfo = deviceEvent.args
-        mDeviceMeshName = deviceInfo.meshName ?: getString(R.string.unnamed)
+        mDeviceMeshName = deviceInfo.meshName?:getString(R.string.unnamed)
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 if (isOta) {
                     getVersion()
                 } else {
                     bestRSSIDevice = deviceInfo
-                    LogUtils.d("LightAdapter.STATUS_LOGIN productUUID = ${bestRSSIDevice?.productUUID}")
                     onLogin()//判断进入那个开关设置界面
                     stopConnectTimer()
+                    com.blankj.utilcode.util.LogUtils.d("connected22")
                 }
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                if (isclickOTA)
+                    connect()
+                isclickOTA = false
+            }
+
+            LightAdapter.STATUS_CONNECTED -> {
+                com.blankj.utilcode.util.LogUtils.d("connected11")
             }
         }
 
@@ -347,7 +343,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
 
     private fun getVersion() {
         Log.e("zcl", "zcl******进入")
-        isclickOTA = false
+        isclickOTA =false
         if (TelinkApplication.getInstance().connectDevice != null) {
             Log.e("TAG", currentLight!!.meshAddr.toString())
             Commander.getDeviceVersion(currentLight!!.meshAddr, { s ->
@@ -367,51 +363,45 @@ class SwitchDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String>,
     }
 
     private fun autoConnectSwitch() {
-
-        //添加监听之前确保已经remove了所有listener
-        this.mApplication?.removeEventListener(this)
-        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
         connectParams.setConnectMac(currentLight!!.macAddr)
         connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
+        connectParams.setTimeoutSeconds(10)
+        showLoadingDialog(getString(R.string.connecting))
 
-        TelinkLightService.Instance()?.autoConnect(connectParams)
-
-        /*     //刷新Notify参数
-             val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
-             refreshNotifyParams.setRefreshRepeatCount(3)
-             refreshNotifyParams.setRefreshInterval(1000)
-             ToastUtils.showShort(getString(R.string.connecting))
-             //开启自动刷新Notify
-             TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)*/
-    }
-
-    private fun addScanListeners() {
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-//        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-    }
-
-    @SuppressLint("CheckResult")
-    private fun connect(/*mac: String*/) {
+        //连接，如断开会自动重连 自动登录 不用login
         GlobalScope.launch {
-            TelinkLightService.Instance()?.idleMode(true)
-            delay(500)
-            autoConnectSwitch()
+            TelinkLightService.Instance()?.autoConnect(connectParams)
         }
     }
 
-    private fun login() {
-        val meshName = DBUtils.lastUser?.controlMeshName
-        val pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
-        TelinkLightService.Instance()?.login(Strings.stringToBytes(meshName, 16)
-                , Strings.stringToBytes(pwd, 16))
+    private fun addScanListeners() {
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
+    }
+
+    @SuppressLint("CheckResult")
+    private fun connect() {
+        try {
+            mCheckRssiDisposal?.dispose()
+            mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                    Manifest.permission.BLUETOOTH_ADMIN)
+                    .subscribe({
+                        if (it) {
+                            autoConnectSwitch()
+                        } else {    //没有授予权限
+                            DialogUtils.showNoBlePermissionDialog(this, { autoConnectSwitch() }, { finish() })
+                        }
+                    }, {})
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     var locationServiceDialog: AlertDialog? = null

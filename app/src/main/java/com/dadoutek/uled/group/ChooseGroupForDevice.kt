@@ -55,6 +55,7 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
 
     private val itemClickListener = OnItemClickListener { parent, view, position, id ->
         val group = adapter!!.getItem(position)
+        group?.deviceType = mLight.productUUID.toLong()
         if (group != null) {
             if (TelinkApplication.getInstance().connectDevice == null) {
                 ToastUtils.showLong(R.string.group_fail)
@@ -67,18 +68,10 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                         //如果修改分组成功,才改数据库之类的操作
                         allocDeviceGroup(group, {
                             val sceneIds = getRelatedSceneIds(group.meshAddr)
-
-//                            //发两次
-//                            for (i in 0..1) {
-//                                deletePreGroup(mLight.meshAddr)
-//                                sleep(100)
-//                            }
-
                             for (i in 0..1) {
                                 deleteAllSceneByLightAddr(mLight.meshAddr)
                                 sleep(100)
                             }
-
                             for (sceneId in sceneIds) {
                                 val action = DBUtils.getActionBySceneId(sceneId, group.meshAddr)
                                 if (action != null) {
@@ -100,13 +93,12 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
                                 ActivityUtils.finishActivity(RGBSettingActivity::class.java)
                                 finish()
                             }
-                        },
-                                {
-                                    runOnUiThread {
-                                        hideLoadingDialog()
-                                        ToastUtils.showShort(R.string.group_failed)
-                                    }
-                                })
+                        }, {
+                            runOnUiThread {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(R.string.group_failed)
+                            }
+                        })
                         sleep(100)
                     }
                 }) {
@@ -151,24 +143,8 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
      */
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-    }
-
-    /**
-     * 删除指定灯的之前的分组
-     *
-     * @param lightMeshAddr 灯的mesh地址
-     */
-    private fun deletePreGroup(lightMeshAddr: Int) {
-        if (DBUtils.getGroupByID(mLight?.belongGroupId ?: 0) != null) {
-            val groupAddress = DBUtils.getGroupByID(mLight?.belongGroupId ?: 0)?.meshAddr
-            val opcode = Opcode.SET_GROUP
-            val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), //0x00表示删除组
-                    (groupAddress shr 8 and 0xFF).toByte())
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
-        }
     }
 
 
@@ -176,12 +152,10 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
-//        this.mApplication!!.addEventListener(NotificationEvent.GET_GROUP, this)
         this.setContentView(R.layout.activity_device_grouping)
 
         initData()
         initView()
-//        this.setGroupChecked()
     }
 
     private fun initView() {
@@ -201,15 +175,17 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
     private fun initData() {
         this.type = this.intent.getStringExtra(Constant.TYPE_VIEW)
         this.mLight = this.intent.extras?.get("light") as DbLight
-        val list = DBUtils.groupList
-        filter(list)
+        mGroupList.clear()
+        mGroupList.addAll(DBUtils.getGroupsByDeviceType(mLight.productUUID))
+        mGroupList.addAll(DBUtils.getGroupsByDeviceType(0))
+
         setGroupChecked()
     }
 
     private fun filter(list: MutableList<DbGroup>) {
-        mGroupList?.clear()
-        for (i in list.indices) {
-            if (mLight!!.productUUID == DeviceType.LIGHT_NORMAL ||
+
+        for (i in list.indices) {// todo 分组 0x00是什么意思
+             if (mLight!!.productUUID == DeviceType.LIGHT_NORMAL ||
                     mLight!!.productUUID == DeviceType.LIGHT_NORMAL_OLD ||
                     mLight!!.productUUID == 0x00) {
                 if (OtherUtils.isNormalGroup(list[i])) {
@@ -227,51 +203,15 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         }
     }
 
-    private fun getScene() {
-        val opcode = 0xc0.toByte()
-        val dstAddress = mLight!!.meshAddr
-        val params = byteArrayOf(0x10, 0x00)
-
-        if (dstAddress != null) {
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
-        }
-
-//        TelinkLightService.Instance()?.updateNotification()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-//        this.mApplication!!.removeEventListener(this)
-    }
-
     /**
      * 把所在的组，设置成checked，用来标识当前设备处于哪个分组
      */
     private fun setGroupChecked() {
         for (group in mGroupList) {
             group.checked = group.id == mLight.belongGroupId
-            if (group.checked) {
+            if (group.checked)
                 break
-            }
         }
-
-/*
-        //通过指令，从设备里获取灯所在的组
-        val disposable = Commander.getGroup(mLight.meshAddr)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        { groupAddr ->
-                            LogUtils.d("got group address = $groupAddr")
-                            for (group in mGroupList) {
-                                group.checked = group.meshAddr == groupAddr
-                            }
-                            adapter?.notifyDataSetChanged()
-                        },
-                        {
-                            LogUtils.d(it)
-                        }
-                )
-*/
     }
 
 
@@ -285,16 +225,6 @@ class ChooseGroupForDevice : TelinkBaseActivity(), EventListener<String> {
         }, {
             failedCallback.invoke()
         })
-//            val groupAddress = group.meshAddr
-//            val dstAddress = mLight!!.meshAddr
-//            val opcode = 0xD7.toByte()
-//            val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
-//            params[0] = 0x01
-//
-//        if (dstAddress != null) {
-//           TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
-//        }
-//
         mLight.belongGroupId = group.id
 
     }

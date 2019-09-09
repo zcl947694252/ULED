@@ -9,6 +9,7 @@ import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 
 class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var mContext: Context) : BaseAdapter() {
@@ -42,13 +43,11 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
     @SuppressLint("ViewHolder")
     @Deprecated("")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var convertView: View? = convertView
+        var convertView: View? = inflater.inflate(R.layout.grouping_item, null)
 
         val holder: GroupItemHolder
 
-        convertView = inflater.inflate(R.layout.grouping_item, null)
-
-        val txtName = convertView.findViewById<View>(R.id.txt_name) as TextView
+        val txtName = convertView?.findViewById<View>(R.id.txt_name) as TextView
 
         holder = GroupItemHolder()
         holder.name = txtName
@@ -57,16 +56,16 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
 
         val group = this.getItem(position)
 
+
+
         if (group != null) {
             holder.name!!.text = group.name
 
             if (group.checked) {
-                val color = mContext.resources
-                        .getColorStateList(R.color.primary)
+                val color = mContext.resources.getColorStateList(R.color.primary)
                 holder.name!!.setTextColor(color)
             } else {
-                val color = mContext.resources
-                        .getColorStateList(R.color.black)
+                val color = mContext.resources.getColorStateList(R.color.black)
                 holder.name!!.setTextColor(color)
             }
 

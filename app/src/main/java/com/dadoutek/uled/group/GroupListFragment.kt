@@ -64,7 +64,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
-
     private var inflater: LayoutInflater? = null
     private var adapter: GroupListRecycleViewAdapter? = null
     private var mContext: Activity? = null
@@ -76,17 +75,12 @@ class GroupListFragment : BaseFragment() {
     internal var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 16
-
     private var viewPager: ViewPager? = null
-
     internal var deviceName: ArrayList<DbDeviceName>? = null
-
     private lateinit var cwLightFragment: CWLightFragmentList
     private lateinit var rgbLightFragment: RGBLightFragmentList
     private lateinit var curtianFragment: CurtainFragmentList
     private lateinit var relayFragment: RelayFragmentList
-
-
     //19-2-20 界面调整
     private var install_device: TextView? = null
     private var create_group: TextView? = null
@@ -97,46 +91,22 @@ class GroupListFragment : BaseFragment() {
     //是否正在引导
     private var isGuide = false
     private var isFristUserClickCheckConnect = true
-
-
     private var totalNum: TextView? = null
-
     private var btnOn: ImageView? = null
-
     private var btnOff: ImageView? = null
-
     private var btnSet: ImageView? = null
-
     private var allGroup: DbGroup? = null
-
     private var cwLightGroup: String? = null
-
     private var switchFragment: String? = null
-
-    private var isDelete = false
-
     private lateinit var localBroadcastManager: LocalBroadcastManager
-
     private lateinit var br: BroadcastReceiver
-
     private var isFirst: Boolean = false
-
     private var allLightText: TextView? = null
-
     private var onText: TextView? = null
-
     private var offText: TextView? = null
-
     private var fragmentPosition = 0
-
     private var delete: String? = null
-
     private var deleteComplete: String? = null
-
-//    private var cw_light_btn: TextView? = null
-//    private var rgb_light_btn: TextView? = null
-//    private var curtain_btn: TextView? = null
-//    private var relay_btn: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -228,8 +198,6 @@ class GroupListFragment : BaseFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
             isFristUserClickCheckConnect = true
-//            val act = activity as MainActivity?
-//            act?.addEventListeners()
             refreshView()
         } else {
             isFristUserClickCheckConnect = false

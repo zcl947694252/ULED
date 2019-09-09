@@ -31,5 +31,5 @@
         android:layout_weight="1"
         android:background="@drawable/bottom_right"
         android:text="@string/btn_ok"
-        android:textColor="@color/blue_background" />
+        android:textColor="@color/blue_background"/>
 </LinearLayout>

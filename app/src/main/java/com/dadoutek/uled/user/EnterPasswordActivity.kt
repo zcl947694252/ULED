@@ -136,6 +136,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                 edit_user_password.setText(s)
                 edit_user_password.setSelection(s.length)
                 btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+                edit_user_password_line.background = getDrawable(R.mipmap.line_blue)
             }
         }
     }
@@ -270,9 +271,9 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
     @SuppressLint("CheckResult")
     private fun initMe() {
-        RegionModel.get()?.subscribe ({
+        RegionModel.get()?.subscribe({
             setMeRegion(it)
-        }) {ToastUtils.showShort(it.message)}
+        }) { ToastUtils.showShort(it.message) }
     }
 
     @SuppressLint("StringFormatMatches")
@@ -346,7 +347,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                 }
             }
             DBUtils.saveUser(lastUser)
-            Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id+"--------------------"+DBUtils.lastUser?.last_region_id)
+            Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
             PopUtil.dismiss(pop)
 
 
@@ -378,10 +379,13 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun afterTextChanged(p0: Editable?) {
-        if (TextUtils.isEmpty(p0.toString()))
+        if (TextUtils.isEmpty(p0.toString())) {
             btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
-        else
+            edit_user_password_line.background = getDrawable(R.mipmap.line_gray)
+        } else {
+            edit_user_password_line.background = getDrawable(R.mipmap.line_blue)
             btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        }
     }
 
     override fun onPause() {
