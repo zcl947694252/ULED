@@ -133,7 +133,7 @@
                     android:id="@+id/diy_color_recycler_list_view"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"/>
 
             </LinearLayout>
 

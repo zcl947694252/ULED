@@ -63,8 +63,7 @@ class DeviceFragment : BaseFragment() {
     private val SCENE_MAX_COUNT = 16
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = initLayout(inflater)
-        return view
+        return initLayout(inflater)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -196,7 +195,6 @@ class DeviceFragment : BaseFragment() {
      * 刷新UI
      */
     fun refreshView() {
-//        LogUtils.d("refreshView")
         if (activity != null) {
             initAdapterData()
             deviceAdapter.notifyDataSetChanged()

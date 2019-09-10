@@ -178,6 +178,18 @@ object RegionModel {
     }
 
     /**
+     * 查看授权码
+     */
+    fun lookAuthorCodeState(rid: Long): Observable<ShareCodeBean>? {
+        //数据转换
+        return NetworkFactory.getApi()
+                .mlookAuthroizeCode(rid)
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .doOnNext {}
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+ /**
      * 查看移交吗
      */
     fun lookTransferCodeState(): Observable<TransferData> {

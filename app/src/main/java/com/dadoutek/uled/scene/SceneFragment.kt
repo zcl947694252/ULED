@@ -46,27 +46,17 @@ import java.util.*
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
     private var inflater: LayoutInflater? = null
     private var adaper: SceneRecycleListAdapter? = null
-
     private var toolbar: Toolbar? = null
-
     private var telinkLightApplication: TelinkLightApplication? = null
-    //    private List<Scenes> scenesListData;
     private var scenesListData: MutableList<DbScene>? = null
     private var isDelete = false
     internal var builder: Builder? = null
-    private var guideShowCurrentPage = false
-
     private var recyclerView: RecyclerView? = null
-
     private var no_scene: ConstraintLayout? = null
-
     private var isGuide = false
     private var isRgbClick = false
-
     private var add_scenes: Button? = null
-
     private var addNewScene: ConstraintLayout? = null
-
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
@@ -110,10 +100,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.inflater = inflater
         val view = inflater.inflate(R.layout.fragment_scene, null)
@@ -139,10 +125,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private val onClick = View.OnClickListener {
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
         hidePopupMenu()
         when (it.id) {
             R.id.install_device -> {
@@ -177,7 +159,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(activity)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -214,25 +196,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btn_delete = toolbar?.findViewById<ImageView>(R.id.img_function2)
 
         btn_add?.visibility = View.VISIBLE
-        // btn_delete?.visibility = View.VISIBLE
 
         btn_add?.setOnClickListener(this)
         btn_delete?.setOnClickListener(this)
-    }
-
-    fun lazyLoad(showTypeView: Int) {
-//        step1Guide()
-    }
-
-    private fun step1Guide() {
-        guideShowCurrentPage = !GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_KEY, false)
-        if (guideShowCurrentPage) {
-            GuideUtils.resetSceneGuide(activity!!)
-            val guide1 = toolbar?.findViewById<View>(R.id.img_function1) as ImageView
-            GuideUtils.guideBuilder(this, GuideUtils.STEP7_GUIDE_ADD_SCENE)
-                    .addGuidePage(GuideUtils.addGuidePage(guide1, R.layout.view_guide_simple_scene_1, getString(R.string.scene_guide_1),
-                            View.OnClickListener { guide1.performClick() }, GuideUtils.END_ADD_SCENE_KEY, activity!!)).show()
-        }
     }
 
     private fun stepEndGuide2() {
@@ -276,11 +242,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     view.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                    lazyLoad(showTypeView)
                 }
             })
         }
-        //        }
     }
 
     private fun initData() {
@@ -308,11 +272,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerView!!.layoutManager = layoutmanager
         //添加分割线
-        val decoration = DividerItemDecoration(activity!!,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(activity!!, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         recyclerView!!.addItemDecoration(decoration)
         //添加Item变化动画
         recyclerView!!.itemAnimator = DefaultItemAnimator()
@@ -331,7 +292,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
         adaper!!.notifyDataSetChanged()
 
-//        add_scenes!!.setOnClickListener(this)
     }
 
     var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
@@ -343,7 +303,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         toolbar?.title = ""
         setBack()
         adaper!!.notifyDataSetChanged()
-//        refreshData()
         return@OnItemLongClickListener true
     }
 
@@ -393,12 +352,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         dialog.show()
     }
 
-    private fun refreshData() {
-        adaper!!.notifyDataSetChanged()
-        initData()
-        initView()
-    }
-
     override fun onResume() {
         super.onResume()
         if (GuideUtils.getCurrentViewIsEnd(activity!!, GuideUtils.END_ADD_SCENE_KEY, false)) {
@@ -413,20 +366,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         initView()
     }
 
-    @Synchronized
-    private fun deleteScene(position: Int) {
-        val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        if (scenesListData!!.size > 0) {
-            val id = scenesListData!![position].id!!
-            val list = DBUtils.getActionsBySceneId(id)
-            params = byteArrayOf(0x00, id.toByte())
-            Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
-            DBUtils.deleteSceneActionsList(list)
-            DBUtils.deleteScene(scenesListData!![position])
-            scenesListData!!.removeAt(position)
-        }
-    }
 
     private fun setScene(id: Long) {
         val opcode = Opcode.SCENE_LOAD
@@ -447,7 +386,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             refreshView()
             initOnLayoutListener(1)
         } else {
-            //                initOnLayoutListener(2);
             refreshView()
         }
 
@@ -549,7 +487,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun loadData(): MutableList<DbScene> {
-        var showList: List<DbScene> = ArrayList()
+        var showList: List<DbScene>
         showList = DBUtils.sceneList
         return showList
     }
@@ -557,16 +495,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun onMenuItemClick(item: MenuItem): Boolean {
         val instance = TelinkLightService.Instance()
         when (item.itemId) {
-//            R.id.menu_delete -> {
-////                if (isDelete) {
-////                    isDelete = false
-////                } else {
-////                    isDelete = true
-////                }
-////
-////                adaper!!.changeState(isDelete)
-////                refreshData()
-////            }
             R.id.menu_install -> if (!instance.isLogin) {
             } else {
                 if (scenesListData!!.size >= SCENE_MAX_COUNT) {
@@ -585,14 +513,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         when (v.id) {
             R.id.img_function2 -> {
                 showDeleteDialog()
-//                if (isDelete) {
-//                    isDelete = false
-//                } else {
-//                    isDelete = true
-//                }
-//
-//                adaper!!.changeState(isDelete)
-//                refreshData()
             }
             R.id.img_function1 -> {
                 isGuide = false
@@ -633,21 +553,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
             }
         }
-        //                if (!SharedPreferencesUtils.getConnectState(getActivity())) {
-        ////                    return;
-        //                } else {
-        //                    if (scenesListData.size() >= SCENE_MAX_COUNT) {
-        //                        ToastUtils.showLong(R.string.scene_16_tip);
-        //                    } else {
-        //                        if(TelinkLightApplication.getApp().getConnectDevice()==null){
-        //                            ToastUtils.showLong(R.string.device_not_connected);
-        //                        }else{
-        //                            Intent intent = new Intent(getActivity(), NewSceneSetAct.class);
-        //                            intent.putExtra(Constant.IS_CHANGE_SCENE, false);
-        //                            startActivityForResult(intent, 0);
-        //                        }
-        //                    }
-        //                }
     }
 
     private fun showPopupMenu() {
@@ -665,7 +570,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is CallbackLinkMainActAndFragment) {
-            callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
+            callbackLinkMainActAndFragment = context
         }
     }
 
@@ -696,6 +601,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     companion object {
-        private val SCENE_MAX_COUNT = 16
+        private const val SCENE_MAX_COUNT = 16
     }
 }

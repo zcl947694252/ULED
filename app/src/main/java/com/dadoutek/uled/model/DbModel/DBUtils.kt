@@ -425,9 +425,6 @@ object DBUtils {
     fun getRelyByMeshAddr(meshAddr: Int): DbConnector? {
         val dbRelyList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbRelyList.size > 0) {
-            //            for(int i=0;i<dbLightList.size();i++){
-            ////                Log.d("DataError", "getLightByMeshAddr: "+dbLightList.get(i).getMeshAddr()+);
-            //            }
             dbRelyList[0]
         } else null
     }

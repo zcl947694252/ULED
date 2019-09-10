@@ -25,9 +25,7 @@ import java.util.*
 /**
  * Created by hejiajun on 2018/5/5.
  */
-
-class SceneGroupAdapter
-(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdapter<ItemGroup, BaseViewHolder>(layoutResId, data), SeekBar.OnSeekBarChangeListener {
+class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdapter<ItemGroup, BaseViewHolder>(layoutResId, data), SeekBar.OnSeekBarChangeListener {
 
     private var preTime: Long = 0
     private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
@@ -53,8 +51,6 @@ class SceneGroupAdapter
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
 
         val position = helper.layoutPosition
-//        val sbBrightnessRGB = helper.getView<SeekBar>(R.id.sbBrightness)
-//        val sbWBrightRGB = helper.getView<SeekBar>(R.id.sb_w_bright)
         sbBrightnessCW = helper.getView<SeekBar>(R.id.cw_sbBrightness)
         sbtemperature = helper.getView<SeekBar>(R.id.temperature)
         addBrightnessCW = helper.getView(R.id.cw_brightness_add)
@@ -63,7 +59,8 @@ class SceneGroupAdapter
         addTemperatureCW = helper.getView(R.id.temperature_add)
         var docOne = helper.getView<Dot>(R.id.dot_one)
 
-        var dot = helper.getView<Dot>(R.id.dot_s)
+        var dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
+
 
         sbBrightnessRGB = helper.getView(R.id.sbBrightness)
         sbWhiteLightRGB = helper.getView(R.id.sb_w_bright)
@@ -72,17 +69,20 @@ class SceneGroupAdapter
         addWhiteLightRGB = helper.getView(R.id.sb_w_bright_add)
         lessWhiteLightRGB = helper.getView(R.id.sb_w_bright_less)
 
-        docOne.setChecked(true, if (item.color == 0)
+        //0x4FFFE0
+        docOne.setChecked(true, if (item.color == 16777215) {
+            docOne.visibility = View.GONE
+            dotRgb.visibility = View.VISIBLE
             TelinkLightApplication.getApp().resources.getColor(R.color.primary)
-        else
-        //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
-        //右移n位，指 按2进制的 位 右移n位， （等于 除以 2的n次方），低于最低位的数则丢掉 。
-        //位与是指两个二进制数按对应的位上的两个二进制数相乘，口诀是有0出0，11出1，如10 & 01=00。
-            (0x00ff0000 shl 8) or (item.color and 0xffffff))
-        //   0001fe00    16711680  ff000000                              0x4FFFE0  0xff0fff00
-
+        } else {
+            //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
+            //右移n位，指 按2进制的 位 右移n位， （等于 除以 2的n次方），低于最低位的数则丢掉 。
+            //位与是指两个二进制数按对应的位上的两个二进制数相乘，口诀是有0出0，11出1，如10 & 01=00。
+           docOne.visibility = View.VISIBLE
+            dotRgb.visibility = View.GONE
+            (0x00ff0000 shl 8) or (item.color and 0xffffff)
+        })
         Log.e("zcl", "zclSceneGroupAdapter*****************${0xff0000 shl 8}*****************" + { item.color and 0xffffff })
-        dot.setChecked(true, TelinkLightApplication.getApp().resources.getColor(R.color.color_000000))
 
 
         helper.setText(R.id.name_gp, item.gpName)
@@ -94,27 +94,34 @@ class SceneGroupAdapter
             helper.setText(R.id.sbBrightness_num, sbBrightnessRGB!!.progress.toString() + "%")
             helper.setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
 
-
-            if (item.brightness <= 0) {
-                addBrightnessRGB!!.isEnabled = true
-                lessBrightnessRGB!!.isEnabled = false
-            } else if (item.brightness >= 100) {
-                addBrightnessRGB!!.isEnabled = false
-                lessBrightnessRGB!!.isEnabled = true
-            } else {
-                addBrightnessRGB!!.isEnabled = true
-                lessBrightnessRGB!!.isEnabled = true
+            when {
+                item.brightness <= 0 -> {
+                    addBrightnessRGB!!.isEnabled = true
+                    lessBrightnessRGB!!.isEnabled = false
+                }
+                item.brightness >= 100 -> {
+                    addBrightnessRGB!!.isEnabled = false
+                    lessBrightnessRGB!!.isEnabled = true
+                }
+                else -> {
+                    addBrightnessRGB!!.isEnabled = true
+                    lessBrightnessRGB!!.isEnabled = true
+                }
             }
 
-            if (item.temperature <= 0) {
-                addWhiteLightRGB!!.isEnabled = true
-                lessWhiteLightRGB!!.isEnabled = false
-            } else if (item.temperature >= 100) {
-                addWhiteLightRGB!!.isEnabled = false
-                lessWhiteLightRGB!!.isEnabled = true
-            } else {
-                addWhiteLightRGB!!.isEnabled = true
-                lessWhiteLightRGB!!.isEnabled = true
+            when {
+                item.temperature <= 0 -> {
+                    addWhiteLightRGB!!.isEnabled = true
+                    lessWhiteLightRGB!!.isEnabled = false
+                }
+                item.temperature >= 100 -> {
+                    addWhiteLightRGB!!.isEnabled = false
+                    lessWhiteLightRGB!!.isEnabled = true
+                }
+                else -> {
+                    addWhiteLightRGB!!.isEnabled = true
+                    lessWhiteLightRGB!!.isEnabled = true
+                }
             }
 
         } else {
@@ -199,7 +206,7 @@ class SceneGroupAdapter
             helper.setGone(R.id.cw_scene, true)
             helper.setGone(R.id.switch_scene, false)
         }
-//
+
         sbBrightnessCW!!.tag = position
         sbtemperature!!.tag = position
         sbBrightnessRGB!!.tag = position
@@ -209,8 +216,8 @@ class SceneGroupAdapter
         sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
         helper.addOnClickListener(R.id.btn_delete)
-//        helper.addOnClickListener(R.id.rgb_view)
         helper.addOnClickListener(R.id.dot_one)
+        helper.addOnClickListener(R.id.dot_rgb)
         helper.addOnClickListener(R.id.sbBrightness_add)
         helper.addOnClickListener(R.id.rg_xx)
         helper.addOnClickListener(R.id.rg_yy)

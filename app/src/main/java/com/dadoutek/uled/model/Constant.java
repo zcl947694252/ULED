@@ -238,12 +238,16 @@ public class Constant implements Serializable {
 
     //分组标识
 
+
     //默认分组
     public static final Long DEVICE_TYPE_DEFAULT_ALL = 0L;
     //默认分组  1是所有灯的分组，-1是默认分组
     public static final Long DEVICE_TYPE_DEFAULT = -1L;
     //所有灯的分组
     public static final Long DEVICE_TYPE_NO = 1L;
+
+
+
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL = Long.valueOf(0x04);
     //RGB分组
@@ -255,6 +259,7 @@ public class Constant implements Serializable {
 
     //升级标记t
     public static final String UP_VERSION = "UP_VERSION";
+
     //网络授权分享人数
     public static final String SHARE_PERSON = "SHARE_PERSON";
 

@@ -133,7 +133,7 @@ class RGBLightFragmentList : BaseFragment() {
                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
                                 successCallback = {
                                     hideLoadingDialog()
-                                    setResult(Constant.RESULT_OK)
+                                    setResult()
                                 },
                                 failedCallback = {
                                     hideLoadingDialog()
@@ -173,7 +173,7 @@ class RGBLightFragmentList : BaseFragment() {
         localBroadcastManager.registerReceiver(br, intentFilter)
     }
 
-    private fun setResult(resulT_OK: Int) {
+    private fun setResult() {
         Thread.sleep(500)
         val intent = Intent("delete_true")
         intent.putExtra("delete_true", "true")
@@ -267,15 +267,12 @@ class RGBLightFragmentList : BaseFragment() {
         })
 
         this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
-        val decoration = DividerItemDecoration(activity,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线
         recyclerView?.addItemDecoration(decoration)
         var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
-        lin.setOnClickListener(View.OnClickListener {
+        lin.setOnClickListener({
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
             } else {

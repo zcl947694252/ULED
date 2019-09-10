@@ -1,7 +1,6 @@
 package com.dadoutek.uled.switches
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
@@ -54,12 +53,12 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
     private lateinit var mAdapter: SwitchSceneGroupAdapter
     private lateinit var mSwitchList: ArrayList<String>
     private lateinit var mSceneList: List<DbScene>
-    private var loadDialog: Dialog? = null
     private var mConfigFailSnackbar: Snackbar? = null
-
     private var groupName: String? = null
-
     private var switchDate: DbSwitch? = null
+    private var mDisconnectSnackBar: Snackbar? = null
+    private var mConnectedSnackBar: Snackbar? = null
+    private var mConnectingSnackBar: Snackbar? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +67,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         supportActionBar?.title = getString(R.string.scene_set)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        mApplication = getApplication() as TelinkLightApplication
+        mApplication = application as TelinkLightApplication
 
         initData()
         initView()
@@ -90,8 +89,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                     failedCallback = {
                         versionLayout.visibility = View.GONE
                     })
-        } else {
-            dstAddress = 0
         }
     }
 
@@ -100,8 +97,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
 
-        fab.setOnClickListener { _ ->
-            //            showLoadingDialog(getString(R.string.setting_switch))
+        fab.setOnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
@@ -109,10 +105,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 }
             } else {
                 progressBar.visibility = View.VISIBLE
-                Thread {
-                    //                mDeviceInfo.meshAddress=Constant.SWITCH_PIR_ADDRESS
+                GlobalScope.launch {
                     setSceneForSwitch()
-//                updateNameForSwitch()
                     Commander.updateMeshName(successCallback = {
                         mIsConfiguring = true
                         disconnect()
@@ -124,7 +118,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                                     mIsConfiguring = false
                                 }
                             })
-                }.start()
+                }
             }
         }
     }
@@ -171,7 +165,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         } else {
                             saveSwitch()
                         }
-//                        saveSwitch()
                         TelinkLightService.Instance()?.idleMode(true)
                         TelinkLightService.Instance()?.disconnect()
                         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
@@ -193,10 +186,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
             } else {
-                var newMeshAdress: Int
                 var dbSwitch: DbSwitch? = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-//                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
                 dbSwitch!!.controlSceneId = getControlScene()
                 dbSwitch!!.macAddr = mDeviceInfo.macAddress
                 dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -209,7 +200,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                         Constant.DB_ADD)
             }
         } else {
-//            switchDate!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             switchDate!!.controlSceneId = getControlScene()
             switchDate!!.macAddr = mDeviceInfo.macAddress
             switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -225,7 +215,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         var switch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
         if (switch != null) {
             var dbSwitch: DbSwitch? = DbSwitch()
-//            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             dbSwitch!!.controlSceneId = getControlScene()
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
             dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -234,10 +223,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         } else {
-            var newMeshAdress: Int
             var dbSwitch: DbSwitch? = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
-//            dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
             dbSwitch!!.controlSceneId = getControlScene()
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
             dbSwitch!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -245,9 +232,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch!!.index = dbSwitch.id.toInt()
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            DBUtils.recordingChange(dbSwitch!!.id,
-                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                    Constant.DB_ADD)
+            DBUtils.recordingChange(dbSwitch!!.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
         }
 
     }
@@ -279,24 +264,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 }
                 .setTitle(R.string.do_you_really_want_to_cancel)
                 .show()
-    }
-
-    private fun doFinish() {
-        this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance()?.idleMode(true)
-        TelinkLightService.Instance()?.disconnect()
-        finish()
-    }
-
-    private fun configureComplete() {
-        this.mApplication.removeEventListener(this)
-        TelinkLightService.Instance()?.idleMode(true)
-        TelinkLightService.Instance()?.disconnect()
-        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun performed(event: Event<String>?) {
@@ -394,15 +361,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
     }
 
-    private var mDisconnectSnackBar: Snackbar? = null
-
-    private var mConnectedSnackBar: Snackbar? = null
-
-    private var mConnectingSnackBar: Snackbar? = null
-
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
-//        mDeviceMeshName = deviceInfo.meshName
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
@@ -412,7 +372,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
 
             LightAdapter.STATUS_LOGOUT -> {
-//                onLoginFailed()
                 if (mIsDisconnecting) {
                     this.mApplication.removeEventListener(this)
 
@@ -445,8 +404,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
         }
         params.setOldPassword(mesh.factoryPassword)
         params.setNewMeshName(mesh.name)
-        /*  val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp(),
-                  Constant.DB_NAME_KEY, "dadou")*/
+
         if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh.name) + mesh.name))
         } else {
@@ -474,7 +432,6 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
 
             Thread.sleep(200)
         }
-
     }
 
     @SuppressLint("RestrictedApi")

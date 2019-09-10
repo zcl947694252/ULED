@@ -19,8 +19,19 @@ import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
 import kotlinx.android.synthetic.main.activity_select_color.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import top.defaults.colorpicker.ColorObserver
 import java.util.*
+
+/**
+ * 描述	    场景选择颜色弹框
+ *
+ * 更新者     zcl
+ * 更新时间
+ * 更新描述   ${为类添加标识}$
+ */
 
 class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var itemGroup: ItemGroup? = null
@@ -45,19 +56,14 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         itemGroup = intent.getSerializableExtra(Constant.GROUPS_KEY) as? ItemGroup
-        num = intent.getIntExtra("circle", 0);
+        num = intent.getIntExtra("circle", 0)
     }
 
     @SuppressLint("ClickableViewAccessibility", "StringFormatInvalid")
     private fun initView() {
-//        toolbar.title = getString(R.string.color_checked_set)
-//        setSupportActionBar(toolbar)
-//        val actionBar = supportActionBar
-//        actionBar?.setDisplayHomeAsUpEnabled(true)
-
         color_picker.reset()
         color_picker.subscribe(colorObserver)
-        color_picker!!.setOnTouchListener { v, event ->
+        color_picker!!.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true)
             false
         }
@@ -76,44 +82,28 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
         }
 
-//        diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 4)
-//        colorSelectDiyRecyclerViewAdapter = ColorSceneSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
-//        colorSelectDiyRecyclerViewAdapter!!.onItemChildClickListener = diyOnItemChildClickListener
-//        colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
-//        colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
-
         diy_color_recycler_list_view!!.layoutManager = GridLayoutManager(this, 4)
         colorSelectDiyRecyclerViewAdapter = ColorSceneSelectDiyRecyclerViewAdapter(R.layout.color_select_diy_item, presetColors)
         colorSelectDiyRecyclerViewAdapter!!.onItemChildClickListener = diyOnItemChildClickListener
         colorSelectDiyRecyclerViewAdapter!!.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter!!.bindToRecyclerView(diy_color_recycler_list_view)
 
+        var w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
+        var r = Color.red(itemGroup?.color!!)
+        var g = Color.green(itemGroup?.color!!)
+        var b = Color.blue(itemGroup?.color!!)
+        color_picker.setInitialColor((itemGroup?.color ?: 0 and 0xffffff) or 0xff000000.toInt())
+        if (w == -1) {
+            w = 0
+        }
 
-//        var w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
-//        var r = Color.red(itemGroup?.color!!)
-//        var g = Color.green(itemGroup?.color!!)
-//        var b = Color.blue(itemGroup?.color!!)
-//        color_picker.setInitialColor((itemGroup?.color ?: 0 and 0xffffff) or 0xff000000.toInt())
-//        if (w == -1) {
-//            w = 0
-//        }
+        color_r.text = r.toString()
+        color_g.text = g.toString()
+        color_b.text = b.toString()
 
-            var w = ((itemGroup?.color ?: 0) and 0xff000000.toInt()) shr 24
-            var r=Color.red(itemGroup?.color!!)
-            var g=Color.green(itemGroup?.color!!)
-            var b= Color.blue(itemGroup?.color!!)
-            color_picker.setInitialColor((itemGroup?.color?:0 and 0xffffff) or 0xff000000.toInt())
-            if(w==-1){
-                w=0
-            }
-
-            color_r.text = r.toString()
-            color_g.text = g.toString()
-            color_b.text = b.toString()
-
-            wValue = w
-            tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
-            sb_w_bright.progress = w
+        wValue = w
+        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
+        sb_w_bright.progress = w
 
 
         sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
@@ -185,73 +175,30 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         var w = sb_w_bright.progress
 //
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
-//        val color = presetColors?.get(position)?.color
-//        var brightness = light!!.brightness
         var ws = (color!! and 0xff000000.toInt()) shr 24
         val red = (color!! and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-        val showBrightness = w
-        var showW = ws
-        Thread {
 
+        GlobalScope.launch {
             try {
-
-                if (w!! > Constant.MAX_VALUE) {
+                if (w!! > Constant.MAX_VALUE)
                     w = Constant.MAX_VALUE
-                }
-                if (ws > Constant.MAX_VALUE) {
+
+                if (ws > Constant.MAX_VALUE)
                     ws = Constant.MAX_VALUE
-                }
-                if (ws == -1) {
+
+                if (ws == -1)
                     ws = 0
-                    showW = 0
-                }
 
-                var addr = 0
-//                if (currentShowGroupSetPage) {
-//                    addr = group?.meshAddr!!
-//                } else {
-//                    addr = light?.meshAddr!!
-//                }
-
-                val opcode = Opcode.SET_TEMPERATURE
-
-                val paramsW: ByteArray = byteArrayOf(ws.toByte())
-                val params: ByteArray = byteArrayOf(w!!.toByte())
-
-//                Thread.sleep(80)
-//                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
-
-                Thread.sleep(80)
+                delay(80)
                 changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
-
-//                if (currentShowGroupSetPage) {
-//                    group?.brightness = showBrightness!!
-//                    group?.color = color
-//                } else {
-//                    light?.brightness = showBrightness!!
-//                    light?.color = color
-//                }
-
-//               //("changedff2" + opcode + "--" + addr + "--" + brightness)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        }.start()
-
-//        sbBrightness?.progress = showBrightness!!
-//        sb_w_bright_num.text = showBrightness.toString() + "%"
-//        if (w != -1) {
-//            sb_w_bright_num.text = showW.toString() + "%"
-//            sb_w_bright.progress = showW
-//        } else {
-//            sb_w_bright_num.text = "0%"
-//            sb_w_bright.progress = 0
-//        }
-//        scrollView?.setBackgroundColor(color)
+        }
 
         itemGroup!!.color = color
 
@@ -278,10 +225,8 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         val w = sb_w_bright.progress
 
         val color: Int = (r shl 16) or (g shl 8) or b
-//        val color =
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
-//            scrollView?.setBackgroundColor(0xff000000.toInt() or color)
             if (r == 0 && g == 0 && b == 0) {
             } else {
                 Thread {
@@ -309,16 +254,14 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         Log.d("RGBCOLOR", logStr)
 
         if (isOnceSet) {
-//            for(i in 0..3){
             Thread.sleep(50)
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
-//            }
         } else {
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAress, params)
         }
     }
 
-    internal var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+    private var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         val color = presetColors?.get(position)?.color
         val brightness = presetColors?.get(position)?.brightness
         val red = (color!! and 0xff0000) shr 16
@@ -370,7 +313,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
             this.onValueChange(seekBar, seekBar.progress, true)
-           //("seekBarstop" + seekBar.progress)
+            //("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {

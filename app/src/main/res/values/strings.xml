@@ -731,7 +731,7 @@
     <string name="open_it">Open it</string>
     <string name="restart_it">Restart it</string>
     <string name="i_see">I see</string>
-    <string name="switch_grouping">Afresh set</string>
+    <string name="relocation">Afresh set</string>
     <string name="please_rgb">Please enter RGB value</string>
     <string name="cannot_rgb_null">RGB values cannot be null</string>
     <string name="rgb_max">RGB value should not be greater than 255</string>
@@ -815,7 +815,7 @@
     <string name="syncing_relogin">Please login again in sync data</string>
     <string name="in_use">in_use</string>
     <string name="use">use</string>
-    <string name="creater_name">Creator: +</string>
+    <string name="creater_name">Creator: </string>
     <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
     <string name="input_region_name">Please enter a zone name</string>
     <string name="developer_mode_open">Developer mode is on</string>
@@ -885,5 +885,6 @@
     <string name="please_restore_device">Please restore all devices in the area to factory Settings before deleting the area</string>
     <string name="please_connect_normal_light">Please connect the  lights</string>
     <string name="please_connect_curtain">Please connect the curtain</string>
+    <string name="scanning_timeout">Scan timeout</string>
 
 </resources>

@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.Toast
 import cn.smssdk.SMSSDK
@@ -24,7 +22,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_forget_password.*
-import kotlinx.android.synthetic.main.activity_register.btn_send_verification
 import kotlinx.android.synthetic.main.activity_register.ccp
 import kotlinx.android.synthetic.main.activity_register.edit_user_phone
 import kotlinx.android.synthetic.main.activity_register.register_completed
@@ -41,7 +38,6 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     private var countryCode: String? = null
     private var isChangePwd = false
     private var dbUser: DbUser? = null
-    private var isPassword = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +51,9 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
         countryCode = ccp.selectedCountryCode
         ccp.setOnCountryChangeListener { countryCode = ccp.selectedCountryCode }
         register_completed.setOnClickListener(this)
-        btn_send_verification.setOnClickListener(this)
-        forget_password_btn.setOnClickListener(this)
         image_return.setOnClickListener(this)
         StringUtils.initEditTextFilterForRegister(edit_user_phone)
+
         register_completed.addTextChangedListener(this)
         if (isChangePwd) {
             dbUser = DbUser()
@@ -71,13 +66,6 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
             R.id.register_completed -> {
                 getAccount()
             }
-            R.id.btn_send_verification ->
-                if (NetWorkUtils.isNetworkAvalible(this)) {
-                    send_verification()
-                } else {
-                    ToastUtils.showLong(getString(R.string.net_work_error))
-                }
-            R.id.forget_password_btn -> eyePassword()
             R.id.image_return -> finish()
         }
     }
@@ -136,22 +124,8 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
     }
 
 
-    private fun eyePassword() {
-        if (isPassword) {
-            forget_password_btn.setImageResource(R.drawable.icon_turn)
-            isPassword = false
-            edit_forget_password.transformationMethod = PasswordTransformationMethod.getInstance()
-            edit_forget_password.setSelection(edit_forget_password.text.length)
-        } else {
-            isPassword = true
-            forget_password_btn.setImageResource(R.drawable.icon_open_eye)
-            edit_forget_password.transformationMethod = HideReturnsTransformationMethod.getInstance()
-            edit_forget_password.setSelection(edit_forget_password.text.length)
-        }
-    }
-
     private fun send_verification() {
-        val phoneNum = edit_user_phone.getText().toString().trim({ it <= ' ' })
+        val phoneNum = edit_user_phone.text.toString().trim { it <= ' ' }
         if (com.blankj.utilcode.util.StringUtils.isEmpty(phoneNum)) {
             ToastUtils.showShort(R.string.phone_cannot_be_empty)
         } else {

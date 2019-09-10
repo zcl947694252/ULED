@@ -104,6 +104,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
     private val mCompositeDisposable = CompositeDisposable()
+    private var disposableCamera: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
@@ -173,19 +174,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun addEventListeners() {
         // 监听各种事件
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-//        this.mApplication?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
-
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
         this.mApplication?.addEventListener(ServiceEvent.SERVICE_CONNECTED, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
     }
 
     private fun requestCamera() {
-        val disposable = mRxPermission.request(Manifest.permission.CAMERA)
+         disposableCamera = mRxPermission.request(Manifest.permission.CAMERA)
                 .subscribe(
                         {
 
@@ -459,7 +455,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         UpdateModel.isVersionAvailable(0, version)
                 .subscribe(object : NetworkObserver<ResponseVersionAvailable>() {
                     override fun onNext(s: ResponseVersionAvailable) {
-                        if (s.isUsable == false) {
+                        if (!s.isUsable) {
                             syncDataAndExit()
                         }
                         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", s.isUsable)
@@ -472,25 +468,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 })
     }
 
-    @SuppressLint("CheckResult")
-    private fun getVersion() {
-        val info = this.packageManager.getPackageInfo(this.packageName, 0)
-        LogUtils.e("zcl**********************VersionBean${info.versionName}")
-        UpdateModel.getVersion(info.versionName)!!.subscribe({
-            object : NetworkObserver<VersionBean>() {
-                override fun onNext(t: VersionBean) {
-                    CreateDialog(t)
-                    LogUtils.e("zcl**********************VersionBean$t")
-                }
-
-                override fun onError(e: Throwable) {
-                    super.onError(e)
-                    ToastUtils.showLong(R.string.get_server_version_fail)
-                }
-            }
-        }, {})
-
-    }
 
     private fun CreateDialog(t: VersionBean) {
         builder = AllenVersionChecker
@@ -534,7 +511,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         return uiData
     }
 
-    fun packageName(context: Context): String {
+    private fun packageName(context: Context): String {
         val manager = context.packageManager
         var name: String? = null
         try {
@@ -564,25 +541,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
-//        bnve.currentItem = 1  //默认显示第二页
-//        viewPager.currentItem = 1
-/*
-        viewPager.setOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {
-                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                    override fun start() {}
-                    override fun complete() {}
-                    override fun error(msg: String) {}
-                })
-            }
-
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
-            }
-
-            override fun onPageSelected(p0: Int) {
-            }
-        })
-*/
     }
 
 
@@ -671,9 +629,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ActivityUtils.finishAllActivities()
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
-                root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
+                /*root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                     LeBluetooth.getInstance().enable(applicationContext)
-                }
+                }*/
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
@@ -848,6 +806,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()
+        disposableCamera?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
     }
 
@@ -1036,7 +995,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             NotificationEvent.GET_DEVICE_STATE -> onNotificationEvent(event as NotificationEvent)
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
-                onErrorReport(info)
+                onErrorReportNormal(info)
             }
         }
     }
@@ -1093,9 +1052,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    /**
+/*    *//**
      * 报错log打印
-     */
+     *//*
     private fun onErrorReport(info: ErrorReportInfo) {
         if (bestRSSIDevice != null) {
 //            connectFailedDeviceMacList.add(bestRSSIDevice!!.macAddress)
@@ -1142,7 +1101,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //                retryConnect()
             }
         }
-    }
+    }*/
 
     private fun onNotificationEvent(event: NotificationEvent) {
         if (!foreground) return

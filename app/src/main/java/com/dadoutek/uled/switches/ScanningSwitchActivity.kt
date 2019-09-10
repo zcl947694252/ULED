@@ -194,6 +194,7 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 TelinkLightService.Instance()?.idleMode(true)
                 val mesh = mApplication.mesh
+
                 //扫描参数
                 val params = LeScanParameters.create()
                 if (BuildConfig.DEBUG) {
@@ -207,8 +208,8 @@ class ScanningSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 }
                 //把当前的mesh设置为out_of_mesh，这样也能扫描到已配置过的设备
                 if(isSupportInstallOldDevice){
-                    params.setMeshName(mesh.name)
-                    params.setOutOfMeshName(mesh.name)
+                    params.setMeshName(DBUtils.lastUser?.controlMeshName)
+                    params.setOutOfMeshName(DBUtils.lastUser?.controlMeshName)
                 }
                 params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
                 params.setScanMode(false)

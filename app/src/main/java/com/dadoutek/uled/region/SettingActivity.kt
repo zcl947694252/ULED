@@ -3,7 +3,6 @@ package com.dadoutek.uled.region
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.provider.Settings
@@ -59,7 +58,6 @@ class SettingActivity : BaseActivity() {
     private var cancel: Button? = null
     private var confirm: Button? = null
     private lateinit var pop: PopupWindow
-    private var loadDialog1: Dialog? = null
     private var compositeDisposable = CompositeDisposable()
 
 

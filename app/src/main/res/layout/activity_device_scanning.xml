@@ -18,8 +18,8 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieAnimationView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="246dp"
+        android:layout_height="246dp"
         android:visibility="visible"
         android:layout_margin="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -170,14 +170,14 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="64dp"
         android:background="@drawable/rectangle"
         android:text="@string/stop_scan"
         android:textColor="@color/gray_3"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.673"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView

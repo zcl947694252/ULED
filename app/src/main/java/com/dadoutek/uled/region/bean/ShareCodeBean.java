@@ -46,4 +46,13 @@ public class ShareCodeBean  implements Serializable {
     public void setCode(String code) {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "ShareCodeBean{" +
+                "expire=" + expire +
+                ", type=" + type +
+                ", code='" + code + '\'' +
+                '}';
+    }
 }
