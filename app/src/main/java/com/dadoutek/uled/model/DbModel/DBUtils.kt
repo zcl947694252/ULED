@@ -442,7 +442,16 @@ object DBUtils {
         } else null
     }
 
-    fun getSwitchByMesAddr(meshAddr: Int): DbSwitch? {
+
+    /**
+     * 判断这个mesh地址的设备是不是存在与数据库
+     */
+    fun isDeviceExist(meshAddr: Int): Boolean {
+        return getLightByMeshAddr(meshAddr) != null || getRelyByMeshAddr(meshAddr) != null || getCurtainByMeshAddr(meshAddr) != null
+                || getSwitchByMeshAddr(meshAddr) != null || getSensorByMeshAddr(meshAddr) != null
+    }
+
+    fun getSwitchByMeshAddr(meshAddr: Int): DbSwitch? {
         val dbLightList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(meshAddr)).list()
         return if (dbLightList.size > 0) {
             //            for(int i=0;i<dbLightList.size();i++){
@@ -512,11 +521,11 @@ object DBUtils {
     fun getGroupByMesh(mesh: Int): DbGroup? {
         var dbGroup: DbGroup? = null
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
-        Log.d("datasave", "getGroupByMesh: $mesh")
+//        Log.d("datasave", "getGroupByMesh: $mesh")
         if (dbGroupLs.size > 0) {
             dbGroup = dbGroupLs[0]
         }
-        return dbGroup?: createAllLightControllerGroup()    //如果获取不到所有灯这个组，就直接创建一个返回
+        return dbGroup ?: createAllLightControllerGroup()    //如果获取不到所有灯这个组，就直接创建一个返回
     }
 
     fun getLightMeshAddr(meshAddr: Int): ArrayList<DbLight> {
@@ -945,8 +954,6 @@ object DBUtils {
     }
 
 
-
-
     fun deleteConnector(dbConnector: DbConnector) {
         DaoSessionInstance.getInstance().dbConnectorDao.delete(dbConnector)
         recordingChange(dbConnector.id,
@@ -1079,7 +1086,7 @@ object DBUtils {
         }
     }
 
-    fun addNewGroupWithType(name: String, type: Long) : DbGroup?{
+    fun addNewGroupWithType(name: String, type: Long): DbGroup? {
         val groups = DBUtils.groupList
         //        if (!checkRepeat(groups, context, name) && !checkReachedTheLimit(groups)) {
         if (!checkReachedTheLimit(groups, name)) {
@@ -1137,6 +1144,7 @@ object DBUtils {
         for (i in scList.indices) {
             scNameList.add(scList[i].name)
         }
+
 
         var count = scList.size
         while (true) {

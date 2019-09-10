@@ -21,7 +21,7 @@ public class DbSwitch implements Serializable {
     private Long id;
     @NotNull
     private int meshAddr;
-    private String name;
+    private String name = "";
     private int controlGroupAddr;
     private String macAddr;
     private int productUUID;

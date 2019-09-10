@@ -196,7 +196,7 @@ class DeviceFragment : BaseFragment() {
      * 刷新UI
      */
     fun refreshView() {
-        LogUtils.d("refreshView")
+//        LogUtils.d("refreshView")
         if (activity != null) {
             initAdapterData()
             deviceAdapter.notifyDataSetChanged()

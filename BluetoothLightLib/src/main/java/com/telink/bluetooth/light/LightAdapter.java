@@ -971,7 +971,7 @@ public class LightAdapter {
 
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-            TelinkLog.e("Scan : " + device.getName() + "-" + device.getAddress());
+//            TelinkLog.e("Scan : " + device.getName() + "-" + device.getAddress());
 
             if (scanEmpty.get()) {
                 scanEmpty.set(false);
@@ -1002,7 +1002,7 @@ public class LightAdapter {
             if (scanNoTarget.get()) {
                 scanNoTarget.set(false);
             }
-            TelinkLog.e("add scan result : " + device.getAddress());
+//            TelinkLog.e("add scan result : " + device.getAddress());
 //            saveLog("add scan result : " + device.getAddress());
 
             int mode = getMode();
@@ -1734,7 +1734,7 @@ public class LightAdapter {
 
             synchronized (this) {
                 for (LightPeripheral light : this.mPeripherals) {
-                    Log.d(getClass().getSimpleName(), "light mac = " + light.getMacAddress()+ "     rssi = " + light.getRssi());
+//                    Log.d(getClass().getSimpleName(), "light mac = " + light.getMacAddress()+ "     rssi = " + light.getRssi());
                     if (result == null || light.getRssi() > result.getRssi())
                         result = light;
                 }

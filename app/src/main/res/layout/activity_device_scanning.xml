@@ -163,20 +163,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-        android:id="@+id/scanPb"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:indeterminate="true"
-        app:mpb_progressStyle="horizontal"
-        app:mpb_indeterminateTint="@color/accent"
-        app:mpb_useIntrinsicPadding="false"
-        app:mpb_showProgressBackground="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
-        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding" />
 
     <Button
         android:id="@+id/btn_stop_scan"
@@ -200,8 +186,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_marginBottom="48dp"
-        android:text="@string/scanning"
+        android:layout_marginBottom="24dp"
+        android:text="@string/scanned_x_devices"
         android:textColor="@color/gray_3"
         android:visibility="visible"
         android:gravity="center"
