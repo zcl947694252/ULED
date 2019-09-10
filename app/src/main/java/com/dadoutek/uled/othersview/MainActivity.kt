@@ -81,10 +81,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.design.indefiniteSnackbar
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -100,6 +103,7 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 2
  */
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment {
 
+    private val mCompositeDisposable = CompositeDisposable()
     private var disposableCamera: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
@@ -143,9 +147,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
                 when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                     BluetoothAdapter.STATE_ON -> {
-                        TelinkLightService.Instance().idleMode(true)
                         retryConnectCount = 0
-                        startScan()
+                        autoConnect()
                     }
                     BluetoothAdapter.STATE_OFF -> {
                     }
@@ -228,7 +231,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun LogOutAndExitApp() {
         SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
-        TelinkLightService.Instance().disconnect()
         TelinkLightService.Instance().idleMode(true)
 
         //重启app并杀死原进程
@@ -554,6 +556,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPause() {
         super.onPause()
+        mCompositeDisposable.clear()
         mScanTimeoutDisposal?.dispose()
         mConnectDisposal?.dispose()
         mScanSnackBar?.dismiss()
@@ -642,9 +645,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     Manifest.permission.BLUETOOTH_ADMIN)
                                     .subscribeOn(Schedulers.io())
                                     .subscribe({
-
-                                        LogUtils.d("start Auto connect")
                                         GlobalScope.launch(Dispatchers.Main) {
+                                            ToastUtils.showLong(R.string.connecting)
                                             retryConnectCount = 0
                                             connectFailedDeviceMacList.clear()
                                             val meshName = DBUtils.lastUser!!.controlMeshName
@@ -691,48 +693,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
     }
 
-    @SuppressLint("CheckResult")
-    private fun startScan() {
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    if (it) {
-                        TelinkLightService.Instance().idleMode(true)
-                        bestRSSIDevice = null   //扫描前置空信号最好设备。
-                        //扫描参数
-                        // val account = DBUtils.lastUser?.account
-                        val meshName = DBUtils.lastUser?.controlMeshName
-
-                        LogUtils.e("zcl**********************扫描账号$meshName")
-                        val scanFilters = ArrayList<ScanFilter>()
-                        val scanFilter = ScanFilter.Builder()
-                                .setDeviceName(meshName)
-                                .build()
-                        scanFilters.add(scanFilter)
-
-                        val params = LeScanParameters.create()
-                        if (!AppUtils.isExynosSoc) {
-                            params.setScanFilters(scanFilters)
-                        }
-                        params.setMeshName(meshName)
-                        params.setOutOfMeshName(meshName)
-                        params.setTimeoutSeconds(SCAN_TIMEOUT_SECOND)
-                        params.setScanMode(false)
-
-                        startScanTimeout()//重新订阅超时时间
-                        TelinkLightService.Instance().startScan(params)
-                        startCheckRSSITimer()
-                    } else {
-                        //没有授予权限
-                        DialogUtils.showNoBlePermissionDialog(this, {
-                            retryConnectCount = 0
-                            startScan()
-                        }, { finish() })
-                    }
-                }, {})
-    }
-
     private fun stopConnectTimer() {
         mConnectDisposal?.dispose()
     }
@@ -757,42 +717,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 }
     }
 
-    private fun startScanTimeout() {
-        mScanTimeoutDisposal?.dispose()
-        mScanTimeoutDisposal = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
-                .subscribe({
-                    TelinkLightService.Instance()?.idleMode(false)      //use this stop scan
-                    onLeScanTimeout()
-                }, {})
-    }
-
-    private fun startCheckRSSITimer() {
-        mScanTimeoutDisposal?.dispose()
-        val periodCount = SCAN_TIMEOUT_SECOND.toLong() - SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND
-        Observable.intervalRange(1, periodCount, SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND, 1,
-                TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .subscribe(object : io.reactivex.Observer<Long?> {
-                    override fun onComplete() {
-                        retryConnect()
-                    }
-
-                    override fun onSubscribe(d: Disposable) {
-                        mScanTimeoutDisposal = d
-                    }
-
-                    override fun onNext(t: Long) {
-                        if (bestRSSIDevice != null) {
-                            mScanTimeoutDisposal?.dispose()
-                            LogUtils.d("connect device , mac = ${bestRSSIDevice?.macAddress}  rssi = ${bestRSSIDevice?.rssi}")
-                            connect(bestRSSIDevice!!.macAddress)
-                        }
-                    }
-
-                    override fun onError(e: Throwable) {
-                        LogUtils.d(e)
-                    }
-                })
-    }
 
 /*
     private fun login() {
@@ -804,8 +728,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 */
 
     private fun onNError(event: DeviceEvent) {
-
-        TelinkLightService.Instance().idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")
 
         val builder = AlertDialog.Builder(this)
@@ -829,6 +751,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             setSnack()
         }
     }
+
 
     private fun setSnack() {
         if (mNotFoundSnackBar?.isShown != true) {
@@ -878,6 +801,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onDestroy() {
         super.onDestroy()
+        if (TelinkLightService.Instance() != null)
+            TelinkLightService.Instance().idleMode(true)
         this.mDelayHandler.removeCallbacksAndMessages(null)
         Lights.getInstance().clear()
         mDisposable.dispose()
@@ -895,6 +820,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
                 GlobalScope.launch(Dispatchers.Main) {
                     //在主线程执行
+                    image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
                     stopConnectTimer()
                     if (progressBar?.visibility != GONE)
                         progressBar?.visibility = GONE
@@ -911,12 +837,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     this.connectMeshAddress = connectDevice.meshAddress
                 }
                 ToastUtils.showShort(getString(R.string.connect_success))
-                RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser!!.controlMeshName)
+                val disposable = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser!!.controlMeshName)
                         .subscribeOn(Schedulers.io())
                         .subscribe {
                             LogUtils.d("added $it mesh devices")
                             deviceFragment.refreshView()
                         }
+                mCompositeDisposable.add(disposable)
+
             }
             LightAdapter.STATUS_LOGOUT -> {
                 LogUtils.d("STATUS_LOGOUT")
