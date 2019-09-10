@@ -27,9 +27,7 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.acitvity_phone_verification.*
 import kotlinx.android.synthetic.main.activity_verification_code.*
-import kotlinx.android.synthetic.main.activity_verification_code.btn_send_verification
 import org.jetbrains.anko.toast
 import org.json.JSONObject
 import java.util.*
@@ -51,8 +49,11 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
 
 
     private fun initView() {
-        countryCode = ccp?.selectedCountryCode
-        ccp?.setOnCountryChangeListener { countryCode = ccp?.selectedCountryCode }
+        countryCode = country_code_picker?.selectedCountryCode
+        country_code_picker?.setOnCountryChangeListener {
+            countryCode = country_code_picker?.selectedCountryCode
+        }
+
         btn_register.setOnClickListener(this)
         btn_send_verification.setOnClickListener(this)
         sms_login.setOnClickListener(this)
@@ -133,14 +134,6 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
         finish()
     }
 
-    private fun login() {
-        var intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
-        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
-        intent.putExtra("country_code",countryCode)
-        intent.putExtra("phone",edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
-        startActivity(intent)
-    }
-
     private fun getAccount() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
             val userName = edit_user_phone.editableText.toString().trim { it <= ' '}
@@ -175,8 +168,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                             }
                             override fun onError(e: Throwable) {
                                 hideLoadingDialog()
-                                Toast.makeText(this@VerificationCodeActivity, "onError:" + e.toString(), Toast.LENGTH_SHORT).show()
-                                //("zcl**********************$e")
+                                Toast.makeText(this@VerificationCodeActivity, "onError:$e", Toast.LENGTH_SHORT).show()
                             }
                             override fun onComplete() {}
                         })

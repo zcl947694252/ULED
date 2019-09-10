@@ -650,11 +650,11 @@ object DBUtils {
     }
 
     fun saveSensor(sensor: DbSensor?, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbSensorDao.insert(sensor)
-        } else {
+        /*if (isFromServer) {
+            DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(sensor)
+        } else {*/
             DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
-        }
+        /*}*/
     }
 
     fun saveSwitch(dbSwitch: DbSwitch?, isFromServer: Boolean) {

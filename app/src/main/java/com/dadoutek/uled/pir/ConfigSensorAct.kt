@@ -75,6 +75,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         initListener()
         if (TelinkLightApplication.getApp().connectDevice == null)
             autoConnectSensor()
+        else
+            getVersion()
     }
 
     private fun initListener() {
@@ -212,7 +214,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
         LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
                 "   triggerValue = $triggerValue")
-//        val spGroup = groupConvertSpecialValue(groupAddr)
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = byteArrayOf(
@@ -229,6 +230,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 paramBytes)
 
         Thread.sleep(300)
+
+        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance().disconnect()
     }
 
 
@@ -293,7 +297,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
         DBUtils.saveSensor(dbSensor, false)
 
-//        dbSensor=DBUtils.getSensorByID(dbSensor.id)!!
         dbSensor = DBUtils.getSensorByMacAddr(mDeviceInfo.macAddress)
         recordingChange(dbSensor!!.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
@@ -335,10 +338,14 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 successCallback = {
                                     hideLoadingDialog()
                                     configureComplete()
+                                     TelinkLightService.Instance().idleMode(true)
+                                                         TelinkLightService.Instance().disconnect()
                                 },
                                 failedCallback = {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))
                                     hideLoadingDialog()
+                                    TelinkLightService.Instance().idleMode(true)
+                                    TelinkLightService.Instance().disconnect()
                                 })
                     }.start()
 

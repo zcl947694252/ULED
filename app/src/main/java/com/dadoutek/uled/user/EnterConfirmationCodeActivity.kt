@@ -55,12 +55,12 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
     @SuppressLint("SetTextI18n")
     private fun initViewType() {
-        countryCode = this.intent.extras!!.getString("country_code")
+        countryCode = this.intent.extras!!.getString("country_code")?:""
         phone = this.intent.extras!!.getString("phone")
         account = this.intent.extras!!.getString("account")
         if (type == Constant.TYPE_VERIFICATION_CODE) {
             tv_notice.visibility = View.VISIBLE
-            codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
+            codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode+" "  + phone
         } else if (type == Constant.TYPE_REGISTER) {
             codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
             tv_notice.visibility = View.GONE

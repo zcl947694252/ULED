@@ -6,7 +6,6 @@ import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.google.gson.Gson
 import io.reactivex.Flowable
-import io.reactivex.disposables.Disposable
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
@@ -30,7 +29,6 @@ class StompManager private constructor() {
     //单点登录频道
     val WS_TOPIC_LOGIN = "/user/topic/user.login.state"
     
-    private var mQrcodeTopicDisposable: Disposable? = null
     private var mStompClient: StompClient? = null
 
     companion object {

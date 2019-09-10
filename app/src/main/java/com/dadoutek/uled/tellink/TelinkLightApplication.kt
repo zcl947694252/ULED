@@ -123,7 +123,7 @@ class TelinkLightApplication : TelinkApplication() {
 
                 singleLoginTopicDisposable = mStompManager.singleLoginTopic().subscribe({
                     val key = SharedPreferencesHelper.getString(this@TelinkLightApplication, Constant.LOGIN_STATE_KEY, "no_have_key")
-                    if (it != key) {
+                    if (it != key&&"no_have_key"!=it) {
                         LogUtils.e("zcl登出")
                         val intent = Intent()
                         intent.action = Constant.LOGIN_OUT

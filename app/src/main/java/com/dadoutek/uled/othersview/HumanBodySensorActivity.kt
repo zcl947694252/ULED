@@ -740,6 +740,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     failedCallback = {
                         snackbar(sensor_root, getString(R.string.pace_fail))
                         hideLoadingDialog()
+                         TelinkLightService.Instance().idleMode(true)
+                                             TelinkLightService.Instance().disconnect()
                     })
 
         }.start()
@@ -792,10 +794,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                     successCallback = {
                         hideLoadingDialog()
                         configureComplete()
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                     },
                     failedCallback = {
                         snackbar(sensor_root, getString(R.string.pace_fail))
                         hideLoadingDialog()
+                        TelinkLightService.Instance().idleMode(true)
+                        TelinkLightService.Instance().disconnect()
                     })
 
         }.start()
@@ -844,6 +850,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
         saveSensor()
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLightService.Instance()?.disconnect()
+
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
