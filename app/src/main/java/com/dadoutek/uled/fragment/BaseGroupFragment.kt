@@ -444,7 +444,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 if (retryCount <= maxRetryCount) {
                     val light = lights[0]
                     val lightMeshAddr = light.meshAddr
-                    Commander.deleteGroup(lightMeshAddr,group.meshAddr,
+                    Commander.deleteGroup(lightMeshAddr,
                             successCallback = {
                                 light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
                                 DBUtils.updateLight(light)

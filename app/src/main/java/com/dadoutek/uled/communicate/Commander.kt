@@ -294,7 +294,6 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onError(e: Throwable) {
-                        //(e.message)
                     }
                 })
     }

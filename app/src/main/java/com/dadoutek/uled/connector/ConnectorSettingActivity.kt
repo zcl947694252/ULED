@@ -249,7 +249,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), EventListener<String>, Te
                 if (retryCount <= maxRetryCount) {
                     val light = lights[0]
                     val lightMeshAddr = light.meshAddr
-                    Commander.deleteGroup(lightMeshAddr,group.meshAddr,
+                    Commander.deleteGroup(lightMeshAddr,
                             successCallback = {
                                 light.belongGroupId = DBUtils.groupNull!!.id
                                 DBUtils.updateConnector(light)
