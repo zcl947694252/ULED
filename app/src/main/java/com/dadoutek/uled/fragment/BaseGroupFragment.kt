@@ -57,7 +57,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private var recyclerView: RecyclerView? = null
     private var no_group: ConstraintLayout? = null
     private var groupAdapter: GroupListAdapter? = null
-    private  var groupList: ArrayList<DbGroup> =  ArrayList()
+    open var groupList: ArrayList<DbGroup> = ArrayList()
     private var isFristUserClickCheckConnect = true
     private var updateLightDisposal: Disposable? = null
     private var mContext: Activity? = null
@@ -87,7 +87,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val str = intent.getStringExtra("delete")
-              //  val switch = intent.getStringExtra("switch")
+                //  val switch = intent.getStringExtra("switch")
                 val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
                     isDelete = false
@@ -125,13 +125,13 @@ abstract class BaseGroupFragment : BaseFragment() {
                     Log.e("TAG_DELETE", deleteList.size.toString())
                 }
 
-             /*   if (switch == "true") {
-                    for (i in groupList.indices) {
-                        if (groupList[i].isSelected) {
-                            groupList[i].isSelected = false
-                        }
-                    }
-                }*/
+                /*   if (switch == "true") {
+                       for (i in groupList.indices) {
+                           if (groupList[i].isSelected) {
+                               groupList[i].isSelected = false
+                           }
+                       }
+                   }*/
 
                 if (lightStatus == "on") {
                     for (i in groupList.indices) {
@@ -236,7 +236,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         groupAdapter!!.bindToRecyclerView(recyclerView)
     }
 
-    private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { _, _, _ ->
+    private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { _, _, postion ->
         if (!isDelete) {
             isDelete = true
             SharedPreferencesUtils.setDelete(true)
@@ -249,7 +249,8 @@ abstract class BaseGroupFragment : BaseFragment() {
             isDelete = false
             val intent = Intent("showPro")
             intent.putExtra("is_delete", "false")
-            this.activity?.let { LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
+            this.activity?.let {
+                LocalBroadcastManager.getInstance(it).sendBroadcast(intent)
             }
         }
         groupAdapter?.changeState(isDelete)
@@ -321,15 +322,23 @@ abstract class BaseGroupFragment : BaseFragment() {
 
                 if (currentLight.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentLight.deviceType == groupType/*Constant.DEVICE_TYPE_LIGHT_RGB*/ && DBUtils.getLightByGroupID(currentLight.id).size != 0)) {
                     var intent: Intent? = null
-                     when(groupType){
-                        Constant.DEVICE_TYPE_LIGHT_NORMAL->{ intent = Intent(mContext, NormalSettingActivity::class.java)}
-                        Constant.DEVICE_TYPE_LIGHT_RGB->{intent =  Intent(mContext, RGBSettingActivity::class.java)}
-                        Constant.DEVICE_TYPE_CONNECTOR->{ intent = Intent(mContext, ConnectorSettingActivity::class.java)}//蓝牙接收器
-                        Constant.DEVICE_TYPE_CURTAIN->{ intent = Intent(mContext, WindowCurtainsActivity::class.java)}
+                    when (groupType) {
+                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            intent = Intent(mContext, NormalSettingActivity::class.java)
+                        }
+                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                            intent = Intent(mContext, RGBSettingActivity::class.java)
+                        }
+                        Constant.DEVICE_TYPE_CONNECTOR -> {
+                            intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                        }//蓝牙接收器
+                        Constant.DEVICE_TYPE_CURTAIN -> {
+                            intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                        }
                     }
-                        intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                        intent?.putExtra("group", currentLight)
-                        startActivityForResult(intent, 2)
+                    intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                    intent?.putExtra("group", currentLight)
+                    startActivityForResult(intent, 2)
                 }
             }
 
@@ -481,5 +490,14 @@ abstract class BaseGroupFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         localBroadcastManager.unregisterReceiver(br)
+    }
+
+    fun getGroupDataList(): MutableList<DbGroup> {
+        val list = mutableListOf<DbGroup>()
+        for (group in groupList) {
+            if (group.isSelected)
+                list.add(group)
+        }
+        return list
     }
 }

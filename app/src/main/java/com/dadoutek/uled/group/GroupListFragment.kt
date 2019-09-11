@@ -168,8 +168,7 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = getView(inflater)
         this.initData()
         return view
@@ -316,14 +315,11 @@ class GroupListFragment : BaseFragment() {
 
         viewPager?.offscreenPageLimit = 3
         viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(i: Int, v: Float, i1: Int) {
-
-            }
+            override fun onPageScrolled(i: Int, v: Float, i1: Int) {}
 
             override fun onPageSelected(i: Int) {
-                val intent = Intent("back")
-                intent.putExtra("back", "true")
-                LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
+                sendGroupResterNormal()
+                setBluetoothAndAddVisableDeleteGone()
             }
 
             override fun onPageScrollStateChanged(i: Int) {
@@ -348,7 +344,7 @@ class GroupListFragment : BaseFragment() {
         StringUtils.initEditTextFilter(textGp)
         textGp.setText(DBUtils.getDefaultNewGroupName())
         //设置光标默认在最后
-        textGp.setSelection(textGp.getText().toString().length)
+        textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(activity)
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
@@ -510,10 +506,8 @@ class GroupListFragment : BaseFragment() {
     }
 
     private val onClick = View.OnClickListener {
-        var intent: Intent? = null
+        var intent: Intent?
         //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
         hidePopupMenu()
         when (it.id) {
             R.id.install_device -> {
@@ -597,15 +591,19 @@ class GroupListFragment : BaseFragment() {
 
             R.id.img_function2 -> {
                 var deleteList:ArrayList<DbGroup> = ArrayList()
-                var listLight = DBUtils.getAllGroupsOrderByIndex()
+                deleteList.addAll(cwLightFragment.getGroupData())
+                deleteList.addAll(rgbLightFragment.getGroupData())
+                deleteList.addAll(curtianFragment.getGroupData())
+                deleteList.addAll(relayFragment.getGroupData())
 
+            /*    var listLight = DBUtils.getAllGroupsOrderByIndex()
                 if (listLight.size > 0) {
                     for (i in listLight.indices) {
                         if (listLight[i].isSelected) {
                             deleteList.add(listLight[i])
                         }
                     }
-                }
+                }*/
 
                 if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?)).setMessage(R.string.delete_group_confirm)
@@ -629,7 +627,6 @@ class GroupListFragment : BaseFragment() {
     val CREATE_SCENE_REQUESTCODE = 3
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        refreshData()
         if (requestCode == CREATE_SCENE_REQUESTCODE) {
             callbackLinkMainActAndFragment?.changeToScene()
         }
@@ -640,7 +637,7 @@ class GroupListFragment : BaseFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (context is CallbackLinkMainActAndFragment) {
-            callbackLinkMainActAndFragment = context as CallbackLinkMainActAndFragment
+            callbackLinkMainActAndFragment = context
         }
     }
 
