@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/txt_name"
+            android:id="@+id/tv_group_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="50dp"
@@ -51,9 +51,9 @@
             android:text="0"
             android:textColor="@color/blue_background"
             android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="@+id/txt_name"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_group_name"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/txt_name" />
+            app:layout_constraintTop_toTopOf="@+id/tv_group_name" />
     </android.support.constraint.ConstraintLayout>
 
 

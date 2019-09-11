@@ -147,16 +147,16 @@ public class Peripheral extends BluetoothGattCallback {
                     + this.getMacAddress());
             this.mConnState.set(CONN_STATE_CONNECTING);
 
-            //确保gatt被新对象赋值时，是空的
-            if (this.gatt != null) {
-                close();
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            this.gatt = this.device.connectGatt(context, true, this, BluetoothDevice.TRANSPORT_LE);
+//            //确保gatt被新对象赋值时，是空的
+//            if (this.gatt != null) {
+//                close();
+//                try {
+//                    Thread.sleep(300);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+            this.gatt = this.device.connectGatt(context, false, this, BluetoothDevice.TRANSPORT_LE);
             if (this.gatt == null) {
                 this.disconnect();
                 this.mConnState.set(CONN_STATE_IDLE);
@@ -783,7 +783,7 @@ public class Peripheral extends BluetoothGattCallback {
 
     private void close() {
         this.gatt.disconnect();
-        refreshDeviceCache(gatt);
+//        refreshDeviceCache(gatt);
         this.gatt.close();
         TelinkLog.d("gatt close " + this.gatt);
         this.mConnState.set(CONN_STATE_CLOSED);

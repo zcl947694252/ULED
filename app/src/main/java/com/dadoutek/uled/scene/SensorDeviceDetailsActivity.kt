@@ -28,8 +28,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.connector.ScanningConnectorActivity
-import com.dadoutek.uled.curtain.CurtainScanningNewActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
@@ -56,6 +54,7 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import com.telink.util.MeshUtils
 import com.telink.util.Strings
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -351,30 +350,27 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             R.id.search_bar -> {
                 when (installId) {
                     INSTALL_NORMAL_LIGHT -> {
-                        if (medressData < 254) {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
                     INSTALL_RGB_LIGHT -> {
-                        if (medressData < 254) {
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                            intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }
                     INSTALL_CURTAIN -> {
-                        if (medressData < 254) {
-                            intent = Intent(this, CurtainScanningNewActivity::class.java)
-                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
                         } else {
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
@@ -383,12 +379,11 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     INSTALL_SWITCH -> startActivity(Intent(this, ScanningSwitchActivity::class.java))
                     INSTALL_SENSOR -> startActivity(Intent(this, ScanningSensorActivity::class.java))
                     INSTALL_CONNECTOR -> {
-                        if (medressData < 254) {
-                            intent = Intent(this, ScanningConnectorActivity::class.java)
-                            intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                            intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                        if(medressData <= MeshUtils.DEVICE_ADDRESS_MAX){
+                            intent = Intent(this, DeviceScanningNewActivity::class.java)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
-                        } else {
+                        }else{
                             ToastUtils.showLong(getString(R.string.much_lamp_tip))
                         }
                     }

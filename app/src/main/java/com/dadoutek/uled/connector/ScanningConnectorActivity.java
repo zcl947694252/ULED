@@ -1072,7 +1072,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity imple
             ImageView icon = (ImageView) convertView
                     .findViewById(R.id.img_icon);
             TextView txtName = (TextView) convertView
-                    .findViewById(R.id.txt_name);
+                    .findViewById(R.id.tv_group_name);
             CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
 
             holder = new DeviceItemHolder();

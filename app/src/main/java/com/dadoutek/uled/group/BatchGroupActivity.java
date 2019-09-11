@@ -317,7 +317,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
     private void scanSuccess() {
         //更新Title
         tvStopScan.setVisibility(View.GONE);
-        toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
+        toolbar.setTitle(getString(R.string.title_scanned_device_num, adapter.getCount()));
 
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
@@ -1285,9 +1285,9 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             ImageView icon = (ImageView) convertView
                     .findViewById(R.id.img_icon);
             TextView txtName = (TextView) convertView
-                    .findViewById(R.id.txt_name);
+                    .findViewById(R.id.tv_group_name);
             CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
-            TextView lightName = (TextView) convertView.findViewById(R.id.light_name);
+            TextView lightName = (TextView) convertView.findViewById(R.id.tv_device_name);
 
             holder = new DeviceItemHolder();
 
@@ -1457,7 +1457,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                     isFirtst = false;
                     SharedPreferencesHelper.putBoolean(BatchGroupActivity.this, SplashActivity.IS_FIRST_LAUNCH, false);
                 }
-                toolbar.setTitle(getString(R.string.title_scanning_lights_num, adapter.getCount()));
+                toolbar.setTitle(getString(R.string.title_scanned_device_num, adapter.getCount()));
                 tvStopScan.setVisibility(View.VISIBLE);
 
                 Log.d("ScanningTest", "update mesh success");

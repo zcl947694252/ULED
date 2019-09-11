@@ -2,10 +2,12 @@ package com.dadoutek.uled.model.DbModel
 
 import android.content.Context
 import android.util.Log
+import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
 import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant.USER_CHANNEL
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import java.util.*
@@ -252,7 +254,7 @@ object DBUtils {
     /********************************************查询 */
 
     fun getAllUser(): ArrayList<DbUser> {
-        val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Channel.eq(DeviceType.USER_CHANNEL)).build()
+        val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().where(DbUserDao.Properties.Channel.eq(USER_CHANNEL)).build()
         return ArrayList(query.list())
     }
 
@@ -640,73 +642,100 @@ object DBUtils {
     fun saveDeleteGroup(group: DbGroup) {
         val dbDeleteGroup = DbDeleteGroup()
         dbDeleteGroup.groupAress = group.meshAddr
-        DaoSessionInstance.getInstance().dbDeleteGroupDao.save(dbDeleteGroup)
+        DaoSessionInstance.getInstance().dbDeleteGroupDao.insertOrReplace(dbDeleteGroup)
     }
 
 
-    fun saveLight(light: DbLight, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbLightDao.insert(light)
-        } else {
-            //保存灯之前先把所有的灯都分配到当前的所有组去
-            val dbGroup = groupNull
-            light.belongGroupId = dbGroup?.id
-
-            DaoSessionInstance.getInstance().dbLightDao.save(light)
-            recordingChange(light.id,
+    fun saveLight(db: DbLight, isFromServer: Boolean) {
+        val existList = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        if (existList.size > 0) {
+            //如果该mesh地址的数据已经存在，就直接修改
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbLightDao.insertOrReplace(db)
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            recordingChange(db.id,
                     DaoSessionInstance.getInstance().dbLightDao.tablename,
                     Constant.DB_ADD)
         }
+
+
+
     }
 
-    fun saveSensor(sensor: DbSensor?, isFromServer: Boolean) {
-        /*if (isFromServer) {
-            DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(sensor)
-        } else {*/
-            DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
-        /*}*/
+    fun saveSensor(db: DbSensor, isFromServer: Boolean) {
+        val existList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        if (existList.size > 0) {
+            //如果该mesh地址的数据已经存在，就直接修改
+
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(db)
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            recordingChange(db.id,
+                    DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                    Constant.DB_ADD)
+        }
+
+
     }
 
-    fun saveSwitch(dbSwitch: DbSwitch?, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbSwitchDao.insert(dbSwitch)
-        } else {
-            DaoSessionInstance.getInstance().dbSwitchDao.save(dbSwitch)
+    fun saveSwitch(db: DbSwitch, isFromServer: Boolean) {
+        val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        if (existList.size > 0) {
+            //如果该mesh地址的数据已经存在，就直接修改
+
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbSwitchDao.insertOrReplace(db)
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            recordingChange(db.id,
+                    DaoSessionInstance.getInstance().dbSwitchDao.tablename,
+                    Constant.DB_ADD)
+
         }
     }
 
-    fun saveCurtain(curtain: DbCurtain, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbCurtainDao.insert(curtain)
-        } else {
-            //保存灯之前先把所有的灯都分配到当前的所有组去
-            val dbGroup = groupNull
-            curtain.belongGroupId = dbGroup?.id
+    fun saveCurtain(db: DbCurtain, isFromServer: Boolean) {
+        val existList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        if (existList.size > 0) {
+            //如果该mesh地址的数据已经存在，就直接修改
 
-            DaoSessionInstance.getInstance().dbCurtainDao.save(curtain)
-            recordingChange(curtain.id,
+            db.id = existList[0].id
+        }
+
+        DaoSessionInstance.getInstance().dbCurtainDao.insertOrReplace(db)
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            recordingChange(db.id,
                     DaoSessionInstance.getInstance().dbCurtainDao.tablename,
                     Constant.DB_ADD)
         }
+
     }
 
-    fun saveConnector(connector: DbConnector, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbConnectorDao.insert(connector)
-        } else {
-            //保存灯之前先把所有的灯都分配到当前的所有组去
-            val dbGroup = groupNull
-            connector.belongGroupId = dbGroup?.id
+    fun saveConnector(db: DbConnector, isFromServer: Boolean = false) {
 
-            DaoSessionInstance.getInstance().dbConnectorDao.save(connector)
-            recordingChange(connector.id,
+        val existList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder().where(DbConnectorDao.Properties.MeshAddr.eq(db.meshAddr)).list()
+        if (existList.size > 0) {
+            //如果该mesh地址的数据已经存在，就直接修改已存在的数据
+            db.id = existList[0].id
+        }
+        DaoSessionInstance.getInstance().dbConnectorDao.insertOrReplace(db)
+
+        //不是从服务器下载下来的，才需要把变化写入数据变化表
+        if (!isFromServer) {
+            recordingChange(db.id,
                     DaoSessionInstance.getInstance().dbConnectorDao.tablename,
                     Constant.DB_ADD)
         }
     }
 
     fun oldToNewSaveLight(light: DbLight) {
-        DaoSessionInstance.getInstance().dbLightDao.save(light)
+        DaoSessionInstance.getInstance().dbLightDao.insertOrReplace(light)
         recordingChange(light.id,
                 DaoSessionInstance.getInstance().dbLightDao.tablename,
                 Constant.DB_ADD)
@@ -774,7 +803,7 @@ object DBUtils {
         actions.deviceType = sceneActions.deviceType
         actions.isOn = sceneActions.isOn
 
-        DaoSessionInstance.getInstance().dbSceneActionsDao.save(actions)
+        DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(actions)
     }
 
     fun saveColorNodes(colorNode: DbColorNode, id: Long?,
@@ -787,7 +816,7 @@ object DBUtils {
         colorNodeNew.colorTemperature = colorNode.colorTemperature
         colorNodeNew.rgbw = colorNode.rgbw
 
-        DaoSessionInstance.getInstance().dbColorNodeDao.save(colorNodeNew)
+        DaoSessionInstance.getInstance().dbColorNodeDao.insertOrReplace(colorNodeNew)
     }
 
     /********************************************更改 */

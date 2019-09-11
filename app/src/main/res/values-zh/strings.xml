@@ -130,7 +130,7 @@
     <string name="sure_group">确定分组</string>
     <string name="selected_lamp_tip">至少选择一个灯进行分组</string>
     <string name="select_group_tip">请至少选择一个分组</string>
-    <string name="much_lamp_tip">最高支持254个灯</string>
+    <string name="much_lamp_tip">最高支持32768个灯</string>
     <string name="restart_bluetooth">系统蓝牙出现异常，请重启手机</string>
     <string name="chear_cache">清除数据</string>
     <string name="update_ite">同步ITE</string>
@@ -151,7 +151,7 @@
     <string name="repeat_tip_name">已经有这个组名了,请修改！</string>
     <string name="successfully_modified">修改成功！</string>
     <string name="scan_lights_num">总计：当前扫描出了 %1$s 个灯</string>
-    <string name="title_scanning_lights_num">已扫到 %1$d 个灯</string>
+    <string name="title_scanned_device_num">已添加 %1$d 个设备 </string>
     <string name="title_scanned_lights_num">扫描完毕：%1$d个灯</string>
     <string name="click_double_exit">再按一次退出程序</string>
     <string name="empty_cache_title">数据清空</string>

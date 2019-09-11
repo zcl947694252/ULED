@@ -9,7 +9,6 @@ import android.widget.AbsListView
 import android.widget.BaseAdapter
 import android.widget.TextView
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.DbModel.DBUtils
 import com.dadoutek.uled.model.DbModel.DbGroup
 
 class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var mContext: Context) : BaseAdapter() {
@@ -47,7 +46,7 @@ class DeviceGroupingAdapter(private val groupsInit: List<DbGroup>, internal var 
 
         val holder: GroupItemHolder
 
-        val txtName = convertView?.findViewById<View>(R.id.txt_name) as TextView
+        val txtName = convertView?.findViewById<View>(R.id.tv_group_name) as TextView
 
         holder = GroupItemHolder()
         holder.name = txtName

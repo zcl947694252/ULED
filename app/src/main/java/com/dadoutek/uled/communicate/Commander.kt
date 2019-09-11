@@ -99,7 +99,8 @@ object Commander : EventListener<String> {
         val resendCmdTime: Int = 3
         var connectDeviceIndex: Int = 0
         val lastIndex = lightList.size - 1
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
+                ?: 0x00
         if (lightList.isNotEmpty()) {
             Thread {
                 //找到当前连接的灯的mesh地址
@@ -159,7 +160,8 @@ object Commander : EventListener<String> {
     @Synchronized
     fun resetLights(lightList: List<Int>, successCallback: () -> Unit1,
                     failedCallback: () -> Unit1) {
-        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
+        val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress
+                ?: 0x00
 
 
         var isSupportFastResetFactory: Boolean = false
@@ -253,17 +255,18 @@ object Commander : EventListener<String> {
         }
     }
 
-    fun deleteGroup(lightMeshAddr: Int, groupMeshAddr:Int,successCallback: () -> Unit1, failedCallback: () -> Unit1) {
+    fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
+        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
 
-        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)//添加泰凌葳执行监听
         mDstAddr = lightMeshAddr
-        mTargetGroupAddr = groupMeshAddr
+        mTargetGroupAddr = 0xFFFF
         mGroupSuccess = false
-        val opcode = Opcode.SET_GROUP          //0xD7 代表设置 组的指令标识符
-        val params = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte()) //0x00 代表删除组的执行参数
+        val opcode = Opcode.SET_GROUP          //0xD7 代表设置 组的指令
+//        val params = byteArrayOf(0x01, (groupMeshAddr and 0xFF).toByte(), //0x00 代表删除组
+//                (groupMeshAddr shr 8 and 0xFF).toByte())
+        val params = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte()) //0x00 代表删除组
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)//向蓝牙发送指令
-
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -425,7 +428,7 @@ object Commander : EventListener<String> {
 
     override fun performed(event: Event<String>?) {
         when (event?.type) {
-            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)//泰凌微 添加 更新 删除分组
+            NotificationEvent.GET_GROUP -> this.onGetGroupEvent(event as NotificationEvent)
             NotificationEvent.GET_DEVICE_STATE -> this.onGetLightVersion(event as NotificationEvent)
             NotificationEvent.USER_ALL_NOTIFY -> this.onKickoutEvent(event as NotificationEvent)
             MeshEvent.ERROR -> this.onMeshEvent(event as MeshEvent)
@@ -453,6 +456,7 @@ object Commander : EventListener<String> {
 
     private fun onGetGroupEvent(event: NotificationEvent) {
         val info = event.args
+
         val srcAddress = info.src
         val params = info.params
 
@@ -465,13 +469,13 @@ object Commander : EventListener<String> {
         val len = params.size
 
         for (j in 0 until len) {
-            groupAddress = (params[j].toInt() and 0xFFFF)   //最低2byte
-            //对比是不是原来的groupMeshadd
-            if (mTargetGroupAddr != 0xFFFF && groupAddress != 0xFFFF) {//oxffff地址代表广播地址 发送给所有地址
-                mGotGroupAddr = groupAddress or 0x8000
+            mGotGroupAddr = (params[j].toInt() and 0xFFFF)
+            if (mTargetGroupAddr != 0xFFFF && mGotGroupAddr != 0xFFFF) {
+                mGotGroupAddr = mGotGroupAddr or 0x8000
             }
 
             if (mTargetGroupAddr == mGotGroupAddr) {
+                LogUtils.d("mGroupSuccess = true")
                 mGroupSuccess = true
             }
         }

@@ -25,7 +25,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
     override fun convert(helper: BaseViewHolder, scene: DbLight) {
         if (scene != null) {
             val tvName = helper.getView<TextView>(R.id.name)
-            val tvLightName = helper.getView<TextView>(R.id.light_name)
+            val tvLightName = helper.getView<TextView>(R.id.tv_device_name)
             val tvRgbColor = helper.getView<TextView>(R.id.tv_rgb_color)
             tvName.text = StringUtils.getLightName(scene)
 

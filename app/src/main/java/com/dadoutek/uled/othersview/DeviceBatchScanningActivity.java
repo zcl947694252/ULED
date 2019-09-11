@@ -2,7 +2,6 @@ package com.dadoutek.uled.othersview;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -360,7 +359,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
                 ImageView icon = (ImageView) convertView
                         .findViewById(R.id.img_icon);
                 TextView txtName = (TextView) convertView
-                        .findViewById(R.id.txt_name);
+                        .findViewById(R.id.tv_group_name);
                 CheckBox selected = (CheckBox) convertView.findViewById(R.id.selected);
 
                 holder = new DeviceItemHolder();
