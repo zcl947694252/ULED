@@ -20,6 +20,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -86,7 +87,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
-                val str = intent.getStringExtra("delete")
+                val sonDeleteGroup = intent.getStringExtra("delete")
                 //  val switch = intent.getStringExtra("switch")
                 val lightStatus = intent.getStringExtra("switch_here")
                 if (key == "true") {
@@ -99,7 +100,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     }
                     refreshData()
                 }
-                if (str == "true") {
+                if (sonDeleteGroup == "true") {
                     deleteList = ArrayList()
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected)
@@ -254,6 +255,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
         }
         groupAdapter?.changeState(isDelete)
+        groupList[postion].isSelected = isDelete
         refreshData()
         return@OnItemLongClickListener true
     }
@@ -343,7 +345,8 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
 
             R.id.selected_group -> {
-                currentLight.isChecked = !currentLight.isChecked
+//                currentLight.isChecked = !currentLight.isChecked
+                groupList[position].isSelected = !groupList[position].isSelected
             }
 
             R.id.item_layout -> {
@@ -416,6 +419,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     } else {
                         //往DB里添加组数据
                         val dbGroup = DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, setGroupType())
+
                         dbGroup?.let {
                             groupList?.add(it)
                         }
@@ -492,11 +496,13 @@ abstract class BaseGroupFragment : BaseFragment() {
         localBroadcastManager.unregisterReceiver(br)
     }
 
-    fun getGroupDataList(): MutableList<DbGroup> {
+    fun getGroupDeleteList(): MutableList<DbGroup> {
         val list = mutableListOf<DbGroup>()
         for (group in groupList) {
+            LogUtils.e("zcl---单个-------------$group")
             if (group.isSelected)
                 list.add(group)
+        LogUtils.e("zcl要删除的组-----$list")
         }
         return list
     }

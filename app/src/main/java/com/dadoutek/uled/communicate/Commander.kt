@@ -264,8 +264,8 @@ object Commander : EventListener<String> {
         val opcode = Opcode.SET_GROUP          //0xD7 代表设置 组的指令
 //        val params = byteArrayOf(0x01, (groupMeshAddr and 0xFF).toByte(), //0x00 代表删除组
 //                (groupMeshAddr shr 8 and 0xFF).toByte())
-        val params = byteArrayOf(0x00, 0xFF.toByte(), //0x00 代表删除组
-                0xFF.toByte())
+        val params = byteArrayOf(0x00, 0xFF.toByte(), 0xFF.toByte()) //0x00 代表删除组
+
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())

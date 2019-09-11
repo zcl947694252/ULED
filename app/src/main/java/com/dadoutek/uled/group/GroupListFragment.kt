@@ -591,10 +591,10 @@ class GroupListFragment : BaseFragment() {
 
             R.id.img_function2 -> {
                 var deleteList:ArrayList<DbGroup> = ArrayList()
-                deleteList.addAll(cwLightFragment.getGroupData())
-                deleteList.addAll(rgbLightFragment.getGroupData())
-                deleteList.addAll(curtianFragment.getGroupData())
-                deleteList.addAll(relayFragment.getGroupData())
+                deleteList.addAll(cwLightFragment.getGroupDeleteList())
+                deleteList.addAll(rgbLightFragment.getGroupDeleteList())
+                deleteList.addAll(curtianFragment.getGroupDeleteList())
+                deleteList.addAll(relayFragment.getGroupDeleteList())
 
             /*    var listLight = DBUtils.getAllGroupsOrderByIndex()
                 if (listLight.size > 0) {
@@ -611,8 +611,7 @@ class GroupListFragment : BaseFragment() {
                                 showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")
                                 intent.putExtra("delete", "true")
-                                LocalBroadcastManager.getInstance(this!!.mContext!!)
-                                        .sendBroadcast(intent)
+                                LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
                             }
                             .setNegativeButton(R.string.btn_cancel, null)
                             .show()
@@ -737,5 +736,10 @@ class GroupListFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         localBroadcastManager.unregisterReceiver(br)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sendGroupResterNormal()
     }
 }
