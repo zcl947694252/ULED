@@ -6,7 +6,6 @@ import com.dadoutek.uled.model.DbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.polidea.rxandroidble2.RxBleClient
-import com.polidea.rxandroidble2.internal.RxBleLog
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanResult
 import com.polidea.rxandroidble2.scan.ScanSettings
@@ -25,8 +24,6 @@ import java.util.concurrent.TimeUnit
 object RecoverMeshDeviceUtil {
     private val rxBleClient: RxBleClient = RxBleClient.create(TelinkLightApplication.getApp())
 
-    private val scannedDeviceMap: TreeMap<Int, String> = TreeMap()  //扫描到的设备    key: meshAddress      value: macAddress
-    //    private val needResetMeshAddrDeviceMacList: MutableList<String> = mutableListOf()  //需要重新配置的设备的mac地址
     private val createdDeviceList: MutableList<DeviceInfo> = mutableListOf()  //需要重新配置的设备的mac地址
 
     private val SCAN_TIMEOUT_SECONDS: Long = 20
@@ -46,123 +43,104 @@ object RecoverMeshDeviceUtil {
     }
 
     fun findMeshDevice(deviceName: String): Observable<Int> {
-//        RxBleClient.setLogLevel(RxBleLog.DEBUG);
-        scannedDeviceMap.clear()
-//        needResetMeshAddrDeviceMacList.clear()
         createdDeviceList.clear()
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
         val scanSettings = ScanSettings.Builder().build()
-
-        val addressList = getAllDeviceAddressList()
 
         LogUtils.d("findMeshDevice name = $deviceName")
         return rxBleClient.scanBleDevices(scanSettings, scanFilter)
                 .observeOn(Schedulers.io())
                 .map { parseData(it) }          //解析数据
                 .filter {
-                    //                   val ret =  it.isNotEmpty() and !needResetMeshAddrDeviceMacList.contains(it)
-//                    LogUtils.d("filter = $ret mac = $it")
-//                    ret
-                    val needCreateDeviceMeshList = (createdDeviceList).map {
-                        it.meshAddress
-                    }
-                   val ret =  !addressList.contains(it.meshAddress) && !needCreateDeviceMeshList.contains(it.meshAddress)
-//                    LogUtils.d("find meshAddr = ${it.meshAddress}  addressList = $addressList  needCreateDeviceMeshList = $needCreateDeviceMeshList    ret = $ret")
-                    ret
+                    addDevicesToDb(it)   //当保存数据库成功时，才发射onNext
                 }
                 .map { deviceInfo ->
                     createdDeviceList.add(deviceInfo)
-                    createDeviceIfNotExistInDb(deviceInfo)
-                    createdDeviceList.size
+                    deviceInfo.meshAddress
 
                 }
                 .timeout(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
                     LogUtils.d("findMeshDevice name complete. size = ${createdDeviceList.size}")
                     it.onComplete()                     //如果过了指定时间，还搜不到缺少的设备，就完成
                 }
-                .takeLast(1)        //只onNext最后一次数据
                 .observeOn(AndroidSchedulers.mainThread())
 
     }
 
 
+
     /**
      * 如果该deviceInfo不存在于数据库，则创建
+     * @return true 保存成功    false，无需保存
      */
-    fun createDeviceIfNotExistInDb(deviceInfo: DeviceInfo) {
-        val addressList = getAllDeviceAddressList()
-        if (!addressList.contains(deviceInfo.meshAddress)) {
-            addDevicesToDb(deviceInfo)
-        }
-    }
-
-
-   private fun addDevicesToDb(deviceInfo: DeviceInfo) {
+    fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
         val productUUID = deviceInfo.productUUID
-       val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
-       if(!isExist){
-           when (productUUID) {
-               DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
-                   val dbLightNew = DbLight()
-                   dbLightNew.productUUID = productUUID
-                   dbLightNew.connectionStatus = 0
-                   dbLightNew.updateIcon()
-                   dbLightNew.belongGroupId = DBUtils.groupNull?.id
-                   dbLightNew.color = 0
-                   dbLightNew.colorTemperature = 0
-                   dbLightNew.meshAddr = deviceInfo.meshAddress
-                   dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
-                   dbLightNew.macAddr = deviceInfo.macAddress
-                   DBUtils.saveLight(dbLightNew, false)
-                   LogUtils.d("create meshAddress=  " + dbLightNew.meshAddr)
-               }
-               DeviceType.SMART_RELAY -> {
-                   val relay = DbConnector()
+        val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
+        if (!isExist) {
+            when (productUUID) {
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
+                    val dbLightNew = DbLight()
+                    dbLightNew.productUUID = productUUID
+                    dbLightNew.connectionStatus = 0
+                    dbLightNew.updateIcon()
+                    dbLightNew.belongGroupId = DBUtils.groupNull?.id
+                    dbLightNew.color = 0
+                    dbLightNew.colorTemperature = 0
+                    dbLightNew.meshAddr = deviceInfo.meshAddress
+                    dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    dbLightNew.macAddr = deviceInfo.macAddress
+                    DBUtils.saveLight(dbLightNew, false)
+                    LogUtils.d("create meshAddress=  " + dbLightNew.meshAddr)
+                }
+                DeviceType.SMART_RELAY -> {
+                    val relay = DbConnector()
 //                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
-                   relay.productUUID = productUUID
-                   relay.connectionStatus = 0
-                   relay.updateIcon()
-                   relay.belongGroupId = DBUtils.groupNull?.id
-                   relay.color = 0
-                   relay.meshAddr = deviceInfo.meshAddress
-                   relay.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
-                   relay.macAddr = deviceInfo.macAddress
-                   DBUtils.saveConnector(relay, false)
-                   LogUtils.d("create = $relay  " + relay.meshAddr)
-               }
+                    relay.productUUID = productUUID
+                    relay.connectionStatus = 0
+                    relay.updateIcon()
+                    relay.belongGroupId = DBUtils.groupNull?.id
+                    relay.color = 0
+                    relay.meshAddr = deviceInfo.meshAddress
+                    relay.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    relay.macAddr = deviceInfo.macAddress
+                    DBUtils.saveConnector(relay, false)
+                    LogUtils.d("create = $relay  " + relay.meshAddr)
+                }
 
-               DeviceType.SMART_CURTAIN -> {
-                   val curtain = DbCurtain()
+                DeviceType.SMART_CURTAIN -> {
+                    val curtain = DbCurtain()
 //                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
-                   curtain.productUUID = productUUID
-                   curtain.connectionStatus = 0
-                   curtain.updateIcon()
-                   curtain.belongGroupId = DBUtils.groupNull?.id
-                   curtain.meshAddr = deviceInfo.meshAddress
-                   curtain.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
-                   curtain.macAddr = deviceInfo.macAddress
-                   DBUtils.saveCurtain(curtain, false)
-                   LogUtils.d("create = $curtain  " + curtain.meshAddr)
-               }
+                    curtain.productUUID = productUUID
+                    curtain.connectionStatus = 0
+                    curtain.updateIcon()
+                    curtain.belongGroupId = DBUtils.groupNull?.id
+                    curtain.meshAddr = deviceInfo.meshAddress
+                    curtain.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    curtain.macAddr = deviceInfo.macAddress
+                    DBUtils.saveCurtain(curtain, false)
+                    LogUtils.d("create = $curtain  " + curtain.meshAddr)
+                }
 
-               DeviceType.NIGHT_LIGHT -> {
-                   val sensor = DbSensor()
+                DeviceType.NIGHT_LIGHT -> {
+                    val sensor = DbSensor()
 //                    LogUtils.d("light_mesh_2:" + (productUUID and 0xff))
-                   sensor.productUUID = productUUID
-                   sensor.belongGroupId = DBUtils.groupNull?.id
-                   sensor.meshAddr = deviceInfo.meshAddress
-                   sensor.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
-                   sensor.macAddr = deviceInfo.macAddress
-                   DBUtils.saveSensor(sensor, false)
-                   LogUtils.d("create = $sensor" + sensor.meshAddr)
-               }
+                    sensor.productUUID = productUUID
+                    sensor.belongGroupId = DBUtils.groupNull?.id
+                    sensor.meshAddr = deviceInfo.meshAddress
+                    sensor.name = TelinkLightApplication.getApp().getString(R.string.unnamed)
+                    sensor.macAddr = deviceInfo.macAddress
+                    DBUtils.saveSensor(sensor, false)
+                    LogUtils.d("create = $sensor" + sensor.meshAddr)
+                }
 
-           }
+            }
 
-       } else {
-           LogUtils.d("the device is exist!!!!!!!")
-       }
+        } else {
+            LogUtils.d("the device is exist!!!!!!!")
+        }
+
+        return !isExist
 
     }
 

@@ -186,7 +186,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 DBUtils.updateSwicth(dbSwitch)
             } else {
-                var dbSwitch: DbSwitch? = DbSwitch()
+                var dbSwitch: DbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch!!.controlSceneId = getControlScene()
                 dbSwitch!!.macAddr = mDeviceInfo.macAddress
@@ -194,8 +194,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
                 dbSwitch!!.productUUID = mDeviceInfo.productUUID
                 dbSwitch!!.index = dbSwitch.id.toInt()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-                DBUtils.recordingChange(dbSwitch!!.id,
+                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                DBUtils.recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
             }
@@ -223,7 +223,7 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         } else {
-            var dbSwitch: DbSwitch? = DbSwitch()
+            val dbSwitch: DbSwitch = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch!!.controlSceneId = getControlScene()
             dbSwitch!!.macAddr = mDeviceInfo.macAddress
@@ -231,8 +231,8 @@ class ConfigSceneSwitchActivity : TelinkBaseActivity(), EventListener<String> {
             dbSwitch!!.productUUID = mDeviceInfo.productUUID
             dbSwitch!!.index = dbSwitch.id.toInt()
             DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            DBUtils.recordingChange(dbSwitch!!.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
+            val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
         }
 
     }

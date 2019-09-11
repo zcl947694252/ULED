@@ -21,6 +21,8 @@ public class Constant implements Serializable {
     //网络请求服务器测试地址
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
 
+
+    public static final String USER_CHANNEL = "dadou";
     //单点登录key
     public static final String LOGIN_STATE_KEY = "LOGIN_STATE_KEY";
 

@@ -35,9 +35,9 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
                         .getColor(R.color.black)
 //            Log.d("setAddress", group.meshAddr.toString())
             if (group.meshAddr == 0xffff) {
-                helper.setText(R.id.txt_name, TelinkLightApplication.getApp().getString(R.string.allLight))
+                helper.setText(R.id.tv_group_name, TelinkLightApplication.getApp().getString(R.string.allLight))
             } else {
-                helper.setText(R.id.txt_name, group.name)
+                helper.setText(R.id.tv_group_name, group.name)
 //                if(OtherUtils.isCurtain(group)){
 //                    helper.setText(R.id.btn_set)
 //                }
@@ -67,7 +67,7 @@ class CurtainGroupListAdapter(layoutResId: Int, data: List<DbGroup>?, internal v
 //                helper.setVisible(R.id.btn_off,false)
 //                helper.setVisible(R.id.btn_on,false)
 //            }
-            helper.setTextColor(R.id.txt_name, group.textColor)
+            helper.setTextColor(R.id.tv_group_name, group.textColor)
 //                    .addOnClickListener(R.id.txt_name)
                     .addOnClickListener(R.id.btn_set)
                     .addOnClickListener(R.id.selected_group_curtain)

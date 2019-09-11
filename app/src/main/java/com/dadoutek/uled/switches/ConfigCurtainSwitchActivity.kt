@@ -343,7 +343,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.meshAddr = Constant.SWITCH_PIR_ADDRESS
                 DBUtils.updateSwicth(dbSwitch)
             }else{
-                var dbSwitch: DbSwitch? = DbSwitch()
+                var dbSwitch: DbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
                 dbSwitch.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
@@ -353,8 +353,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
                 dbSwitch.index = dbSwitch.id.toInt()
 
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-                recordingChange(dbSwitch!!.id,
+                val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+                recordingChange(dbSwitch.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constant.DB_ADD)
             }
@@ -381,7 +381,7 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             dbSwitch.id = switch.id
             DBUtils.updateSwicth(dbSwitch)
         }else{
-            var dbSwitch: DbSwitch? = DbSwitch()
+            var dbSwitch: DbSwitch = DbSwitch()
             DBUtils.saveSwitch(dbSwitch, false)
             dbSwitch!!.belongGroupId = mGroupArrayList.get(mAdapter.selectedPos).id
             dbSwitch.macAddr = mDeviceInfo.macAddress
@@ -390,8 +390,8 @@ class ConfigCurtainSwitchActivity : TelinkBaseActivity(), EventListener<String> 
             dbSwitch.index = dbSwitch.id.toInt()
 
             DBUtils.saveSwitch(dbSwitch, false)
-            dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-            recordingChange(dbSwitch!!.id,
+            val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            recordingChange(gotSwitchByMac?.id,
                     DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                     Constant.DB_ADD)
         }

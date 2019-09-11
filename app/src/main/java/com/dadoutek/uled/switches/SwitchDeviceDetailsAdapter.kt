@@ -13,9 +13,9 @@ class SwitchDeviceDetailsAdapter(layoutResId: Int, data: List<DbSwitch>?) : Base
         if (scene != null) {
 
             if(scene.name!=null){
-                helper.setText(R.id.light_name, scene.name)
+                helper.setText(R.id.tv_device_name, scene.name)
             }else{
-                helper.setText(R.id.light_name, TelinkLightApplication.getApp().getString(R.string.no_name))
+                helper.setText(R.id.tv_device_name, TelinkLightApplication.getApp().getString(R.string.no_name))
             }
 
             helper.setText(R.id.name, StringUtils.getSwitchPirDefaultName(scene.productUUID))

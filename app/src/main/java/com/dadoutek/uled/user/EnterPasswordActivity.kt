@@ -81,8 +81,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
         setContentView(R.layout.activity_enter_password)
         type = intent.extras!!.getString("USER_TYPE")
 
-        LogUtils.d("App id = ${ProcessUtils.getCurrentProcessName()}")
-        LogUtils.d("activity stack size = ${ActivityUtils.getActivityList()}")
         makePop()
         initViewType()
         initView()

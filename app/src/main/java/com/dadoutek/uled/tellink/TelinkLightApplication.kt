@@ -65,10 +65,10 @@ class TelinkLightApplication : TelinkApplication() {
         initStompClient()
 
         LogUtils.getConfig().setBorderSwitch(false)
-        if (!AppUtils.isAppDebug()) {
-        } else {
-            LogUtils.getConfig().setLog2FileSwitch(true)
-        }
+//        if (!AppUtils.isAppDebug()) {
+//        } else {
+//            LogUtils.getConfig().setLog2FileSwitch(true)
+//        }
         MobSDK.init(this)
     }
 

@@ -45,6 +45,7 @@ import com.dadoutek.uled.util.DataManager
 import com.dadoutek.uled.util.DialogUtils
 import com.dadoutek.uled.curtains.CurtainBatchGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
@@ -168,9 +169,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         when (v?.id) {
             R.id.light_add_device_btn -> {
                 if(DBUtils.getAllCurtains().size ==0){
-                    intent = Intent(this, CurtainScanningNewActivity::class.java)
-                    intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                    intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+                    intent = Intent(this, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                     startActivityForResult(intent, 0)
                 }else{
                     addDevice()

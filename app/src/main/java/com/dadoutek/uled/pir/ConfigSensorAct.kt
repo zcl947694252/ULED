@@ -285,27 +285,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
     }
 
-    private fun saveSensor() {
-        var dbSensor: DbSensor? = DbSensor()
-        DBUtils.saveSensor(dbSensor, false)
-        dbSensor!!.controlGroupAddr = getControlGroup()
-        dbSensor.index = dbSensor.id.toInt()
-        dbSensor.macAddr = mDeviceInfo.macAddress
-        dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
-        dbSensor.productUUID = mDeviceInfo.productUUID
-        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
-        DBUtils.saveSensor(dbSensor, false)
-
-        dbSensor = DBUtils.getSensorByMacAddr(mDeviceInfo.macAddress)
-        recordingChange(dbSensor!!.id,
-                DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constant.DB_ADD)
-    }
-
-    private fun getControlGroup(): String? {
-        return mSelectGroupAddr.toString()
-    }
-
     override fun onBackPressed() {
         doFinish()
     }
@@ -337,8 +316,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                                 successCallback = {
                                     hideLoadingDialog()
                                     configureComplete()
-                                     TelinkLightService.Instance().idleMode(true)
-                                                         TelinkLightService.Instance().disconnect()
+                                    TelinkLightService.Instance().idleMode(true)
+                                    TelinkLightService.Instance().disconnect()
                                 },
                                 failedCallback = {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))

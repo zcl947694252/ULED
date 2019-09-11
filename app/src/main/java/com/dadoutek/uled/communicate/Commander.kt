@@ -456,7 +456,6 @@ object Commander : EventListener<String> {
 
     private fun onGetGroupEvent(event: NotificationEvent) {
         val info = event.args
-//        LogUtils.d("onGetGroupEvent info = $info ")
 
         val srcAddress = info.src
         val params = info.params
@@ -470,12 +469,13 @@ object Commander : EventListener<String> {
         val len = params.size
 
         for (j in 0 until len) {
-            groupAddress = (params[j].toInt() and 0xFFFF)
-            if (mTargetGroupAddr != 0xFFFF && groupAddress != 0xFFFF) {
-                mGotGroupAddr = groupAddress or 0x8000
+            mGotGroupAddr = (params[j].toInt() and 0xFFFF)
+            if (mTargetGroupAddr != 0xFFFF && mGotGroupAddr != 0xFFFF) {
+                mGotGroupAddr = mGotGroupAddr or 0x8000
             }
 
             if (mTargetGroupAddr == mGotGroupAddr) {
+                LogUtils.d("mGroupSuccess = true")
                 mGroupSuccess = true
             }
         }

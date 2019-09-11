@@ -479,7 +479,7 @@ class GroupListFragment : BaseFragment() {
                             intent.putExtra("group", group)
                             startActivityForResult(intent, 2)
                         }
-                        R.id.txt_name -> {
+                        R.id.tv_group_name -> {
                             if (group.meshAddr != 0xffff) {
                                 if (group.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
                                     intent = Intent(mContext, CurtainOfGroupActivity::class.java)
