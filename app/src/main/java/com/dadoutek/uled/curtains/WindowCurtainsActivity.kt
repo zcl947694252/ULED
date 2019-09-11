@@ -892,7 +892,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), EventListener<String>, View
                 if (retryCount <= maxRetryCount) {
                     val light = lights[0]
                     val lightMeshAddr = light.meshAddr
-                    Commander.deleteGroup(lightMeshAddr,
+                    Commander.deleteGroup(lightMeshAddr,group.meshAddr,
                             successCallback = {
                                 light.belongGroupId = DBUtils.groupNull!!.id
                                 DBUtils.updateCurtain(light)

@@ -120,7 +120,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 failedCallback = {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(R.string.move_out_some_lights_in_group_failed)
-                                    sendDeleteBrocastRecevicer(0)
+                                    //sendDeleteBrocastRecevicer(0)
                                 })
                     }
                     Log.e("TAG_DELETE", deleteList.size.toString())
@@ -444,7 +444,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 if (retryCount <= maxRetryCount) {
                     val light = lights[0]
                     val lightMeshAddr = light.meshAddr
-                    Commander.deleteGroup(lightMeshAddr,
+                    Commander.deleteGroup(lightMeshAddr,group.meshAddr,
                             successCallback = {
                                 light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
                                 DBUtils.updateLight(light)
