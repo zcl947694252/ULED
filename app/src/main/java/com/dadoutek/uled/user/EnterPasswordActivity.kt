@@ -63,7 +63,6 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private var pop: PopupWindow? = null
     private var popRecycle: RecyclerView? = null
     private var popRecycleAuthorize: RecyclerView? = null
-    private var popTitle: TextView? = null
     private var loadDialog: Dialog? = null
     private var mWakeLock: PowerManager.WakeLock? = null
     private var phone: String? = null
@@ -220,7 +219,7 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
                             SharedPreferencesHelper.putString(this@EnterPasswordActivity, Constant.LOGIN_STATE_KEY, dbUser.login_state_key)
                             DBUtils.deleteLocalData()
                             //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                            SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
+                           SyncDataPutOrGetUtils.syncGetDataStart(dbUser, syncCallback)
                             SharedPreferencesUtils.setUserLogin(true)
                         }
 

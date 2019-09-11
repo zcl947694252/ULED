@@ -91,7 +91,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.Observable;
@@ -99,7 +98,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 import static com.dadoutek.uled.model.Constant.VENDOR_ID;
 
@@ -107,29 +105,16 @@ import static com.dadoutek.uled.model.Constant.VENDOR_ID;
  * Created by hejiajun on 2018/5/21.
  */
 
-public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
-        implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
-    @BindView(R.id.toolbar)
+public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity implements AdapterView.OnItemClickListener, EventListener<String>, Toolbar.OnMenuItemClickListener {
     Toolbar toolbar;
-    @BindView(R.id.recycler_view_groups)
     RecyclerView recyclerViewGroups;
-    @BindView(R.id.add_group_layout)
     LinearLayout addGroupLayout;
-    @BindView(R.id.groups_bottom)
     LinearLayout groupsBottom;
-    @BindView(R.id.list_devices)
-    GridView listDevices;
-
-    @BindView(R.id.btn_add_groups)
+    GridView deviceListView;
     Button btnAddGroups;
-    @BindView(R.id.add_group_relativeLayout)
     RelativeLayout add_relativeLayout;
-    @BindView(R.id.add_group)
     RelativeLayout add_group;
-    @BindView(R.id.lottieAnimationView)
     LottieAnimationView animationView;
-    @BindView(R.id.scanPb)
-    MaterialProgressBar scanPb;
 
     private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
@@ -148,22 +133,14 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     boolean isFirtst = true;
     //标记登录状态
     private boolean isLoginSuccess = false;
-    private GridView deviceListView;
-
     private GroupsRecyclerViewAdapter groupsRecyclerViewAdapter;
     private List<DbGroup> groups;
-
     private Disposable mTimer;
     private int mRetryCount = 0;
-
     //当前所选组index
     private int currentGroupIndex = -1;
-
     private List<DbConnector> updateList;
-
     private ArrayList<Integer> indexList = new ArrayList<>();
-
-
     //灯的mesh地址
     private Disposable mConnectTimer;
     private SparseArray<Disposable> mBlinkDisposables = new SparseArray<>();
@@ -178,6 +155,59 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private MeshAddressGenerator mMeshAddressGenerator;
     private Button btn_stop_scan;
     private TextView scanning_num;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mRxPermission = new RxPermissions(this);
+        //设置屏幕常亮
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setContentView(R.layout.activity_device_scanning);
+        ButterKnife.bind(this);
+        initData();
+        initView();
+        startScan(0);
+    }
+
+
+    private void initView() {
+        //监听事件
+        this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
+        this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
+        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
+        this.mApplication.addEventListener(MeshEvent.UPDATE_COMPLETED, this);
+        this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
+        this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
+        this.inflater = this.getLayoutInflater();
+        this.adapter = new DeviceListAdapter();
+
+        toolbar = findViewById(R.id.toolbar);
+        initToolbar();
+
+        recyclerViewGroups = findViewById(R.id.recycler_view_groups);
+        addGroupLayout = findViewById(R.id.add_group_layout);
+        groupsBottom = findViewById(R.id.groups_bottom);
+        deviceListView = findViewById(R.id.list_devices);
+        btnAddGroups = findViewById(R.id.btn_add_groups);
+        add_relativeLayout = findViewById(R.id.add_group_relativeLayout);
+        animationView = findViewById(R.id.lottieAnimationView);
+        add_group = findViewById(R.id.add_group);
+        btn_stop_scan = findViewById(R.id.btn_stop_scan);
+        scanning_num = findViewById(R.id.scanning_num);
+
+        deviceListView.setAdapter(adapter);
+        this.updateList = new ArrayList<>();
+
+        btnAddGroups.setVisibility(View.GONE);
+
+        toolbar.findViewById(R.id.tv_function1).setVisibility(View.GONE);
+
+        btn_stop_scan.setOnClickListener(onClick);
+        add_relativeLayout.setOnClickListener(v -> {
+            addNewGroup();
+        });
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -312,7 +342,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
 
     private void stopTimer() {
         if (mTimer != null && !mTimer.isDisposed()) {
-//            Log.d("ScanningTest", "cancel timer");
             mTimer.dispose();
         }
     }
@@ -321,7 +350,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private Disposable createConnectTimeout() {
         return Observable.timer(15, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
-//                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();
                     TelinkLightService.Instance().idleMode(true);
                     mConnectTimer = null;
@@ -372,7 +400,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         if (updateList != null && updateList.size() > 0) {
             checkNetworkAndSync();
         }
-//        TelinkLightService.Instance().idleMode(true);
         this.mApplication.removeEventListener(this);
         this.updateList = null;
         mDisposable.dispose();  //销毁时取消订阅.
@@ -547,7 +574,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
         if (grouping) {
             for (int i = 0; i < getCurrentSelectLights().size(); i++) {
                 //让选中的灯停下来别再发闪的命令了。
@@ -557,8 +583,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         } else {
             new AlertDialog.Builder(this)
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-//                        startActivity(new Intent(DeviceScanningNewActivity.this, MainActivity.class));
-//                        finish();
                         doFinish();
                     })
                     .setNegativeButton(R.string.btn_cancel, ((dialog, which) -> {
@@ -576,8 +600,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                 arrayList.add(nowLightList.get(i));
                 indexList.add(i);
             } else if (nowLightList.get(i).selected && nowLightList.get(i).hasGroup) {
-                //如果所选灯已有分组，清空后再继续添加到新的分组
-//                nowLightList.get(i).belongGroups.clear();
                 arrayList.add(nowLightList.get(i));
                 indexList.add(i);
             }
@@ -643,28 +665,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     };
 
     private void showGroupForUpdateNameDialog(int position) {
-//        val textGp = EditText(activity)
-//        StringUtils.initEditTextFilter(textGp)
-//        textGp.setText(DBUtils.getDefaultNewGroupName())
-//        //设置光标默认在最后
-//        textGp.setSelection(textGp.getText().toString().length)
-//        AlertDialog.Builder(activity)
-//                .setTitle(R.string.create_new_group)
-//                .setIcon(android.R.drawable.ic_dialog_info)
-//                .setView(textGp)
-//
-//                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-//            // 获取输入框的内容
-//            if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-//                ToastUtils.showShort(getString(R.string.rename_tip_check))
-//            } else {
-//                //往DB里添加组数据
-//                DBUtils.addNewGroup(textGp.text.toString().trim { it <= ' ' }, DBUtils.groupList, activity!!)
-//                refreshView()
-//                dialog.dismiss()
-//            }
-//        }
-//                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
         EditText textGp = new EditText(this);
         StringUtils.initEditTextFilter(textGp);
         textGp.setText(groups.get(position).getName());
@@ -773,7 +773,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         add_relativeLayout.setVisibility(View.GONE);
         add_group.setVisibility(View.VISIBLE);
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
-        groupsRecyclerViewAdapter.notifyDataSetChanged();
+        //groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex);
     }
@@ -852,19 +852,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mRxPermission = new RxPermissions(this);
-        //设置屏幕常亮
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_device_scanning);
-        ButterKnife.bind(this);
-        initData();
-        initView();
-        startScan(0);
-    }
 
     public void lazyLoad() {
         guideStep1();
@@ -904,11 +891,11 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private void guideStep3() {
         guideShowCurrentPage = !GuideUtils.INSTANCE.getCurrentViewIsEnd(this, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), false);
         if (guideShowCurrentPage) {
-            View guide3 = listDevices.getChildAt(0);
+            View guide3 = deviceListView.getChildAt(0);
             GuideUtils.INSTANCE.guideBuilder(this, GuideUtils.INSTANCE.getSTEP5_GUIDE_SELECT_SOME_LIGHT())
                     .addGuidePage(GuideUtils.INSTANCE.addGuidePage(guide3, R.layout.view_guide_scan2, getString(R.string.scan_light_guide_3)
                             , v -> {
-                                listDevices.performItemClick(guide3, 0, listDevices.getItemIdAtPosition(0));
+                                deviceListView.performItemClick(guide3, 0, deviceListView.getItemIdAtPosition(0));
                                 guideStep4();
                             }, GuideUtils.INSTANCE.getEND_INSTALL_LIGHT_KEY(), this))
                     .show();
@@ -929,42 +916,6 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
         }
     }
 
-
-    private void initView() {
-        initToolbar();
-        //监听事件
-        this.mApplication.addEventListener(LeScanEvent.LE_SCAN, this);
-        this.mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
-        this.mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this);
-        this.mApplication.addEventListener(MeshEvent.UPDATE_COMPLETED, this);
-        this.mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this);
-        this.mApplication.addEventListener(NotificationEvent.GET_GROUP, this);
-        this.inflater = this.getLayoutInflater();
-        this.adapter = new DeviceListAdapter();
-
-        groupsBottom = findViewById(R.id.groups_bottom);
-        animationView = findViewById(R.id.lottieAnimationView);
-        recyclerViewGroups = findViewById(R.id.recycler_view_groups);
-        btn_stop_scan = findViewById(R.id.btn_stop_scan);
-        scanning_num = findViewById(R.id.scanning_num);
-
-        this.btnAddGroups = findViewById(R.id.btn_add_groups);
-        this.add_group = (RelativeLayout) this.findViewById(R.id.add_group);
-        this.add_relativeLayout = (RelativeLayout) this.findViewById(R.id.add_group_relativeLayout);
-
-        deviceListView = this.findViewById(R.id.list_devices);
-        deviceListView.setAdapter(this.adapter);
-        this.updateList = new ArrayList<>();
-
-        btnAddGroups.setVisibility(View.GONE);
-
-        toolbar.findViewById(R.id.tv_function1).setVisibility(View.GONE);
-
-        btn_stop_scan.setOnClickListener(onClick);
-        add_relativeLayout.setOnClickListener(v -> {
-            addNewGroup();
-        });
-    }
 
     private View.OnClickListener onClick = v -> {
         animationView.cancelAnimation();
@@ -1291,8 +1242,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
     private void onLeScanTimeout() {
         btn_stop_scan.setVisibility(View.GONE);
         scanning_num.setVisibility(View.GONE);
-        scanPb.setVisibility(View.GONE);
-        listDevices.setVisibility(View.VISIBLE);
+        deviceListView.setVisibility(View.VISIBLE);
         LeBluetooth.getInstance().stopScan();
         animationView.cancelAnimation();
         animationView.setVisibility(View.GONE);
@@ -1316,11 +1266,8 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         startTimer();
                         animationView.playAnimation();
                         animationView.setVisibility(View.VISIBLE);
-                        if (grouping) {
-//                            Toast.makeText(this, "Grouping", Toast.LENGTH_SHORT).show();
-                            //("Grouping");
+                        if (grouping)
                             return;
-                        }
                         handleIfSupportBle();
                         TelinkLightService.Instance().idleMode(true);
                         if (mApplication.isEmptyMesh()) {
@@ -1460,7 +1407,7 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
             light.setSelected(false);
             this.adapter.add(light);
             this.adapter.notifyDataSetChanged();
-            this.listDevices.smoothScrollToPosition(adapter.getCount() - 1);
+            this.deviceListView.smoothScrollToPosition(adapter.getCount() - 1);
         }
     }
 
@@ -1490,15 +1437,12 @@ public class ScanningConnectorActivity extends TelinkMeshErrorDealActivity
                         bestRssiDevice = deviceInfo;
                     }
                 }
-//                Log.d(TAG, "onDeviceStatusChanged: " + deviceInfo1.macAddress + "-----" + deviceInfo1.meshAddress);
-
                 new Thread(() -> ScanningConnectorActivity.this.mApplication.getMesh().saveOrUpdate(ScanningConnectorActivity.this)).start();
 
                 if (scanCURTAIN) {
                     if (checkIsCurtain(deviceInfo1.productUUID) && deviceInfo1.productUUID == DeviceType.SMART_RELAY) {
                         addDevice(deviceInfo);
                     }
-                } else {
                 }
 
                 //扫描出灯就设置为非首次进入

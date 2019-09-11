@@ -85,10 +85,10 @@ open class BaseFragment : Fragment() {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
                         var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
                         dialog.show()
-                    })
+                    }
                 }else{
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
@@ -101,9 +101,7 @@ open class BaseFragment : Fragment() {
     inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-            when (action) {
+            when (intent.action) {
                 BluetoothDevice.ACTION_ACL_CONNECTED -> {
                     if (toolbar != null) {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
@@ -121,8 +119,7 @@ open class BaseFragment : Fragment() {
                     }
                 }
                 BluetoothAdapter.ACTION_STATE_CHANGED -> {
-                    val blueState = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)
-                    when (blueState) {
+                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                         BluetoothAdapter.STATE_OFF -> {
                             if (toolbar != null) {
                                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)

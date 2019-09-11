@@ -32,7 +32,7 @@ public class NetworkFactory {
                 .readTimeout(3, TimeUnit.SECONDS)
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS) //设置连接超时 30秒
                 .writeTimeout(3, TimeUnit.MINUTES)
-              .addInterceptor(new CommonParamsInterceptor()).retryOnConnectionFailure(true);
+                .addInterceptor(new CommonParamsInterceptor()).retryOnConnectionFailure(true);
 
         if (BuildConfig.DEBUG)
             okHttpBuilder.addInterceptor(logging);
@@ -45,7 +45,7 @@ public class NetworkFactory {
         if (okHttpClient == null) {
             okHttpClient = initHttpClient();
         }
-        if (null ==api) {
+        if (null == api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
                     //.baseUrl(Constant.BASE_URL)

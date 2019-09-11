@@ -190,7 +190,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     })
         } else {
             ToastUtils.showLong(R.string.device_not_connected)
-            dstAdress = 0
         }
     }
 

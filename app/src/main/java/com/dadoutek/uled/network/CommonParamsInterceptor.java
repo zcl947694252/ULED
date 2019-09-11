@@ -56,6 +56,8 @@ public class CommonParamsInterceptor implements Interceptor {
         if (user != null) {
             if ("".equals(user.getControlMeshName()) || user.getControlMeshName() == null)
                 user.setControlMeshName(user.getAccount());
+            if ("".equals(user.getLast_authorizer_user_id())||null==user.getLast_authorizer_user_id())
+                user.setLast_authorizer_user_id(user.getId().toString());
             DBUtils.INSTANCE.saveUser(user);
         }
 

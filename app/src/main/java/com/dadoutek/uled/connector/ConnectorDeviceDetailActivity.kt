@@ -150,17 +150,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
     private fun initView() {
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
-//        this.mApplication?.addEventListener(NotificationEvent.ONLINE_STATUS, this)
         this.mApplication?.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-        val layoutmanager = LinearLayoutManager(this)
-        recycleView!!.layoutManager = GridLayoutManager(this, 3) as RecyclerView.LayoutManager?
-//        val decoration = DividerItemDecoration(this!!,
-//                DividerItemDecoration
-//                        .VERTICAL)
-//        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this!!, R.color
-//                .divider)))
-//        rvDevice!!.addItemDecoration(decoration)
-        //添加Item变化动画
+        recycleView!!.layoutManager = GridLayoutManager(this, 3)
         recycleView!!.itemAnimator = DefaultItemAnimator()
         adaper = DeviceDetailConnectorAdapter(R.layout.device_detail_adapter, lightsData)
         adaper!!.onItemChildClickListener = onItemChildClickListener
@@ -186,11 +177,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
     }
 
     private val onClick = View.OnClickListener {
-        var intent: Intent? = null
-        //点击任何一个选项跳转页面都隐藏引导
-//        val controller=guide2()
-//            controller?.remove()
-//        hidePopupMenu()
         when (it.id) {
             R.id.install_device -> {
                 showInstallDeviceList()
@@ -239,7 +225,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
-//                        callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
                 }
@@ -248,7 +233,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
 
     private fun showInstallDeviceList() {
         dialog_relay.visibility=View.GONE
-//        callbackLinkMainActAndFragment?.showDeviceListDialog(isGuide,isRgbClick)
         showInstallDeviceList(isGuide,isRgbClick)
     }
 
@@ -374,11 +358,6 @@ class ConnectorDeviceDetailActivity : TelinkBaseActivity(), EventListener<String
         installDialog?.setOnShowListener {
 
         }
-
-        if(isGuide){
-//            installDialog?.setCancelable(false)
-        }
-
         installDialog?.show()
     }
 

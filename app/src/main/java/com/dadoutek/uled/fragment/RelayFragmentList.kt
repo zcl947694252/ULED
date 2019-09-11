@@ -1,55 +1,25 @@
 package com.dadoutek.uled.fragment
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.connector.ConnectorOfGroupActivity
-import com.dadoutek.uled.connector.ConnectorSettingActivity
-import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbConnector
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.othersview.BaseFragment
-import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
-import com.telink.bluetooth.light.ConnectionStatus
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.support.v4.runOnUiThread
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
+import com.dadoutek.uled.model.DeviceType
 
-class RelayFragmentList : BaseFragment() {
+class RelayFragmentList : BaseGroupFragment() {
+    override fun setIntentDeviceType(): String? {
+        return "relay_light"
+    }
 
-    private var inflater: LayoutInflater? = null
+    override fun setGroupType(): Long {
+        return Constant.DEVICE_TYPE_CONNECTOR
+    }
+
+    override fun getGroupData(): Collection<DbGroup> {
+        val list = mutableListOf<DbGroup>()
+        list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.SMART_RELAY))
+        return list
+    }
+   /* private var inflater: LayoutInflater? = null
 
     private var recyclerView: RecyclerView? = null
 
@@ -253,7 +223,7 @@ class RelayFragmentList : BaseFragment() {
 
         val intent = Intent("switch_fragment")
         intent.putExtra("switch_fragment", "true")
-        LocalBroadcastManager.getInstance(this!!.mContext!!)
+        LocalBroadcastManager.getInstance(this.mContext!!)
                 .sendBroadcast(intent)
 
         addGroupBtn?.setOnClickListener(onClick)
@@ -391,7 +361,7 @@ class RelayFragmentList : BaseFragment() {
 //        }
     }
 
-/*
+*//*
     private fun checkConnect() {
         try {
             if (TelinkLightApplication.getApp().connectDevice == null) {
@@ -405,7 +375,7 @@ class RelayFragmentList : BaseFragment() {
             e.printStackTrace()
         }
     }
-*/
+*//*
 
     override fun onStop() {
         super.onStop()
@@ -572,9 +542,9 @@ class RelayFragmentList : BaseFragment() {
         }
     }
 
-    /**
+    *//**
      * 删除组，并且把组里的灯的组也都删除。
-     */
+     *//*
     private fun deleteGroup(lights: MutableList<DbConnector>, group: DbGroup, retryCount: Int = 0,
                             successCallback: () -> Unit, failedCallback: () -> Unit) {
         Thread {
@@ -635,5 +605,5 @@ class RelayFragmentList : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         localBroadcastManager.unregisterReceiver(br)
-    }
+    }*/
 }

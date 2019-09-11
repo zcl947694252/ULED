@@ -112,49 +112,32 @@ class GroupListFragment : BaseFragment() {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
         setHasOptionsMenu(true)
-        localBroadcastManager = LocalBroadcastManager
-                .getInstance(this.mContext!!)
+        localBroadcastManager = LocalBroadcastManager.getInstance(mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("showPro")
         intentFilter.addAction("switch_fragment")
         intentFilter.addAction("isDelete")
         intentFilter.addAction("delete_true")
-        br = object : BroadcastReceiver() {
 
+        br = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                cwLightGroup = intent.getStringExtra("is_delete")
+                cwLightGroup = intent.getStringExtra("is_delete")//用户删除模式 长按和长按
                 switchFragment = intent.getStringExtra("switch_fragment")
-                delete = intent.getStringExtra("isDelete")
+                delete = intent.getStringExtra("isDelete")//必定将删除模式恢复掉
                 deleteComplete = intent.getStringExtra("delete_true")
                 if (cwLightGroup == "true") {
-                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.VISIBLE
                     toolbar!!.title = ""
                     changeEnableBackToolbar()
                 } else {
-                    restoreNormalToolbar()
+                    setBluetoothAndAddVisableDeleteGone()
                 }
-                if (switchFragment == "true") {
-                    toolbar!!.setTitle(R.string.group_title)
-                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-                    toolbar!!.navigationIcon = null
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+                if (switchFragment == "true"||delete == "true") {
+                    setBluetoothAndAddVisableDeleteGone()
+                    sendGroupResterNormal()
                 }
-                if (delete == "true") {
-                    toolbar!!.setTitle(R.string.group_title)
-                    toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
-                    toolbar!!.navigationIcon = null
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
-                    toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
-                    SharedPreferencesUtils.setDelete(false)
-                    val intent = Intent("back")
-                    intent.putExtra("back", "true")
-                    LocalBroadcastManager.getInstance(context)
-                            .sendBroadcast(intent)
-                }
-
                 if (deleteComplete == "true") {
                     hideLoadingDialog()
                 }
@@ -163,23 +146,25 @@ class GroupListFragment : BaseFragment() {
         localBroadcastManager.registerReceiver(br, intentFilter)
     }
 
-    private fun restoreNormalToolbar() {
-        val intent = Intent("back")
-        intent.putExtra("back", "true")
-        LocalBroadcastManager.getInstance(this!!.mContext!!)
-                .sendBroadcast(intent)
+    private fun setBluetoothAndAddVisableDeleteGone() {
         toolbar!!.setTitle(R.string.group_title)
-        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.navigationIcon = null
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE//删除
         SharedPreferencesUtils.setDelete(false)
+    }
+
+    private fun sendGroupResterNormal() {
+        val intent = Intent("back")
+        intent.putExtra("back", "true")
+        LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
     }
 
     private fun changeEnableBackToolbar() {
         toolbar!!.setNavigationIcon(R.drawable.navigation_back_white)
         toolbar!!.setNavigationOnClickListener {
-            restoreNormalToolbar()
+            sendGroupResterNormal()
         }
     }
 
@@ -330,6 +315,22 @@ class GroupListFragment : BaseFragment() {
         viewPager?.currentItem = fragmentPosition
 
         viewPager?.offscreenPageLimit = 3
+        viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrolled(i: Int, v: Float, i1: Int) {
+
+            }
+
+            override fun onPageSelected(i: Int) {
+                val intent = Intent("back")
+                intent.putExtra("back", "true")
+                LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
+            }
+
+            override fun onPageScrollStateChanged(i: Int) {
+
+            }
+        })
+        viewPager
         bnve.setTextSize(16f)
         bnve.setIconVisibility(false)
         bnve.enableAnimation(false)
@@ -446,8 +447,6 @@ class GroupListFragment : BaseFragment() {
                     }
                 }
             }
-
-//            initDeviceTypeNavigation()
         }
     }
 
@@ -502,12 +501,8 @@ class GroupListFragment : BaseFragment() {
                             } else if (group.deviceType == Constant.DEVICE_TYPE_NO) {
                                 Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
                             }
-
-//                        ActivityUtils.startActivityForResult(intent)
                         }
-//                    R.id.add_group -> {
-//                        addNewGroup()
-//                    }
+
                     }
                 }
             }
@@ -601,9 +596,7 @@ class GroupListFragment : BaseFragment() {
             }
 
             R.id.img_function2 -> {
-                var deleteList: ArrayList<DbGroup>? = null
-                deleteList = ArrayList()
-
+                var deleteList:ArrayList<DbGroup> = ArrayList()
                 var listLight = DBUtils.getAllGroupsOrderByIndex()
 
                 if (listLight.size > 0) {

@@ -369,6 +369,8 @@ class SyncDataPutOrGetUtils {
                         } else {
                             setupMeshCreat(accountNow)
                         }
+
+
                         NetworkFactory.getApi()
                                 .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
                                 .compose(NetworkTransformer())

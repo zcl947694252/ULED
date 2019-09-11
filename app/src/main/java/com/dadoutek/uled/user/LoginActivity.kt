@@ -439,7 +439,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
 
         if (!StringUtils.isTrimEmpty(phone)) {
-            LogUtils.d("val intent = Intent(this, EnterPasswordActivity::class.java)")
             val intent = Intent(this, EnterPasswordActivity::class.java)
             intent.putExtra("USER_TYPE", Constant.TYPE_LOGIN)
             intent.putExtra("phone", phone)

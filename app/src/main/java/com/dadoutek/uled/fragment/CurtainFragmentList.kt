@@ -1,56 +1,26 @@
 package com.dadoutek.uled.fragment
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.dadoutek.uled.R
-import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.curtain.CurtainOfGroupActivity
-import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DbCurtain
 import com.dadoutek.uled.model.DbModel.DbGroup
-import com.dadoutek.uled.model.DbModel.DbLight
-import com.dadoutek.uled.model.Opcode
-import com.dadoutek.uled.othersview.BaseFragment
-import com.dadoutek.uled.othersview.MainActivity
-import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.curtains.WindowCurtainsActivity
-import com.telink.bluetooth.light.ConnectionStatus
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
-import org.jetbrains.anko.support.v4.runOnUiThread
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
+import com.dadoutek.uled.model.DeviceType
 
-class CurtainFragmentList : BaseFragment() {
+class CurtainFragmentList : BaseGroupFragment() {
 
-    private var inflater: LayoutInflater? = null
+    override fun setIntentDeviceType(): String? {
+        return "curtain_light"
+    }
+    override fun setGroupType(): Long {
+        return Constant.DEVICE_TYPE_CURTAIN
+    }
+
+    override fun getGroupData(): Collection<DbGroup> {
+        val list = mutableListOf<DbGroup>()
+        list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN))
+        return list
+    }
+
+ /*   private var inflater: LayoutInflater? = null
 
     private var recyclerView: RecyclerView? = null
 
@@ -94,14 +64,12 @@ class CurtainFragmentList : BaseFragment() {
         super.onCreate(savedInstanceState)
         this.mContext = this.activity
         setHasOptionsMenu(true)
-        localBroadcastManager = LocalBroadcastManager
-                .getInstance(this!!.mContext!!)
+        localBroadcastManager = LocalBroadcastManager.getInstance(this.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
         intentFilter.addAction("switch")
         br = object : BroadcastReceiver() {
-
             override fun onReceive(context: Context, intent: Intent) {
                 val key = intent.getStringExtra("back")
                 val str = intent.getStringExtra("delete")
@@ -119,7 +87,6 @@ class CurtainFragmentList : BaseFragment() {
                 }
                 if (str == "true") {
                     deleteList = ArrayList()
-//                    Log.e("TAG_delete","删除")
                     for (i in groupList.indices) {
                         if (groupList[i].isSelected) {
                             deleteList.add(groupList[i])
@@ -194,13 +161,10 @@ class CurtainFragmentList : BaseFragment() {
     override fun onResume() {
         super.onResume()
         isFristUserClickCheckConnect = true
-//        refreshView()
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         if (isVisibleToUser) {
-            val act = activity as MainActivity?
-//            act?.addEventListeners()
             isDeleteTrue = true
             isLong = true
             refreshView()
@@ -238,8 +202,7 @@ class CurtainFragmentList : BaseFragment() {
 
         val intent = Intent("switch_fragment")
         intent.putExtra("switch_fragment", "true")
-        LocalBroadcastManager.getInstance(this!!.mContext!!)
-                .sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
 
         addGroupBtn?.setOnClickListener(onClick)
         addNewGroup?.setOnClickListener(onClick)
@@ -261,13 +224,13 @@ class CurtainFragmentList : BaseFragment() {
         //添加分割线
         recyclerView?.addItemDecoration(decoration)
         var lin = LayoutInflater.from(activity).inflate(R.layout.add_group, null)
-        lin.setOnClickListener(View.OnClickListener {
+        lin.setOnClickListener {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
             } else {
                 addNewGroup()
             }
-        })
+        }
         groupAdapter!!.addFooterView(lin)
         groupAdapter!!.onItemChildClickListener = onItemChildClickListener
         groupAdapter!!.onItemLongClickListener = onItemChildLongClickListener
@@ -299,13 +262,8 @@ class CurtainFragmentList : BaseFragment() {
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         var currentLight = groupList[position]
-        val dstAddr = currentLight.meshAddr
         var intent: Intent
-//        if (TelinkLightApplication.getApp().connectDevice == null) {
-//            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-//            checkConnect()
-//        } else {
-        when (view!!.getId()) {
+        when (view!!.id) {
 
             R.id.btn_set -> {
                 if(isLong) {
@@ -318,18 +276,9 @@ class CurtainFragmentList : BaseFragment() {
                 }
             }
 
-//            R.id.group_name -> {
-//                intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-//                intent.putExtra("group", currentLight)
-//                startActivityForResult(intent, 2)
-//            }
 
             R.id.selected_group_curtain -> {
-                if (currentLight.isSelected) {
-                    currentLight.isSelected = false
-                } else {
-                    currentLight.isSelected = true
-                }
+                currentLight.isSelected = !currentLight.isSelected
             }
 
             R.id.item_layout -> {
@@ -339,57 +288,15 @@ class CurtainFragmentList : BaseFragment() {
                     startActivityForResult(intent, 2)
                 }
             }
-//            }
         }
     }
 
-/*
-    private fun checkConnect() {
-        try {
-            if (TelinkLightApplication.getApp().connectDevice == null) {
-                if (isFristUserClickCheckConnect) {
-                    val activity = activity as MainActivity
-                    activity.autoConnect()
-                    isFristUserClickCheckConnect = false
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-*/
 
     override fun onStop() {
         super.onStop()
         isFristUserClickCheckConnect = false
     }
 
-    private fun updateLights(isOpen: Boolean, group: DbGroup) {
-        updateLightDisposal?.dispose()
-        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
-                .subscribe {
-                    var lightList: MutableList<DbLight> = ArrayList()
-
-                    if (group.meshAddr == 0xffff) {
-                        //            lightList = DBUtils.getAllLight();
-                        val list = DBUtils.groupList
-                        for (j in list.indices) {
-                            lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
-                        }
-                    } else {
-                        lightList = DBUtils.getLightByGroupID(group.id)
-                    }
-
-                    for (dbLight: DbLight in lightList) {
-                        if (isOpen) {
-                            dbLight.connectionStatus = ConnectionStatus.ON.value
-                        } else {
-                            dbLight.connectionStatus = ConnectionStatus.OFF.value
-                        }
-                        DBUtils.updateLightLocal(dbLight)
-                    }
-                }
-    }
 
     private val onClick = View.OnClickListener {
         //点击任何一个选项跳转页面都隐藏引导
@@ -518,9 +425,9 @@ class CurtainFragmentList : BaseFragment() {
         }
     }
 
-    /**
+    *//**
      * 删除组，并且把组里的灯的组也都删除。
-     */
+     *//*
     private fun deleteGroup(lights: MutableList<DbCurtain>, group: DbGroup, retryCount: Int = 0,
                             successCallback: () -> Unit, failedCallback: () -> Unit) {
         Thread {
@@ -540,7 +447,7 @@ class CurtainFragmentList : BaseFragment() {
                                 if (lights.count() == 0) {
                                     //所有灯都删除了分组
                                     DBUtils.deleteGroupOnly(group)
-                                    this?.runOnUiThread {
+                                    this.runOnUiThread {
                                         successCallback.invoke()
                                     }
                                 } else {
@@ -563,23 +470,21 @@ class CurtainFragmentList : BaseFragment() {
                 }
             } else {
                 DBUtils.deleteGroupOnly(group)
-                this?.runOnUiThread {
+                this.runOnUiThread {
                     successCallback.invoke()
                 }
             }
         }.start()
-
     }
 
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         localBroadcastManager.unregisterReceiver(br)
-    }
+    }*/
 }

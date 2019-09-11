@@ -535,6 +535,7 @@ object DBUtils {
         return ArrayList(query.list())
     }
 
+    //查询改组内设备数量
     fun getLightByGroupID(id: Long): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.BelongGroupId.eq(id)).build()
         return ArrayList(query.list())
