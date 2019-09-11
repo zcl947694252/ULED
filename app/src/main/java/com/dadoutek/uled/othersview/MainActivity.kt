@@ -613,21 +613,24 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            ToastUtils.showLong(R.string.connecting)
-                            retryConnectCount = 0
-                            connectFailedDeviceMacList.clear()
-                            val meshName = DBUtils.lastUser!!.controlMeshName
 
-                            GlobalScope.launch {
-                                //自动重连参数
-                                val connectParams = Parameters.createAutoConnectParameters()
-                                connectParams.setMeshName(meshName)
-                                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
-                                connectParams.autoEnableNotification(true)
-                                //连接，如断开会自动重连
-                                LogUtils.d("TelinkLightService.Instance().autoConnect(connectParams)")
-                                TelinkLightService.Instance().autoConnect(connectParams)
+                            if (!TelinkLightService.Instance().isLogin) {
+                                ToastUtils.showLong(R.string.connecting)
+                                retryConnectCount = 0
+                                connectFailedDeviceMacList.clear()
+                                val meshName = DBUtils.lastUser!!.controlMeshName
 
+                                GlobalScope.launch {
+                                    //自动重连参数
+                                    val connectParams = Parameters.createAutoConnectParameters()
+                                    connectParams.setMeshName(meshName)
+                                    connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                                    connectParams.autoEnableNotification(true)
+                                    //连接，如断开会自动重连
+                                    LogUtils.d("TelinkLightService.Instance().autoConnect(connectParams)")
+                                    TelinkLightService.Instance().autoConnect(connectParams)
+
+                                }
                             }
                         },
                                 {
