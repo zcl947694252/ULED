@@ -72,7 +72,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
     private var mWakeLock: PowerManager.WakeLock? = null
     var b: Boolean = false
 
-    private var mReceive: BluetoothStateBroadcastReceive? = null
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
 
@@ -118,7 +117,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
-    private fun registerBluetoothReceiver() {
+/*    private fun registerBluetoothReceiver() {
         if (mReceive == null) {
             mReceive = BluetoothStateBroadcastReceive()
         }
@@ -129,7 +128,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_OFF")
         intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
         activity?.registerReceiver(mReceive, intentFilter)
-    }
+    }*/
 
 
     private val allLights: List<DbLight>
@@ -176,7 +175,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             sleepTime = 200
         }
         b = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), "isShowDot", false)
-        registerBluetoothReceiver()
+//        registerBluetoothReceiver()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -201,33 +200,6 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         if (mWakeLock != null) {
             mWakeLock?.acquire()
         }
-        val blueadapter = BluetoothAdapter.getDefaultAdapter()
-        if (blueadapter?.isEnabled == false) {
-            if (bluetooth_image != null) {
-                bluetooth_image.setImageResource(R.drawable.bluetooth_no)
-                bluetooth_image.isEnabled = true
-                bluetooth_image.setOnClickListener {
-                    var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                    dialog.show()
-                }
-            }
-        } else {
-            if (TelinkLightApplication.getApp().connectDevice == null) {
-                if (bluetooth_image != null) {
-                    bluetooth_image.setImageResource(R.drawable.bluetooth_no)
-                    bluetooth_image.isEnabled = true
-                    bluetooth_image.setOnClickListener {
-                        var dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                        dialog.show()
-                    }
-                }
-            } else {
-                if (bluetooth_image != null) {
-                    bluetooth_image.setImageResource(R.drawable.icon_bluetooth)
-                    bluetooth_image.isEnabled = false
-                }
-            }
-        }
     }
 
     override fun onDestroy() {
@@ -235,15 +207,17 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         if (mWakeLock != null) {
             mWakeLock?.release()
         }
-        unregisterBluetoothReceiver()
+//        unregisterBluetoothReceiver()
     }
 
+/*
     private fun unregisterBluetoothReceiver() {
         if (mReceive != null) {
             activity?.unregisterReceiver(mReceive)
             mReceive = null
         }
     }
+*/
 
     fun initClick() {
         chearCache?.setOnClickListener(this)
@@ -315,6 +289,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+/*
     inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
@@ -360,6 +335,7 @@ class MeFragment : BaseFragment(), View.OnClickListener {
             }
         }
     }
+*/
 
     override fun onClick(v: View?) {
         when (v?.id) {

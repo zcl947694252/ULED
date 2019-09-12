@@ -305,15 +305,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun scanFail() {
         showToast(getString(R.string.scan_end))
         closeAnimation()
-        showLoadingDialog(getString(R.string.please_wait))
-        TelinkLightService.Instance().idleMode(true)
-        val disposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    hideLoadingDialog()
-                    doFinish()
-                }
+        doFinish()
     }
 
     private fun startTimer() {
@@ -384,30 +376,44 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     }
 
-    private fun doFinish() {
-        if (updateList.size > 0) {
-            checkNetworkAndSync()
-        }
-        this.mApplication!!.removeEventListener(this)
-        updateList.clear()
-        mDisposable.dispose()  //销毁时取消订阅.
-        if (mTimer != null)
-            mTimer!!.dispose()
-        mGroupingDisposable?.dispose()
-        if (mConnectTimer != null)
-            mConnectTimer!!.dispose()
 
+    private fun disposeAllSubscribe(){
         for (i in 0 until mBlinkDisposables.size()) {
             val disposable = mBlinkDisposables.get(i)
             disposable?.dispose()
         }
+        mGroupingDisposable?.dispose()
+        mDisposable.dispose()
+        mTimer?.dispose()
+        mConnectTimer?.dispose()
+    }
 
-        if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
-            ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
-        else {
-            ActivityUtils.startActivity(MainActivity::class.java)
-            finish()
+    private fun doFinish() {
+        disableEventListenerInGrouping()
+        if (updateList.size > 0) {
+            checkNetworkAndSync()
         }
+        updateList.clear()
+
+        disposeAllSubscribe()
+
+
+        showLoadingDialog(getString(R.string.please_wait))
+        TelinkLightService.Instance().idleMode(true)
+        val disposable = Observable.timer(2000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    hideLoadingDialog()
+                    if (ActivityUtils.isActivityExistsInStack(MainActivity::class.java))
+                        ActivityUtils.finishToActivity(MainActivity::class.java, false, true)
+                    else {
+                        ActivityUtils.startActivity(MainActivity::class.java)
+                        finish()
+                    }
+
+                }
+
     }
 
     override fun onPause() {
@@ -640,15 +646,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             for (meshAddr in mAddedDevices) {
                 stopBlink(meshAddr)
             }
-            showLoadingDialog(getString(R.string.please_wait))
-            TelinkLightService.Instance().idleMode(true)
-            val disposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        hideLoadingDialog()
-                        doFinish()
-                    }
+            doFinish()
         } else {
             AlertDialog.Builder(this)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -734,8 +732,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun disableEventListenerInGrouping() {
-        this.mApplication!!.removeEventListener(LeScanEvent.LE_SCAN, this)
-        this.mApplication!!.removeEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+        this.mApplication!!.removeEventListener(this)
     }
 
     private fun addNewGroup() {
@@ -1026,6 +1023,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     override fun onResume() {
         super.onResume()
+        disableConnectionStatusListener()
         //检测service是否为空，为空则重启
         if (TelinkLightService.Instance() == null)
             mApplication!!.startLightService(TelinkLightService::class.java)
@@ -1073,9 +1071,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
 
-    /*********************************泰凌微后台数据部分 */
-
     /**
+     * 泰凌微蓝牙库的状态回调
      * 事件处理方法
      *
      * @param event

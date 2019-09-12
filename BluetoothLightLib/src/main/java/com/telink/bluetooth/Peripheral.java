@@ -173,27 +173,28 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public void disconnect() {
-        if (this.mConnState.get() != CONN_STATE_CONNECTING && this.mConnState.get() != CONN_STATE_CONNECTED)
-            return;
+//        if (this.mConnState.get() != CONN_STATE_CONNECTING && this.mConnState.get() != CONN_STATE_CONNECTED)
+//            return;
+        close();
 
         TelinkLog.d("disconnect " + this.getDeviceName() + " -- "
                 + this.getMacAddress());
 
-        this.clear();
-
-        synchronized (this.mStateLock) {
-            if (this.gatt != null) {
-                int connState = this.mConnState.get();
-                if (connState == CONN_STATE_CONNECTED) {
-                    this.gatt.disconnect();
-                    this.mConnState.set(CONN_STATE_DISCONNECTING);
-                } else {
-                    close();
-                }
-            } else {
-                this.mConnState.set(CONN_STATE_IDLE);
-            }
-        }
+//        this.clear();
+//
+//        synchronized (this.mStateLock) {
+//            if (this.gatt != null) {
+//                int connState = this.mConnState.get();
+//                if (connState == CONN_STATE_CONNECTED) {
+//                    this.gatt.disconnect();
+//                    this.mConnState.set(CONN_STATE_DISCONNECTING);
+//                } else {
+//                    close();
+//                }
+//            } else {
+//                this.mConnState.set(CONN_STATE_IDLE);
+//            }
+//        }
     }
 
     private void clear() {
@@ -705,7 +706,7 @@ public class Peripheral extends BluetoothGattCallback {
      * Clears the internal cache and forces a refresh of the services from the * remote device.
      */
 
-    public  boolean refreshDeviceCache(BluetoothGatt mBluetoothGatt) {
+    public boolean refreshDeviceCache(BluetoothGatt mBluetoothGatt) {
 
         if (mBluetoothGatt != null) {
 
@@ -769,7 +770,7 @@ public class Peripheral extends BluetoothGattCallback {
 
                 if (this.gatt != null) {
                     close();
-                    TelinkLog.d("gatt close Peripheral#onConnectionStateChange#onDisconnect");
+                    TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect Gatt Close");
                 }
 
                 this.clear();
@@ -781,13 +782,15 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
 
-    private void close() {
-        this.gatt.disconnect();
-//        refreshDeviceCache(gatt);
-        this.gatt.close();
-        TelinkLog.d("gatt close " + this.gatt);
-        this.mConnState.set(CONN_STATE_CLOSED);
-        this.gatt = null;
+    private synchronized void close() {
+        if (this.gatt != null) {
+            this.gatt.disconnect();
+            refreshDeviceCache(gatt);
+            this.gatt.close();
+            TelinkLog.d("gatt close " + this.gatt);
+            this.mConnState.set(CONN_STATE_CLOSED);
+            this.gatt = null;
+        }
     }
 
     @Override

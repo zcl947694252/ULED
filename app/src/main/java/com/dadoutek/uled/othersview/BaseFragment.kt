@@ -1,12 +1,6 @@
 package com.dadoutek.uled.othersview
 
 import android.app.Dialog
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -15,21 +9,28 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
+import com.dadoutek.uled.util.RecoverMeshDeviceUtil
+import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.EventListener
 import kotlinx.android.synthetic.main.toolbar.*
 
 open class BaseFragment : Fragment() {
 
     private var loadDialog: Dialog? = null
-    private var mReceive: BluetoothStateBroadcastReceive? = null
+//    private var mReceive: BluetoothStateBroadcastReceive? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerBluetoothReceiver()
+//        registerBluetoothReceiver()
     }
 
+/*
     private fun registerBluetoothReceiver() {
         if (mReceive == null) {
             mReceive = BluetoothStateBroadcastReceive()
@@ -42,6 +43,7 @@ open class BaseFragment : Fragment() {
         intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
         activity?.registerReceiver(mReceive, intentFilter)
     }
+*/
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -68,36 +70,122 @@ open class BaseFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val blueadapter = BluetoothAdapter.getDefaultAdapter()
-        if (blueadapter?.isEnabled == false) {
-            if(toolbar!=null){
+
+    /**
+     * 改变Toolbar上的图片和状态
+     * @param isConnected       是否是连接状态
+     */
+    private fun changeDisplayImgOnToolbar(isConnected: Boolean) {
+        if (isConnected) {
+            if (toolbar != null) {
+
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+            }
+
+        } else {
+            if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
-                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
+                    val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
                     dialog.show()
-                })
-            }
-        }else{
-            if(toolbar!=null){
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                        var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
-                        dialog.show()
-                    }
-                }else{
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
                 }
+            }
+
+        }
+    }
+
+    //打开基类的连接状态变化监听
+    fun enableConnectionStatusListener() {
+        //先取消，这样可以确保不会重复添加监听
+        TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+    }
+
+    //关闭基类的连接状态变化监听
+    fun disableConnectionStatusListener() {
+        TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+    }
+
+    val StatusChangedListener = EventListener<String?> { event ->
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> {
+                onDeviceStatusChanged(event as DeviceEvent)
+            }
+        }
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+        val deviceInfo = event.args
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                ToastUtils.showLong(getString(R.string.connect_success))
+                changeDisplayImgOnToolbar(true)
+
+                val connectDevice = TelinkLightApplication.getApp()?.connectDevice
+                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
+
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                changeDisplayImgOnToolbar(false)
+            }
+
+            LightAdapter.STATUS_CONNECTING -> {
+                ToastUtils.showLong(R.string.connecting_please_wait)
             }
         }
 
+
     }
 
+
+    override fun onPause() {
+        super.onPause()
+        disableConnectionStatusListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        enableConnectionStatusListener()
+
+        val lightService: TelinkLightService? = TelinkLightService.Instance()
+
+        if (lightService?.isLogin == true) {
+            changeDisplayImgOnToolbar(true)
+        } else {
+            changeDisplayImgOnToolbar(false)
+        }
+
+//        val blueadapter = BluetoothAdapter.getDefaultAdapter()
+//        if (blueadapter?.isEnabled == false) {
+//            if(toolbar!=null){
+//                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+//                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+//                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener(View.OnClickListener {
+//                    var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+//                    dialog.show()
+//                })
+//            }
+//        }else{
+//            if(toolbar!=null){
+//                if (TelinkLightApplication.getApp().connectDevice == null) {
+//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
+//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
+//                        var dialog = BluetoothConnectionFailedDialog(activity,R.style.Dialog)
+//                        dialog.show()
+//                    }
+//                }else{
+//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+//                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+//                }
+//            }
+//        }
+
+    }
+
+/*
     inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
@@ -141,6 +229,7 @@ open class BaseFragment : Fragment() {
             }
         }
     }
+*/
 
 
     fun hideLoadingDialog() {
@@ -149,17 +238,21 @@ open class BaseFragment : Fragment() {
         }
     }
 
+/*
     override fun onDestroy() {
         super.onDestroy()
-        unregisterBluetoothReceiver()
+//        unregisterBluetoothReceiver()
     }
+*/
 
+/*
     private fun unregisterBluetoothReceiver() {
         if (mReceive != null) {
             activity?.unregisterReceiver(mReceive)
             mReceive = null
         }
     }
+*/
 
     open fun endCurrentGuide() {}
 }

@@ -169,7 +169,7 @@
     <string name="create_new_group">Create a new group</string>
     <string name="btn_rename_light">Rename</string>
     <string name="rename_light">Single lamp rename</string>
-    <string name="connect_state">connecting, please wait…</string>
+    <string name="connecting_please_wait">connecting, please wait…</string>
     <string name="connect_success">Connection succeeded!</string>
     <string name="connect_fail">Connection failed!</string>
     <string name="device_not_connected">The device is not connected!</string>

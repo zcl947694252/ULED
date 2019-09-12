@@ -137,7 +137,7 @@ object RecoverMeshDeviceUtil {
             }
 
         } else {
-            LogUtils.d("the device is exist!!!!!!!")
+//            LogUtils.d("the device is exist!!!!!!!")
         }
 
         return !isExist

@@ -211,8 +211,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
 
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
-        LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
-                "   triggerValue = $triggerValue")
+//        LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
+//                "   triggerValue = $triggerValue")
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = byteArrayOf(
@@ -230,8 +230,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         Thread.sleep(300)
 
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
+//        TelinkLightService.Instance().idleMode(true)
+//        TelinkLightService.Instance().disconnect()
     }
 
 
@@ -333,8 +333,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun getModeValue(): Int {
-        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
-        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
+//        LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")
+//        LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
 }

@@ -7,5 +7,5 @@ data class ScannedDeviceItem(val deviceInfo: DeviceInfo,  var name: String): Dev
 
     var isSelected: Boolean =false
     var hasGroup: Boolean = false
-    var belongGroupId: Long = 0
+    var belongGroupId: Long = 1
 }

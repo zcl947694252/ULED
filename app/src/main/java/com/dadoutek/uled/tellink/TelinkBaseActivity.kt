@@ -40,8 +40,11 @@ import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.stomp.model.QrCodeTopicMsg
 import com.dadoutek.uled.util.*
 import com.telink.bluetooth.LeBluetooth
+import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.light.ErrorReportInfo
+import com.telink.bluetooth.light.LightAdapter
+import com.telink.util.EventListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -70,7 +73,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
     protected var toast: Toast? = null
     protected var foreground = false
     private var loadDialog: Dialog? = null
-    private var mReceive: BluetoothStateBroadcastReceive? = null
+//    private var mReceive: BluetoothStateBroadcastReceive? = null
     private var mApplication: TelinkLightApplication? = null
     private var mScanDisposal: Disposable? = null
 
@@ -81,7 +84,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         this.toast = Toast.makeText(this, "", Toast.LENGTH_SHORT)
         foreground = true
         this.mApplication = this.application as TelinkLightApplication
-        registerBluetoothReceiver()
+//        registerBluetoothReceiver()
 
         initStompReceiver()
 
@@ -120,13 +123,16 @@ open class TelinkBaseActivity : AppCompatActivity() {
     }
 
 
+/*
     private fun unregisterBluetoothReceiver() {
         if (mReceive != null) {
             unregisterReceiver(mReceive)
             mReceive = null
         }
     }
+*/
 
+/*
     private fun registerBluetoothReceiver() {
         if (mReceive == null) {
             mReceive = BluetoothStateBroadcastReceive()
@@ -139,39 +145,97 @@ open class TelinkBaseActivity : AppCompatActivity() {
         intentFilter.addAction("android.bluetooth.BluetoothAdapter.STATE_ON")
         registerReceiver(mReceive, intentFilter)
     }
+*/
 
 
-    override fun onResume() {
-        super.onResume()
-        Constant.isTelBase = true
-        foreground = true
-        val blueadapter = BluetoothAdapter.getDefaultAdapter()
-        if (blueadapter?.isEnabled == false) {
-            showOpenBluetoothDialog(ActivityUtils.getTopActivity())
+    /**
+     * 改变Toolbar上的图片和状态
+     * @param isConnected       是否是连接状态
+     */
+    private fun changeDisplayImgOnToolbar(isConnected: Boolean) {
+        if (isConnected) {
+            if (toolbar != null) {
+
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+            }
+
+        } else {
             if (toolbar != null) {
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                    var dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
-                    if (this.isFinishing)
-                        dialog.show()
+                    val dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
+                    dialog.show()
                 }
             }
-        } else {
-            if (toolbar != null) {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = true
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setOnClickListener {
-                        var dialog = BluetoothConnectionFailedDialog(this, R.style.Dialog)
-                        dialog.show()
-                    }
-                } else {
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
-                }
+
+        }
+    }
+
+    //打开基类的连接状态变化监听
+    fun enableConnectionStatusListener() {
+        //先取消，这样可以确保不会重复添加监听
+        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+    }
+
+    //关闭基类的连接状态变化监听
+    fun disableConnectionStatusListener() {
+        this.mApplication?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+    }
+
+    val StatusChangedListener = EventListener<String?> { event ->
+        when (event.type) {
+            DeviceEvent.STATUS_CHANGED -> {
+                onDeviceStatusChanged(event as DeviceEvent)
             }
         }
+    }
+
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
+        val deviceInfo = event.args
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGIN -> {
+                ToastUtils.showLong(getString(R.string.connect_success))
+                changeDisplayImgOnToolbar(true)
+
+                val connectDevice = this.mApplication?.connectDevice
+                RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
+
+            }
+            LightAdapter.STATUS_LOGOUT -> {
+                changeDisplayImgOnToolbar(false)
+            }
+
+            LightAdapter.STATUS_CONNECTING -> {
+                ToastUtils.showLong(R.string.connecting_please_wait)
+            }
+        }
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        enableConnectionStatusListener()
+        Constant.isTelBase = true
+        foreground = true
+        val lightService: TelinkLightService? = TelinkLightService.Instance()
+        if (LeBluetooth.getInstance().isSupport(applicationContext))
+            LeBluetooth.getInstance().enable(applicationContext)
+
+        if (LeBluetooth.getInstance().isEnabled){
+            if (lightService?.isLogin == true) {
+                changeDisplayImgOnToolbar(true)
+            }else{
+                changeDisplayImgOnToolbar(false)
+            }
+        }else{
+            changeDisplayImgOnToolbar(false)
+        }
+
     }
 
     override fun onDestroy() {
@@ -179,7 +243,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         isRuning = false
         this.toast!!.cancel()
         this.toast = null
-        unregisterBluetoothReceiver()
+//        unregisterBluetoothReceiver()
         unregisterReceiver(stompRecevice)
 
     }
@@ -234,6 +298,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         return StringUtils.compileExChar(str)
     }
 
+/*
     inner class BluetoothStateBroadcastReceive : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
@@ -242,6 +307,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     if (toolbar != null) {
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).isEnabled = false
+
                     }
                 }
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> {
@@ -278,10 +344,14 @@ open class TelinkBaseActivity : AppCompatActivity() {
             }
         }
     }
+*/
+
     override fun onPause() {
         super.onPause()
         isRuning = false
         foreground = false
+
+        disableConnectionStatusListener()
     }
 
 
@@ -327,7 +397,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
             TelinkLightService.Instance()?.disconnect()
             TelinkLightService.Instance()?.idleMode(true)
             val b = this@TelinkBaseActivity.isFinishing
-            if (!b&&!singleLogin?.isShowing!!){
+            if (!b && !singleLogin?.isShowing!!) {
                 singleLogin!!.show()
             }
         }
@@ -431,6 +501,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(stompRecevice, filter)
     }
+
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -467,8 +538,8 @@ open class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-     open fun loginOutMethod() {
-         checkNetworkAndSync(this@TelinkBaseActivity)
+    open fun loginOutMethod() {
+        checkNetworkAndSync(this@TelinkBaseActivity)
     }
 
 

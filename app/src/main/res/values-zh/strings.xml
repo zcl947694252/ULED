@@ -287,7 +287,7 @@
     <string name="i_know">我知道了</string>
     <string name="exit">退出</string>
     <string name="saving">保存中…</string>
-    <string name="connect_state">连接中，请稍候…</string>
+    <string name="connecting_please_wait">连接中，请稍候…</string>
     <string name="delete_name">删除</string>
     <string name="open_blutooth">蓝牙开启</string>
     <string name="close_bluetooth">蓝牙关闭</string>
