@@ -184,7 +184,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         var num: String //N-3.1.1
                         if (version.contains("N")) {
                             num = version.substring(2, 3)
-                            if ("" != num && num.toDouble() >= 3.0) {
+                            if ("" != num && num!="-"&&num.toDouble() >= 3.0) {
                                 isGone()
                                 isVisibility()//显示3.0新的人体感应器
                             }
