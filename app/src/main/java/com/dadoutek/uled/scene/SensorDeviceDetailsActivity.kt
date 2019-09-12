@@ -90,6 +90,12 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
  */
 class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> {
 
+    private var delete: TextView? = null
+    private var group: TextView? = null
+    private var set: ImageView? = null
+    private var ota: TextView? = null
+    private var rename: TextView? = null
+    private var views: View? = null
     private var isClick: Int = 0//
     private var settingType: Int = 0 //0是正常连接 1是点击修改 2是点击删除
     private val NORMAL_SENSOR: Int = 0 //0是正常连接 1是点击修改 2是点击删除
@@ -145,6 +151,8 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         super.onResume()
         initDate()
         initView()
+
+        popupWindow?.dismiss()
     }
 
     private fun initView() {
@@ -160,6 +168,16 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
 
+        views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
+        group = views?.findViewById<TextView>(R.id.switch_group)
+        ota = views?.findViewById<TextView>(R.id.ota)
+        delete = views?.findViewById<TextView>(R.id.deleteBtn)
+        rename = views?.findViewById<TextView>(R.id.rename)
+
+        rename?.visibility = View.GONE
+        ota?.visibility = View.VISIBLE
+        group?.visibility = View.VISIBLE
+        group?.text = getString(R.string.relocation)
         progressBar_sensor?.setOnClickListener {}
 
         add_device_btn.setOnClickListener { startActivity(Intent(this, ScanningSensorActivity::class.java)) }//添加设备
@@ -217,7 +235,6 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                     } else {
                         //往DB里添加组数据
                         DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
-//                        callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
                 }
@@ -243,30 +260,21 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         install_device_recyclerView?.layoutManager = layoutManager
         install_device_recyclerView?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(install_device_recyclerView)
-        val decoration = DividerItemDecoration(this,
-                DividerItemDecoration
-                        .VERTICAL)
-        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color
-                .divider)))
+        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         install_device_recyclerView?.addItemDecoration(decoration)
 
         installDeviceListAdapter.onItemClickListener = onItemClickListenerInstallList
 
-        installDialog = android.app.AlertDialog.Builder(this)
-                .setView(view)
-                .create()
-
-        installDialog?.setOnShowListener {}
+        installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
 
         if (isGuide)
             installDialog?.setCancelable(false)
 
         installDialog?.show()
 
-        GlobalScope.launch(Dispatchers.Main) {
-            delay(100)
-        }
+        GlobalScope.launch(Dispatchers.Main) { delay(100) }
     }
 
     private val onItemClickListenerInstallList = BaseQuickAdapter.OnItemClickListener { _, view, position ->
@@ -310,12 +318,12 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         val view = View.inflate(this, R.layout.dialog_install_detail, null)
         val close_install_list = view.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = view.findViewById<ImageView>(R.id.btnBack)
-        stepOneText = view.findViewById<TextView>(R.id.step_one)
-        stepTwoText = view.findViewById<TextView>(R.id.step_two)
-        stepThreeText = view.findViewById<TextView>(R.id.step_three)
-        switchStepOne = view.findViewById<TextView>(R.id.switch_step_one)
-        switchStepTwo = view.findViewById<TextView>(R.id.switch_step_two)
-        swicthStepThree = view.findViewById<TextView>(R.id.switch_step_three)
+        stepOneText = view.findViewById(R.id.step_one)
+        stepTwoText = view.findViewById(R.id.step_two)
+        stepThreeText = view.findViewById(R.id.step_three)
+        switchStepOne = view.findViewById(R.id.switch_step_one)
+        switchStepTwo = view.findViewById(R.id.switch_step_two)
+        swicthStepThree = view.findViewById(R.id.switch_step_three)
         val install_tip_question = view.findViewById<TextView>(R.id.install_tip_question)
         val search_bar = view.findViewById<Button>(R.id.search_bar)
         close_install_list.setOnClickListener(dialogOnclick)
@@ -323,9 +331,7 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
         search_bar.setOnClickListener(dialogOnclick)
         install_tip_question.text = describe
         install_tip_question.movementMethod = ScrollingMovementMethod.getInstance()
-        installDialog = android.app.AlertDialog.Builder(this)
-                .setView(view)
-                .create()
+        installDialog = android.app.AlertDialog.Builder(this).setView(view).create()
 
         installDialog?.setOnShowListener {}
         installDialog?.show()
@@ -413,28 +419,17 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     var onItemChildClickListener = OnItemChildClickListener { _, view, position ->
-        currentLight = sensorData.get(position)
+        currentLight = sensorData[position]
         positionCurrent = position
         if (view.id == R.id.tv_setting) {
-            val views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
-            val set = view!!.findViewById<ImageView>(R.id.tv_setting)
+             set = view!!.findViewById<ImageView>(R.id.tv_setting)
 
             popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             popupWindow!!.contentView = views
             popupWindow!!.isFocusable = true
             popupWindow!!.showAsDropDown(set, 40, -15)
 
-            val group = views.findViewById<TextView>(R.id.switch_group)
-            val ota = views.findViewById<TextView>(R.id.ota)
-            val delete = views.findViewById<TextView>(R.id.deleteBtn)
-            val rename = views.findViewById<TextView>(R.id.rename)
-
-            rename.visibility = View.GONE
-            ota.visibility = View.VISIBLE
-            group.visibility = View.VISIBLE
-            group.text = getString(R.string.relocation)
-
-            group.setOnClickListener {
+            group?.setOnClickListener {
                 settingType = if (TelinkLightApplication.getApp().connectDevice == null) {
                     autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
                     RECOVER_SENSOR
@@ -447,11 +442,11 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                 popupWindow!!.dismiss()
             }
 
-            delete.setOnClickListener {
+            delete?.setOnClickListener {
                 //添加恢复出厂设置
                 showResetConfirmDialog()
             }
-            ota.setOnClickListener {
+            ota?.setOnClickListener {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     autoConnectSensor()//如果是断开状态直接重连不是就断开再重连
                     isClick = OTA_SENSOR //记录点击状态
@@ -497,30 +492,18 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
     }
 
     private fun autoConnectSensor() {
+        showLoadingDialog(getString(R.string.connecting))
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
         connectParams.setConnectMac(currentLight!!.macAddr)
         connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16))
         connectParams.autoEnableNotification(true)
-
+        progressBar_sensor.visibility = View.VISIBLE
         //连接，如断开会自动重连
         GlobalScope.launch {
-            val instance = TelinkLightService.Instance()
-            if (instance != null) {
-                instance.autoConnect(connectParams)
-            }
+            TelinkLightService.Instance()?.autoConnect(connectParams)
         }
-
-/*
-        //刷新Notify参数
-        val refreshNotifyParams = Parameters.createRefreshNotifyParameters                                                                            )
-        refreshNotifyParams.setRefreshRepeatCount(3)
-        refreshNotifyParams.setRefreshInterval(1000)
-        ToastUtils.showShort(getString(R.string.connecting))
-        //开启自动刷新Notify
-        TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
-*/
     }
 
     /**
@@ -567,17 +550,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
                         }
                     }
                     /**
-                     *settingType //0是正常连接 1是点击修改 2是点击删除3是oat
-                     *NORMAL_SENSOR: Int = 0
-                     *RECOVER_SENSOR: Int = 1
-                     *RESET_SENSOR: Int = 2
-                     *OTA_SENSOR: Int = 3
-                     *
-                     * STATUS_CONNECTING = 0;
-                     * STATUS_CONNECTED = 1;
-                     * STATUS_LOGINING = 2;
-                     * STATUS_LOGIN = 3;
-                     * STATUS_LOGOUT = 4;
+                     *settingType //0是正常连接 1是点击修改 2是点击删除3是oat   NORMAL_SENSOR = 0
+                     *RECOVER_SENSOR = 1  RESET_SENSOR= 2   OTA_SENSOR = 3
+                     * STATUS_CONNECTING = 0;STATUS_CONNECTED = 1;STATUS_LOGINING = 2;STATUS_LOGIN = 3;STATUS_LOGOUT = 4;
                      */
                     LightAdapter.STATUS_LOGOUT -> {//4
                         LogUtils.e("zcl", "zcl***STATUS_LOGOUT***$settingType-----$isClick-----")
@@ -945,7 +920,9 @@ class SensorDeviceDetailsActivity : TelinkBaseActivity(), EventListener<String> 
             popupWindow!!.dismiss()
 
         this.mApplication?.removeEventListeners()
+    }
 
-
+    override fun onResumeFragments() {
+        super.onResumeFragments()
     }
 }

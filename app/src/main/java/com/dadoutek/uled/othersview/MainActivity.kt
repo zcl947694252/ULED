@@ -12,7 +12,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
@@ -79,7 +78,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -837,7 +835,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    runOnUiThread { /*deviceFragment.notifyDataSetChanged()*/ }
+                    runOnUiThread {/*deviceFragment.notifyDataSetChanged()*/}
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbConnector()
@@ -904,8 +902,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
 //            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
 //            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {
-            }
+            NotificationEvent.GET_ALARM -> {}
             DeviceEvent.STATUS_CHANGED -> {
                 progressBar.visibility = GONE
                 this.onDeviceStatusChanged(event as DeviceEvent)
@@ -920,14 +917,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 onErrorReportNormal(info)
             }
         }
-    }
-
-    /**
-     * 扫描不到任何设备了
-     * （扫描结束）
-     */
-    private fun onLeScanTimeout() {
-        LogUtils.d("onErrorReport: onLeScanTimeout")
     }
 
     private fun isSwitch(uuid: Int): Boolean {
