@@ -82,9 +82,11 @@ open class TelinkBaseActivity : AppCompatActivity() {
         foreground = true
         this.mApplication = this.application as TelinkLightApplication
         registerBluetoothReceiver()
-
         initStompReceiver()
+        makeDilogAndPop()
+    }
 
+    private fun makeDilogAndPop() {
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
@@ -95,8 +97,6 @@ open class TelinkBaseActivity : AppCompatActivity() {
                     dialog.dismiss()
                     restartApplication()
                 }.create()
-
-
 
         popView = LayoutInflater.from(this).inflate(R.layout.code_warm, null)
 

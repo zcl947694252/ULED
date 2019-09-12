@@ -52,7 +52,7 @@ import kotlin.collections.ArrayList
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 

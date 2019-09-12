@@ -14,7 +14,6 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.DbModel.DBUtils
-import com.dadoutek.uled.model.DbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.DbModel.DbGroup
 import com.dadoutek.uled.model.DbModel.DbSensor
 import com.dadoutek.uled.model.Opcode
@@ -26,6 +25,7 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
+import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
@@ -81,7 +81,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun initListener() {
         fabConfirm.setOnClickListener(this)
-
+        telinkApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)
         telinkApplication.addEventListener(LeScanEvent.LE_SCAN, this)//扫描jt
         telinkApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)//超时jt
         telinkApplication.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)//结束jt
@@ -92,17 +92,20 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     override fun performed(event: Event<String>) {
         when (event.type) {
+            ErrorReportEvent.ERROR_REPORT -> {
+                val info = (event as ErrorReportEvent).args
+                hideLoadingDialog()
+                onErrorReportNormal(info)
+            }
             LeScanEvent.LE_SCAN -> {
-                Log.e("zcl", "zcl******LE_SCAN")
                 progressBar_sensor.visibility = View.VISIBLE
             }
             LeScanEvent.LE_SCAN_TIMEOUT -> {
-                Log.e("zcl", "zcl******LE_SCAN_TIMEOUT")
                 progressBar_sensor.visibility = View.GONE
+                hideLoadingDialog()
 
             }
             LeScanEvent.LE_SCAN_COMPLETED -> {
-                Log.e("zcl", "zcl******LE_SCAN")
                 progressBar_sensor.visibility = View.GONE
             }
 
@@ -114,7 +117,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 Log.e("zcl", "zcl******STATUS_CHANGED$status")
                 when (status) {
                     LightAdapter.STATUS_LOGIN -> {
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_yse)
+                        hideLoadingDialog()
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                         Log.e("zcl", "zcl***STATUS_LOGIN***")
                         getVersion()
                     }
@@ -154,6 +158,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         refreshNotifyParams.setRefreshInterval(1000)
         //开启自动刷新Notify
         TelinkLightService.Instance()?.autoRefreshNotify(refreshNotifyParams)
+        showLoadingDialog(getString(R.string.connecting))
     }
 
 
@@ -209,16 +214,12 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         }
     }
 
-
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
         LogUtils.d("delayTime = $delayTime  minBrightness = $minBrightness  " +
                 "   triggerValue = $triggerValue")
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
-        val paramBytes = byteArrayOf(
-                0x01,
-                groupH, groupL,
-
+        val paramBytes = byteArrayOf(0x01, groupH, groupL,
                 delayTime.toByte(),
                 minBrightness.toByte(),
                 triggerValue.toByte(),
@@ -229,9 +230,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 paramBytes)
 
         Thread.sleep(300)
-
-        TelinkLightService.Instance().idleMode(true)
-        TelinkLightService.Instance().disconnect()
     }
 
 
@@ -315,9 +313,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         Commander.updateMeshName(
                                 successCallback = {
                                     hideLoadingDialog()
+                                    saveSensor()
                                     configureComplete()
-                                    TelinkLightService.Instance().idleMode(true)
-                                    TelinkLightService.Instance().disconnect()
+
                                 },
                                 failedCallback = {
                                     snackbar(configPirRoot, getString(R.string.pace_fail))
@@ -331,6 +329,36 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             }
         }
     }
+
+    private fun saveSensor() {
+        var dbSensor = DbSensor()
+
+        var isConfirm = mDeviceInfo.isConfirm == 1
+        if (isConfirm) {
+            dbSensor.index = mDeviceInfo.id.toInt()
+            if ("none" != mDeviceInfo.id)
+                dbSensor.id = mDeviceInfo.id.toLong()
+        } else {//如果不是重新配置就保存进服务器
+            DBUtils.saveSensor(dbSensor, isConfirm)
+            dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
+        }
+
+
+        dbSensor.controlGroupAddr = mSelectGroupAddr.toString()
+        dbSensor.macAddr = mDeviceInfo.macAddress
+        dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
+        dbSensor.productUUID = mDeviceInfo.productUUID
+        dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID)
+
+        DBUtils.saveSensor(dbSensor, isConfirm)//保存进服务器
+
+        dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
+
+        DBUtils.recordingChange(dbSensor.id,
+                DaoSessionInstance.getInstance().dbSensorDao.tablename,
+                Constant.DB_ADD)
+    }
+
 
     private fun getModeValue(): Int {
         LogUtils.d("FINAL_VALUE$modeStartUpMode-$modeDelayUnit-$modeSwitchMode")

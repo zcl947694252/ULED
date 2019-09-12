@@ -126,14 +126,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                     Log.e("TAG_DELETE", deleteList.size.toString())
                 }
 
-                /*   if (switch == "true") {
-                       for (i in groupList.indices) {
-                           if (groupList[i].isSelected) {
-                               groupList[i].isSelected = false
-                           }
-                       }
-                   }*/
-
                 if (lightStatus == "on") {
                     for (i in groupList.indices) {
                         groupList[i].connectionStatus = ConnectionStatus.ON.value

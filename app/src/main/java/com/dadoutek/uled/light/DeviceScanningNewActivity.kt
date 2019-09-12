@@ -257,11 +257,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun hasGroup(): Boolean {
-        if (groups.size == -1) {
-            return false
-        } else {
-            return true
-        }
+        return groups.size != -1
 
     }
 
@@ -307,7 +303,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         closeAnimation()
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance().idleMode(true)
-        val disposable = Observable.timer(1000, TimeUnit.MILLISECONDS)
+        Observable.timer(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -1372,7 +1368,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         mConnectRetryCount++
         if (mConnectRetryCount < MAX_CONNECT_RETRY_COUNT) {
             showLoadingDialog(resources.getString(R.string.connecting_tip))
-            val disposable = Observable.timer(1500, TimeUnit.MILLISECONDS)
+            Observable.timer(1500, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext {
                         //倒计时，出问题了就超时。

@@ -172,11 +172,11 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun initOnLayoutListener() {
+    fun initOnLayoutListener() {//lan加载监听
         var view = window.decorView
         var viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
-            view.viewTreeObserver.removeOnGlobalLayoutListener({})
+            view.viewTreeObserver.removeOnGlobalLayoutListener{}
         }
     }
 

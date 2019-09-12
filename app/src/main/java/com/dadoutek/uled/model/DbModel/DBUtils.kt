@@ -2,7 +2,6 @@ package com.dadoutek.uled.model.DbModel
 
 import android.content.Context
 import android.util.Log
-import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.dao.*
@@ -664,7 +663,7 @@ object DBUtils {
 
     }
 
-    fun saveSensor(db: DbSensor, isFromServer: Boolean) {
+/*    fun saveSensor(db: DbSensor, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbSensorDao.queryBuilder().where(DbSensorDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0) {
             //如果该mesh地址的数据已经存在，就直接修改
@@ -678,9 +677,16 @@ object DBUtils {
                     DaoSessionInstance.getInstance().dbSensorDao.tablename,
                     Constant.DB_ADD)
         }
+    }*/
 
-
+    fun saveSensor(sensor: DbSensor?, isFromServer: Boolean) {
+        if (isFromServer) {
+            DaoSessionInstance.getInstance().dbSensorDao.insertOrReplace(sensor)
+        } else {
+            DaoSessionInstance.getInstance().dbSensorDao.save(sensor)
+        }
     }
+
 
     fun saveSwitch(db: DbSwitch, isFromServer: Boolean) {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
