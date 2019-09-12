@@ -257,11 +257,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun hasGroup(): Boolean {
-        if (groups.size == -1) {
-            return false
-        } else {
-            return true
-        }
+        return groups.size != -1
 
     }
 

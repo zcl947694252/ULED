@@ -209,7 +209,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     override fun performed(event: Event<String>?) {
-        event?:return
+        event ?: return
         LogUtils.e("zcl**********************Event${event.type}")
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
@@ -343,9 +343,8 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         if (mDeviceInfo?.productUUID == DeviceType.SENSOR) {
             startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!)
         } else if (mDeviceInfo?.productUUID == DeviceType.NIGHT_LIGHT) {
-            startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "1")
+            startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0")
         }
-
 
     }
 

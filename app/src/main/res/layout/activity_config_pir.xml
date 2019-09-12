@@ -102,7 +102,7 @@
                 android:id="@+id/tietDelay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/delay_minute"
+                android:hint="@string/delay_seconds"
                 android:inputType="number"
                 android:maxLength="2" />
         </android.support.design.widget.TextInputLayout>

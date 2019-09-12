@@ -610,7 +610,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             hideLocationServiceDialog()
             mTelinkLightService = TelinkLightService.Instance()
             while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                val disposable = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({

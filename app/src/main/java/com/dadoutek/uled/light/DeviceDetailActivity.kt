@@ -25,7 +25,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.connector.ScanningConnectorActivity
 import com.dadoutek.uled.group.BatchGroupActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.model.Constant
@@ -693,25 +692,13 @@ class DeviceDetailAct : TelinkBaseActivity(), EventListener<String>, View.OnClic
             Constant.INSTALL_NORMAL_LIGHT -> {
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
+                intent.putExtra(Constant.DEVICE_TYPE,  DeviceType.LIGHT_NORMAL)
                 startActivityForResult(intent, 0)
             }
             Constant.INSTALL_RGB_LIGHT -> {
                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                 intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
-                startActivityForResult(intent, 0)
-            }
-            Constant.INSTALL_LIGHT_OF_CW -> {//暂时无用
-                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, false)
-                intent.putExtra(Constant.TYPE_VIEW, Constant.LIGHT_KEY)
-                startActivityForResult(intent, 0)
-            }
-            Constant.INSTALL_LIGHT_OF_RGB -> {//暂时无用没有其他调用
-                intent = Intent(this, DeviceScanningNewActivity::class.java)
-                intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-                intent.putExtra(Constant.TYPE_VIEW, Constant.RGB_LIGHT_KEY)
+                intent.putExtra(Constant.DEVICE_TYPE,  DeviceType.LIGHT_RGB)
                 startActivityForResult(intent, 0)
             }
         }

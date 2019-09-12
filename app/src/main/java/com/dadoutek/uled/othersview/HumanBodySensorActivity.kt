@@ -52,7 +52,7 @@ import kotlin.collections.ArrayList
  *
  * 更新者     $Author$
  * 更新时间   $Date$
- * 更新描述   ${TODO}$
+ * 更新描述   ${}$
  */
 class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
 
@@ -184,7 +184,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener {
                         var num: String //N-3.1.1
                         if (version.contains("N")) {
                             num = version.substring(2, 3)
-                            if ("" != num && num.toDouble() >= 3.0) {
+                            if ("" != num && num!="-"&&num.toDouble() >= 3.0) {
                                 isGone()
                                 isVisibility()//显示3.0新的人体感应器
                             }
