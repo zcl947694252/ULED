@@ -24,6 +24,7 @@ import com.telink.util.Event;
 import com.telink.util.EventListener;
 import com.telink.util.Strings;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,6 +34,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.telink.bluetooth.light.Parameters.PARAM_SCAN_FILTER;
 
 public class LightAdapter {
+public static final int LIGHT_NORMAL = 0x04;
+public static final int LIGHT_NORMAL_OLD = 0xFF;
+public static final int LIGHT_RGB = 0x06;
+public static final int SMART_RELAY = 0x05;       //就是connector
 
     public static final int STATUS_CONNECTING = 0;
     public static final int STATUS_CONNECTED = 1;
@@ -435,7 +440,7 @@ public class LightAdapter {
 
         aBoolean = this.isStarted.get();
         TelinkLog.e("返回数据是:"+aBoolean+"-------"+mode);
-        
+
         if (!aBoolean)
             return;
 
@@ -767,6 +772,16 @@ public class LightAdapter {
 
         Parameters params = this.getParameters();
 
+
+        List<Integer> targetDevices = mParams
+                .getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
+
+        //如果有要连接的目标设备
+        if (targetDevices.size() > 0)
+            if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list里不包含当前设备类型，就过滤掉，return false
+                return false;
+            }
+
         if (params == null)
             return false;
 
@@ -780,6 +795,7 @@ public class LightAdapter {
 
         if (mode == MODE_SCAN_MESH) {
 //            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
+
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
             if (scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac))
                 return false;

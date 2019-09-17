@@ -80,6 +80,11 @@ class AppUtils private constructor() {
             supportVersions.add("L20S-3.4.0")
             supportVersions.add("L36-3.4.0")
             supportVersions.add("L36S-3.4.0")
+            supportVersions.add("LC-3.4.0")
+            supportVersions.add("LCS-3.4.0")
+            supportVersions.add("L-3.4.0")
+            supportVersions.add("LN-3.4.0")
+            supportVersions.add("LNS-3.4.0")
 
             version?.let {
                 val splitStr = version.split("-".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
