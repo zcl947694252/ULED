@@ -4,6 +4,8 @@
  */
 package com.telink.bluetooth.light;
 
+import java.util.List;
+
 /**
  * 自动重连参数
  * <p>{@link LeAutoConnectParameters}定义了{@link LightService#autoConnect(Parameters)} 方法的必须要设置的几项参数.
@@ -60,6 +62,11 @@ public final class LeAutoConnectParameters extends Parameters {
      */
     public LeAutoConnectParameters setTimeoutSeconds(int timeoutSeconds) {
         this.set(PARAM_TIMEOUT_SECONDS, timeoutSeconds);
+        return this;
+    }
+
+    public LeAutoConnectParameters setConnectDeviceType(List<Integer> deviceTypes) {
+        this.set(PARAM_TARGET_DEVICE_TYPE, deviceTypes);
         return this;
     }
 

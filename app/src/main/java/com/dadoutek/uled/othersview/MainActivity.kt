@@ -594,8 +594,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-
-
     fun autoConnect() {
         //如果支持蓝牙就打开蓝牙
         if (LeBluetooth.getInstance().isSupport(applicationContext))
@@ -608,7 +606,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             hideLocationServiceDialog()
             mTelinkLightService = TelinkLightService.Instance()
             while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
+                val rx = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -625,8 +623,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     connectParams.setMeshName(meshName)
                                     connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
                                     connectParams.autoEnableNotification(true)
+                                    connectParams.setConnectDeviceType(
+                                            mutableListOf<Int>(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY))
                                     //连接，如断开会自动重连
-                                    LogUtils.d("TelinkLightService.Instance().autoConnect(connectParams)")
+//                                    LogUtils.d("TelinkLightService.Instance().autoConnect(connectParams)")
                                     TelinkLightService.Instance().autoConnect(connectParams)
 
                                 }
@@ -835,7 +835,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 if (dbLight != null) {
                     dbLight.connectionStatus = connectionStatus.value
                     dbLight.updateIcon()
-                    runOnUiThread {/*deviceFragment.notifyDataSetChanged()*/}
+                    runOnUiThread { /*deviceFragment.notifyDataSetChanged()*/ }
                 } else {
                     if (connectionStatus != ConnectionStatus.OFFLINE) {
                         val dbLightNew = DbConnector()
@@ -902,7 +902,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 //            LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
 //            LeScanEvent.LE_SCAN_TIMEOUT -> onLeScanTimeout()
 //            NotificationEvent.ONLINE_STATUS -> this.onOnlineStatusNotify(event as NotificationEvent)
-            NotificationEvent.GET_ALARM -> {}
+            NotificationEvent.GET_ALARM -> {
+            }
             DeviceEvent.STATUS_CHANGED -> {
                 progressBar.visibility = GONE
                 this.onDeviceStatusChanged(event as DeviceEvent)

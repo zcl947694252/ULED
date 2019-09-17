@@ -6,7 +6,9 @@ package com.telink.bluetooth.light;
 
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Parameters {
@@ -24,6 +26,7 @@ public class Parameters {
     public static final String PARAM_SCAN_TIMEOUT_SECONDS = "com.telink.bluetooth.light.PARAM_SCAN_TIMEOUT_SECONDS";
     public static final String PARAM_SCAN_TYPE_SINGLE = "com.telink.bluetooth.light.PARAM_SCAN_TYPE_SINGLE";
     public static final String PARAM_OFFLINE_TIMEOUT_SECONDS = "com.telink.bluetooth.light.PARAM_OFFLINE_TIMEOUT_SECONDS";
+    public static final String PARAM_TARGET_DEVICE_TYPE = "com.telink.bluetooth.light.PARAM_TARGET_DEVICE_TYPE";
 
     public static final String PARAM_AUTO_ENABLE_NOTIFICATION = "com.telink.bluetooth.light.PARAM_AUTO_ENABLE_NOTIFICATION";
     public static final String PARAM_AUTO_CONNECT_MAC = "com.telink.bluetooth.light.PARAM_AUTO_CONNECT_MAC";
@@ -81,6 +84,12 @@ public class Parameters {
         if (this.mParams.containsKey(key))
             return (int) this.mParams.get(key);
         return defaultValue;
+    }
+
+    public List<Integer> getIntList(String key) {
+        if (this.mParams.containsKey(key))
+            return (List<Integer>) this.mParams.get(key);
+        return new ArrayList<Integer>();
     }
 
     public int getInt(String key) {

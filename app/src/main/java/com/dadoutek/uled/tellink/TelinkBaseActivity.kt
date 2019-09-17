@@ -201,6 +201,7 @@ open class TelinkBaseActivity : AppCompatActivity() {
                 changeDisplayImgOnToolbar(true)
 
                 val connectDevice = this.mApplication?.connectDevice
+                LogUtils.d("directly connection device meshAddr = ${connectDevice?.meshAddress}")
                 RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。
 
             }
